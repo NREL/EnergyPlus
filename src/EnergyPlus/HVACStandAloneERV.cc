@@ -212,7 +212,7 @@ void GetStandAloneERV(EnergyPlusData &state)
     using HeatRecovery::GetHeatExchangerObjectTypeNum;
     auto &GetHXSupplyInletNode(HeatRecovery::GetSupplyInletNode);
     auto &GetHXSecondaryInletNode(HeatRecovery::GetSecondaryInletNode);
-    using CurveManager::GetCurveIndex;
+    using Curve::GetCurveIndex;
     using OutAirNodeManager::CheckOutAirNodeNumber;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -916,7 +916,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             thisOAController.EnthalpyCurvePtr, // Curve index
                                                             {1},                               // Valid dimensions
                                                             "GetStandAloneERV: ",              // Routine name

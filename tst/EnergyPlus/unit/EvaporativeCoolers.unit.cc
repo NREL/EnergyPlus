@@ -66,7 +66,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::CurveManager;
+using namespace EnergyPlus::Curve;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataSizing;
@@ -438,8 +438,8 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     state->dataCurveManager->NumCurves = 1;
     state->dataCurveManager->PerfCurve.allocate(1);
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
@@ -736,8 +736,8 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     state->dataCurveManager->NumCurves = 1;
     state->dataCurveManager->PerfCurve.allocate(1);
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Linear";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Linear";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.0;
     state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;

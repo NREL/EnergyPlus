@@ -76,7 +76,7 @@
 
 namespace EnergyPlus {
 
-namespace CurveManager {
+namespace Curve {
     // Module containing the Curve Manager routines
 
     // MODULE INFORMATION:
@@ -194,17 +194,15 @@ namespace CurveManager {
         }
 
         auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        switch (thisCurve.InterpolationType) {
-        case InterpType::EvaluateCurveToLimits: {
+        switch (thisCurve.interpolationType) {
+        case InterpType::EvaluateCurveToLimits:
             CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3, Var4, Var5);
             break;
-        }
-        case InterpType::BtwxtMethod: {
+        case InterpType::BtwxtMethod:
             CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             break;
-        }
         default:
-            ShowFatalError(state, "CurveValue: Invalid Interpolation Type");
+            assert(false);
         }
 
         if (thisCurve.EMSOverrideOn) CurveValue = thisCurve.EMSOverrideCurveValue;
@@ -258,65 +256,42 @@ namespace CurveManager {
         // Uses "Get" routines to read in data.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumBiQuad;                  // Number of biquadratic curve objects in the input data file
-        int NumCubic;                   // Number of cubic curve objects in the input data file
-        int NumQuartic;                 // Number of quartic (4th order polynomial) objects in the input data file
-        int NumQuad;                    // Number of quadratic curve objects in the input data file
-        int NumQuadLinear;              // Number of quadratic linear curve objects in the input data file
-        int NumCubicLinear;             // Number of cubic linear curve objects in the input file
-        int NumQLinear;                 // Number of quad linear curve objects in the input data file
-        int NumQuintLinear;             // Number of quint linear curve objects in the input data file
-        int NumLinear;                  // Number of linear curve objects in the input data file
-        int NumBicubic;                 // Number of bicubic curve objects in the input data file
-        int NumTriQuad;                 // Number of triquadratic curve objects in the input file
-        int NumExponent;                // Number of exponent curve objects in the input file
-        int NumWPCValTab;               // Number of wind pressure coefficient value table objects in the input file
-        int NumChillerPartLoadWithLift; // Number of ChillerPartLoadWithLift curve objects in the input data file
-        int NumFanPressRise;            // Number of fan pressure rise curve objects in the input file
-        int NumExpSkewNorm;             // Number of exponential skew normal curve objects in the input file
-        int NumSigmoid;                 // Number of sigmoid curve objects in the input file
-        int NumRectHyper1;              // Number of rectangular hyperbola Type 1 curve objects in the input file
-        int NumRectHyper2;              // Number of rectangular hyperbola Type 2 curve objects in the input file
-        int NumExpDecay;                // Number of exponential decay curve objects in the input file
-        int NumDoubleExpDecay;
-        int CurveIndex;                 // do loop index
-        int CurveNum;                   // current curve number
-        Array1D_string Alphas(14);      // Alpha items for object
-        Array1D<Real64> Numbers(10000); // Numeric items for object
-        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
-        int IOStatus;                   // Used in GetObjectItem
-        int NumTableLookup;
+        Array1D_string Alphas(14);       // Alpha items for object
+        Array1D<Real64> Numbers(10000);  // Numeric items for object
+        int NumAlphas;                   // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                  // Number of Numbers for each GetObjectItem call
+        int IOStatus;                    // Used in GetObjectItem
         std::string CurrentModuleObject; // for ease in renaming.
         int MaxTableNums(0);             // Maximum number of numeric input fields in Tables
         //   certain object in the input file
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
-        NumBiQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Biquadratic");
-        NumCubic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Cubic");
-        NumQuartic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Quartic");
-        NumQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Quadratic");
-        NumQLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuadLinear");
-        NumQuintLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuintLinear");
-        NumQuadLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuadraticLinear");
-        NumCubicLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:CubicLinear");
-        NumLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Linear");
-        NumBicubic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Bicubic");
-        NumTriQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Triquadratic");
-        NumExponent = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Exponent");
-        NumTableLookup = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Table:Lookup");
-        NumFanPressRise = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:FanPressureRise");
-        NumExpSkewNorm = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ExponentialSkewNormal");
-        NumSigmoid = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Sigmoid");
-        NumRectHyper1 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola1");
-        NumRectHyper2 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola2");
-        NumExpDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ExponentialDecay");
-        NumDoubleExpDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:DoubleExponentialDecay");
-        NumChillerPartLoadWithLift =
+        int const NumBiQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Biquadratic");
+        int const NumCubic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Cubic");
+        int const NumQuartic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Quartic");
+        int const NumQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Quadratic");
+        int const NumQLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuadLinear");
+        int const NumQuintLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuintLinear");
+        int const NumQuadLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:QuadraticLinear");
+        int const NumCubicLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:CubicLinear");
+        int const NumLinear = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Linear");
+        int const NumBicubic = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Bicubic");
+        int const NumTriQuad = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Triquadratic");
+        int const NumExponent = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Exponent");
+        int const NumTableLookup = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Table:Lookup");
+        int const NumFanPressRise = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:FanPressureRise");
+        int const NumExpSkewNorm = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ExponentialSkewNormal");
+        int const NumSigmoid = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:Sigmoid");
+        int const NumRectHyper1 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola1");
+        int const NumRectHyper2 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola2");
+        int const NumExpDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ExponentialDecay");
+        int const NumDoubleExpDecay = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:DoubleExponentialDecay");
+        int const NumChillerPartLoadWithLift =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
 
-        NumWPCValTab = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:WindPressureCoefficientValues");
+        int const NumWPCValTab =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:WindPressureCoefficientValues");
 
         state.dataCurveManager->NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad +
                                             NumExponent + NumQuartic + NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid +
@@ -328,10 +303,11 @@ namespace CurveManager {
         state.dataCurveManager->UniqueCurveNames.reserve(state.dataCurveManager->NumCurves);
         // initialize the array
 
-        CurveNum = 0;
+        int CurveNum = 0; // keep track of the current curve index in the main curve array
+
         // Loop over biquadratic curves and load data
         CurrentModuleObject = "Curve:Biquadratic";
-        for (CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -357,15 +333,12 @@ namespace CurveManager {
             // could add checks for blank numeric fields, and use field names for errors.
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::BiQuadratic;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 2;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
-            thisCurve.coeff[5] = Numbers(6);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 2;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 6; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(7);
             thisCurve.inputLimits[0].max = Numbers(8);
             thisCurve.inputLimits[1].min = Numbers(9);
@@ -418,7 +391,7 @@ namespace CurveManager {
 
         // Loop over ChillerPartLoadWithLift curves and load data //zrp_Aug2014
         CurrentModuleObject = "Curve:ChillerPartLoadWithLift";
-        for (CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -443,22 +416,13 @@ namespace CurveManager {
             thisCurve.Name = Alphas(1);
 
             thisCurve.curveType = CurveType::ChillerPartLoadWithLift;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 3;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 3;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
 
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
-            thisCurve.coeff[5] = Numbers(6);
-            thisCurve.coeff[6] = Numbers(7);
-            thisCurve.coeff[7] = Numbers(8);
-            thisCurve.coeff[8] = Numbers(9);
-            thisCurve.coeff[9] = Numbers(10);
-            thisCurve.coeff[10] = Numbers(11);
-            thisCurve.coeff[11] = Numbers(12);
+            for (int in = 0; in < 12; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
 
             thisCurve.inputLimits[0].min = Numbers(13);
             thisCurve.inputLimits[0].max = Numbers(14);
@@ -500,7 +464,7 @@ namespace CurveManager {
 
         // Loop over cubic curves and load data
         CurrentModuleObject = "Curve:Cubic";
-        for (CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -524,13 +488,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Cubic;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 4; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(5);
             thisCurve.inputLimits[0].max = Numbers(6);
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
@@ -566,7 +529,7 @@ namespace CurveManager {
 
         // Loop over quadrinomial curves and load data
         CurrentModuleObject = "Curve:Quartic";
-        for (CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -590,14 +553,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Quartic;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 5; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(6);
             thisCurve.inputLimits[0].max = Numbers(7);
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
@@ -633,7 +594,7 @@ namespace CurveManager {
 
         // Loop over quadratic curves and load data
         CurrentModuleObject = "Curve:Quadratic";
-        for (CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -657,12 +618,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Quadratic;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 3; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(4);
             thisCurve.inputLimits[0].max = Numbers(5);
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
@@ -698,7 +659,7 @@ namespace CurveManager {
 
         // Loop over quadratic-linear curves and load data
         CurrentModuleObject = "Curve:QuadraticLinear";
-        for (CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -722,15 +683,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::QuadraticLinear;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 2;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
-            thisCurve.coeff[5] = Numbers(6);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 2;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 6; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(7);
             thisCurve.inputLimits[0].max = Numbers(8);
             thisCurve.inputLimits[1].min = Numbers(9);
@@ -783,7 +741,7 @@ namespace CurveManager {
 
         // Loop over cubic-linear curves and load data
         CurrentModuleObject = "Curve:CubicLinear";
-        for (CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -807,15 +765,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::CubicLinear;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 2;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
-            thisCurve.coeff[5] = Numbers(6);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 2;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 6; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(7);
             thisCurve.inputLimits[0].max = Numbers(8);
             thisCurve.inputLimits[1].min = Numbers(9);
@@ -868,7 +823,7 @@ namespace CurveManager {
 
         // Loop over linear curves and load data
         CurrentModuleObject = "Curve:Linear";
-        for (CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -892,11 +847,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Linear;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 2; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(3);
             thisCurve.inputLimits[0].max = Numbers(4);
             if (NumNumbers > 4 && !state.dataIPShortCut->lNumericFieldBlanks(5)) {
@@ -932,7 +888,7 @@ namespace CurveManager {
 
         // Loop over bicubic curves and load data
         CurrentModuleObject = "Curve:Bicubic";
-        for (CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -956,19 +912,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::BiCubic;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 2;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
-            thisCurve.coeff[5] = Numbers(6);
-            thisCurve.coeff[6] = Numbers(7);
-            thisCurve.coeff[7] = Numbers(8);
-            thisCurve.coeff[8] = Numbers(9);
-            thisCurve.coeff[9] = Numbers(10);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 2;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 10; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(11);
             thisCurve.inputLimits[0].max = Numbers(12);
             thisCurve.inputLimits[1].min = Numbers(13);
@@ -1021,7 +970,7 @@ namespace CurveManager {
 
         // Loop over Triquadratic curves and load data
         CurrentModuleObject = "Curve:Triquadratic";
-        for (CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1045,9 +994,9 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::TriQuadratic;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 3;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 3;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             thisCurve.tri2ndOrder[0] = Numbers(1);
             thisCurve.tri2ndOrder[1] = Numbers(2);
             thisCurve.tri2ndOrder[2] = Numbers(3);
@@ -1144,7 +1093,7 @@ namespace CurveManager {
 
         // Loop over quad linear curves and load data
         CurrentModuleObject = "Curve:QuadLinear";
-        for (CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1168,14 +1117,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::QuadLinear;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 4;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 4;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 5; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(6);
             thisCurve.inputLimits[0].max = Numbers(7);
             thisCurve.inputLimits[1].min = Numbers(8);
@@ -1226,7 +1173,7 @@ namespace CurveManager {
 
         // Loop over quint linear curves and load data
         CurrentModuleObject = "Curve:QuintLinear";
-        for (CurveIndex = 1; CurveIndex <= NumQuintLinear; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumQuintLinear; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1250,15 +1197,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::QuintLinear;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 5;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
-            thisCurve.coeff[5] = Numbers(6);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 5;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 6; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(7);
             thisCurve.inputLimits[0].max = Numbers(8);
             thisCurve.inputLimits[1].min = Numbers(9);
@@ -1310,7 +1254,7 @@ namespace CurveManager {
 
         // Loop over Exponent curves and load data
         CurrentModuleObject = "Curve:Exponent";
-        for (CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1334,12 +1278,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Exponent;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 3; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(4);
             thisCurve.inputLimits[0].max = Numbers(5);
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
@@ -1364,7 +1308,7 @@ namespace CurveManager {
 
         // Loop over Fan Pressure Rise curves and load data
         CurrentModuleObject = "Curve:FanPressureRise";
-        for (CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1388,13 +1332,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::FanPressureRise;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 2;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 2;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 4; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(5);
             thisCurve.inputLimits[0].max = Numbers(6);
             thisCurve.inputLimits[1].min = Numbers(7);
@@ -1434,7 +1377,7 @@ namespace CurveManager {
 
         // Loop over Exponential Skew Normal curves and load data
         CurrentModuleObject = "Curve:ExponentialSkewNormal";
-        for (CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1458,13 +1401,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::ExponentialSkewNormal;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 4; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(5);
             thisCurve.inputLimits[0].max = Numbers(6);
 
@@ -1502,7 +1444,7 @@ namespace CurveManager {
 
         // Loop over Sigmoid curves and load data
         CurrentModuleObject = "Curve:Sigmoid";
-        for (CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1526,14 +1468,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Sigmoid;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 5; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(6);
             thisCurve.inputLimits[0].max = Numbers(7);
 
@@ -1571,7 +1511,7 @@ namespace CurveManager {
 
         // Loop over Rectangular Hyperbola Type 1 curves and load data
         CurrentModuleObject = "Curve:RectangularHyperbola1";
-        for (CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1595,12 +1535,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::RectangularHyperbola1;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 3; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(4);
             thisCurve.inputLimits[0].max = Numbers(5);
 
@@ -1638,7 +1578,7 @@ namespace CurveManager {
 
         // Loop over Rectangular Hyperbola Type 2 curves and load data
         CurrentModuleObject = "Curve:RectangularHyperbola2";
-        for (CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1662,12 +1602,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::RectangularHyperbola2;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 3; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(4);
             thisCurve.inputLimits[0].max = Numbers(5);
 
@@ -1705,7 +1645,7 @@ namespace CurveManager {
 
         // Loop over Exponential Decay curves and load data
         CurrentModuleObject = "Curve:ExponentialDecay";
-        for (CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1729,12 +1669,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::ExponentialDecay;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 3; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(4);
             thisCurve.inputLimits[0].max = Numbers(5);
 
@@ -1772,7 +1712,7 @@ namespace CurveManager {
 
         // ykt July,2011 Loop over DoubleExponential Decay curves and load data
         CurrentModuleObject = "Curve:DoubleExponentialDecay";
-        for (CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex) {
+        for (int CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CurveIndex,
@@ -1796,14 +1736,12 @@ namespace CurveManager {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::DoubleExponentialDecay;
-            thisCurve.ObjectType = CurrentModuleObject;
-            thisCurve.NumDims = 1;
-            thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.coeff[0] = Numbers(1);
-            thisCurve.coeff[1] = Numbers(2);
-            thisCurve.coeff[2] = Numbers(3);
-            thisCurve.coeff[3] = Numbers(4);
-            thisCurve.coeff[4] = Numbers(5);
+            thisCurve.objectType = CurrentModuleObject;
+            thisCurve.numDims = 1;
+            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            for (int in = 0; in < 5; ++in) {
+                thisCurve.coeff[in] = Numbers(in + 1);
+            }
             thisCurve.inputLimits[0].min = Numbers(6);
             thisCurve.inputLimits[0].max = Numbers(7);
 
@@ -1925,14 +1863,14 @@ namespace CurveManager {
                     auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
                     thisCurve.Name = Alphas(1);
-                    thisCurve.ObjectType = CurrentModuleObject;
-                    thisCurve.NumDims = 1;
+                    thisCurve.objectType = CurrentModuleObject;
+                    thisCurve.numDims = 1;
 
-                    thisCurve.InterpolationType = InterpType::BtwxtMethod;
+                    thisCurve.interpolationType = InterpType::BtwxtMethod;
 
                     std::string contextString = format("{} \"{}\"", CurrentModuleObject, Alphas(1));
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                    Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
+                    Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
 
                     thisCurve.inputLimits[0].min = 0.0;
                     thisCurve.inputLimits[0].minPresent = true;
@@ -2010,7 +1948,7 @@ namespace CurveManager {
                     std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                    Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
+                    Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
 
                     // Find independent variable input data
                     if (state.dataCurveManager->btwxtManager.independentVarRefs.count(indVarName)) {
@@ -2074,7 +2012,7 @@ namespace CurveManager {
 
                         Btwxt::Method interpMethod, extrapMethod;
                         if (indVarInstance.count("interpolation_method")) {
-                            interpMethod = CurveManager::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method").get<std::string>());
+                            interpMethod = Curve::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method").get<std::string>());
                         } else {
                             interpMethod = Btwxt::Method::CUBIC;
                         }
@@ -2084,7 +2022,7 @@ namespace CurveManager {
                                 ShowSevereError(state, format("{}: Extrapolation method \"Unavailable\" is not yet available.", contextString));
                                 ErrorsFound = true;
                             }
-                            extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method").get<std::string>());
+                            extrapMethod = Curve::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method").get<std::string>());
                         } else {
                             extrapMethod = Btwxt::Method::LINEAR;
                         }
@@ -2145,14 +2083,14 @@ namespace CurveManager {
                 auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
                 thisCurve.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                thisCurve.ObjectType = "Table:Lookup";
-                thisCurve.InterpolationType = InterpType::BtwxtMethod;
+                thisCurve.objectType = "Table:Lookup";
+                thisCurve.interpolationType = InterpType::BtwxtMethod;
 
                 std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
 
                 std::string contextString = format("Table:Lookup \"{}\"", thisCurve.Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
+                Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
 
                 // TODO: Actually use this to define output variable units
                 if (fields.count("output_unit_type")) {
@@ -2165,7 +2103,7 @@ namespace CurveManager {
                 int gridIndex = state.dataCurveManager->btwxtManager.getGridIndex(state, indVarListName, ErrorsFound);
                 thisCurve.TableIndex = gridIndex;
                 int numDims = state.dataCurveManager->btwxtManager.getNumGridDims(gridIndex);
-                thisCurve.NumDims = numDims;
+                thisCurve.numDims = numDims;
 
                 for (int i = 1; i <= std::min(6, numDims); ++i) {
                     double vMin, vMax;
@@ -2449,7 +2387,7 @@ namespace CurveManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         for (auto &thisCurve : state.dataCurveManager->PerfCurve) {
-            for (int dim = 1; dim <= thisCurve.NumDims; ++dim) {
+            for (int dim = 1; dim <= thisCurve.numDims; ++dim) {
                 std::string numStr = fmt::to_string(dim);
                 SetupOutputVariable(state,
                                     format("Performance Curve Input Variable {} Value", numStr),
@@ -2703,7 +2641,7 @@ namespace CurveManager {
 
         std::string contextString = format("Table:Lookup \"{}\"", thisCurve.Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
+        Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(thisCurve.TableIndex, thisCurve.GridValueIndex, target);
 
         if (thisCurve.outputLimits.minPresent) TableValue = max(TableValue, thisCurve.outputLimits.min);
@@ -2788,7 +2726,7 @@ namespace CurveManager {
     {
         // Returns true if errors found
         auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        int curveDim = thisCurve.NumDims;
+        int curveDim = thisCurve.numDims;
         if (std::find(validDims.begin(), validDims.end(), curveDim) != validDims.end()) {
             // Compatible
             return false;
@@ -3072,9 +3010,9 @@ namespace CurveManager {
         // See if it is valid
         if (TempCurveIndex > 0) {
             // We have to check the type of curve to make sure it is single independent variable type
-            GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex).ObjectType;
+            GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex).objectType;
             {
-                if (state.dataCurveManager->PerfCurve(TempCurveIndex).NumDims == 1) {
+                if (state.dataCurveManager->PerfCurve(TempCurveIndex).numDims == 1) {
                     PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {

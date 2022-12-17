@@ -71,7 +71,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace CurveManager;
+using namespace Curve;
 using namespace DataLoopNode;
 using namespace Fans;
 using namespace FaultsManager;
@@ -101,8 +101,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Inputs: fan curve
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Cubic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1151.1;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 13.509;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.9105;
@@ -352,8 +352,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     // Inputs: fan curve
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Cubic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1151.1;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 13.509;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.9105;

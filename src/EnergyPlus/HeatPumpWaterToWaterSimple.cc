@@ -230,7 +230,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using CurveManager::GetCurveIndex;
+    using Curve::GetCurveIndex;
     using NodeInputManager::GetOnlySingleNode;
     using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -297,7 +297,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex > 0) {
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex,
                                                         {4},
                                                         "GetWatertoWaterHPInput",
@@ -306,7 +306,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                         "Cooling Capacity Curve Name");
         }
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex > 0) {
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex,
                                                         {4},
                                                         "GetWatertoWaterHPInput",
@@ -474,7 +474,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex > 0) {
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex,
                                                         {4},
                                                         "GetWatertoWaterHPInput",
@@ -483,7 +483,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                         "Heating Capacity Curve Name");
         }
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex > 0) {
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex,
                                                         {4},
                                                         "GetWatertoWaterHPInput",
@@ -1646,7 +1646,7 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
 
     // Using/Aliasing
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
 
@@ -1818,7 +1818,7 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
 
     // Using/Aliasing
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
 

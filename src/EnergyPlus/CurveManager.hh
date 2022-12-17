@@ -76,7 +76,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace CurveManager {
+namespace Curve {
 
     // Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
 
@@ -126,12 +126,12 @@ namespace CurveManager {
     {
         // Basic data
         std::string Name;                         // Curve Name
-        std::string ObjectType;                   // Curve object type
+        std::string objectType;                   // Curve object type
         CurveType curveType = CurveType::Invalid; // Curve type (see parameter definitions above)
         // Table data stuff
-        InterpType InterpolationType = InterpType::Invalid; // Table interpolation method
+        InterpType interpolationType = InterpType::Invalid; // Table interpolation method
         int TableIndex = 0;     // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
-        int NumDims = 0;        // Number of dimensions (AKA, independent variables)
+        int numDims = 0;        // Number of dimensions (AKA, independent variables)
         int GridValueIndex = 0; // Index of output within RGI for new Table:Lookup
         // input coefficients
         std::array<Real64, 12> coeff = {0.0}; // curve coefficients
@@ -311,8 +311,8 @@ struct CurveManagerData : BaseGlobalStruct
     bool GetCurvesInputFlag = true;
     bool CurveValueMyBeginTimeStepFlag = false;
     bool FrictionFactorErrorHasOccurred = false;
-    Array1D<CurveManager::PerformanceCurveData> PerfCurve;
-    CurveManager::BtwxtManager btwxtManager;
+    Array1D<Curve::PerformanceCurveData> PerfCurve;
+    Curve::BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
 
     void clear_state() override

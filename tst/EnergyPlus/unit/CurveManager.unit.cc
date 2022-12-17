@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
 
     double var1 = 1, var2 = 0.1, var3 = 20, var4 = 10;
     double expected_value = -3.3333 + (0.1 * 1) + (38.9 * 0.1) + (0.1 * 20) + (0.5 * 10);
-    EXPECT_EQ(expected_value, CurveManager::CurveValue(*state, 1, var1, var2, var3, var4));
+    EXPECT_EQ(expected_value, Curve::CurveValue(*state, 1, var1, var2, var3, var4));
 }
 
 TEST_F(EnergyPlusFixture, QuintLinearCurve)
@@ -154,7 +154,7 @@ TEST_F(EnergyPlusFixture, QuintLinearCurve)
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, QuintLinearCurve)
 
     double var1 = 1, var2 = 0.1, var3 = 0.5, var4 = 10, var5 = 15;
     double expected_value = -3.3333 + (0.1 * 1) + (38.9 * 0.1) + (0.1 * 0.5) + (0.5 * 10) + (1.5 * 15);
-    EXPECT_EQ(expected_value, CurveManager::CurveValue(*state, 1, var1, var2, var3, var4, var5));
+    EXPECT_EQ(expected_value, Curve::CurveValue(*state, 1, var1, var2, var3, var4, var5));
 }
 
 TEST_F(EnergyPlusFixture, TableLookup)
@@ -261,11 +261,11 @@ TEST_F(EnergyPlusFixture, TableLookup)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(3, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ("Table:Lookup", state->dataCurveManager->PerfCurve(1).ObjectType);
+    EXPECT_EQ("Table:Lookup", state->dataCurveManager->PerfCurve(1).objectType);
     EXPECT_EQ("CAPMODFUNCOFWATERFLOW", state->dataCurveManager->PerfCurve(1).Name);
 
     EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
@@ -360,7 +360,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
@@ -371,7 +371,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
     EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
 
     for (auto data_point : table_data) {
-        EXPECT_DOUBLE_EQ(data_point.first * data_point.second, CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+        EXPECT_DOUBLE_EQ(data_point.first * data_point.second, Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -461,7 +461,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
@@ -472,8 +472,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
     EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
 
     for (auto data_point : table_data) {
-        EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_divisor,
-                         CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+        EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_divisor, Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -564,7 +563,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
@@ -576,7 +575,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
 
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_auto_divisor,
-                         CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+                         Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -668,7 +667,7 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
@@ -680,13 +679,13 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
 
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_auto_divisor / normalization_divisor,
-                         CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+                         Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
 TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
 {
-    CurveManager::TableFile testTableFile = CurveManager::TableFile();
+    Curve::TableFile testTableFile = Curve::TableFile();
     fs::path testCSV = configured_source_directory() / "tst/EnergyPlus/unit/Resources/TestCarriageReturn.csv";
     testTableFile.filePath = testCSV;
     testTableFile.load(*state, testCSV);

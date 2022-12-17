@@ -3775,9 +3775,9 @@ namespace SystemAvailabilityManager {
         using NodeInputManager::MarkNode;
         using namespace DataLoopNode;
 
-        using CurveManager::CurveValue;
-        using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveMinMaxValues;
+        using Curve::CurveValue;
+        using Curve::GetCurveIndex;
+        using Curve::GetCurveMinMaxValues;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHybridVentilationInputs: "); // include trailing blank
@@ -4104,7 +4104,7 @@ namespace SystemAvailabilityManager {
                         ErrorsFound = true;
                     }
                     // Check curve type
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 hybridVentMgr.OpeningFactorFWS,             // Curve index
                                                                 {1},                                        // Valid dimensions
                                                                 RoutineName,                                // Routine name
@@ -4621,7 +4621,7 @@ namespace SystemAvailabilityManager {
         // on and open windows or doors.
 
         using namespace DataAirLoop;
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;

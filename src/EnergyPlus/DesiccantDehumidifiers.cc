@@ -138,7 +138,7 @@ namespace DesiccantDehumidifiers {
     using namespace ScheduleManager;
     using namespace HeatingCoils;
     using namespace Fans;
-    using namespace CurveManager;
+    using namespace Curve;
     using namespace Psychrometrics;
     using FluidProperties::GetSatDensityRefrig;
 
@@ -1570,7 +1570,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ExhaustFanCurveIndex = GetCurveIndex(state, Alphas(15));
 
             if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
-                ErrorsFoundGeneric |= CurveManager::CheckCurveDims(state,
+                ErrorsFoundGeneric |= Curve::CheckCurveDims(state,
                                                                    DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
                                                                    {1},                                            // Valid dimensions
                                                                    RoutineName,                                    // Routine name

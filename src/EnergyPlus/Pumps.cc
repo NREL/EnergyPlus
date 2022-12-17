@@ -216,8 +216,8 @@ void GetPumpInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using CurveManager::GetCurveIndex;
-    using CurveManager::GetCurveMinMaxValues;
+    using Curve::GetCurveIndex;
+    using Curve::GetCurveMinMaxValues;
     using DataSizing::AutoSize;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
@@ -384,7 +384,7 @@ void GetPumpInput(EnergyPlusData &state)
             if (TempCurveIndex == 0) {
                 thisPump.PressureCurve_Index = -1;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             TempCurveIndex,                  // Curve index
                                                             {1},                             // Valid dimensions
                                                             RoutineName,                     // Routine name
@@ -616,7 +616,7 @@ void GetPumpInput(EnergyPlusData &state)
             if (TempCurveIndex == 0) {
                 thisPump.PressureCurve_Index = -1;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             TempCurveIndex,                  // Curve index
                                                             {1},                             // Valid dimensions
                                                             RoutineName,                     // Routine name

@@ -4037,7 +4037,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     Real64 RatedSourceTempCool = state->dataSize->DesDayWeath(1).Temp(1);
     EXPECT_EQ(RatedSourceTempCool, 35.0);
     Real64 CoolCoolCapAtPeak = 33453.67913;
-    Real64 TotCapTempModFac = CurveManager::CurveValue(
+    Real64 TotCapTempModFac =
+        Curve::CurveValue(
         *state,
         state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel),
         17.410329442560833,
@@ -19805,15 +19806,15 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     // use psuedo real CapFT curve, use unity curves for all others
     state->dataCurveManager->NumCurves = 2;
     state->dataCurveManager->PerfCurve.allocate(2);
-    state->dataCurveManager->PerfCurve(1).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(1).interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(1).coeff[0] = 1.5;
     state->dataCurveManager->PerfCurve(1).coeff[3] = -0.017; // yields roughly 1.0 at water rating point of 29.4444
-    state->dataCurveManager->PerfCurve(1).curveType = CurveManager::CurveType::BiQuadratic;
+    state->dataCurveManager->PerfCurve(1).curveType = Curve::CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(1).inputLimits[0].max = 50.0;
     state->dataCurveManager->PerfCurve(1).inputLimits[1].max = 50.0;
     state->dataCurveManager->PerfCurve(2).coeff[0] = 1.0;
-    state->dataCurveManager->PerfCurve(2).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(2).curveType = CurveManager::CurveType::Linear;
+    state->dataCurveManager->PerfCurve(2).interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(2).curveType = Curve::CurveType::Linear;
 
     // set up UnitarySystem
     state->dataSize->CurSysNum = 1;
@@ -19856,14 +19857,14 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     Real64 MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(*state, MixTemp, MixHumRat, state->dataEnvrn->StdBaroPress);
     Real64 constexpr RatedInletWaterTemp = 29.4444; // 85 F cooling mode
     Real64 capFT_water =
-        CurveManager::CurveValue(*state, state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10), MixWetBulb, RatedInletWaterTemp);
+        Curve::CurveValue(*state, state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10), MixWetBulb, RatedInletWaterTemp);
 
     // these curve results are very near 1
     EXPECT_NEAR(state->dataSize->DataCoilSizingCapFT, capFT_water, 0.0001);
     EXPECT_NEAR(capFT_water, 0.9994, 0.0001);
 
     // OAT at cooling peak was set = 0 C
-    Real64 capFT_OAT = CurveManager::CurveValue(*state,
+    Real64 capFT_OAT = Curve::CurveValue(*state,
                                                 state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10),
                                                 MixWetBulb,
                                                 state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak);

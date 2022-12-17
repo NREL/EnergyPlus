@@ -65,7 +65,7 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
-using namespace EnergyPlus::CurveManager;
+using namespace EnergyPlus::Curve;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::ChillerElectricEIR;
@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     int constexpr nCapfT = 1;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT);
     pCurve->curveType = CurveType::Cubic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT";
     pCurve->coeff[0] = 0.876825;
     pCurve->coeff[1] = -0.002955;
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     int constexpr nCapfFF = 2;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF);
     pCurve->curveType = CurveType::Quadratic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatCapfFF";
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
@@ -155,7 +155,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     int constexpr nEIRfT = 3;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT);
     pCurve->curveType = CurveType::Cubic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT";
     pCurve->coeff[0] = 0.704658;
     pCurve->coeff[1] = 0.008767;
@@ -168,7 +168,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     int constexpr nEIRfFF = 4;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF);
     pCurve->curveType = CurveType::Quadratic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatEIRfFF";
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     int constexpr nPLFfPLR = 5;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR);
     pCurve->curveType = CurveType::Quadratic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatPLFfPLR";
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
@@ -196,11 +196,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
         PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
         if (rCurve.curveType == CurveType::Cubic) {
-            rCurve.ObjectType = "Curve:Cubic";
+            rCurve.objectType = "Curve:Cubic";
         } else if (rCurve.curveType == CurveType::Quadratic) {
-            rCurve.ObjectType = "Curve:Quadratic";
+            rCurve.objectType = "Curve:Quadratic";
         }
-        rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+        rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
     }
     Real64 NetHeatingCapRatedHighTemp;
     Real64 NetHeatingCapRatedLowTemp;
@@ -328,7 +328,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     int constexpr nCapfT = 1;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT);
     pCurve->curveType = CurveType::Cubic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT";
     pCurve->coeff[0] = 0.876825;
     pCurve->coeff[1] = 0.002955; // previously -ve
@@ -342,7 +342,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     int constexpr nCapfFF = 2;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF);
     pCurve->curveType = CurveType::Quadratic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatCapfFF";
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     int constexpr nEIRfT = 3;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT);
     pCurve->curveType = CurveType::Cubic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT";
     pCurve->coeff[0] = 0.704658;
     pCurve->coeff[1] = 0.008767;
@@ -369,7 +369,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     int constexpr nEIRfFF = 4;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF);
     pCurve->curveType = CurveType::Quadratic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatEIRfFF";
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
@@ -383,7 +383,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     int constexpr nPLFfPLR = 5;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR);
     pCurve->curveType = CurveType::Quadratic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatPLFfPLR";
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
@@ -397,11 +397,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
         PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
         if (rCurve.curveType == CurveType::Cubic) {
-            rCurve.ObjectType = "Curve:Cubic";
+            rCurve.objectType = "Curve:Cubic";
         } else if (rCurve.curveType == CurveType::Quadratic) {
-            rCurve.ObjectType = "Curve:Quadratic";
+            rCurve.objectType = "Curve:Quadratic";
         }
-        rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+        rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
     }
     Real64 NetHeatingCapRatedHighTemp;
     Real64 NetHeatingCapRatedLowTemp;
@@ -520,7 +520,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     int constexpr nCapfT = 1;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT);
     pCurve->curveType = CurveType::Cubic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT"; // Simpl_HPACHeatCapFT_Cubic
     pCurve->coeff[0] = 0.759;
     pCurve->coeff[1] = 0.028;
@@ -534,7 +534,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     int constexpr nCapfFF = 2;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF);
     pCurve->curveType = CurveType::Cubic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatCapfFF"; // Simpl_HPACHeatCapFFF_Cubic
     pCurve->coeff[0] = 0.84;
     pCurve->coeff[1] = 0.16;
@@ -547,7 +547,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     int constexpr nEIRfT = 3;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT);
     pCurve->curveType = CurveType::BiQuadratic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT"; // Simpl_HPACEIRFT_Biquadratic
     pCurve->coeff[0] = 0.342;
     pCurve->coeff[1] = 0.035;
@@ -564,7 +564,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     int constexpr nEIRfFF = 4;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF);
     pCurve->curveType = CurveType::Cubic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatEIRfFF"; // Simpl_HPACHeatEIRFT_Cubic
     pCurve->coeff[0] = 1.192;
     pCurve->coeff[1] = -0.03;
@@ -579,7 +579,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     int constexpr nPLFfPLR = 5;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR);
     pCurve->curveType = CurveType::Quadratic;
-    pCurve->NumDims = 1;
+    pCurve->numDims = 1;
     pCurve->Name = "HPHeatPLFfPLR"; // Simpl_HPACCOOLPLFFPLR_Quadratic
     pCurve->coeff[0] = 0.75;
     pCurve->coeff[1] = 0.25;
@@ -593,11 +593,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
         PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
         if (rCurve.curveType == CurveType::Cubic) {
-            rCurve.ObjectType = "Curve:Cubic";
+            rCurve.objectType = "Curve:Cubic";
         } else if (rCurve.curveType == CurveType::Quadratic) {
-            rCurve.ObjectType = "Curve:Quadratic";
+            rCurve.objectType = "Curve:Quadratic";
         }
-        rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+        rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
     }
     Real64 NetHeatingCapRatedHighTemp;
     Real64 NetHeatingCapRatedLowTemp;
@@ -1053,9 +1053,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     // Cap=f(T)
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpCapfT";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.98898813;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.036832851;
@@ -1072,9 +1072,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     // EIR=f(T)
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfT";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.814058418;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.002335553;
@@ -1091,9 +1091,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     // EIR=f(PLR)
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Cubic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfPLR";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -0.08117804;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.433532026;
@@ -1146,9 +1146,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     // Cap=f(T)
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 2.521130E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.324053E-02;
@@ -1165,9 +1165,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     // EIR=f(T)
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 4.475238E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -2.588210E-02;
@@ -1184,9 +1184,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     // EIR=f(PLR)
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 2.778889E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 2.338363E-01;
@@ -1236,9 +1236,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     // Cap=f(T)
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -4.862465E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -7.293218E-02;
@@ -1255,9 +1255,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     // EIR=f(T)
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 3.522647E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -3.311790E-02;
@@ -1274,9 +1274,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     // EIR=f(PLR)
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiCubic;
-    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 8.215998E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -2.209969E-02;
@@ -1461,7 +1461,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     // check user PLF curve PLR limits
-    CurveManager::GetCurveMinMaxValues(*state, thisCoil.PLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    Curve::GetCurveMinMaxValues(*state, thisCoil.PLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
     EXPECT_EQ(0.0, minEIRfLowPLRXInput);
     EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
 
@@ -1831,7 +1831,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     // check user PLF curve PLR limits
-    CurveManager::GetCurveMinMaxValues(*state, thisCoil.MSPLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    Curve::GetCurveMinMaxValues(*state, thisCoil.MSPLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
     EXPECT_EQ(0.0, minEIRfLowPLRXInput);
     EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
 

@@ -227,7 +227,7 @@ void GetFanInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using CurveManager::GetCurveIndex;
+    using Curve::GetCurveIndex;
     using NodeInputManager::GetOnlySingleNode;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1231,8 +1231,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     // Using/Aliasing
     using namespace DataSizing;
     using namespace OutputReportPredefined;
-    using CurveManager::CurveValue;
-    using CurveManager::GetCurveIndex;
+    using Curve::CurveValue;
+    using Curve::GetCurveIndex;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeFan: "); // include trailing blank space
@@ -1888,7 +1888,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const>
     // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
     // Using/Aliasing
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 RhoAir;
@@ -2182,8 +2182,8 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     // Calculate output node conditions
 
     // Using/Aliasing
-    using CurveManager::CurveValue;
-    using CurveManager::GetCurveIndex;
+    using Curve::CurveValue;
+    using Curve::GetCurveIndex;
     using namespace OutputReportPredefined;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2980,7 +2980,7 @@ Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
     // and the increase of fan pressure rise due to fouling air filters
 
     // Using/Aliasing
-    using namespace CurveManager;
+    using namespace Curve;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 FanFaultyAirFlowRate; // Fan Volume Flow Rate in the Faulty Case [m3/sec]

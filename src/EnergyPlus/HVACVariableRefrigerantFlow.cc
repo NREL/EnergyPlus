@@ -353,7 +353,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     // The terminal units are simulated first, and then the condenser is simulated.
     // If terminal units require more capacity than can be delivered by condenser, a limit is set.
 
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::GetSpecificHeatGlycol;
     using PlantUtilities::SetComponentFlowRate;
     using Psychrometrics::RhoH2O;
@@ -955,7 +955,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 HRCAPFT = vrf.HRCAPFTCool; // Index to cool capacity as a function of temperature\PLR curve for heat recovery
                 if (HRCAPFT > 0) {
                     //         VRF(VRFCond)%HRCAPFTCoolConst = 0.9d0 ! initialized to 0.9
-                    if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTCool).NumDims == 2) { // Curve type for HRCAPFTCool
+                    if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTCool).numDims == 2) { // Curve type for HRCAPFTCool
                         vrf.HRCAPFTCoolConst = CurveValue(state, HRCAPFT, InletAirWetBulbC, CondInletTemp);
                     } else {
                         vrf.HRCAPFTCoolConst = CurveValue(state, HRCAPFT, tmpVRFCondPLR);
@@ -968,7 +968,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 HREIRFT = vrf.HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
                 if (HREIRFT > 0) {
                     //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                    if (state.dataCurveManager->PerfCurve(vrf.HREIRFTCool).NumDims == 2) { // Curve type for HREIRFTCool
+                    if (state.dataCurveManager->PerfCurve(vrf.HREIRFTCool).numDims == 2) { // Curve type for HREIRFTCool
                         vrf.HREIRFTCoolConst = CurveValue(state, HREIRFT, InletAirWetBulbC, CondInletTemp);
                     } else {
                         vrf.HREIRFTCoolConst = CurveValue(state, HREIRFT, tmpVRFCondPLR);
@@ -986,7 +986,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 HRCAPFT = vrf.HRCAPFTHeat; // Index to heat capacity as a function of temperature\PLR curve for heat recovery
                 if (HRCAPFT > 0) {
                     //         VRF(VRFCond)%HRCAPFTHeatConst = 1.1d0 ! initialized to 1.1
-                    if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTHeat).NumDims == 2) { // Curve type for HRCAPFTCool
+                    if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTHeat).numDims == 2) { // Curve type for HRCAPFTCool
                         switch (vrf.HeatingPerformanceOATType) {
                         case DataHVACGlobals::DryBulbIndicator: {
                             vrf.HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, CondInletTemp);
@@ -1009,7 +1009,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 HREIRFT = vrf.HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
                 if (HREIRFT > 0) {
                     //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                    if (state.dataCurveManager->PerfCurve(vrf.HREIRFTHeat).NumDims == 2) { // Curve type for HREIRFTHeat
+                    if (state.dataCurveManager->PerfCurve(vrf.HREIRFTHeat).numDims == 2) { // Curve type for HREIRFTHeat
                         switch (vrf.HeatingPerformanceOATType) {
                         case DataHVACGlobals::DryBulbIndicator: {
                             vrf.HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, CondInletTemp);
@@ -1383,10 +1383,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     using namespace DataLoopNode;
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
-    using CurveManager::checkCurveIsNormalizedToOne;
-    using CurveManager::CurveValue;
-    using CurveManager::GetCurveIndex;
-    using CurveManager::SetCurveOutputMinMaxValues;
+    using Curve::checkCurveIsNormalizedToOne;
+    using Curve::CurveValue;
+    using Curve::GetCurveIndex;
+    using Curve::SetCurveOutputMinMaxValues;
     using DXCoils::GetDXCoilIndex;
     using Fans::GetFanAvailSchPtr;
     using Fans::GetFanDesignVolumeFlowRate;
@@ -1650,7 +1650,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolCapFT = GetCurveIndex(state, cAlphaArgs(3));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolCapFT > 0) {
             // Verify Curve Object, only legal type is biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolCapFT, // Curve index
                                                         {2},                                             // Valid dimensions
                                                         RoutineName,                                     // Routine name
@@ -1673,7 +1673,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolBoundaryCurvePtr = GetCurveIndex(state, cAlphaArgs(4));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolBoundaryCurvePtr > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolBoundaryCurvePtr, // Curve index
                                                         {1},                                                        // Valid dimensions
                                                         RoutineName,                                                // Routine name
@@ -1685,7 +1685,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolCapFTHi = GetCurveIndex(state, cAlphaArgs(5));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolCapFTHi > 0) {
             // Verify Curve Object, only legal type is biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolCapFTHi, // Curve index
                                                         {2},                                               // Valid dimensions
                                                         RoutineName,                                       // Routine name
@@ -1697,7 +1697,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFT = GetCurveIndex(state, cAlphaArgs(6));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFT > 0) {
             // Verify Curve Object, only legal type is biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFT, // Curve index
                                                         {2},                                             // Valid dimensions
                                                         RoutineName,                                     // Routine name
@@ -1709,7 +1709,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).EIRCoolBoundaryCurvePtr = GetCurveIndex(state, cAlphaArgs(7));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).EIRCoolBoundaryCurvePtr > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).EIRCoolBoundaryCurvePtr, // Curve index
                                                         {1},                                                           // Valid dimensions
                                                         RoutineName,                                                   // Routine name
@@ -1721,7 +1721,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFTHi = GetCurveIndex(state, cAlphaArgs(8));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFTHi > 0) {
             // Verify Curve Object, only legal type is biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFTHi, // Curve index
                                                         {2},                                               // Valid dimensions
                                                         RoutineName,                                       // Routine name
@@ -1733,7 +1733,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR1 = GetCurveIndex(state, cAlphaArgs(9));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR1 > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR1, // Curve index
                                                         {1},                                                // Valid dimensions
                                                         RoutineName,                                        // Routine name
@@ -1745,7 +1745,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR2 = GetCurveIndex(state, cAlphaArgs(10));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR2 > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR2, // Curve index
                                                         {1},                                                // Valid dimensions
                                                         RoutineName,                                        // Routine name
@@ -1757,7 +1757,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolCombRatioPTR = GetCurveIndex(state, cAlphaArgs(11));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolCombRatioPTR > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolCombRatioPTR, // Curve index
                                                         {1},                                                    // Valid dimensions
                                                         RoutineName,                                            // Routine name
@@ -1769,7 +1769,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR = GetCurveIndex(state, cAlphaArgs(12));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, // Curve index
                                                         {1},                                               // Valid dimensions
                                                         RoutineName,                                       // Routine name
@@ -1836,7 +1836,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatCapFT = GetCurveIndex(state, cAlphaArgs(13));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatCapFT > 0) {
             // Verify Curve Object, only legal type is biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatCapFT, // Curve index
                                                         {2},                                             // Valid dimensions
                                                         RoutineName,                                     // Routine name
@@ -1870,7 +1870,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatBoundaryCurvePtr = GetCurveIndex(state, cAlphaArgs(14));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatBoundaryCurvePtr > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatBoundaryCurvePtr, // Curve index
                                                         {1},                                                        // Valid dimensions
                                                         RoutineName,                                                // Routine name
@@ -1882,7 +1882,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatCapFTHi = GetCurveIndex(state, cAlphaArgs(15));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatCapFTHi > 0) {
             // Verify Curve Object, only legal type is biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatCapFTHi, // Curve index
                                                         {2},                                               // Valid dimensions
                                                         RoutineName,                                       // Routine name
@@ -1894,7 +1894,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFT = GetCurveIndex(state, cAlphaArgs(16));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFT > 0) {
             // Verify Curve Object, only legal type is biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFT, // Curve index
                                                         {2},                                             // Valid dimensions
                                                         RoutineName,                                     // Routine name
@@ -1906,7 +1906,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).EIRHeatBoundaryCurvePtr = GetCurveIndex(state, cAlphaArgs(17));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).EIRHeatBoundaryCurvePtr > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).EIRHeatBoundaryCurvePtr, // Curve index
                                                         {1},                                                           // Valid dimensions
                                                         RoutineName,                                                   // Routine name
@@ -1918,7 +1918,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFTHi = GetCurveIndex(state, cAlphaArgs(18));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFTHi > 0) {
             // Verify Curve Object, only legal type is biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFTHi, // Curve index
                                                         {2},                                               // Valid dimensions
                                                         RoutineName,                                       // Routine name
@@ -1942,7 +1942,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR1 = GetCurveIndex(state, cAlphaArgs(20));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR1 > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR1, // Curve index
                                                         {1},                                                // Valid dimensions
                                                         RoutineName,                                        // Routine name
@@ -1954,7 +1954,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR2 = GetCurveIndex(state, cAlphaArgs(21));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR2 > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR2, // Curve index
                                                         {1},                                                // Valid dimensions
                                                         RoutineName,                                        // Routine name
@@ -1966,7 +1966,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatCombRatioPTR = GetCurveIndex(state, cAlphaArgs(22));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatCombRatioPTR > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatCombRatioPTR, // Curve index
                                                         {1},                                                    // Valid dimensions
                                                         RoutineName,                                            // Routine name
@@ -1977,7 +1977,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR = GetCurveIndex(state, cAlphaArgs(23));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, or cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, // Curve index
                                                         {1},                                               // Valid dimensions
                                                         RoutineName,                                       // Routine name
@@ -2028,7 +2028,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         Real64 maxEIRfLowPLRXInput = 0.0;
 
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR1 > 0) {
-            CurveManager::GetCurveMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+            Curve::GetCurveMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
             if (minEIRfLowPLRXInput > state.dataHVACVarRefFlow->VRF(VRFNum).MinPLR) {
                 ShowWarningError(
                     state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
@@ -2051,7 +2051,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             maxEIRfLowPLRXInput = 0.0;
         }
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR1 > 0) {
-            CurveManager::GetCurveMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+            Curve::GetCurveMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
             if (minEIRfLowPLRXInput > state.dataHVACVarRefFlow->VRF(VRFNum).MinPLR) {
                 ShowWarningError(
                     state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
@@ -2131,7 +2131,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).PCFLengthCoolPtr = GetCurveIndex(state, cAlphaArgs(29));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).PCFLengthCoolPtr > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).PCFLengthCoolPtr, // Curve index
                                                         {1, 2},                                                 // Valid dimensions
                                                         RoutineName,                                            // Routine name
@@ -2145,7 +2145,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).PCFLengthHeatPtr = GetCurveIndex(state, cAlphaArgs(30));
         if (state.dataHVACVarRefFlow->VRF(VRFNum).PCFLengthHeatPtr > 0) {
             // Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         state.dataHVACVarRefFlow->VRF(VRFNum).PCFLengthHeatPtr, // Curve index
                                                         {1, 2},                                                 // Valid dimensions
                                                         RoutineName,                                            // Routine name
@@ -2195,7 +2195,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(state, cAlphaArgs(33));
             if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr > 0) {
                 // Verify Curve Object, expected type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr, // Curve index
                                                             {2},                                                 // Valid dimensions
                                                             RoutineName,                                         // Routine name
@@ -2457,7 +2457,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->VRF(VRFNum).HRCAPFTCool = GetCurveIndex(state, cAlphaArgs(40));
             if (state.dataHVACVarRefFlow->VRF(VRFNum).HRCAPFTCool > 0) {
                 // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).HRCAPFTCool, // Curve index
                                                             {1, 2},                                            // Valid dimensions
                                                             RoutineName,                                       // Routine name
@@ -2472,7 +2472,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->VRF(VRFNum).HREIRFTCool = GetCurveIndex(state, cAlphaArgs(41));
             if (state.dataHVACVarRefFlow->VRF(VRFNum).HREIRFTCool > 0) {
                 // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).HREIRFTCool, // Curve index
                                                             {1, 2},                                            // Valid dimensions
                                                             RoutineName,                                       // Routine name
@@ -2490,7 +2490,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->VRF(VRFNum).HRCAPFTHeat = GetCurveIndex(state, cAlphaArgs(42));
             if (state.dataHVACVarRefFlow->VRF(VRFNum).HRCAPFTHeat > 0) {
                 // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).HRCAPFTHeat, // Curve index
                                                             {1, 2},                                            // Valid dimensions
                                                             RoutineName,                                       // Routine name
@@ -2508,7 +2508,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->VRF(VRFNum).HREIRFTHeat = GetCurveIndex(state, cAlphaArgs(43));
             if (state.dataHVACVarRefFlow->VRF(VRFNum).HREIRFTHeat > 0) {
                 // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).HREIRFTHeat, // Curve index
                                                             {1, 2},                                            // Valid dimensions
                                                             RoutineName,                                       // Routine name
@@ -2681,7 +2681,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             ErrorsFound = true;
         } else {
             {
-                if (state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).ObjectType == "Curve:Quadratic") {
+                if (state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).objectType == "Curve:Quadratic") {
                     state.dataHVACVarRefFlow->VRF(VRFNum).C1Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).coeff[0];
                     state.dataHVACVarRefFlow->VRF(VRFNum).C2Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).coeff[1];
                     state.dataHVACVarRefFlow->VRF(VRFNum).C3Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).coeff[2];
@@ -2691,7 +2691,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError(state,
                                       "...illegal " + cAlphaFieldNames(6) +
-                                          " type for this object = " + state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).ObjectType);
+                                          " type for this object = " + state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).objectType);
                     ShowContinueError(state, "... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -2714,7 +2714,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             ErrorsFound = true;
         } else {
             {
-                if (state.dataCurveManager->PerfCurve(indexOUCondTempCurve).ObjectType == "Curve:Quadratic") {
+                if (state.dataCurveManager->PerfCurve(indexOUCondTempCurve).objectType == "Curve:Quadratic") {
                     state.dataHVACVarRefFlow->VRF(VRFNum).C1Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).coeff[0];
                     state.dataHVACVarRefFlow->VRF(VRFNum).C2Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).coeff[1];
                     state.dataHVACVarRefFlow->VRF(VRFNum).C3Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).coeff[2];
@@ -2724,7 +2724,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError(state,
                                       "...illegal " + cAlphaFieldNames(7) +
-                                          " type for this object = " + state.dataCurveManager->PerfCurve(indexOUCondTempCurve).ObjectType);
+                                          " type for this object = " + state.dataCurveManager->PerfCurve(indexOUCondTempCurve).objectType);
                     ShowContinueError(state, "... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -2798,7 +2798,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(state, cAlphaArgs(10));
             if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr > 0) {
                 // Verify Curve Object, expected type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr, // Curve index
                                                             {2},                                                 // Valid dimensions
                                                             RoutineName,                                         // Routine name
@@ -2893,7 +2893,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     }
                     ErrorsFound = true;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 indexOUEvapCapCurve,                             // Curve index
                                                                 {2},                                             // Valid dimensions
                                                                 RoutineName,                                     // Routine name
@@ -2926,7 +2926,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     }
                     ErrorsFound = true;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 indexOUCompPwrCurve,                                 // Curve index
                                                                 {2},                                                 // Valid dimensions
                                                                 RoutineName,                                         // Routine name
@@ -3170,7 +3170,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
             ErrorsFound = true;
         } else {
-            if (state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).ObjectType == "Curve:Quadratic") {
+            if (state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).objectType == "Curve:Quadratic") {
                 state.dataHVACVarRefFlow->VRF(VRFNum).C1Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).coeff[0];
                 state.dataHVACVarRefFlow->VRF(VRFNum).C2Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).coeff[1];
                 state.dataHVACVarRefFlow->VRF(VRFNum).C3Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).coeff[2];
@@ -3179,7 +3179,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state,
                                   "...illegal " + cAlphaFieldNames(6) +
-                                      " type for this object = " + state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).ObjectType);
+                                      " type for this object = " + state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).objectType);
                 ShowContinueError(state, "... Curve type must be Quadratic.");
                 ErrorsFound = true;
             }
@@ -3200,7 +3200,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
             ErrorsFound = true;
         } else {
-            if (state.dataCurveManager->PerfCurve(indexOUCondTempCurve).ObjectType == "Curve:Quadratic") {
+            if (state.dataCurveManager->PerfCurve(indexOUCondTempCurve).objectType == "Curve:Quadratic") {
                 state.dataHVACVarRefFlow->VRF(VRFNum).C1Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).coeff[0];
                 state.dataHVACVarRefFlow->VRF(VRFNum).C2Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).coeff[1];
                 state.dataHVACVarRefFlow->VRF(VRFNum).C3Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).coeff[2];
@@ -3209,7 +3209,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state,
                                   "...illegal " + cAlphaFieldNames(7) +
-                                      " type for this object = " + state.dataCurveManager->PerfCurve(indexOUCondTempCurve).ObjectType);
+                                      " type for this object = " + state.dataCurveManager->PerfCurve(indexOUCondTempCurve).objectType);
                 ShowContinueError(state, "... Curve type must be Quadratic.");
                 ErrorsFound = true;
             }
@@ -3282,7 +3282,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(state, cAlphaArgs(10));
             if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr > 0) {
                 // Verify Curve Object, expected type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                ErrorsFound |= Curve::CheckCurveDims(state,
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).DefrostEIRPtr, // Curve index
                                                             {2},                                                 // Valid dimensions
                                                             RoutineName,                                         // Routine name
@@ -3366,7 +3366,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     }
                     ErrorsFound = true;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 indexOUEvapCapCurve,                             // Curve index
                                                                 {2},                                             // Valid dimensions
                                                                 RoutineName,                                     // Routine name
@@ -3399,7 +3399,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     }
                     ErrorsFound = true;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 indexOUCompPwrCurve,                                 // Curve index
                                                                 {2},                                                 // Valid dimensions
                                                                 RoutineName,                                         // Routine name
@@ -4440,7 +4440,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0 && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex > 0 &&
                             state.dataCurveManager
                                     ->PerfCurve(GetDXCoilCapFTCurveIndex(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound))
-                                    .NumDims == 2) {
+                                    .numDims == 2) {
                             if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatingPerformanceOATType ==
                                 DataHVACGlobals::WetBulbIndicator) {
                                 checkCurveIsNormalizedToOne(
@@ -4453,7 +4453,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                         DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXHeatCoilType_Num)),
                                     GetDXCoilCapFTCurveIndex(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound),
                                     "Heating Capacity Ratio Modifier Function of Temperature Curve Name",
-                                    CurveManager::GetCurveName(
+                                    Curve::GetCurveName(
                                         state, GetDXCoilCapFTCurveIndex(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)),
                                     RatedInletAirTempHeat,
                                     RatedOutdoorWetBulbTempHeat);
@@ -4469,7 +4469,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                         DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXHeatCoilType_Num)),
                                     GetDXCoilCapFTCurveIndex(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound),
                                     "Heating Capacity Ratio Modifier Function of Temperature Curve Name",
-                                    CurveManager::GetCurveName(
+                                    Curve::GetCurveName(
                                         state, GetDXCoilCapFTCurveIndex(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)),
                                     RatedInletAirTempHeat,
                                     RatedOutdoorAirTempHeat);
@@ -7856,7 +7856,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     // Obtains flow rates from the zone or system sizing arrays.
 
     using namespace DataSizing;
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     auto &GetDXCoilCap(DXCoils::GetCoilCapacityByIndexType);
     using DataHVACGlobals::CoolingAirflowSizing;
     using DataHVACGlobals::CoolingCapacitySizing;
@@ -8801,7 +8801,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             // calculate the piping correction factors only once
             if (state.dataHVACVarRefFlow->VRF(VRFCond).PCFLengthCoolPtr > 0) {
                 {
-                    if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).PCFLengthCoolPtr).NumDims == 2) {
+                    if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).PCFLengthCoolPtr).numDims == 2) {
                         state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling =
                             min(1.0,
                                 max(0.5,
@@ -8828,7 +8828,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
             if (state.dataHVACVarRefFlow->VRF(VRFCond).PCFLengthHeatPtr > 0) {
                 {
-                    if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).PCFLengthHeatPtr).NumDims == 2) {
+                    if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).PCFLengthHeatPtr).numDims == 2) {
                         state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating =
                             min(1.0,
                                 max(0.5,
@@ -11185,7 +11185,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     //       A new physics based VRF model applicable for Fluid Temperature Control.
 
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::FindRefrigerant;
     using FluidProperties::GetSatEnthalpyRefrig;
     using FluidProperties::GetSatPressureRefrig;
@@ -13229,7 +13229,7 @@ Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
     // PURPOSE OF THIS FUNCTION:
     //       Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
     //
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
 
     Real64 CAPSpd; // Evaporative capacity of the compressor at a given spd[W]
     Real64 CompResidual;
@@ -13816,7 +13816,7 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
     // METHODOLOGY EMPLOYED:
     //        This is part of the VRF-FluidTCtrl Model.
 
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::FindRefrigerant;
     using FluidProperties::GetSatPressureRefrig;
     using FluidProperties::GetSupHeatTempRefrig;
@@ -13975,7 +13975,7 @@ void VRFCondenserEquipment::VRFOU_CompCap(
     // METHODOLOGY EMPLOYED:
     //       This is part of the VRF-FluidTCtrl Model.
 
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::FindRefrigerant;
     using FluidProperties::GetSatPressureRefrig;
     using FluidProperties::GetSupHeatTempRefrig;
@@ -14097,7 +14097,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // This is part of the VRF-FluidTCtrl Model.
 
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::FindRefrigerant;
     using FluidProperties::GetSatEnthalpyRefrig;
     using FluidProperties::GetSatPressureRefrig;
@@ -14446,7 +14446,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     // METHODOLOGY EMPLOYED:
     // This is part of the VRF-FluidTCtrl Model.
 
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::FindRefrigerant;
     using FluidProperties::GetSatEnthalpyRefrig;
     using FluidProperties::GetSatPressureRefrig;

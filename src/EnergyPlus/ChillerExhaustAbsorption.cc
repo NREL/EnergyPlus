@@ -288,7 +288,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using CurveManager::GetCurveCheck;
+    using Curve::GetCurveCheck;
     using DataSizing::AutoSize;
     using GlobalNames::VerifyUniqueChillerName;
     using NodeInputManager::GetOnlySingleNode;
@@ -1622,7 +1622,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
         }
 
         // Determine available cooling capacity using the setpoint temperature
-        lAvailableCoolingCapacity = lNomCoolingCap * CurveManager::CurveValue(state, lCoolCapFTCurve, ChillSupplySetPointTemp, calcCondTemp);
+        lAvailableCoolingCapacity = lNomCoolingCap * Curve::CurveValue(state, lCoolCapFTCurve, ChillSupplySetPointTemp, calcCondTemp);
 
         // Calculate current load for cooling
         MyLoad = sign(max(std::abs(MyLoad), lAvailableCoolingCapacity * lMinPartLoadRat), MyLoad);
@@ -1735,15 +1735,15 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
         // Calculate thermal energy consumption for cooling
         // Thermal Energy used for cooling availCap * TeFIR * TeFIR-FT * TeFIR-FPLR
         lCoolThermalEnergyUseRate = lAvailableCoolingCapacity * lThermalEnergyCoolRatio *
-                                    CurveManager::CurveValue(state, lThermalEnergyCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
-                                    CurveManager::CurveValue(state, lThermalEnergyCoolFPLRCurve, lCoolPartLoadRatio) * lFractionOfPeriodRunning;
+                                    Curve::CurveValue(state, lThermalEnergyCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
+                                    Curve::CurveValue(state, lThermalEnergyCoolFPLRCurve, lCoolPartLoadRatio) * lFractionOfPeriodRunning;
 
         // Calculate electric parasitics used
         // based on nominal capacity, not available capacity,
         // electric used for cooling nomCap * %OP * EIR * EIR-FT * EIR-FPLR
         lCoolElectricPower = lNomCoolingCap * lElecCoolRatio * lFractionOfPeriodRunning *
-                             CurveManager::CurveValue(state, lElecCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
-                             CurveManager::CurveValue(state, lElecCoolFPLRCurve, lCoolPartLoadRatio);
+                             Curve::CurveValue(state, lElecCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
+                             Curve::CurveValue(state, lElecCoolFPLRCurve, lCoolPartLoadRatio);
 
         // determine conderser load which is cooling load plus the
         // ThermalEnergy used for cooling plus
@@ -1816,7 +1816,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
             // iteration's value of condenser supply temperature and the actual calculated condenser supply
             // temperature.  If this becomes too common then may need to iterate a solution instead of
             // relying on previous iteration method.
-            revisedEstimateAvailCap = lNomCoolingCap * CurveManager::CurveValue(state, lCoolCapFTCurve, ChillSupplySetPointTemp, lCondSupplyTemp);
+            revisedEstimateAvailCap = lNomCoolingCap * Curve::CurveValue(state, lCoolCapFTCurve, ChillSupplySetPointTemp, lCondSupplyTemp);
             if (revisedEstimateAvailCap > 0.0) {
                 errorAvailCap = std::abs((revisedEstimateAvailCap - lAvailableCoolingCapacity) / revisedEstimateAvailCap);
                 if (errorAvailCap > 0.05) { // if more than 5% error in estimate
@@ -1977,8 +1977,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
     } else {
 
         // Determine available heating capacity using the current cooling load
-        lAvailableHeatingCapacity = this->NomHeatCoolRatio * this->NomCoolingCap *
-                                    CurveManager::CurveValue(state, lHeatCapFCoolCurve, (this->CoolingLoad / this->NomCoolingCap));
+        lAvailableHeatingCapacity = this->NomHeatCoolRatio * this->NomCoolingCap * Curve::CurveValue(state, lHeatCapFCoolCurve, (this->CoolingLoad / this->NomCoolingCap));
 
         // Calculate current load for heating
         MyLoad = sign(max(std::abs(MyLoad), this->HeatingCapacity * lMinPartLoadRat), MyLoad);
@@ -2026,7 +2025,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
         // ThermalEnergy used for heating availCap * HIR * HIR-FT * HIR-FPLR
 
         lHeatThermalEnergyUseRate =
-            lAvailableHeatingCapacity * lThermalEnergyHeatRatio * CurveManager::CurveValue(state, lThermalEnergyHeatFHPLRCurve, lHeatPartLoadRatio);
+            lAvailableHeatingCapacity * lThermalEnergyHeatRatio * Curve::CurveValue(state, lThermalEnergyHeatFHPLRCurve, lHeatPartLoadRatio);
 
         // calculate the fraction of the time period that the chiller would be running
         // use maximum from heating and cooling sides

@@ -285,9 +285,9 @@ namespace VariableSpeedCoils {
         using BranchNodeConnections::TestCompSet;
         using GlobalNames::VerifyUniqueCoilName;
         using namespace OutputReportPredefined;
-        using CurveManager::CurveValue;
-        using CurveManager::GetCurveIndex;
-        using CurveManager::SetCurveOutputMinMaxValues;
+        using Curve::CurveValue;
+        using Curve::GetCurveIndex;
+        using Curve::SetCurveOutputMinMaxValues;
 
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
@@ -535,7 +535,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -575,8 +575,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
                                                      {1},                                                                     // Valid dimensions
                                                      RoutineName,                                                             // Routine name
@@ -615,8 +614,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
                                                      {1},                                                                       // Valid dimensions
                                                      RoutineName,                                                               // Routine name
@@ -655,7 +653,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -695,7 +693,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
                                                                 {1},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -734,8 +732,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
                                                      {1},                                                                      // Valid dimensions
                                                      RoutineName,                                                              // Routine name
@@ -775,7 +772,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeat(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -1169,7 +1166,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -1209,8 +1206,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
                                                      {1},                                                                     // Valid dimensions
                                                      RoutineName,                                                             // Routine name
@@ -1249,7 +1245,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -1289,7 +1285,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
                                                                 {1},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -1545,7 +1541,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -1587,8 +1583,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
                                                      {1},                                                                     // Valid dimensions
                                                      RoutineName,                                                             // Routine name
@@ -1627,8 +1622,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
                                                      {1},                                                                       // Valid dimensions
                                                      RoutineName,                                                               // Routine name
@@ -1667,7 +1661,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -1709,7 +1703,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
                                                                 {1},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -1748,8 +1742,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
                                                      {1},                                                                      // Valid dimensions
                                                      RoutineName,                                                              // Routine name
@@ -1789,7 +1782,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeat(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -2005,7 +1998,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostEIRFT, // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -2117,7 +2110,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -2157,8 +2150,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
                                                      {1},                                                                     // Valid dimensions
                                                      RoutineName,                                                             // Routine name
@@ -2197,7 +2189,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -2237,7 +2229,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
                                                                 {1},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -2622,7 +2614,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -2664,8 +2656,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
                                                      {1},                                                                     // Valid dimensions
                                                      RoutineName,                                                             // Routine name
@@ -2706,8 +2697,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
                                                      {1},                                                                       // Valid dimensions
                                                      RoutineName,                                                               // Routine name
@@ -2748,7 +2738,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
                                                                 {2},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -2790,7 +2780,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
                                                                 {1},                                                        // Valid dimensions
                                                                 RoutineName,                                                // Routine name
@@ -2831,8 +2821,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |=
-                        CurveManager::CheckCurveDims(state,
+                    ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
                                                      {1},                                                                      // Valid dimensions
                                                      RoutineName,                                                              // Routine name
@@ -4701,7 +4690,7 @@ namespace VariableSpeedCoils {
                         RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
                     }
                     TotCapTempModFac =
-                        CurveManager::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
+                        Curve::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -4779,7 +4768,7 @@ namespace VariableSpeedCoils {
                         RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
                     }
                     TotCapTempModFac =
-                        CurveManager::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
+                        Curve::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -5714,7 +5703,7 @@ namespace VariableSpeedCoils {
         // and RuntimeFrac.
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
@@ -6464,7 +6453,7 @@ namespace VariableSpeedCoils {
         // a compressor COP.
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("CalcVarSpeedHPWH");
@@ -7106,7 +7095,7 @@ namespace VariableSpeedCoils {
         // and RuntimeFrac.
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
@@ -8435,7 +8424,7 @@ namespace VariableSpeedCoils {
         // Predictions. Proceedings of ACEEE Conference.
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("CalcTotCapSHR_VSWSHP");

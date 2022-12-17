@@ -329,10 +329,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                            state.dataIPShortCut->cAlphaArgs(5),
                                            "Condenser (not tested) Nodes");
 
-        thisChiller.GeneratorInputCurvePtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+        thisChiller.GeneratorInputCurvePtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (thisChiller.GeneratorInputCurvePtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         thisChiller.GeneratorInputCurvePtr,         // Curve index
                                                         {1},                                        // Valid dimensions
                                                         RoutineName,                                // Routine name
@@ -341,10 +341,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                         state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
         }
 
-        thisChiller.PumpPowerCurvePtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
+        thisChiller.PumpPowerCurvePtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
         if (thisChiller.PumpPowerCurvePtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         thisChiller.PumpPowerCurvePtr,              // Curve index
                                                         {1},                                        // Valid dimensions
                                                         RoutineName,                                // Routine name
@@ -458,10 +458,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
             };
         }
 
-        thisChiller.CapFCondenserTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
+        thisChiller.CapFCondenserTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
         if (thisChiller.CapFCondenserTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         thisChiller.CapFCondenserTempPtr,            // Curve index
                                                         {1},                                         // Valid dimensions
                                                         RoutineName,                                 // Routine name
@@ -470,10 +470,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                         state.dataIPShortCut->cAlphaFieldNames(11)); // Field Name
         }
 
-        thisChiller.CapFEvaporatorTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12));
+        thisChiller.CapFEvaporatorTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12));
         if (thisChiller.CapFEvaporatorTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         thisChiller.CapFEvaporatorTempPtr,           // Curve index
                                                         {1},                                         // Valid dimensions
                                                         RoutineName,                                 // Routine name
@@ -482,10 +482,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                         state.dataIPShortCut->cAlphaFieldNames(12)); // Field Name
         }
 
-        thisChiller.CapFGeneratorTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13));
+        thisChiller.CapFGeneratorTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13));
         if (thisChiller.CapFGeneratorTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         thisChiller.CapFGeneratorTempPtr,            // Curve index
                                                         {1},                                         // Valid dimensions
                                                         RoutineName,                                 // Routine name
@@ -494,10 +494,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                         state.dataIPShortCut->cAlphaFieldNames(13)); // Field Name
         }
 
-        thisChiller.HeatInputFCondTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14));
+        thisChiller.HeatInputFCondTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14));
         if (thisChiller.HeatInputFCondTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         thisChiller.HeatInputFCondTempPtr,           // Curve index
                                                         {1},                                         // Valid dimensions
                                                         RoutineName,                                 // Routine name
@@ -506,10 +506,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                         state.dataIPShortCut->cAlphaFieldNames(14)); // Field Name
         }
 
-        thisChiller.HeatInputFEvapTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(15));
+        thisChiller.HeatInputFEvapTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(15));
         if (thisChiller.HeatInputFEvapTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
+            ErrorsFound |= Curve::CheckCurveDims(state,
                                                         thisChiller.HeatInputFEvapTempPtr,           // Curve index
                                                         {1},                                         // Valid dimensions
                                                         RoutineName,                                 // Routine name
@@ -1035,7 +1035,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
     Real64 SteamInputRatNom = 1.0; // nominal energy input ratio (steam or hot water)
     if (this->GeneratorInputCurvePtr > 0) {
-        SteamInputRatNom = CurveManager::CurveValue(state, this->GeneratorInputCurvePtr, 1.0);
+        SteamInputRatNom = Curve::CurveValue(state, this->GeneratorInputCurvePtr, 1.0);
     }
 
     // find the appropriate Plant Sizing object
@@ -1703,12 +1703,12 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
 
     Real64 CapacityfAbsorberTemp = 1.0; // performance curve output
     if (this->CapFCondenserTempPtr > 0) {
-        CapacityfAbsorberTemp = CurveManager::CurveValue(state, this->CapFCondenserTempPtr, TempCondIn);
+        CapacityfAbsorberTemp = Curve::CurveValue(state, this->CapFCondenserTempPtr, TempCondIn);
     }
 
     Real64 CapacityfEvaporatorTemp = 1.0; // performance curve output
     if (this->CapFEvaporatorTempPtr > 0) {
-        CapacityfEvaporatorTemp = CurveManager::CurveValue(state, this->CapFEvaporatorTempPtr, TempEvapOut);
+        CapacityfEvaporatorTemp = Curve::CurveValue(state, this->CapFEvaporatorTempPtr, TempEvapOut);
     }
 
     Real64 CapacityfGeneratorTemp = 1.0; // performance curve output
@@ -1716,7 +1716,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
         if (this->GeneratorInletNodeNum > 0) {
             if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 CapacityfGeneratorTemp =
-                    CurveManager::CurveValue(state, this->CapFGeneratorTempPtr, state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp);
+                    Curve::CurveValue(state, this->CapFGeneratorTempPtr, state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp);
             } else {
                 CapacityfGeneratorTemp = 1.0;
             }
@@ -1918,8 +1918,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
     Real64 HeatInputfCondTemp = 1.0; // performance curve output
     if (this->GeneratorInletNodeNum > 0) {
         if (this->HeatInputFCondTempPtr > 0) {
-            HeatInputfCondTemp =
-                CurveManager::CurveValue(state, this->HeatInputFCondTempPtr, state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp);
+            HeatInputfCondTemp = Curve::CurveValue(state, this->HeatInputFCondTempPtr, state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp);
         } else {
             HeatInputfCondTemp = 1.0;
         }
@@ -1927,19 +1926,19 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
 
     Real64 HeatInputfEvapTemp = 1.0; // performance curve output
     if (this->HeatInputFEvapTempPtr > 0) {
-        HeatInputfEvapTemp = CurveManager::CurveValue(state, this->HeatInputFEvapTempPtr, state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp);
+        HeatInputfEvapTemp = Curve::CurveValue(state, this->HeatInputFEvapTempPtr, state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp);
     }
 
     // Calculate steam input ratio. Include impact of generator and evaporator temperatures
     Real64 HeatInputRat = HeatInputfCondTemp * HeatInputfEvapTemp; // generator heat input ratio
     if (this->GeneratorInputCurvePtr > 0) {
-        HeatInputRat = CurveManager::CurveValue(state, this->GeneratorInputCurvePtr, PartLoadRat) * HeatInputfCondTemp * HeatInputfEvapTemp;
+        HeatInputRat = Curve::CurveValue(state, this->GeneratorInputCurvePtr, PartLoadRat) * HeatInputfCondTemp * HeatInputfEvapTemp;
     }
 
     // Calculate electric input ratio
     Real64 ElectricInputRat = 1.0; // energy input ratio
     if (this->PumpPowerCurvePtr > 0) {
-        ElectricInputRat = CurveManager::CurveValue(state, this->PumpPowerCurvePtr, PartLoadRat);
+        ElectricInputRat = Curve::CurveValue(state, this->PumpPowerCurvePtr, PartLoadRat);
     }
 
     this->QGenerator = HeatInputRat * AbsorberNomCap * FRAC;

@@ -78,7 +78,7 @@ using namespace DataAirLoop;
 using namespace DataAirSystems;
 using namespace DataHVACGlobals;
 using namespace DataSizing;
-using namespace CurveManager;
+using namespace Curve;
 using namespace OutputReportPredefined;
 using namespace ScheduleManager;
 using namespace DataEnvironment;
@@ -169,8 +169,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
@@ -184,8 +184,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
@@ -199,8 +199,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Biquadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
@@ -324,8 +324,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
@@ -339,8 +339,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
@@ -354,8 +354,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Biquadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
@@ -656,11 +656,11 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
         PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
         if (rCurve.curveType == CurveType::BiQuadratic) {
-            rCurve.ObjectType = "Curve:Biquadratic";
-            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+            rCurve.objectType = "Curve:Biquadratic";
+            rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
         } else if (rCurve.curveType == CurveType::Quadratic) {
-            rCurve.ObjectType = "Curve:Quadratic";
-            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+            rCurve.objectType = "Curve:Quadratic";
+            rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
         }
     }
 
@@ -904,11 +904,11 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
         PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
         if (rCurve.curveType == CurveType::BiQuadratic) {
-            rCurve.ObjectType = "Curve:Biquadratic";
-            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+            rCurve.objectType = "Curve:Biquadratic";
+            rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
         } else if (rCurve.curveType == CurveType::Quadratic) {
-            rCurve.ObjectType = "Curve:Quadratic";
-            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+            rCurve.objectType = "Curve:Quadratic";
+            rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
         }
     }
 
@@ -3896,8 +3896,8 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP1";
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Biquadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1.658788451;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.0834530076;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.00342409032;
@@ -3912,8 +3912,8 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP2";
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Biquadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1.472738138;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.0672218352;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0029199042;
@@ -3928,8 +3928,8 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP1";
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Biquadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.84077409;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.0014336586;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.000150336;
@@ -3944,8 +3944,8 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     CurveNum = 4;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP2";
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Biquadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.831506971;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.0018392166;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.000187596;
@@ -4053,8 +4053,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     // biquadratic curve
     constantcurve1.Name = "constant biquadratic curve";
     constantcurve1.curveType = CurveType::BiQuadratic;
-    constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = InterpType::EvaluateCurveToLimits;
+    constantcurve1.objectType = "Curve:Biquadratic";
+    constantcurve1.interpolationType = InterpType::EvaluateCurveToLimits;
     constantcurve1.coeff[0] = 1.0;
     constantcurve1.coeff[1] = 0.0;
     constantcurve1.coeff[2] = 0.0;
@@ -4070,8 +4070,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = CurveType::Quadratic;
-    constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = InterpType::EvaluateCurveToLimits;
+    constantcurve2.objectType = "Curve:Quadratic";
+    constantcurve2.interpolationType = InterpType::EvaluateCurveToLimits;
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
     constantcurve2.coeff[2] = 0.0;
@@ -4209,8 +4209,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     // biquadratic curve
     constantcurve1.Name = "constant biquadratic curve";
     constantcurve1.curveType = CurveType::BiQuadratic;
-    constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = InterpType::EvaluateCurveToLimits;
+    constantcurve1.objectType = "Curve:Biquadratic";
+    constantcurve1.interpolationType = InterpType::EvaluateCurveToLimits;
     constantcurve1.coeff[0] = 1.0;
     constantcurve1.coeff[1] = 0.0;
     constantcurve1.coeff[2] = 0.0;
@@ -4226,8 +4226,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = CurveType::Quadratic;
-    constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = InterpType::EvaluateCurveToLimits;
+    constantcurve2.objectType = "Curve:Quadratic";
+    constantcurve2.interpolationType = InterpType::EvaluateCurveToLimits;
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
     constantcurve2.coeff[2] = 0.0;
