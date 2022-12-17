@@ -429,7 +429,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // biquadratic curve
     constantcurve1.Name = "constant biquadratic curve";
     constantcurve1.curveType = Curve::CurveType::BiQuadratic;
-    constantcurve1.objectType = "Curve:Biquadratic";
     constantcurve1.interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     constantcurve1.coeff[0] = 1.0;
     constantcurve1.coeff[1] = 0.0;
@@ -446,7 +445,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = Curve::CurveType::Quadratic;
-    constantcurve2.objectType = "Curve:Quadratic";
     constantcurve2.interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
@@ -848,7 +846,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // biquadratic curve
     constantcurve1.Name = "constant biquadratic curve";
     constantcurve1.curveType = Curve::CurveType::BiQuadratic;
-    constantcurve1.objectType = "Curve:Biquadratic";
     constantcurve1.interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     constantcurve1.coeff[0] = 1.0;
     constantcurve1.coeff[1] = 0.0;
@@ -865,7 +862,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = Curve::CurveType::Quadratic;
-    constantcurve2.objectType = "Curve:Quadratic";
     constantcurve2.interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
@@ -1267,7 +1263,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     // biquadratic curve
     constantcurve1.Name = "constant biquadratic curve";
     constantcurve1.curveType = Curve::CurveType::BiQuadratic;
-    constantcurve1.objectType = "Curve:Biquadratic";
     constantcurve1.interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     constantcurve1.coeff[0] = 1.0;
     constantcurve1.coeff[1] = 0.0;
@@ -1284,7 +1279,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = Curve::CurveType::Quadratic;
-    constantcurve2.objectType = "Curve:Quadratic";
     constantcurve2.interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
@@ -1501,7 +1495,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     // biquadratic curve
     constantcurve1.Name = "constant biquadratic curve";
     constantcurve1.curveType = Curve::CurveType::BiQuadratic;
-    constantcurve1.objectType = "Curve:Biquadratic";
     constantcurve1.interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     constantcurve1.coeff[0] = 1.0;
     constantcurve1.coeff[1] = 0.0;
@@ -1518,7 +1511,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = Curve::CurveType::Quadratic;
-    constantcurve2.objectType = "Curve:Quadratic";
     constantcurve2.interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;

@@ -756,17 +756,16 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            DesupHtr.HEffFTemp,   // Curve index
-                                                            {2},                  // Valid dimensions
-                                                            RoutineName,          // Routine name
-                                                            cCurrentModuleObject, // Object Type
-                                                            DesupHtr.Name,        // Object Name
-                                                            cAlphaFieldNames(4)); // Field Name
+                                                     DesupHtr.HEffFTemp,   // Curve index
+                                                     {2},                  // Valid dimensions
+                                                     RoutineName,          // Routine name
+                                                     cCurrentModuleObject, // Object Type
+                                                     DesupHtr.Name,        // Object Name
+                                                     cAlphaFieldNames(4)); // Field Name
                 if (!ErrorsFound) {
                     if (DesupHtr.HEffFTemp > 0) {
-                        Real64 HEffFTemp =
-                            min(1.0,
-                                max(0.0, Curve::CurveValue(state, DesupHtr.HEffFTemp, DesupHtr.RatedInletWaterTemp, DesupHtr.RatedOutdoorAirTemp)));
+                        Real64 HEffFTemp = min(
+                            1.0, max(0.0, Curve::CurveValue(state, DesupHtr.HEffFTemp, DesupHtr.RatedInletWaterTemp, DesupHtr.RatedOutdoorAirTemp)));
                         if (std::abs(HEffFTemp - 1.0) > 0.05) {
                             ShowWarningError(state, cCurrentModuleObject + ", \"" + DesupHtr.Name + "\":");
                             ShowContinueError(state, "The " + cAlphaFieldNames(4) + " should be normalized ");
@@ -2439,12 +2438,12 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                 }
 
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            Tank.PLFCurve,                              // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            RoutineName,                                // Routine name
-                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                            Tank.Name,                                  // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
+                                                     Tank.PLFCurve,                              // Curve index
+                                                     {1},                                        // Valid dimensions
+                                                     RoutineName,                                // Routine name
+                                                     state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                     Tank.Name,                                  // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
             }
         }
 

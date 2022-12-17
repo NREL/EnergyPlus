@@ -348,12 +348,12 @@ namespace WaterToAirHeatPumpSimple {
                 ErrorsFound = true;
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            simpleWAHP.TotalCoolCapCurveIndex,
-                                                            {4},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            simpleWAHP.Name,
-                                                            "Total Cooling Capacity Curve Name");
+                                                     simpleWAHP.TotalCoolCapCurveIndex,
+                                                     {4},
+                                                     RoutineName,
+                                                     CurrentModuleObject,
+                                                     simpleWAHP.Name,
+                                                     "Total Cooling Capacity Curve Name");
             }
             if (simpleWAHP.SensCoolCapCurveIndex == 0) {
                 if (lAlphaBlanks(7)) {
@@ -366,12 +366,12 @@ namespace WaterToAirHeatPumpSimple {
                 ErrorsFound = true;
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            simpleWAHP.SensCoolCapCurveIndex,
-                                                            {5},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            simpleWAHP.Name,
-                                                            "Sensible Cooling Capacity Curve Name");
+                                                     simpleWAHP.SensCoolCapCurveIndex,
+                                                     {5},
+                                                     RoutineName,
+                                                     CurrentModuleObject,
+                                                     simpleWAHP.Name,
+                                                     "Sensible Cooling Capacity Curve Name");
             }
             if (simpleWAHP.CoolPowCurveIndex == 0) {
                 if (lAlphaBlanks(8)) {
@@ -384,12 +384,12 @@ namespace WaterToAirHeatPumpSimple {
                 ErrorsFound = true;
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            simpleWAHP.CoolPowCurveIndex,
-                                                            {4},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            simpleWAHP.Name,
-                                                            "Cooling Power Consumption Curve Name");
+                                                     simpleWAHP.CoolPowCurveIndex,
+                                                     {4},
+                                                     RoutineName,
+                                                     CurrentModuleObject,
+                                                     simpleWAHP.Name,
+                                                     "Cooling Power Consumption Curve Name");
             }
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
             simpleWAHP.Twet_Rated = NumArray(9);
@@ -563,12 +563,12 @@ namespace WaterToAirHeatPumpSimple {
                 ErrorsFound = true;
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            simpleWAHP.HeatPowCurveIndex,
-                                                            {4},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            simpleWAHP.Name,
-                                                            "Heating Power Consumption Curve Name");
+                                                     simpleWAHP.HeatPowCurveIndex,
+                                                     {4},
+                                                     RoutineName,
+                                                     CurrentModuleObject,
+                                                     simpleWAHP.Name,
+                                                     "Heating Power Consumption Curve Name");
             }
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
             simpleWAHP.WaterInletNodeNum = GetOnlySingleNode(state,
@@ -1841,8 +1841,7 @@ namespace WaterToAirHeatPumpSimple {
                         PeakSensCapTempModFac =
                             Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
                         RatedSensCapTempModFac =
-                            Curve::CurveValue(
-                            state, simpleWatertoAirHP.SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         // calculate the rated sensible capacity based on peak conditions
                         // note: the rated sensible capacity can be different than the sensible capacity
                         // at rated conditions if the capacity curve isn't normalized at the rated
@@ -1963,8 +1962,7 @@ namespace WaterToAirHeatPumpSimple {
                         PeakSensCapTempModFac =
                             Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
                         RatedSensCapTempModFac =
-                            Curve::CurveValue(
-                            state, simpleWatertoAirHP.SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         // Check curve output when rated mixed air wetbulb is the design mixed air wetbulb
                         // calculate the rated sensible capacity based on peak conditions
                         // note: the rated sensible capacity can be different than the sensible capacity

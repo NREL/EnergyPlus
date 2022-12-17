@@ -4038,11 +4038,10 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     EXPECT_EQ(RatedSourceTempCool, 35.0);
     Real64 CoolCoolCapAtPeak = 33453.67913;
     Real64 TotCapTempModFac =
-        Curve::CurveValue(
-        *state,
-        state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel),
-        17.410329442560833,
-        RatedSourceTempCool);
+        Curve::CurveValue(*state,
+                          state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel),
+                          17.410329442560833,
+                          RatedSourceTempCool);
 
     EXPECT_NEAR(TotCapTempModFac, 0.930018048445091, 0.001);
     Real64 RatedCapCoolTotalDes = CoolCoolCapAtPeak / TotCapTempModFac;
@@ -19865,9 +19864,9 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
 
     // OAT at cooling peak was set = 0 C
     Real64 capFT_OAT = Curve::CurveValue(*state,
-                                                state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10),
-                                                MixWetBulb,
-                                                state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak);
+                                         state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10),
+                                         MixWetBulb,
+                                         state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak);
     // this value is certainly not used in the capacity calculation as shown below
     EXPECT_NEAR(capFT_OAT, 1.5, 0.0001);
 

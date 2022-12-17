@@ -265,7 +265,7 @@ TEST_F(EnergyPlusFixture, TableLookup)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(3, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ("Table:Lookup", state->dataCurveManager->PerfCurve(1).objectType);
+    EXPECT_TRUE(compare_enums(Curve::InterpType::BtwxtMethod, state->dataCurveManager->PerfCurve(1).interpolationType));
     EXPECT_EQ("CAPMODFUNCOFWATERFLOW", state->dataCurveManager->PerfCurve(1).Name);
 
     EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);

@@ -996,12 +996,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is BiQuadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                        {2},                                               // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(5));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                 {2},                                               // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(5));                                  // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -1030,12 +1030,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is Quadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
-                                                        {1},                                               // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(6));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                 {1},                                               // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(6));                                  // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -1063,12 +1063,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is BiQuadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
-                                                        {2},                                              // Valid dimensions
-                                                        RoutineName,                                      // Routine name
-                                                        CurrentModuleObject,                              // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                        cAlphaFields(7));                                 // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                 {2},                                              // Valid dimensions
+                                                 RoutineName,                                      // Routine name
+                                                 CurrentModuleObject,                              // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                 cAlphaFields(7));                                 // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -1097,12 +1097,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is Quadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
-                                                        {1},                                              // Valid dimensions
-                                                        RoutineName,                                      // Routine name
-                                                        CurrentModuleObject,                              // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                        cAlphaFields(8));                                 // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                 {1},                                              // Valid dimensions
+                                                 RoutineName,                                      // Routine name
+                                                 CurrentModuleObject,                              // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                 cAlphaFields(8));                                 // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -1130,12 +1130,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
-                                                        {1},                                             // Valid dimensions
-                                                        RoutineName,                                     // Routine name
-                                                        CurrentModuleObject,                             // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
-                                                        cAlphaFields(9));                                // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                 {1},                                             // Valid dimensions
+                                                 RoutineName,                                     // Routine name
+                                                 CurrentModuleObject,                             // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
+                                                 cAlphaFields(9));                                // Field Name
 
             if (!ErrorsFound) {
                 //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -1352,12 +1352,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
-                                                            {2},                                              // Valid dimensions
-                                                            RoutineName,                                      // Routine name
-                                                            CurrentModuleObject,                              // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                            cAlphaFields(15));                                // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
+                                                     {2},                                              // Valid dimensions
+                                                     RoutineName,                                      // Routine name
+                                                     CurrentModuleObject,                              // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                     cAlphaFields(15));                                // Field Name
             }
         }
 
@@ -1370,12 +1370,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is Quadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
-                                                            {1},                                              // Valid dimensions
-                                                            RoutineName,                                      // Routine name
-                                                            CurrentModuleObject,                              // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                            cAlphaFields(16));                                // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
+                                                     {1},                                              // Valid dimensions
+                                                     RoutineName,                                      // Routine name
+                                                     CurrentModuleObject,                              // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                     cAlphaFields(16));                                // Field Name
             }
         }
 
@@ -1598,12 +1598,12 @@ void GetDXCoils(EnergyPlusData &state)
                         } else {
                             // Verify Curve Object, only legal type is BiQuadratic
                             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(PerfModeNum), // Curve index
-                                                                        {2},                                       // Valid dimensions
-                                                                        RoutineName,                               // Routine name
-                                                                        CurrentModuleObject,                       // Object Type
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name, // Object Name
-                                                                        cAlphaFields2(2));                         // Field Name
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(PerfModeNum), // Curve index
+                                                                 {2},                                                         // Valid dimensions
+                                                                 RoutineName,                                                 // Routine name
+                                                                 CurrentModuleObject,                                         // Object Type
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,                   // Object Name
+                                                                 cAlphaFields2(2));                                           // Field Name
 
                             if (!ErrorsFound) {
                                 checkCurveIsNormalizedToOne(state,
@@ -1631,12 +1631,12 @@ void GetDXCoils(EnergyPlusData &state)
                         } else {
                             // Verify Curve Object, only legal type is Quadratic
                             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(PerfModeNum), // Curve index
-                                                                        {1},                                       // Valid dimensions
-                                                                        RoutineName,                               // Routine name
-                                                                        CurrentModuleObject,                       // Object Type
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name, // Object Name
-                                                                        cAlphaFields2(3));                         // Field Name
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(PerfModeNum), // Curve index
+                                                                 {1},                                                         // Valid dimensions
+                                                                 RoutineName,                                                 // Routine name
+                                                                 CurrentModuleObject,                                         // Object Type
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,                   // Object Name
+                                                                 cAlphaFields2(3));                                           // Field Name
 
                             if (!ErrorsFound) {
                                 checkCurveIsNormalizedToOne(state,
@@ -1662,12 +1662,12 @@ void GetDXCoils(EnergyPlusData &state)
                         } else {
                             // Verify Curve Object, only legal type is BiQuadratic
                             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(PerfModeNum), // Curve index
-                                                                        {2},                                       // Valid dimensions
-                                                                        RoutineName,                               // Routine name
-                                                                        CurrentModuleObject,                       // Object Type
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name, // Object Name
-                                                                        cAlphaFields2(4));                         // Field Name
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(PerfModeNum), // Curve index
+                                                                 {2},                                                        // Valid dimensions
+                                                                 RoutineName,                                                // Routine name
+                                                                 CurrentModuleObject,                                        // Object Type
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                 cAlphaFields2(4));                                          // Field Name
 
                             if (!ErrorsFound) {
                                 checkCurveIsNormalizedToOne(state,
@@ -1694,12 +1694,12 @@ void GetDXCoils(EnergyPlusData &state)
                         } else {
                             // Verify Curve Object, only legal type is Quadratic
                             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(PerfModeNum), // Curve index
-                                                                        {1},                                       // Valid dimensions
-                                                                        RoutineName,                               // Routine name
-                                                                        CurrentModuleObject,                       // Object Type
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name, // Object Name
-                                                                        cAlphaFields2(5));                         // Field Name
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(PerfModeNum), // Curve index
+                                                                 {1},                                                        // Valid dimensions
+                                                                 RoutineName,                                                // Routine name
+                                                                 CurrentModuleObject,                                        // Object Type
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                 cAlphaFields2(5));                                          // Field Name
 
                             if (!ErrorsFound) {
                                 checkCurveIsNormalizedToOne(state,
@@ -1725,12 +1725,12 @@ void GetDXCoils(EnergyPlusData &state)
                         } else {
                             // Verify Curve Object, only legal types are Quadratic or Cubic
                             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), // Curve index
-                                                                        {1},                                                       // Valid dimensions
-                                                                        RoutineName,                                               // Routine name
-                                                                        CurrentModuleObject,                                       // Object Type
-                                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,                 // Object Name
-                                                                        cAlphaFields2(6));                                         // Field Name
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), // Curve index
+                                                                 {1},                                                       // Valid dimensions
+                                                                 RoutineName,                                               // Routine name
+                                                                 CurrentModuleObject,                                       // Object Type
+                                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,                 // Object Name
+                                                                 cAlphaFields2(6));                                         // Field Name
 
                             if (!ErrorsFound) {
                                 //             Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -1861,12 +1861,12 @@ void GetDXCoils(EnergyPlusData &state)
                             } else {
                                 // Verify Curve Object, only legal type is BiQuadratic
                                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                            state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp(PerfModeNum), // Curve index
-                                                                            {2},                                       // Valid dimensions
-                                                                            RoutineName,                               // Routine name
-                                                                            CurrentModuleObject,                       // Object Type
-                                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name, // Object Name
-                                                                            cAlphaFields2(9));                         // Field Name
+                                                                     state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp(PerfModeNum), // Curve index
+                                                                     {2},                                                        // Valid dimensions
+                                                                     RoutineName,                                                // Routine name
+                                                                     CurrentModuleObject,                                        // Object Type
+                                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                     cAlphaFields2(9));                                          // Field Name
                             }
                         }
 
@@ -1881,12 +1881,12 @@ void GetDXCoils(EnergyPlusData &state)
                             } else {
                                 // Verify Curve Object, only legal type is BiQuadratic
                                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                            state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow(PerfModeNum), // Curve index
-                                                                            {1},                                       // Valid dimensions
-                                                                            RoutineName,                               // Routine name
-                                                                            CurrentModuleObject,                       // Object Type
-                                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name, // Object Name
-                                                                            cAlphaFields2(10));                        // Field Name
+                                                                     state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow(PerfModeNum), // Curve index
+                                                                     {1},                                                        // Valid dimensions
+                                                                     RoutineName,                                                // Routine name
+                                                                     CurrentModuleObject,                                        // Object Type
+                                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                     cAlphaFields2(10));                                         // Field Name
                             }
                         }
                         if (state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp(PerfModeNum) > 0 &&
@@ -2077,12 +2077,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // only legal types are Quadratic, BiQuadratic and Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                        {1, 2},                                            // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(5));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                 {1, 2},                                            // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(5));                                  // Field Name
 
             if (!ErrorsFound) {
                 if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1)).numDims == 1) {
@@ -2121,12 +2121,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is Quadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
-                                                        {1},                                               // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(6));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                 {1},                                               // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(6));                                  // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -2154,12 +2154,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // only legal types are Quadratic, BiQuadratic and Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
-                                                        {1, 2},                                           // Valid dimensions
-                                                        RoutineName,                                      // Routine name
-                                                        CurrentModuleObject,                              // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                        cAlphaFields(7));                                 // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                 {1, 2},                                           // Valid dimensions
+                                                 RoutineName,                                      // Routine name
+                                                 CurrentModuleObject,                              // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                 cAlphaFields(7));                                 // Field Name
 
             if (!ErrorsFound) {
                 if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1)).numDims == 1) {
@@ -2198,12 +2198,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
-                                                        {1},                                              // Valid dimensions
-                                                        RoutineName,                                      // Routine name
-                                                        CurrentModuleObject,                              // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                        cAlphaFields(8));                                 // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                 {1},                                              // Valid dimensions
+                                                 RoutineName,                                      // Routine name
+                                                 CurrentModuleObject,                              // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                 cAlphaFields(8));                                 // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -2231,12 +2231,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
-                                                        {1},                                             // Valid dimensions
-                                                        RoutineName,                                     // Routine name
-                                                        CurrentModuleObject,                             // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
-                                                        cAlphaFields(9));                                // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                 {1},                                             // Valid dimensions
+                                                 RoutineName,                                     // Routine name
+                                                 CurrentModuleObject,                             // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
+                                                 cAlphaFields(9));                                // Field Name
 
             if (!ErrorsFound) {
                 //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -2295,12 +2295,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
-                                                            {2},                                               // Valid dimensions
-                                                            RoutineName,                                       // Routine name
-                                                            CurrentModuleObject,                               // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                            cAlphaFields(10));                                 // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                                                     {2},                                               // Valid dimensions
+                                                     RoutineName,                                       // Routine name
+                                                     CurrentModuleObject,                               // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                     cAlphaFields(10));                                 // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -2581,12 +2581,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is BiQuadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                        {2},                                               // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(5));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                 {2},                                               // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(5));                                  // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -2615,12 +2615,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is Quadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
-                                                        {1},                                               // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(6));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                 {1},                                               // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(6));                                  // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -2648,12 +2648,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is BiQuadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
-                                                        {2},                                              // Valid dimensions
-                                                        RoutineName,                                      // Routine name
-                                                        CurrentModuleObject,                              // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                        cAlphaFields(7));                                 // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                 {2},                                              // Valid dimensions
+                                                 RoutineName,                                      // Routine name
+                                                 CurrentModuleObject,                              // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                 cAlphaFields(7));                                 // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -2682,12 +2682,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is Quadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
-                                                        {1},                                              // Valid dimensions
-                                                        RoutineName,                                      // Routine name
-                                                        CurrentModuleObject,                              // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                        cAlphaFields(8));                                 // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                 {1},                                              // Valid dimensions
+                                                 RoutineName,                                      // Routine name
+                                                 CurrentModuleObject,                              // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                 cAlphaFields(8));                                 // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -2715,12 +2715,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
-                                                        {1},                                             // Valid dimensions
-                                                        RoutineName,                                     // Routine name
-                                                        CurrentModuleObject,                             // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
-                                                        cAlphaFields(9));                                // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                 {1},                                             // Valid dimensions
+                                                 RoutineName,                                     // Routine name
+                                                 CurrentModuleObject,                             // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
+                                                 cAlphaFields(9));                                // Field Name
 
             if (!ErrorsFound) {
                 //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -2788,12 +2788,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is BiQuadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp2, // Curve index
-                                                        {2},                                             // Valid dimensions
-                                                        RoutineName,                                     // Routine name
-                                                        CurrentModuleObject,                             // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
-                                                        cAlphaFields(10));                               // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp2, // Curve index
+                                                 {2},                                             // Valid dimensions
+                                                 RoutineName,                                     // Routine name
+                                                 CurrentModuleObject,                             // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
+                                                 cAlphaFields(10));                               // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -2822,12 +2822,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is BiQuadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp2, // Curve index
-                                                        {2},                                            // Valid dimensions
-                                                        RoutineName,                                    // Routine name
-                                                        CurrentModuleObject,                            // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
-                                                        cAlphaFields(11));                              // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp2, // Curve index
+                                                 {2},                                            // Valid dimensions
+                                                 RoutineName,                                    // Routine name
+                                                 CurrentModuleObject,                            // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
+                                                 cAlphaFields(11));                              // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -3011,12 +3011,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
-                                                            {2},                                              // Valid dimensions
-                                                            RoutineName,                                      // Routine name
-                                                            CurrentModuleObject,                              // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                            cAlphaFields(17));                                // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
+                                                     {2},                                              // Valid dimensions
+                                                     RoutineName,                                      // Routine name
+                                                     CurrentModuleObject,                              // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                     cAlphaFields(17));                                // Field Name
             }
         }
 
@@ -3030,12 +3030,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
-                                                            {1},                                              // Valid dimensions
-                                                            RoutineName,                                      // Routine name
-                                                            CurrentModuleObject,                              // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
-                                                            cAlphaFields(18));                                // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
+                                                     {1},                                              // Valid dimensions
+                                                     RoutineName,                                      // Routine name
+                                                     CurrentModuleObject,                              // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
+                                                     cAlphaFields(18));                                // Field Name
             }
         }
 
@@ -3048,12 +3048,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp2, // Curve index
-                                                            {2},                                            // Valid dimensions
-                                                            RoutineName,                                    // Routine name
-                                                            CurrentModuleObject,                            // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
-                                                            cAlphaFields(19));                              // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp2, // Curve index
+                                                     {2},                                            // Valid dimensions
+                                                     RoutineName,                                    // Routine name
+                                                     CurrentModuleObject,                            // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
+                                                     cAlphaFields(19));                              // Field Name
             }
         }
 
@@ -3066,12 +3066,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow2, // Curve index
-                                                            {1},                                            // Valid dimensions
-                                                            RoutineName,                                    // Routine name
-                                                            CurrentModuleObject,                            // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
-                                                            cAlphaFields(20));                              // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow2, // Curve index
+                                                     {1},                                            // Valid dimensions
+                                                     RoutineName,                                    // Routine name
+                                                     CurrentModuleObject,                            // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
+                                                     cAlphaFields(20));                              // Field Name
             }
         }
         if (state.dataDXCoils->DXCoil(DXCoilNum).SHRFTemp(1) > 0 && state.dataDXCoils->DXCoil(DXCoilNum).SHRFFlow(1) > 0 &&
@@ -3373,12 +3373,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp, // Curve index
-                                                            {1, 2},                                         // Valid dimensions
-                                                            RoutineName,                                    // Routine name
-                                                            CurrentModuleObject,                            // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
-                                                            cAlphaFields(10));                              // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp, // Curve index
+                                                     {1, 2},                                         // Valid dimensions
+                                                     RoutineName,                                    // Routine name
+                                                     CurrentModuleObject,                            // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
+                                                     cAlphaFields(10));                              // Field Name
 
                 if (!ErrorsFound) {
                     if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp).numDims == 1) {
@@ -3413,12 +3413,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Cubic or Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
-                                                            {1},                                               // Valid dimensions
-                                                            RoutineName,                                       // Routine name
-                                                            CurrentModuleObject,                               // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                            cAlphaFields(11));                                 // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
+                                                     {1},                                               // Valid dimensions
+                                                     RoutineName,                                       // Routine name
+                                                     CurrentModuleObject,                               // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                     cAlphaFields(11));                                 // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -3442,12 +3442,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Cubic or Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCapFWaterFlow, // Curve index
-                                                            {1},                                                 // Valid dimensions
-                                                            RoutineName,                                         // Routine name
-                                                            CurrentModuleObject,                                 // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
-                                                            cAlphaFields(12));                                   // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCapFWaterFlow, // Curve index
+                                                     {1},                                                 // Valid dimensions
+                                                     RoutineName,                                         // Routine name
+                                                     CurrentModuleObject,                                 // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
+                                                     cAlphaFields(12));                                   // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -3471,12 +3471,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp, // Curve index
-                                                            {1, 2},                                         // Valid dimensions
-                                                            RoutineName,                                    // Routine name
-                                                            CurrentModuleObject,                            // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
-                                                            cAlphaFields(13));                              // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp, // Curve index
+                                                     {1, 2},                                         // Valid dimensions
+                                                     RoutineName,                                    // Routine name
+                                                     CurrentModuleObject,                            // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
+                                                     cAlphaFields(13));                              // Field Name
 
                 if (!ErrorsFound) {
                     if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp).numDims == 1) {
@@ -3511,12 +3511,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Cubic or Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
-                                                            {1},                                               // Valid dimensions
-                                                            RoutineName,                                       // Routine name
-                                                            CurrentModuleObject,                               // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                            cAlphaFields(14));                                 // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
+                                                     {1},                                               // Valid dimensions
+                                                     RoutineName,                                       // Routine name
+                                                     CurrentModuleObject,                               // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                     cAlphaFields(14));                                 // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -3540,12 +3540,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Cubic or Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCOPFWaterFlow, // Curve index
-                                                            {1},                                                 // Valid dimensions
-                                                            RoutineName,                                         // Routine name
-                                                            CurrentModuleObject,                                 // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
-                                                            cAlphaFields(15));                                   // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCOPFWaterFlow, // Curve index
+                                                     {1},                                                 // Valid dimensions
+                                                     RoutineName,                                         // Routine name
+                                                     CurrentModuleObject,                                 // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
+                                                     cAlphaFields(15));                                   // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -3569,12 +3569,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Cubic or Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
-                                                            {1},                                             // Valid dimensions
-                                                            RoutineName,                                     // Routine name
-                                                            CurrentModuleObject,                             // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
-                                                            cAlphaFields(16));                               // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                     {1},                                             // Valid dimensions
+                                                     RoutineName,                                     // Routine name
+                                                     CurrentModuleObject,                             // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
+                                                     cAlphaFields(16));                               // Field Name
 
                 if (!ErrorsFound) {
                     //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -3837,12 +3837,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp, // Curve index
-                                                            {1, 2},                                         // Valid dimensions
-                                                            RoutineName,                                    // Routine name
-                                                            CurrentModuleObject,                            // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
-                                                            cAlphaFields(6));                               // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp, // Curve index
+                                                     {1, 2},                                         // Valid dimensions
+                                                     RoutineName,                                    // Routine name
+                                                     CurrentModuleObject,                            // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
+                                                     cAlphaFields(6));                               // Field Name
 
                 if (!ErrorsFound) {
                     if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp).numDims == 1) {
@@ -3877,12 +3877,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Cubic or Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
-                                                            {1},                                               // Valid dimensions
-                                                            RoutineName,                                       // Routine name
-                                                            CurrentModuleObject,                               // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                            cAlphaFields(7));                                  // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
+                                                     {1},                                               // Valid dimensions
+                                                     RoutineName,                                       // Routine name
+                                                     CurrentModuleObject,                               // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                     cAlphaFields(7));                                  // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -3906,12 +3906,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp, // Curve index
-                                                            {1, 2},                                         // Valid dimensions
-                                                            RoutineName,                                    // Routine name
-                                                            CurrentModuleObject,                            // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
-                                                            cAlphaFields(8));                               // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp, // Curve index
+                                                     {1, 2},                                         // Valid dimensions
+                                                     RoutineName,                                    // Routine name
+                                                     CurrentModuleObject,                            // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
+                                                     cAlphaFields(8));                               // Field Name
 
                 if (!ErrorsFound) {
                     if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp).numDims == 1) {
@@ -3946,12 +3946,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Cubic or Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
-                                                            {1},                                               // Valid dimensions
-                                                            RoutineName,                                       // Routine name
-                                                            CurrentModuleObject,                               // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                            cAlphaFields(9));                                  // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
+                                                     {1},                                               // Valid dimensions
+                                                     RoutineName,                                       // Routine name
+                                                     CurrentModuleObject,                               // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                     cAlphaFields(9));                                  // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -3975,12 +3975,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Cubic or Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
-                                                            {1},                                             // Valid dimensions
-                                                            RoutineName,                                     // Routine name
-                                                            CurrentModuleObject,                             // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
-                                                            cAlphaFields(10));                               // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                     {1},                                             // Valid dimensions
+                                                     RoutineName,                                     // Routine name
+                                                     CurrentModuleObject,                             // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,       // Object Name
+                                                     cAlphaFields(10));                               // Field Name
 
                 if (!ErrorsFound) {
                     //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -4318,12 +4318,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                            {2},                                                 // Valid dimensions
-                                                            RoutineName,                                         // Routine name
-                                                            CurrentModuleObject,                                 // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
-                                                            cAlphaFields(13 + (I - 1) * 6));                     // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                     {2},                                                 // Valid dimensions
+                                                     RoutineName,                                         // Routine name
+                                                     CurrentModuleObject,                                 // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
+                                                     cAlphaFields(13 + (I - 1) * 6));                     // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -4352,12 +4352,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
-                                                            {1},                                                 // Valid dimensions
-                                                            RoutineName,                                         // Routine name
-                                                            CurrentModuleObject,                                 // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
-                                                            cAlphaFields(14 + (I - 1) * 6));                     // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
+                                                     {1},                                                 // Valid dimensions
+                                                     RoutineName,                                         // Routine name
+                                                     CurrentModuleObject,                                 // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
+                                                     cAlphaFields(14 + (I - 1) * 6));                     // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -4385,12 +4385,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                            {2},                                                // Valid dimensions
-                                                            RoutineName,                                        // Routine name
-                                                            CurrentModuleObject,                                // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
-                                                            cAlphaFields(15 + (I - 1) * 6));                    // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                     {2},                                                // Valid dimensions
+                                                     RoutineName,                                        // Routine name
+                                                     CurrentModuleObject,                                // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
+                                                     cAlphaFields(15 + (I - 1) * 6));                    // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -4419,12 +4419,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
-                                                            {1},                                                // Valid dimensions
-                                                            RoutineName,                                        // Routine name
-                                                            CurrentModuleObject,                                // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
-                                                            cAlphaFields(16 + (I - 1) * 6));                    // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
+                                                     {1},                                                // Valid dimensions
+                                                     RoutineName,                                        // Routine name
+                                                     CurrentModuleObject,                                // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
+                                                     cAlphaFields(16 + (I - 1) * 6));                    // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -4452,12 +4452,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), // Curve index
-                                                            {1},                                               // Valid dimensions
-                                                            RoutineName,                                       // Routine name
-                                                            CurrentModuleObject,                               // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                            cAlphaFields(17 + (I - 1) * 6));                   // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), // Curve index
+                                                     {1},                                               // Valid dimensions
+                                                     RoutineName,                                       // Routine name
+                                                     CurrentModuleObject,                               // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                     cAlphaFields(17 + (I - 1) * 6));                   // Field Name
 
                 if (!ErrorsFound) {
                     //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -4552,12 +4552,12 @@ void GetDXCoils(EnergyPlusData &state)
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                     // Verify Curve Object, only legal types are BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
-                                                                {2},                                                 // Valid dimensions
-                                                                RoutineName,                                         // Routine name
-                                                                CurrentModuleObject,                                 // Object Type
-                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
-                                                                cAlphaFields(18 + (I - 1) * 6));                     // Field Name
+                                                         state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                         {2},                                                 // Valid dimensions
+                                                         RoutineName,                                         // Routine name
+                                                         CurrentModuleObject,                                 // Object Type
+                                                         state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(18 + (I - 1) * 6));                     // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I), RatedOutdoorAirTemp, RatedInletAirTemp);
@@ -4731,12 +4731,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
-                                                            {2},                                               // Valid dimensions
-                                                            RoutineName,                                       // Routine name
-                                                            CurrentModuleObject,                               // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                            cAlphaFields(5));                                  // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                                                     {2},                                               // Valid dimensions
+                                                     RoutineName,                                       // Routine name
+                                                     CurrentModuleObject,                               // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                     cAlphaFields(5));                                  // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -4871,12 +4871,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // only legal types are Quadratic, BiQuadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                            {1, 2},                                              // Valid dimensions
-                                                            RoutineName,                                         // Routine name
-                                                            CurrentModuleObject,                                 // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
-                                                            cAlphaFields(10 + (I - 1) * 6));                     // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                     {1, 2},                                              // Valid dimensions
+                                                     RoutineName,                                         // Routine name
+                                                     CurrentModuleObject,                                 // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
+                                                     cAlphaFields(10 + (I - 1) * 6));                     // Field Name
 
                 if (!ErrorsFound) {
                     if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I)).numDims == 1) {
@@ -4915,12 +4915,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
-                                                            {1},                                                 // Valid dimensions
-                                                            RoutineName,                                         // Routine name
-                                                            CurrentModuleObject,                                 // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
-                                                            cAlphaFields(11 + (I - 1) * 6));                     // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
+                                                     {1},                                                 // Valid dimensions
+                                                     RoutineName,                                         // Routine name
+                                                     CurrentModuleObject,                                 // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
+                                                     cAlphaFields(11 + (I - 1) * 6));                     // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -4948,12 +4948,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // only legal types are Quadratic, BiQuadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                            {1, 2},                                             // Valid dimensions
-                                                            RoutineName,                                        // Routine name
-                                                            CurrentModuleObject,                                // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
-                                                            cAlphaFields(12 + (I - 1) * 6));                    // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                     {1, 2},                                             // Valid dimensions
+                                                     RoutineName,                                        // Routine name
+                                                     CurrentModuleObject,                                // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
+                                                     cAlphaFields(12 + (I - 1) * 6));                    // Field Name
 
                 if (!ErrorsFound) {
                     if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I)).numDims == 1) {
@@ -4992,12 +4992,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal type is Quadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
-                                                            {1},                                                // Valid dimensions
-                                                            RoutineName,                                        // Routine name
-                                                            CurrentModuleObject,                                // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
-                                                            cAlphaFields(13 + (I - 1) * 6));                    // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
+                                                     {1},                                                // Valid dimensions
+                                                     RoutineName,                                        // Routine name
+                                                     CurrentModuleObject,                                // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
+                                                     cAlphaFields(13 + (I - 1) * 6));                    // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
@@ -5025,12 +5025,12 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), // Curve index
-                                                            {1},                                               // Valid dimensions
-                                                            RoutineName,                                       // Routine name
-                                                            CurrentModuleObject,                               // Object Type
-                                                            state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                            cAlphaFields(14 + (I - 1) * 6));                   // Field Name
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), // Curve index
+                                                     {1},                                               // Valid dimensions
+                                                     RoutineName,                                       // Routine name
+                                                     CurrentModuleObject,                               // Object Type
+                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                     cAlphaFields(14 + (I - 1) * 6));                   // Field Name
 
                 if (!ErrorsFound) {
                     //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -5082,12 +5082,12 @@ void GetDXCoils(EnergyPlusData &state)
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                     // Verify Curve Object, only legal types are BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
-                                                                {2},                                                 // Valid dimensions
-                                                                RoutineName,                                         // Routine name
-                                                                CurrentModuleObject,                                 // Object Type
-                                                                state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
-                                                                cAlphaFields(15 + (I - 1) * 6));                     // Field Name
+                                                         state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                         {2},                                                 // Valid dimensions
+                                                         RoutineName,                                         // Routine name
+                                                         CurrentModuleObject,                                 // Object Type
+                                                         state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(15 + (I - 1) * 6));                     // Field Name
 
                     if (!ErrorsFound) {
                         checkCurveIsNormalizedToOne(state,
@@ -5201,12 +5201,12 @@ void GetDXCoils(EnergyPlusData &state)
         state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(state, Alphas(3));
         // Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
         ErrorsFound |= Curve::CheckCurveDims(state,
-                                                    state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                    {1, 2},                                            // Valid dimensions
-                                                    RoutineName,                                       // Routine name
-                                                    CurrentModuleObject,                               // Object Type
-                                                    state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                    cAlphaFields(3));                                  // Field Name
+                                             state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                             {1, 2},                                            // Valid dimensions
+                                             RoutineName,                                       // Routine name
+                                             CurrentModuleObject,                               // Object Type
+                                             state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                             cAlphaFields(3));                                  // Field Name
 
         if (!ErrorsFound) {
             if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1)).numDims == 1) {
@@ -5244,12 +5244,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is Linear, Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
-                                                        {1},                                               // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(4));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                 {1},                                               // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(4));                                  // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -5386,12 +5386,12 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                        {1, 2},                                            // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(5));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                 {1, 2},                                            // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(5));                                  // Field Name
 
             if (!ErrorsFound) {
                 if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1)).numDims == 1) {
@@ -5424,12 +5424,12 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             // Verify Curve Object, only legal type is Quadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
-                                                        {1},                                               // Valid dimensions
-                                                        RoutineName,                                       // Routine name
-                                                        CurrentModuleObject,                               // Object Type
-                                                        state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
-                                                        cAlphaFields(6));                                  // Field Name
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                 {1},                                               // Valid dimensions
+                                                 RoutineName,                                       // Routine name
+                                                 CurrentModuleObject,                               // Object Type
+                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
+                                                 cAlphaFields(6));                                  // Field Name
 
             if (!ErrorsFound) {
                 checkCurveIsNormalizedToOne(state,
@@ -5535,7 +5535,7 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             {
-                if (state.dataCurveManager->PerfCurve(indexSHCurve).objectType == "Curve:Quadratic") {
+                if (state.dataCurveManager->PerfCurve(indexSHCurve).curveType == Curve::CurveType::Quadratic) {
                     state.dataDXCoils->DXCoil(DXCoilNum).C1Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[0];
                     state.dataDXCoils->DXCoil(DXCoilNum).C2Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[1];
                     state.dataDXCoils->DXCoil(DXCoilNum).C3Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[2];
@@ -5544,8 +5544,9 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowSevereError(
                         state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError(state,
-                                      "...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + state.dataCurveManager->PerfCurve(indexSHCurve).objectType);
+                                      format("...illegal {} type for this object = {}",
+                                             cAlphaFields(5),
+                                             Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(indexSHCurve).curveType)]));
                     ShowContinueError(state, "... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -5657,7 +5658,7 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             {
-                if (state.dataCurveManager->PerfCurve(indexSCCurve).objectType == "Curve:Quadratic") {
+                if (state.dataCurveManager->PerfCurve(indexSCCurve).curveType == Curve::CurveType::Quadratic) {
                     state.dataDXCoils->DXCoil(DXCoilNum).C1Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[0];
                     state.dataDXCoils->DXCoil(DXCoilNum).C2Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[1];
                     state.dataDXCoils->DXCoil(DXCoilNum).C3Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[2];
@@ -5666,8 +5667,9 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowSevereError(
                         state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError(state,
-                                      "...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + state.dataCurveManager->PerfCurve(indexSCCurve).objectType);
+                                      format("...illegal {} type for this object = {}",
+                                             cAlphaFields(5),
+                                             Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(indexSCCurve).curveType)]));
                     ShowContinueError(state, "... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }

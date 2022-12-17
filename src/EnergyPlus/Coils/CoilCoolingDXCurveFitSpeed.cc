@@ -225,12 +225,12 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
         } else {
             // Verify Curve Object dimensions
             bool errorFound = Curve::CheckCurveDims(state,
-                                                           curveIndex,           // Curve index
-                                                           std::move(validDims), // Valid dimensions
-                                                           routineName,          // Routine name
-                                                           this->object_name,    // Object Type
-                                                           this->name,           // Object Name
-                                                           fieldName);           // Field Name
+                                                    curveIndex,           // Curve index
+                                                    std::move(validDims), // Valid dimensions
+                                                    routineName,          // Routine name
+                                                    this->object_name,    // Object Type
+                                                    this->name,           // Object Name
+                                                    fieldName);           // Field Name
             if (!errorFound) {
                 Curve::checkCurveIsNormalizedToOne(
                     state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2, Var3, Var4, Var5);

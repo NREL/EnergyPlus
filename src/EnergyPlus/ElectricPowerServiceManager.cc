@@ -3379,12 +3379,12 @@ ElectricStorage::ElectricStorage( // main constructor
                 errorsFound = true;
             } else {
                 errorsFound |= Curve::CheckCurveDims(state,
-                                                            chargeCurveNum_,                            // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            routineName,                                // Routine name
-                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                            name_,                                      // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(4)); // Field Name
+                                                     chargeCurveNum_,                            // Curve index
+                                                     {1},                                        // Valid dimensions
+                                                     routineName,                                // Routine name
+                                                     state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                     name_,                                      // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(4)); // Field Name
             }
             dischargeCurveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // voltage calculation for discharging
             if (dischargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(5)) {
@@ -3401,12 +3401,12 @@ ElectricStorage::ElectricStorage( // main constructor
                 errorsFound = true;
             } else {
                 errorsFound |= Curve::CheckCurveDims(state,
-                                                            dischargeCurveNum_,                         // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            routineName,                                // Routine name
-                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                            name_,                                      // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
+                                                     dischargeCurveNum_,                         // Curve index
+                                                     {1},                                        // Valid dimensions
+                                                     routineName,                                // Routine name
+                                                     state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                     name_,                                      // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
             }
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "Yes")) {
@@ -3440,12 +3440,12 @@ ElectricStorage::ElectricStorage( // main constructor
                     errorsFound = true;
                 } else {
                     errorsFound |= Curve::CheckCurveDims(state,
-                                                                lifeCurveNum_,                              // Curve index
-                                                                {1},                                        // Valid dimensions
-                                                                routineName,                                // Routine name
-                                                                state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                                name_,                                      // Object Name
-                                                                state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
+                                                         lifeCurveNum_,                              // Curve index
+                                                         {1},                                        // Valid dimensions
+                                                         routineName,                                // Routine name
+                                                         state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                         name_,                                      // Object Name
+                                                         state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
                 }
 
                 cycleBinNum_ = state.dataIPShortCut->rNumericArgs(14);

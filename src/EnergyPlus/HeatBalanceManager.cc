@@ -2055,12 +2055,12 @@ namespace HeatBalanceManager {
                                               " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
                         ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                    state.dataMaterial->Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
-                                                                    {2},                                         // Valid dimensions
-                                                                    RoutineName,                                 // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,   // Object Type
-                                                                    state.dataMaterial->Material(MaterNum).Name, // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(5));  // Field Name
+                                                             state.dataMaterial->Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
+                                                             {2},                                                             // Valid dimensions
+                                                             RoutineName,                                                     // Routine name
+                                                             state.dataHeatBalMgr->CurrentModuleObject,                       // Object Type
+                                                             state.dataMaterial->Material(MaterNum).Name,                     // Object Name
+                                                             state.dataIPShortCut->cAlphaFieldNames(5));                      // Field Name
 
                         GetCurveMinMaxValues(state,
                                              state.dataMaterial->Material(MaterNum).GlassSpecAngTransDataPtr,
@@ -2128,12 +2128,12 @@ namespace HeatBalanceManager {
                                               " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
                         ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                    state.dataMaterial->Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
-                                                                    {2},                                         // Valid dimensions
-                                                                    RoutineName,                                 // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,   // Object Type
-                                                                    state.dataMaterial->Material(MaterNum).Name, // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(6));  // Field Name
+                                                             state.dataMaterial->Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
+                                                             {2},                                                              // Valid dimensions
+                                                             RoutineName,                                                      // Routine name
+                                                             state.dataHeatBalMgr->CurrentModuleObject,                        // Object Type
+                                                             state.dataMaterial->Material(MaterNum).Name,                      // Object Name
+                                                             state.dataIPShortCut->cAlphaFieldNames(6));                       // Field Name
 
                         GetCurveMinMaxValues(state,
                                              state.dataMaterial->Material(MaterNum).GlassSpecAngFRefleDataPtr,
@@ -2201,12 +2201,12 @@ namespace HeatBalanceManager {
                                               " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
                         ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                    state.dataMaterial->Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
-                                                                    {2},                                         // Valid dimensions
-                                                                    RoutineName,                                 // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,   // Object Type
-                                                                    state.dataMaterial->Material(MaterNum).Name, // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(7));  // Field Name
+                                                             state.dataMaterial->Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
+                                                             {2},                                                              // Valid dimensions
+                                                             RoutineName,                                                      // Routine name
+                                                             state.dataHeatBalMgr->CurrentModuleObject,                        // Object Type
+                                                             state.dataMaterial->Material(MaterNum).Name,                      // Object Name
+                                                             state.dataIPShortCut->cAlphaFieldNames(7));                       // Field Name
 
                         GetCurveMinMaxValues(state,
                                              state.dataMaterial->Material(MaterNum).GlassSpecAngBRefleDataPtr,

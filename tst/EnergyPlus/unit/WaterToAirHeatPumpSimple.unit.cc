@@ -120,7 +120,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
 
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -9.149069561;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 10.878140260;
@@ -138,7 +137,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuintLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -5.462690012;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 17.95968138;
@@ -159,7 +157,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -3.205409884;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.976409399;
@@ -1131,7 +1128,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     int CurveNum;
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -9.32564313298629;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 11.088084240584;
@@ -1150,7 +1146,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuintLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -5.26562830117273;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 17.3118017582604;
@@ -1172,7 +1167,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -3.25323327026219;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.990977022339372;
@@ -1207,7 +1201,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
 
     CurveNum = 4;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -0.68126221;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.99529297;
@@ -1226,7 +1219,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
 
     CurveNum = 5;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuintLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 2.24209455;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 7.28913391;
@@ -1248,7 +1240,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
 
     CurveNum = 6;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -3.20456384;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.47656454;
@@ -1348,7 +1339,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
 
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -9.32564313298629;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 11.088084240584;
@@ -1366,7 +1356,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuintLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -5.26562830117273;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 17.3118017582604;
@@ -1387,7 +1376,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -3.25323327026219;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.990977022339372;
@@ -1405,7 +1393,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
 
     CurveNum = 4;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -1.30782327125798;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -2.37467612404102;
@@ -1423,7 +1410,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
 
     CurveNum = 5;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:QuadLinear";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -2.17352461285805;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.830808361346509;

@@ -2354,7 +2354,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     // Read in IDF
     ProcessScheduleInput(*state);                    // read schedules
-    Curve::GetCurveInput(*state);             // read curves
+    Curve::GetCurveInput(*state);                    // read curves
     FluidProperties::GetFluidPropertiesData(*state); // read refrigerant properties
 
     // set up ZoneEquipConfig data
@@ -2851,7 +2851,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     // Inputs: parameters
     auto &thisCurve = state->dataCurveManager->PerfCurve(CurveNum);
     thisCurve.curveType = CurveType::BiQuadratic;
-    thisCurve.objectType = "Curve:Biquadratic";
     thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
     thisCurve.coeff[0] = 724.71125;     // Coefficient1 Constant
     thisCurve.coeff[1] = -21.867868;    // Coefficient2 x
@@ -5724,7 +5723,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DummyArray = 0.0;
     ScheduleManager::GetScheduleValuesForDay(*state, 1, DummyArray, 58, 3);
 
-    Curve::GetCurveInput(*state);                  // read curves
+    Curve::GetCurveInput(*state);                         // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -6622,7 +6621,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataSize->ZoneEqSizing.allocate(1);
 
-    Curve::GetCurveInput(*state);                  // read curves
+    Curve::GetCurveInput(*state);                         // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -15175,7 +15174,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataSize->ZoneEqSizing.allocate(1);
 
-    Curve::GetCurveInput(*state);                  // read curves
+    Curve::GetCurveInput(*state);                         // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 

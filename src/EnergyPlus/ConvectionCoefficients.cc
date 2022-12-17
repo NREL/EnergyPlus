@@ -985,12 +985,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 ErrorsFound = true;
             } else { // check type
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffCurveNum, // Curve index
-                                                 {1},                                                                           // Valid dimensions
-                                                 RoutineName,                                                                   // Routine name
-                                                 CurrentModuleObject,                                                           // Object Type
-                                                 state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,                 // Object Name
-                                                 state.dataIPShortCut->cAlphaFieldNames(3));                                    // Field Name
+                                                     state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffCurveNum, // Curve index
+                                                     {1},                                                           // Valid dimensions
+                                                     RoutineName,                                                   // Routine name
+                                                     CurrentModuleObject,                                           // Object Type
+                                                     state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name, // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(3));                    // Field Name
             }
         } else {
             state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffCurveNum = 0;
@@ -1006,14 +1006,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 ErrorsFound = true;
             } else { // check type
                 ErrorsFound |=
-                    Curve::CheckCurveDims(
-                    state,
-                    state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum, // Curve index
-                    {1},                                                                                    // Valid dimensions
-                    RoutineName,                                                                            // Routine name
-                    CurrentModuleObject,                                                                    // Object Type
-                    state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,                          // Object Name
-                    state.dataIPShortCut->cAlphaFieldNames(4));                                             // Field Name
+                    Curve::CheckCurveDims(state,
+                                          state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum, // Curve index
+                                          {1},                                                                                    // Valid dimensions
+                                          RoutineName,                                                                            // Routine name
+                                          CurrentModuleObject,                                                                    // Object Type
+                                          state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,                          // Object Name
+                                          state.dataIPShortCut->cAlphaFieldNames(4));                                             // Field Name
             }
         } else {
             state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum = 0;
@@ -1028,12 +1027,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 ErrorsFound = true;
             } else { // check type
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHCurveNum, // Curve index
-                                                            {1},                                                           // Valid dimensions
-                                                            RoutineName,                                                   // Routine name
-                                                            CurrentModuleObject,                                           // Object Type
-                                                            state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name, // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(5));                    // Field Name
+                                                     state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHCurveNum, // Curve index
+                                                     {1},                                                                      // Valid dimensions
+                                                     RoutineName,                                                              // Routine name
+                                                     CurrentModuleObject,                                                      // Object Type
+                                                     state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,            // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(5));                               // Field Name
             }
         } else {
             state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHCurveNum = 0;
@@ -1049,14 +1048,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 ErrorsFound = true;
             } else { // check type
                 ErrorsFound |=
-                    Curve::CheckCurveDims(
-                    state,
-                    state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum, // Curve index
-                    {1},                                                                                    // Valid dimensions
-                    RoutineName,                                                                            // Routine name
-                    CurrentModuleObject,                                                                    // Object Type
-                    state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,                          // Object Name
-                    state.dataIPShortCut->cAlphaFieldNames(6));                                             // Field Name
+                    Curve::CheckCurveDims(state,
+                                          state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum, // Curve index
+                                          {1},                                                                                    // Valid dimensions
+                                          RoutineName,                                                                            // Routine name
+                                          CurrentModuleObject,                                                                    // Object Type
+                                          state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name,                          // Object Name
+                                          state.dataIPShortCut->cAlphaFieldNames(6));                                             // Field Name
             }
         } else {
             state.dataConvectionCoefficient->HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum = 0;
@@ -1102,12 +1100,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 ErrorsFound = true;
             } else { // check type
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum, // Curve index
-                                                 {1},                                                                             // Valid dimensions
-                                                 RoutineName,                                                                     // Routine name
-                                                 CurrentModuleObject,                                                             // Object Type
-                                                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name,                  // Object Name
-                                                 state.dataIPShortCut->cAlphaFieldNames(3));                                      // Field Name
+                                                     state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum, // Curve index
+                                                     {1},                                                            // Valid dimensions
+                                                     RoutineName,                                                    // Routine name
+                                                     CurrentModuleObject,                                            // Object Type
+                                                     state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name, // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(3));                     // Field Name
             }
         } else {
             state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum = 0;
@@ -1124,12 +1122,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 ErrorsFound = true;
             } else { // check type
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum, // Curve index
-                                                 {1},                                                                            // Valid dimensions
-                                                 RoutineName,                                                                    // Routine name
-                                                 CurrentModuleObject,                                                            // Object Type
-                                                 state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name,                 // Object Name
-                                                 state.dataIPShortCut->cAlphaFieldNames(4));                                     // Field Name
+                                                     state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum, // Curve index
+                                                     {1},                                                            // Valid dimensions
+                                                     RoutineName,                                                    // Routine name
+                                                     CurrentModuleObject,                                            // Object Type
+                                                     state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name, // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(4));                     // Field Name
             }
         } else {
             state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum = 0;
@@ -1146,14 +1144,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                 ErrorsFound = true;
             } else { // check type
                 ErrorsFound |=
-                    Curve::CheckCurveDims(
-                    state,
-                    state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum, // Curve index
-                    {1},                                                                                     // Valid dimensions
-                    RoutineName,                                                                             // Routine name
-                    CurrentModuleObject,                                                                     // Object Type
-                    state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name,                          // Object Name
-                    state.dataIPShortCut->cAlphaFieldNames(5));                                              // Field Name
+                    Curve::CheckCurveDims(state,
+                                          state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum, // Curve index
+                                          {1},                                                                                     // Valid dimensions
+                                          RoutineName,                                                                             // Routine name
+                                          CurrentModuleObject,                                                                     // Object Type
+                                          state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name,                          // Object Name
+                                          state.dataIPShortCut->cAlphaFieldNames(5));                                              // Field Name
             }
         } else {
             state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum = 0;

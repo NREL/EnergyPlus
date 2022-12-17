@@ -920,12 +920,12 @@ namespace IceThermalStorage {
             }
 
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum, // Curve index
-                                                        {2},                                                                       // Valid dimensions
-                                                        "GetIceStorageInput: ",                                                    // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,                                // Object Type
-                                                        state.dataIceThermalStorage->DetailedIceStorage(iceNum).Name,              // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(6));                                // Field Name
+                                                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum, // Curve index
+                                                 {2},                                                                       // Valid dimensions
+                                                 "GetIceStorageInput: ",                                                    // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,                                // Object Type
+                                                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).Name,              // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(6));                                // Field Name
 
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveName = state.dataIPShortCut->cAlphaArgs(8);
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
@@ -964,12 +964,12 @@ namespace IceThermalStorage {
             }
 
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum, // Curve index
-                                                        {2},                                                                    // Valid dimensions
-                                                        "GetIceStorageInput: ",                                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,                             // Object Type
-                                                        state.dataIceThermalStorage->DetailedIceStorage(iceNum).Name,           // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(8));                             // Field Name
+                                                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum, // Curve index
+                                                 {2},                                                                    // Valid dimensions
+                                                 "GetIceStorageInput: ",                                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,                             // Object Type
+                                                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).Name,           // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(8));                             // Field Name
 
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).CurveFitTimeStep = state.dataIPShortCut->rNumericArgs(2);
             if ((state.dataIceThermalStorage->DetailedIceStorage(iceNum).CurveFitTimeStep <= 0.0) ||

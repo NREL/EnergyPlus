@@ -119,7 +119,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
 
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 21.2;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.09;
@@ -134,7 +133,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).objectType = "Curve:Quadratic";
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 18.8;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.33;

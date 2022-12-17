@@ -536,12 +536,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                         {2},                                                                  // Valid dimensions
+                                                         RoutineName,                                                          // Routine name
+                                                         CurrentModuleObject,                                                  // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                        // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(
@@ -576,12 +576,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
-                                                     {1},                                                                     // Valid dimensions
-                                                     RoutineName,                                                             // Routine name
-                                                     CurrentModuleObject,                                                     // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                           // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                         {1},                                                                     // Valid dimensions
+                                                         RoutineName,                                                             // Routine name
+                                                         CurrentModuleObject,                                                     // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                           // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
@@ -615,12 +615,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
-                                                     {1},                                                                       // Valid dimensions
-                                                     RoutineName,                                                               // Routine name
-                                                     CurrentModuleObject,                                                       // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                             // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
+                                                         {1},                                                        // Valid dimensions
+                                                         RoutineName,                                                // Routine name
+                                                         CurrentModuleObject,                                        // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                              // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
@@ -654,12 +654,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                         {2},                                                                 // Valid dimensions
+                                                         RoutineName,                                                         // Routine name
+                                                         CurrentModuleObject,                                                 // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                       // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(
@@ -694,12 +694,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
-                                                                {1},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                         {1},                                                                    // Valid dimensions
+                                                         RoutineName,                                                            // Routine name
+                                                         CurrentModuleObject,                                                    // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                          // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
@@ -733,12 +733,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
-                                                     {1},                                                                      // Valid dimensions
-                                                     RoutineName,                                                              // Routine name
-                                                     CurrentModuleObject,                                                      // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,               // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                            // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
+                                                         {1},                                                                      // Valid dimensions
+                                                         RoutineName,                                                              // Routine name
+                                                         CurrentModuleObject,                                                      // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,               // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                            // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
@@ -773,12 +773,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeat(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                         {2},                                                                  // Valid dimensions
+                                                         RoutineName,                                                          // Routine name
+                                                         CurrentModuleObject,                                                  // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                        // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(
@@ -1167,12 +1167,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                         {2},                                                                  // Valid dimensions
+                                                         RoutineName,                                                          // Routine name
+                                                         CurrentModuleObject,                                                  // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                        // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(
@@ -1207,12 +1207,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
-                                                     {1},                                                                     // Valid dimensions
-                                                     RoutineName,                                                             // Routine name
-                                                     CurrentModuleObject,                                                     // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                           // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                         {1},                                                                     // Valid dimensions
+                                                         RoutineName,                                                             // Routine name
+                                                         CurrentModuleObject,                                                     // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                           // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
@@ -1246,12 +1246,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                         {2},                                                                 // Valid dimensions
+                                                         RoutineName,                                                         // Routine name
+                                                         CurrentModuleObject,                                                 // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                       // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(
@@ -1286,12 +1286,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
-                                                                {1},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                         {1},                                                                    // Valid dimensions
+                                                         RoutineName,                                                            // Routine name
+                                                         CurrentModuleObject,                                                    // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                          // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
@@ -1542,12 +1542,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                         {2},                                                                  // Valid dimensions
+                                                         RoutineName,                                                          // Routine name
+                                                         CurrentModuleObject,                                                  // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                        // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state,
@@ -1584,12 +1584,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
-                                                     {1},                                                                     // Valid dimensions
-                                                     RoutineName,                                                             // Routine name
-                                                     CurrentModuleObject,                                                     // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                           // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                         {1},                                                                     // Valid dimensions
+                                                         RoutineName,                                                             // Routine name
+                                                         CurrentModuleObject,                                                     // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                           // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
@@ -1623,12 +1623,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
-                                                     {1},                                                                       // Valid dimensions
-                                                     RoutineName,                                                               // Routine name
-                                                     CurrentModuleObject,                                                       // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                             // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
+                                                         {1},                                                        // Valid dimensions
+                                                         RoutineName,                                                // Routine name
+                                                         CurrentModuleObject,                                        // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                              // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
@@ -1662,12 +1662,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                         {2},                                                                 // Valid dimensions
+                                                         RoutineName,                                                         // Routine name
+                                                         CurrentModuleObject,                                                 // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                       // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state,
@@ -1704,12 +1704,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
-                                                                {1},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                         {1},                                                                    // Valid dimensions
+                                                         RoutineName,                                                            // Routine name
+                                                         CurrentModuleObject,                                                    // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                          // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
@@ -1743,12 +1743,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
-                                                     {1},                                                                      // Valid dimensions
-                                                     RoutineName,                                                              // Routine name
-                                                     CurrentModuleObject,                                                      // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,               // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                            // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
+                                                         {1},                                                                      // Valid dimensions
+                                                         RoutineName,                                                              // Routine name
+                                                         CurrentModuleObject,                                                      // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,               // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                            // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
@@ -1783,12 +1783,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeat(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                         {2},                                                                  // Valid dimensions
+                                                         RoutineName,                                                          // Routine name
+                                                         CurrentModuleObject,                                                  // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                        // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state,
@@ -1999,12 +1999,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostEIRFT, // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                                                         {2},                                                                // Valid dimensions
+                                                         RoutineName,                                                        // Routine name
+                                                         CurrentModuleObject,                                                // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,         // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                      // Field Name
                 }
             }
 
@@ -2111,12 +2111,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                         {2},                                                                  // Valid dimensions
+                                                         RoutineName,                                                          // Routine name
+                                                         CurrentModuleObject,                                                  // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                        // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(
@@ -2151,12 +2151,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
-                                                     {1},                                                                     // Valid dimensions
-                                                     RoutineName,                                                             // Routine name
-                                                     CurrentModuleObject,                                                     // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                           // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                         {1},                                                                     // Valid dimensions
+                                                         RoutineName,                                                             // Routine name
+                                                         CurrentModuleObject,                                                     // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                           // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
@@ -2190,12 +2190,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                         {2},                                                                 // Valid dimensions
+                                                         RoutineName,                                                         // Routine name
+                                                         CurrentModuleObject,                                                 // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                       // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(
@@ -2230,12 +2230,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
-                                                                {1},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                         {1},                                                                    // Valid dimensions
+                                                         RoutineName,                                                            // Routine name
+                                                         CurrentModuleObject,                                                    // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                          // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
@@ -2615,12 +2615,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                         {2},                                                                  // Valid dimensions
+                                                         RoutineName,                                                          // Routine name
+                                                         CurrentModuleObject,                                                  // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                        // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal =
@@ -2657,12 +2657,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
-                                                     {1},                                                                     // Valid dimensions
-                                                     RoutineName,                                                             // Routine name
-                                                     CurrentModuleObject,                                                     // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                           // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                         {1},                                                                     // Valid dimensions
+                                                         RoutineName,                                                             // Routine name
+                                                         CurrentModuleObject,                                                     // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                           // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
@@ -2698,12 +2698,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
-                                                     {1},                                                                       // Valid dimensions
-                                                     RoutineName,                                                               // Routine name
-                                                     CurrentModuleObject,                                                       // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                             // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
+                                                         {1},                                                        // Valid dimensions
+                                                         RoutineName,                                                // Routine name
+                                                         CurrentModuleObject,                                        // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                              // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
@@ -2739,12 +2739,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                                {2},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                         {2},                                                                 // Valid dimensions
+                                                         RoutineName,                                                         // Routine name
+                                                         CurrentModuleObject,                                                 // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                       // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal =
@@ -2781,12 +2781,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
-                                                                {1},                                                        // Valid dimensions
-                                                                RoutineName,                                                // Routine name
-                                                                CurrentModuleObject,                                        // Object Type
-                                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, // Object Name
-                                                                cAlphaFields(AlfaFieldIncre));                              // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                         {1},                                                                    // Valid dimensions
+                                                         RoutineName,                                                            // Routine name
+                                                         CurrentModuleObject,                                                    // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                          // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
@@ -2822,12 +2822,12 @@ namespace VariableSpeedCoils {
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
-                                                     {1},                                                                      // Valid dimensions
-                                                     RoutineName,                                                              // Routine name
-                                                     CurrentModuleObject,                                                      // Object Type
-                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,               // Object Name
-                                                     cAlphaFields(AlfaFieldIncre));                                            // Field Name
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
+                                                         {1},                                                                      // Valid dimensions
+                                                         RoutineName,                                                              // Routine name
+                                                         CurrentModuleObject,                                                      // Object Type
+                                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,               // Object Name
+                                                         cAlphaFields(AlfaFieldIncre));                                            // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);

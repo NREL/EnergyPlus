@@ -106,6 +106,29 @@ namespace Curve {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(CurveType::Num)> objectNames = {
+        "Curve:Linear",
+        "Curve:Quadratic",
+        "Curve:Biquadratic",
+        "Curve:Cubic",
+        "Curve:QuadLinear",
+        "Curve:Bicubic",
+        "Curve:Triquadratic",
+        "Curve:Exponent",
+        "Curve:Quartic",
+        "Curve:FanPressureRise",
+        "Curve:ExponentialSkewNormal",
+        "Curve:Sigmoid",
+        "Curve:RectangularHyperbola1",
+        "Curve:RectangularHyperbola2",
+        "Curve:ExponentialDecay",
+        "Curve:DoubleExponentialDecay",
+        "Curve:QuadraticLinear",
+        "Curve:QuintLinear",
+        "Curve:CubicLinear",
+        "Curve:ChillerPartLoadWithLift",
+    }; // namespace Curve
+
     enum class InterpType
     {
         Invalid = -1,
@@ -126,7 +149,6 @@ namespace Curve {
     {
         // Basic data
         std::string Name;                         // Curve Name
-        std::string objectType;                   // Curve object type
         CurveType curveType = CurveType::Invalid; // Curve type (see parameter definitions above)
         // Table data stuff
         InterpType interpolationType = InterpType::Invalid; // Table interpolation method
@@ -303,7 +325,7 @@ namespace Curve {
                                      Optional<Real64 const> Var6 = _       // 6th independent variable
     );
 
-} // namespace CurveManager
+} // namespace Curve
 
 struct CurveManagerData : BaseGlobalStruct
 {

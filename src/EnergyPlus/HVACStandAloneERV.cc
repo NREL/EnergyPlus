@@ -917,12 +917,12 @@ void GetStandAloneERV(EnergyPlusData &state)
             } else {
                 // Verify Curve Object, only legal types are Quadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            thisOAController.EnthalpyCurvePtr, // Curve index
-                                                            {1},                               // Valid dimensions
-                                                            "GetStandAloneERV: ",              // Routine name
-                                                            CurrentModuleObject,               // Object Type
-                                                            thisOAController.Name,             // Object Name
-                                                            cAlphaFields(2));                  // Field Name
+                                                     thisOAController.EnthalpyCurvePtr, // Curve index
+                                                     {1},                               // Valid dimensions
+                                                     "GetStandAloneERV: ",              // Routine name
+                                                     CurrentModuleObject,               // Object Type
+                                                     thisOAController.Name,             // Object Name
+                                                     cAlphaFields(2));                  // Field Name
             }
         }
 

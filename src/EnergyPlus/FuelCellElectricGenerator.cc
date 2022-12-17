@@ -1760,8 +1760,7 @@ namespace FuelCellElectricGenerator {
             } else if (this->AirSup.AirSupRateMode == DataGenerators::AirSupRateMode::QuadraticFuncofPel) { // MEthod 2
 
                 this->FCPM.NdotAir =
-                    Curve::CurveValue(state, this->AirSup.AirFuncPelCurveID, Pel) *
-                                     (1 + this->AirSup.AirTempCoeff * this->AirSup.TairIntoFCPM);
+                    Curve::CurveValue(state, this->AirSup.AirFuncPelCurveID, Pel) * (1 + this->AirSup.AirTempCoeff * this->AirSup.TairIntoFCPM);
 
             } else if (this->AirSup.AirSupRateMode == DataGenerators::AirSupRateMode::QuadraticFuncofNdot) { // method 3
                 this->FCPM.NdotAir = Curve::CurveValue(state, this->AirSup.AirFuncNdotCurveID, this->FCPM.NdotFuel) *

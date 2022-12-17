@@ -717,12 +717,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
             }
 
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        RefrigCase(CaseNum).LatCapCurvePtr, // Curve index
-                                                        {1},                                // Valid dimensions
-                                                        RoutineName,                        // Routine name
-                                                        CurrentModuleObject,                // Object Type
-                                                        RefrigCase(CaseNum).Name,           // Object Name
-                                                        cAlphaFieldNames(5));               // Field Name
+                                                 RefrigCase(CaseNum).LatCapCurvePtr, // Curve index
+                                                 {1},                                // Valid dimensions
+                                                 RoutineName,                        // Routine name
+                                                 CurrentModuleObject,                // Object Type
+                                                 RefrigCase(CaseNum).Name,           // Object Name
+                                                 cAlphaFieldNames(5));               // Field Name
 
             NumNum = 8;
             if (!lNumericBlanks(NumNum)) {
@@ -1076,12 +1076,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             if (RefrigCase(CaseNum).DefCapCurvePtr > 0) {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            RefrigCase(CaseNum).DefCapCurvePtr, // Curve index
-                                                            {1},                                // Valid dimensions
-                                                            RoutineName,                        // Routine name
-                                                            CurrentModuleObject,                // Object Type
-                                                            RefrigCase(CaseNum).Name,           // Object Name
-                                                            cAlphaFieldNames(12));              // Field Name
+                                                     RefrigCase(CaseNum).DefCapCurvePtr, // Curve index
+                                                     {1},                                // Valid dimensions
+                                                     RoutineName,                        // Routine name
+                                                     CurrentModuleObject,                // Object Type
+                                                     RefrigCase(CaseNum).Name,           // Object Name
+                                                     cAlphaFieldNames(12));              // Field Name
             }
 
             //  warn user if defrost energy curve is entered that it is only used for temperature termination types
@@ -2127,12 +2127,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 }
                 // error checks for curve type entered and curve name
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
-                                                            {1},                                         // Valid dimensions
-                                                            RoutineName,                                 // Routine name
-                                                            CurrentModuleObject,                         // Object Type
-                                                            WarehouseCoil(CoilID).Name,                  // Object Name
-                                                            cAlphaFieldNames(AlphaNum));                 // Field Name
+                                                     WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
+                                                     {1},                                         // Valid dimensions
+                                                     RoutineName,                                 // Routine name
+                                                     CurrentModuleObject,                         // Object Type
+                                                     WarehouseCoil(CoilID).Name,                  // Object Name
+                                                     cAlphaFieldNames(AlphaNum));                 // Field Name
             } break;
             case SHRCorrectionType::TabularRH_DT1_TRoom: {
                 WarehouseCoil(CoilID).SHRCorrectionCurvePtr = Curve::GetCurveIndex(state, Alphas(AlphaNum)); // convert curve name to number
@@ -2147,12 +2147,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
-                                                            {3},                                         // Valid dimensions
-                                                            RoutineName,                                 // Routine name
-                                                            CurrentModuleObject,                         // Object Type
-                                                            WarehouseCoil(CoilID).Name,                  // Object Name
-                                                            cAlphaFieldNames(AlphaNum));                 // Field Name
+                                                     WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
+                                                     {3},                                         // Valid dimensions
+                                                     RoutineName,                                 // Routine name
+                                                     CurrentModuleObject,                         // Object Type
+                                                     WarehouseCoil(CoilID).Name,                  // Object Name
+                                                     cAlphaFieldNames(AlphaNum));                 // Field Name
                 //        IF(WarehouseCoil(CoilID)%SHRCorrectionCurvePtr == 0) THEN
                 //          CALL ShowSevereError(state, RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(WarehouseCoil(CoilID)%Name)//&
                 //                           '", not found  '//TRIM(cAlphaFieldNames(AlphaNum)))
@@ -2607,12 +2607,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
             }
 
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        RefrigRack(RackNum).COPFTempPtr, // Curve index
-                                                        {1},                             // Valid dimensions
-                                                        RoutineName,                     // Routine name
-                                                        CurrentModuleObject,             // Object Type
-                                                        RefrigRack(RackNum).Name,        // Object Name
-                                                        cAlphaFieldNames(3));            // Field Name
+                                                 RefrigRack(RackNum).COPFTempPtr, // Curve index
+                                                 {1},                             // Valid dimensions
+                                                 RoutineName,                     // Routine name
+                                                 CurrentModuleObject,             // Object Type
+                                                 RefrigRack(RackNum).Name,        // Object Name
+                                                 cAlphaFieldNames(3));            // Field Name
 
             RefrigRack(RackNum).CondenserFanPower = Numbers(2);
             if (Numbers(2) < 0.0) {
@@ -2632,12 +2632,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             if (!lAlphaBlanks(4)) {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            RefrigRack(RackNum).TotCondFTempPtr, // Curve index
-                                                            {1},                                 // Valid dimensions
-                                                            RoutineName,                         // Routine name
-                                                            CurrentModuleObject,                 // Object Type
-                                                            RefrigRack(RackNum).Name,            // Object Name
-                                                            cAlphaFieldNames(4));                // Field Name
+                                                     RefrigRack(RackNum).TotCondFTempPtr, // Curve index
+                                                     {1},                                 // Valid dimensions
+                                                     RoutineName,                         // Routine name
+                                                     CurrentModuleObject,                 // Object Type
+                                                     RefrigRack(RackNum).Name,            // Object Name
+                                                     cAlphaFieldNames(4));                // Field Name
             }
 
             if (UtilityRoutines::SameString(Alphas(5), "EvaporativelyCooled")) {
@@ -4275,12 +4275,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                Secondary(SecondaryNum).VarSpeedCurvePtr, // Curve index
-                                                                {1},                                      // Valid dimensions
-                                                                RoutineName,                              // Routine name
-                                                                CurrentModuleObject,                      // Object Type
-                                                                Secondary(SecondaryNum).Name,             // Object Name
-                                                                cAlphaFieldNames(AlphaNum));              // Field Name
+                                                         Secondary(SecondaryNum).VarSpeedCurvePtr, // Curve index
+                                                         {1},                                      // Valid dimensions
+                                                         RoutineName,                              // Routine name
+                                                         CurrentModuleObject,                      // Object Type
+                                                         Secondary(SecondaryNum).Name,             // Object Name
+                                                         cAlphaFieldNames(AlphaNum));              // Field Name
                 } // input power conditions/levels for constant or variable speed pump drives
 
                 // Default non-hermetic motor eff at 85% and all shaft power goes to heat in fluid
@@ -5478,9 +5478,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (!Compressor(CompNum).TransFlag) {          //  Subcritical Compressor
                     if (System(RefrigSysNum).NumStages == 1) { //  Single-stage compression
                         Compressor(CompNum).NomCap = Curve::CurveValue(state,
-                                                                              Compressor(CompNum).CapacityCurvePtr,
-                                                                              System(RefrigSysNum).TEvapDesign,
-                                                                              Condenser(System(RefrigSysNum).CondenserNum(1)).RatedTCondense);
+                                                                       Compressor(CompNum).CapacityCurvePtr,
+                                                                       System(RefrigSysNum).TEvapDesign,
+                                                                       Condenser(System(RefrigSysNum).CondenserNum(1)).RatedTCondense);
                         NominalTotalCompCap += Compressor(CompNum).NomCap;
                         ++Compressor(CompNum).NumSysAttach;
                     } else { //  Two-stage compression, low-stage compressors
@@ -5508,9 +5508,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     int CompNum = System(RefrigSysNum).HiStageCompressorNum(CompIndex);
                     if (!Compressor(CompNum).TransFlag) { //  Subcritical Compressor
                         Compressor(CompNum).NomCap = Curve::CurveValue(state,
-                                                                              Compressor(CompNum).CapacityCurvePtr,
-                                                                              System(RefrigSysNum).TIntercooler,
-                                                                              Condenser(System(RefrigSysNum).CondenserNum(1)).RatedTCondense);
+                                                                       Compressor(CompNum).CapacityCurvePtr,
+                                                                       System(RefrigSysNum).TIntercooler,
+                                                                       Condenser(System(RefrigSysNum).CondenserNum(1)).RatedTCondense);
                         NominalTotalHiStageCompCap += Compressor(CompNum).NomCap;
                         ++Compressor(CompNum).NumSysAttach;
                     } else { //  Transcritical compressor attached to subcritical refigeration cycle
@@ -6100,9 +6100,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     CompNum = TransSystem(TransRefrigSysNum).CompressorNumLP(CompIndex);
                     if (TransSystem(TransRefrigSysNum).TransSysType == 2) { //  Calculate capacity of LP compressors
                         Compressor(CompNum).NomCap = Curve::CurveValue(state,
-                                                                              Compressor(CompNum).CapacityCurvePtr,
-                                                                              TransSystem(TransRefrigSysNum).TEvapDesignLT,
-                                                                              TransSystem(TransRefrigSysNum).TEvapDesignMT);
+                                                                       Compressor(CompNum).CapacityCurvePtr,
+                                                                       TransSystem(TransRefrigSysNum).TEvapDesignLT,
+                                                                       TransSystem(TransRefrigSysNum).TEvapDesignMT);
                         NominalTotalCompCapLP += Compressor(CompNum).NomCap;
                         ++Compressor(CompNum).NumSysAttach;
                     }

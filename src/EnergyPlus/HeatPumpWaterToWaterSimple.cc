@@ -298,21 +298,21 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex,
-                                                        {4},
-                                                        "GetWatertoWaterHPInput",
-                                                        HPEqFitCoolingUC,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                        "Cooling Capacity Curve Name");
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex,
+                                                 {4},
+                                                 "GetWatertoWaterHPInput",
+                                                 HPEqFitCoolingUC,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 "Cooling Capacity Curve Name");
         }
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex,
-                                                        {4},
-                                                        "GetWatertoWaterHPInput",
-                                                        HPEqFitCoolingUC,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                        "Cooling Compressor Power Curve Name");
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex,
+                                                 {4},
+                                                 "GetWatertoWaterHPInput",
+                                                 HPEqFitCoolingUC,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 "Cooling Compressor Power Curve Name");
         }
 
         if (NumNums > 4) {
@@ -475,21 +475,21 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex,
-                                                        {4},
-                                                        "GetWatertoWaterHPInput",
-                                                        HPEqFitHeatingUC,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                        "Heating Capacity Curve Name");
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex,
+                                                 {4},
+                                                 "GetWatertoWaterHPInput",
+                                                 HPEqFitHeatingUC,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 "Heating Capacity Curve Name");
         }
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex,
-                                                        {4},
-                                                        "GetWatertoWaterHPInput",
-                                                        HPEqFitHeatingUC,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                        "Heating Compressor Power Curve Name");
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex,
+                                                 {4},
+                                                 "GetWatertoWaterHPInput",
+                                                 HPEqFitHeatingUC,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 "Heating Compressor Power Curve Name");
         }
         if (NumNums > 4) {
             if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {

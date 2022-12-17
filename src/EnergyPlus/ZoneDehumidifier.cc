@@ -339,12 +339,12 @@ namespace ZoneDehumidifier {
             } else {
                 // Verify Curve object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, // Curve index
-                                                 {2},                                                                              // Valid dimensions
-                                                 RoutineName,                                                                      // Routine name
-                                                 CurrentModuleObject,                                                              // Object Type
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,                   // Object Name
-                                                 cAlphaFields(5));                                                                 // Field Name
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, // Curve index
+                                                     {2},                                                            // Valid dimensions
+                                                     RoutineName,                                                    // Routine name
+                                                     CurrentModuleObject,                                            // Object Type
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name, // Object Name
+                                                     cAlphaFields(5));                                               // Field Name
 
                 if (!ErrorsFound) {
                     CurveVal = CurveValue(
@@ -374,12 +374,12 @@ namespace ZoneDehumidifier {
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, // Curve index
-                                                 {2},                                                                              // Valid dimensions
-                                                 RoutineName,                                                                      // Routine name
-                                                 CurrentModuleObject,                                                              // Object Type
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,                   // Object Name
-                                                 cAlphaFields(6));                                                                 // Field Name
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, // Curve index
+                                                     {2},                                                            // Valid dimensions
+                                                     RoutineName,                                                    // Routine name
+                                                     CurrentModuleObject,                                            // Object Type
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name, // Object Name
+                                                     cAlphaFields(6));                                               // Field Name
 
                 if (!ErrorsFound) {
                     CurveVal = CurveValue(
@@ -409,12 +409,12 @@ namespace ZoneDehumidifier {
             } else {
                 // Verify Curve Object, legal types are Quadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex, // Curve index
-                                                 {1},                                                                          // Valid dimensions
-                                                 RoutineName,                                                                  // Routine name
-                                                 CurrentModuleObject,                                                          // Object Type
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,               // Object Name
-                                                 cAlphaFields(7));                                                             // Field Name
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex, // Curve index
+                                                     {1},                                                                          // Valid dimensions
+                                                     RoutineName,                                                                  // Routine name
+                                                     CurrentModuleObject,                                                          // Object Type
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,               // Object Name
+                                                     cAlphaFields(7));                                                             // Field Name
             }
 
             // N4,  \field Minimum Dry-Bulb Temperature for Dehumidifier Operation

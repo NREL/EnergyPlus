@@ -4105,12 +4105,12 @@ namespace SystemAvailabilityManager {
                     }
                     // Check curve type
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                                hybridVentMgr.OpeningFactorFWS,             // Curve index
-                                                                {1},                                        // Valid dimensions
-                                                                RoutineName,                                // Routine name
-                                                                cCurrentModuleObject,                       // Object Type
-                                                                hybridVentMgr.Name,                         // Object Name
-                                                                state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
+                                                         hybridVentMgr.OpeningFactorFWS,             // Curve index
+                                                         {1},                                        // Valid dimensions
+                                                         RoutineName,                                // Routine name
+                                                         cCurrentModuleObject,                       // Object Type
+                                                         hybridVentMgr.Name,                         // Object Name
+                                                         state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
                 }
             }
 

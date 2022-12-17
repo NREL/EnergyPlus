@@ -729,16 +729,16 @@ void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->PlantInletNodeID, this->PlantMassFlowRateMax / rho);
 
     this->A42Model.ElecEff = Curve::CurveValue(state,
-                                                      this->A42Model.ElecEffCurveID,
-                                                      this->A42Model.MaxElecPower,
-                                                      this->PlantMassFlowRateMax,
-                                                      state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
+                                               this->A42Model.ElecEffCurveID,
+                                               this->A42Model.MaxElecPower,
+                                               this->PlantMassFlowRateMax,
+                                               state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
 
     this->A42Model.ThermEff = Curve::CurveValue(state,
-                                                       this->A42Model.ThermalEffCurveID,
-                                                       this->A42Model.MaxElecPower,
-                                                       this->PlantMassFlowRateMax,
-                                                       state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
+                                                this->A42Model.ThermalEffCurveID,
+                                                this->A42Model.MaxElecPower,
+                                                this->PlantMassFlowRateMax,
+                                                state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
 
     GeneratorDynamicsManager::SetupGeneratorControlStateManager(state, this->DynamicsControlID);
 }

@@ -2318,12 +2318,12 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
         } else {
             // Verify Curve Object, only legal types are Quadratic and Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        state.dataMixedAir->OAController(OutAirNum).EnthalpyCurvePtr, // Curve index
-                                                        {1},                                                          // Valid dimensions
-                                                        RoutineName,                                                  // Routine name
-                                                        CurrentModuleObject,                                          // Object Type
-                                                        state.dataMixedAir->OAController(OutAirNum).Name,             // Object Name
-                                                        cAlphaFields(8));                                             // Field Name
+                                                 state.dataMixedAir->OAController(OutAirNum).EnthalpyCurvePtr, // Curve index
+                                                 {1},                                                          // Valid dimensions
+                                                 RoutineName,                                                  // Routine name
+                                                 CurrentModuleObject,                                          // Object Type
+                                                 state.dataMixedAir->OAController(OutAirNum).Name,             // Object Name
+                                                 cAlphaFields(8));                                             // Field Name
         }
     }
 

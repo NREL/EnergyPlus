@@ -333,7 +333,6 @@ namespace Curve {
             // could add checks for blank numeric fields, and use field names for errors.
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::BiQuadratic;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 2;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 6; ++in) {
@@ -416,7 +415,6 @@ namespace Curve {
             thisCurve.Name = Alphas(1);
 
             thisCurve.curveType = CurveType::ChillerPartLoadWithLift;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 3;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
 
@@ -488,7 +486,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Cubic;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 4; ++in) {
@@ -553,7 +550,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Quartic;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 5; ++in) {
@@ -618,7 +614,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Quadratic;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
@@ -683,7 +678,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::QuadraticLinear;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 2;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 6; ++in) {
@@ -765,7 +759,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::CubicLinear;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 2;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 6; ++in) {
@@ -847,7 +840,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Linear;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 2; ++in) {
@@ -912,7 +904,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::BiCubic;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 2;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 10; ++in) {
@@ -994,7 +985,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::TriQuadratic;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 3;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             thisCurve.tri2ndOrder[0] = Numbers(1);
@@ -1117,7 +1107,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::QuadLinear;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 4;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 5; ++in) {
@@ -1197,7 +1186,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::QuintLinear;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 5;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 6; ++in) {
@@ -1278,7 +1266,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Exponent;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
@@ -1332,7 +1319,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::FanPressureRise;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 2;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 4; ++in) {
@@ -1401,7 +1387,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::ExponentialSkewNormal;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 4; ++in) {
@@ -1468,7 +1453,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::Sigmoid;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 5; ++in) {
@@ -1535,7 +1519,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::RectangularHyperbola1;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
@@ -1602,7 +1585,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::RectangularHyperbola2;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
@@ -1669,7 +1651,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::ExponentialDecay;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
@@ -1736,7 +1717,6 @@ namespace Curve {
 
             thisCurve.Name = Alphas(1);
             thisCurve.curveType = CurveType::DoubleExponentialDecay;
-            thisCurve.objectType = CurrentModuleObject;
             thisCurve.numDims = 1;
             thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 5; ++in) {
@@ -1863,7 +1843,6 @@ namespace Curve {
                     auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
                     thisCurve.Name = Alphas(1);
-                    thisCurve.objectType = CurrentModuleObject;
                     thisCurve.numDims = 1;
 
                     thisCurve.interpolationType = InterpType::BtwxtMethod;
@@ -2083,7 +2062,6 @@ namespace Curve {
                 auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
                 thisCurve.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                thisCurve.objectType = "Table:Lookup";
                 thisCurve.interpolationType = InterpType::BtwxtMethod;
 
                 std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
@@ -2991,7 +2969,7 @@ namespace Curve {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TempCurveIndex;
-        std::string GenericCurveType;
+        CurveType GenericCurveType;
 
         // If input is not gotten, go ahead and get it now
         if (state.dataCurveManager->GetCurvesInputFlag) {
@@ -3010,14 +2988,14 @@ namespace Curve {
         // See if it is valid
         if (TempCurveIndex > 0) {
             // We have to check the type of curve to make sure it is single independent variable type
-            GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex).objectType;
+            GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex).curveType;
             {
                 if (state.dataCurveManager->PerfCurve(TempCurveIndex).numDims == 1) {
                     PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {
                     ShowSevereError(state, "Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
-                    ShowContinueError(state, "Curve type detected: " + GenericCurveType);
+                    ShowContinueError(state, format("Curve type detected: {}", Curve::objectNames[static_cast<int>(GenericCurveType)]));
                     ShowContinueError(state, "Generic curves should be single independent variable such that DeltaP = f(mdot)");
                     ShowContinueError(state, " Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
                     ShowFatalError(state, "Errors in pressure simulation input cause program termination");
@@ -3175,6 +3153,6 @@ namespace Curve {
         }
     }
 
-} // namespace CurveManager
+} // namespace Curve
 
 } // namespace EnergyPlus

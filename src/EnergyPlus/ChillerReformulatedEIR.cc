@@ -1458,11 +1458,11 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                 ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
             }
             Curve::GetCurveMinMaxValues(state,
-                                               this->ChillerCapFTIndex,
-                                               this->ChillerCAPFTXTempMin,
-                                               this->ChillerCAPFTXTempMax,
-                                               this->ChillerCAPFTYTempMin,
-                                               this->ChillerCAPFTYTempMax);
+                                        this->ChillerCapFTIndex,
+                                        this->ChillerCAPFTXTempMin,
+                                        this->ChillerCAPFTXTempMax,
+                                        this->ChillerCAPFTYTempMin,
+                                        this->ChillerCAPFTYTempMax);
         }
 
         if (this->ChillerEIRFTIndex > 0) {
@@ -1473,11 +1473,11 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                 ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
             }
             Curve::GetCurveMinMaxValues(state,
-                                               this->ChillerEIRFTIndex,
-                                               this->ChillerEIRFTXTempMin,
-                                               this->ChillerEIRFTXTempMax,
-                                               this->ChillerEIRFTYTempMin,
-                                               this->ChillerEIRFTYTempMax);
+                                        this->ChillerEIRFTIndex,
+                                        this->ChillerEIRFTXTempMin,
+                                        this->ChillerEIRFTXTempMax,
+                                        this->ChillerEIRFTYTempMin,
+                                        this->ChillerEIRFTYTempMax);
         }
 
         if (this->ChillerEIRFPLRIndex > 0) {
@@ -1495,20 +1495,20 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
 
             if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
                 Curve::GetCurveMinMaxValues(state,
-                                                   this->ChillerEIRFPLRIndex,
-                                                   this->ChillerEIRFPLRTempMin,
-                                                   this->ChillerEIRFPLRTempMax,
-                                                   this->ChillerEIRFPLRPLRMin,
-                                                   this->ChillerEIRFPLRPLRMax);
+                                            this->ChillerEIRFPLRIndex,
+                                            this->ChillerEIRFPLRTempMin,
+                                            this->ChillerEIRFPLRTempMax,
+                                            this->ChillerEIRFPLRPLRMin,
+                                            this->ChillerEIRFPLRPLRMax);
             } else if (this->PartLoadCurveType == PLR::Lift) {
                 Curve::GetCurveMinMaxValues(state,
-                                                   this->ChillerEIRFPLRIndex,
-                                                   this->ChillerLiftNomMin,
-                                                   this->ChillerLiftNomMax,
-                                                   this->ChillerEIRFPLRPLRMin,
-                                                   this->ChillerEIRFPLRPLRMax,
-                                                   this->ChillerTdevNomMin,
-                                                   this->ChillerTdevNomMax);
+                                            this->ChillerEIRFPLRIndex,
+                                            this->ChillerLiftNomMin,
+                                            this->ChillerLiftNomMax,
+                                            this->ChillerEIRFPLRPLRMin,
+                                            this->ChillerEIRFPLRPLRMax,
+                                            this->ChillerTdevNomMin,
+                                            this->ChillerTdevNomMax);
             }
 
             if (this->ChillerEIRFPLRPLRMin < 0 || this->ChillerEIRFPLRPLRMin >= this->ChillerEIRFPLRPLRMax || this->ChillerEIRFPLRPLRMin > 1) {
@@ -1589,33 +1589,33 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
         }
     } else { // just get curve min/max values if capacity or cond volume flow rate = 0
         Curve::GetCurveMinMaxValues(state,
-                                           this->ChillerCapFTIndex,
-                                           this->ChillerCAPFTXTempMin,
-                                           this->ChillerCAPFTXTempMax,
-                                           this->ChillerCAPFTYTempMin,
-                                           this->ChillerCAPFTYTempMax);
+                                    this->ChillerCapFTIndex,
+                                    this->ChillerCAPFTXTempMin,
+                                    this->ChillerCAPFTXTempMax,
+                                    this->ChillerCAPFTYTempMin,
+                                    this->ChillerCAPFTYTempMax);
         Curve::GetCurveMinMaxValues(state,
-                                           this->ChillerEIRFTIndex,
-                                           this->ChillerEIRFTXTempMin,
-                                           this->ChillerEIRFTXTempMax,
-                                           this->ChillerEIRFTYTempMin,
-                                           this->ChillerEIRFTYTempMax);
+                                    this->ChillerEIRFTIndex,
+                                    this->ChillerEIRFTXTempMin,
+                                    this->ChillerEIRFTXTempMax,
+                                    this->ChillerEIRFTYTempMin,
+                                    this->ChillerEIRFTYTempMax);
         if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
             Curve::GetCurveMinMaxValues(state,
-                                               this->ChillerEIRFPLRIndex,
-                                               this->ChillerEIRFPLRTempMin,
-                                               this->ChillerEIRFPLRTempMax,
-                                               this->ChillerEIRFPLRPLRMin,
-                                               this->ChillerEIRFPLRPLRMax);
+                                        this->ChillerEIRFPLRIndex,
+                                        this->ChillerEIRFPLRTempMin,
+                                        this->ChillerEIRFPLRTempMax,
+                                        this->ChillerEIRFPLRPLRMin,
+                                        this->ChillerEIRFPLRPLRMax);
         } else if (this->PartLoadCurveType == PLR::Lift) {
             Curve::GetCurveMinMaxValues(state,
-                                               this->ChillerEIRFPLRIndex,
-                                               this->ChillerLiftNomMin,
-                                               this->ChillerLiftNomMax,
-                                               this->ChillerEIRFPLRPLRMin,
-                                               this->ChillerEIRFPLRPLRMax,
-                                               this->ChillerTdevNomMin,
-                                               this->ChillerTdevNomMax);
+                                        this->ChillerEIRFPLRIndex,
+                                        this->ChillerLiftNomMin,
+                                        this->ChillerLiftNomMax,
+                                        this->ChillerEIRFPLRPLRMin,
+                                        this->ChillerEIRFPLRPLRMax,
+                                        this->ChillerTdevNomMin,
+                                        this->ChillerTdevNomMax);
         }
     }
 

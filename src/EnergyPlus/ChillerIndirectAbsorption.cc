@@ -333,24 +333,24 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
         if (thisChiller.GeneratorInputCurvePtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        thisChiller.GeneratorInputCurvePtr,         // Curve index
-                                                        {1},                                        // Valid dimensions
-                                                        RoutineName,                                // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                        thisChiller.Name,                           // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
+                                                 thisChiller.GeneratorInputCurvePtr,         // Curve index
+                                                 {1},                                        // Valid dimensions
+                                                 RoutineName,                                // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                 thisChiller.Name,                           // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
         }
 
         thisChiller.PumpPowerCurvePtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
         if (thisChiller.PumpPowerCurvePtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        thisChiller.PumpPowerCurvePtr,              // Curve index
-                                                        {1},                                        // Valid dimensions
-                                                        RoutineName,                                // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                        thisChiller.Name,                           // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(8)); // Field Name
+                                                 thisChiller.PumpPowerCurvePtr,              // Curve index
+                                                 {1},                                        // Valid dimensions
+                                                 RoutineName,                                // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                 thisChiller.Name,                           // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(8)); // Field Name
         }
 
         if (NumAlphas > 15) {
@@ -462,60 +462,60 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
         if (thisChiller.CapFCondenserTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        thisChiller.CapFCondenserTempPtr,            // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(11)); // Field Name
+                                                 thisChiller.CapFCondenserTempPtr,            // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(11)); // Field Name
         }
 
         thisChiller.CapFEvaporatorTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12));
         if (thisChiller.CapFEvaporatorTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        thisChiller.CapFEvaporatorTempPtr,           // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(12)); // Field Name
+                                                 thisChiller.CapFEvaporatorTempPtr,           // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(12)); // Field Name
         }
 
         thisChiller.CapFGeneratorTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13));
         if (thisChiller.CapFGeneratorTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        thisChiller.CapFGeneratorTempPtr,            // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(13)); // Field Name
+                                                 thisChiller.CapFGeneratorTempPtr,            // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(13)); // Field Name
         }
 
         thisChiller.HeatInputFCondTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14));
         if (thisChiller.HeatInputFCondTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        thisChiller.HeatInputFCondTempPtr,           // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(14)); // Field Name
+                                                 thisChiller.HeatInputFCondTempPtr,           // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(14)); // Field Name
         }
 
         thisChiller.HeatInputFEvapTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(15));
         if (thisChiller.HeatInputFEvapTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                        thisChiller.HeatInputFEvapTempPtr,           // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(15)); // Field Name
+                                                 thisChiller.HeatInputFEvapTempPtr,           // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(15)); // Field Name
         }
 
         // Get remaining data

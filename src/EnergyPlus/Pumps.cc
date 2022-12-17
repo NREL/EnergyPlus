@@ -385,12 +385,12 @@ void GetPumpInput(EnergyPlusData &state)
                 thisPump.PressureCurve_Index = -1;
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            TempCurveIndex,                  // Curve index
-                                                            {1},                             // Valid dimensions
-                                                            RoutineName,                     // Routine name
-                                                            cCurrentModuleObject,            // Object Type
-                                                            thisPump.Name,                   // Object Name
-                                                            thisInput->cAlphaFieldNames(6)); // Field Name
+                                                     TempCurveIndex,                  // Curve index
+                                                     {1},                             // Valid dimensions
+                                                     RoutineName,                     // Routine name
+                                                     cCurrentModuleObject,            // Object Type
+                                                     thisPump.Name,                   // Object Name
+                                                     thisInput->cAlphaFieldNames(6)); // Field Name
 
                 if (!ErrorsFound) {
                     thisPump.PressureCurve_Index = TempCurveIndex;
@@ -617,12 +617,12 @@ void GetPumpInput(EnergyPlusData &state)
                 thisPump.PressureCurve_Index = -1;
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
-                                                            TempCurveIndex,                  // Curve index
-                                                            {1},                             // Valid dimensions
-                                                            RoutineName,                     // Routine name
-                                                            cCurrentModuleObject,            // Object Type
-                                                            thisPump.Name,                   // Object Name
-                                                            thisInput->cAlphaFieldNames(6)); // Field Name
+                                                     TempCurveIndex,                  // Curve index
+                                                     {1},                             // Valid dimensions
+                                                     RoutineName,                     // Routine name
+                                                     cCurrentModuleObject,            // Object Type
+                                                     thisPump.Name,                   // Object Name
+                                                     thisInput->cAlphaFieldNames(6)); // Field Name
 
                 if (!ErrorsFound) {
                     thisPump.PressureCurve_Index = TempCurveIndex;

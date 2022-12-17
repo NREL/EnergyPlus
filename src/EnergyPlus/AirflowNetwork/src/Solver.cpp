@@ -1829,12 +1829,12 @@ namespace AirflowNetwork {
                             "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues.");
                     } else {
                         ErrorsFound |= Curve::CheckCurveDims(m_state,
-                                                                    OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
-                                                                    {1},                                                  // Valid dimensions
-                                                                    RoutineName,                                          // Routine name
-                                                                    CurrentModuleObject,                                  // Object Type
-                                                                    OccupantVentilationControl(i).Name,                   // Object Name
-                                                                    cAlphaFields(2));                                     // Field Name
+                                                             OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
+                                                             {1},                                                  // Valid dimensions
+                                                             RoutineName,                                          // Routine name
+                                                             CurrentModuleObject,                                  // Object Type
+                                                             OccupantVentilationControl(i).Name,                   // Object Name
+                                                             cAlphaFields(2));                                     // Field Name
                     }
                 }
                 if (!lAlphaBlanks(3)) {
@@ -1842,12 +1842,12 @@ namespace AirflowNetwork {
                     OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(m_state, Alphas(3)); // convert curve name to number
                     if (OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
                         ErrorsFound |= Curve::CheckCurveDims(m_state,
-                                                                    OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
-                                                                    {1},                                                   // Valid dimensions
-                                                                    RoutineName,                                           // Routine name
-                                                                    CurrentModuleObject,                                   // Object Type
-                                                                    OccupantVentilationControl(i).Name,                    // Object Name
-                                                                    cAlphaFields(3));                                      // Field Name
+                                                             OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
+                                                             {1},                                                   // Valid dimensions
+                                                             RoutineName,                                           // Routine name
+                                                             CurrentModuleObject,                                   // Object Type
+                                                             OccupantVentilationControl(i).Name,                    // Object Name
+                                                             cAlphaFields(3));                                      // Field Name
                     } else {
                         ShowWarningError(m_state,
                                          format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(3) +
@@ -2588,7 +2588,7 @@ namespace AirflowNetwork {
                                              " is required, but a blank is found.");
                         ShowContinueError(m_state, format("The default value is assigned as {:.1R}", Numbers(1)));
                     }
-                    MultizoneExternalNodeData(i).ExtNum = AirflowNetworkNumOfZones + i;                   // External node number
+                    MultizoneExternalNodeData(i).ExtNum = AirflowNetworkNumOfZones + i;            // External node number
                     MultizoneExternalNodeData(i).curve = Curve::GetCurveIndex(m_state, Alphas(2)); // Wind pressure curve
                     if (MultizoneExternalNodeData(i).curve == 0) {
                         ShowSevereError(m_state, format(RoutineName) + "Invalid " + cAlphaFields(2) + "=" + Alphas(2));
@@ -6816,7 +6816,6 @@ namespace AirflowNetwork {
         state.dataCurveManager->PerfCurve.push_back(Curve::PerformanceCurveData());
 
         state.dataCurveManager->PerfCurve(CurveNum).Name = name;
-        state.dataCurveManager->PerfCurve(CurveNum).objectType = "Table:Lookup";
         state.dataCurveManager->PerfCurve(CurveNum).numDims = 1;
 
         state.dataCurveManager->PerfCurve(CurveNum).interpolationType = Curve::InterpType::BtwxtMethod;
