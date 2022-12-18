@@ -296,7 +296,7 @@ namespace CommandLineInterface {
         state.dataStrGlobals->inputDirPath = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFilePath);
 
         {
-            auto const fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
+            FileSystem::FileTypes const fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
             state.dataGlobal->isEpJSON = FileSystem::is_all_json_type(fileType);
             switch (fileType) {
             case FileSystem::FileTypes::IDF:
