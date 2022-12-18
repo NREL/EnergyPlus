@@ -227,7 +227,7 @@ namespace FileSystem {
     FileTypes getFileType(fs::path const &filePath)
     {
 #ifdef _WIN32
-        auto const &filePathStr = fs::path(filePath).extension().string();
+        auto const filePathStr = fs::path(filePath).extension().string();
         auto extension = std::string_view(filePathStr.c_str());
 #else
         auto extension = std::string_view(fs::path(filePath).extension().c_str());

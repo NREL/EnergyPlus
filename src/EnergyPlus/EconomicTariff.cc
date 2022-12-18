@@ -90,8 +90,6 @@ void UpdateUtilityBills(EnergyPlusData &state)
     //    Single routine used to call all get input
     //    routines for economics.
 
-    using OutputReportTabular::AddTOCEntry;
-
     bool ErrorsFound(false);
 
     if (state.dataEconTariff->Update_GetInput) {
@@ -100,7 +98,7 @@ void UpdateUtilityBills(EnergyPlusData &state)
         GetInputEconomicsCurrencyType(state, ErrorsFound);
         if (state.dataEconTariff->numTariff >= 1) {
             if (!ErrorsFound && state.dataOutRptTab->displayEconomicResultSummary)
-                AddTOCEntry(state, "Economics Results Summary Report", "Entire Facility");
+                OutputReportTabular::AddTOCEntry(state, "Economics Results Summary Report", "Entire Facility");
             CreateCategoryNativeVariables(state);
             GetInputEconomicsQualify(state, ErrorsFound);
             GetInputEconomicsChargeSimple(state, ErrorsFound);
@@ -138,16 +136,12 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
     // It will be the right conversion factors based on the associated meter resource type
     // meaning if "CCF" is picked, the conversion factor isn't the same whether it's a water meter or a fuel meter.
 
-    using DataGlobalConstants::AssignResourceTypeNum;
     using OutputReportTabular::AddTOCEntry;
 
     static constexpr std::string_view RoutineName("GetInputEconomicsTariff: ");
-    int iInObj;    // loop index variable for reading in objects
-    int jObj;      // loop index for objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    int found;
     bool isNotNumeric;
     // variables for getting report variable/meter index
     int KeyCount;
@@ -157,15 +151,13 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
     OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units sting, may be blank
     Array1D_string NamesOfKeys;                                  // Specific key name
     Array1D_int IndexesForKeyVar;                                // Array index
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
 
     auto &tariff(state.dataEconTariff->tariff);
 
-    CurrentModuleObject = "UtilityCost:Tariff";
+    std::string CurrentModuleObject = "UtilityCost:Tariff";
     state.dataEconTariff->numTariff = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     tariff.allocate(state.dataEconTariff->numTariff);
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numTariff; ++iInObj) {
+    for (int iInObj = 1; iInObj <= state.dataEconTariff->numTariff; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  iInObj,
@@ -179,7 +171,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+        for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
             //  args are always turned to upper case but this is okay...
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
                 ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\".");
@@ -189,8 +181,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // name of the tariff
         tariff(iInObj).tariffName = state.dataIPShortCut->cAlphaArgs(1);
         // check if tariff name is unique
-        found = 0;
-        for (jObj = 1; jObj <= iInObj - 1; ++jObj) {
+        int found = 0;
+        for (int jObj = 1; jObj <= iInObj - 1; ++jObj) {
             if (tariff(iInObj).tariffName == tariff(jObj).tariffName) {
                 found = jObj;
                 break;
@@ -239,7 +231,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // Determine whether this meter is related to electricity, or water, or gas
         if (tariff(iInObj).reportMeterIndx != 0) {
 
-            auto const &SELECT_CASE_var(
+            std::string const SELECT_CASE_var(
                 UtilityRoutines::MakeUPPERCase(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
 
             // Various types of electricity meters
@@ -631,11 +623,12 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         tariff(iInObj).totalAnnualCost = 0.0;
         // now create the Table Of Contents entries for an HTML file
         if (state.dataOutRptTab->displayTariffReport) {
-            AddTOCEntry(state, "Tariff Report", tariff(iInObj).tariffName);
+            OutputReportTabular::AddTOCEntry(state, "Tariff Report", tariff(iInObj).tariffName);
         }
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
-            tariff(iInObj).resourceNum = AssignResourceTypeNum(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType);
+            tariff(iInObj).resourceNum =
+                DataGlobalConstants::AssignResourceTypeNum(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType);
         }
     }
 }

@@ -213,7 +213,7 @@ namespace AirLoopHVACDOAS {
         std::string cCurrentModuleObject = "AirLoopHVAC:Mixer";
         std::string cFieldName;
 
-        auto const &instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             errorsFound = true;
         } else {
@@ -245,7 +245,7 @@ namespace AirLoopHVACDOAS {
                     auto NodeArray = NodeNames.value();
                     thisMixer.numOfInletNodes = NodeArray.size();
                     int num = 0;
-                    for (auto &NodeDOASName : NodeArray) {
+                    for (nlohmann::json &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("inlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
@@ -394,7 +394,7 @@ namespace AirLoopHVACDOAS {
                     auto NodeArray = NodeNames.value();
                     thisSplitter.numOfOutletNodes = NodeArray.size();
                     int num = 0;
-                    for (auto &NodeDOASName : NodeArray) {
+                    for (nlohmann::json &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("outlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);

@@ -162,7 +162,7 @@ void VerifyUniqueChillerName(
 }
 
 void VerifyUniqueBaseboardName(
-    EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    EnergyPlusData &state, std::string_view const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
 {
 
     // SUBROUTINE INFORMATION:
