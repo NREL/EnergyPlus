@@ -1478,7 +1478,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     }
 
     // Use performance map to get the rest of results at new sequence number
-    auto &lookupVariablesCooling =
+    auto lookupVariablesCooling =
         this->Representation->performance.performance_map_cooling.calculate_performance(this->EvapVolFlowRate,
                                                                                         this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
                                                                                         this->CondVolFlowRate,

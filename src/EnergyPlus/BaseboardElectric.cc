@@ -242,10 +242,6 @@ namespace BaseboardElectric {
                                                state.dataIPShortCut->cAlphaArgs(2),
                                                state.dataIPShortCut->cAlphaFieldNames(1),
                                                state.dataIPShortCut->cAlphaArgs(1)));
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                            " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                            '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
