@@ -16,7 +16,7 @@ int main( int argc, char const *argv[] )
 		std::cout << "schema file path " << argv[ 1 ] << " not found" << std::endl;
 		return 1;
 	}
-	auto const input_json = json::parse( schema_stream );
+	auto const &input_json = json::parse( schema_stream );
 	auto const v_cbor = json::to_cbor( input_json );
 
 	printf("	static constexpr std::array< std::uint8_t, %zu > embeddedSchema = {{\n", v_cbor.size() );

@@ -230,7 +230,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 
     if (this->curSysNum > 0 && this->curSysNum <= this->numPrimaryAirSys) {
         if (this->sysSizingRunDone) {
-            for (auto &sizingInput : this->sysSizingInputData) {
+            for (auto const &sizingInput : this->sysSizingInputData) {
                 if (sizingInput.AirLoopNum == this->curSysNum) {
                     this->sizingDesRunThisAirSys = true;
                     break;
@@ -250,7 +250,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
             this->sizingDesValueFromParent = this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent;
         }
         if (this->zoneSizingRunDone) {
-            for (auto &sizingInput : this->zoneSizingInput) {
+            for (auto const &sizingInput : this->zoneSizingInput) {
                 if (sizingInput.ZoneNum == this->curZoneEqNum) {
                     this->sizingDesRunThisZone = true;
                     break;

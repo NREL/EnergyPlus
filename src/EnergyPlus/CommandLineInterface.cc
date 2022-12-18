@@ -296,7 +296,7 @@ namespace CommandLineInterface {
         state.dataStrGlobals->inputDirPath = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFilePath);
 
         {
-            auto const fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
+            auto const &fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
             state.dataGlobal->isEpJSON = FileSystem::is_all_json_type(fileType);
             switch (fileType) {
             case FileSystem::FileTypes::IDF:
@@ -586,7 +586,7 @@ namespace CommandLineInterface {
 
         // Check for IDD and IDF files
         if (FileSystem::fileExists(state.files.iniFile.filePath)) {
-            auto iniFile = state.files.iniFile.try_open();
+            auto &iniFile = state.files.iniFile.try_open();
             if (!iniFile.good()) {
                 DisplayString(state, "ERROR: Could not open file " + iniFile.filePath.string() + " for input (read).");
                 if (eplusRunningViaAPI) {
@@ -792,7 +792,7 @@ namespace CommandLineInterface {
         bool NewHeading = false;
 
         while (inputFile.good() && !Found) {
-            const auto readResult = inputFile.readLine();
+            const auto &readResult = inputFile.readLine();
 
             if (readResult.eof) {
                 break;
@@ -816,7 +816,7 @@ namespace CommandLineInterface {
 
             //                                  Heading line found, now looking for Kind
             while (inputFile.good() && !NewHeading) {
-                const auto innerReadResult = inputFile.readLine();
+                const auto &innerReadResult = inputFile.readLine();
                 if (innerReadResult.eof) {
                     break;
                 }
