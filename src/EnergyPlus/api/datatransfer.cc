@@ -296,12 +296,12 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
             if (availActuator.handleCount > 0) {
                 // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
                 bool foundActuator = false;
-                for (auto const &actuatorUsed : thisState->dataRuntimeLang->EMSActuatorUsed) {
-                    if (actuatorUsed.ActuatorVariableNum == handle) {
+                for (auto const &usedActuator : thisState->dataRuntimeLang->EMSActuatorUsed) {
+                    if (usedActuator.ActuatorVariableNum == handle) {
                         EnergyPlus::ShowWarningError(
                             *thisState,
                             "Data Exchange API: An EnergyManagementSystem:Actuator seems to be already defined in the EnergyPlus File and named '" +
-                                actuatorUsed.Name + "'.");
+                                usedActuator.Name + "'.");
                         EnergyPlus::ShowContinueError(
                             *thisState, "Occurred for componentType='" + typeUC + "', controlType='" + controlUC + "', uniqueKey='" + keyUC + "'.");
                         EnergyPlus::ShowContinueError(*thisState,

@@ -161,11 +161,8 @@ void VerifyUniqueChillerName(
     }
 }
 
-void VerifyUniqueBaseboardName(EnergyPlusData &state,
-                               std::string const &TypeToVerify,
-                               std::string const &NameToVerify,
-                               bool &ErrorsFound,
-                               std::string const &StringToDisplay)
+void VerifyUniqueBaseboardName(
+    EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
 {
 
     // SUBROUTINE INFORMATION:
@@ -181,7 +178,7 @@ void VerifyUniqueBaseboardName(EnergyPlusData &state,
     auto const iter = state.dataGlobalNames->BaseboardNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->BaseboardNames.end()) {
         ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
-        ShowContinueError(state, format("...Current entry is Baseboard Type=\"{}\".",TypeToVerify));
+        ShowContinueError(state, format("...Current entry is Baseboard Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->BaseboardNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
