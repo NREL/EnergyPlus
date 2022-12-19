@@ -81,6 +81,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -283,20 +284,18 @@ namespace PhotovoltaicThermalCollectors {
             }
             tmpBIPVTperf(Item).OSCMPtr = Found;
             tmpBIPVTperf(Item).PVEffGapWidth = state.dataIPShortCut->rNumericArgs(1);
-            tmpBIPVTperf(Item).EffCollHeight = state.dataIPShortCut->rNumericArgs(2);
-            tmpBIPVTperf(Item).EffCollWidth = state.dataIPShortCut->rNumericArgs(3);
-            tmpBIPVTperf(Item).PVCellTransAbsProduct = state.dataIPShortCut->rNumericArgs(4);
-            tmpBIPVTperf(Item).BackMatTranAbsProduct = state.dataIPShortCut->rNumericArgs(5);
-            tmpBIPVTperf(Item).CladTranAbsProduct = state.dataIPShortCut->rNumericArgs(6);
-            tmpBIPVTperf(Item).PVAreaFract = state.dataIPShortCut->rNumericArgs(7);
-            tmpBIPVTperf(Item).PVCellAreaFract = state.dataIPShortCut->rNumericArgs(8);
-            tmpBIPVTperf(Item).PVRTop = state.dataIPShortCut->rNumericArgs(9);
-            tmpBIPVTperf(Item).PVRBot = state.dataIPShortCut->rNumericArgs(10);
-            tmpBIPVTperf(Item).PVGEmiss = state.dataIPShortCut->rNumericArgs(11);
-            tmpBIPVTperf(Item).BackMatEmiss = state.dataIPShortCut->rNumericArgs(12);
-            tmpBIPVTperf(Item).ThGlass = state.dataIPShortCut->rNumericArgs(13);
-            tmpBIPVTperf(Item).RIndGlass = state.dataIPShortCut->rNumericArgs(14);
-            tmpBIPVTperf(Item).ECoffGlass = state.dataIPShortCut->rNumericArgs(15);
+            tmpBIPVTperf(Item).PVCellTransAbsProduct = state.dataIPShortCut->rNumericArgs(2);
+            tmpBIPVTperf(Item).BackMatTranAbsProduct = state.dataIPShortCut->rNumericArgs(3);
+            tmpBIPVTperf(Item).CladTranAbsProduct = state.dataIPShortCut->rNumericArgs(4);
+            tmpBIPVTperf(Item).PVAreaFract = state.dataIPShortCut->rNumericArgs(5);
+            tmpBIPVTperf(Item).PVCellAreaFract = state.dataIPShortCut->rNumericArgs(6);
+            tmpBIPVTperf(Item).PVRTop = state.dataIPShortCut->rNumericArgs(7);
+            tmpBIPVTperf(Item).PVRBot = state.dataIPShortCut->rNumericArgs(8);
+            tmpBIPVTperf(Item).PVGEmiss = state.dataIPShortCut->rNumericArgs(9);
+            tmpBIPVTperf(Item).BackMatEmiss = state.dataIPShortCut->rNumericArgs(10);
+            tmpBIPVTperf(Item).ThGlass = state.dataIPShortCut->rNumericArgs(11);
+            tmpBIPVTperf(Item).RIndGlass = state.dataIPShortCut->rNumericArgs(12);
+            tmpBIPVTperf(Item).ECoffGlass = state.dataIPShortCut->rNumericArgs(13);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 tmpBIPVTperf(Item).SchedPtr = ScheduleAlwaysOn;
             } else {
@@ -413,8 +412,7 @@ namespace PhotovoltaicThermalCollectors {
                         state.dataPhotovoltaicThermalCollector->PVT(Item).BIPVT = tmpBIPVTperf(ThisParamObj); // entire structure assigned
                         // do one-time setups on input data
                         state.dataPhotovoltaicThermalCollector->PVT(Item).AreaCol =
-                            state.dataPhotovoltaicThermalCollector->PVT(Item).BIPVT.EffCollWidth *
-                            state.dataPhotovoltaicThermalCollector->PVT(Item).BIPVT.EffCollHeight;
+                            state.dataSurface->Surface(state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum).Area;
                         state.dataPhotovoltaicThermalCollector->PVT(Item).PVTModelType = PVTModelTypes::BIPVTmodel;
                     } else {
                         ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
@@ -1332,8 +1330,8 @@ namespace PhotovoltaicThermalCollectors {
 
         constexpr Real64 pi(3.14159);
         // BIPVT system geometry
-        Real64 w = this->BIPVT.EffCollWidth;                                          // width of BIPVT panel (m)
-        Real64 l = this->BIPVT.EffCollHeight;                                         // length of BIPVT panel (m)
+        Real64 l = state.dataSurface->Surface(this->SurfNum).Height;
+        Real64 w = state.dataSurface->Surface(this->SurfNum).Width;
         Real64 depth_channel = this->BIPVT.PVEffGapWidth;                             // depth of air channel (m)
         Real64 slope = (pi / 180.0) * state.dataSurface->Surface(this->SurfNum).Tilt; // surface tilt in rad
         Real64 beta(0); // surface tilt for calculating internal convective coefficient for stagnation condition
@@ -1343,6 +1341,14 @@ namespace PhotovoltaicThermalCollectors {
         Real64 area_pv = w * l * this->BIPVT.PVAreaFract;                        // total area of pv modules
         Real64 area_wall_total = w * l;                                          // total area of wall
         Real64 length_conv = l;                                                  // length for wind convection coefficient calc
+        Real64 area_bld_surf = state.dataSurface->Surface(this->SurfNum).Area;
+        auto shape_bld_surf = state.dataSurface->Surface(this->SurfNum).Shape;
+
+        if (shape_bld_surf != EnergyPlus::DataSurfaces::SurfaceShape::Rectangle) {
+            ShowFatalError(state,
+                           "BIPVT is located on non-rectangular surface. Surface name = " + state.dataSurface->Surface(this->SurfNum).Name +
+                               ". BIPVT model requires rectangular surface.");
+        }
 
         // BIPVT materials thermal properties
         Real64 emiss_b = this->BIPVT.BackMatEmiss;                 // emissivity of backing surface
