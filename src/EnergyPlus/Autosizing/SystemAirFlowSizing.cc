@@ -796,9 +796,9 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
 
                 } else {
                     auto &sysSizPeakDDNum = state.dataSize->SysSizPeakDDNum(this->curSysNum);
-                    auto &unitarysysEqSizing = this->unitarySysEqSizing(this->curSysNum);
 
                     if (this->airLoopSysFlag) {
+                        auto &unitarysysEqSizing = this->unitarySysEqSizing(this->curSysNum);
                         if (unitarysysEqSizing.CoolingAirFlow && unitarysysEqSizing.HeatingAirFlow) {
                             this->autoSizedValue = std::max(unitarysysEqSizing.CoolingAirVolFlow, unitarysysEqSizing.HeatingAirVolFlow);
                             if (this->autoSizedValue == unitarysysEqSizing.CoolingAirVolFlow) {

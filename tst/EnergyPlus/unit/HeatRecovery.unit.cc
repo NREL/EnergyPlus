@@ -3913,6 +3913,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
+    state->dataSize->SysSizPeakDDNum.allocate(state->dataSize->NumSysSizInput);
     state->dataSize->CurSysNum = 1;    // primary air system
     state->dataSize->CurOASysNum = 0;  // no OA system
     state->dataSize->CurZoneEqNum = 0; // size it based on system

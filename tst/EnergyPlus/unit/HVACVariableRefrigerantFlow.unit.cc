@@ -208,6 +208,7 @@ protected:
         int thisAirLoop = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
         state->dataAirLoop->AirLoopControlInfo.allocate(1);
+        state->dataSize->SysSizPeakDDNum.allocate(1);
 
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(numZones);
 
