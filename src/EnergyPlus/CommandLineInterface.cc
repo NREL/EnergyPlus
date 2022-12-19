@@ -816,7 +816,7 @@ namespace CommandLineInterface {
 
             //                                  Heading line found, now looking for Kind
             while (inputFile.good() && !NewHeading) {
-                const auto &innerReadResult = inputFile.readLine();
+                const auto innerReadResult = inputFile.readLine();
                 if (innerReadResult.eof) {
                     break;
                 }
