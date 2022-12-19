@@ -209,10 +209,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                               std::string_view const routineName,
                                               const std::string &fieldName,
                                               Real64 const Var1,           // required 1st independent variable
-                                              Optional<Real64 const> Var2, // 2nd independent variable
-                                              Optional<Real64 const> Var3, // 3rd independent variable
-                                              Optional<Real64 const> Var4, // 4th independent variable
-                                              Optional<Real64 const> Var5) // 5th independent variable
+                                              Optional<Real64 const> Var2) // 2nd independent variable
 {
     if (curveName.empty()) {
         return false;
@@ -233,7 +230,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                                     fieldName);           // Field Name
             if (!errorFound) {
                 Curve::checkCurveIsNormalizedToOne(
-                    state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2, Var3, Var4, Var5);
+                    state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2);
             }
             return errorFound;
         }

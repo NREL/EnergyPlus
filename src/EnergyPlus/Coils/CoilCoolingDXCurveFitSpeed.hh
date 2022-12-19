@@ -190,11 +190,8 @@ private:
                       std::vector<int> validDims,
                       std::string_view const routineName,
                       const std::string &fieldName,
-                      Real64 Var1,                     // required 1st independent variable
-                      Optional<Real64 const> Var2 = _, // 2nd independent variable
-                      Optional<Real64 const> Var3 = _, // 3rd independent variable
-                      Optional<Real64 const> Var4 = _, // 4th independent variable
-                      Optional<Real64 const> Var5 = _);
+                      Real64 Var1,                      // required 1st independent variable
+                      Optional<Real64 const> Var2 = _); // 2nd independent variable
 };
 } // namespace EnergyPlus
 

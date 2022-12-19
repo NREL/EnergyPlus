@@ -3128,12 +3128,7 @@ namespace Curve {
                                      std::string const &cFieldName,        // object field name
                                      std::string const &cFieldValue,       // user input curve name
                                      Real64 const Var1,                    // required 1st independent variable
-                                     Optional<Real64 const> Var2,          // 2nd independent variable
-                                     Optional<Real64 const> Var3,          // 3rd independent variable
-                                     Optional<Real64 const> Var4,          // 4th independent variable
-                                     Optional<Real64 const> Var5,          // 5th independent variable
-                                     Optional<Real64 const> Var6           // 6th independent variable
-    )
+                                     Optional<Real64 const> Var2)          // 2nd independent variable
     {
 
         // FUNCTION INFORMATION:
@@ -3144,7 +3139,7 @@ namespace Curve {
         // checks that curve output is within 10% of 1 at curve rating point
 
         if (curveIndex > 0) {
-            Real64 const CurveVal = CurveValue(state, curveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
+            Real64 const CurveVal = CurveValue(state, curveIndex, Var1, Var2);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, format("{}=\"{}\" curve values", callingRoutineObj, objectName));
                 ShowContinueError(state, format("... {} = {} output is not equal to 1.0 (+ or - 10%) at rated conditions.", cFieldName, cFieldValue));

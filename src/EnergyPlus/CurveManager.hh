@@ -318,12 +318,7 @@ namespace Curve {
                                      const std::string &cFieldName,        // object field name
                                      const std::string &cFieldValue,       // user input curve name
                                      Real64 Var1,                          // required 1st independent variable
-                                     Optional<Real64 const> Var2 = _,      // 2nd independent variable
-                                     Optional<Real64 const> Var3 = _,      // 3rd independent variable
-                                     Optional<Real64 const> Var4 = _,      // 4th independent variable
-                                     Optional<Real64 const> Var5 = _,      // 5th independent variable
-                                     Optional<Real64 const> Var6 = _       // 6th independent variable
-    );
+                                     Optional<Real64 const> Var2 = _);     // 2nd independent variable
 
 } // namespace Curve
 
