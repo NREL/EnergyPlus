@@ -2640,7 +2640,7 @@ namespace Curve {
         // Returns true if the input unit type is valid
 
         // currently this is a bit overkill to have an enum and string view array, but this sets it up in case we want to do more with these inputs
-        enum class CurveInputTypes
+        enum class CurveInputType
         {
             Invalid = -1,
             Dimensionless,
@@ -2654,14 +2654,14 @@ namespace Curve {
             Angle,
             Num
         };
-        constexpr std::array<std::string_view, static_cast<int>(CurveInputTypes::Num)> inputTypes = {
+        constexpr std::array<std::string_view, static_cast<int>(CurveInputType::Num)> inputTypes = {
             "DIMENSIONLESS", "TEMPERATURE", "PRESSURE", "VOLUMETRICFLOW", "MASSFLOW", "POWER", "DISTANCE", "WAVELENGTH", "ANGLE"};
 
         if (InInputType.empty()) {
             return true; // if not used it is valid
         }
-        CurveInputTypes found = static_cast<CurveInputTypes>(getEnumerationValue(inputTypes, UtilityRoutines::MakeUPPERCase(InInputType)));
-        return found != CurveInputTypes::Invalid;
+        CurveInputType found = static_cast<CurveInputType>(getEnumerationValue(inputTypes, UtilityRoutines::MakeUPPERCase(InInputType)));
+        return found != CurveInputType::Invalid;
     }
 
     bool IsCurveOutputTypeValid(std::string const &InOutputType) // index of curve in curve array
@@ -2676,7 +2676,7 @@ namespace Curve {
         // Returns true if the output unit type is valid
 
         // currently this is a bit overkill to have an enum and string view array, but this sets it up in case we want to do more with these inputs
-        enum class CurveOutputTypes
+        enum class CurveOutputType
         {
             Invalid = -1,
             Dimensionless,
@@ -2686,10 +2686,10 @@ namespace Curve {
             Power,
             Num
         };
-        constexpr std::array<std::string_view, static_cast<int>(CurveOutputTypes::Num)> outputTypes = {
+        constexpr std::array<std::string_view, static_cast<int>(CurveOutputType::Num)> outputTypes = {
             "DIMENSIONLESS", "PRESSURE", "TEMPERATURE", "CAPACITY", "POWER"};
-        CurveOutputTypes found = static_cast<CurveOutputTypes>(getEnumerationValue(outputTypes, UtilityRoutines::MakeUPPERCase(InOutputType)));
-        return found != CurveOutputTypes::Invalid;
+        CurveOutputType found = static_cast<CurveOutputType>(getEnumerationValue(outputTypes, UtilityRoutines::MakeUPPERCase(InOutputType)));
+        return found != CurveOutputType::Invalid;
     }
 
     bool CheckCurveDims(EnergyPlusData &state,
