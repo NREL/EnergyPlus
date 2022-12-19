@@ -490,7 +490,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) || (SELECT_CASE_var == 30)) {
                     tariff(iInObj).demandWindow = DemandWindow::Half;
                     tariff(iInObj).demWinTime = 0.50;
-                    ShowSevereError(state, format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
@@ -506,7 +507,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
                     tariff(iInObj).demandWindow = DemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
-                    ShowSevereError(state, format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("Demand window of HalfHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
@@ -574,13 +576,13 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // check if meter is consistent with buy or sell option
         if ((tariff(iInObj).buyOrSell == sellToUtility) &&
             (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY"))) {
-            ShowSevereError(state, format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowWarningError(state, format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state,
                               format("The meter chosen \"{}\" is not typically used with the sellToUtility option.", tariff(iInObj).reportMeter));
             ShowContinueError(state, "Usually the ElectricitySurplusSold:Facility meter is selected when the sellToUtility option is used.");
         }
         if ((tariff(iInObj).buyOrSell == netMetering) && (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYNET:FACILITY"))) {
-            ShowSevereError(state, format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowWarningError(state, format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state,
                               format("The meter chosen \"{}\" is not typically used with the netMetering option.", tariff(iInObj).reportMeter));
             ShowContinueError(state, "Usually the ElectricityNet:Facility meter is selected when the netMetering option is used.");
@@ -590,8 +592,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             if (hasi(tariff(iInObj).reportMeter, "Elec")) { // test if electric meter
                 if (!(UtilityRoutines::SameString(tariff(iInObj).reportMeter, "Electricity:Facility") ||
                       UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ElectricityPurchased:Facility"))) {
-                    ShowSevereError(state,
-                                    format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
                         state, format("The meter chosen \"{}\" is not typically used with the buyFromUtility option.", tariff(iInObj).reportMeter));
                     ShowContinueError(state,
