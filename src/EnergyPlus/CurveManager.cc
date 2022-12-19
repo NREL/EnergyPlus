@@ -2639,32 +2639,29 @@ namespace Curve {
         // PURPOSE OF THIS FUNCTION:
         // Returns true if the input unit type is valid
 
-        // TODO: Enum and constexpr std::array lookup
-        if (len(InInputType) > 0) {
-            if (UtilityRoutines::SameString(InInputType, "DIMENSIONLESS")) {
-                return true;
-            } else if (UtilityRoutines::SameString(InInputType, "TEMPERATURE")) {
-                return true;
-            } else if (UtilityRoutines::SameString(InInputType, "PRESSURE")) {
-                return true;
-            } else if (UtilityRoutines::SameString(InInputType, "VOLUMETRICFLOW")) {
-                return true;
-            } else if (UtilityRoutines::SameString(InInputType, "MASSFLOW")) {
-                return true;
-            } else if (UtilityRoutines::SameString(InInputType, "POWER")) {
-                return true;
-            } else if (UtilityRoutines::SameString(InInputType, "DISTANCE")) {
-                return true;
-            } else if (UtilityRoutines::SameString(InInputType, "WAVELENGTH")) {
-                return true;
-            } else if (UtilityRoutines::SameString(InInputType, "ANGLE")) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+        // currently this is a bit overkill to have an enum and string view array, but this sets it up in case we want to do more with these inputs
+        enum class CurveInputTypes
+        {
+            Invalid = -1,
+            Dimensionless,
+            Temperature,
+            Pressure,
+            VolumetricFlow,
+            MassFlow,
+            Power,
+            Distance,
+            Wavelength,
+            Angle,
+            Num
+        };
+        constexpr std::array<std::string_view, static_cast<int>(CurveInputTypes::Num)> inputTypes = {
+            "DIMENSIONLESS", "TEMPERATURE", "PRESSURE", "VOLUMETRICFLOW", "MASSFLOW", "POWER", "DISTANCE", "WAVELENGTH", "ANGLE"};
+
+        if (InInputType.empty()) {
             return true; // if not used it is valid
         }
+        CurveInputTypes found = static_cast<CurveInputTypes>(getEnumerationValue(inputTypes, UtilityRoutines::MakeUPPERCase(InInputType)));
+        return found != CurveInputTypes::Invalid;
     }
 
     bool IsCurveOutputTypeValid(std::string const &InOutputType) // index of curve in curve array
@@ -2678,20 +2675,21 @@ namespace Curve {
         // PURPOSE OF THIS FUNCTION:
         // Returns true if the output unit type is valid
 
-        // TODO: Enum and constexpr std::array lookup
-        if (UtilityRoutines::SameString(InOutputType, "DIMENSIONLESS")) {
-            return true;
-        } else if (UtilityRoutines::SameString(InOutputType, "PRESSURE")) {
-            return true;
-        } else if (UtilityRoutines::SameString(InOutputType, "TEMPERATURE")) {
-            return true;
-        } else if (UtilityRoutines::SameString(InOutputType, "CAPACITY")) {
-            return true;
-        } else if (UtilityRoutines::SameString(InOutputType, "POWER")) {
-            return true;
-        } else {
-            return false;
-        }
+        // currently this is a bit overkill to have an enum and string view array, but this sets it up in case we want to do more with these inputs
+        enum class CurveOutputTypes
+        {
+            Invalid = -1,
+            Dimensionless,
+            Pressure,
+            Temperature,
+            Capacity,
+            Power,
+            Num
+        };
+        constexpr std::array<std::string_view, static_cast<int>(CurveOutputTypes::Num)> outputTypes = {
+            "DIMENSIONLESS", "PRESSURE", "TEMPERATURE", "CAPACITY", "POWER"};
+        CurveOutputTypes found = static_cast<CurveOutputTypes>(getEnumerationValue(outputTypes, UtilityRoutines::MakeUPPERCase(InOutputType)));
+        return found != CurveOutputTypes::Invalid;
     }
 
     bool CheckCurveDims(EnergyPlusData &state,
@@ -2791,11 +2789,7 @@ namespace Curve {
         // PURPOSE OF THIS FUNCTION:
         // This function provides a simple call to both return a curve index as well
         // as check for validity and produce an error message.
-
-        // Return value
-        int GetCurveCheckOut;
-
-        GetCurveCheckOut = GetCurveIndex(state, alph); // convert curve name to pointer
+        int GetCurveCheckOut = GetCurveIndex(state, alph); // convert curve name to pointer
         if (GetCurveCheckOut == 0) {
             ShowSevereError(state, format("Curve Not Found for Object=\"{}\" :: {}", ObjName, alph));
             errFlag = true;
@@ -2900,18 +2894,16 @@ namespace Curve {
         std::string_view constexpr CurveObjectName = "Curve:Functional:PressureDrop";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumPressure;
         Array1D_string Alphas(1);   // Alpha items for object
         Array1D<Real64> Numbers(5); // Numeric items for object
         int NumAlphas;              // Number of Alphas for each GetObjectItem call
         int NumNumbers;             // Number of Numbers for each GetObjectItem call
         int IOStatus;               // Used in GetObjectItem
         bool ErrsFound(false);      // Set to true if errors in input, fatal at end of routine
-        int CurveNum;
 
-        NumPressure = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurveObjectName);
+        int NumPressure = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurveObjectName);
         state.dataBranchAirLoopPlant->PressureCurve.allocate(NumPressure);
-        for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
+        for (int CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
             auto &thisCurve = state.dataBranchAirLoopPlant->PressureCurve(CurveNum);
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurveObjectName,
@@ -2967,10 +2959,6 @@ namespace Curve {
         //  PressureCurveType::Pressure    = pressure curve based on friction/minor loss
         //  PressureCurveType::Generic     = curvemanager held curve which is function of flow rate
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int TempCurveIndex;
-        CurveType GenericCurveType;
-
         // If input is not gotten, go ahead and get it now
         if (state.dataCurveManager->GetCurvesInputFlag) {
             GetCurveInput(state);
@@ -2983,12 +2971,12 @@ namespace Curve {
         PressureCurveIndex = 0;
 
         // Try to retrieve a curve manager object
-        TempCurveIndex = GetCurveIndex(state, PressureCurveName);
+        int TempCurveIndex = GetCurveIndex(state, PressureCurveName);
 
         // See if it is valid
         if (TempCurveIndex > 0) {
             // We have to check the type of curve to make sure it is single independent variable type
-            GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex).curveType;
+            CurveType GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex).curveType;
             {
                 if (state.dataCurveManager->PerfCurve(TempCurveIndex).numDims == 1) {
                     PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Generic;
