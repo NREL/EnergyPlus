@@ -174,18 +174,6 @@ namespace HVACSingleDuctInduc {
                              Real64 &LoadMet                // load met by unit (watts)
     );
 
-    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state,
-                                     Real64 const HWFlow,       // hot water flow rate in kg/s
-                                     Array1D<Real64> const &Par // Par(5) is the requested zone load
-    );
-
-    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state,
-                                     Real64 const CWFlow,       // cold water flow rate in kg/s
-                                     Array1D<Real64> const &Par // Par(5) is the requested zone load
-    );
-
-    // ========================= Utilities =======================
-
     bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string_view CompName); // component (mixer) name
 
 } // namespace HVACSingleDuctInduc

@@ -179,10 +179,6 @@ namespace HVACCooledBeam {
                       Real64 &TWOut    // chilled water outlet temperature [C]
     );
 
-    Real64 CoolBeamResidual(EnergyPlusData &state,
-                            Real64 CWFlow, // cold water flow rate in kg/s
-                            Array1D<Real64> const &Par);
-
     void UpdateCoolBeam(EnergyPlusData &state, int CBNum);
 
     void ReportCoolBeam(EnergyPlusData &state, int CBNum);
