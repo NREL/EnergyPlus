@@ -2302,17 +2302,18 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
     // Therefore, C_min/C_max = 0, and the noncondensing fluid (water) is the minimum fluid.
 
     if (MinCapRate > 0.0) {
-
         Real64 NTU = this->UA / MinCapRate;
         Real64 ExpCheckValue = -NTU;
-        if (ExpCheckValue < DataPrecisionGlobals::EXP_LowerLimit) {
-            this->Effectiveness = min(1.0, (1.0 - std::exp(-NTU)));
-        } else {
-            if (ExpCheckValue > DataPrecisionGlobals::EXP_UpperLimit) {
-                this->Effectiveness = 1.0;
+        if (ExpCheckValue > DataPrecisionGlobals::EXP_UpperLimit) {
+            if (-NTU >= DataPrecisionGlobals::EXP_LowerLimit) {
+                this->Effectiveness = 1.0 - std::exp(-NTU);
+                this->Effectiveness = min(1.0, this->Effectiveness);
             } else {
-                this->Effectiveness = min(1.0, std::abs(1.0 - std::exp(-NTU)));
+                this->Effectiveness = 1.0;
             }
+        } else {
+            this->Effectiveness = 1.0 - std::exp(-NTU);
+            this->Effectiveness = min(1.0, this->Effectiveness);
         }
     } else { // no capacity
         this->Effectiveness = 0.0;
