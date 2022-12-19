@@ -1095,10 +1095,42 @@
     WindExposed,             !- Wind Exposure
     0.0000,                  !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.000,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
-    21.756,0.000,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    4.570,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    17.186,0.000,5.009,  !- X,Y,Z ==> Vertex 2 {m}
     17.186,4.570,5.009,  !- X,Y,Z ==> Vertex 3 {m}
     4.570,4.570,5.009;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ZN_1_FLR_1_SEC_1_Ceiling2,!- Name
+    ceiling,                 !- Surface Type
+    ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
+    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
+    OtherSideConditionsModel,                !- Outside Boundary Condition
+    OSCM_ZN_1_FLR_1_SEC_1,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000,                  !- View Factor to Ground
+    3,                       !- Number of Vertices
+    0.000,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    4.570,0.000,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    4.570,4.570,5.009;  !- X,Y,Z ==> Vertex 3 {m}
+
+  BuildingSurface:Detailed,
+    ZN_1_FLR_1_SEC_1_Ceiling3,!- Name
+    ceiling,                 !- Surface Type
+    ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
+    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
+    OtherSideConditionsModel,                !- Outside Boundary Condition
+    OSCM_ZN_1_FLR_1_SEC_1,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000,                  !- View Factor to Ground
+    3,                       !- Number of Vertices
+    17.186,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    21.756,0.000,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    17.186,4.570,5.009;  !- X,Y,Z ==> Vertex 3 {m}
 
   InternalMass,
     ZN_1_FLR_1_SEC_1_InternalMass_1,  !- Name
@@ -1476,10 +1508,42 @@
     WindExposed,             !- Wind Exposure
     0.0000,                  !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.000,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
-    0.000,17.935,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000,4.570,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000,13.365,5.009,  !- X,Y,Z ==> Vertex 2 {m}
     -4.570,13.365,5.009,  !- X,Y,Z ==> Vertex 3 {m}
     -4.570,4.570,5.009;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ZN_1_FLR_1_SEC_2_Ceiling2,!- Name
+    ceiling,                 !- Surface Type
+    ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
+    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
+    OtherSideConditionsModel,                !- Outside Boundary Condition
+    OSCM_ZN_1_FLR_1_SEC_2,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000,                  !- View Factor to Ground
+    3,                       !- Number of Vertices
+    0.000,13.365,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000,17.935,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    -4.570,13.365,5.009;  !- X,Y,Z ==> Vertex 3 {m}
+
+  BuildingSurface:Detailed,
+    ZN_1_FLR_1_SEC_2_Ceiling3,!- Name
+    ceiling,                 !- Surface Type
+    ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
+    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
+    OtherSideConditionsModel,                !- Outside Boundary Condition
+    OSCM_ZN_1_FLR_1_SEC_2,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000,                  !- View Factor to Ground
+    3,                       !- Number of Vertices
+    0.000,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000,4.570,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    -4.570,-4.570,5.009;  !- X,Y,Z ==> Vertex 3 {m}
 
   InternalMass,
     ZN_1_FLR_1_SEC_2_InternalMass_1,  !- Name
@@ -1859,8 +1923,40 @@
     4,                       !- Number of Vertices
     0.000,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
     12.616,0.000,5.009,  !- X,Y,Z ==> Vertex 2 {m}
-    17.186,4.570,5.009,  !- X,Y,Z ==> Vertex 3 {m}
-    -4.570,4.570,5.009;  !- X,Y,Z ==> Vertex 4 {m}
+    12.616,4.570,5.009,  !- X,Y,Z ==> Vertex 3 {m}
+    0.000,4.570,5.009;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ZN_1_FLR_1_SEC_3_Ceiling2,!- Name
+    ceiling,                 !- Surface Type
+    ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
+    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
+    OtherSideConditionsModel,                !- Outside Boundary Condition
+    OSCM_ZN_1_FLR_1_SEC_3,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000,                  !- View Factor to Ground
+    3,                       !- Number of Vertices
+    0.000,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000,4.570,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    -4.570,4.570,5.009;  !- X,Y,Z ==> Vertex 3 {m}
+
+  BuildingSurface:Detailed,
+    ZN_1_FLR_1_SEC_3_Ceiling3,!- Name
+    ceiling,                 !- Surface Type
+    ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
+    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
+    OtherSideConditionsModel,                !- Outside Boundary Condition
+    OSCM_ZN_1_FLR_1_SEC_3,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000,                  !- View Factor to Ground
+    3,                       !- Number of Vertices
+    12.616,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    17.186,4.570,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    12.616,4.570,5.009;  !- X,Y,Z ==> Vertex 3 {m}
 
   InternalMass,
     ZN_1_FLR_1_SEC_3_InternalMass_1,  !- Name
@@ -2238,10 +2334,42 @@
     WindExposed,             !- Wind Exposure
     0.0000,                  !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.000,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000,4.570,5.009,  !- X,Y,Z ==> Vertex 1 {m}
     4.570,4.570,5.009,  !- X,Y,Z ==> Vertex 2 {m}
     4.570,13.365,5.009,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000,17.935,5.009;  !- X,Y,Z ==> Vertex 4 {m}
+    0.000,13.365,5.009;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ZN_1_FLR_1_SEC_4_Ceiling2,!- Name
+    ceiling,                 !- Surface Type
+    ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
+    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
+    OtherSideConditionsModel,                !- Outside Boundary Condition
+    OSCM_ZN_1_FLR_1_SEC_4,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000,                  !- View Factor to Ground
+    3,                       !- Number of Vertices
+    0.000,0.000,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    4.570,4.570,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000,4.570,5.009;  !- X,Y,Z ==> Vertex 3 {m}
+
+  BuildingSurface:Detailed,
+    ZN_1_FLR_1_SEC_4_Ceiling3,!- Name
+    ceiling,                 !- Surface Type
+    ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
+    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
+    OtherSideConditionsModel,                !- Outside Boundary Condition
+    OSCM_ZN_1_FLR_1_SEC_4,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000,                  !- View Factor to Ground
+    3,                       !- Number of Vertices
+    0.000,13.365,5.009,  !- X,Y,Z ==> Vertex 1 {m}
+    4.570,13.365,5.009,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000,17.935,5.009;  !- X,Y,Z ==> Vertex 3 {m}
 
   InternalMass,
     ZN_1_FLR_1_SEC_4_InternalMass_1,  !- Name
@@ -4949,8 +5077,6 @@
     OSCM_ZN_1_FLR_1_SEC_5,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-    12.616, !- Effective Overall Height of Collector
-    8.795, !- Effective Overall Width of Collector
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
@@ -4969,8 +5095,6 @@
     OSCM_ZN_1_FLR_1_SEC_4,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-    4.57, !- Effective Overall Height of Collector
-    13.36, !- Effective Overall Width of Collector
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
@@ -4989,8 +5113,6 @@
     OSCM_ZN_1_FLR_1_SEC_3,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-    17.18, !- Effective Overall Height of Collector
-    4.57, !- Effective Overall Width of Collector
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
@@ -5009,8 +5131,6 @@
     OSCM_ZN_1_FLR_1_SEC_2,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-    4.57, !- Effective Overall Height of Collector
-    13.36, !- Effective Overall Width of Collector
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
@@ -5029,8 +5149,6 @@
     OSCM_ZN_1_FLR_1_SEC_1,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-    17.18, !- Effective Overall Height of Collector
-    4.57, !- Effective Overall Width of Collector
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
