@@ -134,7 +134,7 @@ namespace EnergyPlus::SetPointManager {
 using namespace DataLoopNode;
 using namespace DataAirLoop;
 using namespace ScheduleManager;
-using namespace CurveManager;
+using namespace Curve;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
 
@@ -7710,7 +7710,7 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     // na
 
     // Using/Aliasing
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace DataPlant;
 
