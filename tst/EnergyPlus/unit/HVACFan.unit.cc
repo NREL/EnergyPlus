@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     std::string fanName = "TEST FAN";
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     state->dataSize->CurZoneEqNum = 0;
@@ -412,7 +412,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     std::string fanName = "TEST FAN";
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     state->dataSize->CurZoneEqNum = 0;

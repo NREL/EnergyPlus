@@ -1236,7 +1236,7 @@ insert text
 
 I have got extensive help from Simon, LBNL, to develop this design document. Sincere thanks is expressed here.
 
-This section describes code changes and additions in EnergyPlus in HeatBalanceManager, CurveManager, DataHeatBalance, WindowManagerExteriorData, WindowManagerExteriorOptical, and WCE. The WCE contains 3 main projects: SPectralAveraging, SingleLayerOptics, and MultipleLayerOptics.
+This section describes code changes and additions in EnergyPlus in HeatBalanceManager, Curve, DataHeatBalance, WindowManagerExteriorData, WindowManagerExteriorOptical, and WCE. The WCE contains 3 main projects: SPectralAveraging, SingleLayerOptics, and MultipleLayerOptics.
 
 The code changes will be composed of 3 sections. The first section is data input and commonly required by both WCE and existing one. The second section is used in WCE only. The third section will be used by existing one only. 
 
@@ -1256,7 +1256,7 @@ The additions are mainly used to catch the changes in revised idd object: Window
 
 A section of the GetMaterialData function in the HeatBalanceManager module will be revised to accommodate the idd changes. The changes also cover to get the table curve numbers for 3 optical properties.  
 
-### CurveManager (Common) ###
+### Curve (Common) ###
 
 The changes of this module include new and revised functions.
 
