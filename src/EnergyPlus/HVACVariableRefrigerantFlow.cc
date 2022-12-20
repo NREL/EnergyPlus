@@ -12947,7 +12947,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                           state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
             } else {
                 SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, _);
-            }		 
+            }
         } else { // cooling coil is off
             SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, _);
         }
