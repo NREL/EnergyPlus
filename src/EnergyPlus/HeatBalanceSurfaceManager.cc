@@ -2123,6 +2123,9 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     // Reset spaceHeatBalance even if doSpaceHeatBalance is false, beause spaceHB is used to gether zoneHB in some cases
     for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
         new (&thisSpaceHB) ZoneTempPredictorCorrector::SpaceHeatBalanceData();
+        // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
+        thisSpaceHB.ZoneAirHumRatAvg = state.dataEnvrn->OutHumRat;
+        thisSpaceHB.ZoneAirHumRat = state.dataEnvrn->OutHumRat;
     }
 
     // "Bulk" initializations of arrays sized to TotSurfaces
