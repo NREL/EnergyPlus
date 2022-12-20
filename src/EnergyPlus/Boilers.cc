@@ -257,7 +257,7 @@ void GetBoilerInput(EnergyPlusData &state)
         if (thisBoiler.EfficiencyCurvePtr > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  thisBoiler.EfficiencyCurvePtr,              // Curve index
-                                                 {1, 2},                                     // Valid dimensions
+                                                 {1, 2},                                     // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                // Routine name
                                                  state.dataIPShortCut->cCurrentModuleObject, // Object Type
                                                  thisBoiler.Name,                            // Object Name

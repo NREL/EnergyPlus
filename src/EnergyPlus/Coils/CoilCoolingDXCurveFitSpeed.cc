@@ -82,7 +82,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     errorsFound |= this->processCurve(state,
                                       input_data.total_cooling_capacity_function_of_temperature_curve_name,
                                       this->indexCapFT,
-                                      {1, 2},
+                                      {1, 2}, // MULTIPLECURVEDIMS
                                       routineName,
                                       "Total Cooling Capacity Function of Temperature Curve Name",
                                       RatedInletWetBulbTemp,
@@ -99,7 +99,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     errorsFound |= this->processCurve(state,
                                       input_data.energy_input_ratio_function_of_temperature_curve_name,
                                       this->indexEIRFT,
-                                      {1, 2},
+                                      {1, 2}, // MULTIPLECURVEDIMS
                                       routineName,
                                       "Energy Input Ratio Function of Temperature Curve Name",
                                       RatedInletWetBulbTemp,

@@ -2133,7 +2133,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             // Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataHVACVarRefFlow->VRF(VRFNum).PCFLengthCoolPtr, // Curve index
-                                                 {1, 2},                                                 // Valid dimensions
+                                                 {1, 2},                                                 // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                            // Routine name
                                                  cCurrentModuleObject,                                   // Object Type
                                                  state.dataHVACVarRefFlow->VRF(VRFNum).Name,             // Object Name
@@ -2147,7 +2147,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             // Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataHVACVarRefFlow->VRF(VRFNum).PCFLengthHeatPtr, // Curve index
-                                                 {1, 2},                                                 // Valid dimensions
+                                                 {1, 2},                                                 // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                            // Routine name
                                                  cCurrentModuleObject,                                   // Object Type
                                                  state.dataHVACVarRefFlow->VRF(VRFNum).Name,             // Object Name
@@ -2459,7 +2459,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataHVACVarRefFlow->VRF(VRFNum).HRCAPFTCool, // Curve index
-                                                     {1, 2},                                            // Valid dimensions
+                                                     {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                       // Routine name
                                                      cCurrentModuleObject,                              // Object Type
                                                      state.dataHVACVarRefFlow->VRF(VRFNum).Name,        // Object Name
@@ -2474,7 +2474,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataHVACVarRefFlow->VRF(VRFNum).HREIRFTCool, // Curve index
-                                                     {1, 2},                                            // Valid dimensions
+                                                     {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                       // Routine name
                                                      cCurrentModuleObject,                              // Object Type
                                                      state.dataHVACVarRefFlow->VRF(VRFNum).Name,        // Object Name
@@ -2492,7 +2492,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataHVACVarRefFlow->VRF(VRFNum).HRCAPFTHeat, // Curve index
-                                                     {1, 2},                                            // Valid dimensions
+                                                     {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                       // Routine name
                                                      cCurrentModuleObject,                              // Object Type
                                                      state.dataHVACVarRefFlow->VRF(VRFNum).Name,        // Object Name
@@ -2510,7 +2510,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataHVACVarRefFlow->VRF(VRFNum).HREIRFTHeat, // Curve index
-                                                     {1, 2},                                            // Valid dimensions
+                                                     {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                       // Routine name
                                                      cCurrentModuleObject,                              // Object Type
                                                      state.dataHVACVarRefFlow->VRF(VRFNum).Name,        // Object Name

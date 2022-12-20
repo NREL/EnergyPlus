@@ -2078,7 +2078,7 @@ void GetDXCoils(EnergyPlusData &state)
             // only legal types are Quadratic, BiQuadratic and Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                 {1, 2},                                            // Valid dimensions
+                                                 {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                       // Routine name
                                                  CurrentModuleObject,                               // Object Type
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
@@ -2155,7 +2155,7 @@ void GetDXCoils(EnergyPlusData &state)
             // only legal types are Quadratic, BiQuadratic and Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
-                                                 {1, 2},                                           // Valid dimensions
+                                                 {1, 2},                                           // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                      // Routine name
                                                  CurrentModuleObject,                              // Object Type
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
@@ -3374,7 +3374,7 @@ void GetDXCoils(EnergyPlusData &state)
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp, // Curve index
-                                                     {1, 2},                                         // Valid dimensions
+                                                     {1, 2},                                         // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                    // Routine name
                                                      CurrentModuleObject,                            // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
@@ -3472,7 +3472,7 @@ void GetDXCoils(EnergyPlusData &state)
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp, // Curve index
-                                                     {1, 2},                                         // Valid dimensions
+                                                     {1, 2},                                         // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                    // Routine name
                                                      CurrentModuleObject,                            // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
@@ -3838,7 +3838,7 @@ void GetDXCoils(EnergyPlusData &state)
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp, // Curve index
-                                                     {1, 2},                                         // Valid dimensions
+                                                     {1, 2},                                         // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                    // Routine name
                                                      CurrentModuleObject,                            // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
@@ -3907,7 +3907,7 @@ void GetDXCoils(EnergyPlusData &state)
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp, // Curve index
-                                                     {1, 2},                                         // Valid dimensions
+                                                     {1, 2},                                         // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                    // Routine name
                                                      CurrentModuleObject,                            // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
@@ -4872,7 +4872,7 @@ void GetDXCoils(EnergyPlusData &state)
                 // only legal types are Quadratic, BiQuadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                     {1, 2},                                              // Valid dimensions
+                                                     {1, 2},                                              // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                         // Routine name
                                                      CurrentModuleObject,                                 // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
@@ -4949,7 +4949,7 @@ void GetDXCoils(EnergyPlusData &state)
                 // only legal types are Quadratic, BiQuadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                     {1, 2},                                             // Valid dimensions
+                                                     {1, 2},                                             // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                        // Routine name
                                                      CurrentModuleObject,                                // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
@@ -5202,7 +5202,7 @@ void GetDXCoils(EnergyPlusData &state)
         // Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
         ErrorsFound |= Curve::CheckCurveDims(state,
                                              state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                             {1, 2},                                            // Valid dimensions
+                                             {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                              RoutineName,                                       // Routine name
                                              CurrentModuleObject,                               // Object Type
                                              state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
@@ -5387,7 +5387,7 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                 {1, 2},                                            // Valid dimensions
+                                                 {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                       // Routine name
                                                  CurrentModuleObject,                               // Object Type
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name

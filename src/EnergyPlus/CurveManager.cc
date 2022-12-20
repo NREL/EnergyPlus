@@ -416,7 +416,8 @@ namespace Curve {
         case InterpType::EvaluateCurveToLimits:
             switch (thisCurve.curveType) {
             case CurveType::QuadLinear:
-                CurveValue = thisCurve.coeff[0] + V1 * thisCurve.coeff[1] + V2 * thisCurve.coeff[2] + V3 * thisCurve.coeff[3] + V4 * thisCurve.coeff[4];
+                CurveValue =
+                    thisCurve.coeff[0] + V1 * thisCurve.coeff[1] + V2 * thisCurve.coeff[2] + V3 * thisCurve.coeff[3] + V4 * thisCurve.coeff[4];
                 break;
             default:
                 assert(false);
@@ -464,7 +465,8 @@ namespace Curve {
         case InterpType::EvaluateCurveToLimits:
             switch (thisCurve.curveType) {
             case CurveType::QuintLinear:
-                CurveValue = thisCurve.coeff[0] + V1 * thisCurve.coeff[1] + V2 * thisCurve.coeff[2] + V3 * thisCurve.coeff[3] + V4 * thisCurve.coeff[4] + V5 * thisCurve.coeff[5];
+                CurveValue = thisCurve.coeff[0] + V1 * thisCurve.coeff[1] + V2 * thisCurve.coeff[2] + V3 * thisCurve.coeff[3] +
+                             V4 * thisCurve.coeff[4] + V5 * thisCurve.coeff[5];
                 break;
             default:
                 assert(false);

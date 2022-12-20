@@ -3450,7 +3450,8 @@ namespace StandardRatings {
                     state, CapFTempCurveIndex(spnum), HeatingIndoorCoilInletAirDBTemp_H4FullTest, HeatingOutdoorCoilInletAirDBTemp_H4FullTest);
             }
 
-            //TODO: Could be 1 or 2 dimensional...perhaps back up what we're doing now, and instead just add checks for Var2 present and such and the exact curve types being used; that should isolate the problem call points
+            // TODO: Could be 1 or 2 dimensional...perhaps back up what we're doing now, and instead just add checks for Var2 present and such and the
+            // exact curve types being used; that should isolate the problem call points
             Q_A_Full(spnum) =
                 RatedTotalCapacity(spnum) *
                     Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *

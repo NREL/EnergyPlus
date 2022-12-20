@@ -217,48 +217,48 @@ namespace Curve {
     void ResetPerformanceCurveOutput(EnergyPlusData &state);
 
     Real64 CurveValue(EnergyPlusData &state,
-                      int CurveIndex,        // index of curve in curve array
-                      Real64 Var1            // 1st independent variable
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1     // 1st independent variable
     );
 
     Real64 CurveValue(EnergyPlusData &state,
-                      int CurveIndex,        // index of curve in curve array
-                      Real64 Var1,            // 1st independent variable
-                      Real64 Var2            // 1st independent variable
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2     // 1st independent variable
     );
 
     Real64 CurveValue(EnergyPlusData &state,
-                      int CurveIndex,        // index of curve in curve array
-                      Real64 Var1,            // 1st independent variable
-                      Real64 Var2,            // 1st independent variable
-                      Real64 Var3            // 1st independent variable
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2,    // 1st independent variable
+                      Real64 Var3     // 1st independent variable
     );
 
     Real64 CurveValue(EnergyPlusData &state,
-                      int CurveIndex,        // index of curve in curve array
-                      Real64 Var1,            // 1st independent variable
-                      Real64 Var2,            // 1st independent variable
-                      Real64 Var3,            // 1st independent variable
-                      Real64 Var4            // 1st independent variable
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2,    // 1st independent variable
+                      Real64 Var3,    // 1st independent variable
+                      Real64 Var4     // 1st independent variable
     );
 
     Real64 CurveValue(EnergyPlusData &state,
-                      int CurveIndex,        // index of curve in curve array
-                      Real64 Var1,            // 1st independent variable
-                      Real64 Var2,            // 1st independent variable
-                      Real64 Var3,            // 1st independent variable
-                      Real64 Var4,            // 1st independent variable
-                      Real64 Var5            // 1st independent variable
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2,    // 1st independent variable
+                      Real64 Var3,    // 1st independent variable
+                      Real64 Var4,    // 1st independent variable
+                      Real64 Var5     // 1st independent variable
     );
 
     Real64 CurveValue(EnergyPlusData &state,
-                      int CurveIndex,        // index of curve in curve array
-                      Real64 Var1,            // 1st independent variable
-                      Real64 Var2,            // 1st independent variable
-                      Real64 Var3,            // 1st independent variable
-                      Real64 Var4,            // 1st independent variable
-                      Real64 Var5,            // 1st independent variable
-                      Real64 Var6            // 1st independent variable
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2,    // 1st independent variable
+                      Real64 Var3,    // 1st independent variable
+                      Real64 Var4,    // 1st independent variable
+                      Real64 Var5,    // 1st independent variable
+                      Real64 Var6     // 1st independent variable
     );
 
     void GetCurveInput(EnergyPlusData &state);
@@ -343,7 +343,7 @@ namespace Curve {
                                      int curveIndex,                       // index to curve object
                                      const std::string &cFieldName,        // object field name
                                      const std::string &cFieldValue,       // user input curve name
-                                     Real64 Var1);                          // required 1st independent variable
+                                     Real64 Var1);                         // required 1st independent variable
 
     void checkCurveIsNormalizedToOne(EnergyPlusData &state,
                                      const std::string &callingRoutineObj, // calling routine with object type
@@ -352,8 +352,7 @@ namespace Curve {
                                      const std::string &cFieldName,        // object field name
                                      const std::string &cFieldValue,       // user input curve name
                                      Real64 Var1,                          // required 1st independent variable
-                                     Real64 Var2);     // 2nd independent variable
-
+                                     Real64 Var2);                         // 2nd independent variable
 
 } // namespace Curve
 

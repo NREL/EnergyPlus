@@ -968,9 +968,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                 // Verify Curve Object
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeSHRFTempCurve, // Curve index
-                                                     {2, 3},                                                   // Valid dimensions
-                                                     RoutineName,                                              // Routine name
-                                                     cCurrentModuleObject,                                     // Object Type
+                                                     {2, 3},               // Valid dimensions  // MULTIPLECURVEDIMS
+                                                     RoutineName,          // Routine name
+                                                     cCurrentModuleObject, // Object Type
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).Name, // Object Name
                                                      state.dataIPShortCut->cAlphaFieldNames(29));              // Field Name
             }
@@ -1366,11 +1366,11 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound |=
                     Curve::CheckCurveDims(state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeSHRFTempCurve, // Curve index
-                                          {2, 3},                                                                               // Valid dimensions
-                                          RoutineName,                                                                          // Routine name
-                                          cCurrentModuleObject,                                                                 // Object Type
-                                          state.dataPackagedThermalStorageCoil->TESCoil(item).Name,                             // Object Name
-                                          state.dataIPShortCut->cAlphaFieldNames(43));                                          // Field Name
+                                          {2, 3},                                                   // Valid dimensions  // MULTIPLECURVEDIMS
+                                          RoutineName,                                              // Routine name
+                                          cCurrentModuleObject,                                     // Object Type
+                                          state.dataPackagedThermalStorageCoil->TESCoil(item).Name, // Object Name
+                                          state.dataIPShortCut->cAlphaFieldNames(43));              // Field Name
             }
 
             state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeSHRFFlowCurve =
@@ -1667,9 +1667,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                 // Verify Curve Object
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlySHRFTempCurve, // Curve index
-                                                     {2, 3},                                                   // Valid dimensions
-                                                     RoutineName,                                              // Routine name
-                                                     cCurrentModuleObject,                                     // Object Type
+                                                     {2, 3},               // Valid dimensions  // MULTIPLECURVEDIMS
+                                                     RoutineName,          // Routine name
+                                                     cCurrentModuleObject, // Object Type
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).Name, // Object Name
                                                      state.dataIPShortCut->cAlphaFieldNames(54));              // Field Name
             }
