@@ -12647,7 +12647,8 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
 
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
-        if (((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) || ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad)) ||
+        if (((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
+             ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad) && QZnReq <= 0.0) ||
             (this->isSetPointControlled && this->suppTempSetPoint > state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp)) {
             Real64 ZoneLoad = 0.0;
             Real64 LoadToHeatingSP = 0.0;
@@ -12664,8 +12665,10 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
                 }
             } else {
                 getVRFTUZoneLoad(state, VRFTUNum, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP, false);
-                if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
-                    if ((QZnReq - FullOutput) > DataHVACGlobals::SmallLoad && QZnReq < 0.0) {
+                if (((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad) ||
+                      (QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0)) &&
+                    !FirstHVACIteration) {
+                    if ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0) {
                         SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
                     } else {
                         SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
@@ -12700,6 +12703,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
                 if (this->isSetPointControlled) {
                     if (state.dataLoopNodes->Node(this->coolCoilAirOutNode).Temp > this->coilTempSetPoint) return;
                 } else {
+                    if (QZnReq >= 0.0 && FullOutput >= 0.0) PartLoadRatio = 0.0;
                     return;
                 }
             } else {
