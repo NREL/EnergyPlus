@@ -167,14 +167,6 @@ namespace Curve {
         // EMS override
         bool EMSOverrideOn = false;         // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue = 0.0; // Value of curve result EMS is directing to use
-
-        Real64 value1var(Real64 var1);
-        Real64 value2var(Real64 var1, Real64 var2);
-        Real64 value3var(Real64 var1, Real64 var2, Real64 var3);
-        Real64 value4var(Real64 var1, Real64 var2, Real64 var3, Real64 var4);
-        Real64 value5var(Real64 var1, Real64 var2, Real64 var3, Real64 var4, Real64 var5);
-//        Real64 value6var(Real64 var1, Real64 var2, Real64 var3, Real64 var4, Real64 var5, Real64 var6);
-
     };
 
     // Table file objects
