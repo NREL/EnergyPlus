@@ -4229,10 +4229,8 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     }
 
     //    ZoneTempHistoryTerm = (3.0D0 * ZTM1(zoneNum) - (3.0D0/2.0D0) * ZTM2(zoneNum) + (1.0D0/3.0D0) * ZTM3(zoneNum))
-    int ZoneNodeNum = 0;
-    if (spaceNum == 0) {
-        ZoneNodeNum = thisZone.SystemZoneNodeNumber;
-    } else {
+    int ZoneNodeNum = thisZone.SystemZoneNodeNumber;
+    if (spaceNum > 0) {
         ZoneNodeNum = state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber;
     }
 
@@ -4905,6 +4903,9 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
 
     // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
     int ZoneNodeNum = zone.SystemZoneNodeNumber;
+    if (spaceNum > 0) {
+        ZoneNodeNum = state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber;
+    }
     if (ZoneNodeNum > 0) {
         state.dataLoopNodes->Node(ZoneNodeNum).HumRat = this->ZoneAirHumRatTemp;
         state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(this->ZT, this->ZoneAirHumRatTemp);
