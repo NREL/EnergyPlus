@@ -12669,7 +12669,11 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
                       (QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0)) &&
                     !FirstHVACIteration) {
                     if ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0) {
-                        SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
+                        if (LoadToHeatingSP < 0.0 && QZnReq == 0.0) {
+                            SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                        } else {
+                            SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
+                        }
                     } else {
                         SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
                     }
