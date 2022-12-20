@@ -607,11 +607,11 @@ namespace WindowManager {
                             auto lam = state.dataWindowManager->wle[ILam - 1];
                             state.dataWindowManager->wlt[IGlass - 1][ILam - 1] = lam;
                             state.dataWindowManager->t[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
                             state.dataWindowManager->rff[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
                             state.dataWindowManager->rbb[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
                         }
                         state.dataWindowManager->tmpTrans = solarSpectrumAverage(state, state.dataWindowManager->t[0]);
                         state.dataWindowManager->tmpReflectSolBeamFront = solarSpectrumAverage(state, state.dataWindowManager->rff[0]);
@@ -678,11 +678,11 @@ namespace WindowManager {
                             auto lam = state.dataWindowManager->wle[ILam - 1];
                             state.dataWindowManager->wlt[IGlass - 1][ILam - 1] = lam;
                             state.dataWindowManager->tPhi[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
                             state.dataWindowManager->rfPhi[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
                             state.dataWindowManager->rbPhi[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                     // For use with between-glass shade/blind, save angular properties of isolated glass
@@ -921,11 +921,11 @@ namespace WindowManager {
                             auto lam = state.dataWindowManager->wle[ILam - 1];
                             state.dataWindowManager->wlt[IGlass - 1][ILam - 1] = lam;
                             state.dataWindowManager->tPhi[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
                             state.dataWindowManager->rfPhi[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
                             state.dataWindowManager->rbPhi[IGlass - 1][ILam - 1] =
-                                CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
+                                Curve::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                 }

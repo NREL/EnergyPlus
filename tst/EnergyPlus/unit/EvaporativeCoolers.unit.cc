@@ -66,7 +66,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::CurveManager;
+using namespace EnergyPlus::Curve;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataSizing;
@@ -438,18 +438,17 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     state->dataCurveManager->NumCurves = 1;
     state->dataCurveManager->PerfCurve.allocate(1);
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 0;
 
     // make the call for dry full load operating condition
     EvapCond(EvapCoolNum).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(*state, EvapCoolNum, DryWetMode, FlowRatio);
@@ -736,12 +735,11 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     state->dataCurveManager->NumCurves = 1;
     state->dataCurveManager->PerfCurve.allocate(1);
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Linear";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 1.0;
 
     // set up the flow rates for a direct RDDSpecial
     thisEvapCooler.evapCoolerType = EvapCoolerType::DirectResearchSpecial;

@@ -883,7 +883,7 @@ namespace IceThermalStorage {
             // Obtain the Charging and Discharging Curve types and names
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveName = state.dataIPShortCut->cAlphaArgs(6);
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             if (state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum <= 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -891,7 +891,7 @@ namespace IceThermalStorage {
             }
 
             int dischargeCurveDim =
-                state.dataCurveManager->PerfCurve(state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum).NumDims;
+                state.dataCurveManager->PerfCurve(state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum).numDims;
             if (dischargeCurveDim != 2) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ": Discharge curve must have 2 independent variables");
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -919,24 +919,23 @@ namespace IceThermalStorage {
                 }
             }
 
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum, // Curve index
-                                                        {2},                                                                       // Valid dimensions
-                                                        "GetIceStorageInput: ",                                                    // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,                                // Object Type
-                                                        state.dataIceThermalStorage->DetailedIceStorage(iceNum).Name,              // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(6));                                // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum, // Curve index
+                                                 {2},                                                                       // Valid dimensions
+                                                 "GetIceStorageInput: ",                                                    // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,                                // Object Type
+                                                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).Name,              // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(6));                                // Field Name
 
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveName = state.dataIPShortCut->cAlphaArgs(8);
-            state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
+            state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
             if (state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum <= 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            int chargeCurveDim = state.dataCurveManager->PerfCurve(state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum).NumDims;
+            int chargeCurveDim = state.dataCurveManager->PerfCurve(state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum).numDims;
             if (chargeCurveDim != 2) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ": Charge curve must have 2 independent variables");
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -964,13 +963,13 @@ namespace IceThermalStorage {
                 }
             }
 
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum, // Curve index
-                                                        {2},                                                                    // Valid dimensions
-                                                        "GetIceStorageInput: ",                                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,                             // Object Type
-                                                        state.dataIceThermalStorage->DetailedIceStorage(iceNum).Name,           // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(8));                             // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum, // Curve index
+                                                 {2},                                                                    // Valid dimensions
+                                                 "GetIceStorageInput: ",                                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,                             // Object Type
+                                                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).Name,           // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(8));                             // Field Name
 
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).CurveFitTimeStep = state.dataIPShortCut->rNumericArgs(2);
             if ((state.dataIceThermalStorage->DetailedIceStorage(iceNum).CurveFitTimeStep <= 0.0) ||
@@ -1855,13 +1854,13 @@ namespace IceThermalStorage {
         Real64 CalcQstar;
 
         if (CurveIndVarType == CurveVars::FracChargedLMTD) {
-            CalcQstar = std::abs(CurveManager::CurveValue(state, CurveIndex, FracCharged, LMTDstar));
+            CalcQstar = std::abs(Curve::CurveValue(state, CurveIndex, FracCharged, LMTDstar));
         } else if (CurveIndVarType == CurveVars::FracDischargedLMTD) {
-            CalcQstar = std::abs(CurveManager::CurveValue(state, CurveIndex, (1.0 - FracCharged), LMTDstar));
+            CalcQstar = std::abs(Curve::CurveValue(state, CurveIndex, (1.0 - FracCharged), LMTDstar));
         } else if (CurveIndVarType == CurveVars::LMTDMassFlow) {
-            CalcQstar = std::abs(CurveManager::CurveValue(state, CurveIndex, LMTDstar, MassFlowstar));
+            CalcQstar = std::abs(Curve::CurveValue(state, CurveIndex, LMTDstar, MassFlowstar));
         } else if (CurveIndVarType == CurveVars::LMTDFracCharged) {
-            CalcQstar = std::abs(CurveManager::CurveValue(state, CurveIndex, LMTDstar, FracCharged));
+            CalcQstar = std::abs(Curve::CurveValue(state, CurveIndex, LMTDstar, FracCharged));
         } else { // should never get here as this is checked on input
             CalcQstar = 0.0;
         }

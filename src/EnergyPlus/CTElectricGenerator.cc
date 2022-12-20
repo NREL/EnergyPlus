@@ -212,7 +212,7 @@ namespace CTElectricGenerator {
             // Load Special CT Generator Input
 
             state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedFuelInputCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedFuelInputCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + AlphArray(3));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
@@ -220,7 +220,7 @@ namespace CTElectricGenerator {
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedFuelInputCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedFuelInputCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + AlphArray(4));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
@@ -228,7 +228,7 @@ namespace CTElectricGenerator {
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).ExhaustFlowCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).ExhaustFlowCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + AlphArray(5));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
@@ -236,7 +236,7 @@ namespace CTElectricGenerator {
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedExhaustTempCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedExhaustTempCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
@@ -244,7 +244,7 @@ namespace CTElectricGenerator {
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedExhaustTempCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedExhaustTempCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
@@ -252,7 +252,7 @@ namespace CTElectricGenerator {
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).QLubeOilRecoveredCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).QLubeOilRecoveredCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
@@ -627,14 +627,14 @@ namespace CTElectricGenerator {
         // The TempBasedFuelInputCurve is a correction based on deviation from design inlet air temperature conditions.
         // The first coefficient of this fit should be 1.0 to ensure that no correction is made at design conditions.
         // (EFUEL) rate of Fuel Energy Required to run COMBUSTION turbine (W)
-        Real64 FuelUseRate = elecPowerGenerated * CurveManager::CurveValue(state, this->PLBasedFuelInputCurve, PLR) *
-                             CurveManager::CurveValue(state, this->TempBasedFuelInputCurve, ambientDeltaT);
+        Real64 FuelUseRate = elecPowerGenerated * Curve::CurveValue(state, this->PLBasedFuelInputCurve, PLR) *
+                             Curve::CurveValue(state, this->TempBasedFuelInputCurve, ambientDeltaT);
 
         // Use Curve fit to determine Exhaust Flow.  This curve shows the ratio of exhaust gas flow (kg/s) to electric power
         // output (J/s).  The units on ExhaustFlowCurve are (kg/J).  When multiplied by the rated power of the unit,
         // it gives the exhaust flow rate in kg/s
         // (FEX) Exhaust Gas Flow Rate cubic meters per second???
-        Real64 exhaustFlow = ratedPowerOutput * CurveManager::CurveValue(state, this->ExhaustFlowCurve, ambientDeltaT);
+        Real64 exhaustFlow = ratedPowerOutput * Curve::CurveValue(state, this->ExhaustFlowCurve, ambientDeltaT);
 
         // Use Curve fit to determine Exhaust Temperature.  This curve calculates the exhaust temperature (C) by
         // multiplying the exhaust temperature (C) for a particular part load as given by PLBasedExhaustTempCurve
@@ -645,8 +645,8 @@ namespace CTElectricGenerator {
         if ((PLR > 0.0) && ((exhaustFlow > 0.0) || (maxExhaustperCTPower > 0.0))) {
 
             // (TEX) Exhaust Gas Temperature in C
-            Real64 exhaustTemp = CurveManager::CurveValue(state, this->PLBasedExhaustTempCurve, PLR) *
-                                 CurveManager::CurveValue(state, this->TempBasedExhaustTempCurve, ambientDeltaT);
+            Real64 exhaustTemp = Curve::CurveValue(state, this->PLBasedExhaustTempCurve, PLR) *
+                                 Curve::CurveValue(state, this->TempBasedExhaustTempCurve, ambientDeltaT);
 
             // (UACGC) Heat Exchanger UA to Capacity
             Real64 UA_loc = this->UACoef[0] * std::pow(ratedPowerOutput, this->UACoef[1]);
@@ -667,7 +667,7 @@ namespace CTElectricGenerator {
         // multiplying the total power generated by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // recovered lube oil heat (W)
-        Real64 QLubeOilRec = elecPowerGenerated * CurveManager::CurveValue(state, this->QLubeOilRecoveredCurve, PLR);
+        Real64 QLubeOilRec = elecPowerGenerated * Curve::CurveValue(state, this->QLubeOilRecoveredCurve, PLR);
 
         // Check for divide by zero
         Real64 HeatRecOutTemp; // Heat Recovery Fluid Outlet Temperature (C)
