@@ -216,8 +216,8 @@ void GetPumpInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using CurveManager::GetCurveIndex;
-    using CurveManager::GetCurveMinMaxValues;
+    using Curve::GetCurveIndex;
+    using Curve::GetCurveMinMaxValues;
     using DataSizing::AutoSize;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
@@ -384,13 +384,13 @@ void GetPumpInput(EnergyPlusData &state)
             if (TempCurveIndex == 0) {
                 thisPump.PressureCurve_Index = -1;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            TempCurveIndex,                  // Curve index
-                                                            {1},                             // Valid dimensions
-                                                            RoutineName,                     // Routine name
-                                                            cCurrentModuleObject,            // Object Type
-                                                            thisPump.Name,                   // Object Name
-                                                            thisInput->cAlphaFieldNames(6)); // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     TempCurveIndex,                  // Curve index
+                                                     {1},                             // Valid dimensions
+                                                     RoutineName,                     // Routine name
+                                                     cCurrentModuleObject,            // Object Type
+                                                     thisPump.Name,                   // Object Name
+                                                     thisInput->cAlphaFieldNames(6)); // Field Name
 
                 if (!ErrorsFound) {
                     thisPump.PressureCurve_Index = TempCurveIndex;
@@ -616,13 +616,13 @@ void GetPumpInput(EnergyPlusData &state)
             if (TempCurveIndex == 0) {
                 thisPump.PressureCurve_Index = -1;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            TempCurveIndex,                  // Curve index
-                                                            {1},                             // Valid dimensions
-                                                            RoutineName,                     // Routine name
-                                                            cCurrentModuleObject,            // Object Type
-                                                            thisPump.Name,                   // Object Name
-                                                            thisInput->cAlphaFieldNames(6)); // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     TempCurveIndex,                  // Curve index
+                                                     {1},                             // Valid dimensions
+                                                     RoutineName,                     // Routine name
+                                                     cCurrentModuleObject,            // Object Type
+                                                     thisPump.Name,                   // Object Name
+                                                     thisInput->cAlphaFieldNames(6)); // Field Name
 
                 if (!ErrorsFound) {
                     thisPump.PressureCurve_Index = TempCurveIndex;

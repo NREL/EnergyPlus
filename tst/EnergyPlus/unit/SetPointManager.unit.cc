@@ -385,9 +385,9 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     state->dataLoopNodes->Node(condInletNodeNum).Temp = 10;
 
     SetPointManager::DefineCondEntSetPointManager thisSPM;
-    thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex(*state, "MINDSNWBCURVENAME");
-    thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex(*state, "MINACTWBCURVENAME");
-    thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex(*state, "OPTCONDENTCURVENAME");
+    thisSPM.MinTwrWbCurve = Curve::GetCurveIndex(*state, "MINDSNWBCURVENAME");
+    thisSPM.MinOaWbCurve = Curve::GetCurveIndex(*state, "MINACTWBCURVENAME");
+    thisSPM.OptCondEntCurve = Curve::GetCurveIndex(*state, "OPTCONDENTCURVENAME");
     thisSPM.CondEntTempSchedPtr = ScheduleManager::GetScheduleIndex(*state, "CONDENSER LOOP TEMP SCHEDULE");
     thisSPM.LoopIndexPlantSide = chwLoopIndex;
     thisSPM.ChillerIndexPlantSide = chillerBranchChW;

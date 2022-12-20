@@ -1205,7 +1205,6 @@ namespace HVACSingleDuctInduc {
         Real64 PriAirMassFlow;   // primary air mass flow rate [kg/s]
         Real64 SecAirMassFlow;   // secondary air mass flow rate [kg/s]
         Real64 InducRat;         // Induction Ratio
-        Array1D<Real64> Par(7);
         int SolFlag;
         Real64 ErrTolerance;
         int HWOutletNode;
@@ -1258,19 +1257,14 @@ namespace HVACSingleDuctInduc {
                 // check that it can meet the load
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
                 if (PowerMet > QToHeatSetPt + SmallLoad) {
-                    Par(1) = double(IUNum);
-                    if (FirstHVACIteration) {
-                        Par(2) = 1.0;
-                    } else {
-                        Par(2) = 0.0;
-                    }
-                    Par(3) = double(ZoneNodeNum);
-                    Par(4) = MinColdWaterFlow;
-                    Par(5) = QToHeatSetPt;
-                    Par(6) = QPriOnly;
-                    Par(7) = PowerMet;
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HotControlOffset;
-                    SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par);
+                    auto f =
+                        [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinColdWaterFlow, QToHeatSetPt, QPriOnly, PowerMet](Real64 const HWFlow) {
+                            Real64 UnitOutput;
+                            CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, HWFlow, MinColdWaterFlow, UnitOutput);
+                            return (QToHeatSetPt - UnitOutput) / (PowerMet - QPriOnly);
+                        };
+                    SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HWFlow, f, MinHotWaterFlow, MaxHotWaterFlow);
                     if (SolFlag == -1) {
                         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWCoilFailNum1 == 0) {
                             ShowWarningMessage(state,
@@ -1315,19 +1309,14 @@ namespace HVACSingleDuctInduc {
                 // check that it can meet the load
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
                 if (PowerMet < QToCoolSetPt - SmallLoad) {
-                    Par(1) = double(IUNum);
-                    if (FirstHVACIteration) {
-                        Par(2) = 1.0;
-                    } else {
-                        Par(2) = 0.0;
-                    }
-                    Par(3) = double(ZoneNodeNum);
-                    Par(4) = MinHotWaterFlow;
-                    Par(5) = QToCoolSetPt;
-                    Par(6) = QPriOnly;
-                    Par(7) = PowerMet;
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).ColdControlOffset;
-                    SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
+                    auto f =
+                        [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, QToCoolSetPt, QPriOnly, PowerMet](Real64 const CWFlow) {
+                            Real64 UnitOutput;
+                            CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, CWFlow, UnitOutput);
+                            return (QToCoolSetPt - UnitOutput) / (PowerMet - QPriOnly);
+                        };
+                    SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, CWFlow, f, MinColdWaterFlow, MaxColdWaterFlow);
                     if (SolFlag == -1) {
                         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWCoilFailNum1 == 0) {
                             ShowWarningMessage(state,
@@ -1469,126 +1458,6 @@ namespace HVACSingleDuctInduc {
                                                                               state.dataLoopNodes->Node(ZoneNode).Temp,
                                                                               state.dataLoopNodes->Node(ZoneNode).HumRat);
     }
-
-    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state,
-                                     Real64 const HWFlow,       // hot water flow rate in kg/s
-                                     Array1D<Real64> const &Par // Par(5) is the requested zone load
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   June 2004
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Requested Zone Load - Unit Output) / Requested Coil Load
-        // Unit Output depends on the hot water flow rate which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcFourPipeIndUnit, and calculates
-        // the residual as defined above.
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int IUIndex;
-        bool FirstHVACSoln;
-        int ZoneNodeIndex;
-        Real64 MinCWFlow;
-        Real64 UnitOutput;
-
-        IUIndex = int(Par(1));
-        FirstHVACSoln = (Par(2) > 0.0);
-        ZoneNodeIndex = int(Par(3));
-        MinCWFlow = Par(4);
-        CalcFourPipeIndUnit(state, IUIndex, FirstHVACSoln, ZoneNodeIndex, HWFlow, MinCWFlow, UnitOutput);
-        Residuum = (Par(5) - UnitOutput) / (Par(7) - Par(6));
-
-        return Residuum;
-    }
-
-    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state,
-                                     Real64 const CWFlow,       // cold water flow rate in kg/s
-                                     Array1D<Real64> const &Par // Par(5) is the requested zone load
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   June 2004
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Requested Zone Load - Unit Output) / Requested Coil Load
-        // Unit Output depends on the cold water flow rate which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcFourPipeIndUnit, and calculates
-        // the residual as defined above.
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int IUIndex;
-        bool FirstHVACSoln;
-        int ZoneNodeIndex;
-        Real64 MinHWFlow;
-        Real64 UnitOutput;
-
-        IUIndex = int(Par(1));
-        FirstHVACSoln = (Par(2) > 0.0);
-        ZoneNodeIndex = int(Par(3));
-        MinHWFlow = Par(4);
-        CalcFourPipeIndUnit(state, IUIndex, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, CWFlow, UnitOutput);
-        Residuum = (Par(5) - UnitOutput) / (Par(7) - Par(6));
-
-        return Residuum;
-    }
-
-    // ========================= Utilities =======================
 
     bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name
     {

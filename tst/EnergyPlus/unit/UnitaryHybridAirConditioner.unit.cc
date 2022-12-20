@@ -107,9 +107,9 @@ using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus;
 using namespace EnergyPlus::SizingManager;
-using EnergyPlus::CurveManager::CurveValue;
-using EnergyPlus::CurveManager::GetCurveName;
-using EnergyPlus::CurveManager::GetNormalPoint;
+using EnergyPlus::Curve::CurveValue;
+using EnergyPlus::Curve::GetCurveName;
+using EnergyPlus::Curve::GetNormalPoint;
 using EnergyPlus::Psychrometrics::PsyHFnTdbRhPb;
 using EnergyPlus::Psychrometrics::PsyRhFnTdbWPb;
 using EnergyPlus::Psychrometrics::PsyWFnTdbRhPb;
@@ -874,7 +874,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     EXPECT_EQ(4, state->dataCurveManager->NumCurves);
 
@@ -1270,7 +1270,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSetting
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     EXPECT_EQ(8, state->dataCurveManager->NumCurves);
 

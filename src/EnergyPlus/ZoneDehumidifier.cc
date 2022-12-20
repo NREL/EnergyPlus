@@ -198,8 +198,8 @@ namespace ZoneDehumidifier {
         // Standard EnergyPlus methodology using available utility routines where appropriate.
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
-        using CurveManager::GetCurveIndex;
+        using Curve::CurveValue;
+        using Curve::GetCurveIndex;
         using NodeInputManager::GetOnlySingleNode;
         using WaterManager::SetupTankSupplyComponent;
 
@@ -338,14 +338,13 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve object, only legal type is BiQuadratic
-                ErrorsFound |=
-                    CurveManager::CheckCurveDims(state,
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, // Curve index
-                                                 {2},                                                                              // Valid dimensions
-                                                 RoutineName,                                                                      // Routine name
-                                                 CurrentModuleObject,                                                              // Object Type
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,                   // Object Name
-                                                 cAlphaFields(5));                                                                 // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, // Curve index
+                                                     {2},                                                            // Valid dimensions
+                                                     RoutineName,                                                    // Routine name
+                                                     CurrentModuleObject,                                            // Object Type
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name, // Object Name
+                                                     cAlphaFields(5));                                               // Field Name
 
                 if (!ErrorsFound) {
                     CurveVal = CurveValue(
@@ -374,14 +373,13 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |=
-                    CurveManager::CheckCurveDims(state,
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, // Curve index
-                                                 {2},                                                                              // Valid dimensions
-                                                 RoutineName,                                                                      // Routine name
-                                                 CurrentModuleObject,                                                              // Object Type
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,                   // Object Name
-                                                 cAlphaFields(6));                                                                 // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, // Curve index
+                                                     {2},                                                            // Valid dimensions
+                                                     RoutineName,                                                    // Routine name
+                                                     CurrentModuleObject,                                            // Object Type
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name, // Object Name
+                                                     cAlphaFields(6));                                               // Field Name
 
                 if (!ErrorsFound) {
                     CurveVal = CurveValue(
@@ -410,14 +408,13 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, legal types are Quadratic and Cubic
-                ErrorsFound |=
-                    CurveManager::CheckCurveDims(state,
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex, // Curve index
-                                                 {1},                                                                          // Valid dimensions
-                                                 RoutineName,                                                                  // Routine name
-                                                 CurrentModuleObject,                                                          // Object Type
-                                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,               // Object Name
-                                                 cAlphaFields(7));                                                             // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex, // Curve index
+                                                     {1},                                                                          // Valid dimensions
+                                                     RoutineName,                                                                  // Routine name
+                                                     CurrentModuleObject,                                                          // Object Type
+                                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,               // Object Name
+                                                     cAlphaFields(7));                                                             // Field Name
             }
 
             // N4,  \field Minimum Dry-Bulb Temperature for Dehumidifier Operation
@@ -699,7 +696,7 @@ namespace ZoneDehumidifier {
         // na
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyHFnTdbW;

@@ -598,7 +598,6 @@ struct MixedAirData : BaseGlobalStruct
     Array1D_bool OAControllerMyEnvrnFlag;
     Array1D_bool OAControllerMySizeFlag;
     Array1D_bool MechVentCheckFlag;
-    Array1D<Real64> Par = Array1D<Real64>(6);
 
     void clear_state() override
     {

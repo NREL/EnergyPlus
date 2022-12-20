@@ -6612,7 +6612,6 @@ void GetComfortSetPoints(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PMVResult = 0.0; // Calculated PMV value
     int SolFla = 0;         // feed back flag from SolveRoot
-    Array1D<Real64> Par(2); // Passed parameter for RegularFalsi function
 
     auto &comfortControlledZone = state.dataZoneCtrls->ComfortControlledZone(ComfortControlNum);
     Real64 Tmin = comfortControlledZone.TdbMinSetPoint;

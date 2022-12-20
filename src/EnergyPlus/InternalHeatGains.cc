@@ -194,7 +194,7 @@ namespace InternalHeatGains {
 
         using namespace OutputReportPredefined;
         using namespace DataLoopNode;
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -7394,7 +7394,7 @@ namespace InternalHeatGains {
 
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallTempDiff;
 

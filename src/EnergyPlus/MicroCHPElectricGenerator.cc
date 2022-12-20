@@ -181,9 +181,9 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MinWaterMdot = NumArray(3); // N3 Minimum Cooling Water Flow Rate [kg/s]
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MaxWaterTemp = NumArray(4); // N3 Maximum Cooling Water Inlet Temp [C]
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).ElecEffCurveID =
-                CurveManager::GetCurveCheck(state, AlphArray(2), ErrorsFound, ObjMSGName); // Electrical Eff. ID
+                Curve::GetCurveCheck(state, AlphArray(2), ErrorsFound, ObjMSGName); // Electrical Eff. ID
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).ThermalEffCurveID =
-                CurveManager::GetCurveCheck(state, AlphArray(3), ErrorsFound, ObjMSGName); // Thermal Efficiency
+                Curve::GetCurveCheck(state, AlphArray(3), ErrorsFound, ObjMSGName); // Thermal Efficiency
 
             if (UtilityRoutines::SameString(AlphArray(4), "InternalControl")) {
                 state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).InternalFlowControl = true; //  A4, \field Cooling Water Flow Rate Mode
@@ -196,11 +196,11 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             }
             if (state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).InternalFlowControl) { // get the curve
                 state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).WaterFlowCurveID =
-                    CurveManager::GetCurveCheck(state, AlphArray(5), ErrorsFound, ObjMSGName);
+                    Curve::GetCurveCheck(state, AlphArray(5), ErrorsFound, ObjMSGName);
                 //  Curve for Cooling Water Flow Rate
             }
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).AirFlowCurveID =
-                CurveManager::GetCurveCheck(state, AlphArray(6), ErrorsFound, ObjMSGName);
+                Curve::GetCurveCheck(state, AlphArray(6), ErrorsFound, ObjMSGName);
             //  Name of Curve for Air Flow Rate
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).DeltaPelMax =
                 NumArray(5); // N5 Maximum rate of change in net electrical power [W/s]
@@ -711,7 +711,7 @@ void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus
                                                    RoutineName);
     if (this->A42Model.InternalFlowControl) { // got a curve
         this->PlantMassFlowRateMax =
-            2.0 * CurveManager::CurveValue(
+            2.0 * Curve::CurveValue(
                       state, this->A42Model.WaterFlowCurveID, this->A42Model.MaxElecPower, state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
     } else if (this->CWPlantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
         if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).MaxMassFlowRate > 0.0) {
@@ -728,17 +728,17 @@ void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus
 
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->PlantInletNodeID, this->PlantMassFlowRateMax / rho);
 
-    this->A42Model.ElecEff = CurveManager::CurveValue(state,
-                                                      this->A42Model.ElecEffCurveID,
-                                                      this->A42Model.MaxElecPower,
-                                                      this->PlantMassFlowRateMax,
-                                                      state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
+    this->A42Model.ElecEff = Curve::CurveValue(state,
+                                               this->A42Model.ElecEffCurveID,
+                                               this->A42Model.MaxElecPower,
+                                               this->PlantMassFlowRateMax,
+                                               state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
 
-    this->A42Model.ThermEff = CurveManager::CurveValue(state,
-                                                       this->A42Model.ThermalEffCurveID,
-                                                       this->A42Model.MaxElecPower,
-                                                       this->PlantMassFlowRateMax,
-                                                       state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
+    this->A42Model.ThermEff = Curve::CurveValue(state,
+                                                this->A42Model.ThermalEffCurveID,
+                                                this->A42Model.MaxElecPower,
+                                                this->PlantMassFlowRateMax,
+                                                state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
 
     GeneratorDynamicsManager::SetupGeneratorControlStateManager(state, this->DynamicsControlID);
 }
@@ -947,7 +947,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             if (this->A42Model.InternalFlowControl) {
                 MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
             }
-            ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
+            ElecEff = Curve::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
             ElecEff = max(0.0, ElecEff); // protect against bad curve result
 
             if (ElecEff > 0.0) {           // trap divide by bad thing
@@ -955,7 +955,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             } else {
                 Qgross = 0.0;
             }
-            ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
+            ThermEff = Curve::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
             ThermEff = max(0.0, ThermEff); // protect against bad curve result
 
             Qgenss = ThermEff * Qgross; // W
@@ -988,17 +988,17 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                     if (this->A42Model.InternalFlowControl) {
                         MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
                     }
-                    ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
+                    ElecEff = Curve::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
                     ElecEff = max(0.0, ElecEff); // protect against bad curve result
                 }
 
-                ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
+                ThermEff = Curve::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
                 ThermEff = max(0.0, ThermEff); // protect against bad curve result
                 Qgenss = ThermEff * Qgross;    // W
             }
             Pnetss = 0.0; // no actually power produced here.
             NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-            MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuel);
+            MdotAir = Curve::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuel);
             MdotAir = max(0.0, MdotAir); // protect against bad curve result
 
         } else if (this->A42Model.WarmUpByEngineTemp) {
@@ -1009,7 +1009,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;          // could be here with part load in cool down
             TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
             MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-            ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pmax, MdotCW, TcwIn);
+            ElecEff = Curve::CurveValue(state, this->A42Model.ElecEffCurveID, Pmax, MdotCW, TcwIn);
             ElecEff = max(0.0, ElecEff); // protect against bad curve result
             if (ElecEff > 0.0) {         // trap divide by bad thing
                 Qgross = Pmax / ElecEff; // W
@@ -1040,10 +1040,10 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
 
             MdotFuel = MdotFuelWarmup;
             NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-            MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuelWarmup);
+            MdotAir = Curve::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuelWarmup);
             MdotAir = max(0.0, MdotAir); // protect against bad curve result
             Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
-            ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
+            ThermEff = Curve::CurveValue(state, this->A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
             Qgenss = ThermEff * Qgross; // W
         }
         NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
@@ -1063,7 +1063,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
         }
 
-        ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
+        ElecEff = Curve::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
         ElecEff = max(0.0, ElecEff); // protect against bad curve result
 
         if (ElecEff > 0.0) {           // trap divide by bad thing
@@ -1072,7 +1072,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             Qgross = 0.0;
         }
 
-        ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
+        ThermEff = Curve::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
         ThermEff = max(0.0, ThermEff); // protect against bad curve result
         Qgenss = ThermEff * Qgross;    // W
         MdotFuel = Qgross / (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0) *
@@ -1103,17 +1103,17 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                 if (this->A42Model.InternalFlowControl) {
                     MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
                 }
-                ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
+                ElecEff = Curve::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
                 ElecEff = max(0.0, ElecEff); // protect against bad curve result
             }
 
-            ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
+            ThermEff = Curve::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
             ThermEff = max(0.0, ThermEff); // protect against bad curve result
             Qgenss = ThermEff * Qgross;    // W
         }
 
         NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-        MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuel);
+        MdotAir = Curve::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuel);
         MdotAir = max(0.0, MdotAir); // protect against bad curve result
         if (PLRforSubtimestepStartUp < 1.0) {
             Pnetss = AllowedLoad;
@@ -1148,7 +1148,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             Real64 Pmax = this->A42Model.MaxElecPower;
             TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
             MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-            ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pmax, MdotCW, TcwIn);
+            ElecEff = Curve::CurveValue(state, this->A42Model.ElecEffCurveID, Pmax, MdotCW, TcwIn);
             ElecEff = max(0.0, ElecEff); // protect against bad curve result
             if (ElecEff > 0.0) {         // trap divide by bad thing
                 Qgross = Pmax / ElecEff; // W
@@ -1178,10 +1178,10 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             }
             MdotFuel = MdotFuelWarmup;
             NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-            MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuelWarmup);
+            MdotAir = Curve::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuelWarmup);
             MdotAir = max(0.0, MdotAir); // protect against bad curve result
             Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
-            ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
+            ThermEff = Curve::CurveValue(state, this->A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
             ThermEff = max(0.0, ThermEff); // protect against bad curve result
             Qgenss = ThermEff * Qgross;    // W
         }

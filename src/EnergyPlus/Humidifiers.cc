@@ -211,7 +211,7 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using NodeInputManager::GetOnlySingleNode;
         using WaterManager::SetupTankDemandComponent;
         using WaterManager::SetupTankSupplyComponent;
@@ -398,13 +398,13 @@ namespace Humidifiers {
 
             Humidifier(HumNum).EfficiencyCurvePtr = GetCurveIndex(state, Alphas(3));
             if (Humidifier(HumNum).EfficiencyCurvePtr > 0) {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            Humidifier(HumNum).EfficiencyCurvePtr, // Curve index
-                                                            {1},                                   // Valid dimensions
-                                                            RoutineName,                           // Routine name
-                                                            CurrentModuleObject,                   // Object Type
-                                                            Humidifier(HumNum).Name,               // Object Name
-                                                            cAlphaFields(3));                      // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     Humidifier(HumNum).EfficiencyCurvePtr, // Curve index
+                                                     {1},                                   // Valid dimensions
+                                                     RoutineName,                           // Routine name
+                                                     CurrentModuleObject,                   // Object Type
+                                                     Humidifier(HumNum).Name,               // Object Name
+                                                     cAlphaFields(3));                      // Field Name
             } else if (!lAlphaBlanks(3)) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
                 ShowContinueError(state, "Invalid " + cAlphaFields(3) + '=' + Alphas(3));
@@ -1171,7 +1171,7 @@ namespace Humidifiers {
         // from routine CalcElecSteamHumidifier by Fred Buhl
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using FluidProperties::FindGlycol;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;

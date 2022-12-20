@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, ExerciseHVACDXHeatPumpSystem)
     // manually add a curve
     state->dataCurveManager->PerfCurve.allocate(1);
     state->dataCurveManager->NumCurves = 1;
-    state->dataCurveManager->PerfCurve(1).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(1).interpolationType = Curve::InterpType::EvaluateCurveToLimits;
 
     // setup some outputs
     OutputReportPredefined::SetPredefinedTables(*state);
