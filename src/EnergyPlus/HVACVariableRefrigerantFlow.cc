@@ -12648,7 +12648,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
         if (((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
-             ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad) && QZnReq <= 0.0) ||
+             (((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad) && QZnReq <= 0.0)) ||
             (this->isSetPointControlled && this->suppTempSetPoint > state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp)) {
             Real64 ZoneLoad = 0.0;
             Real64 LoadToHeatingSP = 0.0;
@@ -12666,7 +12666,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
             } else {
                 getVRFTUZoneLoad(state, VRFTUNum, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP, false);
                 if (((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad) ||
-                      (QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0)) &&
+                      ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0))) &&
                     !FirstHVACIteration) {
                     if ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0) {
                         if (LoadToHeatingSP < 0.0 && QZnReq == 0.0) {
