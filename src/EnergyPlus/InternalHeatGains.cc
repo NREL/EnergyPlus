@@ -7299,10 +7299,10 @@ namespace InternalHeatGains {
         for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
 
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-            thisZoneHB.ZoneLatentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
+            thisZoneHB.ZoneLatentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ); // Also sets space gains
             // Added for hybrid model
             if (state.dataHybridModel->FlagHybridModel_PC) {
-                thisZoneHB.ZoneLatentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
+                thisZoneHB.ZoneLatentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ); // Also sets space gains
             }
         }
 
@@ -8718,6 +8718,7 @@ namespace InternalHeatGains {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
             }
+            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGain = SumLatentGainRate;
         }
 
         return SumLatentGainRate;
@@ -8741,6 +8742,7 @@ namespace InternalHeatGains {
                     SumLatentGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                 }
             }
+            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGainExceptPeople = SumLatentGainRateExceptPeople;
         }
 
         return SumLatentGainRateExceptPeople;
