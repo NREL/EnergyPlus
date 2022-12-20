@@ -1052,8 +1052,8 @@ namespace WaterUse {
 
         if (this->TargetTempSchedule > 0) {
             this->TargetTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TargetTempSchedule);
-        } else { // If no TargetTempSchedule, use all hot water
-            this->TargetTemp = this->HotTemp;
+        } else { // If no TargetTempSchedule, use all cold water
+            this->TargetTemp = this->ColdTemp;
         }
 
         // Get the requested total flow rate
