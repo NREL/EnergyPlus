@@ -229,8 +229,13 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                                     this->name,           // Object Name
                                                     fieldName);           // Field Name
             if (!errorFound) {
-                Curve::checkCurveIsNormalizedToOne(
-                    state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2);
+                if (Var2.present()) {
+                    Curve::checkCurveIsNormalizedToOne(
+                        state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2);
+                } else {
+                    Curve::checkCurveIsNormalizedToOne(
+                        state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1);
+                }
             }
             return errorFound;
         }
