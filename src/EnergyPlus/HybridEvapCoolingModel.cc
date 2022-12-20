@@ -87,9 +87,9 @@ namespace HybridEvapCoolingModel {
     // USE STATEMENTS:
     using namespace EnergyPlus::DataEnvironment;
     using namespace Psychrometrics;
-    using CurveManager::CurveValue;
-    using CurveManager::GetCurveIndex;
-    using CurveManager::GetCurveMinMaxValues;
+    using Curve::CurveValue;
+    using Curve::GetCurveIndex;
+    using Curve::GetCurveMinMaxValues;
     using ScheduleManager::GetCurrentScheduleValue;
 
 #define DEF_Tdb 0
