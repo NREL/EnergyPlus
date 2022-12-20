@@ -20346,8 +20346,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     EXPECT_NEAR(212.3, TU2_fan.FanPower + TU2_supp_htg_coil.HeatingCoilRate, 0.1);
     EXPECT_NEAR(0.0, TU2_supp_htg_coil.HeatingCoilRate, 0.1);
     EXPECT_NEAR(4787.7, VRFTU2.SuppHeatingCoilLoad, 0.1);
-    EXPECT_NEAR(VRFTU2.SuppHeatingCoilLoad, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired - TU2_fan.FanPower, 0.1);
-
+    EXPECT_NEAR(
+        VRFTU2.SuppHeatingCoilLoad, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired - TU2_fan.FanPower, 0.1);
 }
 
 } // end of namespace EnergyPlus
