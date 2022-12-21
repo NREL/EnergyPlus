@@ -109,7 +109,7 @@ namespace Material {
 
     constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
 
-    enum class SlatAngleTypeEnum
+    enum class SlatAngleType
     {
         Invalid = -1,
         FixedSlatAngle,
@@ -118,7 +118,7 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SlatAngleTypeEnum::Num)> SlatAngleTypeEnumUC = {
+    constexpr std::array<std::string_view, static_cast<int>(SlatAngleType::Num)> SlatAngleTypeUC = {
         "FIXEDSLATANGLE", "MAXIMIZESOLAR", "BLOCKBEAMSOLAR"};
 
     struct MaterialProperties
@@ -301,7 +301,7 @@ namespace Material {
         Real64 SlatSeparation;                                  // slat separation
         Real64 SlatCrown;                                       // slat crown
         Real64 SlatAngle;                                       // slat angle
-        SlatAngleTypeEnum SlatAngleType;                        // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
+        SlatAngleType slatAngleType;                        // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
         DataWindowEquivalentLayer::Orientation SlatOrientation; // horizontal or vertical
         std::string GasName;                                    // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
         HysteresisPhaseChange::HysteresisPhaseChange *phaseChange = nullptr;
@@ -340,7 +340,7 @@ namespace Material {
               ReflBackDiffDiff(0.0), TausDiffDiff(0.0), ReflFrontDiffDiffVis(0.0), ReflBackDiffDiffVis(0.0), TausDiffDiffVis(0.0),
               EmissThermalFront(0.0), EmissThermalBack(0.0), TausThermal(0.0), gapVentType(GapVentType::Sealed), ISPleatedDrape(false),
               PleatedDrapeWidth(0.0), PleatedDrapeLength(0.0), ScreenWireSpacing(0.0), ScreenWireDiameter(0.0), SlatWidth(0.0), SlatSeparation(0.0),
-              SlatCrown(0.0), SlatAngle(0.0), SlatAngleType(SlatAngleTypeEnum::FixedSlatAngle),
+              SlatCrown(0.0), SlatAngle(0.0), slatAngleType(SlatAngleType::FixedSlatAngle),
               SlatOrientation(DataWindowEquivalentLayer::Orientation::Invalid), GlassSpectralAndAngle(false), GlassSpecAngTransDataPtr(0),
               GlassSpecAngFRefleDataPtr(0), GlassSpecAngBRefleDataPtr(0)
         {

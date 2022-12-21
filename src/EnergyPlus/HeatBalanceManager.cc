@@ -3731,10 +3731,10 @@ namespace HeatBalanceManager {
 
             // By default all blinds have fixed slat angle,
             //  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
-            thisMaterial->SlatAngleType = Material::SlatAngleTypeEnum::FixedSlatAngle;
+            thisMaterial->slatAngleType = Material::SlatAngleType::FixedSlatAngle;
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                thisMaterial->SlatAngleType = static_cast<Material::SlatAngleTypeEnum>(
-                    getEnumerationValue(Material::SlatAngleTypeEnumUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
+                thisMaterial->slatAngleType = static_cast<Material::SlatAngleType>(
+                    getEnumerationValue(Material::SlatAngleTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
             }
             if (thisMaterial->SlatWidth < thisMaterial->SlatSeparation) {
                 ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Seperation/Width");

@@ -245,7 +245,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = thisMaterial->ReflBackDiffDiff;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = thisMaterial->TausDiffDiff;
             CFS(EQLNum).L(sLayer).PHI_DEG = thisMaterial->SlatAngle;
-            CFS(EQLNum).L(sLayer).CNTRL = static_cast<int>(thisMaterial->SlatAngleType);
+            CFS(EQLNum).L(sLayer).CNTRL = static_cast<int>(thisMaterial->slatAngleType);
             CFS(EQLNum).L(sLayer).S = thisMaterial->SlatSeparation;
             CFS(EQLNum).L(sLayer).W = thisMaterial->SlatWidth;
             CFS(EQLNum).L(sLayer).C = thisMaterial->SlatCrown;
