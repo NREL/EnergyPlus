@@ -272,7 +272,7 @@ namespace SimulationManager {
 
         FaultsManager::CheckAndReadFaults(state);
 
-        CurveManager::InitCurveReporting(state);
+        Curve::InitCurveReporting(state);
 
         state.dataErrTracking->AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         state.dataGlobal->KickOffSimulation = false;

@@ -94,7 +94,7 @@ namespace FourPipeBeam {
         using DataLoopNode::ObjectIsParent;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using ScheduleManager::GetScheduleIndex;
         static constexpr std::string_view routineName("FourPipeBeamFactory "); // include trailing blank space
 
@@ -1267,10 +1267,10 @@ namespace FourPipeBeam {
             // test chilled water flow against plant, it might not all be available
             SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             fModCoolCWMdot =
-                CurveManager::CurveValue(state, this->modCoolingQdotCWFlowFuncNum, ((this->mDotCW / this->totBeamLength) / this->mDotNormRatedCW));
-            fModCoolDeltaT = CurveManager::CurveValue(
-                state, this->modCoolingQdotDeltaTFuncNum, ((this->tDBZoneAirTemp - this->cWTempIn) / this->deltaTempRatedCooling));
-            fModCoolAirMdot = CurveManager::CurveValue(
+                Curve::CurveValue(state, this->modCoolingQdotCWFlowFuncNum, ((this->mDotCW / this->totBeamLength) / this->mDotNormRatedCW));
+            fModCoolDeltaT =
+                Curve::CurveValue(state, this->modCoolingQdotDeltaTFuncNum, ((this->tDBZoneAirTemp - this->cWTempIn) / this->deltaTempRatedCooling));
+            fModCoolAirMdot = Curve::CurveValue(
                 state, this->modCoolingQdotAirFlowFuncNum, ((this->mDotSystemAir / this->totBeamLength) / this->mDotNormRatedPrimAir));
             this->qDotBeamCooling = -1.0 * this->qDotNormRatedCooling * fModCoolDeltaT * fModCoolAirMdot * fModCoolCWMdot * this->totBeamLength;
             cp = GetSpecificHeatGlycol(state,
@@ -1308,10 +1308,10 @@ namespace FourPipeBeam {
             // test hot water flow against plant, it might not all be available
             SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             fModHeatHWMdot =
-                CurveManager::CurveValue(state, this->modHeatingQdotHWFlowFuncNum, ((this->mDotHW / this->totBeamLength) / this->mDotNormRatedHW));
-            fModHeatDeltaT = CurveManager::CurveValue(
-                state, this->modHeatingQdotDeltaTFuncNum, ((this->hWTempIn - this->tDBZoneAirTemp) / this->deltaTempRatedHeating));
-            fModHeatAirMdot = CurveManager::CurveValue(
+                Curve::CurveValue(state, this->modHeatingQdotHWFlowFuncNum, ((this->mDotHW / this->totBeamLength) / this->mDotNormRatedHW));
+            fModHeatDeltaT =
+                Curve::CurveValue(state, this->modHeatingQdotDeltaTFuncNum, ((this->hWTempIn - this->tDBZoneAirTemp) / this->deltaTempRatedHeating));
+            fModHeatAirMdot = Curve::CurveValue(
                 state, this->modHeatingQdotAirFlowFuncNum, ((this->mDotSystemAir / this->totBeamLength) / this->mDotNormRatedPrimAir));
             this->qDotBeamHeating = this->qDotNormRatedHeating * fModHeatDeltaT * fModHeatAirMdot * fModHeatHWMdot * this->totBeamLength;
             cp = GetSpecificHeatGlycol(state,

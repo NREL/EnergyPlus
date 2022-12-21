@@ -890,7 +890,7 @@ namespace GeneratorDynamicsManager {
         // na
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using PlantUtilities::SetComponentFlowRate;
 
         // Return value
