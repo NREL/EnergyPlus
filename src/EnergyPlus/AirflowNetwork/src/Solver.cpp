@@ -130,8 +130,8 @@ namespace AirflowNetwork {
     // NISTIR 89-4072, National Institute of Standards and Technology, Gaithersburg, Maryland
 
     // Using/Aliasing
-    using CurveManager::CurveValue;
-    using CurveManager::GetCurveIndex;
+    using Curve::CurveValue;
+    using Curve::GetCurveIndex;
     using DataEnvironment::OutDryBulbTempAt;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
@@ -1637,7 +1637,7 @@ namespace AirflowNetwork {
         // This subroutine reads inputs of air distribution system
 
         // Using/Aliasing
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using DataLoopNode::ObjectIsParent;
         using HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent;
         using MixedAir::GetOAMixerNumber;
@@ -1828,26 +1828,26 @@ namespace AirflowNetwork {
                             m_state,
                             "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues.");
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(m_state,
-                                                                    OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
-                                                                    {1},                                                  // Valid dimensions
-                                                                    RoutineName,                                          // Routine name
-                                                                    CurrentModuleObject,                                  // Object Type
-                                                                    OccupantVentilationControl(i).Name,                   // Object Name
-                                                                    cAlphaFields(2));                                     // Field Name
+                        ErrorsFound |= Curve::CheckCurveDims(m_state,
+                                                             OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
+                                                             {1},                                                  // Valid dimensions
+                                                             RoutineName,                                          // Routine name
+                                                             CurrentModuleObject,                                  // Object Type
+                                                             OccupantVentilationControl(i).Name,                   // Object Name
+                                                             cAlphaFields(2));                                     // Field Name
                     }
                 }
                 if (!lAlphaBlanks(3)) {
                     OccupantVentilationControl(i).ComfortHighTempCurveName = Alphas(3);
                     OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(m_state, Alphas(3)); // convert curve name to number
                     if (OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
-                        ErrorsFound |= CurveManager::CheckCurveDims(m_state,
-                                                                    OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
-                                                                    {1},                                                   // Valid dimensions
-                                                                    RoutineName,                                           // Routine name
-                                                                    CurrentModuleObject,                                   // Object Type
-                                                                    OccupantVentilationControl(i).Name,                    // Object Name
-                                                                    cAlphaFields(3));                                      // Field Name
+                        ErrorsFound |= Curve::CheckCurveDims(m_state,
+                                                             OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
+                                                             {1},                                                   // Valid dimensions
+                                                             RoutineName,                                           // Routine name
+                                                             CurrentModuleObject,                                   // Object Type
+                                                             OccupantVentilationControl(i).Name,                    // Object Name
+                                                             cAlphaFields(3));                                      // Field Name
                     } else {
                         ShowWarningError(m_state,
                                          format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(3) +
@@ -2588,8 +2588,8 @@ namespace AirflowNetwork {
                                              " is required, but a blank is found.");
                         ShowContinueError(m_state, format("The default value is assigned as {:.1R}", Numbers(1)));
                     }
-                    MultizoneExternalNodeData(i).ExtNum = AirflowNetworkNumOfZones + i;                   // External node number
-                    MultizoneExternalNodeData(i).curve = CurveManager::GetCurveIndex(m_state, Alphas(2)); // Wind pressure curve
+                    MultizoneExternalNodeData(i).ExtNum = AirflowNetworkNumOfZones + i;            // External node number
+                    MultizoneExternalNodeData(i).curve = Curve::GetCurveIndex(m_state, Alphas(2)); // Wind pressure curve
                     if (MultizoneExternalNodeData(i).curve == 0) {
                         ShowSevereError(m_state, format(RoutineName) + "Invalid " + cAlphaFields(2) + "=" + Alphas(2));
                         ShowContinueError(m_state, "Entered in " + CurrentModuleObject + '=' + Alphas(1));
@@ -3485,12 +3485,12 @@ namespace AirflowNetwork {
             curves.insert(MultizoneExternalNodeData(i).curve);
         }
         for (auto index : curves) {
-            print(m_state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(m_state, index));
+            print(m_state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", Curve::GetCurveName(m_state, index));
 
             for (j = 0; j < numWinDirs; ++j) {
-                print(m_state.files.eio, "{:.2R},", CurveManager::CurveValue(m_state, index, j * angleDelta));
+                print(m_state.files.eio, "{:.2R},", Curve::CurveValue(m_state, index, j * angleDelta));
             }
-            print(m_state.files.eio, "{:.2R}\n", CurveManager::CurveValue(m_state, index, numWinDirs * angleDelta));
+            print(m_state.files.eio, "{:.2R}\n", Curve::CurveValue(m_state, index, numWinDirs * angleDelta));
         }
 
         if (AirflowNetworkNumOfSingleSideZones > 0) {
@@ -6810,21 +6810,20 @@ namespace AirflowNetwork {
         // Add a new table and performance curve
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
+        Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
 
         int CurveNum = static_cast<int>(state.dataCurveManager->PerfCurve.size()) + 1;
-        state.dataCurveManager->PerfCurve.push_back(CurveManager::PerformanceCurveData());
+        state.dataCurveManager->PerfCurve.push_back(Curve::PerformanceCurveData());
 
         state.dataCurveManager->PerfCurve(CurveNum).Name = name;
-        state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
-        state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
+        state.dataCurveManager->PerfCurve(CurveNum).numDims = 1;
 
-        state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpType::BtwxtMethod;
+        state.dataCurveManager->PerfCurve(CurveNum).interpolationType = Curve::InterpType::BtwxtMethod;
 
-        state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-        state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
-        state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 360.0;
-        state.dataCurveManager->PerfCurve(CurveNum).Var1MaxPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
+        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].minPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 360.0;
+        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].maxPresent = true;
 
         state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
         state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
@@ -7189,7 +7188,7 @@ namespace AirflowNetwork {
                 angle = 360.0 - angle;
             }
         }
-        Cp = CurveManager::CurveValue(m_state, curve, angle);
+        Cp = Curve::CurveValue(m_state, curve, angle);
 
         return Cp * 0.5 * rho * windSpeed * windSpeed;
     }

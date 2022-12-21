@@ -1705,7 +1705,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
     // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
     // Using/Aliasing
     using namespace Psychrometrics;
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
 
     // Return value
     ErlValueType ReturnValue;
@@ -2770,7 +2770,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     // once all the object names are known.
 
     // Using/Aliasing
-    using CurveManager::GetCurveIndex;
+    using Curve::GetCurveIndex;
 
     // Locals
     // SUBROUTINE PARAMETER DEFINITIONS:

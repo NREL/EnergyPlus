@@ -373,8 +373,8 @@ void BranchPressureDrop(EnergyPlusData &state,
     // This will choose an appropriate pressure drop calculation routine based on structure flags
 
     // Using/Aliasing
-    using CurveManager::CurveValue;
-    using CurveManager::PressureCurveValue;
+    using Curve::CurveValue;
+    using Curve::PressureCurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetViscosityGlycol;
 
@@ -835,7 +835,7 @@ Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
     // Calling routine should only call this if needed.
 
     // Using/Aliasing
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetViscosityGlycol;
 

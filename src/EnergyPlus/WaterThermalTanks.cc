@@ -750,24 +750,22 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         DesupHtr.MaxInletWaterTemp = rNumericArgs(5);
 
         if (!lAlphaFieldBlanks(4)) {
-            DesupHtr.HEffFTemp = CurveManager::GetCurveIndex(state, cAlphaArgs(4));
+            DesupHtr.HEffFTemp = Curve::GetCurveIndex(state, cAlphaArgs(4));
             if (DesupHtr.HEffFTemp == 0) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + DesupHtr.Name + ":  " + cAlphaFieldNames(4) + " not found = " + cAlphaArgs(4));
                 ErrorsFound = true;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            DesupHtr.HEffFTemp,   // Curve index
-                                                            {2},                  // Valid dimensions
-                                                            RoutineName,          // Routine name
-                                                            cCurrentModuleObject, // Object Type
-                                                            DesupHtr.Name,        // Object Name
-                                                            cAlphaFieldNames(4)); // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     DesupHtr.HEffFTemp,   // Curve index
+                                                     {2},                  // Valid dimensions
+                                                     RoutineName,          // Routine name
+                                                     cCurrentModuleObject, // Object Type
+                                                     DesupHtr.Name,        // Object Name
+                                                     cAlphaFieldNames(4)); // Field Name
                 if (!ErrorsFound) {
                     if (DesupHtr.HEffFTemp > 0) {
-                        Real64 HEffFTemp =
-                            min(1.0,
-                                max(0.0,
-                                    CurveManager::CurveValue(state, DesupHtr.HEffFTemp, DesupHtr.RatedInletWaterTemp, DesupHtr.RatedOutdoorAirTemp)));
+                        Real64 HEffFTemp = min(
+                            1.0, max(0.0, Curve::CurveValue(state, DesupHtr.HEffFTemp, DesupHtr.RatedInletWaterTemp, DesupHtr.RatedOutdoorAirTemp)));
                         if (std::abs(HEffFTemp - 1.0) > 0.05) {
                             ShowWarningError(state, cCurrentModuleObject + ", \"" + DesupHtr.Name + "\":");
                             ShowContinueError(state, "The " + cAlphaFieldNames(4) + " should be normalized ");
@@ -2422,7 +2420,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
 
         if (!state.dataIPShortCut->cAlphaArgs(5).empty()) {
-            Tank.PLFCurve = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
+            Tank.PLFCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
             if (Tank.PLFCurve == 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -2439,13 +2437,13 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            Tank.PLFCurve,                              // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            RoutineName,                                // Routine name
-                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                            Tank.Name,                                  // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     Tank.PLFCurve,                              // Curve index
+                                                     {1},                                        // Valid dimensions
+                                                     RoutineName,                                // Routine name
+                                                     state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                     Tank.Name,                                  // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
             }
         }
 
@@ -5630,8 +5628,8 @@ void WaterThermalTankData::ValidatePLFCurve(EnergyPlusData &state, int const Cur
     IsValid = true;
 
     // Check 0 and 1
-    if (CurveManager::CurveValue(state, CurveIndex, 0.0) <= 0) IsValid = false;
-    if (CurveManager::CurveValue(state, CurveIndex, 1.0) <= 0) IsValid = false;
+    if (Curve::CurveValue(state, CurveIndex, 0.0) <= 0) IsValid = false;
+    if (Curve::CurveValue(state, CurveIndex, 1.0) <= 0) IsValid = false;
 }
 
 void WaterThermalTankData::SetupStratifiedNodes(EnergyPlusData &state)
@@ -7514,7 +7512,7 @@ Real64 WaterThermalTankData::PartLoadFactor(EnergyPlusData &state, Real64 const 
     // is MODULATE, or correlated to Runtime Fraction, if Heater Control Type is CYCLE.
 
     if (this->PLFCurve > 0) {
-        return max(CurveManager::CurveValue(state, this->PLFCurve, PartLoadRatio_loc), 0.1);
+        return max(Curve::CurveValue(state, this->PLFCurve, PartLoadRatio_loc), 0.1);
     } else {
         return 1.0;
     }
@@ -8433,7 +8431,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
 
     Real64 HEffFTemp;
     if (DesupHtr.HEffFTemp > 0) {
-        HEffFTemp = max(0.0, CurveManager::CurveValue(state, DesupHtr.HEffFTemp, this->SavedTankTemp, state.dataEnvrn->OutDryBulbTemp));
+        HEffFTemp = max(0.0, Curve::CurveValue(state, DesupHtr.HEffFTemp, this->SavedTankTemp, state.dataEnvrn->OutDryBulbTemp));
     } else {
         HEffFTemp = 1.0;
     }

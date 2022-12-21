@@ -1446,8 +1446,8 @@ namespace HeatBalanceManager {
         // material definition.  There are now 10 flavors of materials.  Definitions from
         // the IDD appear below before their counterpart "gets".
 
-        using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveMinMaxValues;
+        using Curve::GetCurveIndex;
+        using Curve::GetCurveMinMaxValues;
 
         using General::ScanForReports;
 
@@ -2050,7 +2050,7 @@ namespace HeatBalanceManager {
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(state, " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    thisMaterial->GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(5));
+                    thisMaterial->GlassSpecAngTransDataPtr = Curve::GetCurveIndex(state, MaterialNames(5));
                     if (thisMaterial->GlassSpecAngTransDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
@@ -2058,13 +2058,13 @@ namespace HeatBalanceManager {
                                           state.dataIPShortCut->cAlphaFieldNames(5) +
                                               " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                                    thisMaterial->GlassSpecAngTransDataPtr,     // Curve index
-                                                                    {2},                                        // Valid dimensions
-                                                                    RoutineName,                                // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
-                                                                    thisMaterial->Name,                         // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
+                        ErrorsFound |= Curve::CheckCurveDims(state,
+                                                             thisMaterial->GlassSpecAngTransDataPtr,     // Curve index
+                                                             {2},                                        // Valid dimensions
+                                                             RoutineName,                                // Routine name
+                                                             state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                             thisMaterial->Name,                         // Object Name
+                                                             state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
 
                         GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
@@ -2118,7 +2118,7 @@ namespace HeatBalanceManager {
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(state, " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    thisMaterial->GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(6));
+                    thisMaterial->GlassSpecAngFRefleDataPtr = Curve::GetCurveIndex(state, MaterialNames(6));
                     if (thisMaterial->GlassSpecAngFRefleDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
@@ -2126,13 +2126,13 @@ namespace HeatBalanceManager {
                                           state.dataIPShortCut->cAlphaFieldNames(6) +
                                               " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                                    thisMaterial->GlassSpecAngFRefleDataPtr,    // Curve index
-                                                                    {2},                                        // Valid dimensions
-                                                                    RoutineName,                                // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
-                                                                    thisMaterial->Name,                         // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(6)); // Field Name
+                        ErrorsFound |= Curve::CheckCurveDims(state,
+                                                             thisMaterial->GlassSpecAngFRefleDataPtr,    // Curve index
+                                                             {2},                                        // Valid dimensions
+                                                             RoutineName,                                // Routine name
+                                                             state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                             thisMaterial->Name,                         // Object Name
+                                                             state.dataIPShortCut->cAlphaFieldNames(6)); // Field Name
 
                         GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
@@ -2186,7 +2186,7 @@ namespace HeatBalanceManager {
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(state, " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    thisMaterial->GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(7));
+                    thisMaterial->GlassSpecAngBRefleDataPtr = Curve::GetCurveIndex(state, MaterialNames(7));
                     if (thisMaterial->GlassSpecAngBRefleDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
@@ -2194,13 +2194,13 @@ namespace HeatBalanceManager {
                                           state.dataIPShortCut->cAlphaFieldNames(7) +
                                               " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                                    thisMaterial->GlassSpecAngBRefleDataPtr,    // Curve index
-                                                                    {2},                                        // Valid dimensions
-                                                                    RoutineName,                                // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
-                                                                    thisMaterial->Name,                         // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
+                        ErrorsFound |= Curve::CheckCurveDims(state,
+                                                             thisMaterial->GlassSpecAngBRefleDataPtr,    // Curve index
+                                                             {2},                                        // Valid dimensions
+                                                             RoutineName,                                // Routine name
+                                                             state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                             thisMaterial->Name,                         // Object Name
+                                                             state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
 
                         GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
