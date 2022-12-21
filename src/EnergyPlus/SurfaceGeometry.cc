@@ -7715,7 +7715,7 @@ namespace SurfaceGeometry {
         int NumAlphas;
         int NumNumbers;
 
-        Real64 const tolerance = 1e-6;
+        Real64 constexpr tolerance = 1e-6;
 
         std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
         int numObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);

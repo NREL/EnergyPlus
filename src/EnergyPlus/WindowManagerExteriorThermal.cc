@@ -677,7 +677,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        Real64 const pres = 1e5; // Old code uses this constant pressure
+        Real64 constexpr pres = 1e5; // Old code uses this constant pressure
         Real64 thickness = material.Thickness;
         auto aGas = getGas(material);
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
@@ -695,7 +695,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        Real64 const pres = 1e5; // Old code uses this constant pressure
+        Real64 constexpr pres = 1e5; // Old code uses this constant pressure
         auto aGas = getAir();
         Real64 thickness = 0.0;
 
@@ -724,7 +724,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        Real64 const pres = 1e5; // Old code uses this constant pressure
+        Real64 constexpr pres = 1e5; // Old code uses this constant pressure
         Real64 thickness = material.Thickness;
         Real64 gasPointer = material.GasPointer;
         auto &gasMaterial(*state.dataMaterial->Material(gasPointer));
@@ -746,7 +746,7 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
         const int numGases = material.NumberOfGasesInMixture;
-        double const vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
+        double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
         const auto gasName = material.Name;
         Gases::CGas aGas;
         for (auto i = 1; i <= numGases; ++i) {
