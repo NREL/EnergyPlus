@@ -94,7 +94,7 @@ namespace FourPipeBeam {
         using DataLoopNode::ObjectIsParent;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using ScheduleManager::GetScheduleIndex;
         static constexpr std::string_view routineName("FourPipeBeamFactory "); // include trailing blank space
 
@@ -853,9 +853,45 @@ namespace FourPipeBeam {
                 this->airAvailable = true;
                 this->coolingAvailable = true;
                 this->heatingAvailable = false;
-                bool dummyParameter = false;
-                auto f = std::bind(&HVACFourPipeBeam::residualSizing, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, ErrTolerance, 50, SolFlag, mDotAirSolutionCooling, f, minFlow, maxFlowCool, dummyParameter);
+                auto f = [&state, this](Real64 const airFlow) {
+                    static constexpr std::string_view routineName("Real64 HVACFourPipeBeam::residualSizing ");
+                    this->mDotSystemAir = airFlow;
+                    this->vDotDesignPrimAir = this->mDotSystemAir / state.dataEnvrn->StdRhoAir;
+                    this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
+                    if (this->vDotDesignCWWasAutosized) {
+                        this->vDotDesignCW = this->vDotNormRatedCW * this->totBeamLength;
+                        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                                             state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidName,
+                                                                             DataGlobalConstants::CWInitConvTemp,
+                                                                             state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidIndex,
+                                                                             routineName);
+                        this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
+                        this->mDotCW = this->vDotDesignCW * rho;
+                        if (this->beamCoolingPresent) {
+                            PlantUtilities::InitComponentNodes(state, 0.0, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum);
+                        }
+                    }
+                    if (vDotDesignHWWasAutosized) {
+                        this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
+                        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                                             state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidName,
+                                                                             DataGlobalConstants::HWInitConvTemp,
+                                                                             state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidIndex,
+                                                                             routineName);
+                        this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
+                        this->mDotHW = this->vDotDesignHW * rho;
+                        if (this->beamHeatingPresent) {
+                            PlantUtilities::InitComponentNodes(state, 0.0, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum);
+                        }
+                    }
+                    this->calc(state);
+                    if (this->qDotZoneReq != 0.0) {
+                        return ((this->qDotZoneReq - this->qDotTotalDelivered) / this->qDotZoneReq);
+                    } else {
+                        return 1.0;
+                    }
+                };
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, mDotAirSolutionCooling, f, minFlow, maxFlowCool);
                 if (SolFlag == -1) {
                     ShowWarningError(state, "Cooling load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError(state, "  Iteration limit exceeded in calculating size for design cooling load");
@@ -896,16 +932,45 @@ namespace FourPipeBeam {
                 this->airAvailable = true;
                 this->heatingAvailable = true;
                 this->coolingAvailable = false;
-                bool dummyParameter = false;
-                General::SolveRoot(state,
-                                   ErrTolerance,
-                                   50,
-                                   SolFlag,
-                                   mDotAirSolutionHeating,
-                                   std::bind(&HVACFourPipeBeam::residualSizing, this, _1, _2, _3),
-                                   0.0,
-                                   maxFlowHeat,
-                                   dummyParameter);
+                auto f = [&state, this](Real64 const airFlow) {
+                    static constexpr std::string_view routineName("Real64 HVACFourPipeBeam::residualSizing ");
+                    this->mDotSystemAir = airFlow;
+                    this->vDotDesignPrimAir = this->mDotSystemAir / state.dataEnvrn->StdRhoAir;
+                    this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
+                    if (this->vDotDesignCWWasAutosized) {
+                        this->vDotDesignCW = this->vDotNormRatedCW * this->totBeamLength;
+                        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                                             state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidName,
+                                                                             DataGlobalConstants::CWInitConvTemp,
+                                                                             state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidIndex,
+                                                                             routineName);
+                        this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
+                        this->mDotCW = this->vDotDesignCW * rho;
+                        if (this->beamCoolingPresent) {
+                            PlantUtilities::InitComponentNodes(state, 0.0, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum);
+                        }
+                    }
+                    if (vDotDesignHWWasAutosized) {
+                        this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
+                        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                                             state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidName,
+                                                                             DataGlobalConstants::HWInitConvTemp,
+                                                                             state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidIndex,
+                                                                             routineName);
+                        this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
+                        this->mDotHW = this->vDotDesignHW * rho;
+                        if (this->beamHeatingPresent) {
+                            PlantUtilities::InitComponentNodes(state, 0.0, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum);
+                        }
+                    }
+                    this->calc(state);
+                    if (this->qDotZoneReq != 0.0) {
+                        return ((this->qDotZoneReq - this->qDotTotalDelivered) / this->qDotZoneReq);
+                    } else {
+                        return 1.0;
+                    }
+                };
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, mDotAirSolutionHeating, f, 0.0, maxFlowHeat);
                 if (SolFlag == -1) {
                     ShowWarningError(state, "Heating load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError(state, "  Iteration limit exceeded in calculating size for design heating load");
@@ -1002,54 +1067,6 @@ namespace FourPipeBeam {
 
     } // set_size
 
-    Real64 HVACFourPipeBeam::residualSizing(EnergyPlusData &state,
-                                            Real64 const airFlow, // air flow in kg/s
-                                            [[maybe_unused]] bool const dummyParameter)
-    {
-
-        static constexpr std::string_view routineName("Real64 HVACFourPipeBeam::residualSizing ");
-        Real64 rho;      // local fluid density
-        Real64 Residuum; // residual to be minimized to zero
-
-        this->mDotSystemAir = airFlow;
-        this->vDotDesignPrimAir = this->mDotSystemAir / state.dataEnvrn->StdRhoAir;
-
-        this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
-        if (this->vDotDesignCWWasAutosized) {
-            this->vDotDesignCW = this->vDotNormRatedCW * this->totBeamLength;
-            rho = FluidProperties::GetDensityGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::CWInitConvTemp,
-                                                    state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidIndex,
-                                                    routineName);
-            this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
-            this->mDotCW = this->vDotDesignCW * rho;
-            if (this->beamCoolingPresent) {
-                PlantUtilities::InitComponentNodes(state, 0.0, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum);
-            }
-        }
-        if (vDotDesignHWWasAutosized) {
-            this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
-            rho = FluidProperties::GetDensityGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::HWInitConvTemp,
-                                                    state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidIndex,
-                                                    routineName);
-            this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
-            this->mDotHW = this->vDotDesignHW * rho;
-            if (this->beamHeatingPresent) {
-                PlantUtilities::InitComponentNodes(state, 0.0, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum);
-            }
-        }
-        this->calc(state);
-        if (this->qDotZoneReq != 0.0) {
-            Residuum = ((this->qDotZoneReq - this->qDotTotalDelivered) / this->qDotZoneReq);
-        } else {
-            Residuum = 1.0;
-        }
-        return Residuum;
-    }
-
     void HVACFourPipeBeam::control(EnergyPlusData &state,
                                    [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    Real64 &NonAirSysOutput                         // convective cooling by the beam system [W]
@@ -1129,9 +1146,17 @@ namespace FourPipeBeam {
                 // can overcool, modulate chilled water flow rate to meet load
                 this->qDotBeamCoolingMax = this->qDotBeamCooling;
                 ErrTolerance = 0.01;
-                bool dummyParameter = false;
-                auto f = std::bind(&HVACFourPipeBeam::residualCooling, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotCW, f, 0.0, this->mDotDesignCW, dummyParameter);
+                auto f = [&state, this](Real64 const cWFlow) {
+                    this->mDotHW = 0.0;
+                    this->mDotCW = cWFlow;
+                    this->calc(state);
+                    if (this->qDotBeamCoolingMax != 0.0) {
+                        return (((this->qDotZoneToCoolSetPt - this->qDotSystemAir) - this->qDotBeamCooling) / this->qDotBeamCoolingMax);
+                    } else {
+                        return 1.0;
+                    }
+                };
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotCW, f, 0.0, this->mDotDesignCW);
                 if (SolFlag == -1) {
                     // ShowWarningError( "Cold water control failed in four pipe beam unit called " + this->name );
                     // ShowContinueError(state,  "  Iteration limit exceeded in calculating cold water mass flow rate" );
@@ -1160,9 +1185,17 @@ namespace FourPipeBeam {
                 this->qDotBeamHeatingMax = this->qDotBeamHeating;
                 // can overheat, modulate hot water flow to meet load
                 ErrTolerance = 0.01;
-                bool dummyParameter = false;
-                auto f = std::bind(&HVACFourPipeBeam::residualHeating, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotHW, f, 0.0, this->mDotDesignHW, dummyParameter);
+                auto f = [&state, this](Real64 const hWFlow) {
+                    this->mDotHW = hWFlow;
+                    this->mDotCW = 0.0;
+                    this->calc(state);
+                    if (this->qDotBeamHeatingMax != 0.0) {
+                        return (((this->qDotZoneToHeatSetPt - this->qDotSystemAir) - this->qDotBeamHeating) / this->qDotBeamHeatingMax);
+                    } else {
+                        return 1.0;
+                    }
+                };
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotHW, f, 0.0, this->mDotDesignHW);
                 if (SolFlag == -1) {
                     // ShowWarningError( "Hot water control failed in four pipe beam unit called " + this->name );
                     // ShowContinueError(state,  "  Iteration limit exceeded in calculating hot water mass flow rate" );
@@ -1234,10 +1267,10 @@ namespace FourPipeBeam {
             // test chilled water flow against plant, it might not all be available
             SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             fModCoolCWMdot =
-                CurveManager::CurveValue(state, this->modCoolingQdotCWFlowFuncNum, ((this->mDotCW / this->totBeamLength) / this->mDotNormRatedCW));
-            fModCoolDeltaT = CurveManager::CurveValue(
-                state, this->modCoolingQdotDeltaTFuncNum, ((this->tDBZoneAirTemp - this->cWTempIn) / this->deltaTempRatedCooling));
-            fModCoolAirMdot = CurveManager::CurveValue(
+                Curve::CurveValue(state, this->modCoolingQdotCWFlowFuncNum, ((this->mDotCW / this->totBeamLength) / this->mDotNormRatedCW));
+            fModCoolDeltaT =
+                Curve::CurveValue(state, this->modCoolingQdotDeltaTFuncNum, ((this->tDBZoneAirTemp - this->cWTempIn) / this->deltaTempRatedCooling));
+            fModCoolAirMdot = Curve::CurveValue(
                 state, this->modCoolingQdotAirFlowFuncNum, ((this->mDotSystemAir / this->totBeamLength) / this->mDotNormRatedPrimAir));
             this->qDotBeamCooling = -1.0 * this->qDotNormRatedCooling * fModCoolDeltaT * fModCoolAirMdot * fModCoolCWMdot * this->totBeamLength;
             cp = GetSpecificHeatGlycol(state,
@@ -1275,10 +1308,10 @@ namespace FourPipeBeam {
             // test hot water flow against plant, it might not all be available
             SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             fModHeatHWMdot =
-                CurveManager::CurveValue(state, this->modHeatingQdotHWFlowFuncNum, ((this->mDotHW / this->totBeamLength) / this->mDotNormRatedHW));
-            fModHeatDeltaT = CurveManager::CurveValue(
-                state, this->modHeatingQdotDeltaTFuncNum, ((this->hWTempIn - this->tDBZoneAirTemp) / this->deltaTempRatedHeating));
-            fModHeatAirMdot = CurveManager::CurveValue(
+                Curve::CurveValue(state, this->modHeatingQdotHWFlowFuncNum, ((this->mDotHW / this->totBeamLength) / this->mDotNormRatedHW));
+            fModHeatDeltaT =
+                Curve::CurveValue(state, this->modHeatingQdotDeltaTFuncNum, ((this->hWTempIn - this->tDBZoneAirTemp) / this->deltaTempRatedHeating));
+            fModHeatAirMdot = Curve::CurveValue(
                 state, this->modHeatingQdotAirFlowFuncNum, ((this->mDotSystemAir / this->totBeamLength) / this->mDotNormRatedPrimAir));
             this->qDotBeamHeating = this->qDotNormRatedHeating * fModHeatDeltaT * fModHeatAirMdot * fModHeatHWMdot * this->totBeamLength;
             cp = GetSpecificHeatGlycol(state,
@@ -1316,41 +1349,6 @@ namespace FourPipeBeam {
         this->qDotTotalDelivered = this->qDotSystemAir + this->qDotBeamCooling + this->qDotBeamHeating;
     }
 
-    Real64 HVACFourPipeBeam::residualCooling(EnergyPlusData &state,
-                                             Real64 const cWFlow,
-                                             [[maybe_unused]] bool const dummyParameter // cold water flow rate in kg/s
-    )
-    {
-
-        Real64 Residuum; // residual to be minimized to zero
-        this->mDotHW = 0.0;
-        this->mDotCW = cWFlow;
-        this->calc(state);
-        if (this->qDotBeamCoolingMax != 0.0) {
-            Residuum = (((this->qDotZoneToCoolSetPt - this->qDotSystemAir) - this->qDotBeamCooling) / this->qDotBeamCoolingMax);
-        } else {
-            Residuum = 1.0;
-        }
-        return Residuum;
-    }
-    Real64 HVACFourPipeBeam::residualHeating(EnergyPlusData &state,
-                                             Real64 const hWFlow,
-                                             [[maybe_unused]] bool const dummyParameter // hot water flow rate in kg/s
-    )
-    {
-
-        Real64 Residuum; // residual to be minimized to zero
-        this->mDotHW = hWFlow;
-        this->mDotCW = 0.0;
-        this->calc(state);
-        if (this->qDotBeamHeatingMax != 0.0) {
-            Residuum = (((this->qDotZoneToHeatSetPt - this->qDotSystemAir) - this->qDotBeamHeating) / this->qDotBeamHeatingMax);
-        } else {
-            Residuum = 1.0;
-        }
-
-        return Residuum;
-    }
     void HVACFourPipeBeam::update(EnergyPlusData &state) const // update node date elsewhere in EnergyPlus, does not change state of this
     {
         auto &Node(state.dataLoopNodes->Node);

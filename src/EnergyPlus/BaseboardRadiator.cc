@@ -614,7 +614,6 @@ namespace BaseboardRadiator {
         Real64 UA0; // lower bound for UA
         Real64 UA1; // upper bound for UA
         Real64 UA;
-        Array1D<Real64> Par(2);
         bool ErrorsFound(false);             // If errors detected in input
         Real64 rho;                          // local fluid density
         Real64 Cp;                           // local fluid specific heat

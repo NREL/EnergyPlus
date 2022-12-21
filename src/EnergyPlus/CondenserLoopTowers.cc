@@ -1020,7 +1020,7 @@ namespace CondenserLoopTowers {
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                tower.FanPowerfAirFlowCurve = CurveManager::GetCurveIndex(state, AlphArray(6));
+                tower.FanPowerfAirFlowCurve = Curve::GetCurveIndex(state, AlphArray(6));
                 if (tower.FanPowerfAirFlowCurve == 0) {
                     ShowWarningError(state,
                                      cCurrentModuleObject + ", \"" + tower.Name +
@@ -1496,7 +1496,7 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
 
-            tower.FanPowerfAirFlowCurve = CurveManager::GetCurveIndex(state, AlphArray(5));
+            tower.FanPowerfAirFlowCurve = Curve::GetCurveIndex(state, AlphArray(5));
             if (tower.FanPowerfAirFlowCurve == 0) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + AlphArray(5));
@@ -1546,7 +1546,7 @@ namespace CondenserLoopTowers {
             }
             tower.FreeConvTowerUASizingFactor = NumArray(16);
 
-            tower.UAModFuncAirFlowRatioCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(6));
+            tower.UAModFuncAirFlowRatioCurvePtr = Curve::GetCurveIndex(state, AlphArray(6));
             if (tower.UAModFuncAirFlowRatioCurvePtr == 0) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
@@ -1554,7 +1554,7 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
 
-            tower.UAModFuncWetBulbDiffCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(7));
+            tower.UAModFuncWetBulbDiffCurvePtr = Curve::GetCurveIndex(state, AlphArray(7));
             if (tower.UAModFuncWetBulbDiffCurvePtr == 0) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
@@ -1562,7 +1562,7 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
 
-            tower.UAModFuncWaterFlowRatioCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(8));
+            tower.UAModFuncWaterFlowRatioCurvePtr = Curve::GetCurveIndex(state, AlphArray(8));
             if (tower.UAModFuncWaterFlowRatioCurvePtr == 0) {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
@@ -5206,7 +5206,7 @@ namespace CondenserLoopTowers {
                     if (this->FanPowerfAirFlowCurve == 0) {
                         this->FanPower = pow_3(this->airFlowRateRatio) * this->HighSpeedFanPower * this->NumCellOn / this->NumCell;
                     } else {
-                        Real64 const FanCurveValue = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+                        Real64 const FanCurveValue = Curve::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
                         this->FanPower = max(0.0, (this->HighSpeedFanPower * FanCurveValue)) * this->NumCellOn / this->NumCell;
                     }
                     //       fan is cycling ON and OFF at the minimum fan speed. Adjust fan power and air flow rate ratio according to cycling rate
@@ -5268,7 +5268,7 @@ namespace CondenserLoopTowers {
                     if (this->FanPowerfAirFlowCurve == 0) {
                         this->FanPower = pow_3(this->airFlowRateRatio) * this->HighSpeedFanPower * this->NumCellOn / this->NumCell;
                     } else {
-                        Real64 const FanCurveValue = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+                        Real64 const FanCurveValue = Curve::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
                         this->FanPower = max(0.0, (this->HighSpeedFanPower * FanCurveValue)) * this->NumCellOn / this->NumCell;
                     }
                     //           outlet water temperature is calculated as the inlet air wet-bulb temperature plus tower approach temperature
@@ -5479,9 +5479,9 @@ namespace CondenserLoopTowers {
         AirFlowRatePerCell = this->HighSpeedAirFlowRate / this->NumCell;
         this->airFlowRateRatio = 1.0;
         Real64 WaterFlowRateRatio = WaterMassFlowRatePerCell / this->DesWaterMassFlowRatePerCell;
-        Real64 UAwetbulbAdjFac = CurveManager::CurveValue(state, this->UAModFuncWetBulbDiffCurvePtr, (DesignWetBulb - this->AirWetBulb));
-        Real64 UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
-        Real64 UAwaterflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
+        Real64 UAwetbulbAdjFac = Curve::CurveValue(state, this->UAModFuncWetBulbDiffCurvePtr, (DesignWetBulb - this->AirWetBulb));
+        Real64 UAairflowAdjFac = Curve::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
+        Real64 UAwaterflowAdjFac = Curve::CurveValue(state, this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
         Real64 UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
         this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
         Real64 FullSpeedFanQdot =
@@ -5497,7 +5497,7 @@ namespace CondenserLoopTowers {
                     ++this->NumCellOn;
                     WaterMassFlowRatePerCell = this->WaterMassFlowRate / this->NumCellOn;
                     WaterFlowRateRatio = WaterMassFlowRatePerCell / this->DesWaterMassFlowRatePerCell;
-                    UAwaterflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
+                    UAwaterflowAdjFac = Curve::CurveValue(state, this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
                     UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
                     this->OutletWaterTemp =
                         this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
@@ -5511,7 +5511,7 @@ namespace CondenserLoopTowers {
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             // now calculate fan power
-            FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+            FanPowerAdjustFac = Curve::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
 
             return;
@@ -5520,7 +5520,7 @@ namespace CondenserLoopTowers {
         // next find minimum air flow ratio cooling rate
         this->airFlowRateRatio = this->MinimumVSAirFlowFrac;
         AirFlowRatePerCell = this->airFlowRateRatio * this->HighSpeedAirFlowRate / this->NumCell;
-        UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
+        UAairflowAdjFac = Curve::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
         UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
         this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
         Real64 MinSpeedFanQdot =
@@ -5531,7 +5531,7 @@ namespace CondenserLoopTowers {
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             // now calculate fan power
-            FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+            FanPowerAdjustFac = Curve::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
             return;
         }
@@ -5541,7 +5541,7 @@ namespace CondenserLoopTowers {
             auto f = [&state, this, MyLoad, WaterMassFlowRatePerCell, UAdesignPerCell, UAwetbulbAdjFac, UAwaterflowAdjFac, CpWater](
                          Real64 airFlowRateRatioLocal) {
                 Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * this->HighSpeedAirFlowRate / this->NumCell;
-                Real64 const UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
+                Real64 const UAairflowAdjFac = Curve::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
                 Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
                 Real64 OutletWaterTempTrial =
                     this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
@@ -5597,7 +5597,7 @@ namespace CondenserLoopTowers {
             // now rerun to get peformance with AirFlowRateRatio
             AirFlowRatePerCell = this->airFlowRateRatio * this->HighSpeedAirFlowRate / this->NumCell;
 
-            UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
+            UAairflowAdjFac = Curve::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
             UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
 
             this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
@@ -5606,7 +5606,7 @@ namespace CondenserLoopTowers {
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
 
             // now calculate fan power
-            FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+            FanPowerAdjustFac = Curve::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
         }
     }

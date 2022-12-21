@@ -250,8 +250,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
 
     // evaluate capacity modifier curve and determine load side heat transfer
-    Real64 capacityModifierFuncTemp =
-        CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+    Real64 capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
 
     if (capacityModifierFuncTemp < 0.0) {
         if (this->capModFTErrorIndex == 0) {
@@ -295,8 +294,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
 
     // calculate power usage from EIR curves
-    Real64 eirModifierFuncTemp =
-        CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+    Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
 
     if (eirModifierFuncTemp < 0.0) {
         if (this->eirModFTErrorIndex == 0) {
@@ -318,7 +316,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         eirModifierFuncTemp = 0.0;
     }
 
-    Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+    Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, partLoadRatio);
 
     if (eirModifierFuncPLR < 0.0) {
         if (this->eirModFPLRErrorIndex == 0) {
@@ -367,6 +365,15 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
     this->oneTimeInit(state); // plant setup
 
     if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+        if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
+            this->sizeLoadSide(state);
+            if (this->waterSource) {
+                this->sizeSrcSideWSHP(state);
+            } else if (this->airSource) {
+                this->sizeSrcSideASHP(state);
+            }
+        }
+
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::InitConvTemp,
@@ -397,15 +404,9 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 }
 
 void EIRPlantLoopHeatPump::getDesignCapacities(
-    EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
 {
     if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
-        this->sizeLoadSide(state);
-        if (this->waterSource) {
-            this->sizeSrcSideWSHP(state);
-        } else if (this->airSource) {
-            this->sizeSrcSideASHP(state);
-        }
         MinLoad = 0.0;
         MaxLoad = this->referenceCapacity;
         OptLoad = this->referenceCapacity;
@@ -765,6 +766,35 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
 
     this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
 
+    std::string_view const typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)];
+    if (this->sourceSideDesignVolFlowRateWasAutoSized) {
+        this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
+        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+            BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+        }
+        if (state.dataPlnt->PlantFirstSizesOkayToReport) {
+            BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+        }
+    } else {
+        // source design flow was hard-sized
+        if (this->sourceSideDesignVolFlowRate > 0.0) {
+            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                if (state.dataGlobal->DoPlantSizing) {
+                    BaseSizer::reportSizerOutput(state,
+                                                 typeName,
+                                                 this->name,
+                                                 "Design Size Source Side Volume Flow Rate [m3/s]",
+                                                 tmpSourceVolFlow,
+                                                 "User-Specified Source Side Volume Flow Rate [m3/s]",
+                                                 this->sourceSideDesignVolFlowRate);
+                } else {
+                    BaseSizer::reportSizerOutput(
+                        state, typeName, this->name, "User-Specified Source Side Volume Flow Rate [m3/s]", this->sourceSideDesignVolFlowRate);
+                }
+            }
+        }
+    }
+
     if (errorsFound) {
         ShowFatalError(state, "Preceding sizing errors cause program termination"); // LCOV_EXCL_LINE
     }
@@ -944,23 +974,21 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 auto &capFtName = fields.at("capacity_modifier_function_of_temperature_curve_name");
-                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
+                thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName.get<std::string>());
                     errorsFound = true;
                 }
                 auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                thisPLHP.powerRatioFuncTempCurveIndex =
-                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
+                thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + eirFtName.get<std::string>());
                     errorsFound = true;
                 }
                 auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
-                thisPLHP.powerRatioFuncPLRCurveIndex =
-                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
+                thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + eirFplrName.get<std::string>());

@@ -107,7 +107,7 @@ namespace GeneratorFuelSupply {
         //                      reuse with both Annex 42 models,
 
         // Using/Aliasing
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using DataLoopNode::ObjectIsNotParent;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
