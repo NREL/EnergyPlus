@@ -276,12 +276,15 @@ void ManageHVAC(EnergyPlusData &state)
 
     SetHeatToReturnAirFlag(state);
 
-    for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
         thisZoneHB.SysDepZoneLoadsLagged = thisZoneHB.SysDepZoneLoads;
-    }
-    if (state.dataHeatBal->doSpaceHeatBalance) {
-        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
-            thisSpaceHB.SysDepZoneLoadsLagged = thisSpaceHB.SysDepZoneLoads;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                // SpaceHB ToDo: For now allocate by space volume frac
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoadsLagged =
+                    thisZoneHB.SysDepZoneLoads * state.dataHeatBal->space(spaceNum).fracZoneVolume;
+            }
         }
     }
 
