@@ -584,7 +584,6 @@ void GetZonePlenumInput(EnergyPlusData &state)
         // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
         state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber =
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
-        state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
         // SpaceHB TODO: For now, assign the same system node to the spaces in the zone
         for (int spaceNum : state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).spaceIndexes) {
             state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
