@@ -493,7 +493,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                         MatGapL = thisConstruct.LayerPoint(LayNumSh - 1);
                         MatGapR = thisConstruct.LayerPoint(LayNumSh + 1);
                         for (IGas = 1; IGas <= 5; ++IGas) {
-                            if ((state.dataMaterial->Material(MatGapL)->GasType(IGas) != state.dataMaterial->Material(MatGapR)->GasType(IGas)) ||
+                            if ((state.dataMaterial->Material(MatGapL)->gasTypes(IGas) != state.dataMaterial->Material(MatGapR)->gasTypes(IGas)) ||
                                 (state.dataMaterial->Material(MatGapL)->GasFract(IGas) != state.dataMaterial->Material(MatGapR)->GasFract(IGas)))
                                 WrongWindowLayering = true;
                         }

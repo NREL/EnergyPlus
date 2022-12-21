@@ -7384,7 +7384,7 @@ namespace WindowManager {
                             print(state.files.eio,
                                   Format_702,
                                   thisMaterial->Name,
-                                  GasTypeName(static_cast<int>(thisMaterial->GasType(1))),
+                                  GasTypeName(static_cast<int>(thisMaterial->gasTypes(1))),
                                   thisMaterial->Thickness);
                             //! fw CASE(WindowGasMixture)
                         } break;
@@ -7589,7 +7589,7 @@ namespace WindowManager {
                             print(state.files.eio,
                                   Format_713,
                                   thisMaterial->Name,
-                                  GasTypeName(static_cast<int>(thisMaterial->GasType(1))),
+                                  GasTypeName(static_cast<int>(thisMaterial->gasTypes(1))),
                                   thisMaterial->Thickness,
                                   GapVentType);
                         } break;

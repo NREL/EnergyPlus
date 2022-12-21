@@ -85,7 +85,7 @@ namespace Material {
         Num
     };
 
-    enum class GasTypeEnum
+    enum class GasType
     {
         Invalid = -1,
         Custom,
@@ -96,7 +96,7 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(GasTypeEnum::Num)> GasTypeEnumUC = {"CUSTOM", "AIR", "ARGON", "KRYPTON", "XENON"};
+    constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> GasTypeUC = {"CUSTOM", "AIR", "ARGON", "KRYPTON", "XENON"};
 
     enum class GapVentTypeEnum
     {
@@ -145,7 +145,7 @@ namespace Material {
         // based on the water vapor density (kg/kgK)
         Real64 Thickness;             // Layer thickness (m)
         Real64 VaporDiffus;           // Layer vapor diffusivity
-        Array1D<GasTypeEnum> GasType; // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
+        Array1D<GasType> gasTypes; // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
         //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
         int GlassSpectralDataPtr;         // Number of a spectral data set associated with a window glass material
         int NumberOfGasesInMixture;       // Number of gases in a window gas mixture
@@ -316,7 +316,7 @@ namespace Material {
         MaterialProperties()
             : Group(Material::MaterialGroup::Invalid), Roughness(DataSurfaces::SurfaceRoughness::Invalid), Conductivity(0.0), Density(0.0),
               IsoMoistCap(0.0), Porosity(0.0), Resistance(0.0), ROnly(false), SpecHeat(0.0), ThermGradCoef(0.0), Thickness(0.0), VaporDiffus(0.0),
-              GasType(5, GasTypeEnum::Custom), GlassSpectralDataPtr(0), NumberOfGasesInMixture(0), GasCon(3, 5, 0.0), GasVis(3, 5, 0.0),
+              gasTypes(5, GasType::Custom), GlassSpectralDataPtr(0), NumberOfGasesInMixture(0), GasCon(3, 5, 0.0), GasVis(3, 5, 0.0),
               GasCp(3, 5, 0.0), GasWght(5, 0.0), GasSpecHeatRatio(5, 0.0), GasFract(5, 0.0), AbsorpSolar(0.0), AbsorpSolarInput(0.0),
               AbsorpSolarEMSOverrideOn(false), AbsorpSolarEMSOverride(0.0), AbsorpThermal(0.0), AbsorpThermalInput(0.0),
               AbsorpThermalEMSOverrideOn(false), AbsorpThermalEMSOverride(0.0), AbsorpVisible(0.0), AbsorpVisibleInput(0.0),
