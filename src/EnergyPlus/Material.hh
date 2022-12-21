@@ -143,8 +143,8 @@ namespace Material {
         Real64 SpecHeat;      // Layer specific heat (J/kgK)
         Real64 ThermGradCoef; // Thermal-gradient coefficient for moisture capacity
         // based on the water vapor density (kg/kgK)
-        Real64 Thickness;             // Layer thickness (m)
-        Real64 VaporDiffus;           // Layer vapor diffusivity
+        Real64 Thickness;          // Layer thickness (m)
+        Real64 VaporDiffus;        // Layer vapor diffusivity
         Array1D<GasType> gasTypes; // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
         //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
         int GlassSpectralDataPtr;         // Number of a spectral data set associated with a window glass material
@@ -291,7 +291,7 @@ namespace Material {
         Real64 EmissThermalFront;                               // Front side thermal or infrared Emissivity
         Real64 EmissThermalBack;                                // Back side thermal or infrared Emissivity
         Real64 TausThermal;                                     // Thermal transmittance (front and back)
-        GapVentType gapVentType;                            // Gap Ven type for equivalent Layer window model
+        GapVentType gapVentType;                                // Gap Ven type for equivalent Layer window model
         bool ISPleatedDrape;                                    // if pleated drape= true, if nonpleated drape = false
         Real64 PleatedDrapeWidth;                               // width of the pleated drape fabric section
         Real64 PleatedDrapeLength;                              // length of the pleated drape fabric section
@@ -301,7 +301,7 @@ namespace Material {
         Real64 SlatSeparation;                                  // slat separation
         Real64 SlatCrown;                                       // slat crown
         Real64 SlatAngle;                                       // slat angle
-        SlatAngleType slatAngleType;                        // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
+        SlatAngleType slatAngleType;                            // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
         DataWindowEquivalentLayer::Orientation SlatOrientation; // horizontal or vertical
         std::string GasName;                                    // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
         HysteresisPhaseChange::HysteresisPhaseChange *phaseChange = nullptr;

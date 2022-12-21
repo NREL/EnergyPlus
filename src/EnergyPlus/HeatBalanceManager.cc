@@ -1467,9 +1467,9 @@ namespace HeatBalanceManager {
         int AirMat;                        // Air space materials in opaque constructions
         int IRTMat;                        // Infrared Transmitting Materials -- R only property definition
 
-        int EcoRoofMat;                                                 // Materials for ecoRoof
-        int NumGas;                                                     // Index for loop over gap gases in a mixture
-        int NumGases;                                                   // Number of gasses in a mixture
+        int EcoRoofMat;                                         // Materials for ecoRoof
+        int NumGas;                                             // Index for loop over gap gases in a mixture
+        int NumGases;                                           // Number of gasses in a mixture
         Material::GasType gasType = Material::GasType::Invalid; // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
         int Loop;
         int ICoeff;            // Gas property coefficient index
