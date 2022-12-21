@@ -178,13 +178,6 @@ namespace Curve {
         switch (thisCurve.interpolationType) {
         case InterpType::EvaluateCurveToLimits:
             switch (thisCurve.curveType) {
-                // TODO: BiQuadratic is not supposed to be here, but some unit tests were setting the curves up as biquadratic but calling with one
-                // var...
-            case CurveType::BiQuadratic:
-                CurveValue = // Each 0.0 here is where V2 would normally go
-                    thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * thisCurve.coeff[2]) + 0.0 * (thisCurve.coeff[3] + 0.0 * thisCurve.coeff[4]) +
-                    V1 * 0.0 * thisCurve.coeff[5];
-                break;
             case CurveType::Linear: {
                 CurveValue = thisCurve.coeff[0] + V1 * thisCurve.coeff[1];
             } break;
@@ -232,7 +225,7 @@ namespace Curve {
                              thisCurve.coeff[3] * std::exp(thisCurve.coeff[4] * V1);
             } break;
             default:
-                assert(false);
+                return thisCurve.curveValueBackup(V1, 0.0, 0.0, 0.0, 0.0);
             }
             break;
         case InterpType::BtwxtMethod:
@@ -267,24 +260,6 @@ namespace Curve {
         switch (thisCurve.interpolationType) {
         case InterpType::EvaluateCurveToLimits:
             switch (thisCurve.curveType) {
-                // TODO: Remove these 1 dimensional ones, but some calls to CurveValue call it like this
-            case CurveType::Linear: {
-                CurveValue = thisCurve.coeff[0] + V1 * thisCurve.coeff[1];
-            } break;
-            case CurveType::Quadratic: {
-                CurveValue = thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * thisCurve.coeff[2]);
-            } break;
-            case CurveType::Cubic: {
-                CurveValue = thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * (thisCurve.coeff[2] + V1 * thisCurve.coeff[3]));
-            } break;
-                // TODO: This is a 3 dimensional curve, but StandardRatings::CalcChillerIPLV was calling it with two args....keeping here temporarily
-            case CurveType::ChillerPartLoadWithLift:
-                CurveValue = thisCurve.coeff[0] + thisCurve.coeff[1] * V1 + thisCurve.coeff[2] * V1 * V1 + thisCurve.coeff[3] * V2 +
-                             thisCurve.coeff[4] * V2 * V2 + thisCurve.coeff[5] * V1 * V2 + thisCurve.coeff[6] * V1 * V1 * V1 +
-                             thisCurve.coeff[7] * V2 * V2 * V2 + thisCurve.coeff[8] * V1 * V1 * V2 + thisCurve.coeff[9] * V1 * V2 * V2 +
-                             thisCurve.coeff[10] * V1 * V1 * V2 * V2 + thisCurve.coeff[11] * 0.0 * V2 * V2 * V2;
-                break;
-                // TODO: The following are normal
             case CurveType::FanPressureRise:
                 CurveValue = V1 * (thisCurve.coeff[0] * V1 + thisCurve.coeff[1] + thisCurve.coeff[2] * std::sqrt(V2)) + thisCurve.coeff[3] * V2;
                 break;
@@ -306,7 +281,7 @@ namespace Curve {
                              V2 * V2 * V2 * thisCurve.coeff[7] + V1 * V1 * V2 * thisCurve.coeff[8] + V1 * V2 * V2 * thisCurve.coeff[9];
                 break;
             default:
-                assert(false);
+                return thisCurve.curveValueBackup(V1, V2, 0.0, 0.0, 0.0);
             }
             break;
         case InterpType::BtwxtMethod:
@@ -344,15 +319,6 @@ namespace Curve {
         switch (thisCurve.interpolationType) {
         case InterpType::EvaluateCurveToLimits:
             switch (thisCurve.curveType) {
-                // TODO: BiQuadratic is a 2-var, shouldn't be used here
-            case CurveType::BiQuadratic:
-                CurveValue = thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * thisCurve.coeff[2]) +
-                             V2 * (thisCurve.coeff[3] + V2 * thisCurve.coeff[4]) + V1 * V2 * thisCurve.coeff[5];
-                break;
-                // TODO: Quadratic is a 1-var, shouldn't be used here
-            case CurveType::Quadratic:
-                CurveValue = thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * thisCurve.coeff[2]);
-                break;
             case CurveType::ChillerPartLoadWithLift:
                 CurveValue = thisCurve.coeff[0] + thisCurve.coeff[1] * V1 + thisCurve.coeff[2] * V1 * V1 + thisCurve.coeff[3] * V2 +
                              thisCurve.coeff[4] * V2 * V2 + thisCurve.coeff[5] * V1 * V2 + thisCurve.coeff[6] * V1 * V1 * V1 +
@@ -374,7 +340,7 @@ namespace Curve {
                              Tri2ndOrder[26] * V1 * V2 * V3;
             } break;
             default:
-                assert(false);
+                return thisCurve.curveValueBackup(V1, V2, V3, 0.0, 0.0);
             }
             break;
         case InterpType::BtwxtMethod:
@@ -534,6 +500,104 @@ namespace Curve {
         thisCurve.inputs[5] = Var6;
 
         return CurveValue;
+    }
+
+    Real64 PerformanceCurveData::curveValueBackup(Real64 const V1, Real64 const V2, Real64 const V3, Real64 const V4, Real64 const V5)
+    {
+        // TODO: Issue a warning asking user to report the issue but let the calculation continue
+        switch (this->curveType) {
+        case CurveType::Linear: {
+            return this->coeff[0] + V1 * this->coeff[1];
+        } break;
+        case CurveType::Quadratic: {
+            return this->coeff[0] + V1 * (this->coeff[1] + V1 * this->coeff[2]);
+        } break;
+        case CurveType::QuadLinear: {
+            return this->coeff[0] + V1 * this->coeff[1] + V2 * this->coeff[2] + V3 * this->coeff[3] + V4 * this->coeff[4];
+        } break;
+        case CurveType::QuintLinear: {
+            return this->coeff[0] + V1 * this->coeff[1] + V2 * this->coeff[2] + V3 * this->coeff[3] + V4 * this->coeff[4] + V5 * this->coeff[5];
+        } break;
+        case CurveType::Cubic: {
+            return this->coeff[0] + V1 * (this->coeff[1] + V1 * (this->coeff[2] + V1 * this->coeff[3]));
+        } break;
+        case CurveType::Quartic: {
+            return this->coeff[0] + V1 * (this->coeff[1] + V1 * (this->coeff[2] + V1 * (this->coeff[3] + V1 * this->coeff[4])));
+        } break;
+        case CurveType::BiQuadratic: {
+            return this->coeff[0] + V1 * (this->coeff[1] + V1 * this->coeff[2]) + V2 * (this->coeff[3] + V2 * this->coeff[4]) +
+                   V1 * V2 * this->coeff[5];
+        } break;
+        case CurveType::QuadraticLinear: {
+            return (this->coeff[0] + V1 * (this->coeff[1] + V1 * this->coeff[2])) +
+                   (this->coeff[3] + V1 * (this->coeff[4] + V1 * this->coeff[5])) * V2;
+        } break;
+        case CurveType::CubicLinear: {
+            return (this->coeff[0] + V1 * (this->coeff[1] + V1 * (this->coeff[2] + V1 * this->coeff[3]))) +
+                   (this->coeff[4] + V1 * this->coeff[5]) * V2;
+        } break;
+        case CurveType::BiCubic: {
+            return this->coeff[0] + V1 * this->coeff[1] + V1 * V1 * this->coeff[2] + V2 * this->coeff[3] + V2 * V2 * this->coeff[4] +
+                   V1 * V2 * this->coeff[5] + V1 * V1 * V1 * this->coeff[6] + V2 * V2 * V2 * this->coeff[7] + V1 * V1 * V2 * this->coeff[8] +
+                   V1 * V2 * V2 * this->coeff[9];
+        } break;
+        case CurveType::ChillerPartLoadWithLift: {
+            return this->coeff[0] + this->coeff[1] * V1 + this->coeff[2] * V1 * V1 + this->coeff[3] * V2 + this->coeff[4] * V2 * V2 +
+                   this->coeff[5] * V1 * V2 + this->coeff[6] * V1 * V1 * V1 + this->coeff[7] * V2 * V2 * V2 + this->coeff[8] * V1 * V1 * V2 +
+                   this->coeff[9] * V1 * V2 * V2 + this->coeff[10] * V1 * V1 * V2 * V2 + this->coeff[11] * V3 * V2 * V2 * V2;
+        } break;
+        case CurveType::TriQuadratic: {
+            auto const &tri(this->tri2ndOrder);
+            auto const V1s(V1 * V1);
+            auto const V2s(V2 * V2);
+            auto const V3s(V3 * V3);
+            return tri[0] + tri[1] * V1s + tri[2] * V1 + tri[3] * V2s + tri[4] * V2 + tri[5] * V3s + tri[6] * V3 + tri[7] * V1s * V2s +
+                   tri[8] * V1 * V2 + tri[9] * V1 * V2s + tri[10] * V1s * V2 + tri[11] * V1s * V3s + tri[12] * V1 * V3 + tri[13] * V1 * V3s +
+                   tri[14] * V1s * V3 + tri[15] * V2s * V3s + tri[16] * V2 * V3 + tri[17] * V2 * V3s + tri[18] * V2s * V3 +
+                   tri[19] * V1s * V2s * V3s + tri[20] * V1s * V2s * V3 + tri[21] * V1s * V2 * V3s + tri[22] * V1 * V2s * V3s +
+                   tri[23] * V1s * V2 * V3 + tri[24] * V1 * V2s * V3 + tri[25] * V1 * V2 * V3s + tri[26] * V1 * V2 * V3;
+        } break;
+        case CurveType::Exponent: {
+            return this->coeff[0] + this->coeff[1] * std::pow(V1, this->coeff[2]);
+        } break;
+        case CurveType::FanPressureRise: {
+            return V1 * (this->coeff[0] * V1 + this->coeff[1] + this->coeff[2] * std::sqrt(V2)) + this->coeff[3] * V2;
+        } break;
+        case CurveType::ExponentialSkewNormal: {
+            Real64 const CoeffZ1 = (V1 - this->coeff[0]) / this->coeff[1];
+            Real64 const CoeffZ2 = (this->coeff[3] * V1 * std::exp(this->coeff[2] * V1) - this->coeff[0]) / this->coeff[1];
+            Real64 const CoeffZ3 = -this->coeff[0] / this->coeff[1];
+            Real64 const sqrt_2_inv(1.0 / std::sqrt(2.0));
+            Real64 const CurveValueNumer =
+                std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
+            Real64 const CurveValueDenom =
+                std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
+            return CurveValueNumer / CurveValueDenom;
+        } break;
+        case CurveType::Sigmoid: {
+            Real64 const CurveValueExp = std::exp((this->coeff[2] - V1) / this->coeff[3]);
+            return this->coeff[0] + this->coeff[1] / std::pow(1.0 + CurveValueExp, this->coeff[4]);
+        } break;
+        case CurveType::RectangularHyperbola1: {
+            Real64 const CurveValueNumer = this->coeff[0] * V1;
+            Real64 const CurveValueDenom = this->coeff[1] + V1;
+            return (CurveValueNumer / CurveValueDenom) + this->coeff[2];
+        } break;
+        case CurveType::RectangularHyperbola2: {
+            Real64 const CurveValueNumer = this->coeff[0] * V1;
+            Real64 const CurveValueDenom = this->coeff[1] + V1;
+            return (CurveValueNumer / CurveValueDenom) + (this->coeff[2] * V1);
+        } break;
+        case CurveType::ExponentialDecay: {
+            return this->coeff[0] + this->coeff[1] * std::exp(this->coeff[2] * V1);
+        } break;
+        case CurveType::DoubleExponentialDecay: {
+            return this->coeff[0] + this->coeff[1] * std::exp(this->coeff[2] * V1) + this->coeff[3] * std::exp(this->coeff[4] * V1);
+        } break;
+        default: {
+            return 0.0;
+        } break;
+        }
     }
 
     void GetCurveInput(EnergyPlusData &state)
