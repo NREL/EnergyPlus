@@ -2620,14 +2620,14 @@ namespace HeatBalanceManager {
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 // Get gap vent type
-                thisMaterial->GapVentType = static_cast<Material::GapVentTypeEnum>(
-                    getEnumerationValue(Material::GapVentTypeEnumUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
-                if (thisMaterial->GapVentType == Material::GapVentTypeEnum::Invalid) {
+                thisMaterial->gapVentType = static_cast<Material::GapVentType>(
+                    getEnumerationValue(Material::GapVentTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
+                if (thisMaterial->gapVentType == Material::GapVentType::Invalid) {
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal gap vent type.");
                     ShowContinueError(state,
                                       "Gap vent type allowed are Sealed, VentedIndoor, or VentedOutdoor." +
                                           state.dataIPShortCut->cAlphaFieldNames(3) + " entered =" + MaterialNames(3));
-                    thisMaterial->GapVentType = Material::GapVentTypeEnum::Sealed;
+                    thisMaterial->gapVentType = Material::GapVentType::Sealed;
                     // ErrorsFound=.TRUE.
                 }
             }

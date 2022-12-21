@@ -307,7 +307,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             // This layer is a gap.  Fill in the parameters
             CFS(EQLNum).G(gLayer).Name = thisMaterial->Name;
             // previously the values of the levels are 1-3, now it's 0-2
-            CFS(EQLNum).G(gLayer).GTYPE = static_cast<int>(thisMaterial->GapVentType) + 1;
+            CFS(EQLNum).G(gLayer).GTYPE = static_cast<int>(thisMaterial->gapVentType) + 1;
             CFS(EQLNum).G(gLayer).TAS = thisMaterial->Thickness;
             CFS(EQLNum).G(gLayer).FG.Name = thisMaterial->GasName;
             CFS(EQLNum).G(gLayer).FG.AK = thisMaterial->GasCon(1, 1);

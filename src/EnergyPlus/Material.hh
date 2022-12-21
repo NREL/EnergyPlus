@@ -98,7 +98,7 @@ namespace Material {
 
     constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> GasTypeUC = {"CUSTOM", "AIR", "ARGON", "KRYPTON", "XENON"};
 
-    enum class GapVentTypeEnum
+    enum class GapVentType
     {
         Invalid = -1,
         Sealed,
@@ -107,7 +107,7 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(GapVentTypeEnum::Num)> GapVentTypeEnumUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
+    constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
 
     enum class SlatAngleTypeEnum
     {
@@ -291,7 +291,7 @@ namespace Material {
         Real64 EmissThermalFront;                               // Front side thermal or infrared Emissivity
         Real64 EmissThermalBack;                                // Back side thermal or infrared Emissivity
         Real64 TausThermal;                                     // Thermal transmittance (front and back)
-        GapVentTypeEnum GapVentType;                            // Gap Ven type for equivalent Layer window model
+        GapVentType gapVentType;                            // Gap Ven type for equivalent Layer window model
         bool ISPleatedDrape;                                    // if pleated drape= true, if nonpleated drape = false
         Real64 PleatedDrapeWidth;                               // width of the pleated drape fabric section
         Real64 PleatedDrapeLength;                              // length of the pleated drape fabric section
@@ -338,7 +338,7 @@ namespace Material {
               TausBackBeamBeamVis(0.0), ReflFrontBeamDiff(0.0), ReflBackBeamDiff(0.0), TausFrontBeamDiff(0.0), TausBackBeamDiff(0.0),
               ReflFrontBeamDiffVis(0.0), ReflBackBeamDiffVis(0.0), TausFrontBeamDiffVis(0.0), TausBackBeamDiffVis(0.0), ReflFrontDiffDiff(0.0),
               ReflBackDiffDiff(0.0), TausDiffDiff(0.0), ReflFrontDiffDiffVis(0.0), ReflBackDiffDiffVis(0.0), TausDiffDiffVis(0.0),
-              EmissThermalFront(0.0), EmissThermalBack(0.0), TausThermal(0.0), GapVentType(GapVentTypeEnum::Sealed), ISPleatedDrape(false),
+              EmissThermalFront(0.0), EmissThermalBack(0.0), TausThermal(0.0), gapVentType(GapVentType::Sealed), ISPleatedDrape(false),
               PleatedDrapeWidth(0.0), PleatedDrapeLength(0.0), ScreenWireSpacing(0.0), ScreenWireDiameter(0.0), SlatWidth(0.0), SlatSeparation(0.0),
               SlatCrown(0.0), SlatAngle(0.0), SlatAngleType(SlatAngleTypeEnum::FixedSlatAngle),
               SlatOrientation(DataWindowEquivalentLayer::Orientation::Invalid), GlassSpectralAndAngle(false), GlassSpecAngTransDataPtr(0),
