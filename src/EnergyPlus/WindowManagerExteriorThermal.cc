@@ -516,11 +516,11 @@ namespace WindowManager {
             (matGroup == Material::MaterialGroup::WindowBlind) || (matGroup == Material::MaterialGroup::Shade) ||
             (matGroup == Material::MaterialGroup::Screen) || (matGroup == Material::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
-            aLayer = getSolidLayer(state, *material, m_SolidLayerIndex);
+            aLayer = getSolidLayer(state, material, m_SolidLayerIndex);
         } else if (matGroup == Material::MaterialGroup::WindowGas || matGroup == Material::MaterialGroup::WindowGasMixture) {
-            aLayer = getGapLayer(*material);
+            aLayer = getGapLayer(material);
         } else if (matGroup == Material::MaterialGroup::ComplexWindowGap) {
-            aLayer = getComplexGapLayer(state, *material);
+            aLayer = getComplexGapLayer(state, material);
         }
 
         return aLayer;
@@ -534,7 +534,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer>
-    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const &material, int const t_Index)
+    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const *material, int const t_Index)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -557,15 +557,15 @@ namespace WindowManager {
         Real64 Aright = 0.0;
         Real64 Afront = 0.0;
 
-        if (material.Group == Material::MaterialGroup::WindowGlass || material.Group == Material::MaterialGroup::WindowSimpleGlazing) {
-            emissFront = material.AbsorpThermalFront;
-            emissBack = material.AbsorpThermalBack;
-            transThermalFront = material.TransThermal;
-            transThermalBack = material.TransThermal;
-            thickness = material.Thickness;
-            conductivity = material.Conductivity;
+        if (material->Group == Material::MaterialGroup::WindowGlass || material->Group == Material::MaterialGroup::WindowSimpleGlazing) {
+            emissFront = material->AbsorpThermalFront;
+            emissBack = material->AbsorpThermalBack;
+            transThermalFront = material->TransThermal;
+            transThermalBack = material->TransThermal;
+            thickness = material->Thickness;
+            conductivity = material->Conductivity;
         }
-        if (material.Group == Material::MaterialGroup::WindowBlind) {
+        if (material->Group == Material::MaterialGroup::WindowBlind) {
             int blNum = state.dataSurface->SurfWinBlindNumber(m_SurfNum);
             auto blind = state.dataHeatBal->Blind(blNum);
             thickness = blind.SlatThickness;
@@ -587,42 +587,42 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == Material::MaterialGroup::Shade) {
-            emissFront = material.AbsorpThermal;
-            emissBack = material.AbsorpThermal;
-            transThermalFront = material.TransThermal;
-            transThermalBack = material.TransThermal;
-            thickness = material.Thickness;
-            conductivity = material.Conductivity;
-            Atop = material.WinShadeTopOpeningMult;
-            Abot = material.WinShadeBottomOpeningMult;
-            Aleft = material.WinShadeLeftOpeningMult;
-            Aright = material.WinShadeRightOpeningMult;
-            Afront = material.WinShadeAirFlowPermeability;
+        if (material->Group == Material::MaterialGroup::Shade) {
+            emissFront = material->AbsorpThermal;
+            emissBack = material->AbsorpThermal;
+            transThermalFront = material->TransThermal;
+            transThermalBack = material->TransThermal;
+            thickness = material->Thickness;
+            conductivity = material->Conductivity;
+            Atop = material->WinShadeTopOpeningMult;
+            Abot = material->WinShadeBottomOpeningMult;
+            Aleft = material->WinShadeLeftOpeningMult;
+            Aright = material->WinShadeRightOpeningMult;
+            Afront = material->WinShadeAirFlowPermeability;
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == Material::MaterialGroup::Screen) {
+        if (material->Group == Material::MaterialGroup::Screen) {
             // Simon: Existing code already takes into account geometry of Woven and scales down
             // emissivity for openning area.
-            emissFront = material.AbsorpThermal;
-            emissBack = material.AbsorpThermal;
-            transThermalFront = material.TransThermal;
-            transThermalBack = material.TransThermal;
-            thickness = material.Thickness;
-            conductivity = material.Conductivity;
-            Atop = material.WinShadeTopOpeningMult;
-            Abot = material.WinShadeBottomOpeningMult;
-            Aleft = material.WinShadeLeftOpeningMult;
-            Aright = material.WinShadeRightOpeningMult;
-            Afront = material.WinShadeAirFlowPermeability;
+            emissFront = material->AbsorpThermal;
+            emissBack = material->AbsorpThermal;
+            transThermalFront = material->TransThermal;
+            transThermalBack = material->TransThermal;
+            thickness = material->Thickness;
+            conductivity = material->Conductivity;
+            Atop = material->WinShadeTopOpeningMult;
+            Abot = material->WinShadeBottomOpeningMult;
+            Aleft = material->WinShadeLeftOpeningMult;
+            Aright = material->WinShadeRightOpeningMult;
+            Afront = material->WinShadeAirFlowPermeability;
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == Material::MaterialGroup::ComplexWindowShade) {
-            auto shdPtr = material.ComplexShadePtr;
+        if (material->Group == Material::MaterialGroup::ComplexWindowShade) {
+            auto shdPtr = material->ComplexShadePtr;
             auto &shade(state.dataHeatBal->ComplexShade(shdPtr));
             thickness = shade.Thickness;
             conductivity = shade.Conductivity;
@@ -667,7 +667,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const &material) const
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const *material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -678,7 +678,7 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
         Real64 constexpr pres = 1e5; // Old code uses this constant pressure
-        Real64 thickness = material.Thickness;
+        Real64 thickness = material->Thickness;
         auto aGas = getGas(material);
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;
@@ -714,7 +714,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(EnergyPlusData &state,
-                                                                                                 Material::MaterialProperties const &material) const
+                                                                                                 Material::MaterialProperties const *material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -725,16 +725,16 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
         Real64 constexpr pres = 1e5; // Old code uses this constant pressure
-        Real64 thickness = material.Thickness;
-        Real64 gasPointer = material.GasPointer;
-        auto &gasMaterial(*state.dataMaterial->Material(gasPointer));
+        Real64 thickness = material->Thickness;
+        Real64 gasPointer = material->GasPointer;
+        auto *gasMaterial(state.dataMaterial->Material(gasPointer));
         auto aGas = getGas(gasMaterial);
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialProperties const &material) const
+    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialProperties const *material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -745,20 +745,20 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        const int numGases = material.NumberOfGasesInMixture;
+        const int numGases = material->NumberOfGasesInMixture;
         double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
-        const auto gasName = material.Name;
+        const auto gasName = material->Name;
         Gases::CGas aGas;
         for (auto i = 1; i <= numGases; ++i) {
-            auto wght = material.GasWght(i);
-            auto fract = material.GasFract(i);
+            auto wght = material->GasWght(i);
+            auto fract = material->GasFract(i);
             std::vector<double> gcon;
             std::vector<double> gvis;
             std::vector<double> gcp;
             for (auto j = 1; j <= 3; ++j) {
-                gcon.push_back(material.GasCon(j, i));
-                gvis.push_back(material.GasVis(j, i));
-                gcp.push_back(material.GasCp(j, i));
+                gcon.push_back(material->GasCon(j, i));
+                gvis.push_back(material->GasVis(j, i));
+                gcp.push_back(material->GasCp(j, i));
             }
             auto aCon = Gases::CIntCoeff(gcon[0], gcon[1], gcon[2]);
             auto aCp = Gases::CIntCoeff(gcp[0], gcp[1], gcp[2]);
