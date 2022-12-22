@@ -168,7 +168,7 @@ namespace Curve {
         bool EMSOverrideOn = false;         // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue = 0.0; // Value of curve result EMS is directing to use
 
-        Real64 curveValueBackup(Real64 Var1, Real64 Var2, Real64 Var3, Real64 Var4, Real64 Var5);
+        Real64 curveValueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5);
     };
 
     // Table file objects
@@ -364,6 +364,7 @@ struct CurveManagerData : BaseGlobalStruct
     bool GetCurvesInputFlag = true;
     bool CurveValueMyBeginTimeStepFlag = false;
     bool FrictionFactorErrorHasOccurred = false;
+    bool showFallbackMessage = true;
     Array1D<Curve::PerformanceCurveData> PerfCurve;
     Curve::BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;

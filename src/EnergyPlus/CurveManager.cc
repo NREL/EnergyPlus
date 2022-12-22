@@ -225,7 +225,7 @@ namespace Curve {
                              thisCurve.coeff[3] * std::exp(thisCurve.coeff[4] * V1);
             } break;
             default:
-                return thisCurve.curveValueBackup(V1, 0.0, 0.0, 0.0, 0.0);
+                return thisCurve.curveValueFallback(state, V1, 0.0, 0.0, 0.0, 0.0);
             }
             break;
         case InterpType::BtwxtMethod:
@@ -281,7 +281,7 @@ namespace Curve {
                              V2 * V2 * V2 * thisCurve.coeff[7] + V1 * V1 * V2 * thisCurve.coeff[8] + V1 * V2 * V2 * thisCurve.coeff[9];
                 break;
             default:
-                return thisCurve.curveValueBackup(V1, V2, 0.0, 0.0, 0.0);
+                return thisCurve.curveValueFallback(state, V1, V2, 0.0, 0.0, 0.0);
             }
             break;
         case InterpType::BtwxtMethod:
@@ -340,7 +340,7 @@ namespace Curve {
                              Tri2ndOrder[26] * V1 * V2 * V3;
             } break;
             default:
-                return thisCurve.curveValueBackup(V1, V2, V3, 0.0, 0.0);
+                return thisCurve.curveValueFallback(state, V1, V2, V3, 0.0, 0.0);
             }
             break;
         case InterpType::BtwxtMethod:
@@ -386,7 +386,7 @@ namespace Curve {
                     thisCurve.coeff[0] + V1 * thisCurve.coeff[1] + V2 * thisCurve.coeff[2] + V3 * thisCurve.coeff[3] + V4 * thisCurve.coeff[4];
                 break;
             default:
-                assert(false);
+                return thisCurve.curveValueFallback(state, V1, V2, V3, V4, 0.0);
             }
             break;
         case InterpType::BtwxtMethod:
@@ -435,7 +435,7 @@ namespace Curve {
                              V4 * thisCurve.coeff[4] + V5 * thisCurve.coeff[5];
                 break;
             default:
-                assert(false);
+                return thisCurve.curveValueFallback(state, V1, V2, V3, V4, V5);
             }
             return CurveValue;
             break;
@@ -477,7 +477,9 @@ namespace Curve {
         auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
         switch (thisCurve.interpolationType) {
         case InterpType::EvaluateCurveToLimits:
-            assert(false); // 6 independent var is only implemented for the table interpolation
+            // 6 independent var is only implemented for the table interpolation
+            ShowSevereError(state, "Invalid call to CurveValue for a rank 6 curve, which does not exist in EnergyPlus.");
+            ShowFatalError(state, "Please submit a ticket to the EnergyPlus repository or helpdesk so a developer can address the issue");
             break;
         case InterpType::BtwxtMethod:
             CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
@@ -502,9 +504,18 @@ namespace Curve {
         return CurveValue;
     }
 
-    Real64 PerformanceCurveData::curveValueBackup(Real64 const V1, Real64 const V2, Real64 const V3, Real64 const V4, Real64 const V5)
+    Real64 PerformanceCurveData::curveValueFallback(
+        EnergyPlusData &state, Real64 const V1, Real64 const V2, Real64 const V3, Real64 const V4, Real64 const V5)
     {
-        // TODO: Issue a warning asking user to report the issue but let the calculation continue
+        if (state.dataCurveManager->showFallbackMessage) {
+            ShowMessage(state, "Note: You have encountered a corner case in the EnergyPlus Curve:* evaluation code.");
+            ShowMessage(state, "The code was refactored for version 23.1, but there were a few corner cases that could not be found automatically");
+            ShowMessage(state,
+                        "If you are able, please provide your input file to the EnergyPlus helpdesk or repository so a developer can patch for your "
+                        "use case");
+            ShowMessage(state, "Your simulation continues as normal, thanks!");
+            state.dataCurveManager->showFallbackMessage = false;
+        }
         switch (this->curveType) {
         case CurveType::Linear: {
             return this->coeff[0] + V1 * this->coeff[1];
