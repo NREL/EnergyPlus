@@ -10411,7 +10411,7 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
     // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
 
     auto const &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-    auto const &thisSolEnclosureName = state.dataViewFactor->EnclSolInfo(enclNum).Name;
+    std::string const &thisSolEnclosureName = state.dataViewFactor->EnclSolInfo(enclNum).Name;
     if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0 && thisEnclDaylight.NumOfDayltgExtWins > 0) {
         for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
             auto &thisDaylightCtrl = state.dataDaylightingData->daylightControl(controlNum);

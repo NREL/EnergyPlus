@@ -747,7 +747,7 @@ namespace WindowManager {
         // Creates gap layer object from material properties in EnergyPlus
         const int numGases = material->NumberOfGasesInMixture;
         double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
-        const auto gasName = material->Name;
+        std::string const &gasName = material->Name;
         Gases::CGas aGas;
         for (auto i = 1; i <= numGases; ++i) {
             auto wght = material->GasWght(i);

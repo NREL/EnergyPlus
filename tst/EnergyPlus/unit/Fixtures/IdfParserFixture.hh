@@ -92,7 +92,7 @@ protected:
     std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n")
     {
         std::ostringstream compare_text;
-        for (auto const &str : strings) {
+        for (std::string const &str : strings) {
             compare_text << str << delimiter;
         }
         return compare_text.str();
