@@ -11004,10 +11004,18 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
         //  Get total capacity modifying factor (function of temperature) for off-rated conditions
         //  InletAirHumRat may be modified in this ADP/BF loop, use temporary varible for calculations
         InletAirHumRatTemp = InletAirHumRat;
-        // No need to differentiate between curve types, single-independent curve will just use first variable
-        // (as long as the first independent variable is the same for both curve types)
+
     Label50:;
-        TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+        switch (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode)).numDims) {
+        case 1:
+            TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC);
+            break;
+        case 2:
+            TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+            break;
+        default:
+            TotCapTempModFac = Curve::CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+        }
 
         //  Warn user if curve output goes negative
         if (TotCapTempModFac < 0.0) {

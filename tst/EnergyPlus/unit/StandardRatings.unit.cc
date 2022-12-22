@@ -1251,7 +1251,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     // EIR=f(PLR)
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiCubic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
     state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 8.215998E-01;

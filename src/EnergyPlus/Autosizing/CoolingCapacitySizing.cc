@@ -189,7 +189,16 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 CoilInWetBulb =
                                 Psychrometrics::PsyTwbFnTdbWPb(state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
                             if (this->dataTotCapCurveIndex > 0) {
-                                TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                switch (state.dataCurveManager->PerfCurve(this->dataTotCapCurveIndex).numDims) {
+                                case 1:
+                                    TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb);
+                                    break;
+                                case 2:
+                                    TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                    break;
+                                default:
+                                    TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                }
                             } else if (this->dataTotCapCurveValue > 0) {
                                 TotCapTempModFac = this->dataTotCapCurveValue;
                             } else {
@@ -430,7 +439,16 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             }
                         }
                         if (this->dataTotCapCurveIndex > 0) {
-                            TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                            switch (state.dataCurveManager->PerfCurve(this->dataTotCapCurveIndex).numDims) {
+                            case 1:
+                                TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb);
+                                break;
+                            case 2:
+                                TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                break;
+                            default: // this block will allow the simulation to continue but issue the message to the user requesting a report
+                                TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                            }
                         } else {
                             TotCapTempModFac = 1.0;
                         }

@@ -196,10 +196,12 @@ protected:
         state->dataCurveManager->PerfCurve.allocate(10);
         state->dataCurveManager->PerfCurve(1).interpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(1).curveType = CurveType::Linear;
+        state->dataCurveManager->PerfCurve(1).numDims = 1;
         state->dataCurveManager->PerfCurve(1).coeff[0] = 1.0;
         state->dataCurveManager->PerfCurve(1).outputLimits.max = 1.0;
         state->dataCurveManager->PerfCurve(2).interpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(2).curveType = CurveType::Linear;
+        state->dataCurveManager->PerfCurve(2).numDims = 1;
         state->dataCurveManager->PerfCurve(2).coeff[0] = 1.0;
         state->dataCurveManager->PerfCurve(2).outputLimits.max = 1.0;
 

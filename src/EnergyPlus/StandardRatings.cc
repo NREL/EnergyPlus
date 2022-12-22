@@ -563,7 +563,19 @@ namespace StandardRatings {
                     // Available chiller capacity as a function of temperature
                     AvailChillerCap = RefCap * ReformEIRChillerCapFT;
 
-                    ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR);
+                    switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex).numDims) {
+                    case 1:
+                        ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp);
+                        break;
+                    case 2:
+                        ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR);
+                        break;
+                    case 3:
+                        ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR, 0.0);
+                        break;
+                    default:
+                        ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR, 0.0);
+                    }
 
                     Power = (AvailChillerCap / RefCOP) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
 
@@ -609,9 +621,27 @@ namespace StandardRatings {
                 PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
 
                 if (PartLoadRatio >= MinUnloadRat) {
-                    ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
+                    switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex).numDims) {
+                    case 1:
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp); break;
+                    case 2:
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio); break;
+                    case 3:
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio, 0.0); break;
+                    default:
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio, 0.0);
+                    }
                 } else {
-                    ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
+                    switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex).numDims) {
+                    case 1:
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp); break;
+                    case 2:
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat); break;
+                    case 3:
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat, 0.0); break;
+                    default:
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat, 0.0);
+                    }
                     PartLoadRatio = MinUnloadRat;
                 }
             } else {
@@ -3450,13 +3480,18 @@ namespace StandardRatings {
                     state, CapFTempCurveIndex(spnum), HeatingIndoorCoilInletAirDBTemp_H4FullTest, HeatingOutdoorCoilInletAirDBTemp_H4FullTest);
             }
 
-            // TODO: Could be 1 or 2 dimensional...perhaps back up what we're doing now, and instead just add checks for Var2 present and such and the
-            // exact curve types being used; that should isolate the problem call points
-            Q_A_Full(spnum) =
-                RatedTotalCapacity(spnum) *
-                    Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
-                    TotCapFlowModFac(spnum) -
-                FanPowerPerEvapAirFlowRate_2023(spnum) * RatedAirVolFlowRate(spnum);
+            Real64 curveVal;
+            switch (state.dataCurveManager->PerfCurve(CapFTempCurveIndex(spnum)).numDims) {
+            case 1:
+                curveVal = Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated);
+                break;
+            case 2:
+                curveVal = Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2);
+                break;
+            default:
+                curveVal = Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2);
+            }
+            Q_A_Full(spnum) = RatedTotalCapacity(spnum) * curveVal * TotCapFlowModFac(spnum) - FanPowerPerEvapAirFlowRate_2023(spnum) * RatedAirVolFlowRate(spnum);
 
             Q_H0_Low(spnum) = RatedTotalCapacity(spnum) * TotCapTempModFacH0Low * TotCapFlowModFac(spnum) +
                               FanPowerPerEvapAirFlowRate_2023(spnum) * RatedAirVolFlowRate(spnum);
