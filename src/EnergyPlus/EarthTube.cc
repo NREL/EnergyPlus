@@ -156,7 +156,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
     // Following used for reporting
     state.dataEarthTube->ZnRptET.allocate(state.dataGlobal->NumOfZones);
 
-    std::string cCurrentModuleObject = "ZoneEarthtube";
+    constexpr std::string_view cCurrentModuleObject = "ZoneEarthtube";
     int TotEarthTube = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     state.dataEarthTube->EarthTubeSys.allocate(TotEarthTube);
@@ -180,7 +180,8 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         thisEarthTube.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), Zone);
         if (thisEarthTube.ZonePtr == 0) {
             ShowSevereError(
-                state, cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + " not found=" + state.dataIPShortCut->cAlphaArgs(1));
+                state,
+                format("{}: {} not found={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
@@ -189,13 +190,19 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         if (thisEarthTube.SchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(2) + " is required, missing for " +
-                                    state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: {} is required, missing for {}={}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                    " entered=" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                    state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: invalid {} entered={} for {}={}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2),
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
             }
             ErrorsFound = true;
         }
@@ -238,8 +245,12 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             thisEarthTube.FanType = static_cast<Ventilation>(getEnumerationValue(ventilationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             if (thisEarthTube.FanType == Ventilation::Invalid) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", " + state.dataIPShortCut->cAlphaFieldNames(3) + " invalid=" + state.dataIPShortCut->cAlphaArgs(3));
+                                format("{}: {}={}, {} invalid={}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(3),
+                                       state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
         }
@@ -348,8 +359,12 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         constexpr std::array<Real64, static_cast<int>(SoilType::Num)> thermalConductivity = {2.42, 1.3, 0.865, 0.346};
         if (soilType == SoilType::Invalid) {
             ShowSevereError(state,
-                            cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
-                                ", " + state.dataIPShortCut->cAlphaFieldNames(4) + " invalid=" + state.dataIPShortCut->cAlphaArgs(4));
+                            format("{}: {}={}, {} invalid={}",
+                                   cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaFieldNames(1),
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaFieldNames(4),
+                                   state.dataIPShortCut->cAlphaArgs(4)));
             ErrorsFound = true;
         } else {
             thisEarthTube.SoilThermDiff = thermalDiffusivity[static_cast<int>(soilType)];
@@ -505,7 +520,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
     CheckEarthTubesInZones(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
     if (ErrorsFound) {
-        ShowFatalError(state, cCurrentModuleObject + ": Errors getting input.  Program terminates.");
+        ShowFatalError(state, format("{}: Errors getting input.  Program terminates.", cCurrentModuleObject));
     }
 }
 

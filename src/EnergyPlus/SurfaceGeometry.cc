@@ -7717,7 +7717,7 @@ namespace SurfaceGeometry {
 
         Real64 constexpr tolerance = 1e-6;
 
-        std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
+        constexpr std::string_view cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
         int numObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (int obj = 1; obj <= numObjects; ++obj) {
@@ -7738,13 +7738,13 @@ namespace SurfaceGeometry {
             int Found =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (Found == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", did not find matching surface");
+                ShowSevereError(state, format("{}=\"{}\", did not find matching surface", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             alpF++;
             if (state.dataSurface->Surface(Found).Class != SurfaceClass::Floor) {
-                ShowWarningError(state, cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", surface is not a floor surface");
-                ShowContinueError(state, cCurrentModuleObject + " will not be used");
+                ShowWarningError(state, format("{}: , surface is not a floor surface", cCurrentModuleObject, state.dataSurface->Surface(Found).Name));
+                ShowContinueError(state, format("{} will not be used", cCurrentModuleObject));
                 continue;
             }
 
@@ -7752,8 +7752,11 @@ namespace SurfaceGeometry {
             std::string calculationMethod = state.dataIPShortCut->cAlphaArgs(alpF);
             if (calculationMethod != "TOTALEXPOSEDPERIMETER" && calculationMethod != "EXPOSEDPERIMETERFRACTION" && calculationMethod != "BYSEGMENT") {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " + calculationMethod +
-                                    " is not a valid choice for " + state.dataIPShortCut->cAlphaFieldNames(alpF));
+                                format("{}=\"{}\", {} is not a valid choice for {}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       calculationMethod,
+                                       state.dataIPShortCut->cAlphaFieldNames(alpF)));
                 ErrorsFound = true;
             }
             alpF++;
@@ -7766,9 +7769,11 @@ namespace SurfaceGeometry {
                     data.exposedFraction = state.dataIPShortCut->rNumericArgs(numF) / state.dataSurface->Surface(Found).Perimeter;
                     if (data.exposedFraction > 1 + tolerance) {
                         ShowWarningError(state,
-                                         cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", " +
-                                             state.dataIPShortCut->cNumericFieldNames(numF) + " is greater than the perimeter of " +
-                                             state.dataSurface->Surface(Found).Name);
+                                         format("{}: {}, {} is greater than the perimeter of {}",
+                                                cCurrentModuleObject,
+                                                state.dataSurface->Surface(Found).Name,
+                                                state.dataIPShortCut->cNumericFieldNames(numF),
+                                                state.dataSurface->Surface(Found).Name));
                         ShowContinueError(state,
                                           format("{} perimeter = {}, {} exposed perimeter = {}",
                                                  state.dataSurface->Surface(Found).Name,
@@ -7784,16 +7789,20 @@ namespace SurfaceGeometry {
                     data.useDetailedExposedPerimeter = false;
                 } else {
                     ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", " + calculationMethod +
-                                         " set as calculation method, but a value has been set for " +
-                                         state.dataIPShortCut->cNumericFieldNames(numF) + ". This value will be ignored.");
+                                     format("{}: {},  set as calculation method, but a value has been set for {}. This value will be ignored.",
+                                            cCurrentModuleObject,
+                                            state.dataSurface->Surface(Found).Name,
+                                            calculationMethod,
+                                            state.dataIPShortCut->cNumericFieldNames(numF)));
                 }
             } else {
                 if (calculationMethod == "TOTALEXPOSEDPERIMETER") {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", " + calculationMethod +
-                                        " set as calculation method, but no value has been set for " +
-                                        state.dataIPShortCut->cNumericFieldNames(numF));
+                                    format("{}: {}, {} set as calculation method, but no value has been set for {}",
+                                           cCurrentModuleObject,
+                                           state.dataSurface->Surface(Found).Name,
+                                           calculationMethod,
+                                           state.dataIPShortCut->cNumericFieldNames(numF)));
                     ErrorsFound = true;
                 }
             }
@@ -7805,16 +7814,20 @@ namespace SurfaceGeometry {
                     data.useDetailedExposedPerimeter = false;
                 } else {
                     ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", " + calculationMethod +
-                                         " set as calculation method, but a value has been set for " +
-                                         state.dataIPShortCut->cNumericFieldNames(numF) + ". This value will be ignored.");
+                                     format("{}: {}, {} set as calculation method, but a value has been set for {}. This value will be ignored.",
+                                            cCurrentModuleObject,
+                                            state.dataSurface->Surface(Found).Name,
+                                            calculationMethod,
+                                            state.dataIPShortCut->cNumericFieldNames(numF)));
                 }
             } else {
                 if (calculationMethod == "EXPOSEDPERIMETERFRACTION") {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", " + calculationMethod +
-                                        " set as calculation method, but no value has been set for " +
-                                        state.dataIPShortCut->cNumericFieldNames(numF));
+                                    format("{}: {}, {} set as calculation method, but no value has been set for {}",
+                                           cCurrentModuleObject,
+                                           state.dataSurface->Surface(Found).Name,
+                                           calculationMethod,
+                                           state.dataIPShortCut->cNumericFieldNames(numF)));
                     ErrorsFound = true;
                 }
             }
@@ -7825,10 +7838,11 @@ namespace SurfaceGeometry {
                 if (calculationMethod == "BYSEGMENT") {
                     if (numRemainingFields != (int)state.dataSurface->Surface(Found).Vertex.size()) {
                         ShowSevereError(state,
-                                        cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name +
-                                            ", must have equal number of segments as the floor has vertices." +
-                                            state.dataIPShortCut->cAlphaFieldNames(alpF) + "\" and \"" +
-                                            state.dataIPShortCut->cNumericFieldNames(numF - 1) + "\"");
+                                        format("{}: {}, must have equal number of segments as the floor has vertices.{}\" and \"{}\"",
+                                               cCurrentModuleObject,
+                                               state.dataSurface->Surface(Found).Name,
+                                               state.dataIPShortCut->cAlphaFieldNames(alpF),
+                                               state.dataIPShortCut->cNumericFieldNames(numF - 1)));
                         ShowContinueError(state,
                                           format("{} number of vertices = {}, {} number of segments = {}",
                                                  state.dataSurface->Surface(Found).Name,
@@ -7843,16 +7857,21 @@ namespace SurfaceGeometry {
                         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(alpF), "NO")) {
                             data.isExposedPerimeter.push_back(false);
                         } else if (state.dataIPShortCut->lAlphaFieldBlanks(alpF)) {
-                            ShowSevereError(state,
-                                            cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", " + calculationMethod +
-                                                " set as calculation method, but no value has been set for " +
-                                                state.dataIPShortCut->cAlphaFieldNames(alpF) + ". Must be \"Yes\" or \"No\".");
+                            ShowSevereError(
+                                state,
+                                format("{}: {}, {} set as calculation method, but no value has been set for {}. Must be \"Yes\" or \"No\".",
+                                       cCurrentModuleObject,
+                                       state.dataSurface->Surface(Found).Name,
+                                       calculationMethod,
+                                       state.dataIPShortCut->cAlphaFieldNames(alpF)));
                             ErrorsFound = true;
                         } else {
                             ShowSevereError(state,
-                                            cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", " +
-                                                state.dataIPShortCut->cAlphaFieldNames(alpF) + " invalid [" + state.dataIPShortCut->cAlphaArgs(alpF) +
-                                                "]. Must be \"Yes\" or \"No\".");
+                                            format("{}: {}, {} invalid [{}]. Must be \"Yes\" or \"No\".",
+                                                   cCurrentModuleObject,
+                                                   state.dataSurface->Surface(Found).Name,
+                                                   state.dataIPShortCut->cAlphaFieldNames(alpF),
+                                                   state.dataIPShortCut->cAlphaArgs(alpF)));
                             ErrorsFound = true;
                         }
                         alpF++;
@@ -7861,8 +7880,10 @@ namespace SurfaceGeometry {
             } else {
                 if (calculationMethod == "BYSEGMENT") {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + ": " + state.dataSurface->Surface(Found).Name + ", " + calculationMethod +
-                                        " set as calculation method, but no values have been set for Surface Segments Exposed");
+                                    format("{}: {}, {} set as calculation method, but no values have been set for Surface Segments Exposed",
+                                           cCurrentModuleObject,
+                                           state.dataSurface->Surface(Found).Name,
+                                           calculationMethod));
                     ErrorsFound = true;
                 }
             }
@@ -8184,7 +8205,7 @@ namespace SurfaceGeometry {
     void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound)
     {
 
-        std::string cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
+        std::string const &cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
         state.dataSurface->TotSurfPropGndSurfs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
