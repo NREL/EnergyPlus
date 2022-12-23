@@ -1545,6 +1545,7 @@ namespace WaterToAirHeatPumpSimple {
                                               format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
                                                      WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)],
                                                      simpleWatertoAirHP.Name));
+                            ratioTS = 0.0;  // Clang complains it is used uninitialized if you don't give it a value
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at rated conditions
@@ -1688,6 +1689,7 @@ namespace WaterToAirHeatPumpSimple {
                                               format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
                                                      WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)],
                                                      simpleWatertoAirHP.Name));
+                            ratioTS = 0.0;  // Clang complains it is used uninitialized if you don't give it a value
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at rated conditions
@@ -2412,6 +2414,7 @@ namespace WaterToAirHeatPumpSimple {
                                               format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
                                                      WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)],
                                                      simpleWatertoAirHP.Name));
+                            HeatratioTS = 0.0;  // Clang complains it is used uninitialized if you don't give it a value
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at refrence conditions
@@ -2439,6 +2442,7 @@ namespace WaterToAirHeatPumpSimple {
                         RatedCapHeatDes = (PeakHeatCapTempModFac > 0.0) ? HeatCapAtPeak / PeakHeatCapTempModFac : HeatCapAtPeak;
                     } else {
                         RatedCapHeatDes = 0.0;
+                        RatedHeatratioTS = 0.0;   // Clang complains it is used uninitialized if you don't give it a value
                     }
                 } else if (state.dataSize->CurZoneEqNum > 0) {
                     CheckZoneSizing(
@@ -2527,6 +2531,7 @@ namespace WaterToAirHeatPumpSimple {
                                               format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
                                                      WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)],
                                                      simpleWatertoAirHP.Name));
+                            HeatratioTS = 0.0; // Clang complains it is used uninitialized if you don't give it a value
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at refrence conditions
@@ -2564,8 +2569,11 @@ namespace WaterToAirHeatPumpSimple {
                         // rated conditions
                         RatedCapHeatDes = (PeakHeatCapTempModFac > 0.0) ? HeatCapAtPeak / PeakHeatCapTempModFac : HeatCapAtPeak;
                     } else {
+                        RatedHeatratioTS = 0.0; // Clang complains it is used uninitialized if you don't give it a value
                         RatedCapHeatDes = 0.0;
                     }
+                } else {
+                    RatedHeatratioTS = 0.0; // Clang complains it is used uninitialized if you don't give it a value
                 }
 
                 // determine adjusted cooling and heating coil capacity
@@ -3790,7 +3798,7 @@ namespace WaterToAirHeatPumpSimple {
         IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP);
 
         if (IndexNum == 0) {
-            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
+            ShowSevereError(state, format(R"(Could not find CoilType="{}" with Name="{}")", CoilType, CoilName));
             ErrorsFound = true;
         }
 
@@ -3852,7 +3860,7 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
+            ShowSevereError(state, format(R"(Could not find CoilType="{}" with Name="{}")", CoilType, CoilName));
             ErrorsFound = true;
             CoilCapacity = -1000.0;
         }
@@ -3898,7 +3906,7 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
+            ShowSevereError(state, format(R"(Could not find CoilType="{}" with Name="{}")", CoilType, CoilName));
             ErrorsFound = true;
             CoilAirFlowRate = -1000.0;
         }
@@ -3940,7 +3948,7 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
+            ShowSevereError(state, format(R"(Could not find CoilType="{}" with Name="{}")", CoilType, CoilName));
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -3982,7 +3990,7 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
+            ShowSevereError(state, format(R"(Could not find CoilType="{}" with Name="{}")", CoilType, CoilName));
             ErrorsFound = true;
             NodeNumber = 0;
         }
