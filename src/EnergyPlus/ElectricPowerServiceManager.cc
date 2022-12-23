@@ -3815,11 +3815,11 @@ void ElectricStorage::reinitAtBeginEnvironment()
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
             x0_[0] = 0.0;
-            for (auto loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
+            for (int loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
                 b10_[loop] = 0.0;
                 x0_[loop] = 0.0;
             }
-            for (auto loop = 0; loop < cycleBinNum_; ++loop) {
+            for (int loop = 0; loop < cycleBinNum_; ++loop) {
                 oneNmb0_[loop] = 0.0;
                 nmb0_[loop] = 0.0;
             }
@@ -3856,11 +3856,11 @@ void ElectricStorage::reinitAtEndWarmup()
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
             x0_[0] = 0.0;
-            for (auto loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
+            for (int loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
                 b10_[loop] = 0.0;
                 x0_[loop] = 0.0;
             }
-            for (auto loop = 0; loop < cycleBinNum_; ++loop) {
+            for (int loop = 0; loop < cycleBinNum_; ++loop) {
                 oneNmb0_[loop] = 0.0;
                 nmb0_[loop] = 0.0;
             }

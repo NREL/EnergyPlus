@@ -906,7 +906,7 @@ namespace SimulationManager {
                 auto &instancesValue = instances.value();
                 for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                     auto const &fields = instance.value();
-                    auto const &thisObjectName = instance.key();
+                    std::string const &thisObjectName = instance.key();
                     state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
 
                     auto diagnosticsExtensibles = fields.find("diagnostics");
@@ -1070,7 +1070,7 @@ namespace SimulationManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     state.dataGlobal->DoCoilDirectSolutions =

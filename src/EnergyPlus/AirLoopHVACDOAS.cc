@@ -222,7 +222,7 @@ namespace AirLoopHVACDOAS {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 ++AirLoopMixerNum;
                 AirLoopMixer thisMixer;
@@ -379,7 +379,7 @@ namespace AirLoopHVACDOAS {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                 ++AirLoopSplitterNum;
@@ -436,7 +436,7 @@ namespace AirLoopHVACDOAS {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 ++AirLoopDOASNum;
                 AirLoopDOAS thisDOAS;
@@ -477,7 +477,7 @@ namespace AirLoopHVACDOAS {
                     bool InletNodeErrFlag = false;
                     bool OutletNodeErrFlag = false;
 
-                    auto typeNameUC = UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum));
+                    const std::string typeNameUC = UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum));
                     auto foundType = static_cast<ValidEquipListType>(getEnumerationValue(validEquipNamesUC, typeNameUC));
 
                     switch (foundType) {

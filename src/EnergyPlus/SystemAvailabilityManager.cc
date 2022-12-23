@@ -1318,7 +1318,7 @@ namespace SystemAvailabilityManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++Item;
                 auto const &objectFields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 auto &mgrList = state.dataSystemAvailabilityManager->ListData(Item);
                 mgrList.Name = thisObjectName;

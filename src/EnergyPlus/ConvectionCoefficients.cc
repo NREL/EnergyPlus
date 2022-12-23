@@ -3416,7 +3416,7 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
 
     Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
 
-    for (auto SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+    for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 height = state.dataSurface->Surface(SurfNum).Height;
             bool isWindow = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow;

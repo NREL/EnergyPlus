@@ -4650,7 +4650,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &objectFields = instance.value();
-            auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+            std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
             EXPECT_EQ(thisObjectName, "SPACE EQUIPMENT");
             // Fields before extensibles
             alphaFieldValue = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "load_distribution_scheme");

@@ -436,7 +436,7 @@ namespace WindowManager {
         auto aIGU = getIGU();
 
         // pick-up all layers and put them in IGU (this includes gap layers as well)
-        for (auto i = 0; i < m_TotLay; ++i) {
+        for (int i = 0; i < m_TotLay; ++i) {
             auto aLayer = getIGULayer(state, i + 1);
             assert(aLayer != nullptr);
             // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
@@ -466,7 +466,7 @@ namespace WindowManager {
 
         m_SolidLayerIndex = 0;
         // pick-up all layers and put them in IGU (this includes gap layers as well)
-        for (auto i = 0; i < m_TotLay; ++i) {
+        for (int i = 0; i < m_TotLay; ++i) {
             auto aLayer = getIGULayer(state, i + 1);
             assert(aLayer != nullptr);
             // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
@@ -749,7 +749,7 @@ namespace WindowManager {
         double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
         std::string const &gasName = material->Name;
         Gases::CGas aGas;
-        for (auto i = 1; i <= numGases; ++i) {
+        for (int i = 1; i <= numGases; ++i) {
             auto wght = material->GasWght(i);
             auto fract = material->GasFract(i);
             std::vector<double> gcon;

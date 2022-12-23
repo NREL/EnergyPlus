@@ -2417,7 +2417,7 @@ void effectiveLayerCond(EnergyPlusData &state,
                         std::string &ErrorMessage                  // Error message
 )
 {
-    for (auto i = 1; i <= nlayer; ++i) {
+    for (int i = 1; i <= nlayer; ++i) {
         if (LayerType(i) != TARCOGLayerType::SPECULAR) {
             auto tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
             auto nmix1 = nmix(i);

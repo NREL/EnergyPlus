@@ -1900,7 +1900,7 @@ namespace Curve {
             auto const &indVarInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:IndependentVariable");
             for (auto &instance : indVarInstances.items()) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
                 state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName), fields);
             }
@@ -1916,7 +1916,7 @@ namespace Curve {
             for (auto &instance : indVarListInstances.items()) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
                 std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
 
@@ -2056,7 +2056,7 @@ namespace Curve {
             for (auto &instance : lookupInstances.items()) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:Lookup", thisObjectName);
                 ++CurveNum;
                 auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);

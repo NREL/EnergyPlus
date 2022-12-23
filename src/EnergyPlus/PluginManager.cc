@@ -142,7 +142,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            auto const &thisObjectName = instance.key();
+            std::string const &thisObjectName = instance.key();
             auto const objNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(thisObjectName);
             // no need to validate name, the JSON will validate that.
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sOutputVariable, thisObjectName);
@@ -476,7 +476,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             // This is a unique object, so we should have one, but this is fine
             auto const &fields = instance.value();
-            auto const &thisObjectName = instance.key();
+            std::string const &thisObjectName = instance.key();
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
             std::string workingDirFlagUC = "YES";
             try {
@@ -572,7 +572,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            auto const &thisObjectName = instance.key();
+            std::string const &thisObjectName = instance.key();
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
             fs::path modulePath(fields.at("python_module_name").get<std::string>());
             std::string className = fields.at("plugin_class_name").get<std::string>();
@@ -601,7 +601,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            auto const &thisObjectName = instance.key();
+            std::string const &thisObjectName = instance.key();
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
             auto const vars = fields.at("global_py_vars");
             for (const auto &var : vars) {
@@ -641,7 +641,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+            std::string const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
             std::string variableName = fields.at("name_of_a_python_plugin_variable").get<std::string>();
             int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(state, variableName);

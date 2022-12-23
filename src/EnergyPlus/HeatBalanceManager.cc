@@ -1573,7 +1573,7 @@ namespace HeatBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
                 std::string materialName = thisObjectName;
 
@@ -4534,7 +4534,7 @@ namespace HeatBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
                 std::string construction_name{UtilityRoutines::MakeUPPERCase(fields.at("construction_name").get<std::string>())};
                 int source_after_layer_number{fields.at("thermal_source_present_after_layer_number")};

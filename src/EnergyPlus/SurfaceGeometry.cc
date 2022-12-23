@@ -8215,7 +8215,7 @@ namespace SurfaceGeometry {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 GroundSurfacesProperty thisGndSurfsObj;
                 thisGndSurfsObj.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
