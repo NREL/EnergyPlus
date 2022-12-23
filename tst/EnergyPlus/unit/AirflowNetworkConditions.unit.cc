@@ -509,17 +509,17 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
     // Load and verify the table
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
-    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1).NumDims);
-    EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(*state, 1));
-    EXPECT_EQ(1, CurveManager::GetCurveIndex(*state, "EFACADE_WPCCURVE"));
-    EXPECT_EQ("Table:Lookup", state->dataCurveManager->PerfCurve(1).ObjectType);
-    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(*state, 1, 0.0));   // In-range value
-    EXPECT_DOUBLE_EQ(0.54, CurveManager::CurveValue(*state, 1, 105.0));  // In-range value
-    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(*state, 1, -10.0)); // Minimum x
-    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(*state, 1, 5000));  // Maximum x
+    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1).numDims);
+    EXPECT_EQ("EFACADE_WPCCURVE", Curve::GetCurveName(*state, 1));
+    EXPECT_EQ(1, Curve::GetCurveIndex(*state, "EFACADE_WPCCURVE"));
+    //    EXPECT_EQ("Table:Lookup", state->dataCurveManager->PerfCurve(1).objectType);
+    EXPECT_DOUBLE_EQ(-0.56, Curve::CurveValue(*state, 1, 0.0));   // In-range value
+    EXPECT_DOUBLE_EQ(0.54, Curve::CurveValue(*state, 1, 105.0));  // In-range value
+    EXPECT_DOUBLE_EQ(-0.56, Curve::CurveValue(*state, 1, -10.0)); // Minimum x
+    EXPECT_DOUBLE_EQ(-0.56, Curve::CurveValue(*state, 1, 5000));  // Maximum x
     EXPECT_FALSE(has_err_output());
 
     // Set up some environmental parameters
@@ -592,17 +592,17 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
     // Load and verify the table
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
-    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1).NumDims);
-    EXPECT_EQ("NFACADE_WPCVALUE", CurveManager::GetCurveName(*state, 1));
-    EXPECT_EQ(1, CurveManager::GetCurveIndex(*state, "NFACADE_WPCVALUE"));
-    EXPECT_EQ("AirflowNetwork:MultiZone:WindPressureCoefficientValues", state->dataCurveManager->PerfCurve(1).ObjectType);
-    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(*state, 1, 0.0));     // In-range value
-    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(*state, 1, 105.0)); // In-range value
-    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(*state, 1, -10.0));   // Minimum x
-    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(*state, 1, 5000));    // Maximum x
+    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1).numDims);
+    EXPECT_EQ("NFACADE_WPCVALUE", Curve::GetCurveName(*state, 1));
+    EXPECT_EQ(1, Curve::GetCurveIndex(*state, "NFACADE_WPCVALUE"));
+    //    EXPECT_EQ("AirflowNetwork:MultiZone:WindPressureCoefficientValues", state->dataCurveManager->PerfCurve(1).objectType);
+    EXPECT_DOUBLE_EQ(0.6, Curve::CurveValue(*state, 1, 0.0));     // In-range value
+    EXPECT_DOUBLE_EQ(-0.56, Curve::CurveValue(*state, 1, 105.0)); // In-range value
+    EXPECT_DOUBLE_EQ(0.6, Curve::CurveValue(*state, 1, -10.0));   // Minimum x
+    EXPECT_DOUBLE_EQ(0.6, Curve::CurveValue(*state, 1, 5000));    // Maximum x
     EXPECT_FALSE(has_err_output());
 
     // Set up some environmental parameters
@@ -1617,7 +1617,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                            // expect no errors
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
     state->afn->get_input();
@@ -2341,7 +2341,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                            // expect no errors
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
     state->afn->get_input();
@@ -2984,7 +2984,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                            // expect no errors
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
     state->afn->get_input();
@@ -2994,12 +2994,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     // Check the curves
     Real64 cp105N = -0.5 * (0.44267457181949038 + 0.68051108580039887);
     Real64 cp105S = 0.5 * (0.11880548415819636 - 0.44267457181949038);
-    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(*state, 2, 0));     // In-range value
-    EXPECT_DOUBLE_EQ(cp105N, CurveManager::CurveValue(*state, 2, 105));                // In-range value
-    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(*state, 2, -10.0)); // Minimum x
-    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(*state, 2, 5000));  // Maximum x
+    EXPECT_DOUBLE_EQ(0.60345944298105458, Curve::CurveValue(*state, 2, 0));     // In-range value
+    EXPECT_DOUBLE_EQ(cp105N, Curve::CurveValue(*state, 2, 105));                // In-range value
+    EXPECT_DOUBLE_EQ(0.60345944298105458, Curve::CurveValue(*state, 2, -10.0)); // Minimum x
+    EXPECT_DOUBLE_EQ(0.60345944298105458, Curve::CurveValue(*state, 2, 5000));  // Maximum x
     // Check the other curve
-    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(*state, 1, 0)); // In-range value
+    EXPECT_DOUBLE_EQ(0.592, Curve::CurveValue(*state, 1, 0)); // In-range value
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -3693,7 +3693,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                            // expect no errors
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
     state->afn->get_input();
@@ -4347,7 +4347,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                            // expect no errors
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
     state->afn->get_input();
@@ -4371,11 +4371,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     // Check the curves
     Real64 cp105N = -0.590653062499999;
     Real64 cp105S = -0.298039062499999;
-    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(*state, 1, 0));                   // In-range value
-    EXPECT_NEAR(cp105N, CurveManager::CurveValue(*state, 1, 105), 1e-14);              // In-range value
-    EXPECT_NEAR(cp105S, CurveManager::CurveValue(*state, 1, 75), 1e-14);               // In-range value
-    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(*state, 1, -10.0));               // Minimum x
-    EXPECT_NEAR(-0.403903999999994, CurveManager::CurveValue(*state, 1, 5000), 1e-14); // Maximum x
+    EXPECT_DOUBLE_EQ(0.592, Curve::CurveValue(*state, 1, 0));                   // In-range value
+    EXPECT_NEAR(cp105N, Curve::CurveValue(*state, 1, 105), 1e-14);              // In-range value
+    EXPECT_NEAR(cp105S, Curve::CurveValue(*state, 1, 75), 1e-14);               // In-range value
+    EXPECT_DOUBLE_EQ(0.592, Curve::CurveValue(*state, 1, -10.0));               // Minimum x
+    EXPECT_NEAR(-0.403903999999994, Curve::CurveValue(*state, 1, 5000), 1e-14); // Maximum x
 
     // Set up some environmental parameters
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -5076,7 +5076,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
     state->dataGlobal->AnyLocalEnvironmentsInModel = true;
@@ -5559,7 +5559,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                            // expect no errors
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     state->afn->get_input();
@@ -5581,14 +5581,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     // Check the curve values for the left window, taken from v8.6.0 on Windows
     for (unsigned i = 0; i <= 36; i++) {
         Real64 angle = i * 10.0;
-        Real64 value = CurveManager::CurveValue(*state, 7, angle);
+        Real64 value = Curve::CurveValue(*state, 7, angle);
         EXPECT_NEAR(valsForLeftWindow[i], value, 1.0e-12) << (format("Issue at index: {}", i));
     }
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
     for (unsigned i = 0; i <= 36; i++) {
         Real64 angle = i * 10.0;
-        Real64 value = CurveManager::CurveValue(*state, 6, angle);
+        Real64 value = Curve::CurveValue(*state, 6, angle);
         EXPECT_NEAR(valsForRightWindow[i], value, 1.0e-12) << (format("Issue at index: {}", i));
     }
 }
@@ -6014,7 +6014,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                            // expect no errors
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     // #6912

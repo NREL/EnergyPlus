@@ -32,7 +32,7 @@ FUNCTION GetCurveCheck(alph, errFlag, ObjName)~ \&
 
 The curve index (as in GetCurveIndex) is the result. Curve values will always be accessed via the pointer not the name during the simulation for reasons of efficiency. This function would be called during an input phase for an object.
 
-USE CurveManager, ONLY: GetCurveCheck
+USE Curve, ONLY: GetCurveCheck
 
 \ldots{}
 
@@ -52,7 +52,7 @@ CHARACTER(len = 20) FUNCTION GetCurveType (CurveIndex)
 
 Example of use:
 
-USE CurveManager,~~ ONLY: GetCurveIndex, GetCurveType
+USE Curve,~~ ONLY: GetCurveIndex, GetCurveType
 
 \ldots{}
 

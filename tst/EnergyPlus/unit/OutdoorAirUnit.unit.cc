@@ -78,7 +78,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::CurveManager;
+using namespace EnergyPlus::Curve;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;

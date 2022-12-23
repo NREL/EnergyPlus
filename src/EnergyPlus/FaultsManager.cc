@@ -238,7 +238,7 @@ namespace FaultsManager {
         // Get number of faults-related input objects and assign faults input to data structure
 
         // Using/Aliasing
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1987,7 +1987,7 @@ namespace FaultsManager {
         //       To calculate the dynamic fault offset based on the fault availability schedule and severity schedule.
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2022,7 +2022,7 @@ namespace FaultsManager {
         // schedule. The factor is the ratio between the nominal capacity or efficiency at fouling case and that at fault free case
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2059,7 +2059,7 @@ namespace FaultsManager {
         // Fouling factor is the ratio between the UA value at fouling case and that at fault free case
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2177,7 +2177,7 @@ namespace FaultsManager {
         // Return true if the curve covers the fan rated operational point
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using namespace Fans;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

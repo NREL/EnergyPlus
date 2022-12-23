@@ -1113,7 +1113,7 @@ namespace BranchInputManager {
                               Array1D_bool &lAlphaBlanks)
     {
         // Using
-        using CurveManager::GetPressureCurveTypeAndIndex;
+        using Curve::GetPressureCurveTypeAndIndex;
 
         // Locals
         PressureCurveType pressureCurveType;

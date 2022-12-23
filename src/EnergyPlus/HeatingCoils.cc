@@ -270,7 +270,7 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using GlobalNames::VerifyUniqueCoilName;
         using NodeInputManager::GetOnlySingleNode;
 
@@ -2094,7 +2094,7 @@ namespace HeatingCoils {
         // that produced at low stage, the coil cycles between off and low stage.
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
@@ -2292,7 +2292,7 @@ namespace HeatingCoils {
         // Simulates a simple Gas heating coil with a burner efficiency
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         using DataHVACGlobals::TempControlTol;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2495,7 +2495,7 @@ namespace HeatingCoils {
         // that produced at low stage, the coil cycles between off and low stage.
 
         // Using/Aliasing
-        using CurveManager::CurveValue;
+        using Curve::CurveValue;
         auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
         auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;

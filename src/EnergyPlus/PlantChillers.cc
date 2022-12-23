@@ -2373,38 +2373,35 @@ namespace PlantChillers {
             thisChiller.TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(20);
 
             // Load Special EngineDriven Chiller Curve Fit Inputs
-            thisChiller.ClngLoadtoFuelCurve = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert curve name to number
+            thisChiller.ClngLoadtoFuelCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert curve name to number
             if (thisChiller.ClngLoadtoFuelCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            thisChiller.RecJacHeattoFuelCurve =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8)); // convert curve name to number
+            thisChiller.RecJacHeattoFuelCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8)); // convert curve name to number
             if (thisChiller.RecJacHeattoFuelCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            thisChiller.RecLubeHeattoFuelCurve =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9)); // convert curve name to number
+            thisChiller.RecLubeHeattoFuelCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9)); // convert curve name to number
             if (thisChiller.RecLubeHeattoFuelCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            thisChiller.TotExhausttoFuelCurve =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10)); // convert curve name to number
+            thisChiller.TotExhausttoFuelCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10)); // convert curve name to number
             if (thisChiller.TotExhausttoFuelCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            thisChiller.ExhaustTempCurve = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
+            thisChiller.ExhaustTempCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
             if (thisChiller.ExhaustTempCurve == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -3761,7 +3758,7 @@ namespace PlantChillers {
         } else {
             PartLoadRat = max(this->MinPartLoadRat, PartLoadRat);
             // (RELDC) Ratio of Shaft Power to Fuel Energy Input
-            Real64 ClngLoadFuelRat = CurveManager::CurveValue(state, this->ClngLoadtoFuelCurve, PartLoadRat);
+            Real64 ClngLoadFuelRat = Curve::CurveValue(state, this->ClngLoadtoFuelCurve, PartLoadRat);
             EngineDrivenFuelEnergy = this->QEvaporator / ClngLoadFuelRat;
         }
         // Use Curve fit to determine energy recovered in the water jacket.  This curve calculates the water jacket energy recovered (J/s) by
@@ -3769,26 +3766,26 @@ namespace PlantChillers {
         // particular part load.
 
         // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-        Real64 RecJacHeattoFuelRat = CurveManager::CurveValue(state, this->RecJacHeattoFuelCurve, PartLoadRat);
+        Real64 RecJacHeattoFuelRat = Curve::CurveValue(state, this->RecJacHeattoFuelCurve, PartLoadRat);
         this->QJacketRecovered = EngineDrivenFuelEnergy * RecJacHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered Lubricant Energy.  This curve calculates the lube energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
-        Real64 RecLubeHeattoFuelRat = CurveManager::CurveValue(state, this->RecLubeHeattoFuelCurve, PartLoadRat);
+        Real64 RecLubeHeattoFuelRat = Curve::CurveValue(state, this->RecLubeHeattoFuelCurve, PartLoadRat);
         this->QLubeOilRecovered = EngineDrivenFuelEnergy * RecLubeHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered from the exhaust.  This curve calculates the  energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the exhaust at that
         // particular part load.
-        Real64 TotExhausttoFuelRat = CurveManager::CurveValue(state, this->TotExhausttoFuelCurve, PartLoadRat);
+        Real64 TotExhausttoFuelRat = Curve::CurveValue(state, this->TotExhausttoFuelCurve, PartLoadRat);
         Real64 TotalExhaustEnergy = EngineDrivenFuelEnergy * TotExhausttoFuelRat;
 
         // Use Curve fit to determine Exhaust Temperature in C.  The temperature is simply a curve fit
         // of the exhaust temperature in C to the part load ratio.
         if (PartLoadRat != 0) {
-            Real64 exhaustTemp = CurveManager::CurveValue(state, this->ExhaustTempCurve, PartLoadRat);
+            Real64 exhaustTemp = Curve::CurveValue(state, this->ExhaustTempCurve, PartLoadRat);
             Real64 ExhaustGasFlow = TotalExhaustEnergy / (ExhaustCP * (exhaustTemp - ReferenceTemp));
 
             // Use Curve fit to determine stack temp after heat recovery

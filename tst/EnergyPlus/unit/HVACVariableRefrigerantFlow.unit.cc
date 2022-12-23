@@ -95,7 +95,7 @@
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace EnergyPlus::BranchInputManager;
-using namespace EnergyPlus::CurveManager;
+using namespace EnergyPlus::Curve;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -194,14 +194,14 @@ protected:
         state->dataSize->SysSizInput(1).AirLoopNum = 1;
         state->dataCurveManager->NumCurves = 10;
         state->dataCurveManager->PerfCurve.allocate(10);
-        state->dataCurveManager->PerfCurve(1).InterpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(1).interpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(1).curveType = CurveType::Linear;
-        state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
-        state->dataCurveManager->PerfCurve(1).CurveMax = 1.0;
-        state->dataCurveManager->PerfCurve(2).InterpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(1).coeff[0] = 1.0;
+        state->dataCurveManager->PerfCurve(1).outputLimits.max = 1.0;
+        state->dataCurveManager->PerfCurve(2).interpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(2).curveType = CurveType::Linear;
-        state->dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
-        state->dataCurveManager->PerfCurve(2).CurveMax = 1.0;
+        state->dataCurveManager->PerfCurve(2).coeff[0] = 1.0;
+        state->dataCurveManager->PerfCurve(2).outputLimits.max = 1.0;
 
         int NumAirLoops = state->dataHVACGlobal->NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
         state->dataAirSystemsData->PrimaryAirSystems.allocate(NumAirLoops);
@@ -2354,7 +2354,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     // Read in IDF
     ProcessScheduleInput(*state);                    // read schedules
-    CurveManager::GetCurveInput(*state);             // read curves
+    Curve::GetCurveInput(*state);                    // read curves
     FluidProperties::GetFluidPropertiesData(*state); // read refrigerant properties
 
     // set up ZoneEquipConfig data
@@ -2837,7 +2837,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     // PURPOSE OF THIS SUBROUTINE:
     //  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
 
-    using namespace CurveManager;
+    using namespace Curve;
 
     int CurveNum = 1;
     double Te = -2.796; // Outdoor unit evaporating temperature
@@ -2851,18 +2851,17 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     // Inputs: parameters
     auto &thisCurve = state->dataCurveManager->PerfCurve(CurveNum);
     thisCurve.curveType = CurveType::BiQuadratic;
-    thisCurve.ObjectType = "Curve:Biquadratic";
-    thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-    thisCurve.Coeff1 = 724.71125;  // Coefficient1 Constant
-    thisCurve.Coeff2 = -21.867868; // Coefficient2 x
-    thisCurve.Coeff3 = 0.52480042; // Coefficient3 x**2
-    thisCurve.Coeff4 = -17.043566; // Coefficient4 y
-    thisCurve.Coeff5 = -.40346383; // Coefficient5 y**2
-    thisCurve.Coeff6 = 0.29573589; // Coefficient6 x*y
-    thisCurve.Var1Min = 15;        // Minimum Value of x
-    thisCurve.Var1Max = 65;        // Maximum Value of x
-    thisCurve.Var2Min = -30;       // Minimum Value of y
-    thisCurve.Var2Max = 15;        // Maximum Value of y
+    thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+    thisCurve.coeff[0] = 724.71125;     // Coefficient1 Constant
+    thisCurve.coeff[1] = -21.867868;    // Coefficient2 x
+    thisCurve.coeff[2] = 0.52480042;    // Coefficient3 x**2
+    thisCurve.coeff[3] = -17.043566;    // Coefficient4 y
+    thisCurve.coeff[4] = -.40346383;    // Coefficient5 y**2
+    thisCurve.coeff[5] = 0.29573589;    // Coefficient6 x*y
+    thisCurve.inputLimits[0].min = 15;  // Minimum Value of x
+    thisCurve.inputLimits[0].max = 65;  // Maximum Value of x
+    thisCurve.inputLimits[1].min = -30; // Minimum Value of y
+    thisCurve.inputLimits[1].max = 15;  // Maximum Value of y
 
     // Run and Check
     double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(*state, Tdis, CondHeat, CurveNum, Te);
@@ -5723,7 +5722,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DummyArray = 0.0;
     ScheduleManager::GetScheduleValuesForDay(*state, 1, DummyArray, 58, 3);
 
-    CurveManager::GetCurveInput(*state);                  // read curves
+    Curve::GetCurveInput(*state);                         // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -6621,7 +6620,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataSize->ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput(*state);                  // read curves
+    Curve::GetCurveInput(*state);                         // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -6709,7 +6708,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
 
     int VRFCond = 1;
     state->dataHVACVarRefFlow->VRF.allocate(1);
@@ -13279,7 +13278,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
 
     int VRFCond = 1;
     state->dataHVACVarRefFlow->VRF.allocate(1);
@@ -14473,23 +14472,23 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     // check user input VRF Minimum PLR
     EXPECT_EQ(0.15, thisVRF.MinPLR);
     // EIRFPLR curve minimum PLR value specified
-    CurveManager::GetCurveMinMaxValues(*state, thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
-    EXPECT_EQ(0.25, thisCoolEIRFPLR.Var1Min);
+    Curve::GetCurveMinMaxValues(*state, thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.25, thisCoolEIRFPLR.inputLimits[0].min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
-    EXPECT_EQ(1.00, thisCoolEIRFPLR.Var1Max);
-    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
-    EXPECT_GT(thisCoolEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
+    EXPECT_EQ(1.00, thisCoolEIRFPLR.inputLimits[0].max);
+    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                          // getinput checks this
+    EXPECT_GT(thisCoolEIRFPLR.inputLimits[0].min, thisVRF.MinPLR); // expect warning message
     minEIRfLowPLRXInput = 0.0;
     maxEIRfLowPLRXInput = 0.0;
-    CurveManager::GetCurveMinMaxValues(*state, thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
-    EXPECT_EQ(0.25, thisHeatEIRFPLR.Var1Min);
+    Curve::GetCurveMinMaxValues(*state, thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.25, thisHeatEIRFPLR.inputLimits[0].min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
-    EXPECT_EQ(1.00, thisHeatEIRFPLR.Var1Max);
-    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
-    EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
+    EXPECT_EQ(1.00, thisHeatEIRFPLR.inputLimits[0].max);
+    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                          // getinput checks this
+    EXPECT_GT(thisHeatEIRFPLR.inputLimits[0].min, thisVRF.MinPLR); // expect warning message
     EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum,
                               DataGlobalConstants::ResourceType::Electricity)); // Check fuel type input that uses
-                                                                         // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+                                                                                // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
@@ -15173,7 +15172,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataSize->ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput(*state);                  // read curves
+    Curve::GetCurveInput(*state);                         // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -15933,7 +15932,7 @@ TEST_F(EnergyPlusFixture, VRF_Condenser_Calc_EIRFPLR_Bound_Test)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
 
     int VRFCond = 1;
     state->dataHVACVarRefFlow->VRF.allocate(1);
