@@ -1545,7 +1545,7 @@ namespace WaterToAirHeatPumpSimple {
                                               format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
                                                      WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)],
                                                      simpleWatertoAirHP.Name));
-                            ratioTS = 0.0;  // Clang complains it is used uninitialized if you don't give it a value
+                            ratioTS = 0.0; // Clang complains it is used uninitialized if you don't give it a value
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at rated conditions
@@ -1689,7 +1689,7 @@ namespace WaterToAirHeatPumpSimple {
                                               format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
                                                      WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)],
                                                      simpleWatertoAirHP.Name));
-                            ratioTS = 0.0;  // Clang complains it is used uninitialized if you don't give it a value
+                            ratioTS = 0.0; // Clang complains it is used uninitialized if you don't give it a value
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at rated conditions
@@ -2414,7 +2414,7 @@ namespace WaterToAirHeatPumpSimple {
                                               format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
                                                      WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)],
                                                      simpleWatertoAirHP.Name));
-                            HeatratioTS = 0.0;  // Clang complains it is used uninitialized if you don't give it a value
+                            HeatratioTS = 0.0; // Clang complains it is used uninitialized if you don't give it a value
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at refrence conditions
@@ -2442,7 +2442,7 @@ namespace WaterToAirHeatPumpSimple {
                         RatedCapHeatDes = (PeakHeatCapTempModFac > 0.0) ? HeatCapAtPeak / PeakHeatCapTempModFac : HeatCapAtPeak;
                     } else {
                         RatedCapHeatDes = 0.0;
-                        RatedHeatratioTS = 0.0;   // Clang complains it is used uninitialized if you don't give it a value
+                        RatedHeatratioTS = 0.0; // Clang complains it is used uninitialized if you don't give it a value
                     }
                 } else if (state.dataSize->CurZoneEqNum > 0) {
                     CheckZoneSizing(

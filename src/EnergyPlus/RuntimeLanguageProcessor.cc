@@ -2473,7 +2473,8 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number);
                         break;
                     case 4:
-                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number, Operand(5).Number);
+                        curveVal = CurveValue(
+                            state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number, Operand(5).Number);
                         break;
                     }
                     ReturnValue = SetErlValueNumber(curveVal);
@@ -2490,10 +2491,17 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                         curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number);
                         break;
                     case 4:
-                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number, Operand(5).Number);
+                        curveVal = CurveValue(
+                            state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number, Operand(5).Number);
                         break;
                     case 5:
-                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number, Operand(5).Number, Operand(6).Number);
+                        curveVal = CurveValue(state,
+                                              std::floor(Operand(1).Number),
+                                              Operand(2).Number,
+                                              Operand(3).Number,
+                                              Operand(4).Number,
+                                              Operand(5).Number,
+                                              Operand(6).Number);
                         break;
                     }
                     ReturnValue = SetErlValueNumber(curveVal);
