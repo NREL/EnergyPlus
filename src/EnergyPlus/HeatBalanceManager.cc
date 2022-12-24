@@ -2476,14 +2476,6 @@ namespace HeatBalanceManager {
             thisMaterial->gasTypes(1) =
                 static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
 
-            if (thisMaterial->gasTypes(1) == Material::GasType::Invalid) {
-                ErrorsFound = true;
-                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-                ShowContinueError(state,
-                                  state.dataIPShortCut->cAlphaFieldNames(2) + " entered value=\"" + TypeOfGas +
-                                      "\" should be Air, Argon, Krypton, Xenon or Custom.");
-            }
-
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
             thisMaterial->Thickness = MaterialProps(1);
@@ -2594,13 +2586,6 @@ namespace HeatBalanceManager {
             thisMaterial->gasTypes(1) =
                 static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
 
-            if (thisMaterial->gasTypes(1) == Material::GasType::Invalid) {
-                ErrorsFound = true;
-                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-                ShowContinueError(
-                    state, state.dataIPShortCut->cAlphaFieldNames(2) + " entered value=\"" + TypeOfGas + "\" should be Air, Argon, Krypton, Xenon");
-            }
-
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
             thisMaterial->Thickness = MaterialProps(1);
@@ -2622,14 +2607,6 @@ namespace HeatBalanceManager {
                 // Get gap vent type
                 thisMaterial->gapVentType = static_cast<Material::GapVentType>(
                     getEnumerationValue(Material::GapVentTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
-                if (thisMaterial->gapVentType == Material::GapVentType::Invalid) {
-                    ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal gap vent type.");
-                    ShowContinueError(state,
-                                      "Gap vent type allowed are Sealed, VentedIndoor, or VentedOutdoor." +
-                                          state.dataIPShortCut->cAlphaFieldNames(3) + " entered =" + MaterialNames(3));
-                    thisMaterial->gapVentType = Material::GapVentType::Sealed;
-                    // ErrorsFound=.TRUE.
-                }
             }
 
             if (gasType == Material::GasType::Custom) {
@@ -2714,14 +2691,6 @@ namespace HeatBalanceManager {
                 TypeOfGas = state.dataIPShortCut->cAlphaArgs(1 + NumGas);
                 thisMaterial->gasTypes(NumGas) =
                     static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
-                if (thisMaterial->gasTypes(NumGas) == Material::GasType::Invalid) {
-                    ErrorsFound = true;
-                    ShowSevereError(state,
-                                    state.dataHeatBalMgr->CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", Illegal value.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(2 + NumGas) + " entered value=\"" + TypeOfGas +
-                                          "\" should be Air, Argon, Krypton, or Xenon.");
-                }
             }
 
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
