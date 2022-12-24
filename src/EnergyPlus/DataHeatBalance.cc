@@ -482,29 +482,29 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 if (!WrongWindowLayering) {
                     LayNumSh = 2 * TotGlassLayers - 1;
                     MatSh = thisConstruct.LayerPoint(LayNumSh);
+                    auto const *thisMaterialSh = state.dataMaterial->Material(MatSh);
                     // For double pane, shade/blind must be layer #3.
                     // For triple pane, it must be layer #5 (i.e., between two inner panes).
-                    if (state.dataMaterial->Material(MatSh)->Group != Material::MaterialGroup::Shade &&
-                        state.dataMaterial->Material(MatSh)->Group != Material::MaterialGroup::WindowBlind)
+                    if (thisMaterialSh->Group != Material::MaterialGroup::Shade && thisMaterialSh->Group != Material::MaterialGroup::WindowBlind)
                         WrongWindowLayering = true;
                     if (TotLayers != 2 * TotGlassLayers + 1) WrongWindowLayering = true;
                     if (!WrongWindowLayering) {
                         // Gas on either side of a between-glass shade/blind must be the same
                         MatGapL = thisConstruct.LayerPoint(LayNumSh - 1);
                         MatGapR = thisConstruct.LayerPoint(LayNumSh + 1);
+                        auto const *thisMaterialGapL = state.dataMaterial->Material(MatGapL);
+                        auto const *thisMaterialGapR = state.dataMaterial->Material(MatGapR);
                         for (IGas = 1; IGas <= 5; ++IGas) {
-                            if ((state.dataMaterial->Material(MatGapL)->gasTypes(IGas) != state.dataMaterial->Material(MatGapR)->gasTypes(IGas)) ||
-                                (state.dataMaterial->Material(MatGapL)->GasFract(IGas) != state.dataMaterial->Material(MatGapR)->GasFract(IGas)))
+                            if ((thisMaterialGapL->gasTypes(IGas) != thisMaterialGapR->gasTypes(IGas)) ||
+                                (thisMaterialGapL->GasFract(IGas) != thisMaterialGapR->GasFract(IGas)))
                                 WrongWindowLayering = true;
                         }
                         // Gap width on either side of a between-glass shade/blind must be the same
-                        if (std::abs(state.dataMaterial->Material(MatGapL)->Thickness - state.dataMaterial->Material(MatGapR)->Thickness) > 0.0005)
-                            WrongWindowLayering = true;
-                        if (state.dataMaterial->Material(MatSh)->Group == Material::MaterialGroup::WindowBlind) {
-                            BlNum = state.dataMaterial->Material(MatSh)->BlindDataPtr;
+                        if (std::abs(thisMaterialGapL->Thickness - thisMaterialGapR->Thickness) > 0.0005) WrongWindowLayering = true;
+                        if (thisMaterialSh->Group == Material::MaterialGroup::WindowBlind) {
+                            BlNum = thisMaterialSh->BlindDataPtr;
                             if (BlNum > 0) {
-                                if ((state.dataMaterial->Material(MatGapL)->Thickness + state.dataMaterial->Material(MatGapR)->Thickness) <
-                                    state.dataHeatBal->Blind(BlNum).SlatWidth) {
+                                if ((thisMaterialGapL->Thickness + thisMaterialGapR->Thickness) < state.dataHeatBal->Blind(BlNum).SlatWidth) {
                                     ErrorsFound = true;
                                     ShowSevereError(state, "CheckAndSetConstructionProperties: For window construction " + thisConstruct.Name);
                                     ShowContinueError(state, "the slat width of the between-glass blind is greater than");
