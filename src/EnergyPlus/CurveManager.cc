@@ -160,6 +160,131 @@ namespace Curve {
         }
     }
 
+    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1)
+    {
+        if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1);
+        switch (this->curveType) {
+        case CurveType::Linear:
+            return this->coeff[0] + V1 * this->coeff[1];
+        case CurveType::Quadratic:
+            return this->coeff[0] + V1 * (this->coeff[1] + V1 * this->coeff[2]);
+        case CurveType::Cubic:
+            return this->coeff[0] + V1 * (this->coeff[1] + V1 * (this->coeff[2] + V1 * this->coeff[3]));
+        case CurveType::Quartic:
+            return this->coeff[0] + V1 * (this->coeff[1] + V1 * (this->coeff[2] + V1 * (this->coeff[3] + V1 * this->coeff[4])));
+        case CurveType::Exponent:
+            return this->coeff[0] + this->coeff[1] * std::pow(V1, this->coeff[2]);
+        case CurveType::ExponentialSkewNormal: {
+            Real64 CoeffZ1 = (V1 - this->coeff[0]) / this->coeff[1];
+            Real64 CoeffZ2 = (this->coeff[3] * V1 * std::exp(this->coeff[2] * V1) - this->coeff[0]) / this->coeff[1];
+            Real64 CoeffZ3 = -this->coeff[0] / this->coeff[1];
+            static Real64 const sqrt_2_inv(1.0 / std::sqrt(2.0)); // would be constexpr-able if std::sqrt was constexpr, but not yet
+            Real64 CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
+            Real64 CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
+            return CurveValueNumer / CurveValueDenom;
+        }
+        case CurveType::Sigmoid: {
+            Real64 CurveValueExp = std::exp((this->coeff[2] - V1) / this->coeff[3]);
+            return this->coeff[0] + this->coeff[1] / std::pow(1.0 + CurveValueExp, this->coeff[4]);
+        }
+        case CurveType::RectangularHyperbola1: {
+            Real64 CurveValueNumer = this->coeff[0] * V1;
+            Real64 CurveValueDenom = this->coeff[1] + V1;
+            return (CurveValueNumer / CurveValueDenom) + this->coeff[2];
+        }
+        case CurveType::RectangularHyperbola2: {
+            Real64 CurveValueNumer = this->coeff[0] * V1;
+            Real64 CurveValueDenom = this->coeff[1] + V1;
+            return (CurveValueNumer / CurveValueDenom) + (this->coeff[2] * V1);
+        }
+        case CurveType::ExponentialDecay:
+            return this->coeff[0] + this->coeff[1] * std::exp(this->coeff[2] * V1);
+        case CurveType::DoubleExponentialDecay:
+            return this->coeff[0] + this->coeff[1] * std::exp(this->coeff[2] * V1) + this->coeff[3] * std::exp(this->coeff[4] * V1);
+        default:
+            return this->valueFallback(state, V1, 0.0, 0.0, 0.0, 0.0);
+        }
+    }
+
+    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2)
+    {
+        if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1, V2);
+        switch (this->curveType) {
+        case CurveType::FanPressureRise:
+            return V1 * (this->coeff[0] * V1 + this->coeff[1] + this->coeff[2] * std::sqrt(V2)) + this->coeff[3] * V2;
+        case CurveType::BiQuadratic:
+            return this->coeff[0] + V1 * (this->coeff[1] + V1 * this->coeff[2]) + V2 * (this->coeff[3] + V2 * this->coeff[4]) +
+                   V1 * V2 * this->coeff[5];
+        case CurveType::QuadraticLinear:
+            return (this->coeff[0] + V1 * (this->coeff[1] + V1 * this->coeff[2])) +
+                   (this->coeff[3] + V1 * (this->coeff[4] + V1 * this->coeff[5])) * V2;
+        case CurveType::CubicLinear:
+            return (this->coeff[0] + V1 * (this->coeff[1] + V1 * (this->coeff[2] + V1 * this->coeff[3]))) +
+                   (this->coeff[4] + V1 * this->coeff[5]) * V2;
+        case CurveType::BiCubic:
+            return this->coeff[0] + V1 * this->coeff[1] + V1 * V1 * this->coeff[2] + V2 * this->coeff[3] + V2 * V2 * this->coeff[4] +
+                   V1 * V2 * this->coeff[5] + V1 * V1 * V1 * this->coeff[6] + V2 * V2 * V2 * this->coeff[7] + V1 * V1 * V2 * this->coeff[8] +
+                   V1 * V2 * V2 * this->coeff[9];
+        default:
+            return this->valueFallback(state, V1, V2, 0.0, 0.0, 0.0);
+        }
+    }
+
+    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3)
+    {
+        if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1, V2, V3);
+        switch (this->curveType) {
+        case CurveType::ChillerPartLoadWithLift:
+            return this->coeff[0] + this->coeff[1] * V1 + this->coeff[2] * V1 * V1 + this->coeff[3] * V2 + this->coeff[4] * V2 * V2 +
+                   this->coeff[5] * V1 * V2 + this->coeff[6] * V1 * V1 * V1 + this->coeff[7] * V2 * V2 * V2 + this->coeff[8] * V1 * V1 * V2 +
+                   this->coeff[9] * V1 * V2 * V2 + this->coeff[10] * V1 * V1 * V2 * V2 + this->coeff[11] * V3 * V2 * V2 * V2;
+        case CurveType::TriQuadratic: {
+            auto const &Tri2ndOrder(this->tri2ndOrder);
+            auto const V1s(V1 * V1);
+            auto const V2s(V2 * V2);
+            auto const V3s(V3 * V3);
+            return Tri2ndOrder[0] + Tri2ndOrder[1] * V1s + Tri2ndOrder[2] * V1 + Tri2ndOrder[3] * V2s + Tri2ndOrder[4] * V2 + Tri2ndOrder[5] * V3s +
+                   Tri2ndOrder[6] * V3 + Tri2ndOrder[7] * V1s * V2s + Tri2ndOrder[8] * V1 * V2 + Tri2ndOrder[9] * V1 * V2s +
+                   Tri2ndOrder[10] * V1s * V2 + Tri2ndOrder[11] * V1s * V3s + Tri2ndOrder[12] * V1 * V3 + Tri2ndOrder[13] * V1 * V3s +
+                   Tri2ndOrder[14] * V1s * V3 + Tri2ndOrder[15] * V2s * V3s + Tri2ndOrder[16] * V2 * V3 + Tri2ndOrder[17] * V2 * V3s +
+                   Tri2ndOrder[18] * V2s * V3 + Tri2ndOrder[19] * V1s * V2s * V3s + Tri2ndOrder[20] * V1s * V2s * V3 +
+                   Tri2ndOrder[21] * V1s * V2 * V3s + Tri2ndOrder[22] * V1 * V2s * V3s + Tri2ndOrder[23] * V1s * V2 * V3 +
+                   Tri2ndOrder[24] * V1 * V2s * V3 + Tri2ndOrder[25] * V1 * V2 * V3s + Tri2ndOrder[26] * V1 * V2 * V3;
+        }
+        default:
+            return this->valueFallback(state, V1, V2, V3, 0.0, 0.0);
+        }
+    }
+
+    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4)
+    {
+        if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1, V2, V3, V4);
+        switch (this->curveType) {
+        case CurveType::QuadLinear:
+            return this->coeff[0] + V1 * this->coeff[1] + V2 * this->coeff[2] + V3 * this->coeff[3] + V4 * this->coeff[4];
+        default:
+            return this->valueFallback(state, V1, V2, V3, V4, 0.0);
+        }
+    }
+
+    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5)
+    {
+        if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1, V2, V3, V4, V5);
+        switch (this->curveType) {
+        case CurveType::QuintLinear:
+            return this->coeff[0] + V1 * this->coeff[1] + V2 * this->coeff[2] + V3 * this->coeff[3] + V4 * this->coeff[4] + V5 * this->coeff[5];
+            break;
+        default:
+            return this->valueFallback(state, V1, V2, V3, V4, V5);
+        }
+    }
+
+    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5, Real64 V6)
+    {
+        // tables are the only 6-D curves, for now at least
+        return BtwxtTableInterpolation(state, V1, V2, V3, V4, V5, V6);
+    }
+
     Real64 CurveValue(EnergyPlusData &state,
                       int const CurveIndex, // index of curve in curve array
                       Real64 const Var1     // 1st independent variable
@@ -169,74 +294,12 @@ namespace Curve {
         Real64 CurveValue(0.0);
         auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
         Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
-        switch (thisCurve.interpolationType) {
-        case InterpType::EvaluateCurveToLimits:
-            switch (thisCurve.curveType) {
-            case CurveType::Linear: {
-                CurveValue = thisCurve.coeff[0] + V1 * thisCurve.coeff[1];
-            } break;
-            case CurveType::Quadratic: {
-                CurveValue = thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * thisCurve.coeff[2]);
-            } break;
-            case CurveType::Cubic: {
-                CurveValue = thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * (thisCurve.coeff[2] + V1 * thisCurve.coeff[3]));
-            } break;
-            case CurveType::Quartic: {
-                CurveValue =
-                    thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * (thisCurve.coeff[2] + V1 * (thisCurve.coeff[3] + V1 * thisCurve.coeff[4])));
-            } break;
-            case CurveType::Exponent: {
-                CurveValue = thisCurve.coeff[0] + thisCurve.coeff[1] * std::pow(V1, thisCurve.coeff[2]);
-            } break;
-            case CurveType::ExponentialSkewNormal: {
-                Real64 CoeffZ1 = (V1 - thisCurve.coeff[0]) / thisCurve.coeff[1];
-                Real64 CoeffZ2 = (thisCurve.coeff[3] * V1 * std::exp(thisCurve.coeff[2] * V1) - thisCurve.coeff[0]) / thisCurve.coeff[1];
-                Real64 CoeffZ3 = -thisCurve.coeff[0] / thisCurve.coeff[1];
-                static Real64 const sqrt_2_inv(1.0 / std::sqrt(2.0)); // would be constexpr-able if std::sqrt was constexpr, but not yet
-                Real64 CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
-                Real64 CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
-                CurveValue = CurveValueNumer / CurveValueDenom;
-            } break;
-            case CurveType::Sigmoid: {
-                Real64 CurveValueExp = std::exp((thisCurve.coeff[2] - V1) / thisCurve.coeff[3]);
-                CurveValue = thisCurve.coeff[0] + thisCurve.coeff[1] / std::pow(1.0 + CurveValueExp, thisCurve.coeff[4]);
-            } break;
-            case CurveType::RectangularHyperbola1: {
-                Real64 CurveValueNumer = thisCurve.coeff[0] * V1;
-                Real64 CurveValueDenom = thisCurve.coeff[1] + V1;
-                CurveValue = (CurveValueNumer / CurveValueDenom) + thisCurve.coeff[2];
-            } break;
-            case CurveType::RectangularHyperbola2: {
-                Real64 CurveValueNumer = thisCurve.coeff[0] * V1;
-                Real64 CurveValueDenom = thisCurve.coeff[1] + V1;
-                CurveValue = (CurveValueNumer / CurveValueDenom) + (thisCurve.coeff[2] * V1);
-            } break;
-            case CurveType::ExponentialDecay: {
-                CurveValue = thisCurve.coeff[0] + thisCurve.coeff[1] * std::exp(thisCurve.coeff[2] * V1);
-            } break;
-            case CurveType::DoubleExponentialDecay: {
-                CurveValue = thisCurve.coeff[0] + thisCurve.coeff[1] * std::exp(thisCurve.coeff[2] * V1) +
-                             thisCurve.coeff[3] * std::exp(thisCurve.coeff[4] * V1);
-            } break;
-            default:
-                return thisCurve.curveValueFallback(state, V1, 0.0, 0.0, 0.0, 0.0);
-            }
-            break;
-        case InterpType::BtwxtMethod:
-            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1);
-            break;
-        default:
-            assert(false);
-        }
-
+        CurveValue = thisCurve.value(state, V1);
         if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
         if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
-
         if (thisCurve.EMSOverrideOn) CurveValue = thisCurve.EMSOverrideCurveValue;
-
         thisCurve.output = CurveValue;
         thisCurve.inputs[0] = Var1;
-
         return CurveValue;
     }
 
@@ -251,39 +314,7 @@ namespace Curve {
         auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
         Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
         Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
-        switch (thisCurve.interpolationType) {
-        case InterpType::EvaluateCurveToLimits:
-            switch (thisCurve.curveType) {
-            case CurveType::FanPressureRise:
-                CurveValue = V1 * (thisCurve.coeff[0] * V1 + thisCurve.coeff[1] + thisCurve.coeff[2] * std::sqrt(V2)) + thisCurve.coeff[3] * V2;
-                break;
-            case CurveType::BiQuadratic:
-                CurveValue = thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * thisCurve.coeff[2]) +
-                             V2 * (thisCurve.coeff[3] + V2 * thisCurve.coeff[4]) + V1 * V2 * thisCurve.coeff[5];
-                break;
-            case CurveType::QuadraticLinear:
-                CurveValue = (thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * thisCurve.coeff[2])) +
-                             (thisCurve.coeff[3] + V1 * (thisCurve.coeff[4] + V1 * thisCurve.coeff[5])) * V2;
-                break;
-            case CurveType::CubicLinear:
-                CurveValue = (thisCurve.coeff[0] + V1 * (thisCurve.coeff[1] + V1 * (thisCurve.coeff[2] + V1 * thisCurve.coeff[3]))) +
-                             (thisCurve.coeff[4] + V1 * thisCurve.coeff[5]) * V2;
-                break;
-            case CurveType::BiCubic:
-                CurveValue = thisCurve.coeff[0] + V1 * thisCurve.coeff[1] + V1 * V1 * thisCurve.coeff[2] + V2 * thisCurve.coeff[3] +
-                             V2 * V2 * thisCurve.coeff[4] + V1 * V2 * thisCurve.coeff[5] + V1 * V1 * V1 * thisCurve.coeff[6] +
-                             V2 * V2 * V2 * thisCurve.coeff[7] + V1 * V1 * V2 * thisCurve.coeff[8] + V1 * V2 * V2 * thisCurve.coeff[9];
-                break;
-            default:
-                return thisCurve.curveValueFallback(state, V1, V2, 0.0, 0.0, 0.0);
-            }
-            break;
-        case InterpType::BtwxtMethod:
-            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2);
-            break;
-        default:
-            assert(false);
-        }
+        CurveValue = thisCurve.value(state, V1, V2);
 
         if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
         if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
@@ -310,39 +341,7 @@ namespace Curve {
         Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
         Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
         Real64 const V3(max(min(Var3, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min)); // 3rd independent variable after limits imposed
-        switch (thisCurve.interpolationType) {
-        case InterpType::EvaluateCurveToLimits:
-            switch (thisCurve.curveType) {
-            case CurveType::ChillerPartLoadWithLift:
-                CurveValue = thisCurve.coeff[0] + thisCurve.coeff[1] * V1 + thisCurve.coeff[2] * V1 * V1 + thisCurve.coeff[3] * V2 +
-                             thisCurve.coeff[4] * V2 * V2 + thisCurve.coeff[5] * V1 * V2 + thisCurve.coeff[6] * V1 * V1 * V1 +
-                             thisCurve.coeff[7] * V2 * V2 * V2 + thisCurve.coeff[8] * V1 * V1 * V2 + thisCurve.coeff[9] * V1 * V2 * V2 +
-                             thisCurve.coeff[10] * V1 * V1 * V2 * V2 + thisCurve.coeff[11] * V3 * V2 * V2 * V2;
-                break;
-            case CurveType::TriQuadratic: {
-                auto const &Tri2ndOrder(thisCurve.tri2ndOrder);
-                auto const V1s(V1 * V1);
-                auto const V2s(V2 * V2);
-                auto const V3s(V3 * V3);
-                CurveValue = Tri2ndOrder[0] + Tri2ndOrder[1] * V1s + Tri2ndOrder[2] * V1 + Tri2ndOrder[3] * V2s + Tri2ndOrder[4] * V2 +
-                             Tri2ndOrder[5] * V3s + Tri2ndOrder[6] * V3 + Tri2ndOrder[7] * V1s * V2s + Tri2ndOrder[8] * V1 * V2 +
-                             Tri2ndOrder[9] * V1 * V2s + Tri2ndOrder[10] * V1s * V2 + Tri2ndOrder[11] * V1s * V3s + Tri2ndOrder[12] * V1 * V3 +
-                             Tri2ndOrder[13] * V1 * V3s + Tri2ndOrder[14] * V1s * V3 + Tri2ndOrder[15] * V2s * V3s + Tri2ndOrder[16] * V2 * V3 +
-                             Tri2ndOrder[17] * V2 * V3s + Tri2ndOrder[18] * V2s * V3 + Tri2ndOrder[19] * V1s * V2s * V3s +
-                             Tri2ndOrder[20] * V1s * V2s * V3 + Tri2ndOrder[21] * V1s * V2 * V3s + Tri2ndOrder[22] * V1 * V2s * V3s +
-                             Tri2ndOrder[23] * V1s * V2 * V3 + Tri2ndOrder[24] * V1 * V2s * V3 + Tri2ndOrder[25] * V1 * V2 * V3s +
-                             Tri2ndOrder[26] * V1 * V2 * V3;
-            } break;
-            default:
-                return thisCurve.curveValueFallback(state, V1, V2, V3, 0.0, 0.0);
-            }
-            break;
-        case InterpType::BtwxtMethod:
-            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3);
-            break;
-        default:
-            assert(false);
-        }
+        CurveValue = thisCurve.value(state, V1, V2, V3);
 
         if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
         if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
@@ -372,23 +371,7 @@ namespace Curve {
         Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
         Real64 const V3(max(min(Var3, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min)); // 3rd independent variable after limits imposed
         Real64 const V4(max(min(Var4, thisCurve.inputLimits[3].max), thisCurve.inputLimits[3].min)); // 4th independent variable after limits imposed
-        switch (thisCurve.interpolationType) {
-        case InterpType::EvaluateCurveToLimits:
-            switch (thisCurve.curveType) {
-            case CurveType::QuadLinear:
-                CurveValue =
-                    thisCurve.coeff[0] + V1 * thisCurve.coeff[1] + V2 * thisCurve.coeff[2] + V3 * thisCurve.coeff[3] + V4 * thisCurve.coeff[4];
-                break;
-            default:
-                return thisCurve.curveValueFallback(state, V1, V2, V3, V4, 0.0);
-            }
-            break;
-        case InterpType::BtwxtMethod:
-            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4);
-            break;
-        default:
-            assert(false);
-        }
+        CurveValue = thisCurve.value(state, V1, V2, V3, V4);
 
         if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
         if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
@@ -421,24 +404,7 @@ namespace Curve {
         Real64 const V3(max(min(Var3, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min)); // 3rd independent variable after limits imposed
         Real64 const V4(max(min(Var4, thisCurve.inputLimits[3].max), thisCurve.inputLimits[3].min)); // 4th independent variable after limits imposed
         Real64 const V5(max(min(Var5, thisCurve.inputLimits[4].max), thisCurve.inputLimits[4].min)); // 5th independent variable after limits imposed
-        switch (thisCurve.interpolationType) {
-        case InterpType::EvaluateCurveToLimits:
-            switch (thisCurve.curveType) {
-            case CurveType::QuintLinear:
-                CurveValue = thisCurve.coeff[0] + V1 * thisCurve.coeff[1] + V2 * thisCurve.coeff[2] + V3 * thisCurve.coeff[3] +
-                             V4 * thisCurve.coeff[4] + V5 * thisCurve.coeff[5];
-                break;
-            default:
-                return thisCurve.curveValueFallback(state, V1, V2, V3, V4, V5);
-            }
-            return CurveValue;
-            break;
-        case InterpType::BtwxtMethod:
-            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5);
-            break;
-        default:
-            assert(false);
-        }
+        CurveValue = thisCurve.value(state, V1, V2, V3, V4, V5);
 
         if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
         if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
@@ -469,18 +435,14 @@ namespace Curve {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
         auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        switch (thisCurve.interpolationType) {
-        case InterpType::EvaluateCurveToLimits:
-            // 6 independent var is only implemented for the table interpolation
-            ShowSevereError(state, "Invalid call to CurveValue for a rank 6 curve, which does not exist in EnergyPlus.");
-            ShowFatalError(state, "Please submit a ticket to the EnergyPlus repository or helpdesk so a developer can address the issue");
-            break;
-        case InterpType::BtwxtMethod:
-            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
-            break;
-        default:
-            assert(false);
-        }
+        Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
+        Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
+        Real64 const V3(max(min(Var3, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min)); // 3rd independent variable after limits imposed
+        Real64 const V4(max(min(Var4, thisCurve.inputLimits[3].max), thisCurve.inputLimits[3].min)); // 4th independent variable after limits imposed
+        Real64 const V5(max(min(Var5, thisCurve.inputLimits[4].max), thisCurve.inputLimits[4].min)); // 5th independent variable after limits imposed
+        Real64 const V6(max(min(Var6, thisCurve.inputLimits[5].max), thisCurve.inputLimits[5].min)); // 6th independent variable after limits imposed
+
+        CurveValue = thisCurve.value(state, V1, V2, V3, V4, V5, V6);
 
         if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
         if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
@@ -498,8 +460,7 @@ namespace Curve {
         return CurveValue;
     }
 
-    Real64 PerformanceCurveData::curveValueFallback(
-        EnergyPlusData &state, Real64 const V1, Real64 const V2, Real64 const V3, Real64 const V4, Real64 const V5)
+    Real64 PerformanceCurveData::valueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5)
     {
         if (state.dataCurveManager->showFallbackMessage) {
             ShowMessage(state, "Note: You have encountered a corner case in the EnergyPlus Curve:* evaluation code.");
@@ -2376,14 +2337,15 @@ namespace Curve {
                             ErrorsFound = true;
                         }
 
-                        // This could be an enum lookup, but they are accessing enums inside Btwxt that we don't control, and it's only two options for each
-                        Btwxt::Method interpMethod = Btwxt::Method::CUBIC;  // Assume cubic as the default
+                        // This could be an enum lookup, but they are accessing enums inside Btwxt that we don't control, and it's only two options
+                        // for each
+                        Btwxt::Method interpMethod = Btwxt::Method::CUBIC; // Assume cubic as the default
                         if (indVarInstance.count("interpolation_method")) {
                             if (indVarInstance.at("interpolation_method").get<std::string>() == "Linear") {
                                 interpMethod = Btwxt::Method::LINEAR;
                             }
                         }
-                        Btwxt::Method extrapMethod = Btwxt::Method::LINEAR;  // Assume linear as the default
+                        Btwxt::Method extrapMethod = Btwxt::Method::LINEAR; // Assume linear as the default
                         if (indVarInstance.count("extrapolation_method")) {
                             if (indVarInstance.at("extrapolation_method") == "Unavailable") {
                                 ShowSevereError(state, format("{}: Extrapolation method \"Unavailable\" is not yet available.", contextString));
@@ -2822,54 +2784,52 @@ namespace Curve {
         }
     }
 
-    Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                   int const CurveIndex,        // index of curve in curve array
-                                   Real64 const Var1,           // 1st independent variable
-                                   Optional<Real64 const> Var2, // 2nd independent variable
-                                   Optional<Real64 const> Var3, // 3rd independent variable
-                                   Optional<Real64 const> Var4, // 4th independent variable
-                                   Optional<Real64 const> Var5, // 5th independent variable
-                                   Optional<Real64 const> Var6  // 6th independent variable
+    Real64 PerformanceCurveData::BtwxtTableInterpolation(EnergyPlusData &state,
+                                                         Real64 const Var1,           // 1st independent variable
+                                                         Optional<Real64 const> Var2, // 2nd independent variable
+                                                         Optional<Real64 const> Var3, // 3rd independent variable
+                                                         Optional<Real64 const> Var4, // 4th independent variable
+                                                         Optional<Real64 const> Var5, // 5th independent variable
+                                                         Optional<Real64 const> Var6  // 6th independent variable
     )
     {
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
         // TODO: Generalize for N-dims
         Real64 var = Var1;
-        var = max(min(var, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min);
+        var = max(min(var, this->inputLimits[0].max), this->inputLimits[0].min);
         std::vector<double> target{var};
         if (present(Var2)) {
             var = Var2;
-            var = max(min(var, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min);
+            var = max(min(var, this->inputLimits[1].max), this->inputLimits[1].min);
             target.push_back(var);
         }
         if (present(Var3)) {
             var = Var3;
-            var = max(min(var, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min);
+            var = max(min(var, this->inputLimits[2].max), this->inputLimits[2].min);
             target.push_back(var);
         }
         if (present(Var4)) {
             var = Var4;
-            var = max(min(var, thisCurve.inputLimits[3].max), thisCurve.inputLimits[3].min);
+            var = max(min(var, this->inputLimits[3].max), this->inputLimits[3].min);
             target.push_back(var);
         }
         if (present(Var5)) {
             var = Var5;
-            var = max(min(var, thisCurve.inputLimits[4].max), thisCurve.inputLimits[4].min);
+            var = max(min(var, this->inputLimits[4].max), this->inputLimits[4].min);
             target.push_back(var);
         }
         if (present(Var6)) {
             var = Var6;
-            var = max(min(var, thisCurve.inputLimits[5].max), thisCurve.inputLimits[5].min);
+            var = max(min(var, this->inputLimits[5].max), this->inputLimits[5].min);
             target.push_back(var);
         }
 
-        std::string contextString = format("Table:Lookup \"{}\"", thisCurve.Name);
+        std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
         Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
-        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(thisCurve.TableIndex, thisCurve.GridValueIndex, target);
+        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
-        if (thisCurve.outputLimits.minPresent) TableValue = max(TableValue, thisCurve.outputLimits.min);
-        if (thisCurve.outputLimits.maxPresent) TableValue = min(TableValue, thisCurve.outputLimits.max);
+        if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
+        if (this->outputLimits.maxPresent) TableValue = min(TableValue, this->outputLimits.max);
 
         return TableValue;
     }

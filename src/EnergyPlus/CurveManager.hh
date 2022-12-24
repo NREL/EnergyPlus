@@ -167,9 +167,26 @@ namespace Curve {
         // EMS override
         bool EMSOverrideOn = false;         // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue = 0.0; // Value of curve result EMS is directing to use
-
-        Real64 curveValueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5);
+        Real64 value(EnergyPlusData &state, Real64 V1);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5, Real64 V6);
+        Real64 valueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5);
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       Real64 Var1,                     // 1st independent variable
+                                       Optional<Real64 const> Var2 = _, // 2nd independent variable
+                                       Optional<Real64 const> Var3 = _, // 3rd independent variable
+                                       Optional<Real64 const> Var4 = _, // 4th independent variable
+                                       Optional<Real64 const> Var5 = _, // 5th independent variable
+                                       Optional<Real64 const> Var6 = _);
     };
+
+    //    struct CurveLinear : PerformanceCurveData
+    //    {
+    //
+    //    };
 
     // Table file objects
     class TableFile
@@ -265,15 +282,6 @@ namespace Curve {
     void GetCurveInputData(EnergyPlusData &state, bool &ErrorsFound);
 
     void InitCurveReporting(EnergyPlusData &state);
-
-    Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                   int CurveIndex,                  // index of curve in curve array
-                                   Real64 Var1,                     // 1st independent variable
-                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                   Optional<Real64 const> Var4 = _, // 4th independent variable
-                                   Optional<Real64 const> Var5 = _, // 5th independent variable
-                                   Optional<Real64 const> Var6 = _);
 
     bool IsCurveInputTypeValid(std::string const &InInputType); // index of curve in curve array
 
