@@ -109,12 +109,6 @@ namespace Curve {
     // validating it, and storing it in such a manner that the curve manager
     // can provide the simulation with performance curve output.
 
-    std::map<std::string, Btwxt::Method> BtwxtManager::interpMethods = // NOLINT(cert-err58-cpp)
-        {{"Linear", Btwxt::Method::LINEAR}, {"Cubic", Btwxt::Method::CUBIC}};
-
-    std::map<std::string, Btwxt::Method> BtwxtManager::extrapMethods = // NOLINT(cert-err58-cpp)
-        {{"Linear", Btwxt::Method::LINEAR}, {"Constant", Btwxt::Method::CONSTANT}};
-
     // Functions
     void BtwxtMessageCallback(const Btwxt::MsgLevel messageType, const std::string message, void *contextPtr)
     {
@@ -2382,21 +2376,21 @@ namespace Curve {
                             ErrorsFound = true;
                         }
 
-                        Btwxt::Method interpMethod, extrapMethod;
+                        // This could be an enum lookup, but they are accessing enums inside Btwxt that we don't control, and it's only two options for each
+                        Btwxt::Method interpMethod = Btwxt::Method::CUBIC;  // Assume cubic as the default
                         if (indVarInstance.count("interpolation_method")) {
-                            interpMethod = Curve::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method").get<std::string>());
-                        } else {
-                            interpMethod = Btwxt::Method::CUBIC;
+                            if (indVarInstance.at("interpolation_method").get<std::string>() == "Linear") {
+                                interpMethod = Btwxt::Method::LINEAR;
+                            }
                         }
-
+                        Btwxt::Method extrapMethod = Btwxt::Method::LINEAR;  // Assume linear as the default
                         if (indVarInstance.count("extrapolation_method")) {
                             if (indVarInstance.at("extrapolation_method") == "Unavailable") {
                                 ShowSevereError(state, format("{}: Extrapolation method \"Unavailable\" is not yet available.", contextString));
                                 ErrorsFound = true;
+                            } else if (indVarInstance.at("extrapolation_method") == "Constant") {
+                                extrapMethod = Btwxt::Method::CONSTANT;
                             }
-                            extrapMethod = Curve::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method").get<std::string>());
-                        } else {
-                            extrapMethod = Btwxt::Method::LINEAR;
                         }
 
                         double min_grid_value = *std::min_element(axis.begin(), axis.end());

@@ -190,9 +190,6 @@ namespace Curve {
     class BtwxtManager
     {
     public:
-        using json = nlohmann::json;
-        static std::map<std::string, Btwxt::Method> interpMethods;
-        static std::map<std::string, Btwxt::Method> extrapMethods;
         // Map RGI collection to string name of independent variable list
         int addGrid(const std::string &indVarListName, Btwxt::GriddedData grid)
         {
@@ -205,7 +202,7 @@ namespace Curve {
         int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
-        std::map<std::string, const json &> independentVarRefs;
+        std::map<std::string, const nlohmann::json &> independentVarRefs;
         std::map<fs::path, TableFile> tableFiles;
         void clear();
 
