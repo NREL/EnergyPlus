@@ -429,6 +429,13 @@ void SizeZoneEquipment(EnergyPlusData &state)
 
         thisZoneHB.NonAirSystemResponse = 0.0;
         thisZoneHB.SysDepZoneLoads = 0.0;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
+                // SpaceHB ToDo: For now allocate by space volume frac
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse = 0.0;
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoads = 0.0;
+            }
+        }
         SysOutputProvided = 0.0;
         LatOutputProvided = 0.0;
         InitSystemOutputRequired(state, ControlledZoneNum, true);
@@ -651,6 +658,13 @@ void SizeZoneEquipment(EnergyPlusData &state)
             Node(SupplyAirNode).MassFlowRate = MassFlowRate;
         } else {
             thisZoneHB.NonAirSystemResponse = SysOutputProvided;
+            if (state.dataHeatBal->doSpaceHeatBalance) {
+                for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
+                    // SpaceHB ToDo: For now allocate by space volume frac
+                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse =
+                        thisZoneHB.NonAirSystemResponse * state.dataHeatBal->space(spaceNum).fracZoneVolume;
+                }
+            }
             if (calcZoneSizing.zoneLatentSizing) {
                 int ZoneMult = zone.Multiplier * zone.ListMultiplier;
                 thisZoneHB.ZoneLatentGain += (LatOutputProvided * HgAir) / ZoneMult;
@@ -3609,8 +3623,15 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             UpdateSystemOutputRequired(state, ControlledZoneNum, SysOutputProvided, LatOutputProvided, EquipTypeNum);
             state.dataSize->CurTermUnitSizingNum = 0;
-        } // zone loop
-    }     // End of controlled zone loop
+        } // zone equipment loop
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
+                // SpaceHB ToDo: For now allocate by space volume frac
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse =
+                    thisZoneHB.NonAirSystemResponse * state.dataHeatBal->space(spaceNum).fracZoneVolume;
+            }
+        }
+    } // End of controlled zone loop
     state.dataSize->CurZoneEqNum = 0;
     state.dataZoneEquipmentManager->FirstPassZoneEquipFlag = false;
 
