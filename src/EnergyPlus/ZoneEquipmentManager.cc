@@ -223,16 +223,32 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex == 0) continue;
             int ZoneEquipCount =
                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex).NumOfEquipTypes;
-            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).NumZoneEquipment = ZoneEquipCount;
-            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequired.allocate(ZoneEquipCount);
-            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequiredToHeatingSP.allocate(ZoneEquipCount);
-            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequiredToCoolingSP.allocate(ZoneEquipCount);
-            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).NumZoneEquipment = ZoneEquipCount;
-            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequired.allocate(ZoneEquipCount);
-            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToHumidSP.allocate(ZoneEquipCount);
-            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToDehumidSP.allocate(ZoneEquipCount);
+            auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum);
+            thisZoneSysEnergyDemand.NumZoneEquipment = ZoneEquipCount;
+            thisZoneSysEnergyDemand.SequencedOutputRequired.allocate(ZoneEquipCount);
+            thisZoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP.allocate(ZoneEquipCount);
+            thisZoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP.allocate(ZoneEquipCount);
+            auto &thisZoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum);
+            thisZoneSysMoistureDemand.NumZoneEquipment = ZoneEquipCount;
+            thisZoneSysMoistureDemand.SequencedOutputRequired.allocate(ZoneEquipCount);
+            thisZoneSysMoistureDemand.SequencedOutputRequiredToHumidSP.allocate(ZoneEquipCount);
+            thisZoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP.allocate(ZoneEquipCount);
             state.dataSize->ZoneEqSizing(ControlledZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
             state.dataSize->ZoneEqSizing(ControlledZoneNum).SizingMethod = 0;
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
+                    auto &thisSpaceSysEnergyDemand = state.dataZoneEnergyDemand->spaceSysEnergyDemand(ControlledZoneNum);
+                    thisSpaceSysEnergyDemand.NumZoneEquipment = ZoneEquipCount;
+                    thisSpaceSysEnergyDemand.SequencedOutputRequired.allocate(ZoneEquipCount);
+                    thisSpaceSysEnergyDemand.SequencedOutputRequiredToHeatingSP.allocate(ZoneEquipCount);
+                    thisSpaceSysEnergyDemand.SequencedOutputRequiredToCoolingSP.allocate(ZoneEquipCount);
+                    auto &thisSpaceSysMoistureDemand = state.dataZoneEnergyDemand->spaceSysMoistureDemand(ControlledZoneNum);
+                    thisSpaceSysMoistureDemand.NumZoneEquipment = ZoneEquipCount;
+                    thisSpaceSysMoistureDemand.SequencedOutputRequired.allocate(ZoneEquipCount);
+                    thisSpaceSysMoistureDemand.SequencedOutputRequiredToHumidSP.allocate(ZoneEquipCount);
+                    thisSpaceSysMoistureDemand.SequencedOutputRequiredToDehumidSP.allocate(ZoneEquipCount);
+                }
+            }
         }
     }
 
@@ -3770,10 +3786,36 @@ void InitSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool con
 
     // METHODOLOGY EMPLOYED:
     // Initialize remaining output variables using predictor calculations
+    initOutputRequired(state,
+                       ZoneNum,
+                       state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum),
+                       state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum),
+                       FirstHVACIteration,
+                       ResetSimOrder);
+    // SpaceHB TODO: This may need more work
+    if (state.dataHeatBal->doSpaceHeatBalance) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            initOutputRequired(state,
+                               ZoneNum,
+                               state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum),
+                               state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum),
+                               FirstHVACIteration,
+                               ResetSimOrder,
+                               spaceNum);
+        }
+    }
 
-    auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
-    auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
+    DistributeSystemOutputRequired(state, ZoneNum, FirstHVACIteration);
+}
 
+void initOutputRequired(EnergyPlusData &state,
+                        int const ZoneNum,
+                        DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                        DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                        bool const FirstHVACIteration,
+                        bool const ResetSimOrder,
+                        int spaceNum)
+{
     energy.RemainingOutputRequired = energy.TotalOutputRequired;
     energy.UnadjRemainingOutputRequired = energy.TotalOutputRequired;
     energy.RemainingOutputReqToHeatSP = energy.OutputRequiredToHeatingSP;
@@ -3788,7 +3830,7 @@ void InitSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool con
     moisture.RemainingOutputReqToDehumidSP = moisture.OutputRequiredToDehumidifyingSP;
     moisture.UnadjRemainingOutputReqToDehumidSP = moisture.OutputRequiredToDehumidifyingSP;
 
-    if (ResetSimOrder) {
+    if (ResetSimOrder && spaceNum == 0) {
         SetZoneEquipSimOrder(state, ZoneNum);
     }
 
@@ -3818,6 +3860,7 @@ void InitSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool con
             } else if ((loadDistType == DataZoneEquipment::LoadDist::UniformPLR) ||
                        (loadDistType == DataZoneEquipment::LoadDist::SequentialUniformPLR)) {
                 // init each sequenced demand to the zone design load in order to get available capacities from equipment
+                // SpaceHB TODO: This may need more work
                 if (energy.TotalOutputRequired >= 0.0) {
                     energy.SequencedOutputRequired = state.dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
                 } else {
@@ -3851,8 +3894,6 @@ void InitSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool con
     }
 
     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum);
-
-    DistributeSystemOutputRequired(state, ZoneNum, FirstHVACIteration);
 }
 
 void DistributeSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool const FirstHVACIteration)
@@ -3869,8 +3910,31 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bo
         return;
     }
 
-    auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
-    auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
+    distributeOutputRequired(state,
+                             ZoneNum,
+                             state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum),
+                             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum),
+                             FirstHVACIteration);
+    // SpaceHB TODO: This may need more work
+    if (state.dataHeatBal->doSpaceHeatBalance) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            distributeOutputRequired(state,
+                                     ZoneNum,
+                                     state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum),
+                                     state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum),
+                                     FirstHVACIteration,
+                                     spaceNum);
+        }
+    }
+}
+
+void distributeOutputRequired(EnergyPlusData &state,
+                              int const ZoneNum,
+                              DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                              DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                              bool const FirstHVACIteration,
+                              int spaceNum)
+{
     auto &thisZEqList(state.dataZoneEquip->ZoneEquipList(ZoneNum));
     Real64 heatLoadRatio = 1.0;
     Real64 coolLoadRatio = 1.0;
