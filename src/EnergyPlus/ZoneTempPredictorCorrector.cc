@@ -3018,12 +3018,6 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
 
         for (auto &e : state.dataHeatBal->Zone)
             e.NoHeatToReturnAir = false;
-        for (auto &e : state.dataZoneTempPredictorCorrector->zoneHeatBalance)
-            e.ZoneT1 = 0.0;
-        if (state.dataHeatBal->doSpaceHeatBalance) {
-            for (auto &e : state.dataZoneTempPredictorCorrector->spaceHeatBalance)
-                e.ZoneT1 = 0.0;
-        }
         state.dataHeatBalFanSys->PreviousMeasuredZT1 = 0.0;     // Hybrid modeling
         state.dataHeatBalFanSys->PreviousMeasuredZT2 = 0.0;     // Hybrid modeling
         state.dataHeatBalFanSys->PreviousMeasuredZT3 = 0.0;     // Hybrid modeling
@@ -3188,6 +3182,7 @@ void ZoneSpaceHeatBalanceData::beginEnvironmentInit(EnergyPlusData &state)
     this->TempDepZnLd = 0.0;
     this->ZoneAirRelHum = 0.0;
     this->AirPowerCap = 0.0;
+    this->ZoneT1 = 0.0;
 }
 
 void ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name)
@@ -7127,11 +7122,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     // Calculate the predicted system load for a time step.
 
     assert(zoneNum > 0);
-    auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-    auto &thisTempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
-    auto &thisZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);
-    auto &thisZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum);
-    auto &thisDeadBandOrSetBack = state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum);
+    auto const &thisZone = state.dataHeatBal->Zone(zoneNum);
+    Real64 &thisTempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
+    Real64 const thisZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);
+    Real64 const thisZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum);
+    bool &thisDeadBandOrSetBack = state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum);
 
     thisDeadBandOrSetBack = false;
     Real64 ZoneSetPoint = 0.0;
@@ -7487,13 +7482,13 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber).TempSetPoint = ZoneSetPoint;
     }
 
-    if (ZoneSetPoint > state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneSetPointLast) {
+    if (ZoneSetPoint > this->ZoneSetPointLast) {
         state.dataZoneEnergyDemand->Setback(zoneNum) = true;
     } else {
         state.dataZoneEnergyDemand->Setback(zoneNum) = false;
     }
 
-    state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneSetPointLast = ZoneSetPoint;
+    this->ZoneSetPointLast = ZoneSetPoint;
     thisTempZoneThermostatSetPoint = ZoneSetPoint; // needed to fix Issue # 5048
     state.dataZoneEnergyDemand->CurDeadBandOrSetback(zoneNum) = thisDeadBandOrSetBack;
 
