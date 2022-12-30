@@ -7123,12 +7123,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
 
     assert(zoneNum > 0);
     auto const &thisZone = state.dataHeatBal->Zone(zoneNum);
-    Real64 &thisTempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
+    Real64 const thisTempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
     Real64 const thisZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);
     Real64 const thisZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum);
-    bool &thisDeadBandOrSetBack = state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum);
 
-    thisDeadBandOrSetBack = false;
+    bool thisDeadBandOrSetBack = false;
     Real64 ZoneSetPoint = 0.0;
     Real64 totalLoad = 0.0;
     Real64 LoadToHeatingSetPoint = 0.0;
@@ -7482,14 +7481,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber).TempSetPoint = ZoneSetPoint;
     }
 
-    if (ZoneSetPoint > this->ZoneSetPointLast) {
-        state.dataZoneEnergyDemand->Setback(zoneNum) = true;
-    } else {
-        state.dataZoneEnergyDemand->Setback(zoneNum) = false;
-    }
+    state.dataZoneEnergyDemand->Setback(zoneNum) = (ZoneSetPoint > this->ZoneSetPointLast);
 
     this->ZoneSetPointLast = ZoneSetPoint;
-    thisTempZoneThermostatSetPoint = ZoneSetPoint; // needed to fix Issue # 5048
+    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum) = ZoneSetPoint; // needed to fix Issue # 5048
+    state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum) = thisDeadBandOrSetBack;
     state.dataZoneEnergyDemand->CurDeadBandOrSetback(zoneNum) = thisDeadBandOrSetBack;
 
     // Apply the Zone Multiplier and Load Correction factor as needed
