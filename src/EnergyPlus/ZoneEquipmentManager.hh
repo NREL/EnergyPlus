@@ -114,9 +114,7 @@ namespace ZoneEquipmentManager {
     void distributeOutputRequired(EnergyPlusData &state,
                                   int const ZoneNum,
                                   DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
-                                  DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
-                                  bool const FirstHVACIteration,
-                                  int spaceNum = 0);
+                                  DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture);
 
     void UpdateSystemOutputRequired(EnergyPlusData &state,
                                     int ZoneNum,

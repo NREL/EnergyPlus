@@ -237,12 +237,12 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
             state.dataSize->ZoneEqSizing(ControlledZoneNum).SizingMethod = 0;
             if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
                 for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
-                    auto &thisSpaceSysEnergyDemand = state.dataZoneEnergyDemand->spaceSysEnergyDemand(ControlledZoneNum);
+                    auto &thisSpaceSysEnergyDemand = state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum);
                     thisSpaceSysEnergyDemand.NumZoneEquipment = ZoneEquipCount;
                     thisSpaceSysEnergyDemand.SequencedOutputRequired.allocate(ZoneEquipCount);
                     thisSpaceSysEnergyDemand.SequencedOutputRequiredToHeatingSP.allocate(ZoneEquipCount);
                     thisSpaceSysEnergyDemand.SequencedOutputRequiredToCoolingSP.allocate(ZoneEquipCount);
-                    auto &thisSpaceSysMoistureDemand = state.dataZoneEnergyDemand->spaceSysMoistureDemand(ControlledZoneNum);
+                    auto &thisSpaceSysMoistureDemand = state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum);
                     thisSpaceSysMoistureDemand.NumZoneEquipment = ZoneEquipCount;
                     thisSpaceSysMoistureDemand.SequencedOutputRequired.allocate(ZoneEquipCount);
                     thisSpaceSysMoistureDemand.SequencedOutputRequiredToHumidSP.allocate(ZoneEquipCount);
@@ -3910,20 +3910,15 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bo
         return;
     }
 
-    distributeOutputRequired(state,
-                             ZoneNum,
-                             state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum),
-                             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum),
-                             FirstHVACIteration);
+    distributeOutputRequired(
+        state, ZoneNum, state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum), state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
     // SpaceHB TODO: This may need more work
     if (state.dataHeatBal->doSpaceHeatBalance) {
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             distributeOutputRequired(state,
                                      ZoneNum,
                                      state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum),
-                                     state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum),
-                                     FirstHVACIteration,
-                                     spaceNum);
+                                     state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum));
         }
     }
 }
@@ -3931,9 +3926,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bo
 void distributeOutputRequired(EnergyPlusData &state,
                               int const ZoneNum,
                               DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
-                              DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
-                              bool const FirstHVACIteration,
-                              int spaceNum)
+                              DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture)
 {
     auto &thisZEqList(state.dataZoneEquip->ZoneEquipList(ZoneNum));
     Real64 heatLoadRatio = 1.0;
