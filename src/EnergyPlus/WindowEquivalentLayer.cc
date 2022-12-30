@@ -664,7 +664,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
-    using General::InterpSw;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyTdpFnWPb;
     using ScheduleManager::GetCurrentScheduleValue;

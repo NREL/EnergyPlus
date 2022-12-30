@@ -2411,7 +2411,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
     // Using/Aliasing
     using DaylightingDevices::TransTDD;
-    using General::InterpSw;
     using General::POLYF;
     using SolarShading::CalcInteriorSolarDistribution;
     using namespace DataWindowEquivalentLayer;
@@ -3469,7 +3468,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     FrontDiffTrans = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTrans(SlatsAngIndexLower),
                                                                             state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTrans(SlatsAngIndexUpper),
                                                                             SlatsAngInterpFac);
-                                    TBlBmDif = General::InterpProfSlat(
+                                    TBlBmDif = WindowManager::InterpProfSlat(
                                         state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffTrans(SlatsAngIndexLower,
                                                                                               state.dataSurface->SurfWinProfAngIndex(SurfNum)),
                                         state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffTrans(SlatsAngIndexUpper,
@@ -3647,7 +3646,6 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     // (I)BLAST legacy routine QSUN
 
     using DaylightingDevices::DistributeTDDAbsorbedSolar;
-    using General::InterpSw;
     using namespace DataWindowEquivalentLayer;
 
     auto &Surface(state.dataSurface->Surface);
@@ -4108,7 +4106,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
             if (ShadeFlag != WinShadingType::SwitchableGlazing) {
                 SUM1 += thisSurf.Area * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
             } else { // Switchable glazing
-                SUM1 += thisSurf.Area * General::InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
+                SUM1 += thisSurf.Area * WindowManager::InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
                                                           thisConstruct.InsideAbsorpThermal,
                                                           state.dataConstruction->Construct(thisSurf.activeShadedConstruction).InsideAbsorpThermal);
             }
@@ -4246,7 +4244,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                         // Switchable glazing
                         if (ShadeFlag == WinShadingType::SwitchableGlazing)
                             AbsDiffLayWin =
-                                General::InterpSw(SwitchFac, AbsDiffLayWin, state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(Lay));
+                                WindowManager::InterpSw(SwitchFac, AbsDiffLayWin, state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(Lay));
 
                         AbsDiffTotWin += AbsDiffLayWin;
                     }
@@ -4282,7 +4280,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                     // Switchable glazing
 
                     if (ShadeFlag == WinShadingType::SwitchableGlazing)
-                        TransDiffWin = General::InterpSw(SwitchFac, TransDiffWin, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
+                        TransDiffWin = WindowManager::InterpSw(SwitchFac, TransDiffWin, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
 
                     SUM1 += thisSurf.Area * (TransDiffWin + AbsDiffTotWin + DiffAbsShade);
 
