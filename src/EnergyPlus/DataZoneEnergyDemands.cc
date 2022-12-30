@@ -95,39 +95,61 @@ void ZoneSystemMoistureDemand::beginEnvironmentInit()
     this->ZoneMoisturePredictedHumSPRate = 0.0;
     this->ZoneMoisturePredictedDehumSPRate = 0.0;
 }
-void ZoneSystemSensibleDemand::setUpOutputVars(
-    EnergyPlusData &state, std::string_view prefix, std::string_view name, int const zoneMult, int const listMult, bool const staged)
+void ZoneSystemSensibleDemand::setUpOutputVars(EnergyPlusData &state,
+                                               std::string_view prefix,
+                                               std::string_view name,
+                                               bool const staged,
+                                               bool const attachMeters,
+                                               int const zoneMult,
+                                               int const listMult)
 {
-    SetupOutputVariable(state,
-                        format("{} Air System Sensible Heating Energy", prefix),
-                        OutputProcessor::Unit::J,
-                        this->ZoneSNLoadHeatEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
-                        name,
-                        _,
-                        "ENERGYTRANSFER",
-                        "Heating",
-                        _,
-                        "Building",
-                        name,
-                        zoneMult,
-                        listMult);
-    SetupOutputVariable(state,
-                        format("{} Air System Sensible Cooling Energy", prefix),
-                        OutputProcessor::Unit::J,
-                        this->ZoneSNLoadCoolEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
-                        name,
-                        _,
-                        "ENERGYTRANSFER",
-                        "Cooling",
-                        _,
-                        "Building",
-                        name,
-                        zoneMult,
-                        listMult);
+    if (attachMeters) {
+        SetupOutputVariable(state,
+                            format("{} Air System Sensible Heating Energy", prefix),
+                            OutputProcessor::Unit::J,
+                            this->ZoneSNLoadHeatEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "Heating",
+                            _,
+                            "Building",
+                            name,
+                            zoneMult,
+                            listMult);
+        SetupOutputVariable(state,
+                            format("{} Air System Sensible Cooling Energy", prefix),
+                            OutputProcessor::Unit::J,
+                            this->ZoneSNLoadCoolEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "Cooling",
+                            _,
+                            "Building",
+                            name,
+                            zoneMult,
+                            listMult);
+    } else {
+        SetupOutputVariable(state,
+                            format("{} Air System Sensible Heating Energy", prefix),
+                            OutputProcessor::Unit::J,
+                            this->ZoneSNLoadHeatEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name);
+        SetupOutputVariable(state,
+                            format("{} Air System Sensible Cooling Energy", prefix),
+                            OutputProcessor::Unit::J,
+                            this->ZoneSNLoadCoolEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            name);
+    }
     SetupOutputVariable(state,
                         format("{} Air System Sensible Heating Rate", prefix),
                         OutputProcessor::Unit::W,
@@ -202,9 +224,10 @@ void ZoneSystemSensibleDemand::setUpOutputVars(
 void ZoneSystemMoistureDemand::setUpOutputVars(EnergyPlusData &state,
                                                std::string_view prefix,
                                                std::string_view name,
+                                               [[maybe_unused]] bool const staged,
+                                               [[maybe_unused]] bool const attachMeters,
                                                [[maybe_unused]] int const zoneMult,
-                                               [[maybe_unused]] int const listMult,
-                                               [[maybe_unused]] bool staged)
+                                               [[maybe_unused]] int const listMult)
 {
     if (state.dataHeatBal->DoLatentSizing) {
         SetupOutputVariable(state,
@@ -371,6 +394,4 @@ void ZoneSystemMoistureDemand::reportMoistLoadsZoneMultiplier(
         }
     }
 }
-
-void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
 } // namespace EnergyPlus::DataZoneEnergyDemands

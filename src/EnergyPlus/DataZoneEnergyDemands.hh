@@ -74,8 +74,8 @@ namespace DataZoneEnergyDemands {
 
         virtual void beginEnvironmentInit() = 0;
 
-        virtual void
-        setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name, int zoneMult, int listMult, bool staged) = 0;
+        virtual void setUpOutputVars(
+            EnergyPlusData &state, std::string_view prefix, std::string_view name, bool staged, bool attachMeters, int zoneMult, int listMult) = 0;
     };
 
     struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
@@ -103,7 +103,13 @@ namespace DataZoneEnergyDemands {
 
         void beginEnvironmentInit() override;
 
-        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name, int zoneMult, int listMult, bool staged) override;
+        void setUpOutputVars(EnergyPlusData &state,
+                             std::string_view prefix,
+                             std::string_view name,
+                             bool staged,
+                             bool attachMeters,
+                             int zoneMult,
+                             int listMult) override;
 
         void reportZoneAirSystemSensibleLoads(EnergyPlusData &state, Real64 SNLoad);
 
@@ -141,9 +147,10 @@ namespace DataZoneEnergyDemands {
         void setUpOutputVars(EnergyPlusData &state,
                              std::string_view prefix,
                              std::string_view name,
-                             [[maybe_unused]] int zoneMult,
-                             [[maybe_unused]] int listMult,
-                             [[maybe_unused]] bool staged) override;
+                             [[maybe_unused]] bool staged = false,
+                             [[maybe_unused]] bool attachMeters = false,
+                             [[maybe_unused]] int zoneMult = 0,
+                             [[maybe_unused]] int listMult = 0) override;
 
         void reportZoneAirSystemMoistureLoads(EnergyPlusData &state, Real64 latentGain, Real64 sensibleLoad, Real64 vaporPressureDiff);
 

@@ -2817,28 +2817,28 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
                 staged = state.dataZoneCtrls->StageZoneLogic(zoneNum);
             }
+            // If not doSpaceHeatBalanceSimulation then meter zones, not spaces
+            bool attachMeters = !state.dataHeatBal->doSpaceHeatBalanceSimulation;
             state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).setUpOutputVars(
-                state, DataStringGlobals::zonePrefix, thisZone.Name, thisZone.Multiplier, thisZone.ListMultiplier, staged);
+                state, DataStringGlobals::zonePrefix, thisZone.Name, staged, attachMeters, thisZone.Multiplier, thisZone.ListMultiplier);
             if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+                // If doSpaceHeatBalanceSimulation then meter spaces, not zones
+                attachMeters = state.dataHeatBal->doSpaceHeatBalanceSimulation;
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                     state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).setUpOutputVars(state,
                                                                                                DataStringGlobals::spacePrefix,
                                                                                                state.dataHeatBal->space(spaceNum).Name,
+                                                                                               staged,
+                                                                                               attachMeters,
                                                                                                thisZone.Multiplier,
-                                                                                               thisZone.ListMultiplier,
-                                                                                               staged);
+                                                                                               thisZone.ListMultiplier);
                 }
             }
-            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum).setUpOutputVars(
-                state, DataStringGlobals::zonePrefix, thisZone.Name, thisZone.Multiplier, thisZone.ListMultiplier, staged);
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum).setUpOutputVars(state, DataStringGlobals::zonePrefix, thisZone.Name);
             if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                    state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum).setUpOutputVars(state,
-                                                                                                 DataStringGlobals::spacePrefix,
-                                                                                                 state.dataHeatBal->space(spaceNum).Name,
-                                                                                                 thisZone.Multiplier,
-                                                                                                 thisZone.ListMultiplier,
-                                                                                                 staged);
+                    state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum).setUpOutputVars(
+                        state, DataStringGlobals::spacePrefix, state.dataHeatBal->space(spaceNum).Name);
                 }
             }
             SetupOutputVariable(state,
