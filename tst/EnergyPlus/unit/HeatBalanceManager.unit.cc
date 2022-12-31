@@ -339,8 +339,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
 
     bool ErrorsFound(false); // If errors detected in input
 
-    state->dataHeatBal->TotMaterials = 3;
-    for (int i = 1; i <= state->dataHeatBal->TotMaterials; i++) {
+    state->dataMaterial->TotMaterials = 3;
+    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
         Material::MaterialProperties *p = new Material::MaterialProperties;
         state->dataMaterial->Material.push_back(p);
     }
@@ -355,7 +355,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
 
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
-    state->dataHeatBal->NominalR.allocate(state->dataHeatBal->TotMaterials);
+    state->dataHeatBal->NominalR.allocate(state->dataMaterial->TotMaterials);
     state->dataHeatBal->NominalR(1) = 0.4; // Set these explicity for each material layer to avoid random failures of check for
                                            // NominalRforNominalUCalculation == 0.0 at end of GetConstructData
     state->dataHeatBal->NominalR(2) = 0.4;
@@ -1856,7 +1856,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     // skip call to get material data since this doesn't use IRT
     ErrorsFound = false;
-    EXPECT_EQ(state->dataHeatBal->TotMaterials, 0);
+    EXPECT_EQ(state->dataMaterial->TotMaterials, 0);
 
     // get constructions
     ErrorsFound = false;

@@ -945,7 +945,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(1, state->dataHeatBal->TotMaterials);
+    EXPECT_EQ(1, state->dataMaterial->TotMaterials);
     EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1)->Group, Material::MaterialGroup::WindowSimpleGlazing));
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
@@ -1984,7 +1984,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         }
     }
     // get venetian blind material index
-    for (int i = 1; i <= state->dataHeatBal->TotMaterials; i++) {
+    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
         if (state->dataMaterial->Material(i)->Group == Material::MaterialGroup::BlindEquivalentLayer) {
             VBMatNum = i;
             break;

@@ -352,6 +352,7 @@ namespace Material {
 struct MaterialData : BaseGlobalStruct
 {
     EPVector<Material::MaterialProperties *> Material;
+    int TotMaterials = 0; // Total number of unique materials (layers) in this simulation
 
     void clear_state() override
     {

@@ -878,7 +878,7 @@ namespace PlantPipingSystemsManager {
             // Get slab material properties
             if (thisDomain.SlabInGradeFlag) {
                 thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                    state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.SlabMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" + state.dataIPShortCut->cAlphaArgs(6));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
@@ -907,7 +907,7 @@ namespace PlantPipingSystemsManager {
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
                 thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(8), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                    state.dataIPShortCut->cAlphaArgs(8), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=" + state.dataIPShortCut->cAlphaArgs(8));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
@@ -956,7 +956,7 @@ namespace PlantPipingSystemsManager {
             // Get vertical insulation material properties
             if (thisDomain.VertInsPresentFlag) {
                 thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(11), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                    state.dataIPShortCut->cAlphaArgs(11), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + "=" + state.dataIPShortCut->cAlphaArgs(11));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
@@ -1286,7 +1286,7 @@ namespace PlantPipingSystemsManager {
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
                 thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                    state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" + state.dataIPShortCut->cAlphaArgs(6));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
@@ -1341,7 +1341,7 @@ namespace PlantPipingSystemsManager {
                     ErrorsFound = true;
                 }
                 thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(10), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                    state.dataIPShortCut->cAlphaArgs(10), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + "=" + state.dataIPShortCut->cAlphaArgs(10));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);

@@ -209,7 +209,7 @@ namespace HeatBalFiniteDiffManager {
 
         auto &MaterialFD = state.dataHeatBalFiniteDiffMgr->MaterialFD;
 
-        MaterialFD.allocate(state.dataHeatBal->TotMaterials);
+        MaterialFD.allocate(state.dataMaterial->TotMaterials);
 
         // Load the additional CondFD Material properties
         cCurrentModuleObject = "MaterialProperty:PhaseChange"; // Phase Change Information First
@@ -387,7 +387,7 @@ namespace HeatBalFiniteDiffManager {
             }
         }
 
-        for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
+        for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
             if (MaterialFD(MaterNum).numTempEnth == 0) {
                 MaterialFD(MaterNum).numTempEnth = 3;
                 MaterialFD(MaterNum).TempEnth.dimension(2, 3, -100.0);

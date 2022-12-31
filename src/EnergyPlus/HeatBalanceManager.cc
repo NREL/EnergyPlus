@@ -1528,7 +1528,7 @@ namespace HeatBalanceManager {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
         state.dataHeatBal->W5GapMatEQL = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
 
-        state.dataHeatBal->TotMaterials =
+        state.dataMaterial->TotMaterials =
             RegMat + RegRMat + AirMat + state.dataHeatBal->W5GlsMat + state.dataHeatBal->W5GlsMatAlt + state.dataHeatBal->W5GasMat +
             state.dataHeatBal->W5GasMatMixture + state.dataHeatBal->TotShades + state.dataHeatBal->TotScreens + state.dataHeatBal->TotBlinds +
             EcoRoofMat + IRTMat + state.dataHeatBal->TotSimpleWindow + state.dataHeatBal->TotComplexShades + state.dataHeatBal->TotComplexGaps +
@@ -1548,16 +1548,16 @@ namespace HeatBalanceManager {
 
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
             // Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
-            state.dataHeatBal->TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
+            state.dataMaterial->TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
 
-        for (int i = 1; i <= state.dataHeatBal->TotMaterials; i++) {
+        for (int i = 1; i <= state.dataMaterial->TotMaterials; i++) {
             Material::MaterialProperties *p = new Material::MaterialProperties;
             state.dataMaterial->Material.push_back(p);
         }
-        state.dataHeatBalMgr->UniqueMaterialNames.reserve(static_cast<unsigned>(state.dataHeatBal->TotMaterials));
+        state.dataHeatBalMgr->UniqueMaterialNames.reserve(static_cast<unsigned>(state.dataMaterial->TotMaterials));
 
-        state.dataHeatBal->NominalR.dimension(state.dataHeatBal->TotMaterials, 0.0);
+        state.dataHeatBal->NominalR.dimension(state.dataMaterial->TotMaterials, 0.0);
 
         MaterNum = 0;
 
@@ -4024,7 +4024,7 @@ namespace HeatBalanceManager {
             constexpr const char *Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
             constexpr const char *Format_702(" Material:Air,{},{:.4R}\n");
 
-            for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
+            for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
 
                 auto *thisMaterial = state.dataMaterial->Material(MaterNum);
                 switch (thisMaterial->Group) {
@@ -4053,7 +4053,7 @@ namespace HeatBalanceManager {
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
-            for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
+            for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
                 auto *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) continue;
                 SetupEMSActuator(state,
@@ -7104,24 +7104,24 @@ namespace HeatBalanceManager {
                                "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
                                    " from the Window5 data file cannot be used because of above errors");
 
-            TotMaterialsPrev = state.dataHeatBal->TotMaterials;
+            TotMaterialsPrev = state.dataMaterial->TotMaterials;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 NGaps(IGlSys) = NGlass(IGlSys) - 1;
-                state.dataHeatBal->TotMaterials += NGlass(IGlSys) + NGaps(IGlSys);
+                state.dataMaterial->TotMaterials += NGlass(IGlSys) + NGaps(IGlSys);
             }
 
             // Create Material objects
 
             // reallocate Material type
 
-            for (int i = 1; i <= state.dataHeatBal->TotMaterials; i++) {
+            for (int i = 1; i <= state.dataMaterial->TotMaterials; i++) {
                 Material::MaterialProperties *p = new Material::MaterialProperties;
                 state.dataMaterial->Material.push_back(p);
             }
-            state.dataHeatBal->NominalR.redimension(state.dataHeatBal->TotMaterials, 0.0);
+            state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials, 0.0);
 
             // Initialize new materials
-            for (loop = TotMaterialsPrev + 1; loop <= state.dataHeatBal->TotMaterials; ++loop) {
+            for (loop = TotMaterialsPrev + 1; loop <= state.dataMaterial->TotMaterials; ++loop) {
                 state.dataMaterial->Material(loop)->Name = "";
                 state.dataMaterial->Material(loop)->Group = Material::MaterialGroup::Invalid;
                 state.dataMaterial->Material(loop)->Roughness = DataSurfaces::SurfaceRoughness::Invalid;

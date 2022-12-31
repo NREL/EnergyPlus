@@ -2044,7 +2044,6 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotCrossMixing = 0;     // Total Cross Mixing Statementsn instances after expansion to spaces
     int TotRefDoorMixing = 0;   // Total RefrigerationDoor Mixing Statements in input
     int TotBBHeat = 0;          // Total BBHeat Statements instances after expansion to spaces
-    int TotMaterials = 0;       // Total number of unique materials (layers) in this simulation
     int TotConstructs = 0;      // Total number of unique constructions in this simulation
     int TotSpectralData = 0;    // Total window glass spectral data sets
     int W5GlsMat = 0;           // Window5 Glass Materials, specified by transmittance and front and back reflectance

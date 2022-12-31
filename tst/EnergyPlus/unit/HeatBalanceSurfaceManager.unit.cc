@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
 
     state->dataSurface->TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
-    state->dataHeatBal->TotMaterials = 1;
+    state->dataMaterial->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
@@ -294,7 +294,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    for (int i = 1; i <= state->dataHeatBal->TotMaterials; i++) {
+    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
         Material::MaterialProperties *p = new Material::MaterialProperties;
         state->dataMaterial->Material.push_back(p);
     }
@@ -3160,7 +3160,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
 
     state->dataSurface->TotSurfaces = 2;
     state->dataGlobal->NumOfZones = 2;
-    state->dataHeatBal->TotMaterials = 1;
+    state->dataMaterial->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataViewFactor->NumOfSolarEnclosures = 2;
 

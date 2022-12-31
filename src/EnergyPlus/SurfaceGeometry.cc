@@ -9646,7 +9646,7 @@ namespace SurfaceGeometry {
             windowShadingControl.getInputShadedConstruction = UtilityRoutines::FindItemInList(
                 state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
             windowShadingControl.ShadingDevice = UtilityRoutines::FindItemInPtrList(
-                state.dataIPShortCut->cAlphaArgs(9), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                state.dataIPShortCut->cAlphaArgs(9), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
             windowShadingControl.Schedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             windowShadingControl.SetPoint = state.dataIPShortCut->rNumericArgs(2);
             windowShadingControl.SetPoint2 = state.dataIPShortCut->rNumericArgs(3);
@@ -10182,7 +10182,7 @@ namespace SurfaceGeometry {
             state.dataSurface->StormWindow(StormWinNum).BaseWindowNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum = UtilityRoutines::FindItemInPtrList(
-                state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
             state.dataSurface->StormWindow(StormWinNum).StormWinDistance = state.dataIPShortCut->rNumericArgs(1);
             state.dataSurface->StormWindow(StormWinNum).MonthOn = state.dataIPShortCut->rNumericArgs(2);
             state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn = state.dataIPShortCut->rNumericArgs(3);
@@ -11615,7 +11615,7 @@ namespace SurfaceGeometry {
             SurfNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             MaterNum = UtilityRoutines::FindItemInPtrList(
-                state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
             auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType =
@@ -13510,12 +13510,12 @@ namespace SurfaceGeometry {
     {
         int mmDistance = int(1000 * distance); // Thickness of air gap in mm (usually between storm window and rest of window)
         std::string MatNameStAir = namePrefix + format("{}MM", mmDistance); // Name of created air layer material
-        int newAirMaterial = UtilityRoutines::FindItemInPtrList(MatNameStAir, state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+        int newAirMaterial = UtilityRoutines::FindItemInPtrList(MatNameStAir, state.dataMaterial->Material, state.dataMaterial->TotMaterials);
         if (newAirMaterial == 0) {
             // Create new material
-            state.dataHeatBal->TotMaterials = state.dataHeatBal->TotMaterials + 1;
-            newAirMaterial = state.dataHeatBal->TotMaterials;
-            for (int i = 1; i <= state.dataHeatBal->TotMaterials; i++) {
+            state.dataMaterial->TotMaterials = state.dataMaterial->TotMaterials + 1;
+            newAirMaterial = state.dataMaterial->TotMaterials;
+            for (int i = 1; i <= state.dataMaterial->TotMaterials; i++) {
                 Material::MaterialProperties *p = new Material::MaterialProperties;
                 state.dataMaterial->Material.push_back(p);
             }

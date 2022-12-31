@@ -4519,7 +4519,7 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     if (!state.dataGlobal->AnySurfPropOverridesInModel) return; // quick return if nothing has ever needed to be done
 
     // first, loop over materials
-    for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
+    for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
         auto *thisMaterial = state.dataMaterial->Material(MaterNum);
         if (thisMaterial->AbsorpSolarEMSOverrideOn) {
             thisMaterial->AbsorpSolar = max(min(thisMaterial->AbsorpSolarEMSOverride, 0.9999), 0.0001);
