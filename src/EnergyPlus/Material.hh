@@ -292,6 +292,7 @@ namespace Material {
         Real64 EmissThermalBack;                                // Back side thermal or infrared Emissivity
         Real64 TausThermal;                                     // Thermal transmittance (front and back)
         GapVentType gapVentType;                                // Gap Ven type for equivalent Layer window model
+        std::string gapVentName;                                // name of gap vent type
         bool ISPleatedDrape;                                    // if pleated drape= true, if nonpleated drape = false
         Real64 PleatedDrapeWidth;                               // width of the pleated drape fabric section
         Real64 PleatedDrapeLength;                              // length of the pleated drape fabric section

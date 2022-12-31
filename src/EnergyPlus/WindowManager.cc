@@ -7569,19 +7569,13 @@ namespace WindowManager {
                                   thisMaterial->EmissThermalBack);
                         } break;
                         case Material::MaterialGroup::GapEquivalentLayer: {
-                            gapVentType = "Sealed";
-                            if (thisMaterial->gapVentType == Material::GapVentType::VentedIndoor) {
-                                gapVentType = "VentedIndoor";
-                            } else if (thisMaterial->gapVentType == Material::GapVentType::VentedOutdoor) {
-                                gapVentType = "VentedOutdoor";
-                            }
                             static constexpr std::string_view Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
                             print(state.files.eio,
                                   Format_713,
                                   thisMaterial->Name,
                                   GasTypeName(static_cast<int>(thisMaterial->gasTypes(1))),
                                   thisMaterial->Thickness,
-                                  gapVentType);
+                                  thisMaterial->gapVentName);
                         } break;
                         default:
                             break;
