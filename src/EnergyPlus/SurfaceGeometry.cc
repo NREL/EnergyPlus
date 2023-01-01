@@ -7743,7 +7743,8 @@ namespace SurfaceGeometry {
             }
             alpF++;
             if (state.dataSurface->Surface(Found).Class != SurfaceClass::Floor) {
-                ShowWarningError(state, format("{}: , surface is not a floor surface", cCurrentModuleObject, state.dataSurface->Surface(Found).Name));
+                ShowWarningError(state,
+                                 format("{}: {}, surface is not a floor surface", cCurrentModuleObject, state.dataSurface->Surface(Found).Name));
                 ShowContinueError(state, format("{} will not be used", cCurrentModuleObject));
                 continue;
             }
@@ -7789,7 +7790,7 @@ namespace SurfaceGeometry {
                     data.useDetailedExposedPerimeter = false;
                 } else {
                     ShowWarningError(state,
-                                     format("{}: {},  set as calculation method, but a value has been set for {}. This value will be ignored.",
+                                     format("{}: {}, {} set as calculation method, but a value has been set for {}. This value will be ignored.",
                                             cCurrentModuleObject,
                                             state.dataSurface->Surface(Found).Name,
                                             calculationMethod,
