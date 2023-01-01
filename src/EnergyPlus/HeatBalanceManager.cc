@@ -2607,7 +2607,7 @@ namespace HeatBalanceManager {
                 // Get gap vent type
                 thisMaterial->gapVentType = static_cast<Material::GapVentType>(
                     getEnumerationValue(Material::GapVentTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
-                thisMaterial->gapVentName = MaterialNames(3);
+                thisMaterial->gapVentName = Material::GapVentTypeTC[static_cast<int>(thisMaterial->gapVentType)];
             }
 
             if (gasType == Material::GasType::Custom) {
