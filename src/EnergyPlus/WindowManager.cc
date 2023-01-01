@@ -7163,7 +7163,6 @@ namespace WindowManager {
         std::string SpectralDataName;
         std::string OpticalDataType;
         std::string SlateOrientation;
-        std::string gapVentType;
 
         ScanForReports(state, "Constructions", state.dataWindowManager->DoReport, "Constructions");
 
