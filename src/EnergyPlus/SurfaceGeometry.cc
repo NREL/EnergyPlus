@@ -7750,8 +7750,20 @@ namespace SurfaceGeometry {
             }
 
             // Choose calculation method
-            std::string calculationMethod = state.dataIPShortCut->cAlphaArgs(alpF);
-            if (calculationMethod != "TOTALEXPOSEDPERIMETER" && calculationMethod != "EXPOSEDPERIMETERFRACTION" && calculationMethod != "BYSEGMENT") {
+
+            enum class CalculationMethod
+            {
+                Invalid = -1,
+                TotalExposedPerimeter,
+                ExposedPerimeterFraction,
+                Bysegment,
+                Num
+            };
+
+            constexpr std::array<std::string_view, static_cast<int>(CalculationMethod::Num)> CalculationMethodUC = {
+                "TOTALEXPOSEDPERIMETER", "EXPOSEDPERIMETERFRACTION", "BYSEGMENT"};
+            CalculationMethod calculationMethod = static_cast<CalculationMethod>(getEnumerationValue(CalculationMethodUC, state.dataIPShortCut->cAlphaArgs(alpF)));
+            if (calculationMethod != CalculationMethod::TotalExposedPerimeter && calculationMethod != CalculationMethod::ExposedPerimeterFraction && calculationMethod != CalculationMethod::Bysegment) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", {} is not a valid choice for {}",
                                        cCurrentModuleObject,
@@ -7766,7 +7778,7 @@ namespace SurfaceGeometry {
             data.useDetailedExposedPerimeter = true;
 
             if (!state.dataIPShortCut->lNumericFieldBlanks(numF)) {
-                if (calculationMethod == "TOTALEXPOSEDPERIMETER") {
+                if (calculationMethod == CalculationMethod::TotalExposedPerimeter) {
                     data.exposedFraction = state.dataIPShortCut->rNumericArgs(numF) / state.dataSurface->Surface(Found).Perimeter;
                     if (data.exposedFraction > 1 + tolerance) {
                         ShowWarningError(state,
@@ -7797,7 +7809,7 @@ namespace SurfaceGeometry {
                                             state.dataIPShortCut->cNumericFieldNames(numF)));
                 }
             } else {
-                if (calculationMethod == "TOTALEXPOSEDPERIMETER") {
+                if (calculationMethod == CalculationMethod::TotalExposedPerimeter) {
                     ShowSevereError(state,
                                     format("{}: {}, {} set as calculation method, but no value has been set for {}",
                                            cCurrentModuleObject,
@@ -7810,7 +7822,7 @@ namespace SurfaceGeometry {
             numF++;
 
             if (!state.dataIPShortCut->lNumericFieldBlanks(numF)) {
-                if (calculationMethod == "EXPOSEDPERIMETERFRACTION") {
+                if (calculationMethod == CalculationMethod::ExposedPerimeterFraction) {
                     data.exposedFraction = state.dataIPShortCut->rNumericArgs(numF);
                     data.useDetailedExposedPerimeter = false;
                 } else {
@@ -7822,7 +7834,7 @@ namespace SurfaceGeometry {
                                             state.dataIPShortCut->cNumericFieldNames(numF)));
                 }
             } else {
-                if (calculationMethod == "EXPOSEDPERIMETERFRACTION") {
+                if (calculationMethod == CalculationMethod::ExposedPerimeterFraction) {
                     ShowSevereError(state,
                                     format("{}: {}, {} set as calculation method, but no value has been set for {}",
                                            cCurrentModuleObject,
@@ -7836,7 +7848,7 @@ namespace SurfaceGeometry {
 
             int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF - 1);
             if (numRemainingFields > 0) {
-                if (calculationMethod == "BYSEGMENT") {
+                if (calculationMethod == CalculationMethod::Bysegment) {
                     if (numRemainingFields != (int)state.dataSurface->Surface(Found).Vertex.size()) {
                         ShowSevereError(state,
                                         format("{}: {}, must have equal number of segments as the floor has vertices.{}\" and \"{}\"",
@@ -7879,7 +7891,7 @@ namespace SurfaceGeometry {
                     }
                 }
             } else {
-                if (calculationMethod == "BYSEGMENT") {
+                if (calculationMethod == CalculationMethod::Bysegment) {
                     ShowSevereError(state,
                                     format("{}: {}, {} set as calculation method, but no values have been set for Surface Segments Exposed",
                                            cCurrentModuleObject,
