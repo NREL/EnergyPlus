@@ -695,11 +695,11 @@ namespace AirLoopHVACDOAS {
                         thisDOAS.FanBeforeCoolingCoilFlag = true;
                     }
                     if (InletNodeErrFlag) {
-                        ShowSevereError(state, format("Inlet node number is not found in {} = {}", CurrentModuleObject, std::string{CompName}));
+                        ShowSevereError(state, format("Inlet node number is not found in {} = {}", CurrentModuleObject, CompName));
                         errorsFound = true;
                     }
                     if (OutletNodeErrFlag) {
-                        ShowSevereError(state, format("Outlet node number is not found in {} = {}", CurrentModuleObject, std::string{CompName}));
+                        ShowSevereError(state, format("Outlet node number is not found in {} = {}", CurrentModuleObject, CompName));
                         errorsFound = true;
                     }
                 }
