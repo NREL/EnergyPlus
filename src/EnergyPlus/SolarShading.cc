@@ -6464,43 +6464,38 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                 auto const &thisBlind = state.dataHeatBal->Blind(BlNum);
                 if (VarSlats) {
                     // Used in time step variable reporting
-                    FrontDiffDiffTrans = General::InterpGeneral(thisBlind.SolFrontDiffDiffTrans(SlatsAngIndexLower),
-                                                                thisBlind.SolFrontDiffDiffTrans(SlatsAngIndexUpper),
-                                                                SlatsAngInterpFac);
+                    FrontDiffDiffTrans = General::InterpGeneral(
+                        thisBlind.SolFrontDiffDiffTrans(SlatsAngIndexLower), thisBlind.SolFrontDiffDiffTrans(SlatsAngIndexUpper), SlatsAngInterpFac);
                 } else {
                     FrontDiffDiffTrans = thisBlind.SolFrontDiffDiffTrans(1);
                 }
 
                 if (SunLitFract > 0.0 || SunlitFracWithoutReveal) {
                     if (VarSlats) {
-                        FrontBeamDiffTrans = WindowManager::InterpProfSlat(
-                            thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
-                            thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexLower),
-                            thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexUpper),
-                            thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexUpper),
-                            SlatsAngInterpFac,
-                            ProfAngInterpFac);
-                        FrontBeamAbs =
-                            WindowManager::InterpProfSlat(thisBlind.SolFrontBeamAbs(SlatsAngIndexLower, ProfAngIndexLower),
-                                                          thisBlind.SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexLower),
-                                                          thisBlind.SolFrontBeamAbs(SlatsAngIndexLower, ProfAngIndexUpper),
-                                                          thisBlind.SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                                          SlatsAngInterpFac,
-                                                          ProfAngInterpFac);
+                        FrontBeamDiffTrans = WindowManager::InterpProfSlat(thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                           thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                           thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                           thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                           SlatsAngInterpFac,
+                                                                           ProfAngInterpFac);
+                        FrontBeamAbs = WindowManager::InterpProfSlat(thisBlind.SolFrontBeamAbs(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                     thisBlind.SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                     thisBlind.SolFrontBeamAbs(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                     thisBlind.SolFrontBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                     SlatsAngInterpFac,
+                                                                     ProfAngInterpFac);
                         if (ShadeFlag != WinShadingType::ExtBlind) { // FRONT: interior or bg blinds
                             FrontDiffDiffRefl = General::InterpGeneral(thisBlind.SolFrontDiffDiffRefl(SlatsAngIndexLower),
                                                                        thisBlind.SolFrontDiffDiffRefl(SlatsAngIndexUpper),
                                                                        SlatsAngInterpFac);
-                            FrontDiffAbs = General::InterpGeneral(thisBlind.SolFrontDiffAbs(SlatsAngIndexLower),
-                                                                  thisBlind.SolFrontDiffAbs(SlatsAngIndexUpper),
-                                                                  SlatsAngInterpFac);
-                            FrontBeamDiffRefl = WindowManager::InterpProfSlat(
-                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexLower),
-                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexLower),
-                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexUpper),
-                                thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                SlatsAngInterpFac,
-                                ProfAngInterpFac);
+                            FrontDiffAbs = General::InterpGeneral(
+                                thisBlind.SolFrontDiffAbs(SlatsAngIndexLower), thisBlind.SolFrontDiffAbs(SlatsAngIndexUpper), SlatsAngInterpFac);
+                            FrontBeamDiffRefl = WindowManager::InterpProfSlat(thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                              thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                              thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                              thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                              SlatsAngInterpFac,
+                                                                              ProfAngInterpFac);
                         }
                         if (ShadeFlag != WinShadingType::IntBlind) { // BACK: exterior or bg blinds
                             BackDiffDiffTrans = General::InterpGeneral(thisBlind.SolBackDiffDiffTrans(SlatsAngIndexLower),
@@ -6509,35 +6504,30 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             BackDiffDiffRefl = General::InterpGeneral(thisBlind.SolBackDiffDiffRefl(SlatsAngIndexLower),
                                                                       thisBlind.SolBackDiffDiffRefl(SlatsAngIndexUpper),
                                                                       SlatsAngInterpFac);
-                            BackDiffAbs = General::InterpGeneral(thisBlind.SolBackDiffAbs(SlatsAngIndexLower),
-                                                                 thisBlind.SolBackDiffAbs(SlatsAngIndexUpper),
-                                                                 SlatsAngInterpFac);
-                            BackBeamDiffTrans = WindowManager::InterpProfSlat(
-                                thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
-                                thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexLower),
-                                thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexUpper),
-                                thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                SlatsAngInterpFac,
-                                ProfAngInterpFac);
-                            BackBeamDiffRefl = WindowManager::InterpProfSlat(
-                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexLower),
-                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexLower),
-                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexUpper),
-                                thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                SlatsAngInterpFac,
-                                ProfAngInterpFac);
-                            BackBeamAbs =
-                                WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLower, ProfAngIndexLower),
-                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexLower),
-                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexLower, ProfAngIndexUpper),
-                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
-                                                              SlatsAngInterpFac,
-                                                              ProfAngInterpFac);
+                            BackDiffAbs = General::InterpGeneral(
+                                thisBlind.SolBackDiffAbs(SlatsAngIndexLower), thisBlind.SolBackDiffAbs(SlatsAngIndexUpper), SlatsAngInterpFac);
+                            BackBeamDiffTrans = WindowManager::InterpProfSlat(thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                              thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                              thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                              thisBlind.SolBackBeamDiffTrans(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                              SlatsAngInterpFac,
+                                                                              ProfAngInterpFac);
+                            BackBeamDiffRefl = WindowManager::InterpProfSlat(thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                             thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                             thisBlind.SolBackBeamDiffRefl(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                             thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                             SlatsAngInterpFac,
+                                                                             ProfAngInterpFac);
+                            BackBeamAbs = WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLower, ProfAngIndexLower),
+                                                                        thisBlind.SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexLower),
+                                                                        thisBlind.SolBackBeamAbs(SlatsAngIndexLower, ProfAngIndexUpper),
+                                                                        thisBlind.SolBackBeamAbs(SlatsAngIndexUpper, ProfAngIndexUpper),
+                                                                        SlatsAngInterpFac,
+                                                                        ProfAngInterpFac);
                         }
                     } else {
-                        FrontBeamAbs = General::InterpGeneral(thisBlind.SolFrontBeamAbs(1, ProfAngIndexLower),
-                                                              thisBlind.SolFrontBeamAbs(1, ProfAngIndexUpper),
-                                                              ProfAngInterpFac);
+                        FrontBeamAbs = General::InterpGeneral(
+                            thisBlind.SolFrontBeamAbs(1, ProfAngIndexLower), thisBlind.SolFrontBeamAbs(1, ProfAngIndexUpper), ProfAngInterpFac);
                         FrontBeamDiffTrans = General::InterpGeneral(thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexLower),
                                                                     thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexUpper),
                                                                     ProfAngInterpFac);
@@ -6558,9 +6548,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             BackBeamDiffRefl = General::InterpGeneral(thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexLower),
                                                                       thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexUpper),
                                                                       ProfAngInterpFac);
-                            BackBeamAbs = General::InterpGeneral(thisBlind.SolBackBeamAbs(1, ProfAngIndexLower),
-                                                                 thisBlind.SolBackBeamAbs(1, ProfAngIndexUpper),
-                                                                 ProfAngInterpFac);
+                            BackBeamAbs = General::InterpGeneral(
+                                thisBlind.SolBackBeamAbs(1, ProfAngIndexLower), thisBlind.SolBackBeamAbs(1, ProfAngIndexUpper), ProfAngInterpFac);
                         }
                     }
                 }
@@ -7529,13 +7518,13 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     Real64 ProfAngInterpFacBack = state.dataSurface->SurfWinProfAngInterpFac(BackSurfNum);
 
                                     Real64 TGlBmBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef);
-                                    Real64 TBlBmBmBack = WindowManager::BlindBeamBeamTrans(
-                                        ProfAngBack,
-                                        DataGlobalConstants::Pi - SlatAngBack,
-                                        thisBlindBack.SlatWidth,
-                                        thisBlindBack.SlatSeparation,
-                                        thisBlindBack.SlatThickness); // Blind solar back beam-beam transmittance
-                                    Real64 TBlBmDiffBack;                                   // Blind solar back beam-diffuse transmittance
+                                    Real64 TBlBmBmBack =
+                                        WindowManager::BlindBeamBeamTrans(ProfAngBack,
+                                                                          DataGlobalConstants::Pi - SlatAngBack,
+                                                                          thisBlindBack.SlatWidth,
+                                                                          thisBlindBack.SlatSeparation,
+                                                                          thisBlindBack.SlatThickness); // Blind solar back beam-beam transmittance
+                                    Real64 TBlBmDiffBack;                                               // Blind solar back beam-diffuse transmittance
                                     if (state.dataSurface->SurfWinMovableSlats(BackSurfNum)) {
                                         TBlBmDiffBack = WindowManager::InterpProfSlat(
                                             thisBlind.SolBackBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
@@ -7545,10 +7534,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                             SlatsAngInterpFacBack,
                                             ProfAngInterpFacBack);
                                     } else {
-                                        TBlBmDiffBack =
-                                            General::InterpGeneral(thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexLowerBack),
-                                                                   thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexUpperBack),
-                                                                   ProfAngInterpFacBack);
+                                        TBlBmDiffBack = General::InterpGeneral(thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexLowerBack),
+                                                                               thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexUpperBack),
+                                                                               ProfAngInterpFacBack);
                                     }
 
                                     if (ShadeFlagBack == WinShadingType::IntBlind) {
@@ -7557,18 +7545,16 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 AbsBlFront; // Blind solar front beam absorptance
                                         Real64 AbsBlBack;  // Blind solar back beam absorptance
                                         if (state.dataSurface->SurfWinMovableSlats(BackSurfNum)) {
-                                            FrontDiffDiffRefl =
-                                                General::InterpGeneral(thisBlindBack.SolFrontDiffDiffRefl(
-                                                                           state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum)),
-                                                                       thisBlindBack.SolFrontDiffDiffRefl(std::min(
-                                                                           MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
-                                                                       state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
-                                            FrontDiffAbs =
-                                                General::InterpGeneral(thisBlindBack.SolFrontDiffAbs(
-                                                                           state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum)),
-                                                                       thisBlindBack.SolFrontDiffAbs(std::min(
-                                                                           MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
-                                                                       state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
+                                            FrontDiffDiffRefl = General::InterpGeneral(
+                                                thisBlindBack.SolFrontDiffDiffRefl(state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum)),
+                                                thisBlindBack.SolFrontDiffDiffRefl(
+                                                    std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
+                                                state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
+                                            FrontDiffAbs = General::InterpGeneral(
+                                                thisBlindBack.SolFrontDiffAbs(state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum)),
+                                                thisBlindBack.SolFrontDiffAbs(
+                                                    std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
+                                                state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
                                             RhoBlFront = WindowManager::InterpProfSlat(
                                                 thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
                                                 thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
@@ -7583,29 +7569,25 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                 thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
                                                 SlatsAngInterpFacBack,
                                                 ProfAngInterpFacBack);
-                                            AbsBlBack = WindowManager::InterpProfSlat(
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                        } else {
-                                            FrontDiffDiffRefl =
-                                                thisBlindBack.SolFrontDiffDiffRefl(1); // Blind solar front beam reflectance
-                                            FrontDiffAbs = thisBlindBack.SolFrontDiffAbs(1);
-                                            RhoBlFront =
-                                                General::InterpGeneral(thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexLowerBack),
-                                                                       thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexUpperBack),
-                                                                       ProfAngInterpFacBack);
-                                            AbsBlFront =
-                                                General::InterpGeneral(thisBlind.SolFrontBeamAbs(1, ProfAngIndexLowerBack),
-                                                                       thisBlind.SolFrontBeamAbs(1, ProfAngIndexUpperBack),
-                                                                       ProfAngInterpFacBack);
                                             AbsBlBack =
-                                                General::InterpGeneral(thisBlind.SolBackBeamAbs(1, ProfAngIndexLowerBack),
-                                                                       thisBlind.SolBackBeamAbs(1, ProfAngIndexUpperBack),
-                                                                       ProfAngInterpFacBack);
+                                                WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                              SlatsAngInterpFacBack,
+                                                                              ProfAngInterpFacBack);
+                                        } else {
+                                            FrontDiffDiffRefl = thisBlindBack.SolFrontDiffDiffRefl(1); // Blind solar front beam reflectance
+                                            FrontDiffAbs = thisBlindBack.SolFrontDiffAbs(1);
+                                            RhoBlFront = General::InterpGeneral(thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexLowerBack),
+                                                                                thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexUpperBack),
+                                                                                ProfAngInterpFacBack);
+                                            AbsBlFront = General::InterpGeneral(thisBlind.SolFrontBeamAbs(1, ProfAngIndexLowerBack),
+                                                                                thisBlind.SolFrontBeamAbs(1, ProfAngIndexUpperBack),
+                                                                                ProfAngInterpFacBack);
+                                            AbsBlBack = General::InterpGeneral(thisBlind.SolBackBeamAbs(1, ProfAngIndexLowerBack),
+                                                                               thisBlind.SolBackBeamAbs(1, ProfAngIndexUpperBack),
+                                                                               ProfAngInterpFacBack);
                                         }
 
                                         Real64 RhoBlDiffFront = FrontDiffDiffRefl; // Glazing system solar back beam-beam reflectance
@@ -7668,26 +7650,23 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                 thisBlind.SolBackBeamDiffRefl(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
                                                 SlatsAngInterpFacBack,
                                                 ProfAngInterpFacBack);
-                                            AbsBlBack = WindowManager::InterpProfSlat(
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
-                                        } else {
-                                            RhoBlBack =
-                                                General::InterpGeneral(thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexLowerBack),
-                                                                       thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexUpperBack),
-                                                                       ProfAngInterpFacBack);
-                                            RhoBlBmDifBk =
-                                                General::InterpGeneral(thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexLowerBack),
-                                                                       thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexUpperBack),
-                                                                       ProfAngInterpFacBack);
                                             AbsBlBack =
-                                                General::InterpGeneral(thisBlind.SolBackBeamAbs(1, ProfAngIndexLowerBack),
-                                                                       thisBlind.SolBackBeamAbs(1, ProfAngIndexUpperBack),
-                                                                       ProfAngInterpFacBack);
+                                                WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                              SlatsAngInterpFacBack,
+                                                                              ProfAngInterpFacBack);
+                                        } else {
+                                            RhoBlBack = General::InterpGeneral(thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexLowerBack),
+                                                                               thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexUpperBack),
+                                                                               ProfAngInterpFacBack);
+                                            RhoBlBmDifBk = General::InterpGeneral(thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexLowerBack),
+                                                                                  thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexUpperBack),
+                                                                                  ProfAngInterpFacBack);
+                                            AbsBlBack = General::InterpGeneral(thisBlind.SolBackBeamAbs(1, ProfAngIndexLowerBack),
+                                                                               thisBlind.SolBackBeamAbs(1, ProfAngIndexUpperBack),
+                                                                               ProfAngInterpFacBack);
                                         }
 
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
@@ -7741,30 +7720,24 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                                                            thisBlindBack.SlatSeparation,
                                                                                            thisBlindBack.SlatThickness);
 
-                                        Real64 tfshBdk =
-                                            General::InterpGeneral(thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexLowerBack),
-                                                                   thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexUpperBack),
-                                                                   ProfAngInterpFacBack);
-                                        Real64 tbshBdk =
-                                            General::InterpGeneral(thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexLowerBack),
-                                                                   thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexUpperBack),
-                                                                   ProfAngInterpFacBack);
-                                        Real64 rfshBk =
-                                            General::InterpGeneral(thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexLowerBack),
-                                                                   thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexUpperBack),
-                                                                   ProfAngInterpFacBack);
-                                        Real64 rbshBk =
-                                            General::InterpGeneral(thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexLowerBack),
-                                                                   thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexUpperBack),
-                                                                   ProfAngInterpFacBack);
-                                        Real64 afshBk =
-                                            General::InterpGeneral(thisBlind.SolFrontBeamAbs(1, ProfAngIndexLowerBack),
-                                                                   thisBlind.SolFrontBeamAbs(1, ProfAngIndexUpperBack),
-                                                                   ProfAngInterpFacBack);
-                                        Real64 abshBk =
-                                            General::InterpGeneral(thisBlind.SolBackBeamAbs(1, ProfAngIndexLowerBack),
-                                                                   thisBlind.SolBackBeamAbs(1, ProfAngIndexUpperBack),
-                                                                   ProfAngInterpFacBack);
+                                        Real64 tfshBdk = General::InterpGeneral(thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexLowerBack),
+                                                                                thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexUpperBack),
+                                                                                ProfAngInterpFacBack);
+                                        Real64 tbshBdk = General::InterpGeneral(thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexLowerBack),
+                                                                                thisBlind.SolBackBeamDiffTrans(1, ProfAngIndexUpperBack),
+                                                                                ProfAngInterpFacBack);
+                                        Real64 rfshBk = General::InterpGeneral(thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexLowerBack),
+                                                                               thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexUpperBack),
+                                                                               ProfAngInterpFacBack);
+                                        Real64 rbshBk = General::InterpGeneral(thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexLowerBack),
+                                                                               thisBlind.SolBackBeamDiffRefl(1, ProfAngIndexUpperBack),
+                                                                               ProfAngInterpFacBack);
+                                        Real64 afshBk = General::InterpGeneral(thisBlind.SolFrontBeamAbs(1, ProfAngIndexLowerBack),
+                                                                               thisBlind.SolFrontBeamAbs(1, ProfAngIndexUpperBack),
+                                                                               ProfAngInterpFacBack);
+                                        Real64 abshBk = General::InterpGeneral(thisBlind.SolBackBeamAbs(1, ProfAngIndexLowerBack),
+                                                                               thisBlind.SolBackBeamAbs(1, ProfAngIndexUpperBack),
+                                                                               ProfAngInterpFacBack);
                                         Real64 tfshdk = thisBlindBack.SolFrontDiffDiffTrans(1);
                                         Real64 rfshdk = thisBlindBack.SolFrontDiffDiffRefl(1);
                                         Real64 afshdk = thisBlindBack.SolFrontDiffAbs(1);
@@ -7772,30 +7745,24 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 rbshdk = thisBlindBack.SolBackDiffDiffRefl(1);
                                         Real64 abshdk = thisBlindBack.SolBackDiffAbs(1);
                                         if (state.dataSurface->SurfWinMovableSlats(BackSurfNum)) {
-                                            tfshdk = General::InterpGeneral(
-                                                thisBlindBack.SolFrontDiffDiffTrans(SlatsAngIndexLowerBack),
-                                                thisBlindBack.SolFrontDiffDiffTrans(SlatsAngIndexUpperBack),
-                                                SlatsAngInterpFacBack);
-                                            rfshdk = General::InterpGeneral(
-                                                thisBlindBack.SolFrontDiffDiffRefl(SlatsAngIndexLowerBack),
-                                                thisBlindBack.SolFrontDiffDiffRefl(SlatsAngIndexUpperBack),
-                                                SlatsAngInterpFacBack);
-                                            afshdk =
-                                                General::InterpGeneral(thisBlindBack.SolFrontDiffAbs(SlatsAngIndexLowerBack),
-                                                                       thisBlindBack.SolFrontDiffAbs(SlatsAngIndexUpperBack),
-                                                                       SlatsAngInterpFacBack);
-                                            tbshdk = General::InterpGeneral(
-                                                thisBlindBack.SolBackDiffDiffTrans(SlatsAngIndexLowerBack),
-                                                thisBlindBack.SolBackDiffDiffTrans(SlatsAngIndexUpperBack),
-                                                SlatsAngInterpFacBack);
-                                            rbshdk = General::InterpGeneral(
-                                                thisBlindBack.SolBackDiffDiffRefl(SlatsAngIndexLowerBack),
-                                                thisBlindBack.SolBackDiffDiffRefl(SlatsAngIndexUpperBack),
-                                                SlatsAngInterpFacBack);
-                                            abshdk =
-                                                General::InterpGeneral(thisBlindBack.SolBackDiffAbs(SlatsAngIndexLowerBack),
-                                                                       thisBlindBack.SolBackDiffAbs(SlatsAngIndexUpperBack),
-                                                                       SlatsAngInterpFacBack);
+                                            tfshdk = General::InterpGeneral(thisBlindBack.SolFrontDiffDiffTrans(SlatsAngIndexLowerBack),
+                                                                            thisBlindBack.SolFrontDiffDiffTrans(SlatsAngIndexUpperBack),
+                                                                            SlatsAngInterpFacBack);
+                                            rfshdk = General::InterpGeneral(thisBlindBack.SolFrontDiffDiffRefl(SlatsAngIndexLowerBack),
+                                                                            thisBlindBack.SolFrontDiffDiffRefl(SlatsAngIndexUpperBack),
+                                                                            SlatsAngInterpFacBack);
+                                            afshdk = General::InterpGeneral(thisBlindBack.SolFrontDiffAbs(SlatsAngIndexLowerBack),
+                                                                            thisBlindBack.SolFrontDiffAbs(SlatsAngIndexUpperBack),
+                                                                            SlatsAngInterpFacBack);
+                                            tbshdk = General::InterpGeneral(thisBlindBack.SolBackDiffDiffTrans(SlatsAngIndexLowerBack),
+                                                                            thisBlindBack.SolBackDiffDiffTrans(SlatsAngIndexUpperBack),
+                                                                            SlatsAngInterpFacBack);
+                                            rbshdk = General::InterpGeneral(thisBlindBack.SolBackDiffDiffRefl(SlatsAngIndexLowerBack),
+                                                                            thisBlindBack.SolBackDiffDiffRefl(SlatsAngIndexUpperBack),
+                                                                            SlatsAngInterpFacBack);
+                                            abshdk = General::InterpGeneral(thisBlindBack.SolBackDiffAbs(SlatsAngIndexLowerBack),
+                                                                            thisBlindBack.SolBackDiffAbs(SlatsAngIndexUpperBack),
+                                                                            SlatsAngInterpFacBack);
                                             tfshBdk = WindowManager::InterpProfSlat(
                                                 thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
                                                 thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
@@ -7831,13 +7798,13 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                 thisBlind.SolFrontBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
                                                 SlatsAngInterpFacBack,
                                                 ProfAngInterpFacBack);
-                                            abshBk = WindowManager::InterpProfSlat(
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
-                                                thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
-                                                SlatsAngInterpFacBack,
-                                                ProfAngInterpFacBack);
+                                            abshBk =
+                                                WindowManager::InterpProfSlat(thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexLowerBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexLowerBack, ProfAngIndexUpperBack),
+                                                                              thisBlind.SolBackBeamAbs(SlatsAngIndexUpperBack, ProfAngIndexUpperBack),
+                                                                              SlatsAngInterpFacBack,
+                                                                              ProfAngInterpFacBack);
                                         }
 
                                         Real64 ABlBack;

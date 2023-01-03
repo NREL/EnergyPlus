@@ -7762,8 +7762,10 @@ namespace SurfaceGeometry {
 
             constexpr std::array<std::string_view, static_cast<int>(CalculationMethod::Num)> CalculationMethodUC = {
                 "TOTALEXPOSEDPERIMETER", "EXPOSEDPERIMETERFRACTION", "BYSEGMENT"};
-            CalculationMethod calculationMethod = static_cast<CalculationMethod>(getEnumerationValue(CalculationMethodUC, state.dataIPShortCut->cAlphaArgs(alpF)));
-            if (calculationMethod != CalculationMethod::TotalExposedPerimeter && calculationMethod != CalculationMethod::ExposedPerimeterFraction && calculationMethod != CalculationMethod::Bysegment) {
+            CalculationMethod calculationMethod =
+                static_cast<CalculationMethod>(getEnumerationValue(CalculationMethodUC, state.dataIPShortCut->cAlphaArgs(alpF)));
+            if (calculationMethod != CalculationMethod::TotalExposedPerimeter && calculationMethod != CalculationMethod::ExposedPerimeterFraction &&
+                calculationMethod != CalculationMethod::Bysegment) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", {} is not a valid choice for {}",
                                        cCurrentModuleObject,

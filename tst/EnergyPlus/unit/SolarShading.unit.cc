@@ -3392,7 +3392,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
     bool ErrorsFound = false;
 
     Material::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);                                 // expect no errors

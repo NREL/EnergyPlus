@@ -60,8 +60,8 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -338,7 +338,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data

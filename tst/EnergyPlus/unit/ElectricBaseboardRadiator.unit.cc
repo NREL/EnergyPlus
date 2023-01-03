@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -569,7 +569,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data

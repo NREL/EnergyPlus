@@ -207,7 +207,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     GetZoneEquipmentData(*state);
 
     Material::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);            // expect no errors
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);             // expect no errors

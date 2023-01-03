@@ -890,7 +890,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1432,7 +1432,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1489,7 +1489,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1546,7 +1546,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1603,7 +1603,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1660,7 +1660,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1717,7 +1717,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     errorsFound = false;
     Material::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -3127,7 +3127,7 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
     bool ErrorsFound = false;
 
     Material::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);                                 // expect no errors
@@ -3348,7 +3348,7 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_WeirderShape)
     bool ErrorsFound = false;
 
     Material::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);                                 // expect no errors

@@ -64,8 +64,7 @@ namespace EnergyPlus::Material {
 
 using namespace DataHeatBalance;
 
-constexpr std::array<std::string_view, static_cast<int>(Material::GapVentType::Num)> GapVentTypeNames = {
-    "Sealed", "VentedIndoor", "VentedOutdoor"};
+constexpr std::array<std::string_view, static_cast<int>(Material::GapVentType::Num)> GapVentTypeNames = {"Sealed", "VentedIndoor", "VentedOutdoor"};
 
 void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
 {

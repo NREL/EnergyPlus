@@ -8723,7 +8723,7 @@ namespace WindowManager {
             // blind transmittance to account for reflection and absorption by the slat edges.
             // fEdge is ratio of area subtended by edge of slat to area between tops of adjacent slats.
 
-            Real64 fEdge = 0.0;// Slat edge correction factor
+            Real64 fEdge = 0.0; // Slat edge correction factor
             Real64 fEdge1 = 0.0;
             if (std::abs(std::sin(gamma)) > 0.01) {
                 if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2 && ProfAng <= SlatAng) ||
