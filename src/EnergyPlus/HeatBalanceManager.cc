@@ -2483,12 +2483,12 @@ namespace HeatBalanceManager {
             gasType = thisMaterial->gasTypes(1);
             if ((gasType == Material::GasType::Air) || (gasType == Material::GasType::Argon) || (gasType == Material::GasType::Krypton) ||
                 (gasType == Material::GasType::Xenon)) {
-                thisMaterial->GasWght(1) = GasWght[static_cast<int>(thisMaterial->gasTypes(1))];
-                thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(thisMaterial->gasTypes(1))];
+                thisMaterial->GasWght(1) = GasWght[static_cast<int>(gasType)];
+                thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(1))];
-                    thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(1))];
-                    thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(1))];
+                    thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
                 }
             }
 
@@ -2592,12 +2592,12 @@ namespace HeatBalanceManager {
             gasType = thisMaterial->gasTypes(1);
             if ((gasType == Material::GasType::Air) || (gasType == Material::GasType::Argon) || (gasType == Material::GasType::Krypton) ||
                 (gasType == Material::GasType::Xenon)) {
-                thisMaterial->GasWght(1) = GasWght[static_cast<int>(thisMaterial->gasTypes(1))];
-                thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(thisMaterial->gasTypes(1))];
+                thisMaterial->GasWght(1) = GasWght[static_cast<int>(gasType)];
+                thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(1))];
-                    thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(1))];
-                    thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(1))];
+                    thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
                 }
             }
 
@@ -2705,13 +2705,13 @@ namespace HeatBalanceManager {
                 gasType = thisMaterial->gasTypes(NumGas);
                 if ((gasType == Material::GasType::Air) || (gasType == Material::GasType::Argon) || (gasType == Material::GasType::Krypton) ||
                     (gasType == Material::GasType::Xenon)) {
-                    thisMaterial->GasWght(NumGas) = GasWght[static_cast<int>(thisMaterial->gasTypes(NumGas))];
-                    thisMaterial->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[static_cast<int>(thisMaterial->gasTypes(NumGas))];
+                    thisMaterial->GasWght(NumGas) = GasWght[static_cast<int>(gasType)];
+                    thisMaterial->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[static_cast<int>(gasType)];
                     thisMaterial->GasFract(NumGas) = MaterialProps(2 + NumGas);
                     for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                        thisMaterial->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(NumGas))];
-                        thisMaterial->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(NumGas))];
-                        thisMaterial->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][static_cast<int>(thisMaterial->gasTypes(NumGas))];
+                        thisMaterial->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                        thisMaterial->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                        thisMaterial->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
                     }
                 }
             }
