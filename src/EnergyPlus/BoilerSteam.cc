@@ -200,9 +200,9 @@ namespace BoilerSteam {
             thisBoiler.Name = state.dataIPShortCut->cAlphaArgs(1);
 
             // Validate fuel type input
-            thisBoiler.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            thisBoiler.FuelType = static_cast<DataGlobalConstants::eResource>(
                 getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
-            if (thisBoiler.FuelType == DataGlobalConstants::ResourceType::Invalid) {
+            if (thisBoiler.FuelType == DataGlobalConstants::eResource::Invalid) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\",");

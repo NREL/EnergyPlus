@@ -106,9 +106,9 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         this->alternateMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
     }
     // Validate fuel type input
-    this->compressorFuelType = static_cast<DataGlobalConstants::ResourceType>(
+    this->compressorFuelType = static_cast<DataGlobalConstants::eResource>(
         getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(input_data.compressor_fuel_type)));
-    if (this->compressorFuelType == DataGlobalConstants::ResourceType::Invalid) {
+    if (this->compressorFuelType == DataGlobalConstants::eResource::Invalid) {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");
         errorsFound = true;
@@ -372,7 +372,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
     this->basinHeaterPower *= (1.0 - this->RTF);
     this->electricityConsumption = this->powerUse * reportingConstant;
 
-    if (this->compressorFuelType != DataGlobalConstants::ResourceType::Electricity) {
+    if (this->compressorFuelType != DataGlobalConstants::eResource::Electricity) {
         this->compressorFuelRate = this->powerUse;
         this->compressorFuelConsumption = this->electricityConsumption;
 

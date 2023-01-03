@@ -2415,9 +2415,9 @@ namespace PlantChillers {
             thisChiller.DesignMinExitGasTemp = state.dataIPShortCut->rNumericArgs(24);
 
             // Validate fuel type input
-            thisChiller.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            thisChiller.FuelType = static_cast<DataGlobalConstants::eResource>(
                 getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(12))));
-            if (thisChiller.FuelType == DataGlobalConstants::ResourceType::Invalid) {
+            if (thisChiller.FuelType == DataGlobalConstants::eResource::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(
@@ -4464,9 +4464,9 @@ namespace PlantChillers {
             }
 
             // Fuel Type Case Statement
-            thisChiller.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            thisChiller.FuelType = static_cast<DataGlobalConstants::eResource>(
                 getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
-            if (thisChiller.FuelType == DataGlobalConstants::ResourceType::Invalid) {
+            if (thisChiller.FuelType == DataGlobalConstants::eResource::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(

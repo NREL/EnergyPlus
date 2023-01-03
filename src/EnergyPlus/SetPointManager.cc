@@ -8339,7 +8339,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     Array1D<OutputProcessor::VariableType> VarTypes;                // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes;              // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar;                     // units from enum for each variable
-    std::map<int, DataGlobalConstants::ResourceType> ResourceTypes; // ResourceTypes for each variable
+    std::map<int, DataGlobalConstants::eResource> ResourceTypes; // ResourceTypes for each variable
     Array1D_string EndUses;                                         // EndUses for each variable
     Array1D_string Groups;                                          // Groups for each variable
     Array1D_string Names;                                           // Variable Names for each variable
@@ -8367,7 +8367,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     unitsForVar.allocate(NumVariables);
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::Invalid));
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::eResource>(varN, DataGlobalConstants::eResource::Invalid));
     }
 
     EndUses.allocate(NumVariables);
@@ -8390,7 +8390,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
 
     ResourceTypes.clear();
     for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::Invalid));
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::eResource>(varN, DataGlobalConstants::eResource::Invalid));
     }
 
     EndUses.allocate(NumVariables);
@@ -8421,7 +8421,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
 
         ResourceTypes.clear();
         for (int varN = 1; varN <= NumVariables; ++varN) {
-            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::Invalid));
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::eResource>(varN, DataGlobalConstants::eResource::Invalid));
         }
 
         EndUses.allocate(NumVariables);
@@ -8444,7 +8444,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
 
     ResourceTypes.clear();
     for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::Invalid));
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::eResource>(varN, DataGlobalConstants::eResource::Invalid));
     }
 
     EndUses.allocate(NumVariables);

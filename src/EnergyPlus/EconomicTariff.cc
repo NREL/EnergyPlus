@@ -634,7 +634,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         }
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
-            tariff(iInObj).resourceNum = static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+            tariff(iInObj).resourceNum = static_cast<DataGlobalConstants::eResource>(getEnumerationValue(
                 DataGlobalConstants::ResourceTypeNamesUC,
                 UtilityRoutines::MakeUPPERCase(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
         }
@@ -5042,7 +5042,7 @@ void selectTariff(EnergyPlusData &state)
     MinTariffIndex.deallocate();
 }
 
-void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)
+void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::eResource const inResourceNumber, Array1A<Real64> outMonthlyCosts)
 {
     //       AUTHOR         Jason Glazer
     //       DATE WRITTEN   May 2010

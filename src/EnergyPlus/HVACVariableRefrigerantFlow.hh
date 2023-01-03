@@ -242,7 +242,7 @@ namespace HVACVariableRefrigerantFlow {
         int HRMaxTempLimitIndex = 0;                        // Warning message recurring error index
         int CoolingMaxTempLimitIndex = 0;                   // Warning message recurring error index
         int HeatingMaxTempLimitIndex = 0;                   // Warning message recurring error index
-        DataGlobalConstants::ResourceType FuelTypeNum = DataGlobalConstants::ResourceType::Invalid; // Fuel type number
+        DataGlobalConstants::eResource FuelTypeNum = DataGlobalConstants::eResource::Invalid; // Fuel type number
         Real64 SUMultiplier;                                                                        // exponential timer for mode changes
         Real64 TUCoolingLoad;                                                                       // total TU cooling load for each VRF system
         Real64 TUHeatingLoad;                                                                       // total TU heating load for each VRF system

@@ -129,7 +129,7 @@ TEST_F(EnergyPlusFixture, ICEngineElectricGenerator_Fueltype)
 
     GetICEngineGeneratorInput(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataICEngElectGen->ICEngineGenerator(1).FuelType, DataGlobalConstants::ResourceType::Diesel));
+    EXPECT_TRUE(compare_enums(state->dataICEngElectGen->ICEngineGenerator(1).FuelType, DataGlobalConstants::eResource::Diesel));
 }
 
 } // namespace EnergyPlus

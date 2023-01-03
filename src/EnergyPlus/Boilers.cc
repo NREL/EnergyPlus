@@ -210,9 +210,9 @@ void GetBoilerInput(EnergyPlusData &state)
         thisBoiler.Type = DataPlant::PlantEquipmentType::Boiler_Simple;
 
         // Validate fuel type input
-        thisBoiler.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+        thisBoiler.FuelType = static_cast<DataGlobalConstants::eResource>(
             getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
-        if (thisBoiler.FuelType == DataGlobalConstants::ResourceType::Invalid) {
+        if (thisBoiler.FuelType == DataGlobalConstants::eResource::Invalid) {
             ShowSevereError(
                 state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));

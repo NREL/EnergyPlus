@@ -289,9 +289,9 @@ namespace ICEngineElectricGenerator {
             }
 
             // Validate fuel type input
-            state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType = static_cast<DataGlobalConstants::eResource>(
                 getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(10))));
-            if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == DataGlobalConstants::ResourceType::Invalid) {
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == DataGlobalConstants::eResource::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;

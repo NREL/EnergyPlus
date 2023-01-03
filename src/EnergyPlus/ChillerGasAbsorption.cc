@@ -519,9 +519,9 @@ void GetGasAbsorberInput(EnergyPlusData &state)
         thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(17);
 
         // Validate fuel type input
-        thisChiller.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+        thisChiller.FuelType = static_cast<DataGlobalConstants::eResource>(
             getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(17))));
-        if (thisChiller.FuelType == DataGlobalConstants::ResourceType::Invalid) {
+        if (thisChiller.FuelType == DataGlobalConstants::eResource::Invalid) {
             ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + '=' + state.dataIPShortCut->cAlphaArgs(17));
             ShowContinueError(

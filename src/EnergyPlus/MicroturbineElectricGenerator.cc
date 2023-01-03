@@ -343,9 +343,9 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         // Validate fuel type input
-        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType = static_cast<DataGlobalConstants::ResourceType>(
+        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType = static_cast<DataGlobalConstants::eResource>(
             getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(5))));
-        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == DataGlobalConstants::ResourceType::Invalid) {
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == DataGlobalConstants::eResource::Invalid) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "  = " + AlphArray(5));

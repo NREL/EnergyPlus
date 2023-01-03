@@ -797,9 +797,9 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     // ValidateFuelType tests for WaterHeater:Stratified
     WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, DataGlobalConstants::ResourceType::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, DataGlobalConstants::ResourceType::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, DataGlobalConstants::ResourceType::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.FuelType, DataGlobalConstants::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, DataGlobalConstants::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, DataGlobalConstants::eResource::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -1523,9 +1523,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     // ValidateFuelType tests for WaterHeater:Mixed
     WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, DataGlobalConstants::ResourceType::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, DataGlobalConstants::ResourceType::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, DataGlobalConstants::ResourceType::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.FuelType, DataGlobalConstants::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, DataGlobalConstants::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, DataGlobalConstants::eResource::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
@@ -4220,9 +4220,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, DataGlobalConstants::ResourceType::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, DataGlobalConstants::ResourceType::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, DataGlobalConstants::ResourceType::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, DataGlobalConstants::eResource::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, DataGlobalConstants::eResource::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, DataGlobalConstants::eResource::Steam));
     }
 
     ++HPWaterHeaterNum;

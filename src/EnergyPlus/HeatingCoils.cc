@@ -352,7 +352,7 @@ namespace HeatingCoils {
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
 
             CurrentModuleObject = "Coil:Heating:Electric";
-            heatingCoil.ResourceType = DataGlobalConstants::ResourceType::Electricity;
+            heatingCoil.ResourceType = DataGlobalConstants::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -488,7 +488,7 @@ namespace HeatingCoils {
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
 
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
-            heatingCoil.ResourceType = DataGlobalConstants::ResourceType::Electricity;
+            heatingCoil.ResourceType = DataGlobalConstants::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -675,18 +675,18 @@ namespace HeatingCoils {
             heatingCoil.HeatingCoilModel = "Fuel";
             heatingCoil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
-            heatingCoil.ResourceType = static_cast<DataGlobalConstants::ResourceType>(
+            heatingCoil.ResourceType = static_cast<DataGlobalConstants::eResource>(
                 getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(3))));
-            if (!(heatingCoil.ResourceType == DataGlobalConstants::ResourceType::NaturalGas ||
-                  heatingCoil.ResourceType == DataGlobalConstants::ResourceType::Propane ||
-                  heatingCoil.ResourceType == DataGlobalConstants::ResourceType::Diesel ||
-                  heatingCoil.ResourceType == DataGlobalConstants::ResourceType::Gasoline ||
-                  heatingCoil.ResourceType == DataGlobalConstants::ResourceType::FuelOilNo1 ||
-                  heatingCoil.ResourceType == DataGlobalConstants::ResourceType::FuelOilNo2 ||
-                  heatingCoil.ResourceType == DataGlobalConstants::ResourceType::OtherFuel1 ||
-                  heatingCoil.ResourceType == DataGlobalConstants::ResourceType::OtherFuel2 ||
-                  heatingCoil.ResourceType == DataGlobalConstants::ResourceType::Coal) ||
-                heatingCoil.ResourceType == DataGlobalConstants::ResourceType::Invalid) {
+            if (!(heatingCoil.ResourceType == DataGlobalConstants::eResource::NaturalGas ||
+                  heatingCoil.ResourceType == DataGlobalConstants::eResource::Propane ||
+                  heatingCoil.ResourceType == DataGlobalConstants::eResource::Diesel ||
+                  heatingCoil.ResourceType == DataGlobalConstants::eResource::Gasoline ||
+                  heatingCoil.ResourceType == DataGlobalConstants::eResource::FuelOilNo1 ||
+                  heatingCoil.ResourceType == DataGlobalConstants::eResource::FuelOilNo2 ||
+                  heatingCoil.ResourceType == DataGlobalConstants::eResource::OtherFuel1 ||
+                  heatingCoil.ResourceType == DataGlobalConstants::eResource::OtherFuel2 ||
+                  heatingCoil.ResourceType == DataGlobalConstants::eResource::Coal) ||
+                heatingCoil.ResourceType == DataGlobalConstants::eResource::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}: Invalid {} entered ={} for {}={}",
                                        RoutineName,
@@ -842,7 +842,7 @@ namespace HeatingCoils {
             auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
-            heatingCoil.ResourceType = DataGlobalConstants::ResourceType::NaturalGas;
+            heatingCoil.ResourceType = DataGlobalConstants::eResource::NaturalGas;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -1041,7 +1041,7 @@ namespace HeatingCoils {
             auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
             CurrentModuleObject = "Coil:Heating:Desuperheater";
-            heatingCoil.ResourceType = DataGlobalConstants::ResourceType::Electricity;
+            heatingCoil.ResourceType = DataGlobalConstants::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,

@@ -319,9 +319,9 @@ namespace CTElectricGenerator {
             }
 
             // Validate fuel type input
-            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType = static_cast<DataGlobalConstants::eResource>(
                 getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
-            if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == DataGlobalConstants::ResourceType::Invalid) {
+            if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == DataGlobalConstants::eResource::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
