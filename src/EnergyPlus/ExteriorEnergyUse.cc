@@ -479,7 +479,7 @@ namespace ExteriorEnergyUse {
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr == 0) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                     ShowSevereError(state,
-                                    format("{}{}:  is required, missing for {}={}",
+                                    format("{}{}: {} is required, missing for {}={}",
                                            RoutineName,
                                            cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaFieldNames(3),
