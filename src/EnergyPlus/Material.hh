@@ -110,6 +110,8 @@ namespace Material {
 
     constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
 
+    extern const std::array<std::string_view, static_cast<int>(Material::GapVentType::Num)> GapVentTypeNames;
+
     enum class SlatAngleType
     {
         Invalid = -1,
