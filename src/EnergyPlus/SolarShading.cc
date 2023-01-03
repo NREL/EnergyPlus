@@ -8665,8 +8665,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             ////////////////////////////////////////////////////////////////////
             // SKY AND GROUND DIFFUSE SOLAR GAIN INTO ZONE FROM EXTERIOR WINDOW
             ////////////////////////////////////////////////////////////////////
-            const Real64 minLambda{0.3};
-            const Real64 maxLambda{2.5};
+            constexpr Real64 minLambda{0.3};
+            constexpr Real64 maxLambda{2.5};
             const Real64 Tdiff =
                 aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::T, Side::Front, Scattering::DiffuseDiffuse, Theta, Phi);
             state.dataConstruction->Construct(ConstrNum).TransDiff = Tdiff;
@@ -9471,7 +9471,7 @@ void WindowShadingManager(EnergyPlusData &state)
 
     static Real64 const DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
     static Real64 const DeltaAng_inv(1.0 / DeltaAng);
-    static Real64 const DeltaProfAng(DataGlobalConstants::Pi / 36.0);
+    static Real64 constexpr DeltaProfAng(DataGlobalConstants::Pi / 36.0);
     int IConst; // Construction
 
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {

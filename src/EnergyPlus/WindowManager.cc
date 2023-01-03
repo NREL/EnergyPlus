@@ -8589,7 +8589,7 @@ namespace WindowManager {
         // Linear interpolation.
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
+        Real64 constexpr DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
@@ -8686,7 +8686,7 @@ namespace WindowManager {
         PropArray.dim(MaxSlatAngs, 37);
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaProfAng(DataGlobalConstants::Pi / 36.0);
+        Real64 constexpr DeltaProfAng(DataGlobalConstants::Pi / 36.0);
         Real64 const DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:

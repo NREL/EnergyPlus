@@ -654,8 +654,8 @@ namespace WindowManager {
                 CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
 
             // Report is done for normal incidence
-            const Real64 Theta{0.0};
-            const Real64 Phi{0.0};
+            constexpr Real64 Theta{0.0};
+            constexpr Real64 Phi{0.0};
             const Real64 absCoeff =
                 aLayer->getAbsorptanceLayer(t_Index, FenestrationCommon::Side::Front, FenestrationCommon::ScatteringSimple::Diffuse, Theta, Phi);
             aSolidLayer->setSolarAbsorptance(absCoeff, standardizedRadiationIntensity);
