@@ -110,9 +110,6 @@ namespace Material {
 
     constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
 
-    constexpr std::array<std::string_view, static_cast<int>(Material::GapVentType::Num)> GapVentTypeNames = {
-        "Sealed", "VentedIndoor", "VentedOutdoor"};
-
     enum class SlatAngleType
     {
         Invalid = -1,
@@ -361,6 +358,9 @@ struct MaterialData : BaseGlobalStruct
 
     void clear_state() override
     {
+        for (int i = 0; i < TotMaterials; ++i) {
+            delete Material[i]; //
+        }
         Material.deallocate();
     }
 };
