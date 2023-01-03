@@ -8588,9 +8588,6 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // Return value
-        Real64 InterpProfAng;
-
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
 
@@ -8600,13 +8597,12 @@ namespace WindowManager {
 
         // DeltaAng = Pi/36
         if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-            InterpProfAng = 0.0;
+            return 0.0;
         } else {
             IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
             InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
-            InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
+            return (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
-        return InterpProfAng;
     }
 
     Real64 InterpSlatAng(Real64 const SlatAng,           // Slat angle (rad)
