@@ -7517,6 +7517,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 // of back exterior window with BLIND
                                 if (ANY_BLIND(ShadeFlagBack)) {
                                     int BlNumBack = state.dataSurface->SurfWinBlindNumber(BackSurfNum); // Back surface blind number
+                                    auto const &thisBlindBack = state.dataHeatBal->Blind(BlNumBack);
                                     Real64 ProfAngBack =
                                         state.dataSurface->SurfWinProfileAng(BackSurfNum); // Back window solar profile angle (radians)
 
@@ -7531,9 +7532,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     Real64 TBlBmBmBack = WindowManager::BlindBeamBeamTrans(
                                         ProfAngBack,
                                         DataGlobalConstants::Pi - SlatAngBack,
-                                        state.dataHeatBal->Blind(BlNumBack).SlatWidth,
-                                        state.dataHeatBal->Blind(BlNumBack).SlatSeparation,
-                                        state.dataHeatBal->Blind(BlNumBack).SlatThickness); // Blind solar back beam-beam transmittance
+                                        thisBlindBack.SlatWidth,
+                                        thisBlindBack.SlatSeparation,
+                                        thisBlindBack.SlatThickness); // Blind solar back beam-beam transmittance
                                     Real64 TBlBmDiffBack;                                   // Blind solar back beam-diffuse transmittance
                                     if (state.dataSurface->SurfWinMovableSlats(BackSurfNum)) {
                                         TBlBmDiffBack = WindowManager::InterpProfSlat(
@@ -7557,15 +7558,15 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 AbsBlBack;  // Blind solar back beam absorptance
                                         if (state.dataSurface->SurfWinMovableSlats(BackSurfNum)) {
                                             FrontDiffDiffRefl =
-                                                General::InterpGeneral(state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffRefl(
+                                                General::InterpGeneral(thisBlindBack.SolFrontDiffDiffRefl(
                                                                            state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum)),
-                                                                       state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffRefl(std::min(
+                                                                       thisBlindBack.SolFrontDiffDiffRefl(std::min(
                                                                            MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
                                                                        state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
                                             FrontDiffAbs =
-                                                General::InterpGeneral(state.dataHeatBal->Blind(BlNumBack).SolFrontDiffAbs(
+                                                General::InterpGeneral(thisBlindBack.SolFrontDiffAbs(
                                                                            state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum)),
-                                                                       state.dataHeatBal->Blind(BlNumBack).SolFrontDiffAbs(std::min(
+                                                                       thisBlindBack.SolFrontDiffAbs(std::min(
                                                                            MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
                                                                        state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
                                             RhoBlFront = WindowManager::InterpProfSlat(
@@ -7591,8 +7592,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                 ProfAngInterpFacBack);
                                         } else {
                                             FrontDiffDiffRefl =
-                                                state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffRefl(1); // Blind solar front beam reflectance
-                                            FrontDiffAbs = state.dataHeatBal->Blind(BlNumBack).SolFrontDiffAbs(1);
+                                                thisBlindBack.SolFrontDiffDiffRefl(1); // Blind solar front beam reflectance
+                                            FrontDiffAbs = thisBlindBack.SolFrontDiffAbs(1);
                                             RhoBlFront =
                                                 General::InterpGeneral(thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexLowerBack),
                                                                        thisBlind.SolFrontBeamDiffRefl(1, ProfAngIndexUpperBack),
@@ -7731,14 +7732,14 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 rbd2k = state.dataConstruction->Construct(ConstrNumBack).rbBareSolDiff(2);
                                         Real64 tfshBBk = WindowManager::BlindBeamBeamTrans(ProfAngBack,
                                                                                            SlatAngBack,
-                                                                                           state.dataHeatBal->Blind(BlNumBack).SlatWidth,
-                                                                                           state.dataHeatBal->Blind(BlNumBack).SlatSeparation,
-                                                                                           state.dataHeatBal->Blind(BlNumBack).SlatThickness);
+                                                                                           thisBlindBack.SlatWidth,
+                                                                                           thisBlindBack.SlatSeparation,
+                                                                                           thisBlindBack.SlatThickness);
                                         Real64 tbshBBk = WindowManager::BlindBeamBeamTrans(ProfAngBack,
                                                                                            DataGlobalConstants::Pi - SlatAngBack,
-                                                                                           state.dataHeatBal->Blind(BlNumBack).SlatWidth,
-                                                                                           state.dataHeatBal->Blind(BlNumBack).SlatSeparation,
-                                                                                           state.dataHeatBal->Blind(BlNumBack).SlatThickness);
+                                                                                           thisBlindBack.SlatWidth,
+                                                                                           thisBlindBack.SlatSeparation,
+                                                                                           thisBlindBack.SlatThickness);
 
                                         Real64 tfshBdk =
                                             General::InterpGeneral(thisBlind.SolFrontBeamDiffTrans(1, ProfAngIndexLowerBack),
@@ -7764,36 +7765,36 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                             General::InterpGeneral(thisBlind.SolBackBeamAbs(1, ProfAngIndexLowerBack),
                                                                    thisBlind.SolBackBeamAbs(1, ProfAngIndexUpperBack),
                                                                    ProfAngInterpFacBack);
-                                        Real64 tfshdk = state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffTrans(1);
-                                        Real64 rfshdk = state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffRefl(1);
-                                        Real64 afshdk = state.dataHeatBal->Blind(BlNumBack).SolFrontDiffAbs(1);
-                                        Real64 tbshdk = state.dataHeatBal->Blind(BlNumBack).SolBackDiffDiffTrans(1);
-                                        Real64 rbshdk = state.dataHeatBal->Blind(BlNumBack).SolBackDiffDiffRefl(1);
-                                        Real64 abshdk = state.dataHeatBal->Blind(BlNumBack).SolBackDiffAbs(1);
+                                        Real64 tfshdk = thisBlindBack.SolFrontDiffDiffTrans(1);
+                                        Real64 rfshdk = thisBlindBack.SolFrontDiffDiffRefl(1);
+                                        Real64 afshdk = thisBlindBack.SolFrontDiffAbs(1);
+                                        Real64 tbshdk = thisBlindBack.SolBackDiffDiffTrans(1);
+                                        Real64 rbshdk = thisBlindBack.SolBackDiffDiffRefl(1);
+                                        Real64 abshdk = thisBlindBack.SolBackDiffAbs(1);
                                         if (state.dataSurface->SurfWinMovableSlats(BackSurfNum)) {
                                             tfshdk = General::InterpGeneral(
-                                                state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffTrans(SlatsAngIndexLowerBack),
-                                                state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffTrans(SlatsAngIndexUpperBack),
+                                                thisBlindBack.SolFrontDiffDiffTrans(SlatsAngIndexLowerBack),
+                                                thisBlindBack.SolFrontDiffDiffTrans(SlatsAngIndexUpperBack),
                                                 SlatsAngInterpFacBack);
                                             rfshdk = General::InterpGeneral(
-                                                state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffRefl(SlatsAngIndexLowerBack),
-                                                state.dataHeatBal->Blind(BlNumBack).SolFrontDiffDiffRefl(SlatsAngIndexUpperBack),
+                                                thisBlindBack.SolFrontDiffDiffRefl(SlatsAngIndexLowerBack),
+                                                thisBlindBack.SolFrontDiffDiffRefl(SlatsAngIndexUpperBack),
                                                 SlatsAngInterpFacBack);
                                             afshdk =
-                                                General::InterpGeneral(state.dataHeatBal->Blind(BlNumBack).SolFrontDiffAbs(SlatsAngIndexLowerBack),
-                                                                       state.dataHeatBal->Blind(BlNumBack).SolFrontDiffAbs(SlatsAngIndexUpperBack),
+                                                General::InterpGeneral(thisBlindBack.SolFrontDiffAbs(SlatsAngIndexLowerBack),
+                                                                       thisBlindBack.SolFrontDiffAbs(SlatsAngIndexUpperBack),
                                                                        SlatsAngInterpFacBack);
                                             tbshdk = General::InterpGeneral(
-                                                state.dataHeatBal->Blind(BlNumBack).SolBackDiffDiffTrans(SlatsAngIndexLowerBack),
-                                                state.dataHeatBal->Blind(BlNumBack).SolBackDiffDiffTrans(SlatsAngIndexUpperBack),
+                                                thisBlindBack.SolBackDiffDiffTrans(SlatsAngIndexLowerBack),
+                                                thisBlindBack.SolBackDiffDiffTrans(SlatsAngIndexUpperBack),
                                                 SlatsAngInterpFacBack);
                                             rbshdk = General::InterpGeneral(
-                                                state.dataHeatBal->Blind(BlNumBack).SolBackDiffDiffRefl(SlatsAngIndexLowerBack),
-                                                state.dataHeatBal->Blind(BlNumBack).SolBackDiffDiffRefl(SlatsAngIndexUpperBack),
+                                                thisBlindBack.SolBackDiffDiffRefl(SlatsAngIndexLowerBack),
+                                                thisBlindBack.SolBackDiffDiffRefl(SlatsAngIndexUpperBack),
                                                 SlatsAngInterpFacBack);
                                             abshdk =
-                                                General::InterpGeneral(state.dataHeatBal->Blind(BlNumBack).SolBackDiffAbs(SlatsAngIndexLowerBack),
-                                                                       state.dataHeatBal->Blind(BlNumBack).SolBackDiffAbs(SlatsAngIndexUpperBack),
+                                                General::InterpGeneral(thisBlindBack.SolBackDiffAbs(SlatsAngIndexLowerBack),
+                                                                       thisBlindBack.SolBackDiffAbs(SlatsAngIndexUpperBack),
                                                                        SlatsAngInterpFacBack);
                                             tfshBdk = WindowManager::InterpProfSlat(
                                                 thisBlind.SolFrontBeamDiffTrans(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
