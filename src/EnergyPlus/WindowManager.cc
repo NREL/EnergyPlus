@@ -8588,19 +8588,13 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // FUNCTION PARAMETER DEFINITIONS:
-        Real64 constexpr DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InterpFac; // Interpolation factor
-        int IAlpha;       // Profile angle index
-
         // DeltaAng = Pi/36
         if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
             return 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            Real64 constexpr DeltaAngRad(DataGlobalConstants::Pi / 36.0);                                             // Profile angle increment (rad)
+            int IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);                              // Profile angle index
+            Real64 InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad; // Interpolation factor
             return (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
     }
