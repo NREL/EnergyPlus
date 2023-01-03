@@ -2472,9 +2472,8 @@ namespace HeatBalanceManager {
 
             thisMaterial->Name = MaterialNames(1);
             thisMaterial->NumberOfGasesInMixture = 1;
-            TypeOfGas = MaterialNames(2);
             thisMaterial->gasTypes(1) =
-                static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
+                static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
@@ -2581,10 +2580,9 @@ namespace HeatBalanceManager {
 
             thisMaterial->Name = MaterialNames(1);
             thisMaterial->NumberOfGasesInMixture = 1;
-            TypeOfGas = MaterialNames(2);
             thisMaterial->GasName = TypeOfGas;
             thisMaterial->gasTypes(1) =
-                static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
+                static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
@@ -2689,9 +2687,8 @@ namespace HeatBalanceManager {
             NumGases = MaterialProps(2);
             thisMaterial->NumberOfGasesInMixture = NumGases;
             for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
-                TypeOfGas = state.dataIPShortCut->cAlphaArgs(1 + NumGas);
-                thisMaterial->gasTypes(NumGas) =
-                    static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
+                thisMaterial->gasTypes(NumGas) = static_cast<Material::GasType>(
+                    getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
             }
 
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
