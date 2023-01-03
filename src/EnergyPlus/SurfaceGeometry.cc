@@ -13528,10 +13528,8 @@ namespace SurfaceGeometry {
             // Create new material
             state.dataMaterial->TotMaterials = state.dataMaterial->TotMaterials + 1;
             newAirMaterial = state.dataMaterial->TotMaterials;
-            for (int i = 1; i <= state.dataMaterial->TotMaterials; i++) {
-                Material::MaterialProperties *p = new Material::MaterialProperties;
-                state.dataMaterial->Material.push_back(p);
-            }
+            Material::MaterialProperties *p = new Material::MaterialProperties;
+            state.dataMaterial->Material.push_back(p);
             auto *thisMaterial = state.dataMaterial->Material(state.dataMaterial->TotMaterials);
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
