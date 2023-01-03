@@ -7331,7 +7331,6 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             // from this exterior window since the beam-beam transmittance of shades and diffusing glass
             // is assumed to be zero. The beam-beam transmittance of tubular daylighting devices is also
             // assumed to be zero.
-            auto const &thisBlind = state.dataHeatBal->Blind(BlNum);
             if (SunLitFract > 0.0) {
                 if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowModel::BSDF)
                     if (ANY_SHADE(ShadeFlag) || state.dataSurface->SurfWinSolarDiffusing(SurfNum) ||
@@ -7507,6 +7506,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 if (ANY_BLIND(ShadeFlagBack)) {
                                     int BlNumBack = state.dataSurface->SurfWinBlindNumber(BackSurfNum); // Back surface blind number
                                     auto const &thisBlindBack = state.dataHeatBal->Blind(BlNumBack);
+                                    auto const &thisBlind = state.dataHeatBal->Blind(BlNum);
                                     Real64 ProfAngBack =
                                         state.dataSurface->SurfWinProfileAng(BackSurfNum); // Back window solar profile angle (radians)
 
