@@ -144,7 +144,7 @@ namespace ExteriorEnergyUse {
                           ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber, // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,                     // Fuel Type String
                           std::string &FuelTypeString,                          // Standardized Fuel Type String (for variable naming)
-                          std::string const &CurrentModuleObject,               // object being parsed
+                          std::string_view CurrentModuleObject,                 // object being parsed
                           std::string const &CurrentField,                      // current field being parsed
                           std::string const &CurrentName                        // current object name being parsed
     );
