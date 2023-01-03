@@ -508,7 +508,7 @@ namespace WindowManager {
     {
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = nullptr;
 
-        auto material = getLayerMaterial(state, t_Index);
+        auto *material = getLayerMaterial(state, t_Index);
 
         Material::MaterialGroup matGroup = material->Group;
 
@@ -705,7 +705,7 @@ namespace WindowManager {
             thickness = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
         if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
-            const auto material = getLayerMaterial(state, t_Index);
+            const auto *material = getLayerMaterial(state, t_Index);
             thickness = material->WinShadeToGlassDist;
         }
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
