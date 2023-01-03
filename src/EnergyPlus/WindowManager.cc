@@ -8621,33 +8621,16 @@ namespace WindowManager {
         // Using/Aliasing
         using DataSurfaces::MaxSlatAngs;
 
-        // Return value
-        Real64 InterpSlatAng;
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
-        static Real64 constexpr DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InterpFac; // Interpolation factor
-        int IBeta;        // Slat angle index
-        Real64 SlatAng1;
-
-        if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
-            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
-        } else {
-            SlatAng1 = SlatAng;
-        }
-
         if (VarSlats) { // Variable-angle slats
-            IBeta = 1 + int(SlatAng1 * DeltaAng_inv);
-            InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv;
-            InterpSlatAng = PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
+            Real64 SlatAng1 = std::clamp(SlatAng, 0.0, DataGlobalConstants::Pi);
+            static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+            static Real64 constexpr DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
+            int IBeta = 1 + int(SlatAng1 * DeltaAng_inv);                          // Slat angle index
+            Real64 InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv; // Interpolation factor
+            return PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
         } else { // Fixed-angle slats or shade
-            InterpSlatAng = PropArray(1);
+            return PropArray(1);
         }
-
-        return InterpSlatAng;
     }
 
     Real64 InterpProfSlatAng(Real64 const ProfAng,           // Profile angle (rad)
@@ -8673,61 +8656,38 @@ namespace WindowManager {
         // Using/Aliasing
         using DataSurfaces::MaxSlatAngs;
 
-        // Return value
-        Real64 InterpProfSlatAng;
-
         // Argument array dimensioning
         PropArray.dim(MaxSlatAngs, 37);
 
-        // FUNCTION PARAMETER DEFINITIONS:
+        Real64 SlatAng1 = std::clamp(SlatAng, 0.0, DataGlobalConstants::Pi);
+
+        // This is not correct, fixed 2/17/2010
+        // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
+        Real64 ProfAng1 = std::clamp(ProfAng, -DataGlobalConstants::PiOvr2, DataGlobalConstants::PiOvr2);
+
         Real64 constexpr DeltaProfAng(DataGlobalConstants::Pi / 36.0);
-        Real64 constexpr DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+        int IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1; // Profile angle index
+        Real64 ProfAngRatio =
+            (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng; // Profile angle interpolation factor
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 ProfAngRatio; // Profile angle interpolation factor
-        Real64 SlatAngRatio; // Slat angle interpolation factor
-        int IAlpha;          // Profile angle index
-        int IBeta;           // Slat angle index
-        Real64 Val1;         // Property values at points enclosing the given ProfAngle and SlatAngle
+        Real64 Val1;
         Real64 Val2;
-        Real64 Val3;
-        Real64 Val4;
-        Real64 ValA; // Property values at given SlatAngle to be interpolated in profile angle
-        Real64 ValB;
-        Real64 SlatAng1;
-        Real64 ProfAng1;
-
-        if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
-
-            // This is not correct, fixed 2/17/2010
-            // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-            ProfAng1 = min(max(ProfAng, -DataGlobalConstants::PiOvr2), DataGlobalConstants::PiOvr2);
-        } else {
-            SlatAng1 = SlatAng;
-            ProfAng1 = ProfAng;
-        }
-
-        IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1;
-        ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
-
         if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
-            IBeta = int(SlatAng1 / DeltaSlatAng) + 1;
-            SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng;
-            Val1 = PropArray(IBeta, IAlpha);
+            Real64 constexpr DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+            int IBeta = int(SlatAng1 / DeltaSlatAng) + 1;                                 // Slat angle index
+            Real64 SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng; // Slat angle interpolation factor
+            Val1 = PropArray(IBeta, IAlpha); // Property values at points enclosing the given ProfAngle and SlatAngle
             Val2 = PropArray(min(MaxSlatAngs, IBeta + 1), IAlpha);
-            Val3 = PropArray(IBeta, min(37, IAlpha + 1));
-            Val4 = PropArray(min(MaxSlatAngs, IBeta + 1), min(37, IAlpha + 1));
-            ValA = Val1 + SlatAngRatio * (Val2 - Val1);
-            ValB = Val3 + SlatAngRatio * (Val4 - Val3);
-            InterpProfSlatAng = ValA + ProfAngRatio * (ValB - ValA);
+            Real64 Val3 = PropArray(IBeta, min(37, IAlpha + 1));
+            Real64 Val4 = PropArray(min(MaxSlatAngs, IBeta + 1), min(37, IAlpha + 1));
+            Real64 ValA = Val1 + SlatAngRatio * (Val2 - Val1); // Property values at given SlatAngle to be interpolated in profile angle
+            Real64 ValB = Val3 + SlatAngRatio * (Val4 - Val3);
+            return ValA + ProfAngRatio * (ValB - ValA);
         } else { // Fixed-angle slats: interpolate only in profile angle
             Val1 = PropArray(1, IAlpha);
             Val2 = PropArray(1, min(37, IAlpha + 1));
-            InterpProfSlatAng = Val1 + ProfAngRatio * (Val2 - Val1);
+            return Val1 + ProfAngRatio * (Val2 - Val1);
         }
-
-        return InterpProfSlatAng;
     }
 
     Real64 BlindBeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (rad)
@@ -8750,21 +8710,11 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         // Based on solar profile angle and slat geometry
 
-        // Return value
-        Real64 BlindBeamBeamTrans;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 fEdge;      // Slat edge correction factor
-        Real64 wbar;       // Intermediate variable
-        Real64 gamma;      // Intermediate variable
-        Real64 fEdge1;     // Intermediate variable
-        Real64 CosProfAng; // Cosine of profile angle
-
-        CosProfAng = std::cos(ProfAng);
-        gamma = SlatAng - ProfAng;
-        wbar = SlatSeparation;
+        Real64 CosProfAng = std::cos(ProfAng); // Cosine of profile angle
+        Real64 gamma = SlatAng - ProfAng;
+        Real64 wbar = SlatSeparation;
         if (CosProfAng != 0.0) wbar = SlatWidth * std::cos(gamma) / CosProfAng;
-        BlindBeamBeamTrans = max(0.0, 1.0 - std::abs(wbar / SlatSeparation));
+        Real64 BlindBeamBeamTrans = max(0.0, 1.0 - std::abs(wbar / SlatSeparation));
 
         if (BlindBeamBeamTrans > 0.0) {
 
@@ -8772,8 +8722,8 @@ namespace WindowManager {
             // blind transmittance to account for reflection and absorption by the slat edges.
             // fEdge is ratio of area subtended by edge of slat to area between tops of adjacent slats.
 
-            fEdge = 0.0;
-            fEdge1 = 0.0;
+            Real64 fEdge = 0.0;// Slat edge correction factor
+            Real64 fEdge1 = 0.0;
             if (std::abs(std::sin(gamma)) > 0.01) {
                 if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2 && ProfAng <= SlatAng) ||
                     (SlatAng > DataGlobalConstants::PiOvr2 && SlatAng <= DataGlobalConstants::Pi && ProfAng > -(DataGlobalConstants::Pi - SlatAng)))

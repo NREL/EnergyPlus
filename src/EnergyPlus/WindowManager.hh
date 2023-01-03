@@ -390,17 +390,9 @@ namespace WindowManager {
         // For switchable glazing, calculates a weighted average of properties
         // A and B
 
-        // Return value
-        Real64 InterpSw;
+        Real64 locSwitchFac = std::clamp(SwitchFac, 0.0, 1.0);
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 locSwitchFac;
-
-        locSwitchFac = min(SwitchFac, 1.0);
-        locSwitchFac = max(locSwitchFac, 0.0);
-
-        InterpSw = (1.0 - locSwitchFac) * A + locSwitchFac * B;
-        return InterpSw;
+        return (1.0 - locSwitchFac) * A + locSwitchFac * B;
     }
 
     void ViewFac(Real64 s,         // Slat width (m)
