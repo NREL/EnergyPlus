@@ -96,6 +96,7 @@ namespace Material {
         Num
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> gasTypeNames = {"Custom", "Air", "Argon", "Krypton", "Xenon"};
     constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> GasTypeUC = {"CUSTOM", "AIR", "ARGON", "KRYPTON", "XENON"};
 
     enum class GapVentType
@@ -306,7 +307,6 @@ namespace Material {
         Real64 SlatAngle;                                       // slat angle
         SlatAngleType slatAngleType;                            // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
         DataWindowEquivalentLayer::Orientation SlatOrientation; // horizontal or vertical
-        std::string GasName;                                    // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
         HysteresisPhaseChange::HysteresisPhaseChange *phaseChange = nullptr;
         bool GlassSpectralAndAngle;    // if SpectralAndAngle is an entered choice
         int GlassSpecAngTransDataPtr;  // Data set index of transmittance as a function of spectral and angle associated with a window glass material

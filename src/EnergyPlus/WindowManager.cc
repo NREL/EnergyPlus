@@ -7133,7 +7133,6 @@ namespace WindowManager {
         using WindowComplexManager::UpdateComplexWindows;
 
         static Array1D_string const Roughness({0, 5}, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
-        static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
 
         Real64 TempVar(0.0); // just temporary usage for complex fenestration
 
@@ -7373,7 +7372,7 @@ namespace WindowManager {
                             print(state.files.eio,
                                   Format_702,
                                   thisMaterial->Name,
-                                  GasTypeName(static_cast<int>(thisMaterial->gasTypes(1))),
+                                  Material::gasTypeNames[static_cast<int>(thisMaterial->gasTypes(1))],
                                   thisMaterial->Thickness);
                             //! fw CASE(WindowGasMixture)
                         } break;
@@ -7572,7 +7571,7 @@ namespace WindowManager {
                             print(state.files.eio,
                                   Format_713,
                                   thisMaterial->Name,
-                                  GasTypeName(static_cast<int>(thisMaterial->gasTypes(1))),
+                                  Material::gasTypeNames[static_cast<int>(thisMaterial->gasTypes(1))],
                                   thisMaterial->Thickness,
                                   thisMaterial->gapVentName);
                         } break;

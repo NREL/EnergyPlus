@@ -1473,8 +1473,6 @@ namespace HeatBalanceManager {
         Material::GasType gasType = Material::GasType::Invalid; // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
         int Loop;
         int ICoeff;            // Gas property coefficient index
-        std::string TypeOfGas; // Type of window gas fill (Air, Argon, Krypton, &
-        // Xenon, or Custom
         Real64 MinSlatAngGeom; // Minimum and maximum slat angle allowed by slat geometry (deg)
         Real64 MaxSlatAngGeom;
         Real64 ReflectivitySol;   // Glass reflectivity, solar
@@ -2580,7 +2578,6 @@ namespace HeatBalanceManager {
 
             thisMaterial->Name = MaterialNames(1);
             thisMaterial->NumberOfGasesInMixture = 1;
-            thisMaterial->GasName = TypeOfGas;
             thisMaterial->gasTypes(1) =
                 static_cast<Material::GasType>(getEnumerationValue(Material::GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
