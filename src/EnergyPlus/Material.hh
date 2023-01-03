@@ -110,7 +110,8 @@ namespace Material {
 
     constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
 
-    constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeTC = {"Sealed", "VentedIndoor", "VentedOutdoor"};
+    constexpr std::array<std::string_view, static_cast<int>(Material::GapVentType::Num)> GapVentTypeNames = {
+        "Sealed", "VentedIndoor", "VentedOutdoor"};
 
     enum class SlatAngleType
     {
@@ -295,7 +296,6 @@ namespace Material {
         Real64 EmissThermalBack;                                // Back side thermal or infrared Emissivity
         Real64 TausThermal;                                     // Thermal transmittance (front and back)
         GapVentType gapVentType;                                // Gap Ven type for equivalent Layer window model
-        std::string gapVentName;                                // name of gap vent type
         bool ISPleatedDrape;                                    // if pleated drape= true, if nonpleated drape = false
         Real64 PleatedDrapeWidth;                               // width of the pleated drape fabric section
         Real64 PleatedDrapeLength;                              // length of the pleated drape fabric section

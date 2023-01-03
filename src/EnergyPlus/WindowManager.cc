@@ -74,6 +74,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -7573,7 +7574,7 @@ namespace WindowManager {
                                   thisMaterial->Name,
                                   Material::gasTypeNames[static_cast<int>(thisMaterial->gasTypes(1))],
                                   thisMaterial->Thickness,
-                                  thisMaterial->gapVentName);
+                                  Material::GapVentTypeNames[static_cast<int>(thisMaterial->gapVentType)]);
                         } break;
                         default:
                             break;
