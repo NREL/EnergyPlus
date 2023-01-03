@@ -13521,10 +13521,10 @@ namespace SurfaceGeometry {
         }     // end of loop over storm window objects
     }
 
-    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string namePrefix)
+    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string_view namePrefix)
     {
         int mmDistance = int(1000 * distance); // Thickness of air gap in mm (usually between storm window and rest of window)
-        std::string MatNameStAir = namePrefix + format("{}MM", mmDistance); // Name of created air layer material
+        std::string MatNameStAir = format("{}{}MM", namePrefix, mmDistance); // Name of created air layer material
         int newAirMaterial = UtilityRoutines::FindItemInPtrList(MatNameStAir, state.dataMaterial->Material, state.dataMaterial->TotMaterials);
         if (newAirMaterial == 0) {
             // Create new material
