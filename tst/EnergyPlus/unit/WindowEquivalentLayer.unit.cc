@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
 
     int VBMatNum(0);
@@ -943,7 +943,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, state->dataMaterial->TotMaterials);
     EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1)->Group, Material::MaterialGroup::WindowSimpleGlazing));

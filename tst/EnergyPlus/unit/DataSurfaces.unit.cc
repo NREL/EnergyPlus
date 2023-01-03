@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/Vectors.hh>
 
@@ -163,7 +164,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     EXPECT_FALSE(ErrorsFound);                  // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(*state, ErrorsFound); // read material data
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);            // expect no errors
 
     ErrorsFound = false;

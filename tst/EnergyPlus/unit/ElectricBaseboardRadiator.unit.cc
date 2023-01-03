@@ -60,6 +60,7 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
@@ -273,7 +274,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    Material::GetMaterialData(*state, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
@@ -567,7 +568,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    Material::GetMaterialData(*state, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;

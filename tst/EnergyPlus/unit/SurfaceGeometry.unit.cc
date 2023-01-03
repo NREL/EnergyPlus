@@ -77,6 +77,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::Material;
 
 TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 {
@@ -10019,7 +10020,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 

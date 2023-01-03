@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

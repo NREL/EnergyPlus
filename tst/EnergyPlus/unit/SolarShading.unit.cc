@@ -64,6 +64,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
@@ -630,7 +631,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -1032,7 +1033,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -1446,7 +1447,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -1822,7 +1823,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -2238,7 +2239,7 @@ WindowMaterial:SimpleGlazingSystem,
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -2558,7 +2559,7 @@ WindowMaterial:SimpleGlazingSystem,
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -3109,7 +3110,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -3390,7 +3391,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
 
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
@@ -3842,7 +3843,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state);
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);

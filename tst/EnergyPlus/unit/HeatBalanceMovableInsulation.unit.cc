@@ -265,7 +265,7 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // get schedule data
     ScheduleManager::ProcessScheduleInput(*state);
     // get materials data
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(4, state->dataMaterial->TotMaterials);
     EXPECT_TRUE(compare_enums(state->dataMaterial->Material(4)->Group, Material::MaterialGroup::WindowSimpleGlazing));

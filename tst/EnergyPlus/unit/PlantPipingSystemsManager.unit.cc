@@ -65,7 +65,7 @@
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
-using HeatBalanceManager::GetMaterialData;
+using Material::GetMaterialData;
 using SurfaceGeometry::GetOSCMData;
 
 TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs)

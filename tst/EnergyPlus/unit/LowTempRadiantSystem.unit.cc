@@ -65,6 +65,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -1134,7 +1135,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
-    GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(*state, ErrorsFound);
@@ -2016,7 +2017,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
-    GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(*state, ErrorsFound);
@@ -4649,7 +4650,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
-    GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(*state, ErrorsFound);

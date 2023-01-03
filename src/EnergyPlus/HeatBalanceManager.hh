@@ -99,8 +99,6 @@ namespace HeatBalanceManager {
 
     void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
     void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input

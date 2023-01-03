@@ -310,7 +310,7 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalFiniteDiffManager_skipNotUsedConstruct
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);                                // expect no errors
 
     ErrorsFound = false;
@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);                                // expect no errors
 
     ErrorsFound = false;

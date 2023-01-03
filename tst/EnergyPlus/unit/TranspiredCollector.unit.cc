@@ -60,6 +60,7 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -205,7 +206,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     GetZoneData(*state, ErrorsFound);
     GetZoneEquipmentData(*state);
 
-    GetMaterialData(*state, ErrorsFound); // read material data
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);            // expect no errors
 
     GetConstructData(*state, ErrorsFound); // read construction data

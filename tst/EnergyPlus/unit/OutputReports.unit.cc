@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
@@ -126,7 +127,7 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
+    Material::GetMaterialData(*state, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data

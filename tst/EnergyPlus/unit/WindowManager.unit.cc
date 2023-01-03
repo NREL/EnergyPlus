@@ -74,6 +74,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -472,7 +473,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 
@@ -2531,7 +2532,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::GetWindowGlassSpectralData(*state, FoundError);
     EXPECT_FALSE(FoundError);
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -2731,7 +2732,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 
@@ -3029,7 +3030,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     bool ErrorsFound(false);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(34, 1.0);
@@ -3099,7 +3100,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_found = false;
-    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    Material::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(state->dataHeatBal->ComplexShade(1).Name, "SHADE_14_LAYER");
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ));
@@ -3145,7 +3146,7 @@ TEST_F(EnergyPlusFixture, SetupComplexWindowStateGeometry_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_found = false;
-    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    Material::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
 
     state->dataWindowComplexManager->NumComplexWind = 1;

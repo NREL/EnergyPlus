@@ -147,8 +147,8 @@ Real64 constexpr PhiMin = 0.5 * DPhi;                             // Minimum alt
 Real64 constexpr HCMULT = 100000.0; // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
                                     // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
                                     // to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
-Real64 const sqHCMULT = (HCMULT * HCMULT);    // Square of HCMult used in Homogeneous coordinates
-Real64 const sqHCMULT_fac = (0.5 / sqHCMULT); // ( 0.5 / sqHCMULT ) factor
+Real64 constexpr sqHCMULT = (HCMULT * HCMULT);    // Square of HCMult used in Homogeneous coordinates
+Real64 constexpr sqHCMULT_fac = (0.5 / sqHCMULT); // ( 0.5 / sqHCMULT ) factor
 
 // Parameters for use with the variable OverlapStatus...
 int constexpr NoOverlap = 1;

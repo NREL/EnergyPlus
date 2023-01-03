@@ -350,6 +350,8 @@ namespace Material {
         }
     };
 
+    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
+
 } // namespace Material
 
 struct MaterialData : BaseGlobalStruct

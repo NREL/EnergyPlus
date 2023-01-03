@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -686,7 +687,7 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);

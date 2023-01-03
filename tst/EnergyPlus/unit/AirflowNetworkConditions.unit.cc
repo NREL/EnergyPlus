@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1600,7 +1601,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
+    Material::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
@@ -2324,7 +2325,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
+    Material::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
@@ -2967,7 +2968,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
+    Material::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
@@ -3676,7 +3677,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
+    Material::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
@@ -4330,7 +4331,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
+    Material::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
@@ -5542,7 +5543,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
+    Material::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
@@ -5997,7 +5998,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
+    Material::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
