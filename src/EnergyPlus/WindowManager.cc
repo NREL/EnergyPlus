@@ -8625,8 +8625,8 @@ namespace WindowManager {
         Real64 InterpSlatAng;
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 const DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
-        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
+        static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+        static Real64 constexpr DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
@@ -8681,7 +8681,7 @@ namespace WindowManager {
 
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 constexpr DeltaProfAng(DataGlobalConstants::Pi / 36.0);
-        Real64 const DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+        Real64 constexpr DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ProfAngRatio; // Profile angle interpolation factor

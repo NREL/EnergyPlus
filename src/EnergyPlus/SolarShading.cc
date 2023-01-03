@@ -9469,8 +9469,8 @@ void WindowShadingManager(EnergyPlusData &state)
     using General::POLYF;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    static Real64 const DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
-    static Real64 const DeltaAng_inv(1.0 / DeltaAng);
+    static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+    static Real64 constexpr DeltaAng_inv(1.0 / DeltaAng);
     static Real64 constexpr DeltaProfAng(DataGlobalConstants::Pi / 36.0);
     int IConst; // Construction
 
