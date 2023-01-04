@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -61,8 +62,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::Material {
-
-using namespace DataHeatBalance;
 
 constexpr std::array<std::string_view, static_cast<int>(Material::GapVentType::Num)> GapVentTypeNames = {"Sealed", "VentedIndoor", "VentedOutdoor"};
 
@@ -1120,12 +1119,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         gasType = thisMaterial->gasTypes(1);
         if ((gasType == Material::GasType::Air) || (gasType == Material::GasType::Argon) || (gasType == Material::GasType::Krypton) ||
             (gasType == Material::GasType::Xenon)) {
-            thisMaterial->GasWght(1) = GasWght[static_cast<int>(gasType)];
-            thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+            thisMaterial->GasWght(1) = DataHeatBalance::GasWght[static_cast<int>(gasType)];
+            thisMaterial->GasSpecHeatRatio(1) = DataHeatBalance::GasSpecificHeatRatio[static_cast<int>(gasType)];
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasCon(ICoeff, 1) = DataHeatBalance::GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasVis(ICoeff, 1) = DataHeatBalance::GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasCp(ICoeff, 1) = DataHeatBalance::GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
             }
         }
 
@@ -1228,12 +1227,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         gasType = thisMaterial->gasTypes(1);
         if ((gasType == Material::GasType::Air) || (gasType == Material::GasType::Argon) || (gasType == Material::GasType::Krypton) ||
             (gasType == Material::GasType::Xenon)) {
-            thisMaterial->GasWght(1) = GasWght[static_cast<int>(gasType)];
-            thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+            thisMaterial->GasWght(1) = DataHeatBalance::GasWght[static_cast<int>(gasType)];
+            thisMaterial->GasSpecHeatRatio(1) = DataHeatBalance::GasSpecificHeatRatio[static_cast<int>(gasType)];
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasCon(ICoeff, 1) = DataHeatBalance::GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasVis(ICoeff, 1) = DataHeatBalance::GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasCp(ICoeff, 1) = DataHeatBalance::GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
             }
         }
 
@@ -1339,13 +1338,13 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             gasType = thisMaterial->gasTypes(NumGas);
             if ((gasType == Material::GasType::Air) || (gasType == Material::GasType::Argon) || (gasType == Material::GasType::Krypton) ||
                 (gasType == Material::GasType::Xenon)) {
-                thisMaterial->GasWght(NumGas) = GasWght[static_cast<int>(gasType)];
-                thisMaterial->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+                thisMaterial->GasWght(NumGas) = DataHeatBalance::GasWght[static_cast<int>(gasType)];
+                thisMaterial->GasSpecHeatRatio(NumGas) = DataHeatBalance::GasSpecificHeatRatio[static_cast<int>(gasType)];
                 thisMaterial->GasFract(NumGas) = MaterialProps(2 + NumGas);
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    thisMaterial->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                    thisMaterial->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                    thisMaterial->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasCon(ICoeff, NumGas) = DataHeatBalance::GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasVis(ICoeff, NumGas) = DataHeatBalance::GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasCp(ICoeff, NumGas) = DataHeatBalance::GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
                 }
             }
         }
@@ -2655,7 +2654,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                       Format_701,
                       thisMaterial->Name,
                       thisMaterial->Resistance,
-                      DisplayMaterialRoughness(thisMaterial->Roughness),
+                      DataHeatBalance::DisplayMaterialRoughness(thisMaterial->Roughness),
                       thisMaterial->Thickness,
                       thisMaterial->Conductivity,
                       thisMaterial->Density,
