@@ -98,6 +98,16 @@
 # than uniform.
 
 import licensetext
+import argparse
+
+parser = argparse.ArgumentParser(description='Update the E+ license year.')
+parser.add_argument('-v', '--verbose', dest='verbose', action='store_true',
+                    default=False, help='operate verbosely')
+# Maybe next year
+#parser.add_argument('--update', dest='dryrun', action='store_false',
+#                    default=True, help='update the license year')
+
+args = parser.parse_args()
 
 TOOL_NAME = 'license-update'
 dryrun = True
@@ -125,6 +135,8 @@ if not dryrun:
 else:
     print('Skipping writing out LICENSE.txt')
 
+full_count = 1
+
 # Create C++ Replacer object
 replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
 
@@ -134,6 +146,7 @@ for base in cpp_dirs:
 
 print('\nC++ Summary')
 print(replacer.summary())
+full_count += len(replacer.replaced)
 
 # Get the Python current text
 current = licensetext.current_python()
@@ -151,4 +164,6 @@ for base in python_dirs:
     replacer.visit(base, exclude_patterns=patterns)
 
 print('\nPython Summary')
-print(replacer.summary())
+print(replacer.summary(full_report=args.verbose))
+full_count += len(replacer.replaced)
+print('\nFull count of files: %d' % full_count)
