@@ -774,19 +774,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Obtains data from Zone Sizing and Zone Equipment objects already input.
 
-    int NumOfTimeStepInDay; // number of zone time steps in a day
-    int DesDayNum;          // design day index
-    // unused  INTEGER :: DesDayEnvrnNum   ! design day index
-    int ZoneSizNum;           // zone sizing input index
-    Real64 TotPeopleInZone;   // total (maximum) number of people in a zone
-    int PeopleNum;            // index of People structure
-    Real64 OAFromPeople(0.0); // min OA calculated from zone occupancy [m3/s]
-    Real64 OAFromArea(0.0);   // min OA calculated from zone area and OA flow per area [m3/s]
-    bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
-    Real64 SchMax(0.0);       // maximum people multiplier value
-    Real64 OAVolumeFlowRate;  // outside air flow rate (m3/s)
-    bool UseOccSchFlag;       // flag to use occupancy schedule when calculating OA
-    bool UseMinOASchFlag;     // flag to use min OA schedule when calculating OA
+    bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
     // TODO MJW: Punt for now, sometimes unit test will get here and need these to be allocated, but simulations need them sooner
     if (!state.dataHeatBal->ZoneIntGain.allocated()) {
@@ -796,9 +784,9 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     for (int ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         int ZoneIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
         if (ZoneIndex == 0) {
-            ShowSevereError(state,
-                            "SetUpZoneSizingArrays: Sizing:Zone=\"" + state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName +
-                                "\" references unknown zone");
+            ShowSevereError(
+                state,
+                format("SetUpZoneSizingArrays: Sizing:Zone=\"{}\" references unknown zone", state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName));
             ErrorsFound = true;
         }
         if (std::any_of(state.dataZoneEquip->ZoneEquipConfig.begin(), state.dataZoneEquip->ZoneEquipConfig.end(), [](EquipConfiguration const &e) {
@@ -809,8 +797,8 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             if (ZoneIndex == 0) {
                 if (!state.dataGlobal->isPulseZoneSizing) {
                     ShowWarningError(state,
-                                     "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName +
-                                         "\", Zone is not found in the Controlled Zones List");
+                                     format("SetUpZoneSizingArrays: Requested Sizing for Zone=\"{}\", Zone is not found in the Controlled Zones List",
+                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName));
                 }
             } else {
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneNum = ZoneIndex;
@@ -820,9 +808,9 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 if (!ZoneTempPredictorCorrector::VerifyThermostatInZone(state, state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                     if (!state.dataGlobal->isPulseZoneSizing) {
                         ShowWarningError(state,
-                                         "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" +
-                                             state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName +
-                                             "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)");
+                                         format("SetUpZoneSizingArrays: Requested Sizing for Zone=\"{}\", Zone has no thermostat (ref: "
+                                                "ZoneControl:Thermostat, et al)",
+                                                state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName));
                     }
                 }
             }
@@ -841,7 +829,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->TermUnitFinalZoneSizing.allocate(state.dataSize->NumAirTerminalUnits);
     state.dataSize->DesDayWeath.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-    NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
+    int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
     state.dataZoneEquipmentManager->AvgData.allocate(NumOfTimeStepInDay);
     state.dataSize->CoolPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->HeatPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
@@ -858,7 +846,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->ZoneSizThermSetPtHi = 0.0;
     state.dataSize->ZoneSizThermSetPtLo = 1000.0;
 
-    for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
+    for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
         auto &thisDesDayWeather = state.dataSize->DesDayWeath(DesDayNum);
         thisDesDayWeather.Temp.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         thisDesDayWeather.HumRat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -867,28 +855,31 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         thisDesDayWeather.HumRat = 0.0;
         thisDesDayWeather.Press = 0.0;
     }
+
     // Fill zone sizing arrays from input array
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
         if (!zoneEquipConfig.IsControlled) continue;
 
         // For each Zone Sizing object, find the corresponding controlled zone
-        ZoneSizNum = UtilityRoutines::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+        int ZoneSizNum = UtilityRoutines::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
         auto &zoneSizingInput = (ZoneSizNum > 0) ? state.dataSize->ZoneSizingInput(ZoneSizNum) : state.dataSize->ZoneSizingInput(1);
 
-        for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
+        for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &zoneSizing = state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum);
             auto &calcZoneSizing = state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum);
             zoneSizing.ZoneName = zoneEquipConfig.ZoneName;
             zoneSizing.ZoneNum = CtrlZoneNum;
             calcZoneSizing.ZoneName = zoneEquipConfig.ZoneName;
             calcZoneSizing.ZoneNum = CtrlZoneNum;
-            // LKL I think this is sufficient for warning -- no need for array
-            if (DesDayNum == 1 && ZoneSizNum == 0) {
+
+            if (DesDayNum == 1 && ZoneSizNum == 0) { // LKL I think this is sufficient for warning -- no need for array
                 if (!state.dataGlobal->isPulseZoneSizing) {
-                    ShowWarningError(state,
-                                     "SetUpZoneSizingArrays: Sizing for Zone=\"" + state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneName +
-                                         "\" will use Sizing:Zone specifications listed for Zone=\"" + zoneSizingInput.ZoneName + "\".");
+                    ShowWarningError(
+                        state,
+                        format("SetUpZoneSizingArrays: Sizing for Zone=\"{}\" will use Sizing:Zone specifications listed for Zone=\"{}\".",
+                               state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneName,
+                               zoneSizingInput.ZoneName));
                 }
             }
 
@@ -1060,8 +1051,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
 
         // setup CalcFinalZoneSizing structure for use with EMS, some as sensors, some as actuators
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-
-            // actuate  REAL(r64)             :: DesHeatMassFlow          = 0.0d0   ! zone design heating air mass flow rate [kg/s]
             SetupEMSInternalVariable(
                 state, "Final Zone Design Heating Air Mass Flow Rate", finalZoneSizing.ZoneName, "[kg/s]", finalZoneSizing.DesHeatMassFlow);
             SetupEMSInternalVariable(state,
@@ -1164,16 +1153,16 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 if (thisSpaceNum > 0) {
                     thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
                 } else {
-                    ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                    ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
+                    ShowSevereError(state, format("SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList={}", thisOAReq.Name));
+                    ShowContinueError(state, format("Space Name={} not found.", thisSpaceName));
                     dsoaError = true;
                     ErrorsFound = true;
                 }
                 // Check for duplicate spaces
                 for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
                     if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
-                        ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                        ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in the list.");
+                        ShowSevereError(state, format("SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=()", thisOAReq.Name));
+                        ShowContinueError(state, format("Space Name={} appears more than once in the list.", thisSpaceName));
                         dsoaError = true;
                         ErrorsFound = true;
                     }
@@ -1191,7 +1180,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         auto &finalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
         auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
         // Use the max occupancy PEOPLE structure to calculate design min OA for each zone from the outside air flow per person input
-        TotPeopleInZone = 0.0;
+        Real64 TotPeopleInZone = 0.0;
         Real64 ZoneMinOccupancy = 0.;
         int DSOAPtr = finalZoneSizing.ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
         if ((DSOAPtr > 0) && !dsoaError) {
@@ -1216,11 +1205,11 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             finalZoneSizing.DesOAFlowPerArea = thisOAReq.desFlowPerZoneArea(state, CtrlZoneNum);
         }
 
-        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+        for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
             if (state.dataHeatBal->People(PeopleNum).ZonePtr == CtrlZoneNum) {
                 auto &people = state.dataHeatBal->People(PeopleNum);
                 TotPeopleInZone += (people.NumberOfPeople * thisZone.Multiplier * thisZone.ListMultiplier);
-                SchMax = ScheduleManager::GetScheduleMaxValue(state, people.NumberOfPeoplePtr);
+                Real64 SchMax = ScheduleManager::GetScheduleMaxValue(state, people.NumberOfPeoplePtr);
                 if (SchMax > 0) {
                     finalZoneSizing.ZonePeakOccupancy = TotPeopleInZone * SchMax;
                 } else {
@@ -1230,8 +1219,8 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             }
         }
         finalZoneSizing.TotalZoneFloorArea = (thisZone.FloorArea * thisZone.Multiplier * thisZone.ListMultiplier);
-        OAFromPeople = finalZoneSizing.DesOAFlowPPer * TotPeopleInZone;
-        OAFromArea = finalZoneSizing.DesOAFlowPerArea * finalZoneSizing.TotalZoneFloorArea;
+        Real64 OAFromPeople = finalZoneSizing.DesOAFlowPPer * TotPeopleInZone;
+        Real64 OAFromArea = finalZoneSizing.DesOAFlowPerArea * finalZoneSizing.TotalZoneFloorArea;
         finalZoneSizing.TotPeopleInZone = TotPeopleInZone;
         finalZoneSizing.TotalOAFromPeople = OAFromPeople;
         finalZoneSizing.TotalOAFromArea = OAFromArea;
@@ -1244,14 +1233,15 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         state.dataHeatBal->ZonePreDefRep(CtrlZoneNum).VozMin = (ZoneMinOccupancy * finalZoneSizing.DesOAFlowPPer + OAFromArea) / MinEz;
 
         // Calculate the design min OA flow rate for this zone
-        UseOccSchFlag = false;
-        UseMinOASchFlag = false;
+        // flag to use occupancy schedule when calculating OA
+        bool UseOccSchFlag = false;
+        // flag to use min OA schedule when calculating OA
+        bool UseMinOASchFlag = false;
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr;                                     // store for later use
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex = finalZoneSizing.ZoneAirDistributionIndex; // store for later use
+        Real64 OAVolumeFlowRate = 0.0;
         if (!dsoaError) {
             OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, CtrlZoneNum, UseOccSchFlag, UseMinOASchFlag);
-        } else {
-            OAVolumeFlowRate = 0.0;
         }
 
         // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir
@@ -1282,7 +1272,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         finalZoneSizing.InpDesHeatAirFlow *= zoneMultiplier;
         calcFinalZoneSizing.InpDesHeatAirFlow *= zoneMultiplier;
 
-        for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
+        for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &zoneSizing = state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum);
             zoneSizing.MinOA = finalZoneSizing.MinOA;
             state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).MinOA = calcFinalZoneSizing.MinOA;
