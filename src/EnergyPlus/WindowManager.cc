@@ -2453,11 +2453,11 @@ namespace WindowManager {
                         state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
                 }
                 state.dataWindowManager->gnmix[IGap - 1] = 1;
-                state.dataWindowManager->gwght[0][IGap - 1] = GasWght[static_cast<int>(Material::GasType::Air)];
+                state.dataWindowManager->gwght[0][IGap - 1] = Material::GasWght[static_cast<int>(Material::GasType::Air)];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    state.dataWindowManager->gcon[ICoeff - 1][0][IGap - 1] = GasCoeffsCon[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-                    state.dataWindowManager->gvis[ICoeff - 1][0][IGap - 1] = GasCoeffsVis[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-                    state.dataWindowManager->gcp[ICoeff - 1][0][IGap - 1] = GasCoeffsCp[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
+                    state.dataWindowManager->gcon[ICoeff - 1][0][IGap - 1] = Material::GasCoeffsCon[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
+                    state.dataWindowManager->gvis[ICoeff - 1][0][IGap - 1] = Material::GasCoeffsVis[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
+                    state.dataWindowManager->gcp[ICoeff - 1][0][IGap - 1] = Material::GasCoeffsCp[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
                 }
             }
 

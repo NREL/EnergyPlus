@@ -2853,12 +2853,12 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        wght(iprop(1, 1)) = GasWght[static_cast<int>(Material::GasType::Air)];
-        gama(iprop(1, 1)) = GasSpecificHeatRatio[static_cast<int>(Material::GasType::Air)];
+        wght(iprop(1, 1)) = Material::GasWght[static_cast<int>(Material::GasType::Air)];
+        gama(iprop(1, 1)) = Material::GasSpecificHeatRatio[static_cast<int>(Material::GasType::Air)];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
+            gcon(ICoeff, iprop(1, 1)) = Material::GasCoeffsCon[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
+            gvis(ICoeff, iprop(1, 1)) = Material::GasCoeffsVis[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
+            gcp(ICoeff, iprop(1, 1)) = Material::GasCoeffsCp[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
         }
 
         // Fill window layer properties needed for window layer heat balance calculation

@@ -424,33 +424,6 @@ namespace DataHeatBalance {
     constexpr Real64 SurfInitialTemp(23.0);       // Surface temperature for initialization
     constexpr Real64 SurfInitialConvCoeff(3.076); // Surface convective coefficient for initialization
 
-    // Air       Argon     Krypton   Xenon
-    // Gas conductivity coefficients for gases in a mixture
-    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsCon = {{{0.0, 2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                            {0.0, 7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
-
-    // Air       Argon     Krypton   Xenon
-    // Gas viscosity coefficients for gases in a mixture
-    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsVis = {{{0.0, 3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                            {0.0, 4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
-
-    // Air       Argon     Krypton   Xenon
-    // Gas specific heat coefficients for gases in a mixture
-    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsCp = {{
-        {0.0, 1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0},
-        {0.0, 1.2324e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-    }};
-
-    // Air       Argon     Krypton   Xenon
-    static constexpr std::array<Real64, 10> GasWght = {
-        0.0, 28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0}; // Gas molecular weights for gases in a mixture
-
-    // Gas specific heat ratios.  Used for gasses in low pressure
-    static constexpr std::array<Real64, 10> GasSpecificHeatRatio = {0.0, 1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0};
-
     struct TCGlazingsType
     {
         // Members
