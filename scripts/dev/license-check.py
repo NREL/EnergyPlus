@@ -65,7 +65,7 @@ licensetext.report_error = licensetext.error_for_humans
 #
 # Directories to check
 #
-cpp_dirs = ["./src/EnergyPlus/",
+cpp_dirs = ["./src/",
             "./tst/EnergyPlus/"]
 
 python_dirs = ["./"]

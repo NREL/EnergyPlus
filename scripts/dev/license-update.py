@@ -96,6 +96,17 @@
 # context of decent_ci. Python support came much later, so there are some
 # things (like how files and exclusions are handled) that are a little less
 # than uniform.
+#
+# For 2023, used the following to find some missed files:
+#
+#   $ ls -lR | grep -e '\.cpp$' -e '\.hpp$' -e '\.hh$' -e '\.cc$' -e '\.c$' -e '\.h$' |  wc -l
+#
+# and
+#
+#   $  find ./ | grep -e '\.py$' | grep -v third_party | grep -v readthedocs | grep -v bin | grep -v build | wc -l
+#
+# These are both pretty awful and need to be improved, and it would help if the
+# exclusions were uniform.
 
 import licensetext
 import argparse
@@ -115,8 +126,8 @@ dryrun = True
 #
 # Directories to check
 #
-cpp_dirs = ["./src/EnergyPlus/",
-            "./tst/EnergyPlus/unit/"]
+cpp_dirs = ["./src/",
+            "./tst/EnergyPlus/"]
 python_dirs = ["./"]
 
 # Get the C++ current text
@@ -136,6 +147,8 @@ else:
     print('Skipping writing out LICENSE.txt')
 
 full_count = 1
+if dryrun:
+    full_count = 0
 
 # Create C++ Replacer object
 replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
