@@ -147,8 +147,6 @@ else:
     print('Skipping writing out LICENSE.txt')
 
 full_count = 1
-if dryrun:
-    full_count = 0
 
 # Create C++ Replacer object
 replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
