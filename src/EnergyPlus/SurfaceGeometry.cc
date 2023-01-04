@@ -8913,9 +8913,7 @@ namespace SurfaceGeometry {
                   state.dataHeatBal->LowHConvLimit,
                   state.dataHeatBal->HighHConvLimit);
             if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
-                ShowSevereError(
-                    state,
-                    "CombinedHeatAndMoistureFiniteElement is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
+                ShowSevereError(state, "CombinedHeatAndMoistureFiniteElement is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
                 ErrorsFound = true;
             }
         }
