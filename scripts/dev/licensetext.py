@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -63,7 +63,7 @@ import sys
 #
 # The previous year that is in the license. It should be a string
 #
-_previous_year = '2021'
+_previous_year = '2022'
 #
 # From file "EnergyPlus License DRAFT 112015 100 fixed.txt"
 #
