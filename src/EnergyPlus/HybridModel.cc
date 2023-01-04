@@ -490,6 +490,10 @@ namespace HybridModel {
                         ShowWarningError(state, "Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone.");
                     }
                 }
+                if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                    ShowSevereError(state, "Hybrid Modeling is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
+                    ErrorsFound = true;
+                }
             }
 
             if (ErrorsFound) {

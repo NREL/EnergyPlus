@@ -4532,6 +4532,13 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         }
     }
 
+    if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
+            ShowSevereError(state, "Non-Mixing RoomAirModelType is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
+            ErrorsFound = true;
+        }
+    }
+
     // Write RoomAir Model details onto EIO file
     static constexpr std::string_view RoomAirHeader("! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined\n");
     print(state.files.eio, RoomAirHeader);

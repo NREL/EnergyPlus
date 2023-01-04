@@ -8884,6 +8884,12 @@ namespace SurfaceGeometry {
                   state.dataHeatBalSurf->MaxSurfaceTempLimit,
                   state.dataHeatBal->LowHConvLimit,
                   state.dataHeatBal->HighHConvLimit);
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                ShowSevereError(
+                    state,
+                    "MoisturePenetrationDepthConductionTransferFunction is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
+                ErrorsFound = true;
+            }
         }
         if (state.dataHeatBal->AnyCondFD) {
             state.dataHeatBal->AllCTF = false;
@@ -8906,6 +8912,12 @@ namespace SurfaceGeometry {
                   state.dataHeatBalSurf->MaxSurfaceTempLimit,
                   state.dataHeatBal->LowHConvLimit,
                   state.dataHeatBal->HighHConvLimit);
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                ShowSevereError(
+                    state,
+                    "CombinedHeatAndMoistureFiniteElement is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
+                ErrorsFound = true;
+            }
         }
         if (state.dataHeatBal->AnyKiva) {
             state.dataHeatBal->AllCTF = false;
