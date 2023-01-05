@@ -3404,7 +3404,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             int space1 = thisAirBoundaryMixing.space1;
             int space2 = thisAirBoundaryMixing.space2;
             int zone1 = state.dataHeatBal->space(space1).zoneNum;
-            int zone2 = state.dataHeatBal->space(space1).zoneNum;
+            int zone2 = state.dataHeatBal->space(space2).zoneNum;
             auto &thisCrossMizing = state.dataHeatBal->CrossMixing(mixingNum);
             thisCrossMizing.Name = fmt::format("Air Boundary Mixing Zones {} and {}", zone1, zone2);
             thisCrossMizing.spaceIndex = space1;
@@ -3415,7 +3415,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             thisCrossMizing.fromSpaceIndex = space2;
         }
         assert(mixingNum == state.dataHeatBal->TotCrossMixing);
-        for (int mixingRepNum = 1; mixingRepNum <= state.dataHeatBal->TotMixing; ++mixingRepNum) {
+        for (int mixingRepNum = 1; mixingRepNum <= state.dataHeatBal->TotCrossMixing; ++mixingRepNum) {
             int zoneNum = state.dataHeatBal->CrossMixing(mixingRepNum).ZonePtr;
             if (zoneNum > 0) {
                 std::string const &zoneName = state.dataHeatBal->Zone(zoneNum).Name;
