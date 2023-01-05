@@ -70,26 +70,25 @@ constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> GasTypeUC
 // Air       Argon     Krypton   Xenon
 // Gas conductivity coefficients for gases in a mixture
 constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsCon = {{{0.0, 2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                           {0.0, 7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                           {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
+                                                                 {0.0, 7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0, 0.0, 0.0, 0.0, 0.0},
+                                                                 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
 
 // Air       Argon     Krypton   Xenon
 // Gas viscosity coefficients for gases in a mixture
 constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsVis = {{{0.0, 3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                           {0.0, 4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                           {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
+                                                                 {0.0, 4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0, 0.0, 0.0, 0.0, 0.0},
+                                                                 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
 
 // Air       Argon     Krypton   Xenon
 // Gas specific heat coefficients for gases in a mixture
 constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsCp = {{
-                                                                          {0.0, 1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                          {0.0, 1.2324e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                          {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                      }};
+    {0.0, 1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0},
+    {0.0, 1.2324e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+}};
 
 // Air       Argon     Krypton   Xenon
-constexpr std::array<Real64, 10> GasWght = {
-    0.0, 28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0}; // Gas molecular weights for gases in a mixture
+constexpr std::array<Real64, 10> GasWght = {0.0, 28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0}; // Gas molecular weights for gases in a mixture
 
 // Gas specific heat ratios.  Used for gasses in low pressure
 constexpr std::array<Real64, 10> GasSpecificHeatRatio = {0.0, 1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -143,9 +142,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     int AirMat;                        // Air space materials in opaque constructions
     int IRTMat;                        // Infrared Transmitting Materials -- R only property definition
 
-    int EcoRoofMat;                                         // Materials for ecoRoof
-    int NumGas;                                             // Index for loop over gap gases in a mixture
-    int NumGases;                                           // Number of gasses in a mixture
+    int EcoRoofMat;                     // Materials for ecoRoof
+    int NumGas;                         // Index for loop over gap gases in a mixture
+    int NumGases;                       // Number of gasses in a mixture
     GasType gasType = GasType::Invalid; // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
     int Loop;
     int ICoeff;            // Gas property coefficient index
@@ -1137,8 +1136,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->gasTypes(1) =
-            static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
         thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
@@ -1244,8 +1242,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->gasTypes(1) =
-            static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
         thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
@@ -1348,8 +1345,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         NumGases = MaterialProps(2);
         thisMaterial->NumberOfGasesInMixture = NumGases;
         for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
-            thisMaterial->gasTypes(NumGas) = static_cast<GasType>(
-                getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
+            thisMaterial->gasTypes(NumGas) =
+                static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
         }
 
         thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
@@ -2350,8 +2347,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         //  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
         thisMaterial->slatAngleType = SlatAngleType::FixedSlatAngle;
         if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            thisMaterial->slatAngleType = static_cast<SlatAngleType>(
-                getEnumerationValue(SlatAngleTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
+            thisMaterial->slatAngleType =
+                static_cast<SlatAngleType>(getEnumerationValue(SlatAngleTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
         }
         if (thisMaterial->SlatWidth < thisMaterial->SlatSeparation) {
             ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Seperation/Width");
