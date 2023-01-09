@@ -74,6 +74,7 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -2298,7 +2299,7 @@ namespace HeatBalFiniteDiffManager {
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(state.dataMstBal->HConvInFD(Surf));
 
-        Real64 const Tia(state.dataHeatBalFanSys->MAT(surface.Zone));
+        Real64 const Tia(state.dataZoneTempPredictorCorrector->zoneHeatBalance(surface.Zone).MAT);
 
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC

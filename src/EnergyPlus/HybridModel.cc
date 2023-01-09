@@ -128,10 +128,9 @@ namespace HybridModel {
         // Read hybrid model input
         CurrentModuleObject = "HybridModel:Zone";
         state.dataHybridModel->NumOfHybridModelZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
 
         if (state.dataHybridModel->NumOfHybridModelZones > 0) {
-
+            state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
             for (int HybridModelNum = 1; HybridModelNum <= state.dataHybridModel->NumOfHybridModelZones; ++HybridModelNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -490,6 +489,10 @@ namespace HybridModel {
                         state.dataRoomAirMod->AirModel(ZonePtr).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                         ShowWarningError(state, "Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone.");
                     }
+                }
+                if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                    ShowSevereError(state, "Hybrid Modeling is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
+                    ErrorsFound = true;
                 }
             }
 

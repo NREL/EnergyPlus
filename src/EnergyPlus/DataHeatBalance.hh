@@ -509,6 +509,7 @@ namespace DataHeatBalance {
         Real64 Volume = DataGlobalConstants::AutoCalculate;        // Volume entered by user [m3] or calculated
         Real64 ExtGrossWallArea = 0.0;                             // Exterior Wall Area for Zone (Gross)
         Real64 ExteriorTotalSurfArea = 0.0;                        // Total surface area of all exterior surfaces for Zone
+        int SystemZoneNodeNumber = 0;                              // This is the zone or space node number for the system for a controlled zone
     };
 
     struct SpaceData : ZoneSpaceData
@@ -522,8 +523,10 @@ namespace DataHeatBalance {
         Real64 calcFloorArea = 0.0;                                       // Calculated floor area used for this space
         Real64 floorArea = 0.0;                                           // Floor area used for this space
         bool hasFloor = false;                                            // Has "Floor" surface
-        Real64 extWindowArea = 0.0;                                       // Exterior Window Area for Zone
-        Real64 totalSurfArea = 0.0;                                       // Total surface area for Zone
+        Real64 fracZoneFloorArea = 0.0;                                   // fraction of total floor area for all spaces in zone
+        Real64 fracZoneVolume = 0.0;                                      // fraction of total volume for all spaces in zone
+        Real64 extWindowArea = 0.0;                                       // Exterior Window Area for space
+        Real64 totalSurfArea = 0.0;                                       // Total surface area for space
         int radiantEnclosureNum = 0;                                      // Radiant exchange enclosure this space belongs to
         int solarEnclosureNum = 0;                                        // Solar distribution enclosure this space belongs to
         Real64 totOccupants = 0.0;     // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
@@ -532,6 +535,33 @@ namespace DataHeatBalance {
         bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
+
+        // Pointers to Surface Data Structure
+        // |AllSurfF                                                                      |AllSurfL
+        // |            |HTSurfF                                                          |HTSurfL
+        // |            |OpaqOrWinMassSurfF                              |OpaqOrWinSurfL  |
+        // |            |OpaqOrIntMassSurfF      |OpaqOrIntMassSurfL                      |
+        // |            |                        ||WindowSurfF           |WindowSurfL     |
+        // |            |                        ||                      ||DomeF          |DomeL
+        // {[ SurfAir ] [(   SurfOpaqOrIntMass   )( SurfWinOrTDDDiffuser )( TDDDome       )]}
+        // HTSurfaceFirst == OpaqOrWinMassSurfaceFirst == OpaqOrIntMassSurfaceFirst
+        // WindowSurfaceFirst == OpaqOrIntMassSurfaceLast + 1
+        // TDDDomeFirst == OpaqOrWinSurfaceLast + 1 == WindowSurfaceLast + 1
+        // AllSurfaceLast == HTSurfaceLast = TDDDomeLast
+        int AllSurfaceFirst = 0;           // First surface in space including air boundaries
+        int AllSurfaceLast = -1;           // Last  surface in space including air boundaries
+        int HTSurfaceFirst = 0;            // First Heat Transfer Surface in space
+        int HTSurfaceLast = -1;            // Last  Heat Transfer Surface in space
+        int OpaqOrIntMassSurfaceFirst = 0; // First Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in space
+        int OpaqOrIntMassSurfaceLast = -1; // Last  Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in space
+        int WindowSurfaceFirst = 0;        // First Window Heat Transfer Surface in space
+        int WindowSurfaceLast = -1;        // Last  Window Heat Transfer Surface in space
+        int OpaqOrWinSurfaceFirst = 0;     // First opaque (including IntMass) or window (non TDD Dome) Surface in space
+        int OpaqOrWinSurfaceLast = -1;     // Last  opaque (including IntMass) or window (non TDD Dome) Surface in space
+        int TDDDomeFirst = 0;              // First TDD Dome Surface in space
+        int TDDDomeLast = -1;              // Last  TDD Dome Surface in space
+
+        Real64 sumHATsurf(EnergyPlusData &state);
     };
 
     struct SpaceListData
@@ -622,36 +652,14 @@ namespace DataHeatBalance {
         Real64 ExteriorTotalGroundSurfArea = 0.0;       // Total surface area of all surfaces for Zone with ground contact
         Real64 ExtGrossGroundWallArea = 0.0;            // Ground contact Wall Area for Zone (Gross)
         Real64 ExtGrossGroundWallArea_Multiplied = 0.0; // Ground contact Wall Area for Zone (Gross) with multipliers
-        int SystemZoneNodeNumber = 0;                   // This is the zone node number for the system for a controlled zone
         bool IsControlled = false;                      // True when this is a controlled zone.
         bool IsSupplyPlenum = false;                    // True when this zone is a supply plenum
         bool IsReturnPlenum = false;                    // True when this zone is a return plenum
         int PlenumCondNum = 0;                          // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex = 0;                // this is the index number for TempControlledZone structure for lookup
-        // Pointers to Surface Data Structure
-        // |AllSurfF                                                                      |AllSurfL
-        // |            |HTSurfF                                                          |HTSurfL
-        // |            |OpaqOrWinMassSurfF                              |OpaqOrWinSurfL  |
-        // |            |OpaqOrIntMassSurfF      |OpaqOrIntMassSurfL                      |
-        // |            |                        ||WindowSurfF           |WindowSurfL     |
-        // |            |                        ||                      ||DomeF          |DomeL
-        // {[ SurfAir ] [(   SurfOpaqOrIntMass   )( SurfWinOrTDDDiffuser )( TDDDome       )]}
-        // HTSurfaceFirst == OpaqOrWinMassSurfaceFirst == OpaqOrIntMassSurfaceFirst
-        // WindowSurfaceFirst == OpaqOrIntMassSurfaceLast + 1
-        // TDDDomeFirst == OpaqOrWinSurfaceLast + 1 == WindowSurfaceLast + 1
-        // AllSurfaceLast == HTSurfaceLast = TDDDomeLast
-        int AllSurfaceFirst = 0;           // First surface in zone including air boundaries
-        int AllSurfaceLast = -1;           // Last  surface in zone including air boundaries
-        int HTSurfaceFirst = 0;            // First Heat Transfer Surface in Zone
-        int HTSurfaceLast = -1;            // Last  Heat Transfer Surface in Zone
-        int OpaqOrIntMassSurfaceFirst = 0; // First Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
-        int OpaqOrIntMassSurfaceLast = -1; // Last  Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
-        int WindowSurfaceFirst = 0;        // First Window Heat Transfer Surface in Zone
-        int WindowSurfaceLast = -1;        // Last  Window Heat Transfer Surface in Zone
-        int OpaqOrWinSurfaceFirst = 0;     // First opaque (including IntMass) or window (non TDD Dome) Surface in Zone
-        int OpaqOrWinSurfaceLast = -1;     // Last  opaque (including IntMass) or window (non TDD Dome) Surface in Zone
-        int TDDDomeFirst = 0;              // First TDD Dome Surface in Zone
-        int TDDDomeLast = -1;              // Last  TDD Dome Surface in Zone
+        int humidityControlZoneIndex = 0;               // this is the index number for HumidityControlZone structure for lookup
+        int AllSurfaceFirst = 0;                        // First surface in zone including air boundaries
+        int AllSurfaceLast = -1;                        // Last  surface in zone including air boundaries
         int InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple; // Ref: appropriate values for Inside Convection solution
         int NumSurfaces = 0;                                                // Number of surfaces for this zone
         int NumSubSurfaces = 0;     // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
@@ -684,8 +692,7 @@ namespace DataHeatBalance {
         bool WindDirEMSOverrideOn = false;           // if true, EMS is calling to override the surface's outside wind direction
         Real64 WindDirEMSOverrideValue = 0.0;        // value to use for EMS override of the surface's outside wind speed
 
-        bool HasLinkedOutAirNode = false; // true if an OutdoorAir::Node is linked to the surface
-        int LinkedOutAirNode = 0;         // Index of the an OutdoorAir:Node
+        int LinkedOutAirNode = 0; // Index of the an OutdoorAir:Node,, zero if none
 
         bool isPartOfTotalArea = true;           // Count the zone area when determining the building total floor area
         bool isNominalOccupied = false;          // has occupancy nominally specified
@@ -759,6 +766,8 @@ namespace DataHeatBalance {
         void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
 
         void SetWindDirAt(Real64 fac);
+
+        Real64 sumHATsurf(EnergyPlusData &state);
     };
 
     struct ZoneListData
@@ -1180,6 +1189,7 @@ namespace DataHeatBalance {
         Real64 EffAngle = 0.0;    // Effective angle [degree]
         Real64 DH = 0.0;          // Height difference [m]
         Real64 DiscCoef = 0.0;    // Discharge coefficient
+        Real64 MCP = 0.0;         // Product of mass flow rate and Cp
     };
 
     struct ZoneAirBalanceData
@@ -1235,6 +1245,7 @@ namespace DataHeatBalance {
         int NumRefDoorConnections = 0;
         bool EMSSimpleMixingOn = false;      // EMS actuating ventilation flow rate if .TRUE.
         bool RefDoorMixFlag = false;         // Refrigeration door mixing within zone
+        bool ReportFlag = false;             // TRUE when Mixing or Cross Mixing is active based on controls
         Real64 EMSimpleMixingFlowRate = 0.0; // Value EMS is directing to use for override
         Array1D_bool EMSRefDoorMixingOn;
         Array1D<Real64> EMSRefDoorFlowRate;
@@ -1677,6 +1688,8 @@ namespace DataHeatBalance {
         Real64 OABalanceFanElec = 0.0;       // Fan Electricity {W} due to OA air balance
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
+
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
     };
 
     struct ZonePreDefRepType
@@ -1939,19 +1952,6 @@ namespace DataHeatBalance {
         Real64 SumToutMinusTSup = 0.0; // Denominator for zone-level sensible heat index (SHI)
     };
 
-    struct latentReportVariables
-    {
-        Real64 ZoneLTLoadHeatEnergy = 0.0;        // latent heating energy [J]
-        Real64 ZoneLTLoadCoolEnergy = 0.0;        // latent cooling energy [J]
-        Real64 ZoneLTLoadHeatRate = 0.0;          // latent heating rate [W]
-        Real64 ZoneLTLoadCoolRate = 0.0;          // latent cooling rate [W]
-        Real64 ZoneSensibleHeatRatio = 0.0;       // zone load SHR []
-        Real64 ZoneVaporPressureDifference = 0.0; // vapor pressure depression [Pa]
-        Real64 ZoneMoisturePredictedRate = 0.0;
-        Real64 ZoneMoisturePredictedHumSPRate = 0.0;   // Predicted latent load to humidification setpoint (unmultiplied)
-        Real64 ZoneMoisturePredictedDehumSPRate = 0.0; // Predicted latent load to dehumidification setpoint (unmultiplied)
-    };
-
     // Functions
 
     void SetZoneOutBulbTempAt(EnergyPlusData &state);
@@ -2048,6 +2048,9 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 CondFDRelaxFactorInput = 1.0; // Relaxation factor, for looping across all the surfaces, user input value
     DataHeatBalance::SolutionAlgo ZoneAirSolutionAlgo =
         DataHeatBalance::SolutionAlgo::ThirdOrder; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    bool doSpaceHeatBalanceSizing = false;         // Do space heat balance during sizing
+    bool doSpaceHeatBalanceSimulation = false;     // Do space heat balance during simulation
+    bool doSpaceHeatBalance = false;               // Do space heat balance currently
     bool OverrideZoneAirSolutionAlgo = false;      // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
     Real64 BuildingRotationAppendixG = 0.0;        // Building Rotation for Appendix G
     Real64 ZoneTotalExfiltrationHeatLoss = 0.0;    // Building total heat emission through zone exfiltration;
@@ -2118,14 +2121,6 @@ struct HeatBalanceData : BaseGlobalStruct
     bool DoLatentSizing = false; // true when latent sizing is performed during zone sizing
     bool isAnyLatentLoad = false;
 
-    Array1D<Real64> ZoneSNLoadHeatEnergy;
-    Array1D<Real64> ZoneSNLoadCoolEnergy;
-    Array1D<Real64> ZoneSNLoadHeatRate;
-    Array1D<Real64> ZoneSNLoadCoolRate;
-    Array1D<Real64> ZoneSNLoadPredictedRate;
-    Array1D<Real64> ZoneSNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
-    Array1D<Real64> ZoneSNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
-    EPVector<DataHeatBalance::latentReportVariables> latentReports;
     Array1D<Real64> ZoneListSNLoadHeatEnergy;
     Array1D<Real64> ZoneListSNLoadCoolEnergy;
     Array1D<Real64> ZoneListSNLoadHeatRate;
@@ -2281,6 +2276,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimVS_DXCoil;
     EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
     EPVector<DataHeatBalance::AirReportVars> ZnAirRpt;
+    EPVector<DataHeatBalance::AirReportVars> spaceAirRpt;
     EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
     EPVector<DataHeatBalance::ZoneReportVars> ZoneRpt;
