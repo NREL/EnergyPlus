@@ -732,10 +732,9 @@ namespace DataSurfaces {
         Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
         bool SurfHasSurroundingSurfProperty;   // true if surrounding surfaces properties are listed for an external surface
         bool SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
-        bool SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
         int SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
         int SurfExternalShadingSchInd;         // Schedule for a the external shading
-        int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
+        int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node, zero if none
         Real64 AE = 0.0;                       // Product of area and emissivity for each surface
         Real64 enclAESum = 0.0;                // Sum of area times emissivity for all other surfaces in enclosure
 
@@ -755,7 +754,7 @@ namespace DataSurfaces {
               SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid),
               IsSurfPropertyGndSurfacesDefined(false), SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false),
               UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0), SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false),
-              SurfHasLinkedOutAirNode(false), SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
+              SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
         {
         }
 

@@ -57,7 +57,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -68,6 +67,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -129,7 +129,6 @@ namespace EcoRoofManager {
         // The Atmospheric Boundary Layer - by J.R. Garratt (Cambridge Atmos. & Space Science Series), 316pp.
         // Using/Aliasing
         using namespace DataEnvironment;
-        using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
         using namespace DataSurfaces;
@@ -275,12 +274,13 @@ namespace EcoRoofManager {
             if (thisConstruct.CTFCross(0) > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
                 F1temp = thisConstruct.CTFCross(0) / (thisConstruct.CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
-                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
-                             F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
-                                       state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
-                                       thisConstruct.CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
-                                       state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
-                                       state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
+                Qsoilpart1 =
+                    -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
+                    F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
+                              state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
+                              state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
+                              state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
+                              state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
                 Qsoilpart1 =
                     -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + thisConstruct.CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);

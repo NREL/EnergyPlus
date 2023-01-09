@@ -239,6 +239,7 @@ namespace SimulationManager {
             state.dataGlobal->DoOutputReporting = true;
         }
         state.dataGlobal->DoingSizing = false;
+        state.dataHeatBal->doSpaceHeatBalance = state.dataHeatBal->doSpaceHeatBalanceSimulation;
 
         if ((state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) &&
             !(state.dataGlobal->DoDesDaySim || (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput))) {

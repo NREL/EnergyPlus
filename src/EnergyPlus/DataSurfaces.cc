@@ -56,7 +56,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -64,6 +63,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::DataSurfaces {
 
@@ -80,7 +80,6 @@ namespace EnergyPlus::DataSurfaces {
 using namespace DataVectorTypes;
 using namespace DataBSDFWindow;
 using namespace DataHeatBalance;
-using namespace DataHeatBalFanSys;
 using namespace DataZoneEquipment;
 using namespace DataLoopNode;
 using namespace Psychrometrics;
@@ -227,9 +226,10 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
     Real64 RefAirTemp = 0;
 
     // determine reference air temperature for this surface
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->Zone);
     switch (state.dataSurface->SurfTAirRef(t_SurfNum)) {
     case RefAirTemp::ZoneMeanAirTemp: {
-        RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+        RefAirTemp = thisZoneHB.MAT;
     } break;
     case RefAirTemp::AdjacentAirTemp: {
         RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(t_SurfNum);
@@ -250,7 +250,7 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
         for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
             Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
             Real64 MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-            Real64 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(Zone));
+            Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
         }
@@ -259,12 +259,12 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
             // a weighted average of the inlet temperatures.
             RefAirTemp = SumSysMCpT / SumSysMCp;
         } else {
-            RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+            RefAirTemp = thisZoneHB.MAT;
         }
     } break;
     default: {
         // currently set to mean air temp but should add error warning here
-        RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+        RefAirTemp = thisZoneHB.MAT;
     } break;
     }
 

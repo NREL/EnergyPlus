@@ -3862,12 +3862,11 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     SizingManager::GetOARequirements(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    state->dataHeatBalFanSys->MAT.allocate(6);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(6);
-    state->dataHeatBalFanSys->MAT = 23.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat = 0.001;
-    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(6);
-    state->dataHeatBalFanSys->SysDepZoneLoads.allocate(6);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(6);
+    for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
+        thisZoneHB.MAT = 23.0;
+        thisZoneHB.ZoneAirHumRat = 0.001;
+    }
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(state->dataGlobal->NumOfZones);
@@ -3882,8 +3881,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataUnitarySystems->getInputOnceFlag = false;
     for (int i = 1; i <= state->dataGlobal->NumOfZones; ++i) {
         if (!state->dataZoneEquip->ZoneEquipConfig(i).IsControlled) continue;
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp = state->dataHeatBalFanSys->MAT(i);
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat = state->dataHeatBalFanSys->ZoneAirHumRat(i);
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
             Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
                                        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);
@@ -3948,8 +3949,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataLoopNodes->Node(mixerMixedNode).MassFlowRateMaxAvail = 0.26908 * 1.2;
     for (int i = 1; i <= state->dataGlobal->NumOfZones; ++i) {
         if (!state->dataZoneEquip->ZoneEquipConfig(i).IsControlled) continue;
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp = state->dataHeatBalFanSys->MAT(i);
-        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat = state->dataHeatBalFanSys->ZoneAirHumRat(i);
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
+        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
             Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
                                        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);

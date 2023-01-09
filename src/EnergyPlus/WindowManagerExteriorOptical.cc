@@ -139,8 +139,8 @@ namespace WindowManager {
     //         if ( construction.isGlazingConstruction() ) {
     //             for ( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
     //                 auto& material( dataMaterial.Material( construction.LayerPoint( LayNum ) ) );
-    //                 if ( material.Group != WindowGas && material.Group != WindowGasMixture &&
-    //                     material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
+    //                 if ( material->Group != WindowGas && material->Group != WindowGasMixture &&
+    //                     material->Group != ComplexWindowGap && material->Group != ComplexWindowShade ) {
     //                     auto aMaterial = std::make_shared< Material::MaterialProperties >();
     //                     *aMaterial = material;
     //
@@ -188,8 +188,8 @@ namespace WindowManager {
             auto &construction(state.dataConstruction->Construct(ConstrNum));
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
-                    auto &material(*state.dataMaterial->Material(construction.LayerPoint(LayNum)));
-                    if (BITF_TEST_NONE(BITF(material.Group),
+                    auto *material(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
+                    if (BITF_TEST_NONE(BITF(material->Group),
                                        BITF(Material::MaterialGroup::WindowGas) | BITF(Material::MaterialGroup::WindowGasMixture) |
                                            BITF(Material::MaterialGroup::ComplexWindowGap) | BITF(Material::MaterialGroup::ComplexWindowShade))) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
@@ -198,11 +198,11 @@ namespace WindowManager {
                         construction.TransDiff = 0.1;
 
                         auto aRange = WavelengthRange::Solar;
-                        auto aSolarLayer = getScatteringLayer(state, material, aRange);
+                        auto aSolarLayer = getScatteringLayer(state, *material, aRange);
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aSolarLayer);
 
                         aRange = WavelengthRange::Visible;
-                        auto aVisibleLayer = getScatteringLayer(state, material, aRange);
+                        auto aVisibleLayer = getScatteringLayer(state, *material, aRange);
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aVisibleLayer);
                     }
                 }

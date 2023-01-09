@@ -56,7 +56,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
@@ -69,6 +68,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::MoistureBalanceEMPDManager {
 
@@ -359,10 +359,11 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
     for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
-        Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(state.dataHeatBalFanSys->MAT(ZoneNum),
-                                                                  max(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), 1.0e-5),
-                                                                  state.dataEnvrn->OutBaroPress),
-                                             PsyRhovFnTdbRh(state, state.dataHeatBalFanSys->MAT(ZoneNum), 1.0, "InitMoistureBalanceEMPD"));
+        Real64 const rv_air_in_initval =
+            min(PsyRhovFnTdbWPb_fast(state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT,
+                                     max(state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat, 1.0e-5),
+                                     state.dataEnvrn->OutBaroPress),
+                PsyRhovFnTdbRh(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT, 1.0, "InitMoistureBalanceEMPD"));
         state.dataMstBalEMPD->RVSurfaceOld(SurfNum) = rv_air_in_initval;
         state.dataMstBalEMPD->RVSurface(SurfNum) = rv_air_in_initval;
         state.dataMstBalEMPD->RVSurfLayer(SurfNum) = rv_air_in_initval;
@@ -547,7 +548,8 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
 
     auto const *material(state.dataMaterial->Material(MatNum));
     if (material->EMPDmu <= 0.0) {
-        rv_surface = PsyRhovFnTdbWPb(TempZone, state.dataHeatBalFanSys->ZoneAirHumRat(surface.Zone), state.dataEnvrn->OutBaroPress);
+        rv_surface = PsyRhovFnTdbWPb(
+            TempZone, state.dataZoneTempPredictorCorrector->zoneHeatBalance(surface.Zone).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
         return;
     }
 

@@ -2106,11 +2106,10 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
     }
 }
 
-void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
-                            Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
-                            Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
-                            Real64 const WZone,    // humidity ratio at zone air node
-                            Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
+Real64 calcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
+                              Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
+                              Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+                              Real64 const WZone     // humidity ratio at zone air node
 )
 {
 
@@ -2124,9 +2123,10 @@ void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
     // or Q_sensible = m_dot * cp_moistair_zoneHumRat * (TDBEquip - TDBZone)
     //    cp_moistair_zoneHumRat = Psychrometrics::PsyCpAirFnW(WZone);
 
-    SensibleOutput = 0.0;
+    Real64 sensibleOutput = 0.0; // sensible output rate (state 2 -> State 1), {W}
     if (MassFlow > 0.0) {
-        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
+        sensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
     }
+    return sensibleOutput;
 }
 } // namespace EnergyPlus

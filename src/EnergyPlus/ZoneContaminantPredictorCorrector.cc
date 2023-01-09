@@ -95,7 +95,6 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 // Using/Aliasing
 using namespace DataHVACGlobals;
 using namespace DataHeatBalance;
-using namespace DataHeatBalFanSys;
 using namespace Psychrometrics;
 using namespace HybridModel;
 
@@ -1719,6 +1718,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
 
     // Update zone CO2
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         if (ShortenTimeStepSys) {
 
@@ -1865,8 +1865,8 @@ void PredictZoneContaminants(EnergyPlusData &state,
             if (ControlledCO2ZoneFlag) {
                 Real64 RhoAir = PsyRhoAirFnPbTdbW(state,
                                                   state.dataEnvrn->OutBaroPress,
-                                                  state.dataHeatBalFanSys->ZT(ZoneNum),
-                                                  state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
+                                                  thisZoneHB.ZT,
+                                                  thisZoneHB.ZoneAirHumRat,
                                                   RoutineName); // The density of air
 
                 // Calculate Co2 from infiltration + humidity added from latent load to determine system added/subtracted moisture.
@@ -1877,6 +1877,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Calculate the coefficients for the 3rd Order derivative for final
                 // zone CO2.  The A, B, C coefficients are analogous to the CO2 balance.
                 // Assume that the system will have flow
+                auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                 if (state.afn->multizone_always_simulated ||
                     (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                      state.afn->AirflowNetworkFanActivated)) {
@@ -1885,14 +1886,9 @@ void PredictZoneContaminants(EnergyPlusData &state,
                     A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr;
                 } else {
                     B = CO2Gain +
-                        ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-                          state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                         state.dataContaminantBalance->OutdoorCO2) +
-                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) +
-                        state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
-                    A = state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                        state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
-                        state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                        ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL) * state.dataContaminantBalance->OutdoorCO2) +
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) + thisZoneHB.MDotOA * state.dataContaminantBalance->OutdoorCO2;
+                    A = thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.MixingMassFlowZone + thisZoneHB.MDotOA;
                 }
                 C = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 
@@ -1984,11 +1980,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
 
             if (ControlledGCZoneFlag) {
                 // The density of air
-                Real64 RhoAir = PsyRhoAirFnPbTdbW(state,
-                                                  state.dataEnvrn->OutBaroPress,
-                                                  state.dataHeatBalFanSys->ZT(ZoneNum),
-                                                  state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
-                                                  RoutineName);
+                Real64 RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, RoutineName);
 
                 // Calculate generic contaminant from infiltration + humidity added from latent load
                 // to determine system added/subtracted moisture.
@@ -1999,6 +1991,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Calculate the coefficients for the 3rd Order derivative for final
                 // zone GC.  The A, B, C coefficients are analogous to the GC balance.
                 // Assume that the system will have flow
+                auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                 if (state.afn->multizone_always_simulated ||
                     (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                      state.afn->AirflowNetworkFanActivated)) {
@@ -2007,14 +2000,9 @@ void PredictZoneContaminants(EnergyPlusData &state,
                     A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr;
                 } else {
                     B = GCGain +
-                        ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-                          state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                         state.dataContaminantBalance->OutdoorGC) +
-                        state.dataContaminantBalance->MixingMassFlowGC(ZoneNum) +
-                        state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorGC;
-                    A = state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                        state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
-                        state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                        ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL) * state.dataContaminantBalance->OutdoorGC) +
+                        state.dataContaminantBalance->MixingMassFlowGC(ZoneNum) + thisZoneHB.MDotOA * state.dataContaminantBalance->OutdoorGC;
+                    A = thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.MixingMassFlowZone + thisZoneHB.MDotOA;
                 }
                 C = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpGenContam /
                     SysTimeStepInSeconds;
@@ -2201,6 +2189,7 @@ void InverseModelCO2(EnergyPlusData &state,
         state.dataEnvrn->DayOfYear <= state.dataHybridModel->HybridModelZone(ZoneNum).HybridEndDayOfYear) {
         state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration;
 
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         if (state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C && state.dataHVACGlobal->UseZoneTimeStepHistory) {
             static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
             // Conditionally calculate the CO2-dependent and CO2-independent terms.
@@ -2214,23 +2203,15 @@ void InverseModelCO2(EnergyPlusData &state,
                 Real64 SumSysMxCO2_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate *
                                         state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
 
-                AA = SumSysM_HM + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                AA = SumSysM_HM + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.MixingMassFlowZone + thisZoneHB.MDotOA;
                 BB = SumSysMxCO2_HM + CO2Gain +
-                     ((state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                      state.dataContaminantBalance->OutdoorCO2) +
-                     state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
+                     ((thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL) * state.dataContaminantBalance->OutdoorCO2) +
+                     state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) + thisZoneHB.MDotOA * state.dataContaminantBalance->OutdoorCO2;
 
             } else {
-                AA = state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
-                BB = CO2Gain +
-                     ((state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                      state.dataContaminantBalance->OutdoorCO2) +
-                     state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
+                AA = thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.MixingMassFlowZone + thisZoneHB.MDotOA;
+                BB = CO2Gain + ((thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL) * state.dataContaminantBalance->OutdoorCO2) +
+                     state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) + thisZoneHB.MDotOA * state.dataContaminantBalance->OutdoorCO2;
             }
 
             Real64 CC = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
@@ -2286,26 +2267,20 @@ void InverseModelCO2(EnergyPlusData &state,
                 Real64 SumSysMxCO2_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate *
                                         state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
 
-                AA = SumSysM_HM + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                AA = SumSysM_HM + thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.MixingMassFlowZone +
+                     thisZoneHB.MDotOA;
                 BB = CO2GainExceptPeople +
-                     ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                       state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                      state.dataContaminantBalance->OutdoorCO2) +
+                     ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL) * state.dataContaminantBalance->OutdoorCO2) +
                      (SumSysMxCO2_HM) + state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
+                     thisZoneHB.MDotOA * state.dataContaminantBalance->OutdoorCO2;
 
             } else {
-                AA = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                AA = ZoneMassFlowRate + thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.MixingMassFlowZone +
+                     thisZoneHB.MDotOA;
                 BB = CO2GainExceptPeople +
-                     ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                       state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                      state.dataContaminantBalance->OutdoorCO2) +
+                     ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL) * state.dataContaminantBalance->OutdoorCO2) +
                      (CO2MassFlowRate) + state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
+                     thisZoneHB.MDotOA * state.dataContaminantBalance->OutdoorCO2;
             }
 
             Real64 CC = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
@@ -2488,13 +2463,13 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         }
 
         Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         // Calculate the coefficients for the 3rd order derivative for final
         // zone humidity ratio.  The A, B, C coefficients are analogous to the
         // CO2 balance.  There are 2 cases that should be considered, system operating and system shutdown.
 
-        Real64 RhoAir = PsyRhoAirFnPbTdbW(
-            state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName);
+        Real64 RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, RoutineName);
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum) = RhoAir;
         // Calculate Co2 internal gain
@@ -2505,15 +2480,11 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             GCGain = state.dataContaminantBalance->ZoneGCGain(ZoneNum) * RhoAir * 1.0e6;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            B = CO2Gain +
-                ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                  state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                 state.dataContaminantBalance->OutdoorCO2) +
+            B = CO2Gain + ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL) * state.dataContaminantBalance->OutdoorCO2) +
                 (CO2MassFlowRate) + state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) +
-                state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
-            A = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-                state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) +
-                state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                thisZoneHB.MDotOA * state.dataContaminantBalance->OutdoorCO2;
+            A = ZoneMassFlowRate + thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.MixingMassFlowZone +
+                thisZoneHB.MDotOA;
             if (state.afn->multizone_always_simulated ||
                 (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                  state.afn->AirflowNetworkFanActivated)) {
@@ -2561,10 +2532,12 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             if (zoneAirCO2Temp < 0.0) zoneAirCO2Temp = 0.0;
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = zoneAirCO2Temp;
 
-            if ((state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C ||
-                 state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_C) &&
-                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
-                InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
+            if (state.dataHybridModel->FlagHybridModel) {
+                if ((state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C ||
+                     state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_C) &&
+                    (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
+                    InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
+                }
             }
             // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
             const int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
@@ -2574,15 +2547,11 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            B = GCGain +
-                ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                  state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                 state.dataContaminantBalance->OutdoorGC) +
+            B = GCGain + ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL) * state.dataContaminantBalance->OutdoorGC) +
                 (GCMassFlowRate) + state.dataContaminantBalance->MixingMassFlowGC(ZoneNum) +
-                state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorGC;
-            A = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-                state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) +
-                state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                thisZoneHB.MDotOA * state.dataContaminantBalance->OutdoorGC;
+            A = ZoneMassFlowRate + thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.MixingMassFlowZone +
+                thisZoneHB.MDotOA;
             if (state.afn->multizone_always_simulated ||
                 (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                  state.afn->AirflowNetworkFanActivated)) {

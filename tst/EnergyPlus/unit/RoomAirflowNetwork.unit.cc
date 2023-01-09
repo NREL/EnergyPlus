@@ -76,6 +76,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
@@ -128,8 +129,7 @@ protected:
         state->dataMstBal->RhoVaporSurfIn.allocate(NumOfSurfaces);
         state->dataMstBal->RhoVaporAirIn.allocate(NumOfSurfaces);
         state->dataMstBal->HMassConvInFD.allocate(NumOfSurfaces);
-        state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
-        state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+        state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
         state->afn->AirflowNetworkLinkageData.allocate(5);
         state->afn->AirflowNetworkNodeSimu.allocate(6);
         state->afn->AirflowNetworkLinkSimu.allocate(5);
@@ -264,8 +264,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     state->dataHeatBal->Zone(ZoneNum).Volume = 100;
     state->dataHeatBal->Zone(ZoneNum).IsControlled = true;
-    state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 2;
+    state->dataHeatBal->space.allocate(ZoneNum);
+    state->dataHeatBal->space(ZoneNum).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(ZoneNum).HTSurfaceLast = 2;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
     state->dataHeatBal->Zone(ZoneNum).spaceIndexes.emplace_back(1);
 
@@ -292,33 +293,27 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataLoopNodes->NodeID(1) = "Supply";
     state->dataLoopNodes->NodeID(2) = "Return";
 
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
-
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(1).HumRat = 0.001;
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01;
 
-    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+    thisZoneHB.MAT = 20.0;
+    thisZoneHB.ZoneAirHumRat = 0.001;
     state->dataHeatBalSurf->SurfHConvInt(1) = 1.0;
     state->dataHeatBalSurf->SurfHConvInt(2) = 1.0;
     state->dataHeatBalSurf->SurfTempInTmp(1) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(2) = 30.0;
-    state->dataMstBal->RhoVaporAirIn(1) =
-        PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
-    state->dataMstBal->RhoVaporAirIn(2) =
-        PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
+    state->dataMstBal->RhoVaporAirIn(1) = PsyRhovFnTdbWPb(thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, state->dataEnvrn->OutBaroPress);
+    state->dataMstBal->RhoVaporAirIn(2) = PsyRhovFnTdbWPb(thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, state->dataEnvrn->OutBaroPress);
     state->dataMstBal->HMassConvInFD(1) =
         state->dataHeatBalSurf->SurfHConvInt(1) /
-        ((PsyRhoAirFnPbTdbW(
-              *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
-          state->dataMstBal->RhoVaporAirIn(1)) *
-         PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+        ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat) + state->dataMstBal->RhoVaporAirIn(1)) *
+         PsyCpAirFnW(thisZoneHB.ZoneAirHumRat));
     state->dataMstBal->HMassConvInFD(2) =
         state->dataHeatBalSurf->SurfHConvInt(2) /
-        ((PsyRhoAirFnPbTdbW(
-              *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
-          state->dataMstBal->RhoVaporAirIn(2)) *
-         PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
+        ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat) + state->dataMstBal->RhoVaporAirIn(2)) *
+         PsyCpAirFnW(thisZoneHB.ZoneAirHumRat));
 
     RoomAirNode = 1;
     auto &thisRAFN(state->dataRoomAirflowNetModel->RAFN(ZoneNum));

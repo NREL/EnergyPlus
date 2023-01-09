@@ -55,7 +55,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -75,6 +74,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::LowTempRadiantSystem;
@@ -2397,11 +2397,11 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes = 1;
     state->dataLowTempRadSys->CflowRadiantSysDesign.allocate(state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes);
     state->dataScheduleMgr->Schedule.allocate(3);
-    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 22.0;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 25.0;
-    state->dataHeatBalFanSys->MAT(1) = 21.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     state->dataLowTempRadSys->TotalNumOfRadSystems = 0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ZonePtr = 1;
@@ -2437,13 +2437,9 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     // Cooling
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CoolingSystem = false;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HeatingSystem = true;
-    state->dataHeatBalFanSys->MAT(1) = 26.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 26.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(*state, Load);
     EXPECT_EQ(NotOperating, state->dataLowTempRadSys->CFloRadSys(RadSysNum).OperatingMode);
-
-    state->dataLowTempRadSys->CFloRadSys.deallocate();
-    state->dataScheduleMgr->Schedule.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate();
 }
 
 TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
@@ -2463,11 +2459,11 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).SurfacePtr.allocate(1);
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).SurfacePtr(1) = 1;
     state->dataScheduleMgr->Schedule.allocate(3);
-    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 22.0;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 25.0;
-    state->dataHeatBalFanSys->MAT(1) = 21.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).NumOfSurfaces = 0;
     state->dataLowTempRadSys->TotalNumOfRadSystems = 0;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr = 1;
@@ -2497,13 +2493,9 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     // Cooling
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingSystem = false;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingSystem = true;
-    state->dataHeatBalFanSys->MAT(1) = 26.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 26.0;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(*state, Load);
     EXPECT_EQ(NotOperating, state->dataLowTempRadSys->HydrRadSys(RadSysNum).OperatingMode);
-
-    state->dataLowTempRadSys->HydrRadSys.deallocate();
-    state->dataScheduleMgr->Schedule.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate();
 }
 
 TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
@@ -2935,7 +2927,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     Real64 actualResult;
     Real64 acceptibleError = 0.001;
 
-    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBalSurf->SurfTempIn.allocate(1);
@@ -2945,7 +2937,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     state->dataLowTempRadSys->ElecRadSys.allocate(1);
 
     // Test Data
-    state->dataHeatBalFanSys->MAT(1) = 23.456;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.456;
     state->dataHeatBal->ZoneMRT(1) = 12.345;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 34.567;
     state->dataHeatBal->Zone(1).OutWetBulbTemp = 1.234;
@@ -2963,19 +2955,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 1: MAT Control
     state->dataLowTempRadSys->HydrRadSys(1).controlType = LowTempRadiantControlTypes::MATControl;
-    expectedResult = state->dataHeatBalFanSys->MAT(1);
+    expectedResult = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).controlType = LowTempRadiantControlTypes::MATControl;
-    expectedResult = state->dataHeatBalFanSys->MAT(1);
+    expectedResult = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).controlType = LowTempRadiantControlTypes::MATControl;
-    expectedResult = state->dataHeatBalFanSys->MAT(1);
+    expectedResult = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).controlType);
@@ -3003,19 +2995,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 3: Operative Temperature Control
     state->dataLowTempRadSys->HydrRadSys(1).controlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->ZoneMRT(1)) / 2.0;
+    expectedResult = (state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT + state->dataHeatBal->ZoneMRT(1)) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).controlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->ZoneMRT(1)) / 2.0;
+    expectedResult = (state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT + state->dataHeatBal->ZoneMRT(1)) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).controlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->ZoneMRT(1)) / 2.0;
+    expectedResult = (state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT + state->dataHeatBal->ZoneMRT(1)) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).controlType);
