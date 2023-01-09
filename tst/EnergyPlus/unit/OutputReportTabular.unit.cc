@@ -7188,6 +7188,19 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
     state->dataSize->FinalSysSizing(1).loadSizingType = DataSizing::LoadSizing::Total;
 
+    // For #9772
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->SysSizInput(1).SizingOption = DataSizing::NonCoincident;
+    auto degC_to_F = [](Real64 celsius) constexpr { return celsius * (9.0 / 5.0) + 32.0; };
+    constexpr Real64 coolMixTempSys = 26.2;
+    constexpr Real64 coolMixTempSysIP = degC_to_F(coolMixTempSys);
+    constexpr Real64 heatMixTempSys = -1.7;
+    constexpr Real64 heatMixTempSysIP = degC_to_F(heatMixTempSys);
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = coolMixTempSys;
+    state->dataSize->FinalSysSizing(1).HeatMixTemp = heatMixTempSys;
+
     state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
     state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).HeatPeakDD = heatDDNum;
     state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
@@ -7251,6 +7264,28 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
     auto result = queryResult(query_2, "TabularDataWithStrings")[0][0];
     EXPECT_EQ(result, "0.0000");
+
+    // Test for #9772
+    {
+        {
+            const std::string queryCool = R"sql(
+            SELECT Value From TabularDataWithStrings
+             WHERE TableName = 'Cooling Peak Conditions'
+                AND ReportName = 'AirLoop Component Load Summary'
+                AND RowName = 'Mixed Air Temperature')sql";
+
+            EXPECT_EQ(coolMixTempSysIP, execAndReturnFirstDouble(queryCool));
+        }
+        {
+            const std::string queryHeat = R"sql(
+            SELECT Value From TabularDataWithStrings
+             WHERE TableName = 'Heating Peak Conditions'
+                AND ReportName = 'AirLoop Component Load Summary'
+                AND RowName = 'Mixed Air Temperature')sql";
+
+            EXPECT_EQ(heatMixTempSysIP, execAndReturnFirstDouble(queryHeat));
+        }
+    }
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodDesignDay)
