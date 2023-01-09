@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1705,7 +1705,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
     // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
     // Using/Aliasing
     using namespace Psychrometrics;
-    using CurveManager::CurveValue;
+    using Curve::CurveValue;
 
     // Return value
     ErlValueType ReturnValue;
@@ -2770,7 +2770,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     // once all the object names are known.
 
     // Using/Aliasing
-    using CurveManager::GetCurveIndex;
+    using Curve::GetCurveIndex;
 
     // Locals
     // SUBROUTINE PARAMETER DEFINITIONS:

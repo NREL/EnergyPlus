@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -100,7 +101,20 @@ namespace ZoneEquipmentManager {
 
     void InitSystemOutputRequired(EnergyPlusData &state, int ZoneNum, bool FirstHVACIteration, bool ResetSimOrder = false);
 
+    void initOutputRequired(EnergyPlusData &state,
+                            int const ZoneNum,
+                            DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                            DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                            bool const FirstHVACIteration,
+                            bool const ResetSimOrder,
+                            int spaceNum = 0);
+
     void DistributeSystemOutputRequired(EnergyPlusData &state, int ZoneNum, bool FirstHVACIteration);
+
+    void distributeOutputRequired(EnergyPlusData &state,
+                                  int const ZoneNum,
+                                  DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                  DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture);
 
     void UpdateSystemOutputRequired(EnergyPlusData &state,
                                     int ZoneNum,

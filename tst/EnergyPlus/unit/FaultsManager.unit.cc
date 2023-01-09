@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,7 +71,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace CurveManager;
+using namespace Curve;
 using namespace DataLoopNode;
 using namespace Fans;
 using namespace FaultsManager;
@@ -101,16 +101,15 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Inputs: fan curve
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = -0.0129;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 21.0;
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1151.1;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 13.509;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.9105;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.0129;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 7.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 21.0;
 
     // Inputs:
     FanNum = 1;
@@ -352,16 +351,15 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     // Inputs: fan curve
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = -0.0129;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 21.0;
+    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1151.1;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 13.509;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.9105;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.0129;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 7.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 21.0;
 
     // Inputs: fans
     FanNum = 1;

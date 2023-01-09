@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1491,18 +1491,17 @@ namespace UnitHeater {
         int constexpr MaxIter(100); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ControlNode;        // the hot water inlet node
-        int InletNode;          // unit air inlet node
-        int OutletNode;         // unit air outlet node
-        Real64 ControlOffset;   // tolerance for output control
-        Real64 MaxWaterFlow;    // maximum water flow for heating or cooling [kg/sec]
-        Real64 MinWaterFlow;    // minimum water flow for heating or cooling [kg/sec]
-        Real64 QUnitOut;        // heating or sens. cooling provided by fan coil unit [watts]
-        Real64 LatentOutput;    // Latent (moisture) add/removal rate, negative is dehumidification [kg/s]
-        Real64 SpecHumOut;      // Specific humidity ratio of outlet air (kg moisture / kg moist air)
-        Real64 SpecHumIn;       // Specific humidity ratio of inlet air (kg moisture / kg moist air)
-        Real64 mdot;            // local temporary for fluid mass flow rate
-        Array1D<Real64> Par(3); // parameters passed to RegulaFalsi function
+        int ControlNode;      // the hot water inlet node
+        int InletNode;        // unit air inlet node
+        int OutletNode;       // unit air outlet node
+        Real64 ControlOffset; // tolerance for output control
+        Real64 MaxWaterFlow;  // maximum water flow for heating or cooling [kg/sec]
+        Real64 MinWaterFlow;  // minimum water flow for heating or cooling [kg/sec]
+        Real64 QUnitOut;      // heating or sens. cooling provided by fan coil unit [watts]
+        Real64 LatentOutput;  // Latent (moisture) add/removal rate, negative is dehumidification [kg/s]
+        Real64 SpecHumOut;    // Specific humidity ratio of outlet air (kg moisture / kg moist air)
+        Real64 SpecHumIn;     // Specific humidity ratio of inlet air (kg moisture / kg moist air)
+        Real64 mdot;          // local temporary for fluid mass flow rate
         int OpMode;
         Real64 PartLoadFrac;
         Real64 NoOutput;
