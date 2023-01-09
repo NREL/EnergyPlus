@@ -5,7 +5,8 @@ Improved Support for Multi-speed Fans
 
 **Florida Solar Energy Center**
 
- - 11/30/22 (First revision )
+ - 1/9/23 (Second revision)
+ - 11/30/22 (First revision)
  - 11/21/22 (Original draft)
  
 ## Justification for New Feature ##
@@ -16,7 +17,7 @@ Many Water-to-Air Heat Pump units and VRF indoor units in the market are equippe
 
 Mike Witte made comments before ther conference call. The NFP was discussed in the conference call of EnergyPlus Technicalities on 11/30/22
 
-###Mike's comments###
+###Mike's comments before the conference call on 11/30/22###
 
 @mjwitte commented on this pull request.
 ________________________________________
@@ -34,14 +35,13 @@ In design/FY2023/NFP_MultispeedFans.md:
 +
 +This section provides inputs of the new object.
 +
-+<span style="color:red">
+
 +
 +An alternative way is to use the existing object of UnitarySystemPerformance:Multispeed. Since this object is not used only for UnitarySystem, the name of the object may be changed.
 @lgu1234 I would support changing the existing object name rather than making a new object. Of course, that will require a transition rule for the existing field in AirloopHVAC:UnitarySystem.
 ________________________________________
 In design/FY2023/NFP_MultispeedFans.md:
 > +
-<span style="color:red">
 +
 +An alternative way is to use the existing object of UnitarySystemPerformance:Multispeed. Since this object is not used only for UnitarySystem, the name of the object may be changed.
 +
@@ -75,22 +75,84 @@ The conference call focused on the issue whether we need to use the exsting obje
 
 Add a section to compare both objects to see whether FanSystemModel can be used to specify multispeed fans.
 
+###Action response on 11/30/22###
+
+@mjwitte @Myoldmopar @rraustad @EnergyArchmage
+
+Based on discussion in the conference call today, I revised the NFP by adding a section to show differences between between UnitarySystemPerformance:Multispeed and Fan:SystemModel for review.
+
+The Fan:SystemModel does not have No Load Supply Air Flow Rate Ratio, and different fan flow ratios between heating and cooling.
+
+Justification
+No Load Supply Air Flow Rate Ratio
+As long as the No Load Supply Air Flow Rate is designed in the parent object correctly, there is no need to have this field.
+
+Different fan flow ratios between heating and cooling
+The real system has only a single supply fan.
+
+Please let me know your comments via E-mail.
+
+Thanks.
+
+###Email communication on 1/4/23###
+
+####My request on 1/4/22####
+
+All:
+
+Happy New Year! I came back to the US after Christmas. I started to work from today after a China trip.
+
+The new feature proposal was discussed on Nov. 30, 2022. The main topic is if we use either Fan:SystemModel or UnitarySystemPerformance:Multispeed. I submited my response to show differences between two objects in https://github.com/NREL/EnergyPlus/pull/9746:
+
+Based on discussion in the conference call today, I revised the NFP by adding a section to show differences between between UnitarySystemPerformance:Multispeed and Fan:SystemModel for review.
+The Fan:SystemModel does not have No Load Supply Air Flow Rate Ratio, and different fan flow ratios between heating and cooling.
+Justification
+No Load Supply Air Flow Rate Ratio
+As long as the No Load Supply Air Flow Rate is designed in the parent object correctly, there is no need to have this field.
+Different fan flow ratios between heating and cooling
+The real system has only a single supply fan.
+Please let me know your comments via E-mail.
+Thanks.
+I would like to have your feedback to let me know which object is selected, so that I can move forward.
+Thanks.
+Gu 
+
+####Mike comments on 1/4/22####
+
+@lgu1234 Using the speeds in Fan:SystemModel to inform the parent object is desirable, because it avoids duplicate input. But it would introduce a new paradigm.
+
+My understanding is that none of the current parent objects mine this information from the fan. The parent objects decide on a flow rate and tell the fan where it's operating. Then the fan calculates it's power use based on interpolating between the speeds. @rraustad is that correct?
+
+Since ZoneHVAC:WaterToAirHeatPump is actually using the UnitarySystem code, the most expedient approach seems to be to use UnitarySystemPerformance:Multispeed for this one. It should require minimal new code.
+
+If UnitarySystem does not currently throw any warnings for inconsistent flow fractions between UnitarySystemPerformance:Multispeed and the Fan:SystemModel object, then I would suggest adding these checks as part of this PR.
+
+For ZoneHVAC:TerminalUnit:VariableRefrigerantFlow it would then make sense to keep the same approach and use UnitarySystemPerformance:Multispeed.
+
+Another alternative is to support both methods: If UnitarySystemPerformance:Multispeed is specified, then use it. If not, check the fan inputs and use those.
+
+@rraustad @EnergyArchmage ?
+
+###Action after Mike's comments###
+
+The object of UnitarySystemPerformance:Multispeed will be used in this new feature for both ZoneHVAC:WaterToAirHeatPump and ZoneHVAC:TerminalUnit:VariableRefrigerantFlow.
+
+Warnings will be issued if UnitarySystem does not currently throw any warnings for inconsistent flow fractions between UnitarySystemPerformance:Multispeed and the Fan:SystemModel object, but speed fractions from UnitarySystemPerformance:Multispeed will be used.
+
+The alternative method will be included if I hvae time left: If UnitarySystemPerformance:Multispeed is specified, then use it. If not, check the fan inputs and use those.
+
 ## Overview ##
 
 The ZoneHVAC:FourPipeFanCoil object allows multi-speed cycling fan with constant water flow rate. MultiSpeedFan is one of choices defined in the Capacity Control Method field. The object has two fields to defind Low Speed Supply Air Flow Ratio, and Medium Speed Supply Air Flow Ratio. Therefore, it has 3 fan speeds to be applied to the object. The fan air flow cycles between adjacent speeds based on the cooling/heating capacity. It is obvious that 3 speed fan operation may not be general enough. If a user wants more or less speed operation, more fields are needed. In addition, water flow rate remains the same with different air flow rates. 
 
 The AirLoopHVAC:UnitarySystem object allows multispeed coils with two fields input: Design Specification Multispeed Object Type and Design Specification Multispeed Object Name. The advatage to introduce an object to define multispeed coils is to provide more choices for users to define fan flow ratios with heating, cooling and no load conditions.
 
-The proposed changes, to mimic AirLoopHVAC:UnitarySystem, are to add two optional fields in both ZoneHVAC:WaterToAirHeatPump and ZoneHVAC:TerminalUnit:VariableRefrigerantFlow objects as:
+The proposed changes, to mimic AirLoopHVAC:UnitarySystem, are to add two optional fields in both ZoneHVAC:WaterToAirHeatPump and ZoneHVAC:TerminalUnit:VariableRefrigerantFlow objects to specify UnitarySystemPerformance:Multispeed as:
 
-Design Specification Multispeed Fan Object Type
+Design Specification Multispeed Object Type
+Design Specification Multispeed Object Name
 
-Design Specification Multispeed Fan Object Name
-
-A new object is proposed as FanPerformance:Multispeed to define airflow ratios under heating and cooling conditions.
-
-An alternative way is to use an existing object of UnitarySystemPerformance:Multispeed. Since this object will not be used only for UnitarySystem, the name of the object may be changed.
- 
+The alternative method will be included if I hvae time left: If UnitarySystemPerformance:Multispeed is specified, then use it. If not, check the fan inputs and use those.
 
 ## Approach ##
 
@@ -101,16 +163,16 @@ As mentioned in the previous section, two new optional fields are proposed in th
 Two optional new fields are added to allow a multiple speed fan.
 
 	...
-  	A21, \field Design Specification Multispeed Fan Object Type
+  	A21, \field Design Specification Multispeed Object Type
        \type choice
-       \key FanPerformance:Multispeed
-       \note Enter the type of performance specification object used to describe the multispeed fan.
-  	A22; \field Design Specification Multispeed Fan Object Name
+       \key UnitarySystemPerformance:Multispeed
+       \note Enter the type of performance specification object used to describe the multispeed coil or fan.
+  	A22; \field Design Specification Multispeed Object Name
        \type object-list
-       \object-list FanPerformaceNames
-       \note Enter the name of the performance specification object used to describe the multispeed fan.
+       \object-list UnitarySystemPerformaceNames
+       \note Enter the name of the performance specification object used to describe the multispeed coil or fan.
 
-If the entered heating coil type is Coil:Heating:WaterToAirHeatPump:EquationFit, the multiple fan spees are allowed, the full water flow rate is assumed. The fan air flow cycles between adjacent speeds based on the cooling/heating capacity.
+If the entered heating coil type is Coil:Heating:WaterToAirHeatPump:EquationFit, the multiple fan speeds are allowed, the full water flow rate is assumed. The fan air flow cycles between adjacent speeds based on the cooling/heating capacity.
 
 If the entered heating coil type is Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit, the input of Number of Speeds should be the same number defined in FanPerformance:Multispeed. The fan air flow speed coordinates with the cooling/heating coil stage for variable speed water to air coils.
 
@@ -123,14 +185,14 @@ If the entered cooling coil type is Coil:Cooling:WaterToAirHeatPump:VariableSpee
 Two optional new fields are added to allow a multiple speed fan.
 
 	...
-  	A20, \field Design Specification Multispeed Fan Object Type
+  	A20, \field Design Specification Multispeed Object Type
        \type choice
-       \key FanPerformance:Multispeed
-       \note Enter the type of performance specification object used to describe the multispeed fan.
+       \key UnitarySystemPerformance:Multispeed
+       \note Enter the type of performance specification object used to describe the multispeed coil or fan.
   	A21; \field Design Specification Multispeed Fan Object Name
        \type object-list
-       \object-list FanPerformaceNames
-       \note Enter the name of the performance specification object used to describe the multispeed fan.
+       \object-list UnitarySystemPerformaceNames
+       \note Enter the name of the performance specification object used to describe the multispeed coil or fan.
 
 Allowed heating and cooling coils:
  
@@ -142,20 +204,6 @@ Allowed heating and cooling coils:
 Since ZoneHVAC:TerminalUnit:VariableRefrigerantFlow only allows single speed coils, listed below, no multiple speed coils will be applied. The multiple speed fan will be allowed after adding the FanPerformance:Multispeed field. The fan air flow cycles between adjacent speeds based on the cooling/heating capacity for Coil:Cooling:DX:VariableRefrigerantFlow and Coil:Heating:DX:VariableRefrigerantFlow only.
 
 Since Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl and Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl require variable speed fans, the multiple speed fans are not applied to both coils.
-
-###FanPerformance:Multispeed###
-
-A new object is proposed. The advantage of the new object will be applied different fan flow ratios to single and variable speed coils.  
-
-It should be pointed out that No Load Supply Air Flow Rate Ratio field is removed, becuase the parenet objects have a filed to defind No Load Supply Air Flow Rates. 
-
-<span style="color:red">
-
-An alternative way is to use the existing object of UnitarySystemPerformance:Multispeed. Since this object will not be used only for UnitarySystem, the name of the object may be changed.
-
-It should be pointed out that since this object mainly specify airflow ratios at different speeds, it is OK to use the object with minor name change.
-  
-</span>
 
 ###Comparison between UnitarySystemPerformance:Multispeed and Fan:SystemModel###
 
@@ -455,14 +503,14 @@ This section provides input objects, two modified objects and a new object. Any 
 
 <span style="color:red">
 
-  	A21, \field Design Specification Multispeed Fan Object Type
+  	A21, \field Design Specification Multispeed Object Type
        \type choice
        \key FanPerformance:Multispeed
-       \note Enter the type of performance specification object used to describe the multispeed fan.
-  	A22; \field Design Specification Multispeed Fan Object Name
+       \note Enter the type of performance specification object used to describe the multispeed fan or coil.
+  	A22; \field Design Specification Multispeed Object Name
        \type object-list
        \object-list FanPerformaceNames
-       \note Enter the name of the performance specification object used to describe the multispeed fan.
+       \note Enter the name of the performance specification object used to describe the multispeed fan or coil.
 </span>
 
 ###ZoneHVAC:TerminalUnit:VariableRefrigerantFlow###
@@ -702,217 +750,15 @@ This section provides input objects, two modified objects and a new object. Any 
 
 <span style="color:red">
 
-  	A20, \field Design Specification Multispeed Fan Object Type
+  	A20, \field Design Specification Multispeed Object Type
        \type choice
        \key FanPerformance:Multispeed
-       \note Enter the type of performance specification object used to describe the multispeed fan.
-  	A21; \field Design Specification Multispeed Fan Object Name
+       \note Enter the type of performance specification object used to describe the multispeed fan or coil.
+  	A21; \field Design Specification Multispeed Object Name
        \type object-list
        \object-list FanPerformaceNames
-       \note Enter the name of the performance specification object used to describe the multispeed fan.
+       \note Enter the name of the performance specification object used to describe the multispeed fan or coil.
 </span>
-
-###FanPerformance:Multispeed###
-
-This section provides inputs of the new object.
-
-<span style="color:red">
-
-An alternative way is to use the existing object of UnitarySystemPerformance:Multispeed. Since this object is not used only for UnitarySystem, the name of the object may be changed.
-
-It should be pointed out that since this object mainly specify airflow ratios at different speeds, it is OK to use the object with minor name change.
-  
-</span>
-
-
-	FanPerformance:Multispeed,
-       \memo The FanPerformance object is used to specify the air flow ratio at each
-       \memo operating speed. This object is primarily used for ZoneHVAC:WaterToAirHeatPump and 
-       \memo ZoneHVAC:TerminalUnit:VariableRefrigerantFlow objects to allow operation at 
-       \memo different fan flow rates.
-       \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
-  	A1 , \field Name
-       \required-field
-       \reference FanPerformaceNames
-  	N1 , \field Number of Speeds for Heating
-       \required-field
-       \type integer
-       \minimum 0
-       \maximum 10
-       \note Used only for Multi speed fans
-       \note Enter the number of the following sets of data for air flow rates.
-  	N2 , \field Number of Speeds for Cooling
-       \required-field
-       \type integer
-       \minimum 0
-       \maximum 10
-       \note Used only for Multi speed fans
-       \note Enter the number of the following sets of data for air flow rates.
-  	N3 , \field Heating Speed 1 Supply Air Flow Ratio
-       \required-field
-       \type real
-       \autosizable
-       \minimum> 0
-       \begin-extensible
-       \note Used only for Multi speed coils
-       \note Enter the lowest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N4 , \field Cooling Speed 1 Supply Air Flow Ratio
-       \required-field
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the lowest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N5 , \field Heating Speed 2 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N6 , \field Cooling Speed 2 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N7 , \field Heating Speed 3 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N8 , \field Cooling Speed 3 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N9, \field Heating Speed 4 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N10, \field Cooling Speed 4 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N11, \field Heating Speed 5 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N12, \field Cooling Speed 5 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N13, \field Heating Speed 6 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N14, \field Cooling Speed 6 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N15, \field Heating Speed 7 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N16, \field Cooling Speed 7 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N17, \field Heating Speed 8 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N18, \field Cooling Speed 8 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N19, \field Heating Speed 9 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N20, \field Cooling Speed 9 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N21, \field Heating Speed 10 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during heating
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-  	N22; \field Cooling Speed 10 Supply Air Flow Ratio
-       \type real
-       \autosizable
-       \minimum> 0
-       \note Used only for Multi speed coils
-       \note Enter the next highest operating supply air flow ratio during cooling
-       \note operation or specify autosize. This value is the ratio of air flow
-       \note at this speed to the maximum air flow rate.
-
-
 
 ## Outputs Description ##
 
