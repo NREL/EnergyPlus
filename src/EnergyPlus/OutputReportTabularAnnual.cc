@@ -129,7 +129,7 @@ void GetInputTabularAnnual(EnergyPlusData &state)
             for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
                 curVarMtr = alphArray(jAlpha);
                 if (curVarMtr.empty()) {
-                    ShowFatalError(state, "Blank report name in Oputput:Table:Annual");
+                    ShowFatalError(state, "Blank report name in Output:Table:Annual");
                 }
                 if (jAlpha <= numAlphas) {
                     std::string aggregationString = alphArray(jAlpha + 1);
