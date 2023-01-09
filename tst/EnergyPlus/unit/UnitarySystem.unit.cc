@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -275,6 +275,7 @@ public:
         state->dataSize->SysSizPeakDDNum(1).CoolFlowPeakDD = 1;
         state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = 1;
         state->dataSize->FinalSysSizing.allocate(1);
+        state->dataSize->CalcSysSizing.allocate(1);
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataHVACGlobal->NumPrimaryAirSys = 1;
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -370,7 +371,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataSize->CurOASysNum = 0;
     state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.3;
     Real64 heatFlowRat = 0.3;
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
@@ -4036,11 +4037,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     Real64 RatedSourceTempCool = state->dataSize->DesDayWeath(1).Temp(1);
     EXPECT_EQ(RatedSourceTempCool, 35.0);
     Real64 CoolCoolCapAtPeak = 33453.67913;
-    Real64 TotCapTempModFac = CurveManager::CurveValue(
-        *state,
-        state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel),
-        17.410329442560833,
-        RatedSourceTempCool);
+    Real64 TotCapTempModFac =
+        Curve::CurveValue(*state,
+                          state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel),
+                          17.410329442560833,
+                          RatedSourceTempCool);
 
     EXPECT_NEAR(TotCapTempModFac, 0.930018048445091, 0.001);
     Real64 RatedCapCoolTotalDes = CoolCoolCapAtPeak / TotCapTempModFac;
@@ -11635,6 +11636,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
 
@@ -11655,7 +11657,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
-    bool zoneEquipment = true;
+    bool zoneEquipment = false;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
@@ -11678,7 +11680,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
-    ControlZoneNum = thisSys->NodeNumOfControlledZone;
+    int ControlZoneNodeNum = thisSys->NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
     state->dataLoopNodes->Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
@@ -11687,8 +11689,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
 
     // set zone temperature
-    state->dataLoopNodes->Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
-    state->dataLoopNodes->Node(ControlZoneNum).HumRat =
+    state->dataLoopNodes->Node(ControlZoneNodeNum).Temp =
+        24.0; // set zone temperature during cooling season used to determine system delivered capacity
+    state->dataLoopNodes->Node(ControlZoneNodeNum).HumRat =
         0.001;                               // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0; // initialize weather
     state->dataEnvrn->OutHumRat = 0.1;
@@ -11905,9 +11908,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     EXPECT_NEAR(0.528942, thisSys->m_CycRatio, 0.0001); // cycling ratio
     EXPECT_EQ(1, thisSys->m_CoolingSpeedNum);           // Speed number
     EXPECT_NEAR(1.02,
-                state->dataCurveManager->PerfCurve(21).CurveInput1,
+                state->dataCurveManager->PerfCurve(21).inputs[0],
                 0.0001); // Speed 1 Total Cooling Capacity Function of Flow Fraction Curve input value
-    EXPECT_NEAR(1.02, state->dataCurveManager->PerfCurve(22).CurveInput1,
+    EXPECT_NEAR(1.02, state->dataCurveManager->PerfCurve(22).inputs[0],
                 0.0001);                                                     // Speed 1 Total EIR Function of Flow Fraction Curve input value
     EXPECT_NEAR(0.4896, state->dataHVACGlobal->MSHPMassFlowRateLow, 0.0001); // cycling ratio
     // #8580
@@ -11941,15 +11944,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     EXPECT_NEAR(0.15358, thisSys->m_CycRatio, 0.0001); // cycling ratio
     EXPECT_EQ(1, thisSys->m_HeatingSpeedNum);          // Speed number
     EXPECT_NEAR(0.90667,
-                state->dataCurveManager->PerfCurve(13).CurveInput1,
+                state->dataCurveManager->PerfCurve(13).inputs[0],
                 0.0001); // Speed 1 Total Cooling Capacity Function of Flow Fraction Curve input value
     EXPECT_NEAR(0.98506,
-                state->dataCurveManager->PerfCurve(13).CurveOutput,
+                state->dataCurveManager->PerfCurve(13).output,
                 0.0001); // Speed 1 Total Cooling Capacity Function of Flow Fraction Curve input value
     EXPECT_NEAR(0.90667,
-                state->dataCurveManager->PerfCurve(23).CurveInput1,
+                state->dataCurveManager->PerfCurve(23).inputs[0],
                 0.0001); // Speed 1 Total Cooling Capacity Function of Flow Fraction Curve input value
-    EXPECT_NEAR(1.03138, state->dataCurveManager->PerfCurve(23).CurveOutput,
+    EXPECT_NEAR(1.03138, state->dataCurveManager->PerfCurve(23).output,
                 0.0001);                                                     // Speed 1 Total EIR Function of Flow Fraction Curve input value
     EXPECT_NEAR(0.4896, state->dataHVACGlobal->MSHPMassFlowRateLow, 0.0001); // cycling ratio
 }
@@ -15953,10 +15956,10 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataLoopNodes->Node(1).HumRat = 0.01522; // 17C wb
     state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
     state->dataLoopNodes->Node(1).Press = state->dataEnvrn->OutBaroPress;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
+
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = state->dataLoopNodes->Node(1).HumRat;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -16009,8 +16012,8 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataLoopNodes->Node(8).Temp = 24.18496;    // 24C db
     state->dataLoopNodes->Node(8).HumRat = 0.0121542; // 17C wb
     state->dataLoopNodes->Node(8).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(8).Temp, state->dataLoopNodes->Node(8).HumRat);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = state->dataLoopNodes->Node(1).HumRat;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(1).Temp;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -397.162;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -397.162;
@@ -17268,10 +17271,10 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     state->dataLoopNodes->Node(1).HumRat = 0.01522; // 17C wb
     state->dataLoopNodes->Node(1).Press = state->dataEnvrn->OutBaroPress;
     state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
+
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = state->dataLoopNodes->Node(1).HumRat;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -19802,15 +19805,15 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     // use psuedo real CapFT curve, use unity curves for all others
     state->dataCurveManager->NumCurves = 2;
     state->dataCurveManager->PerfCurve.allocate(2);
-    state->dataCurveManager->PerfCurve(1).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(1).Coeff1 = 1.5;
-    state->dataCurveManager->PerfCurve(1).Coeff4 = -0.017; // yields roughly 1.0 at water rating point of 29.4444
-    state->dataCurveManager->PerfCurve(1).curveType = CurveManager::CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(1).Var1Max = 50.0;
-    state->dataCurveManager->PerfCurve(1).Var2Max = 50.0;
-    state->dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
-    state->dataCurveManager->PerfCurve(2).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(2).curveType = CurveManager::CurveType::Linear;
+    state->dataCurveManager->PerfCurve(1).interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(1).coeff[0] = 1.5;
+    state->dataCurveManager->PerfCurve(1).coeff[3] = -0.017; // yields roughly 1.0 at water rating point of 29.4444
+    state->dataCurveManager->PerfCurve(1).curveType = Curve::CurveType::BiQuadratic;
+    state->dataCurveManager->PerfCurve(1).inputLimits[0].max = 50.0;
+    state->dataCurveManager->PerfCurve(1).inputLimits[1].max = 50.0;
+    state->dataCurveManager->PerfCurve(2).coeff[0] = 1.0;
+    state->dataCurveManager->PerfCurve(2).interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(2).curveType = Curve::CurveType::Linear;
 
     // set up UnitarySystem
     state->dataSize->CurSysNum = 1;
@@ -19853,17 +19856,17 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     Real64 MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(*state, MixTemp, MixHumRat, state->dataEnvrn->StdBaroPress);
     Real64 constexpr RatedInletWaterTemp = 29.4444; // 85 F cooling mode
     Real64 capFT_water =
-        CurveManager::CurveValue(*state, state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10), MixWetBulb, RatedInletWaterTemp);
+        Curve::CurveValue(*state, state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10), MixWetBulb, RatedInletWaterTemp);
 
     // these curve results are very near 1
     EXPECT_NEAR(state->dataSize->DataCoilSizingCapFT, capFT_water, 0.0001);
     EXPECT_NEAR(capFT_water, 0.9994, 0.0001);
 
     // OAT at cooling peak was set = 0 C
-    Real64 capFT_OAT = CurveManager::CurveValue(*state,
-                                                state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10),
-                                                MixWetBulb,
-                                                state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak);
+    Real64 capFT_OAT = Curve::CurveValue(*state,
+                                         state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).MSCCapFTemp(10),
+                                         MixWetBulb,
+                                         state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak);
     // this value is certainly not used in the capacity calculation as shown below
     EXPECT_NEAR(capFT_OAT, 1.5, 0.0001);
 

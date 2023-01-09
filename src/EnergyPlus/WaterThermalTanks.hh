@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -893,11 +893,18 @@ namespace WaterThermalTanks {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
+        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Real64 desTankTemp, TankOperatingMode mode, Real64 mDotWater);
 
         Real64 PLRResidualIterSpeed(EnergyPlusData &state,
                                     Real64 SpeedRatio, // speed ratio between two speed levels
-                                    Array1D<Real64> const &Par);
+                                    int HPNum,
+                                    int SpeedNum,
+                                    int HPWaterInletNode,
+                                    int HPWaterOutletNode,
+                                    Real64 RhoWater,
+                                    Real64 desTankTemp,
+                                    TankOperatingMode mode,
+                                    bool FirstHVACIteration);
 
         static void ValidatePLFCurve(EnergyPlusData &state, int CurveIndex, bool &IsValid);
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -3112,7 +3111,7 @@ namespace HVACMultiSpeedHeatPump {
                            DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                            int const OpMode,                                        // operating mode: CycFanCycCoil | ContFanCycCoil
                            Real64 const QZnReq,                                     // cooling or heating output needed by zone [W]
-                           int const ZoneNum,                                       // Index to zone number
+                           int const ZoneNum [[maybe_unused]],                      // Index to zone number
                            int &SpeedNum,                                           // Speed number
                            Real64 &SpeedRatio,                                      // unit speed ratio for DX coils
                            Real64 &PartLoadFrac,                                    // unit part load fraction
@@ -3146,7 +3145,6 @@ namespace HVACMultiSpeedHeatPump {
         Real64 NoCompOutput;       // output when no active compressor [W]
         Real64 ErrorToler;         // error tolerance
         int SolFla;                // Flag of RegulaFalsi solver
-        Array1D<Real64> Par(9);    // Parameters passed to RegulaFalsi
         Real64 CpAir;              // air specific heat
         Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
         Real64 QCoilActual;        // coil load actually delivered returned to calling component
@@ -3393,26 +3391,33 @@ namespace HVACMultiSpeedHeatPump {
             // Calculate the part load fraction
             if (((QZnReq > SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput)) &&
                 (!MSHeatPump(MSHeatPumpNum).Staged)) {
-
-                Par(1) = MSHeatPumpNum;
-                Par(2) = ZoneNum;
-                if (FirstHVACIteration) {
-                    Par(3) = 1.0;
-                } else {
-                    Par(3) = 0.0;
-                }
-                Par(4) = OpMode;
-                Par(5) = QZnReq;
-                Par(6) = OnOffAirFlowRatio;
-                Par(7) = SupHeaterLoad;
-                Par(9) = static_cast<int>(CompressorOp);
                 // Check whether the low speed coil can meet the load or not
                 CalcMSHeatPump(
                     state, MSHeatPumpNum, FirstHVACIteration, CompressorOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                 if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
                     SpeedRatio = 0.0;
                     SpeedNum = 1;
-                    SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
+                    auto f = [&state, MSHeatPumpNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](
+                                 Real64 const PartLoadFrac) {
+                        //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq); MSHP output depends on PLR which is being varied to zero
+                        //  the residual.
+                        Real64 ActualOutput; // delivered capacity of MSHP
+                        Real64 tmpAirFlowRatio = OnOffAirFlowRatio;
+                        Real64 tmpHeaterLoad = SupHeaterLoad;
+                        CalcMSHeatPump(state,
+                                       MSHeatPumpNum,
+                                       FirstHVACIteration,
+                                       CompressorOp,
+                                       1,
+                                       0.0,
+                                       PartLoadFrac,
+                                       ActualOutput,
+                                       QZnReq,
+                                       tmpAirFlowRatio,
+                                       tmpHeaterLoad);
+                        return (ActualOutput - QZnReq) / QZnReq;
+                    };
+                    SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (state.dataHVACMultiSpdHP->ErrCountCyc == 0) {
@@ -3477,8 +3482,27 @@ namespace HVACMultiSpeedHeatPump {
                             }
                         }
                     }
-                    Par(8) = SpeedNum;
-                    SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
+                    auto f = [&state, OnOffAirFlowRatio, SupHeaterLoad, MSHeatPumpNum, FirstHVACIteration, CompressorOp, SpeedNum, QZnReq](
+                                 Real64 const SpeedRatio) {
+                        //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq) MSHP output depends on PLR which is being varied to zero the
+                        //  residual.
+                        Real64 localAirFlowRatio = OnOffAirFlowRatio;
+                        Real64 localHeaterLoad = SupHeaterLoad;
+                        Real64 ActualOutput;
+                        CalcMSHeatPump(state,
+                                       MSHeatPumpNum,
+                                       FirstHVACIteration,
+                                       CompressorOp,
+                                       SpeedNum,
+                                       SpeedRatio,
+                                       1.0,
+                                       ActualOutput,
+                                       QZnReq,
+                                       localAirFlowRatio,
+                                       localHeaterLoad);
+                        return (ActualOutput - QZnReq) / QZnReq;
+                    };
+                    SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (state.dataHVACMultiSpdHP->ErrCountVar == 0) {
@@ -3506,26 +3530,33 @@ namespace HVACMultiSpeedHeatPump {
             } else {
                 // Staged thermostat performance
                 if (MSHeatPump(MSHeatPumpNum).StageNum != 0) {
-                    Par(1) = MSHeatPumpNum;
-                    Par(2) = ZoneNum;
-                    if (FirstHVACIteration) {
-                        Par(3) = 1.0;
-                    } else {
-                        Par(3) = 0.0;
-                    }
-                    Par(4) = OpMode;
-                    Par(5) = QZnReq;
-                    Par(6) = OnOffAirFlowRatio;
-                    Par(7) = SupHeaterLoad;
-                    Par(9) = static_cast<int>(CompressorOp);
                     SpeedNum = std::abs(MSHeatPump(MSHeatPumpNum).StageNum);
-                    Par(8) = SpeedNum;
                     if (SpeedNum == 1) {
                         CalcMSHeatPump(
                             state, MSHeatPumpNum, FirstHVACIteration, CompressorOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                         SpeedRatio = 0.0;
                         if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
-                            SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
+                            auto f = [&state, MSHeatPumpNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](
+                                         Real64 const PartLoadFrac) {
+                                //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq); MSHP output depends on PLR which is being varied to
+                                //  zero the residual.
+                                Real64 ActualOutput; // delivered capacity of MSHP
+                                Real64 tmpAirFlowRatio = OnOffAirFlowRatio;
+                                Real64 tmpHeaterLoad = SupHeaterLoad;
+                                CalcMSHeatPump(state,
+                                               MSHeatPumpNum,
+                                               FirstHVACIteration,
+                                               CompressorOp,
+                                               1,
+                                               0.0,
+                                               PartLoadFrac,
+                                               ActualOutput,
+                                               QZnReq,
+                                               tmpAirFlowRatio,
+                                               tmpHeaterLoad);
+                                return (ActualOutput - QZnReq) / QZnReq;
+                            };
+                            SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             if (SolFla == -1) {
                                 if (!state.dataGlobal->WarmupFlag) {
                                     if (state.dataHVACMultiSpdHP->ErrCountCyc == 0) {
@@ -3584,8 +3615,28 @@ namespace HVACMultiSpeedHeatPump {
                                            OnOffAirFlowRatio,
                                            SupHeaterLoad);
                             if ((QZnReq > 0.0 && QZnReq <= FullOutput) || (QZnReq < 0.0 && QZnReq >= FullOutput)) {
-                                Par(8) = SpeedNum;
-                                SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
+                                auto f =
+                                    [&state, OnOffAirFlowRatio, SupHeaterLoad, MSHeatPumpNum, FirstHVACIteration, CompressorOp, SpeedNum, QZnReq](
+                                        Real64 const SpeedRatio) {
+                                        //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq) MSHP output depends on PLR which is being
+                                        //  varied to zero the residual.
+                                        Real64 localAirFlowRatio = OnOffAirFlowRatio;
+                                        Real64 localHeaterLoad = SupHeaterLoad;
+                                        Real64 ActualOutput;
+                                        CalcMSHeatPump(state,
+                                                       MSHeatPumpNum,
+                                                       FirstHVACIteration,
+                                                       CompressorOp,
+                                                       SpeedNum,
+                                                       SpeedRatio,
+                                                       1.0,
+                                                       ActualOutput,
+                                                       QZnReq,
+                                                       localAirFlowRatio,
+                                                       localHeaterLoad);
+                                        return (ActualOutput - QZnReq) / QZnReq;
+                                    };
+                                SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (state.dataHVACMultiSpdHP->ErrCountVar == 0) {
@@ -3741,13 +3792,17 @@ namespace HVACMultiSpeedHeatPump {
         InletNode = MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
         if (MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex > 0) {
             if (state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).IsSecondaryDXCoilInZone) {
-                OutsideDryBulbTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
+                OutsideDryBulbTemp = state.dataZoneTempPredictorCorrector
+                                         ->zoneHeatBalance(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr)
+                                         .ZT;
             } else {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
         } else if (MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex > 0) {
             if (state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).IsSecondaryDXCoilInZone) {
-                OutsideDryBulbTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
+                OutsideDryBulbTemp = state.dataZoneTempPredictorCorrector
+                                         ->zoneHeatBalance(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr)
+                                         .ZT;
             } else {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
@@ -4100,178 +4155,6 @@ namespace HVACMultiSpeedHeatPump {
 
         MSHeatPump(MSHeatPumpNum).LoadMet = LoadMet;
     }
-
-    //******************************************************************************
-
-    Real64 MSHPCyclingResidual(EnergyPlusData &state,
-                               Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1D<Real64> const &Par // par(1) = MSHPNum
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   June 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  Revised for multispeed heat pump use based on DXCoilCyclingResidual
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq)
-        //  MSHP output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        //  Calls CalcMSHeatPump to get ActualOutput at the given part load ratio
-        //  and calculates the residual as defined above
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 MSHPCyclingResidual;
-
-        // Argument array dimensioning
-
-        // Locals
-        Real64 SupHeaterLoad; // Supplemental heater load
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = Zone Num
-        // par(3) = FirstHVACIteration
-        // par(4) = OpMode
-        // par(5) = QZnReq
-        // par(6) = OnOffAirFlowRatio
-        // par(7) = SupHeaterLoad
-        // par(9) = CompressorOp
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int MSHeatPumpNum;                                 // MSHP index
-        int ZoneNum;                                       // Zone index
-        bool FirstHVACIteration;                           // FirstHVACIteration flag
-        int OpMode;                                        // Compressor operating mode
-        Real64 QZnReq;                                     // zone load (W)
-        Real64 OnOffAirFlowRatio;                          // ratio of compressor ON airflow to average airflow over timestep
-        Real64 ActualOutput;                               // delivered capacity of MSHP
-        DataHVACGlobals::CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
-
-        MSHeatPumpNum = int(Par(1));
-        ZoneNum = int(Par(2));
-        // FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-        FirstHVACIteration = (Par(3) == 1.0);
-        OpMode = int(Par(4));
-        QZnReq = Par(5);
-        OnOffAirFlowRatio = Par(6);
-        SupHeaterLoad = Par(7);
-        CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par(9));
-
-        CalcMSHeatPump(
-            state, MSHeatPumpNum, FirstHVACIteration, CompressorOp, 1, 0.0, PartLoadFrac, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
-
-        MSHPCyclingResidual = (ActualOutput - QZnReq) / QZnReq;
-        return MSHPCyclingResidual;
-    }
-
-    //******************************************************************************
-
-    Real64 MSHPVarSpeedResidual(EnergyPlusData &state,
-                                Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                Array1D<Real64> const &Par // par(1) = MSHPNum
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   June 2007
-        //       MODIFIED       na L. Gu, Oct. 2006, revised for multispeed heat pump use
-        //       RE-ENGINEERED  Revised for multispeed heat pump use based on DXCoilVarSpeedResidual
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq)
-        //  MSHP output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        //  Calls CalcMSHeatPump to get ActualOutput at the given speed ratio (partload ratio for high speed)
-        //  and calculates the residual as defined above
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 MSHPVarSpeedResidual;
-
-        // Argument array dimensioning
-
-        // Locals
-        Real64 SupHeaterLoad; // Supplemental heater load
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = Zone Num
-        // par(3) = FirstHVACIteration
-        // par(4) = OpMode
-        // par(5) = QZnReq
-        // par(6) = OnOffAirFlowRatio
-        // par(7) = SupHeaterLoad
-        // par(8) = SpeedNum
-        // par(9) = CompressorOp
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int MSHeatPumpNum;                                 // MSHP index
-        int ZoneNum;                                       // Zone index
-        bool FirstHVACIteration;                           // FirstHVACIteration flag
-        int OpMode;                                        // Compressor operating mode
-        Real64 QZnReq;                                     // zone load (W)
-        Real64 OnOffAirFlowRatio;                          // ratio of compressor ON airflow to average airflow over timestep
-        Real64 ActualOutput;                               // delivered capacity of MSHP
-        int SpeedNum;                                      // Speed number
-        DataHVACGlobals::CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
-
-        MSHeatPumpNum = int(Par(1));
-        ZoneNum = int(Par(2));
-        // FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-        FirstHVACIteration = (Par(3) == 1.0);
-        OpMode = int(Par(4));
-        QZnReq = Par(5);
-        OnOffAirFlowRatio = Par(6);
-        SupHeaterLoad = Par(7);
-        SpeedNum = int(Par(8));
-        CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par(9));
-
-        CalcMSHeatPump(state,
-                       MSHeatPumpNum,
-                       FirstHVACIteration,
-                       CompressorOp,
-                       SpeedNum,
-                       SpeedRatio,
-                       1.0,
-                       ActualOutput,
-                       QZnReq,
-                       OnOffAirFlowRatio,
-                       SupHeaterLoad);
-
-        MSHPVarSpeedResidual = (ActualOutput - QZnReq) / QZnReq;
-        return MSHPVarSpeedResidual;
-    }
-
-    //******************************************************************************
 
     void UpdateMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum) // Engine driven heat pump number
     {
@@ -4630,7 +4513,6 @@ namespace HVACMultiSpeedHeatPump {
         Real64 MinWaterFlow;    // coil minimum hot water mass flow rate, kg/s
         Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;    // actual hot water mass flow rate
-        Array1D<Real64> Par(3);
         int SolFlag;
 
         int HeatCoilType;
@@ -4690,14 +4572,25 @@ namespace HVACMultiSpeedHeatPump {
                         // control water flow to obtain output matching HeatingLoad
                         SolFlag = 0;
                         MinWaterFlow = 0.0;
-                        Par(1) = double(MSHeatPumpNum);
-                        if (FirstHVACIteration) {
-                            Par(2) = 1.0;
-                        } else {
-                            Par(2) = 0.0;
-                        }
-                        Par(3) = HeatingLoad;
-                        SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                        auto f = [&state, MSHeatPumpNum, FirstHVACIteration, HeatingLoad](Real64 const HWFlow) {
+                            // Calculates residual function (QCoilActual - SupHeatCoilLoad) / SupHeatCoilLoad
+                            // coil actual output depends on the hot water flow rate which is varied to minimize the residual.
+                            Real64 targetHeatingCoilLoad = HeatingLoad;
+                            Real64 calcHeatingCoilLoad = targetHeatingCoilLoad;
+                            Real64 mdot = HWFlow;
+                            auto &hp = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum);
+                            PlantUtilities::SetComponentFlowRate(
+                                state, mdot, hp.HotWaterCoilControlNode, hp.HotWaterCoilOutletNode, hp.HotWaterPlantLoc);
+                            // simulate the hot water supplemental heating coil
+                            WaterCoils::SimulateWaterCoilComponents(
+                                state, hp.HotWaterCoilName, FirstHVACIteration, hp.HotWaterCoilNum, calcHeatingCoilLoad, hp.OpMode);
+                            if (targetHeatingCoilLoad != 0.0) {
+                                return (calcHeatingCoilLoad - targetHeatingCoilLoad) / targetHeatingCoilLoad;
+                            } else { // Autodesk:Return Condition added to assure return value is set
+                                return 0.0;
+                            }
+                        };
+                        SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
                         if (SolFlag == -1) {
                             if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
                                 ShowWarningMessage(state,
@@ -4782,81 +4675,6 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
         HeatCoilLoadmet = QCoilActual;
-    }
-
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,       // hot water flow rate in kg/s
-                                Array1D<Real64> const &Par // Par(5) is the requested coil load
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bereket Nigusse, FSEC/UCF
-        //       DATE WRITTEN   November 2011
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (QCoilActual - SupHeatCoilLoad) / SupHeatCoilLoad
-        // coil actual output depends on the hot water flow rate which is varied to minimize the
-        // residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls HotWaterCoilResidual, and calculates the residual as defined above.
-
-        // REFERENCES:
-
-        // Using/Aliasing
-        using PlantUtilities::SetComponentFlowRate;
-        using WaterCoils::SimulateWaterCoilComponents;
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int MSHeatPumpNum;
-        bool FirstHVACSoln;
-        Real64 QCoilActual;  // delivered coild load, W
-        Real64 HeatCoilLoad; // requested coild load, W
-        Real64 mdot;
-
-        MSHeatPumpNum = int(Par(1));
-        FirstHVACSoln = (Par(2) > 0.0);
-        HeatCoilLoad = Par(3);
-        QCoilActual = HeatCoilLoad;
-        mdot = HWFlow;
-        SetComponentFlowRate(state,
-                             mdot,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilControlNode,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilOutletNode,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc);
-        // simulate the hot water supplemental heating coil
-        SimulateWaterCoilComponents(state,
-                                    state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilName,
-                                    FirstHVACSoln,
-                                    state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilNum,
-                                    QCoilActual,
-                                    state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).OpMode);
-        if (HeatCoilLoad != 0.0) {
-            Residuum = (QCoilActual - HeatCoilLoad) / HeatCoilLoad;
-        } else { // Autodesk:Return Condition added to assure return value is set
-            Residuum = 0.0;
-        }
-        return Residuum;
     }
 
 } // namespace HVACMultiSpeedHeatPump

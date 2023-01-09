@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -135,39 +135,6 @@ namespace OutputProcessor {
     };
 
     constexpr int N_WriteTimeStampFormatData(100);
-
-    constexpr const char *DayTypes(int &d)
-    {
-        switch (d) {
-        case 1:
-            return "Sunday";
-        case 2:
-            return "Monday";
-        case 3:
-            return "Tuesday";
-        case 4:
-            return "Wednesday";
-        case 5:
-            return "Thursday";
-        case 6:
-            return "Friday";
-        case 7:
-            return "Saturday";
-        case 8:
-            return "Holiday";
-        case 9:
-            return "SummerDesignDay";
-        case 10:
-            return "WinterDesignDay";
-        case 11:
-            return "CustomDay1";
-        case 12:
-            return "CustomDay2";
-        default:
-            assert(false);
-        }
-        return "Impossible day"; // even though the above switch block will *always* either return a string or assert, compilers still warn...
-    }
 
     static constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
                                                                              "COOLING",

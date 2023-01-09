@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -189,7 +189,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 CoilInWetBulb =
                                 Psychrometrics::PsyTwbFnTdbWPb(state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
                             if (this->dataTotCapCurveIndex > 0) {
-                                TotCapTempModFac = CurveManager::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                             } else if (this->dataTotCapCurveValue > 0) {
                                 TotCapTempModFac = this->dataTotCapCurveValue;
                             } else {
@@ -430,7 +430,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             }
                         }
                         if (this->dataTotCapCurveIndex > 0) {
-                            TotCapTempModFac = CurveManager::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                            TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                         } else {
                             TotCapTempModFac = 1.0;
                         }

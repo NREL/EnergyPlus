@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -108,12 +108,6 @@ namespace StandardRatings {
                          Optional<Real64 const> CondVolFlowRate,
                          Optional_int_const CondLoopNum,
                          Optional<Real64 const> OpenMotorEff);
-
-    Real64
-    ReformEIRChillerCondInletTempResidual(EnergyPlusData &state,
-                                          Real64 const CondenserOutletTemp, // Condenser outlet temperature (boundary condition or guess value) [C]
-                                          Array1<Real64> const &Par         // par(1)  = Condenser inlet temperature at AHRI Standard
-    );
 
     void ReportChillerIPLV(EnergyPlusData &state,
                            std::string const &ChillerName,            // Name of Chiller for which IPLV is calculated

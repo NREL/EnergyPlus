@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -273,8 +273,12 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             ListPtr = this_component.OpScheme(CurCompLevelOpNum).EquipList(ListNum).ListPtr;
             RangeHiLimit = this_op_scheme.EquipList(ListPtr).RangeUpperLimit;
             RangeLoLimit = this_op_scheme.EquipList(ListPtr).RangeLowerLimit;
-            // these limits are stored with absolute values, but the LoopDemand can be negative for cooling
-            TestRangeVariable = std::abs(RangeVariable);
+            if (CurSchemeType == OpScheme::HeatingRB || CurSchemeType == OpScheme::CoolingRB) {
+                // these limits are stored with absolute values, but the LoopDemand can be negative for cooling
+                TestRangeVariable = std::abs(RangeVariable);
+            } else {
+                TestRangeVariable = RangeVariable;
+            }
 
             // trying to do something where the last stage still runs the equipment but at the hi limit.
 

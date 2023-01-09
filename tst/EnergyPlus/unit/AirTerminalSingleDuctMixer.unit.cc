@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -358,7 +358,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     UnitarySystems::UnitarySys thisSys;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
-    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", false, 0);
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
@@ -612,7 +612,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     UnitarySystems::UnitarySys thisSys;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys = state->dataUnitarySystems->unitarySys[0];
-    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", false, 0);
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTAC
@@ -964,7 +964,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     UnitarySystems::UnitarySys thisSys;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys = state->dataUnitarySystems->unitarySys[0];
-    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", false, 0);
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTAC
@@ -1837,7 +1837,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     UnitarySystems::UnitarySys thisSys;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys = state->dataUnitarySystems->unitarySys[0];
-    thisSys.getUnitarySystemInput(*state, "SPACE1-1 Heat Pump", false, 0);
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 Heat Pump", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTHP

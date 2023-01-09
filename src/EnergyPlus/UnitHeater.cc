@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1491,18 +1491,17 @@ namespace UnitHeater {
         int constexpr MaxIter(100); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ControlNode;        // the hot water inlet node
-        int InletNode;          // unit air inlet node
-        int OutletNode;         // unit air outlet node
-        Real64 ControlOffset;   // tolerance for output control
-        Real64 MaxWaterFlow;    // maximum water flow for heating or cooling [kg/sec]
-        Real64 MinWaterFlow;    // minimum water flow for heating or cooling [kg/sec]
-        Real64 QUnitOut;        // heating or sens. cooling provided by fan coil unit [watts]
-        Real64 LatentOutput;    // Latent (moisture) add/removal rate, negative is dehumidification [kg/s]
-        Real64 SpecHumOut;      // Specific humidity ratio of outlet air (kg moisture / kg moist air)
-        Real64 SpecHumIn;       // Specific humidity ratio of inlet air (kg moisture / kg moist air)
-        Real64 mdot;            // local temporary for fluid mass flow rate
-        Array1D<Real64> Par(3); // parameters passed to RegulaFalsi function
+        int ControlNode;      // the hot water inlet node
+        int InletNode;        // unit air inlet node
+        int OutletNode;       // unit air outlet node
+        Real64 ControlOffset; // tolerance for output control
+        Real64 MaxWaterFlow;  // maximum water flow for heating or cooling [kg/sec]
+        Real64 MinWaterFlow;  // minimum water flow for heating or cooling [kg/sec]
+        Real64 QUnitOut;      // heating or sens. cooling provided by fan coil unit [watts]
+        Real64 LatentOutput;  // Latent (moisture) add/removal rate, negative is dehumidification [kg/s]
+        Real64 SpecHumOut;    // Specific humidity ratio of outlet air (kg moisture / kg moist air)
+        Real64 SpecHumIn;     // Specific humidity ratio of inlet air (kg moisture / kg moist air)
+        Real64 mdot;          // local temporary for fluid mass flow rate
         int OpMode;
         Real64 PartLoadFrac;
         Real64 NoOutput;
@@ -1699,12 +1698,23 @@ namespace UnitHeater {
                     CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
                     if ((FullOutput - state.dataUnitHeaters->QZnReq) > SmallLoad) {
                         // Unit heater full load capacity is able to meet the load, Find PLR
-                        Par(1) = double(UnitHeatNum);
-                        Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                        if (FirstHVACIteration) Par(2) = 1.0;
-                        Par(3) = double(state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode);
+                        auto opMode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode;
+
+                        auto f = [&state, UnitHeatNum, FirstHVACIteration, opMode](Real64 const PartLoadRatio) {
+                            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+                            Real64 QUnitOut; // heating provided by unit heater [watts]
+
+                            CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, QUnitOut, opMode, PartLoadRatio);
+
+                            // Calculate residual based on output calculation flag
+                            if (state.dataUnitHeaters->QZnReq != 0.0) {
+                                return (QUnitOut - state.dataUnitHeaters->QZnReq) / state.dataUnitHeaters->QZnReq;
+                            } else
+                                return 0.0;
+                        };
+
                         // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                        SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitHeaterResidual, 0.0, 1.0, Par);
+                        SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, f, 0.0, 1.0);
                     }
                 }
 
@@ -2020,53 +2030,6 @@ namespace UnitHeater {
                 DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, 0, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FirstPass);
             }
         }
-    }
-
-    Real64 CalcUnitHeaterResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadRatio, // heating coil part load ratio
-                                  Array1D<Real64> const &Par  // Function parameters
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma/Bereket Nigusse, FSEC
-        //       DATE WRITTEN   October 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // To calculate the part-load ratio for the unit heater
-
-        // METHODOLOGY EMPLOYED:
-        // Use SolveRoot to call this Function to converge on a solution
-
-        // Return value
-        Real64 Residuum(0.0); // Result (force to 0)
-
-        //   Parameter description example:
-        //   Par(1)  = REAL(UnitHeaterNum,r64) ! Index to UnitHeater
-        //   Par(2)  = 0.0                     ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
-        //   Par(3)  = REAL(OpMode,r64)        ! Fan control, IF 1.0 then cycling fan, if 0.0 then continuous fan
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int UnitHeaterNum;       // Index to this UnitHeater
-        bool FirstHVACIteration; // FirstHVACIteration flag
-        int OpMode;              // Cycling fan or constant fan
-        Real64 QUnitOut;         // heating provided by unit heater [watts]
-
-        // Convert parameters to usable variables
-        UnitHeaterNum = int(Par(1)); // Autodesk:OPTIONAL Par used without PRESENT check
-        FirstHVACIteration = (Par(2) == 1.0);
-        OpMode = int(Par(3));
-
-        CalcUnitHeaterComponents(state, UnitHeaterNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio);
-
-        // Calculate residual based on output calculation flag
-        if (state.dataUnitHeaters->QZnReq != 0.0) {
-            Residuum = (QUnitOut - state.dataUnitHeaters->QZnReq) / state.dataUnitHeaters->QZnReq;
-        }
-
-        return Residuum;
     }
 
 } // namespace UnitHeater
