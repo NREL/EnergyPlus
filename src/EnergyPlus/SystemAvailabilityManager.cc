@@ -80,6 +80,7 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -4662,6 +4663,7 @@ namespace SystemAvailabilityManager {
         }
 
         int ZoneNum = hybridVentMgr.ControlledZoneNum;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         if (!KeepStatus) hybridVentMgr.VentilationCtrl = HybridVentCtrl_NoAction;
         TempExt = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
         WindExt = state.dataHeatBal->Zone(ZoneNum).WindSpeed;
@@ -4687,7 +4689,7 @@ namespace SystemAvailabilityManager {
                 // Enthalpy control
             } break;
             case HybridVentMode_Enth: {
-                ZoneAirEnthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+                ZoneAirEnthalpy = PsyHFnTdbW(thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
                 if (state.dataEnvrn->OutEnthalpy >= hybridVentMgr.MinOutdoorEnth && state.dataEnvrn->OutEnthalpy <= hybridVentMgr.MaxOutdoorEnth) {
                     hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
                 } else {
@@ -4728,7 +4730,7 @@ namespace SystemAvailabilityManager {
             } break;
             case HybridVentMode_OperT80: {
                 if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                    hybridVentMgr.OperativeTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
                     minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 14.3;
                     maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 21.3;
                     hybridVentMgr.minAdaTem = minAdaTem;
@@ -4745,7 +4747,7 @@ namespace SystemAvailabilityManager {
             } break;
             case HybridVentMode_OperT90: {
                 if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                    hybridVentMgr.OperativeTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
                     minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 15.3;
                     maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 20.3;
                     hybridVentMgr.minAdaTem = minAdaTem;
@@ -4813,13 +4815,13 @@ namespace SystemAvailabilityManager {
                     switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
 
                     case DataHVACGlobals::ThermostatType::SingleHeating: {
-                        if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
+                        if (thisZoneHB.MAT < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
                             hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                         }
 
                     } break;
                     case DataHVACGlobals::ThermostatType::SingleCooling: {
-                        if (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
+                        if (thisZoneHB.MAT > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
                             hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                         }
 
@@ -4845,8 +4847,8 @@ namespace SystemAvailabilityManager {
 
                     } break;
                     case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
-                        if ((state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) ||
-                            (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum))) {
+                        if ((thisZoneHB.MAT < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) ||
+                            (thisZoneHB.MAT > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum))) {
                             hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                         }
 
@@ -4858,12 +4860,8 @@ namespace SystemAvailabilityManager {
 
                 // Dew point control mode
                 if (hybridVentMgr.ControlMode == HybridVentMode_DewPoint) {
-                    ZoneAirRH = PsyRhFnTdbWPb(state,
-                                              state.dataHeatBalFanSys->MAT(ZoneNum),
-                                              state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
-                                              state.dataEnvrn->OutBaroPress) *
-                                100.0;
-                    ZoneAirDewPoint = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
+                    ZoneAirRH = PsyRhFnTdbWPb(state, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
+                    ZoneAirDewPoint = PsyTdpFnWPb(state, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
                     if (state.dataZoneCtrls->NumHumidityControlZones == 0) {
                         ++hybridVentMgr.DewPointNoRHErrCount;
                         if (hybridVentMgr.DewPointNoRHErrCount < 2) {
@@ -4891,14 +4889,11 @@ namespace SystemAvailabilityManager {
                             ZoneRHDehumidifyingSetPoint =
                                 GetCurrentScheduleValue(state, state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).DehumidifyingSchedIndex);
                             if (ZoneAirRH > ZoneRHDehumidifyingSetPoint) { // Need dehumidification
-                                WSetPoint = PsyWFnTdbRhPb(state,
-                                                          state.dataHeatBalFanSys->MAT(ZoneNum),
-                                                          (ZoneRHDehumidifyingSetPoint / 100.0),
-                                                          state.dataEnvrn->OutBaroPress);
+                                WSetPoint =
+                                    PsyWFnTdbRhPb(state, thisZoneHB.MAT, (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                                 if (WSetPoint < state.dataEnvrn->OutHumRat) hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                             } else if (ZoneAirRH < ZoneRHHumidifyingSetPoint) { // Need humidification
-                                WSetPoint = PsyWFnTdbRhPb(
-                                    state, state.dataHeatBalFanSys->MAT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                WSetPoint = PsyWFnTdbRhPb(state, thisZoneHB.MAT, (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                                 if (WSetPoint > state.dataEnvrn->OutHumRat) hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                             } else {
                                 hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;

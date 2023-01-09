@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -100,7 +101,20 @@ namespace ZoneEquipmentManager {
 
     void InitSystemOutputRequired(EnergyPlusData &state, int ZoneNum, bool FirstHVACIteration, bool ResetSimOrder = false);
 
+    void initOutputRequired(EnergyPlusData &state,
+                            int const ZoneNum,
+                            DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                            DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                            bool const FirstHVACIteration,
+                            bool const ResetSimOrder,
+                            int spaceNum = 0);
+
     void DistributeSystemOutputRequired(EnergyPlusData &state, int ZoneNum, bool FirstHVACIteration);
+
+    void distributeOutputRequired(EnergyPlusData &state,
+                                  int const ZoneNum,
+                                  DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                  DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture);
 
     void UpdateSystemOutputRequired(EnergyPlusData &state,
                                     int ZoneNum,

@@ -70,6 +70,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SolarShading;
@@ -2707,9 +2708,13 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
     surf2.activeWindowShadingControl = surf2.windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
 
     state->dataHeatBal->Zone.allocate(1);
-    state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).WindowSurfaceLast = 2;
+    state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes[0] = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).WindowSurfaceFirst = 1;
+    state->dataHeatBal->space(1).WindowSurfaceLast = 2;
     state->dataGlobal->NumOfZones = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     // the following enables calculation when sun is up with SolarOnWindow computed to be 3700
     int constexpr NumTimeSteps(6);

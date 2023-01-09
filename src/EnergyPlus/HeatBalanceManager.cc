@@ -74,6 +74,7 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -107,6 +108,7 @@
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -143,7 +145,6 @@ namespace HeatBalanceManager {
     // Using/Aliasing
     using namespace DataComplexFenestration;
     using namespace DataEnvironment;
-    using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataRoomAirModel;
@@ -200,6 +201,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (state.dataHeatBalMgr->ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
+            if (state.dataGlobal->DoingSizing) state.dataHeatBal->doSpaceHeatBalance = state.dataHeatBal->doSpaceHeatBalanceSizing;
             HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
             // Surface octree setup
@@ -1063,6 +1065,12 @@ namespace HeatBalanceManager {
                     }
                 }
             }
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                state.dataHeatBal->doSpaceHeatBalanceSizing = static_cast<bool>(getYesNoValue(AlphaName(2)));
+            }
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                state.dataHeatBal->doSpaceHeatBalanceSimulation = static_cast<bool>(getYesNoValue(AlphaName(3)));
+            }
         } else {
             state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
@@ -1073,11 +1081,15 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        constexpr const char *Format_726(
-            "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
+        constexpr const char *Format_726("! <Zone Air Solution Algorithm>, Algorithm {{ThirdOrderBackwardDifference | AnalyticalSolution | "
+                                         "EulerMethod}}, Space Heat Balance Sizing, Space Heat Balance Simulation\n");
         print(state.files.eio, Format_726);
-        constexpr const char *Format_727(" Zone Air Solution Algorithm, {}\n");
-        print(state.files.eio, Format_727, AlphaName(1));
+        constexpr const char *Format_727(" Zone Air Solution Algorithm, {}, {}, {}\n");
+        print(state.files.eio,
+              Format_727,
+              AlphaName(1),
+              state.dataHeatBal->doSpaceHeatBalanceSizing ? "Yes" : "No",
+              state.dataHeatBal->doSpaceHeatBalanceSimulation ? "Yes" : "No");
 
         // A new object is added by L. Gu, 06/10
         state.dataHeatBalMgr->CurrentModuleObject = "ZoneAirContaminantBalance";
@@ -5373,7 +5385,6 @@ namespace HeatBalanceManager {
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 if (state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
                     if (state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
-                        state.dataHeatBal->Zone(ZoneLoop).HasLinkedOutAirNode = true;
                         state.dataHeatBal->Zone(ZoneLoop).LinkedOutAirNode = state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
                     }
                 }
@@ -5723,7 +5734,6 @@ namespace HeatBalanceManager {
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
         int StormWinNum; // Number of StormWindow object
-        int ZoneNum;
 
         if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(state); // Allocate the Module Arrays
@@ -5788,14 +5798,17 @@ namespace HeatBalanceManager {
                 state.dataHeatBalMgr->ChangeSet = true;
             }
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-                int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 &&
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::WindowModel::Detailed) {
-                        state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
-                    } else {
-                        state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    int const firstSurfWin = thisSpace.WindowSurfaceFirst;
+                    int const lastSurfWin = thisSpace.WindowSurfaceLast;
+                    for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 &&
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::WindowModel::Detailed) {
+                            state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+                        } else {
+                            state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                        }
                     }
                 }
             }
@@ -5860,8 +5873,8 @@ namespace HeatBalanceManager {
         // Set zone data to linked air node value if defined.
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             SetOutAirNodes(state);
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (state.dataHeatBal->Zone(ZoneNum).HasLinkedOutAirNode) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                if (state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode > 0) {
                     if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
                         state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(
                             state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
@@ -5896,7 +5909,7 @@ namespace HeatBalanceManager {
 
         // Overwriting surface and zone level environmental data with EMS override value
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataHeatBal->Zone(ZoneNum).OutDryBulbTempEMSOverrideOn) {
                     state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTempEMSOverrideValue;
                 }
@@ -5914,12 +5927,15 @@ namespace HeatBalanceManager {
 
         if (state.dataGlobal->BeginSimFlag) {
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-                int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel::BSDF &&
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel::EQL) {
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::WindowModel::Detailed;
+                for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    int const firstSurfWin = thisSpace.WindowSurfaceFirst;
+                    int const lastSurfWin = thisSpace.WindowSurfaceLast;
+                    for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel::BSDF &&
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel::EQL) {
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::WindowModel::Detailed;
+                        }
                     }
                 }
             }
@@ -5938,6 +5954,10 @@ namespace HeatBalanceManager {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
         }
+        state.dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state.dataGlobal->NumOfZones);
+        // Always allocate spaceHeatBalance, even if doSpaceHeatBalance is false, because it's used to gather some of the zone totals
+        state.dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(state.dataGlobal->numSpaces);
+
         state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQD.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataViewFactor->NumOfSolarEnclosures);
@@ -5976,55 +5996,11 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->XM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->DSXMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->DSXM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->DSXM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->DSXM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->XMPT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->MCPI.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPTI.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPV.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPTV.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPM.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPTM.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MixingMassFlowZone.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MixingMassFlowXHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneMassBalanceFlag.dimension(state.dataGlobal->NumOfZones, false);
         state.dataHeatBalFanSys->ZoneInfiltrationFlag.dimension(state.dataGlobal->NumOfZones, false);
         state.dataHeatBalFanSys->ZoneReOrder = 0;
-        state.dataHeatBalFanSys->ZoneLatentGain.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->ZoneLatentGainExceptPeople.dimension(state.dataGlobal->NumOfZones, 0.0); // Added for hybrid model
-        state.dataHeatBalFanSys->OAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->VAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->ZTAV.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->ZTAVComf.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->ZoneTMX.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->ZoneTM2.dimension(state.dataGlobal->NumOfZones, 23.0);
-        // Allocate this zone air humidity ratio
-        state.dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
-        state.dataHeatBalFanSys->ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);
-        state.dataHeatBalFanSys->ZoneAirHumRat.dimension(state.dataGlobal->NumOfZones, 0.01);
-        state.dataHeatBalFanSys->ZoneAirHumRatOld.dimension(state.dataGlobal->NumOfZones, 0.01);
-        state.dataHeatBalFanSys->SumHmAW.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->SumHmARa.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->SumHmARaW.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPTE.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPE.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->EAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->EAMFLxHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPTC.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MCPC.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->CTMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MDotCPOA.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->MDotOA.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, DataHeatBalance::ZoneInitialTemp);
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
@@ -6154,17 +6130,19 @@ namespace HeatBalanceManager {
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) > state.dataHeatBalMgr->MaxTempZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+            auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum);
+            if (thisZoneHB.ZTAV > state.dataHeatBalMgr->MaxTempZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxTempZone(ZoneNum) = thisZoneHB.ZTAV;
             }
-            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) < state.dataHeatBalMgr->MinTempZone(ZoneNum)) {
-                state.dataHeatBalMgr->MinTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            if (thisZoneHB.ZTAV < state.dataHeatBalMgr->MinTempZone(ZoneNum)) {
+                state.dataHeatBalMgr->MinTempZone(ZoneNum) = thisZoneHB.ZTAV;
             }
-            if (state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum);
+            if (thisZoneSysEnergyDemand.ZoneSNLoadHeatRate > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = thisZoneSysEnergyDemand.ZoneSNLoadHeatRate;
             }
-            if (state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum) > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
+            if (thisZoneSysEnergyDemand.ZoneSNLoadCoolRate > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = thisZoneSysEnergyDemand.ZoneSNLoadCoolRate;
             }
 
             // Record temperature and load for individual zone
@@ -6172,9 +6150,9 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->LoadZoneSecPrevDay(ZoneNum) = state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum);
             state.dataHeatBalMgr->TempZonePrevDay(ZoneNum) = state.dataHeatBalMgr->TempZone(ZoneNum);
             state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum) = state.dataHeatBalMgr->LoadZone(ZoneNum);
-            state.dataHeatBalMgr->TempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            state.dataHeatBalMgr->TempZone(ZoneNum) = thisZoneHB.ZTAV;
             state.dataHeatBalMgr->LoadZone(ZoneNum) =
-                max(state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum)));
+                max(thisZoneSysEnergyDemand.ZoneSNLoadHeatRate, std::abs(thisZoneSysEnergyDemand.ZoneSNLoadCoolRate));
 
             // Calculate differences in temperature and load for the last two warmup days
             if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 &&
@@ -8447,8 +8425,6 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int iSurf;
-        int iConst;
         int SchedPtr;         // scheduled surface gains pointer
         bool ZoneUnscheduled; // true if all surfaces in the zone are unscheduled
         bool ZoneScheduled;   // true if all surfaces in the zone are scheduled
@@ -8456,51 +8432,56 @@ namespace HeatBalanceManager {
         ZoneUnscheduled = false;
         ZoneScheduled = false;
 
-        for (iSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
-            iConst = state.dataSurface->Surface(iSurf).Construction;
-            if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
-                SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
-            } else {
-                SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
-            }
-            if (iSurf == state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst) {
-                if (SchedPtr != 0) {
-                    ZoneScheduled = true;
-                    ZoneUnscheduled = false;
-                } else {
-                    ZoneScheduled = false;
-                    ZoneUnscheduled = true;
-                }
-            } else {
-                if (SchedPtr != 0) {
-                    ZoneUnscheduled = false;
-                } else {
-                    ZoneScheduled = false;
-                }
-            }
-
-            if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-                // zone is nor scheduled nor unscheduled
-                ShowWarningError(state,
-                                 "Zone " + state.dataHeatBal->Zone(ZoneNum).Name + " does not have all surfaces scheduled with surface gains.");
-                ShowContinueError(state,
-                                  "If at least one surface in the zone is scheduled with surface gains, then all other surfaces within the same zone "
-                                  "should be scheduled as well.");
-                break;
-            }
-        }
-
-        if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-            for (iSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
-                iConst = state.dataSurface->Surface(iSurf).Construction;
+        bool firstZoneSurface = true;
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            auto &thisSpace = state.dataHeatBal->space(spaceNum);
+            for (int iSurf = thisSpace.HTSurfaceFirst; iSurf <= thisSpace.HTSurfaceLast; ++iSurf) {
+                int iConst = state.dataSurface->Surface(iSurf).Construction;
                 if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
                     SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
                 } else {
                     SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
                 }
+                if (firstZoneSurface) {
+                    if (SchedPtr != 0) {
+                        ZoneScheduled = true;
+                        ZoneUnscheduled = false;
+                    } else {
+                        ZoneScheduled = false;
+                        ZoneUnscheduled = true;
+                    }
+                    firstZoneSurface = false;
+                } else {
+                    if (SchedPtr != 0) {
+                        ZoneUnscheduled = false;
+                    } else {
+                        ZoneScheduled = false;
+                    }
+                }
+            }
+        }
+        if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
+            // zone is nor scheduled nor unscheduled
+            ShowWarningError(state, "Zone " + state.dataHeatBal->Zone(ZoneNum).Name + " does not have all surfaces scheduled with surface gains.");
+            ShowContinueError(state,
+                              "If at least one surface in the zone is scheduled with surface gains, then all other surfaces within the same zone "
+                              "should be scheduled as well.");
+        }
 
-                if (SchedPtr == 0) {
-                    ShowContinueError(state, "Surface " + state.dataSurface->Surface(iSurf).Name + " does not have scheduled surface gains.");
+        if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int iSurf = thisSpace.HTSurfaceFirst; iSurf <= thisSpace.HTSurfaceLast; ++iSurf) {
+                    int iConst = state.dataSurface->Surface(iSurf).Construction;
+                    if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
+                        SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
+                    } else {
+                        SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
+                    }
+
+                    if (SchedPtr == 0) {
+                        ShowContinueError(state, "Surface " + state.dataSurface->Surface(iSurf).Name + " does not have scheduled surface gains.");
+                    }
                 }
             }
         }
