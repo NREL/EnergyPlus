@@ -9354,9 +9354,9 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
         }
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if (NoCompOutput <= QZnReq) {
-            PartLoadRatio = 0.0;
-            return;
+        if (NoCompOutput <= QZnReq || (QZnReq >= -DataHVACGlobals::SmallLoad && NoCompOutput <= QZnReq && !HRCoolingMode)) {
+            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = false;
+            if (!this->SuppHeatingCoilPresent) return;
         }
     } else if (VRFHeatingMode || HRHeatingMode) {
         // IF the system is in heating mode and/or the terminal unit requests heating
@@ -9395,8 +9395,18 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 }
             } else {
                 getVRFTUZoneLoad(state, VRFTUNum, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP, false);
-                if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
-                    SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                if (((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad) ||
+                      ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0))) &&
+                    !FirstHVACIteration) {
+                    if ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0) {
+                        if (LoadToHeatingSP < 0.0 && QZnReq == 0.0) {
+                            SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                        } else {
+                            SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
+                        }
+                    } else {
+                        SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                    }
                     this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
                     if (this->DesignSuppHeatingCapacity > 0.0) {
                         this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
@@ -9699,17 +9709,22 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         if ((!state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && state.dataHVACVarRefFlow->CoolingLoad(VRFCond)) ||
             (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed &&
              state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
-            SimDXCoil(state,
-                      "",
-                      DataHVACGlobals::CompressorOperation::On,
-                      FirstHVACIteration,
-                      this->CoolCoilIndex,
-                      OpMode,
-                      PartLoadRatio,
-                      OnOffAirFlowRatio,
-                      _,
-                      state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
-                      state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
+            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive) {
+                SimDXCoil(state,
+                          "",
+                          DataHVACGlobals::CompressorOperation::On,
+                          FirstHVACIteration,
+                          this->CoolCoilIndex,
+                          OpMode,
+                          PartLoadRatio,
+                          OnOffAirFlowRatio,
+                          _,
+                          state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
+                          state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
+            } else {
+                SimDXCoil(
+                    state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
+            }
         } else { // cooling coil is off
             SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
         }
