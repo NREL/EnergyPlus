@@ -23864,7 +23864,8 @@ IF (.NOT. isBaseboardNone) THEN
   CALL AddToObjFld('Air Outlet Node Name', base + fczNameOff,' Supply Fan Outlet')
   CALL AddToObjStr('Design Maximum Air Flow Rate {m3/s}','autosize')
   IF ((capacityControlKind == capctrlVarFanConstFlow) .or. & 
-        (capacityControlKind == capctrlVarFanVarFlow)) THEN
+        (capacityControlKind == capctrlVarFanVarFlow) .or. &
+        (capacityControlKind == capctrlASHRAE90VarFan)) THEN
     CALL AddToObjStr('Speed Control Method', 'Continuous')
   ELSE
     CALL AddToObjStr('Speed Control Method', 'Discrete')
