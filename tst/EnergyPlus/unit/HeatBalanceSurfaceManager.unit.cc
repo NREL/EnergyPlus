@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,6 +83,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -153,12 +154,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
 
-    state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 1;
-    state->dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast = 1;
-    state->dataHeatBal->Zone(ZoneNum).OpaqOrWinSurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).OpaqOrWinSurfaceLast = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(ZoneNum).spaceIndexes.emplace_back(ZoneNum);
+    state->dataHeatBal->space(ZoneNum).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(ZoneNum).HTSurfaceLast = 1;
+    state->dataHeatBal->space(ZoneNum).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->space(ZoneNum).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->space(ZoneNum).OpaqOrWinSurfaceFirst = 1;
+    state->dataHeatBal->space(ZoneNum).OpaqOrWinSurfaceLast = 1;
 
     CalcOutsideSurfTemp(*state, SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag);
 
@@ -285,10 +288,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
-    state->dataHeatBal->Zone(1).zoneRadEnclosureFirst = 1;
-    state->dataHeatBal->Zone(1).zoneRadEnclosureLast = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).WindowSurfaceFirst = 1;
+    state->dataHeatBal->space(1).WindowSurfaceLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
@@ -308,6 +311,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataViewFactor->NumOfRadiantEnclosures = 1;
     state->dataViewFactor->EnclRadInfo.allocate(1);
     state->dataViewFactor->EnclRadInfo(1).radReCalc = true;
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.emplace_back(1);
     state->dataViewFactor->EnclRadInfo(1).SurfacePtr.allocate(1);
     state->dataViewFactor->EnclRadInfo(1).SurfacePtr(1) = 1;
 
@@ -336,10 +340,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(1).Construction = 1;
-    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
 
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
@@ -754,10 +760,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
-    state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
     state->dataLoopNodes->Node.allocate(4);
 
@@ -793,10 +795,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataMstBal->HMassConvInFD.allocate(6);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     SolarShading::AllocateModuleArrays(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
 
@@ -822,22 +825,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(1));
     EXPECT_EQ(23.0, state->dataHeatBal->SurfTempEffBulkAir(2));
     EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(3));
-
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
-    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    state->dataLoopNodes->Node.deallocate();
-    state->dataGlobal->KickOffSimulation = false;
-    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
-    state->dataHeatBalSurf->SurfHConvInt.deallocate();
-    state->dataMstBal->HConvInFD.deallocate();
-    state->dataMstBal->RhoVaporAirIn.deallocate();
-    state->dataMstBal->HMassConvInFD.deallocate();
-    state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRepEnergy.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurfKiva)
@@ -1315,10 +1302,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
-    state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
     state->dataLoopNodes->Node.allocate(4);
 
@@ -1362,13 +1345,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
 
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
     for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
@@ -1843,10 +1827,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
-    state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
 
     state->dataLoopNodes->Node.allocate(4);
 
@@ -1880,7 +1863,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -2422,10 +2404,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
-    state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
 
     state->dataLoopNodes->Node.allocate(4);
 
@@ -2459,7 +2440,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -2996,10 +2976,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
-    state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
 
     state->dataLoopNodes->Node.allocate(4);
 
@@ -3036,7 +3015,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -3068,23 +3046,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     EXPECT_EQ(-0.1, state->dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(1));
     CalcHeatBalanceInsideSurf(*state);
     EXPECT_EQ(0.1, state->dataHeatBalSurf->SurfQAdditionalHeatSourceInside(6));
-
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
-    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    state->dataLoopNodes->Node.deallocate();
-    state->dataGlobal->KickOffSimulation = false;
-    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
-    state->dataHeatBal->SurfTempEffBulkAir.deallocate();
-    state->dataHeatBalSurf->SurfHConvInt.deallocate();
-    state->dataMstBal->HConvInFD.deallocate();
-    state->dataMstBal->RhoVaporAirIn.deallocate();
-    state->dataMstBal->HMassConvInFD.deallocate();
-    state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRepEnergy.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSurfTemp)
@@ -3227,8 +3188,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZTAV.dimension(state->dataGlobal->NumOfZones, 0.0);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state->dataGlobal->NumOfZones, 0.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0;
 
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(state->dataGlobal->NumOfZones, 28.0);
@@ -3253,9 +3215,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Heat Index Case 1: Zone T < 80 F;
     state->dataGlobal->HourOfDay = 1;
-    state->dataHeatBalFanSys->ZTAV(1) = 25;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 25;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -4.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.00988; // RH = 50%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(25, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
@@ -3263,8 +3225,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Heat Index Case 2: Zone RH > 85, 80 < T < 87 F;
     state->dataGlobal->HourOfDay = 2;
-    state->dataHeatBalFanSys->ZTAV(1) = 27;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 27;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.02035; // RH = 90%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(31, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
@@ -3272,8 +3234,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Heat Index Case 3: < Zone RH > 85, 80 < T < 87 F;
     state->dataGlobal->HourOfDay = 3;
-    state->dataHeatBalFanSys->ZTAV(1) = 27;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 27;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0022; // RH = 10%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(26, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
@@ -3281,8 +3243,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Heat Index Case 4: Rothfusz regression, other than the above conditions;
     state->dataGlobal->HourOfDay = 4;
-    state->dataHeatBalFanSys->ZTAV(1) = 30;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 30;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.01604; // RH = 60%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(33, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
@@ -3446,7 +3408,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
-    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 31;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -3.5;
     for (int hour = 5; hour <= 7; hour++) {
         state->dataGlobal->HourOfDay = hour;
@@ -3495,7 +3457,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
-    state->dataHeatBalFanSys->ZTAV(1) = 28;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 28;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -1.2;
     for (int hour = 8; hour <= 10; hour++) {
@@ -3544,7 +3506,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
-    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 31;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 0.5;
     for (int hour = 11; hour <= 12; hour++) {
         state->dataGlobal->HourOfDay = hour;
@@ -3591,7 +3553,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
-    state->dataHeatBalFanSys->ZTAV(1) = 30;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 30;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 1.2;
     for (int hour = 13; hour <= 18; hour++) {
@@ -3640,7 +3602,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
-    state->dataHeatBalFanSys->ZTAV(1) = 12;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 12;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 1.2;
     for (int hour = 19; hour <= 20; hour++) {
         state->dataGlobal->HourOfDay = hour;
@@ -3772,8 +3734,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZTAV.dimension(state->dataGlobal->NumOfZones, 0.0);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state->dataGlobal->NumOfZones, 0.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
@@ -3834,9 +3797,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
     // ---------------------------------------------------------------------
     // Heat Index Case 1: Zone T < 80 F;
     state->dataGlobal->HourOfDay = 1;
-    state->dataHeatBalFanSys->ZTAV(1) = 25;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 25;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -4.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.00988; // RH = 50%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(25, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
@@ -3844,8 +3807,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
 
     // Heat Index Case 2: Zone RH > 85, 80 < T < 87 F;
     state->dataGlobal->HourOfDay = 2;
-    state->dataHeatBalFanSys->ZTAV(1) = 27;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 27;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.02035; // RH = 90%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(31, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
@@ -3853,8 +3816,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
 
     // Heat Index Case 3: < Zone RH > 85, 80 < T < 87 F;
     state->dataGlobal->HourOfDay = 3;
-    state->dataHeatBalFanSys->ZTAV(1) = 27;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 27;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0022; // RH = 10%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(26, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
@@ -3862,8 +3825,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
 
     // Heat Index Case 4: Rothfusz regression, other than the above conditions;
     state->dataGlobal->HourOfDay = 4;
-    state->dataHeatBalFanSys->ZTAV(1) = 30;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 30;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.01604; // RH = 60%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(33, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
@@ -3990,7 +3953,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
-    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 31;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -3.5;
     for (int hour = 5; hour <= 7; hour++) {
         state->dataGlobal->HourOfDay = hour;
@@ -4041,7 +4004,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
-    state->dataHeatBalFanSys->ZTAV(1) = 28;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 28;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -1.2;
     for (int hour = 8; hour <= 10; hour++) {
@@ -4096,7 +4059,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
     // ---------------------------------------------------------------------
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
-    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 31;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 0.5;
     for (int hour = 11; hour <= 12; hour++) {
         state->dataGlobal->HourOfDay = hour;
@@ -4108,7 +4071,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
     // ---------------------------------------------------------------------
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
-    state->dataHeatBalFanSys->ZTAV(1) = 30;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 30;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 1.2;
     for (int hour = 13; hour <= 18; hour++) {
@@ -4159,7 +4122,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
-    state->dataHeatBalFanSys->ZTAV(1) = 12;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 12;
     state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 1.2;
     for (int hour = 19; hour <= 20; hour++) {
         state->dataGlobal->HourOfDay = hour;
@@ -4850,8 +4813,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
     EXPECT_FALSE(has_err_output(true));
 
-    state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
 
@@ -4862,7 +4824,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -5322,8 +5283,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
     SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
 
@@ -5334,7 +5294,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataGlobal->NumOfTimeStepInHour = 6;
     state->dataGlobal->HourOfDay = 1;
@@ -5954,15 +5913,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 10;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataHeatBalFanSys->MAT.allocate(2); // Zone temperature C
-    state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->MAT(2) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(2);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(2);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(2) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(2);
+    for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
+        thisZoneHB.MAT = 24.0;
+        thisZoneHB.ZoneAirHumRat = 0.001;
+        thisZoneHB.ZoneAirHumRatAvg = 0.001;
+    }
 
     state->dataLoopNodes->Node.allocate(4);
 
@@ -7076,10 +7032,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     zoneEquipConfig.FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
+
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
 
     state->dataLoopNodes->Node.allocate(4);
     auto &InletNode1 = state->dataLoopNodes->Node(1);
@@ -7099,7 +7055,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
 
     state->dataSurface->TotSurfaces = 6;
     // set convective coefficient adjustment ratio to 1.0
@@ -8321,10 +8276,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     zoneEquipConfig.FixedReturnFlow.allocate(1);
 
     state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
 
     state->dataLoopNodes->Node.allocate(4);
     auto &InletNode1 = state->dataLoopNodes->Node(1);
@@ -8344,7 +8298,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
 
     state->dataSurface->TotSurfaces = 6;
     // set convective coefficient adjustment ratio to 1.0

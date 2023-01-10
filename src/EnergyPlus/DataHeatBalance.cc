@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,9 +57,11 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::DataHeatBalance {
@@ -97,6 +99,49 @@ using DataBSDFWindow::BSDFWindowInputStruct;
 
 // Functions
 
+Real64 SpaceData::sumHATsurf(EnergyPlusData &state)
+{
+    // PURPOSE OF THIS FUNCTION:
+    // This function calculates the space sum of Hc*Area*Tsurf.
+
+    Real64 sumHATsurf = 0.0;
+
+    for (int surfNum = this->HTSurfaceFirst; surfNum <= this->HTSurfaceLast; ++surfNum) {
+        Real64 Area = state.dataSurface->Surface(surfNum).Area;
+
+        if (state.dataSurface->Surface(surfNum).Class == DataSurfaces::SurfaceClass::Window) {
+            if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
+                    // The area is the shade or blind area = sum of the glazing area and the divider area (which is zero if no divider)
+                    Area += state.dataSurface->SurfWinDividerArea(surfNum);
+                } else {
+                    // Window divider contribution (only for window with divider and no interior shade or blind)
+                    sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) * state.dataSurface->SurfWinDividerTempIn(surfNum);
+                }
+            }
+
+            if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
+                // Window frame contribution
+                sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
+                              (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFrameTempIn(surfNum);
+            }
+        }
+
+        sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(surfNum);
+    }
+
+    return sumHATsurf;
+}
+
+Real64 ZoneData::sumHATsurf(EnergyPlusData &state)
+{
+    Real64 sumHATsurf = 0.0;
+    for (int spaceNum : this->spaceIndexes) {
+        sumHATsurf += state.dataHeatBal->space(spaceNum).sumHATsurf(state);
+    }
+    return sumHATsurf;
+}
 void ZoneData::SetOutBulbTempAt(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -156,6 +201,96 @@ void ZoneData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
 void ZoneData::SetWindDirAt(Real64 const fac)
 {
     WindDir = fac;
+}
+
+void AirReportVars::setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name)
+{
+    SetupOutputVariable(state,
+                        format("{} Mean Air Temperature", prefix),
+                        OutputProcessor::Unit::C,
+                        this->MeanAirTemp,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Operative Temperature", prefix),
+                        OutputProcessor::Unit::C,
+                        this->OperativeTemp,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Mean Air Dewpoint Temperature", prefix),
+                        OutputProcessor::Unit::C,
+                        this->MeanAirDewPointTemp,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Mean Air Humidity Ratio", prefix),
+                        OutputProcessor::Unit::kgWater_kgDryAir,
+                        this->MeanAirHumRat,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Internal Convective Heat Gain Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumIntGains,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Surface Convection Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumHADTsurfs,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Interzone Air Transfer Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumMCpDTzones,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Outdoor Air Transfer Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumMCpDtInfil,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance System Air Transfer Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumMCpDTsystem,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance System Convective Heat Gain Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumNonAirSystem,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Air Energy Storage Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->CzdTdt,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    if (state.dataGlobal->DisplayAdvancedReportVariables) {
+        SetupOutputVariable(state,
+                            format("{} Air Heat Balance Deviation Rate", prefix),
+                            OutputProcessor::Unit::W,
+                            this->imBalance,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
+    }
 }
 
 void SetZoneOutBulbTempAt(EnergyPlusData &state)

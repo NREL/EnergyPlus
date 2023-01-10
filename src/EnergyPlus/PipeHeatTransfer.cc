@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -80,6 +79,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::PipeHeatTransfer {
 
@@ -1050,7 +1050,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
             state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
         } break;
         case EnvrnPtr::ZoneEnv: {
-            state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->EnvrZonePtr).MAT;
         } break;
         case EnvrnPtr::ScheduleEnv: {
             state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
@@ -1866,7 +1866,7 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
             AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
         } break;
         case EnvrnPtr::ZoneEnv: {
-            AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+            AirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->EnvrZonePtr).MAT;
             AirVel = RoomAirVel;
         } break;
         default:

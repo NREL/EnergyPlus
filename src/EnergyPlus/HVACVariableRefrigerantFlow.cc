@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -101,6 +101,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::HVACVariableRefrigerantFlow {
 // Module containing the Variable Refrigerant Flow (VRF or VRV) simulation routines
@@ -10369,6 +10370,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
             if (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority == ThermostatCtrlType::ThermostatOffsetPriority) {
                 //         for TSTATPriority, just check difference between zone temp and thermostat setpoint
                 if (ThisZoneNum > 0) {
+                    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ThisZoneNum);
                     SPTempHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ThisZoneNum);
                     SPTempLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ThisZoneNum);
 
@@ -10378,16 +10380,16 @@ void InitializeOperatingMode(EnergyPlusData &state,
                         break;
                     case DataHVACGlobals::ThermostatType::SingleHeating:
                         // if heating load, ZoneDeltaT will be negative
-                        ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
+                        ZoneDeltaT = min(0.0, thisZoneHB.ZT - SPTempLo);
                         state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
                         break;
                     case DataHVACGlobals::ThermostatType::SingleCooling:
                         // if cooling load, ZoneDeltaT will be positive
-                        ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
+                        ZoneDeltaT = max(0.0, thisZoneHB.ZT - SPTempHi);
                         state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
                         break;
                     case DataHVACGlobals::ThermostatType::SingleHeatCool:
-                        ZoneDeltaT = state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi; //- SPTempHi and SPTempLo are same value
+                        ZoneDeltaT = thisZoneHB.ZT - SPTempHi; //- SPTempHi and SPTempLo are same value
                         if (ZoneDeltaT > 0.0) {
                             state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
                         } else {
@@ -10395,11 +10397,11 @@ void InitializeOperatingMode(EnergyPlusData &state,
                         }
                         break;
                     case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
-                        if (state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi > 0.0) {
-                            ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
+                        if (thisZoneHB.ZT - SPTempHi > 0.0) {
+                            ZoneDeltaT = max(0.0, thisZoneHB.ZT - SPTempHi);
                             state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
-                        } else if (SPTempLo - state.dataHeatBalFanSys->ZT(ThisZoneNum) > 0.0) {
-                            ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
+                        } else if (SPTempLo - thisZoneHB.ZT > 0.0) {
+                            ZoneDeltaT = min(0.0, thisZoneHB.ZT - SPTempLo);
                             state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
                         }
                         break;
