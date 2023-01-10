@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,6 +61,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -104,6 +105,174 @@ namespace ZoneTempPredictorCorrector {
         Array1D<Real64> ThermalComfortAdaptiveCEN15251_Central;
     };
 
+    struct SumHATOutput
+    {
+        // Output results from calSumHAT
+        Real64 sumIntGain = 0.0;
+        Real64 sumHA = 0.0;
+        Real64 sumHATsurf = 0.0;
+        Real64 sumHATref = 0.0;
+    };
+
+    struct ZoneSpaceHeatBalanceData
+    {
+        // This entire struct is re-initialized during the simulation, so no static data may be stored here (e.g. zone or space characteristics)
+
+        // Zone or space air drybulb temperature conditions
+        Real64 MAT = DataHeatBalance::ZoneInitialTemp;      // Mean Air Temperature at end of zone time step [C]
+        Real64 ZTAV = DataHeatBalance::ZoneInitialTemp;     // Air Temperature Averaged over the zone time step (during HVAC Time Steps)
+        Real64 ZT = DataHeatBalance::ZoneInitialTemp;       // Air Temperature Averaged over the system time step
+        Real64 ZTAVComf = DataHeatBalance::ZoneInitialTemp; // Air Temperature Averaged used in thermal comfort models (currently Fanger model only) -
+                                                            // TODO: lagged? could MAT be used instead?
+        Real64 XMPT = DataHeatBalance::ZoneInitialTemp;     // Air temperature at previous system time step
+        std::array<Real64, 4> XMAT = {DataHeatBalance::ZoneInitialTemp,
+                                      DataHeatBalance::ZoneInitialTemp,
+                                      DataHeatBalance::ZoneInitialTemp,
+                                      DataHeatBalance::ZoneInitialTemp}; // Temporary air temperature history
+        std::array<Real64, 4> DSXMAT = {DataHeatBalance::ZoneInitialTemp,
+                                        DataHeatBalance::ZoneInitialTemp,
+                                        DataHeatBalance::ZoneInitialTemp,
+                                        DataHeatBalance::ZoneInitialTemp}; // Down Stepped air temperature history storage
+        // Exact and Euler solutions
+        Real64 ZoneTMX = DataHeatBalance::ZoneInitialTemp; // Temporary air temperature to test convergence in Exact and Euler method
+        Real64 ZoneTM2 = DataHeatBalance::ZoneInitialTemp; // Temporary air temperature at timestep t-2 in Exact and Euler method
+        Real64 ZoneT1 = 0.0;                               // Air temperature at the previous time step used in Exact and Euler method
+
+        // Zone or space air moisture conditions
+        Real64 ZoneAirHumRat = 0.01;        // Air Humidity Ratio
+        Real64 ZoneAirHumRatAvg = 0.01;     // Air Humidity Ratio averaged over the zone time step
+        Real64 ZoneAirHumRatTemp = 0.01;    // Temporary air humidity ratio at time plus 1
+        Real64 ZoneAirHumRatAvgComf = 0.01; // Air Humidity Ratio averaged over the zone time
+                                            // step used in thermal comfort models (currently Fang model only)
+                                            // TODO: lagged? could ZoneAirHumRatAvg be used instead?
+
+        std::array<Real64, 4> WPrevZoneTS = {0.0, 0.0, 0.0, 0.0};   // Air Humidity Ratio zone time step history
+        std::array<Real64, 4> DSWPrevZoneTS = {0.0, 0.0, 0.0, 0.0}; // DownStepped Air Humidity Ratio zone time step history for 3rd order derivative
+        Real64 WZoneTimeMinusP = 0.0;                               // Air Humidity Ratio at previous system time step
+        // Exact and Euler solutions
+        Real64 ZoneWMX = 0.0; // Temporary humidity ratio to test convergence in Exact and Euler method
+        Real64 ZoneWM2 = 0.0; // Temporary humidity ratio at timestep t-2 in Exact and Euler method
+        Real64 ZoneW1 = 0.0;  // Zone/space humidity ratio at the previous time step used in Exact and Euler method
+
+        std::array<Real64, 4> ZTM = {
+            0.0, 0.0, 0.0, 0.0}; // air temperature at previous 3 zone timesteps (sized to 4 to be compatible with other similar arrays)
+        std::array<Real64, 4> WPrevZoneTSTemp = {0.0, 0.0, 0.0, 0.0}; // Temporary Air Humidity Ratio zone time step history (4th term not used)
+        // Real64 WZoneTimeMinus1Temp = 0.0;                         // Zone air humidity ratio at previous timestep
+        // Real64 WZoneTimeMinus2Temp = 0.0; // Zone air humidity ratio at timestep T-2
+        // Real64 WZoneTimeMinus3Temp = 0.0; // Zone air humidity ratio at timestep T-3
+
+        Real64 SumIntGain = 0.0; // Sum of convective internal gains
+        Real64 SumHA = 0.0;      // Sum of Hc*Area
+        Real64 SumHATsurf = 0.0; // Sum of Hc*Area*Tsurf
+        Real64 SumHATref = 0.0;  // Sum of Hc*Area*Tref= 0.0; for ceiling diffuser convection correlation
+        Real64 SumMCp = 0.0;     // Sum of MassFlowRate*Cp
+        Real64 SumMCpT = 0.0;    // Sum of MassFlowRate*Cp*T
+        Real64 SumSysMCp = 0.0;  // Sum of air system MassFlowRate*Cp
+        Real64 SumSysMCpT = 0.0; // Sum of air system MassFlowRate*Cp*T
+        Real64 SumIntGainExceptPeople = 0.0;
+
+        // Moisture variables to carry info from HB to the Zone Temp Predictor-Corrector for Fan System
+        Real64 SumHmAW = 0.0;   // SUM OF ZONE AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
+        Real64 SumHmARa = 0.0;  // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
+        Real64 SumHmARaW = 0.0; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
+        Real64 SumHmARaZ = 0.0;
+
+        Real64 TempDepCoef = 0.0; // Temperature dependent coefficient
+        Real64 TempIndCoef = 0.0; // Temperature ndependent coefficient
+        Real64 TempHistoryTerm = 0.0;
+
+        Real64 MCPI = 0.0;                       // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
+        Real64 MCPTI = 0.0;                      // INFILTRATION MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 MCPV = 0.0;                       // VENTILATION MASS FLOW * AIR SPECIFIC HEAT
+        Real64 MCPTV = 0.0;                      // VENTILATION MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 MCPM = 0.0;                       // Mixing MASS FLOW * AIR SPECIFIC HEAT
+        Real64 MCPTM = 0.0;                      // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 MCPE = 0.0;                       // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
+        Real64 EAMFL = 0.0;                      // OUTDOOR AIR MASS FLOW for EarthTube
+        Real64 EAMFLxHumRat = 0.0;               // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
+        Real64 MCPTE = 0.0;                      // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 MCPC = 0.0;                       // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
+        Real64 CTMFL = 0.0;                      // OUTDOOR AIR MASS FLOW for cooltower
+        Real64 MCPTC = 0.0;                      // COOLTOWER MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 ThermChimAMFL = 0.0;              // OUTDOOR AIR MASS FLOW for THERMALCHIMNEY
+        Real64 MCPTThermChim = 0.0;              // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
+        Real64 MCPThermChim = 0.0;               // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 ZoneLatentGain = 0.0;             // Latent Energy from each Zone (People, equipment)
+        Real64 ZoneLatentGainExceptPeople = 0.0; // Added for hybrid model -- Latent Energy from each Zone (equipment)
+        Real64 OAMFL = 0.0;                      // OUTDOOR AIR MASS FLOW (kg/s) for infiltration
+        Real64 VAMFL = 0.0;                      // OUTDOOR AIR MASS FLOW (kg/s) for ventilation
+        Real64 NonAirSystemResponse = 0.0;       // Convective heat addition rate from non forced air
+        // equipment such as baseboards plus heat from lights to
+        Real64 SysDepZoneLoads = 0.0; // Convective heat addition or subtraction rate from sources that
+        // depend on what is happening with the HVAC system. Such as:
+        // heat gain from lights to return air when return flow = 0= 0.0; heat gain
+        // from air flow windows to return air when return air flow = 0= 0.0;
+        // and heat removed by return air from refrigeration cases when
+        // return air flow = 0.
+        Real64 SysDepZoneLoadsLagged = 0.0; // SysDepZoneLoads saved to be added to zone heat balance next
+        // HVAC time step
+        Real64 MDotCPOA = 0.0; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+        Real64 MDotOA = 0.0;   // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+        Real64 MixingMAT = DataHeatBalance::ZoneInitialTemp; // Air temperature for mixing
+        Real64 MixingHumRat = 0.01;                          // Air humidity ratio for mixing
+        Real64 MixingMassFlowZone = 0.0;                     // Mixing MASS FLOW (kg/s)
+        Real64 MixingMassFlowXHumRat = 0.0;                  // Mixing MASS FLOW * Humidity Ratio
+
+        Real64 ZoneSetPointLast = 0.0;
+        Real64 TempIndZnLd = 0.0;
+        Real64 TempDepZnLd = 0.0;
+        Real64 ZoneAirRelHum = 0.0; // Zone relative humidity in percent
+        Real64 AirPowerCap = 0.0;   // "air power capacity"  Vol*VolMult*rho*Cp/timestep [W/degK]
+
+        void beginEnvironmentInit(EnergyPlusData &state);
+
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
+
+        void predictSystemLoad(EnergyPlusData &state,
+                               bool shortenTimeStepSys,
+                               bool useZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                               Real64 priorTimeStep,        // the old value for timestep length is passed for possible use in interpolating
+                               int zoneNum,
+                               int spaceNum = 0);
+
+        void calcPredictedSystemLoad(EnergyPlusData &state, Real64 RAFNFrac, int zoneNum, int spaceNum = 0);
+
+        void calcZoneOrSpaceSums(EnergyPlusData &state,
+                                 bool CorrectorFlag, // Corrector call flag
+                                 int zoneNum,
+                                 int spaceNum = 0);
+
+        virtual SumHATOutput calcSumHAT(EnergyPlusData &state, int zoneNum, int spaceNum) = 0;
+
+        void updateTemperatures(
+            EnergyPlusData &state, bool ShortenTimeStepSys, bool UseZoneTimeStepHistory, Real64 PriorTimeStep, int zoneNum, int spaceNum = 0);
+
+        Real64 correctAirTemp(EnergyPlusData &state,
+                              bool useZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
+                              int zoneNum,
+                              int spaceNum = 0);
+
+        void correctHumRat(EnergyPlusData &state, int zoneNum, int spaceNum = 0);
+
+        void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 RAFNFrac, int zoneNum, int spaceNum = 0);
+
+        void pushZoneTimestepHistory(EnergyPlusData &state, int zoneNum, int spaceNum = 0);
+
+        void pushSystemTimestepHistory(EnergyPlusData &state, int zoneNum, int spaceNum = 0);
+
+        void revertZoneTimestepHistory(EnergyPlusData &state, int zoneNum, int spaceNum = 0);
+    };
+
+    struct ZoneHeatBalanceData : ZoneSpaceHeatBalanceData
+    {
+        SumHATOutput calcSumHAT(EnergyPlusData &state, int zoneNum, [[maybe_unused]] int spaceNum) override;
+    };
+
+    struct SpaceHeatBalanceData : ZoneSpaceHeatBalanceData
+    {
+        SumHATOutput calcSumHAT(EnergyPlusData &state, int zoneNum, int spaceNum) override;
+    };
+
     // Functions
 
     void ManageZoneAirUpdates(EnergyPlusData &state,
@@ -131,34 +300,8 @@ namespace ZoneTempPredictorCorrector {
     void
     CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
-    void CalcPredictedSystemLoad(EnergyPlusData &state, int ZoneNum, Real64 RAFNFrac);
-
-    void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
-                                           Real64 &TotalHeatLoad,
-                                           Real64 &TotalCoolLoad,
-                                           Real64 &SensLoadSingleZone,
-                                           Real64 &SensLoadHeatSingleZone,
-                                           Real64 &SensLoadCoolSingleZone,
-                                           Real64 OutputHeatSP,
-                                           Real64 OutputCoolSP,
-                                           Real64 LoadCorrFactor,
-                                           Real64 ZoneMultiplier,
-                                           Real64 ZoneMultiplierList);
-
-    void CalcPredictedHumidityRatio(EnergyPlusData &state, int ZoneNum, Real64 RAFNFrac);
-
-    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
-                                        Real64 &TotalHumidLoad,
-                                        Real64 &TotalDehumidLoad,
-                                        Real64 &MoistLoadSingleZone,
-                                        Real64 &MoistLoadHumidSingleZone,
-                                        Real64 &MoistLoadDehumidSingleZone,
-                                        Real64 ZoneMultiplier,
-                                        Real64 ZoneMultiplierList);
-
-    void CorrectZoneAirTemp(EnergyPlusData &state,
-                            Real64 &ZoneTempChange,     // Temperature change in zone air between previous and current timestep
-                            bool UseZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
+    Real64 correctZoneAirTemps(EnergyPlusData &state,
+                               bool useZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
     );
 
     void PushZoneTimestepHistories(EnergyPlusData &state);
@@ -167,55 +310,42 @@ namespace ZoneTempPredictorCorrector {
 
     void RevertZoneTimestepHistories(EnergyPlusData &state);
 
-    void CorrectZoneHumRat(EnergyPlusData &state, int ZoneNum);
-
     void DownInterpolate4HistoryValues(Real64 OldTimeStep,
                                        Real64 NewTimeStep,
-                                       Real64 &oldVal0,
-                                       Real64 &oldVal1,
-                                       Real64 &oldVal2,
+                                       Real64 oldVal0,
+                                       Real64 oldVal1,
+                                       Real64 oldVal2,
                                        Real64 &newVal0,
                                        Real64 &newVal1,
                                        Real64 &newVal2,
-                                       Real64 &newVal3, // unused 1208
-                                       Real64 &newVal4  // unused 1208
-    );
+                                       Real64 &newVal3,
+                                       Real64 &newVal4);
+
+    Real64
+    DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> const &oldVals, std::array<Real64, 4> &newVals);
 
     void InverseModelTemperature(EnergyPlusData &state,
-                                 int ZoneNum,                    // Zone number
-                                 Real64 &SumIntGain,             // Zone sum of convective internal gains
-                                 Real64 &SumIntGainExceptPeople, // Zone sum of convective internal gains except for people
-                                 Real64 &SumHA,                  // Zone sum of Hc*Area
-                                 Real64 &SumHATsurf,             // Zone sum of Hc*Area*Tsurf
-                                 Real64 &SumHATref,              // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-                                 Real64 &SumMCp,                 // Zone sum of MassFlowRate*Cp
-                                 Real64 &SumMCpT,                // Zone sum of MassFlowRate*Cp*T
-                                 Real64 &SumSysMCp,              // Zone sum of air system MassFlowRate*Cp
-                                 Real64 &SumSysMCpT,             // Zone sum of air system MassFlowRate*Cp*T
-                                 Real64 &AirCap                  // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"rd
+                                 int ZoneNum,                   // Zone number
+                                 Real64 SumIntGain,             // Zone sum of convective internal gains
+                                 Real64 SumIntGainExceptPeople, // Zone sum of convective internal gains except for people
+                                 Real64 SumHA,                  // Zone sum of Hc*Area
+                                 Real64 SumHATsurf,             // Zone sum of Hc*Area*Tsurf
+                                 Real64 SumHATref,              // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
+                                 Real64 SumMCp,                 // Zone sum of MassFlowRate*Cp
+                                 Real64 SumMCpT,                // Zone sum of MassFlowRate*Cp*T
+                                 Real64 SumSysMCp,              // Zone sum of air system MassFlowRate*Cp
+                                 Real64 SumSysMCpT,             // Zone sum of air system MassFlowRate*Cp*T
+                                 Real64 AirCap                  // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"rd
     );
 
     void InverseModelHumidity(EnergyPlusData &state,
-                              int ZoneNum,                    // Zone number
-                              Real64 &LatentGain,             // Zone sum of latent gain
-                              Real64 &LatentGainExceptPeople, // Zone sum of latent gain except for people
-                              Real64 &ZoneMassFlowRate,       // Zone air mass flow rate
-                              Real64 &MoistureMassFlowRate,   // Zone moisture mass flow rate
-                              Real64 &H2OHtOfVap,             // Heat of vaporization of air
-                              Real64 &RhoAir                  // Air density
-    );
-
-    void CalcZoneSums(EnergyPlusData &state,
-                      int ZoneNum,              // Zone number
-                      Real64 &SumIntGain,       // Zone sum of convective internal gains
-                      Real64 &SumHA,            // Zone sum of Hc*Area
-                      Real64 &SumHATsurf,       // Zone sum of Hc*Area*Tsurf
-                      Real64 &SumHATref,        // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-                      Real64 &SumMCp,           // Zone sum of MassFlowRate*Cp
-                      Real64 &SumMCpT,          // Zone sum of MassFlowRate*Cp*T
-                      Real64 &SumSysMCp,        // Zone sum of air system MassFlowRate*Cp
-                      Real64 &SumSysMCpT,       // Zone sum of air system MassFlowRate*Cp*T
-                      bool CorrectorFlag = true // Corrector call flag
+                              int ZoneNum,                   // Zone number
+                              Real64 LatentGain,             // Zone sum of latent gain
+                              Real64 LatentGainExceptPeople, // Zone sum of latent gain except for people
+                              Real64 ZoneMassFlowRate,       // Zone air mass flow rate
+                              Real64 MoistureMassFlowRate,   // Zone moisture mass flow rate
+                              Real64 H2OHtOfVap,             // Heat of vaporization of air
+                              Real64 RhoAir                  // Air density
     );
 
     void CalcZoneComponentLoadSums(EnergyPlusData &state,
@@ -285,11 +415,6 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
     // Number of zone with onoff thermostat
     int NumOnOffCtrZone = 0;
 
-    Array1D<Real64> ZoneSetPointLast;
-    Array1D<Real64> TempIndZnLd;
-    Array1D<Real64> TempDepZnLd;
-    Array1D<Real64> ZoneAirRelHum; // Zone relative humidity in percent
-
     // Zone temperature history - used only for oscillation test
     Array2D<Real64> ZoneTempHist;
     Array1D<Real64> ZoneTempOscillate;
@@ -330,6 +455,9 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
     int IterLimitErrIndex1 = 0;
     int IterLimitExceededNum2 = 0;
     int IterLimitErrIndex2 = 0;
+
+    EPVector<ZoneTempPredictorCorrector::ZoneHeatBalanceData> zoneHeatBalance;
+    EPVector<ZoneTempPredictorCorrector::SpaceHeatBalanceData> spaceHeatBalance;
 
     void clear_state() override
     {

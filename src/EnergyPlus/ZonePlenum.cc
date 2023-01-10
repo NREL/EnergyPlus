@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -349,6 +349,10 @@ void GetZonePlenumInput(EnergyPlusData &state)
         // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
         state.dataHeatBal->Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber =
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
+        // SpaceHB TODO: For now, assign the same system node to the spaces in the zone
+        for (int spaceNum : state.dataHeatBal->Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).spaceIndexes) {
+            state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
+        }
 
         state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode =
             GetOnlySingleNode(state,
@@ -580,6 +584,10 @@ void GetZonePlenumInput(EnergyPlusData &state)
         // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
         state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber =
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
+        // SpaceHB TODO: For now, assign the same system node to the spaces in the zone
+        for (int spaceNum : state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).spaceIndexes) {
+            state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
+        }
 
         state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode =
             GetOnlySingleNode(state,

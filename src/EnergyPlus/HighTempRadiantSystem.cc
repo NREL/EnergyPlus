@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,6 +73,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -763,7 +764,7 @@ namespace HighTempRadiantSystem {
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
             state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
-                SumHATsurf(state, ZoneNum);                          // Set this to figure out what part of the load the radiant system meets
+                state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);  // Set this to figure out what part of the load the radiant system meets
             state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
             state.dataHighTempRadSys->LastQHTRadSrc(RadSysNum) =
                 0.0; // At the beginning of a time step, reset to zero so average calculation can start again
@@ -950,18 +951,20 @@ namespace HighTempRadiantSystem {
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
             SetPtTemp = GetCurrentScheduleValue(state, state.dataHighTempRadSys->HighTempRadSys(RadSysNum).SetptSchedPtr);
             OffTemp = SetPtTemp + 0.5 * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
-            OpTemp = (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
+            OpTemp = (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum)) /
+                     2.0; // Approximate the "operative" temperature
 
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
             switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
             case RadControlType::MATControl: {
-                HeatFrac = (OffTemp - state.dataHeatBalFanSys->MAT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
+                HeatFrac = (OffTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT) /
+                           state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
             } break;
             case RadControlType::MRTControl: {
                 HeatFrac = (OffTemp - state.dataHeatBal->ZoneMRT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
             } break;
             case RadControlType::OperativeControl: {
-                OpTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                OpTemp = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
                 HeatFrac = (OffTemp - OpTemp) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
             } break;
             default:
@@ -1062,13 +1065,13 @@ namespace HighTempRadiantSystem {
             // Determine the proper temperature on which to control
             switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
             case RadControlType::MATSPControl: {
-                ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                ZoneTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
             } break;
             case RadControlType::MRTSPControl: {
                 ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
             } break;
             case RadControlType::OperativeSPControl: {
-                ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                ZoneTemp = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
             } break;
             default: {
                 assert(false);
@@ -1106,13 +1109,13 @@ namespace HighTempRadiantSystem {
                     // Redetermine the current value of the controlling temperature
                     switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
                     case RadControlType::MATControl: {
-                        ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                        ZoneTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                     } break;
                     case RadControlType::MRTControl: {
                         ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
                     } break;
                     case RadControlType::OperativeControl: {
-                        ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                        ZoneTemp = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
                     } break;
                     default:
                         break;
@@ -1235,7 +1238,7 @@ namespace HighTempRadiantSystem {
             LoadMet = 0.0; // System wasn't running so it can't meet a load
         } else {
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
-            LoadMet = (SumHATsurf(state, ZoneNum) - state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum)) +
+            LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum)) +
                       state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
         }
     }
@@ -1435,72 +1438,6 @@ namespace HighTempRadiantSystem {
         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatPower = state.dataHighTempRadSys->QHTRadSource(RadSysNum);
         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatEnergy =
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
-    }
-
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
-        // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
-        // and should be updated accordingly.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataSurfaces;
-        using namespace DataHeatBalance;
-
-        // Return value
-        Real64 SumHATsurf;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int SurfNum; // Surface number
-        Real64 Area; // Effective surface area
-
-        SumHATsurf = 0.0;
-
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-
-            Area = state.dataSurface->Surface(SurfNum).Area;
-
-            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
-                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                    // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-                }
-
-                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                    // Window frame contribution
-                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
-                }
-
-                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
-                    !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                    // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
-                }
-            }
-
-            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
-        }
-
-        return SumHATsurf;
     }
 
 } // namespace HighTempRadiantSystem

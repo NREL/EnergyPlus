@@ -218,6 +218,54 @@ The outdoor wind speed calculated at the height above ground of the zone centroi
   Zone,Sum,Space Total Internal Total Heating Energy {[}J{]}
 \item
   Zone,Average,Space Total Internal Total Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Temperature {[}C{]}
+\item
+  Zone,Average,Space Mean Air Dewpoint Temperature {[}C{]}
+\item
+  Zone,Average,Space Mean Radiant Temperature {[}C{]}
+\item
+  Zone,Average,Space Operative Temperature {[}C{]}
+\item
+  HVAC,Average,Space Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Surface Convection Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance InterSpace Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Outdoor Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance System Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance System Convective Heat Gain Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Air Energy Storage Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Deviation Rate {[}W{]}
+\item
+  HVAC,Sum,Space Air System Sensible Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Space Air System Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Space Air System Sensible Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Sensible Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Humidity Ratio{[}kgWater/kgDryAir{]}
+\item
+  HVAC,Average,Space Air Relative Humidity{[}\%{]}
+\item
+  HVAC,Sum,Space Air System Latent Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Space Air System Latent Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Space Air System Latent Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Latent Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Sensible Heat Ratio {[}{]}
+\item
+  HVAC,Average,Space Air Vapor Pressure Difference {[}Pa{]}
 \end{itemize}
 
 \subsubsection{Zone Thermal Outputs Overview}\label{zone-thermal-outputs}
@@ -321,7 +369,7 @@ These two variable outputs are/should be identical. However, note that they can 
 
 \paragraph{Zone Mean Air Temperature {[}C{]}}\label{zone-mean-air-temperature-c}
 
-From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone.
+From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone unless a non-mixing RoomAirModel is specified.
 
 \paragraph{Zone Air Temperature {[}C{]}}\label{zone-air-temperature-c}
 
