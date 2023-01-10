@@ -1338,7 +1338,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 capacityModifierFuncTemp =
         // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
         // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, oaTempforCurve);
-        CurveManager::CurveValue(state, this->capFuncTempCurveIndex, waterTempforCurve, oaTempforCurve);
+        Curve::CurveValue(state, this->capFuncTempCurveIndex, waterTempforCurve, oaTempforCurve);
 
     if (capacityModifierFuncTemp < 0.0) {
         if (this->capModFTErrorIndex == 0) {
@@ -1380,11 +1380,11 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
 
     // calculate power usage from EIR curves
-    Real64 eirModifierFuncTemp = CurveManager::CurveValue(state,
-                                                          this->powerRatioFuncTempCurveIndex,
-                                                          waterTempforCurve,
-                                                          oaTempforCurve); // CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex,
-                                                                           // this->loadSideOutletTemp, this->sourceSideInletTemp);
+    Real64 eirModifierFuncTemp = Curve::CurveValue(state,
+                                                   this->powerRatioFuncTempCurveIndex,
+                                                   waterTempforCurve,
+                                                   oaTempforCurve); // CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex,
+                                                                    // this->loadSideOutletTemp, this->sourceSideInletTemp);
 
     if (eirModifierFuncTemp < 0.0) {
         if (this->eirModFTErrorIndex == 0) {
@@ -1409,7 +1409,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 miniPLR_mod = 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
     Real64 PLFf = max(miniPLR_mod, partLoadRatio);
 
-    Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, PLFf);
+    Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, PLFf);
     // this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
     // this->powerEnergy = this->powerUsage * reportingInterval;
 
@@ -1435,7 +1435,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     if ((state.dataEnvrn->OutDryBulbTemp <= this->defrostMaxOADBT) && this->defrostType == DefrostType::OnDemand) {
         if (this->defrostEIRCurveIndex > 0) {
-            eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTemp2);
+            eirDefrost = Curve::CurveValue(state, this->defrostEIRCurveIndex, oaTemp2);
         }
 
         if (eirDefrost < 1.0) {
@@ -1464,14 +1464,14 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     CRF = 0.4167 * CR + 0.5833; // 2022-05-31: this is the fixed eqn in the paper, but with the curve input it could be any curve
     if (this->cycRatioCurveIndex > 0) {
-        CRF = CurveManager::CurveValue(state, this->cycRatioCurveIndex, CR);
+        CRF = Curve::CurveValue(state, this->cycRatioCurveIndex, CR);
     }
     if (CRF <= DataGlobalConstants::rTinyValue) CRF = 0.5833; // 2022-06-02: what could a proper default for too tiny CRF?
 
     // aux elec
     Real64 eirAuxElecFuncTemp = 0.0;
     if (this->auxElecEIRFoTempCurveIndex > 0) {
-        eirAuxElecFuncTemp = CurveManager::CurveValue(state, this->auxElecEIRFoTempCurveIndex, waterTempforCurve, oaTempforCurve);
+        eirAuxElecFuncTemp = Curve::CurveValue(state, this->auxElecEIRFoTempCurveIndex, waterTempforCurve, oaTempforCurve);
     }
 
     if (eirAuxElecFuncTemp < 0.0) {
@@ -1498,7 +1498,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     Real64 eirAuxElecFuncPLR = 0.0;
     if (this->auxElecEIRFoPLRCurveIndex > 0) {
-        eirAuxElecFuncPLR = CurveManager::CurveValue(state, this->auxElecEIRFoPLRCurveIndex, partLoadRatio);
+        eirAuxElecFuncPLR = Curve::CurveValue(state, this->auxElecEIRFoPLRCurveIndex, partLoadRatio);
     }
 
     if (eirAuxElecFuncPLR < 0.0) {
@@ -1921,7 +1921,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // A11 normalized_capacity_function_of_temperature_curve_name
                 auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
-                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
+                thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(state,
                                     fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
@@ -1932,8 +1932,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // A12 fuel_energy_input_ratio_function_of_temperature_curve_name
                 auto &eirFtName = fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name");
-                thisPLHP.powerRatioFuncTempCurveIndex =
-                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
+                thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(state,
                                     fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
@@ -1943,8 +1942,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
                 // A13 fuel_energy_input_ratio_function_of_plr_curve_name
                 auto &eirFplrName = fields.at("fuel_energy_input_ratio_function_of_plr_curve_name");
-                thisPLHP.powerRatioFuncPLRCurveIndex =
-                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
+                thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(state,
                                     fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
@@ -1997,7 +1995,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     if (fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name") != fields.end()) {
                         auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
                         thisPLHP.defrostEIRCurveIndex =
-                            CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
+                            Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
                         if (thisPLHP.defrostEIRCurveIndex == 0) {
                             ShowSevereError(state,
                                             fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
@@ -2092,8 +2090,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // A16 cycling_ratio_factor_curve_name
                 if (fields.find("cycling_ratio_factor_curve_name") != fields.end()) {
                     auto &cycRatioCurveName = fields.at("cycling_ratio_factor_curve_name");
-                    thisPLHP.cycRatioCurveIndex =
-                        CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
+                    thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
                     if (thisPLHP.cycRatioCurveIndex == 0) {
                         ShowSevereError(state,
                                         fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
@@ -2128,7 +2125,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 if (fields.find("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name") != fields.end()) {
                     auto &auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
                     thisPLHP.auxElecEIRFoTempCurveIndex =
-                        CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
+                        Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
                     if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
                         ShowSevereError(state,
                                         fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
@@ -2144,7 +2141,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 if (fields.find("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name") != fields.end()) {
                     auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
                     thisPLHP.auxElecEIRFoPLRCurveIndex =
-                        CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
+                        Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
                     if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
                         ShowSevereError(state,
                                         fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
