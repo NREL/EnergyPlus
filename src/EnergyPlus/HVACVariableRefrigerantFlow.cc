@@ -4723,9 +4723,9 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = rNumericArgs(11);
             // set maximum outdoor dry-bulb temperature for supplemental heating coil operation
             if (NumNums < 12) {
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxOATSuppHeatingCoil = 21.0;            
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxOATSuppHeatingCoil = 21.0;
             } else {
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxOATSuppHeatingCoil = rNumericArgs(12);                        
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxOATSuppHeatingCoil = rNumericArgs(12);
             }
         }
 
