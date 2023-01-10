@@ -2081,11 +2081,11 @@ void TestInletOutletNodes(EnergyPlusData &state)
 }
 
 void TestCompSet(EnergyPlusData &state,
-                 std::string const &CompType,   // Component Type
-                 std::string_view CompName,     // Component Name
-                 std::string const &InletNode,  // Inlet Node Name
-                 std::string const &OutletNode, // Outlet Node Name
-                 std::string const &Description // Description of Node Pair (for warning message)
+                 std::string_view const &CompType, // Component Type
+                 std::string_view CompName,        // Component Name
+                 std::string const &InletNode,     // Inlet Node Name
+                 std::string const &OutletNode,    // Outlet Node Name
+                 std::string const &Description    // Description of Node Pair (for warning message)
 )
 {
 

@@ -299,7 +299,8 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
                        OASysNum,
                        OAHeatCoil,
                        OACoolCoil,
-                       OAHX);
+                       OAHX,
+                       CompNum);
         if (OAHX) ReSim = true;
     }
     // if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again
@@ -320,7 +321,8 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
                            OASysNum,
                            OAHeatCoil,
                            OACoolCoil,
-                           OAHX);
+                           OAHX,
+                           CompNum);
         }
         // now simulate again propagate current temps back through OA system
         for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
@@ -337,7 +339,8 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
                            OASysNum,
                            OAHeatCoil,
                            OACoolCoil,
-                           OAHX);
+                           OAHX,
+                           CompNum);
         }
     }
 }
@@ -453,7 +456,8 @@ void SimOAComponent(EnergyPlusData &state,
                     int const OASysNum,   // index to outside air system
                     bool &OAHeatingCoil,  // TRUE indicates a heating coil has been found
                     bool &OACoolingCoil,  // TRUE indicates a cooling coil has been found
-                    bool &OAHX            // TRUE indicates a heat exchanger has been found
+                    bool &OAHX,           // TRUE indicates a heat exchanger has been found
+                    int const CompNum
 )
 {
 
@@ -502,6 +506,14 @@ void SimOAComponent(EnergyPlusData &state,
     OAHX = false;
     Real64 AirloopPLR;
     int FanOpMode;
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    Real64 sensOut = 0.0;
+    Real64 latOut = 0.0;
+    int constexpr zoneOAUnitNum = -1;
+    Real64 constexpr OAUCoilOutTemp = 0.0;
+    bool constexpr ZoneEquipFlag = false;
+
 
     if (CompTypeNum == SimAirServingZones::CompType::OAMixer_Num) { // 'OutdoorAir:Mixer'
         if (Sim) {
@@ -637,13 +649,7 @@ void SimOAComponent(EnergyPlusData &state,
         OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
         if (Sim) {
-            bool HeatingActive = false;
-            bool CoolingActive = false;
-            Real64 OAUCoilOutTemp = 0.0;
-            bool ZoneEquipFlag = false;
-            Real64 sensOut = 0.0;
-            Real64 latOut = 0.0;
-            int compNum = CompIndex - 1;
+            int compNum = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum);
             state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[compNum]->simulate(state,
                                                                                       CompName,
                                                                                       FirstHVACIteration,
@@ -651,7 +657,7 @@ void SimOAComponent(EnergyPlusData &state,
                                                                                       compNum,
                                                                                       HeatingActive,
                                                                                       CoolingActive,
-                                                                                      0,
+                                                                                      zoneOAUnitNum,
                                                                                       OAUCoilOutTemp,
                                                                                       ZoneEquipFlag,
                                                                                       sensOut,
@@ -660,20 +666,15 @@ void SimOAComponent(EnergyPlusData &state,
         OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::CoilSystemWater) { // "CoilSystem:Cooling:Water"
         if (Sim) {
-            bool HeatingActive = false;
-            bool CoolingActive = false;
-            Real64 OAUCoilOutTemp = 0.0;
-            bool ZoneEquipFlag = false;
-            Real64 sensOut = 0.0;
-            Real64 latOut = 0.0;
+            int compNum = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum);
             state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state,
                                                                                         CompName,
                                                                                         FirstHVACIteration,
                                                                                         AirLoopNum,
-                                                                                        CompIndex,
+                                                                                        compNum,
                                                                                         HeatingActive,
                                                                                         CoolingActive,
-                                                                                        CompIndex,
+                                                                                        zoneOAUnitNum,
                                                                                         OAUCoilOutTemp,
                                                                                         ZoneEquipFlag,
                                                                                         sensOut,
@@ -682,20 +683,15 @@ void SimOAComponent(EnergyPlusData &state,
         OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
         if (Sim) {
-            bool HeatingActive = false;
-            bool CoolingActive = false;
-            Real64 OAUCoilOutTemp = 0.0;
-            bool ZoneEquipFlag = false;
-            Real64 sensOut = 0.0;
-            Real64 latOut = 0.0;
+            int compNum = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum);
             state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state,
                                                                                         CompName,
                                                                                         FirstHVACIteration,
                                                                                         AirLoopNum,
-                                                                                        CompIndex,
+                                                                                        compNum,
                                                                                         HeatingActive,
                                                                                         CoolingActive,
-                                                                                        CompIndex,
+                                                                                        zoneOAUnitNum,
                                                                                         OAUCoilOutTemp,
                                                                                         ZoneEquipFlag,
                                                                                         sensOut,
@@ -915,8 +911,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   Oct 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Input the Outside Air System data and store it in the OutsideAirSys array.
@@ -924,49 +918,29 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Use the Get routines from the InputProcessor module.
 
-    // Using/Aliasing
-    using BranchNodeConnections::SetUpCompSets;
-    using BranchNodeConnections::TestCompSet;
-
-    // Locals
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetOutsideAirSysInputs: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+    bool ErrorsFound(false);
     int NumNums;   // Number of real numbers returned by GetObjectItem
     int NumAlphas; // Number of alphanumerics returned by GetObjectItem
+    int AlphaNum;
+    int TotalArgs(0); // Total number of alpha and numeric arguments (max) for a
     int IOStat;
     Array1D<Real64> NumArray;
     Array1D_string AlphArray;
-    int OASysNum;
-    int CompNum;
-    int Item;
-    // unused0909INTEGER :: NumComponents
-    int AlphaNum;
-    std::string ComponentListName;
-    std::string ControllerListName;
-    int NumInList;
-    int InListNum;
-    int ListNum;
-    int NumSimpControllers; // number of Controller:Simple objects in an OA System
-    bool ErrorsFound(false);
-    std::string CurrentModuleObject; // Object type for getting and messages
-    Array1D_string cAlphaFields;     // Alpha field names
-    Array1D_string cNumericFields;   // Numeric field names
-    Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-    Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-    int MaxNums(0);                  // Maximum number of numeric input fields
-    int MaxAlphas(0);                // Maximum number of alpha input fields
-    int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a
-    //  certain object in the input file
+    Array1D_string cAlphaFields;   // Alpha field names
+    Array1D_string cNumericFields; // Numeric field names
+    Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+    Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
     if (!state.dataMixedAir->GetOASysInputFlag) return;
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::OASystem)), TotalArgs, NumAlphas, NumNums);
-    MaxNums = max(MaxNums, NumNums);
-    MaxAlphas = max(MaxAlphas, NumAlphas);
+    int MaxNums = NumNums;
+    int MaxAlphas = NumAlphas;
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::AirLoopEqList)), TotalArgs, NumAlphas, NumNums);
     MaxNums = max(MaxNums, NumNums);
@@ -983,12 +957,12 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     lAlphaBlanks.dimension(MaxAlphas, true);
     lNumericBlanks.dimension(MaxNums, true);
 
-    CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::ControllerList));
+    std::string_view CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::ControllerList));
     state.dataMixedAir->NumControllerLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
     state.dataMixedAir->ControllerLists.allocate(state.dataMixedAir->NumControllerLists);
 
-    for (Item = 1; Item <= state.dataMixedAir->NumControllerLists; ++Item) {
+    for (int Item = 1; Item <= state.dataMixedAir->NumControllerLists; ++Item) {
 
         // create a reference for convenience
         auto &thisControllerList(state.dataMixedAir->ControllerLists(Item));
@@ -1010,7 +984,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         thisControllerList.ControllerType.allocate(thisControllerList.NumControllers);
         thisControllerList.ControllerName.allocate(thisControllerList.NumControllers);
         AlphaNum = 2;
-        for (CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum) {
+        for (int CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum) {
             if (UtilityRoutines::SameString(AlphArray(AlphaNum), "Controller:WaterCoil") ||
                 UtilityRoutines::SameString(AlphArray(AlphaNum), "Controller:OutdoorAir")) {
                 thisControllerList.ControllerType(CompNum) = AlphArray(AlphaNum);
@@ -1022,15 +996,15 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                     for (int PreviousListControllerNum = 1; PreviousListControllerNum <= previousList.NumControllers; ++PreviousListControllerNum) {
                         if ((previousList.ControllerType(PreviousListControllerNum) == thisControllerList.ControllerType(CompNum)) &&
                             (previousList.ControllerName(PreviousListControllerNum) == thisControllerList.ControllerName(CompNum))) {
-                            ShowSevereError(state, "Controller instance repeated in multiple " + CurrentModuleObject + " objects");
-                            ShowContinueError(state, "Found in " + CurrentModuleObject + " = " + thisControllerList.Name);
-                            ShowContinueError(state, "Also found in " + CurrentModuleObject + " = " + previousList.Name);
+                            ShowSevereError(state, format("Controller instance repeated in multiple {} objects", CurrentModuleObject));
+                            ShowContinueError(state, format("Found in {} = {}", CurrentModuleObject, thisControllerList.Name));
+                            ShowContinueError(state, format("Also found in {} = {}", CurrentModuleObject, previousList.Name));
                             ErrorsFound = true;
                         }
                     }
                 }
             } else {
-                ShowSevereError(state, "For " + CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(AlphaNum));
+                ShowSevereError(state, format("For {}=\"{}\" invalid {}", CurrentModuleObject, AlphArray(1), cAlphaFields(AlphaNum)));
                 ShowContinueError(state, "...entered=\"" + AlphArray(AlphaNum) + "\", should be Controller:WaterCoil or Controller:OutdoorAir.");
                 ErrorsFound = true;
             }
@@ -1049,8 +1023,8 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     state.dataMixedAir->MyOneTimeCheckUnitarySysFlag.dimension(state.dataAirLoop->NumOASystems, true);
     state.dataMixedAir->initOASysFlag.dimension(state.dataAirLoop->NumOASystems, true);
 
-    for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
-
+    for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
+        auto &OASys = state.dataAirLoop->OutsideAirSys(OASysNum);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  OASysNum,
@@ -1064,136 +1038,127 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                                                                  cAlphaFields,
                                                                  cNumericFields);
         UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
-        state.dataAirLoop->OutsideAirSys(OASysNum).Name = AlphArray(1);
+        OASys.Name = AlphArray(1);
         if (!AlphArray(2).empty()) {
             GlobalNames::IntraObjUniquenessCheck(
                 state, AlphArray(2), CurrentModuleObject, cAlphaFields(2), state.dataMixedAir->ControllerListUniqueNames, ErrorsFound);
         }
-        ControllerListName = AlphArray(2);
-        state.dataAirLoop->OutsideAirSys(OASysNum).ControllerListName = AlphArray(2);
-        ComponentListName = AlphArray(3);
-        state.dataAirLoop->OutsideAirSys(OASysNum).ComponentListName = AlphArray(3);
+        OASys.ControllerListName = AlphArray(2);
+        OASys.ComponentListName = AlphArray(3);
 
-        TestCompSet(state, CurrentModuleObject, AlphArray(1), "UNDEFINED", "UNDEFINED", "Air Nodes");
+        BranchNodeConnections::TestCompSet(state, CurrentModuleObject, OASys.Name, "UNDEFINED", "UNDEFINED", "Air Nodes");
 
         if (!lAlphaBlanks(3)) {
-            ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-                state, CurrentModuleObjects(static_cast<int>(CMO::AirLoopEqList)), ComponentListName);
+            int ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
+                state, CurrentModuleObjects(static_cast<int>(CMO::AirLoopEqList)), OASys.ComponentListName);
             if (ListNum > 0) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, CurrentModuleObjects(static_cast<int>(CMO::AirLoopEqList)), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-                NumInList = (NumAlphas - 1) / 2;
-                state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents = NumInList;
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName.allocate(NumInList);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType.allocate(NumInList);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum.dimension(NumInList, SimAirServingZones::CompType::Invalid);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex.dimension(NumInList, 0);
-                state.dataAirLoop->OutsideAirSys(OASysNum).InletNodeNum.dimension(NumInList, 0);
-                state.dataAirLoop->OutsideAirSys(OASysNum).OutletNodeNum.dimension(NumInList, 0);
-                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer.resize(NumInList + 1, nullptr);
-                for (InListNum = 1; InListNum <= NumInList; ++InListNum) {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(InListNum) = AlphArray(InListNum * 2 + 1);
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(InListNum) = AlphArray(InListNum * 2);
+                int NumInList = (NumAlphas - 1) / 2;
+                OASys.NumComponents = NumInList;
+                OASys.ComponentName.allocate(NumInList);
+                OASys.ComponentType.allocate(NumInList);
+                OASys.ComponentTypeEnum.dimension(NumInList, SimAirServingZones::CompType::Invalid);
+                OASys.ComponentIndex.dimension(NumInList, 0);
+                OASys.InletNodeNum.dimension(NumInList, 0);
+                OASys.OutletNodeNum.dimension(NumInList, 0);
+                OASys.compPointer.resize(NumInList + 1, nullptr);
+                for (int InListNum = 1; InListNum <= NumInList; ++InListNum) {
+                    OASys.ComponentName(InListNum) = AlphArray(InListNum * 2 + 1);
+                    OASys.ComponentType(InListNum) = AlphArray(InListNum * 2);
 
                     // Add equipment to component sets array
-                    SetUpCompSets(state,
-                                  CurrentModuleObject,
-                                  state.dataAirLoop->OutsideAirSys(OASysNum).Name,
-                                  state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(InListNum),
-                                  state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(InListNum),
-                                  "UNDEFINED",
-                                  "UNDEFINED");
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         CurrentModuleObject,
+                                                         OASys.Name,
+                                                         OASys.ComponentType(InListNum),
+                                                         OASys.ComponentName(InListNum),
+                                                         "UNDEFINED",
+                                                         "UNDEFINED");
                 }
             } else {
                 ShowSevereError(
-                    state, CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(3) + "=\"" + AlphArray(3) + "\" not found.");
+                    state,
+                    format("{} = \"{}\" invalid {}=\"{}\" not found.", CurrentModuleObject, OASys.Name, cAlphaFields(3), OASys.ComponentListName));
                 ErrorsFound = true;
             }
         } else {
-            ShowSevereError(state, CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(3) + " is blank and must be entered.");
+            ShowSevereError(state, format("{} = \"{}\" invalid {} is blank and must be entered.", CurrentModuleObject, OASys.Name, cAlphaFields(3)));
             ErrorsFound = true;
         }
 
-        ListNum = 0;
-        NumSimpControllers = 0;
+        int ListNum = 0;
+        int NumSimpControllers = 0; // number of Controller:Simple objects in an OA System
         if (!lAlphaBlanks(2)) {
             ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-                state, CurrentModuleObjects(static_cast<int>(CMO::ControllerList)), ControllerListName);
+                state, CurrentModuleObjects(static_cast<int>(CMO::ControllerList)), OASys.ControllerListName);
             if (ListNum > 0) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, CurrentModuleObjects(static_cast<int>(CMO::ControllerList)), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-                NumInList = (NumAlphas - 1) / 2;
-                state.dataAirLoop->OutsideAirSys(OASysNum).NumControllers = NumInList;
-                state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName.allocate(NumInList);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ControllerType.allocate(NumInList);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ControllerIndex.dimension(NumInList, 0);
-                for (InListNum = 1; InListNum <= NumInList; ++InListNum) {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName(InListNum) = AlphArray(InListNum * 2 + 1);
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ControllerType(InListNum) = AlphArray(InListNum * 2);
-                    if (!UtilityRoutines::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerType(InListNum),
-                                                     CurrentModuleObjects(static_cast<int>(CMO::OAController)))) {
+                int NumInList = (NumAlphas - 1) / 2;
+                OASys.NumControllers = NumInList;
+                OASys.ControllerName.allocate(NumInList);
+                OASys.ControllerType.allocate(NumInList);
+                OASys.ControllerIndex.dimension(NumInList, 0);
+                for (int InListNum = 1; InListNum <= NumInList; ++InListNum) {
+                    OASys.ControllerName(InListNum) = AlphArray(InListNum * 2 + 1);
+                    OASys.ControllerType(InListNum) = AlphArray(InListNum * 2);
+                    if (!UtilityRoutines::SameString(OASys.ControllerType(InListNum), CurrentModuleObjects(static_cast<int>(CMO::OAController)))) {
                         ++NumSimpControllers;
                     }
                 }
             } else {
-                ShowSevereError(
-                    state, CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(2) + "=\"" + AlphArray(2) + "\" not found.");
+                ShowSevereError(state,
+                                format("{} = \"{}\" invalid {}=\"{}\" not found.", CurrentModuleObject, AlphArray(1), cAlphaFields(2), AlphArray(2)));
                 ErrorsFound = true;
             }
         } else {
             if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") == 0) {
                 ShowSevereError(state,
-                                CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(2) + " is blank and must be entered.");
+                                format("{} = \"{}\" invalid {} is blank and must be entered.", CurrentModuleObject, AlphArray(1), cAlphaFields(2)));
                 ErrorsFound = true;
             } else {
                 ShowWarningError(state,
-                                 CurrentModuleObject + " = \"" + AlphArray(1) + "\": blank " + cAlphaFields(2) +
-                                     " must be used with AirLoopHVAC:DedicatedOutdoorAirSystem.");
+                                 format("{} = \"{}\": blank {} must be used with AirLoopHVAC:DedicatedOutdoorAirSystem.",
+                                        CurrentModuleObject,
+                                        AlphArray(1),
+                                        cAlphaFields(2)));
             }
         }
-        state.dataAirLoop->OutsideAirSys(OASysNum).ControllerListNum = ListNum;
-        state.dataAirLoop->OutsideAirSys(OASysNum).NumSimpleControllers = NumSimpControllers;
+        OASys.ControllerListNum = ListNum;
+        OASys.NumSimpleControllers = NumSimpControllers;
     }
 
-    for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
-        for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
-            state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(getEnumerationValue(
-                CompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum))));
-            if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
+    for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
+        auto &OASys = state.dataAirLoop->OutsideAirSys(OASysNum);
+        for (int CompNum = 1; CompNum <= OASys.NumComponents; ++CompNum) {
+            OASys.ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(
+                getEnumerationValue(CompTypeNamesUC, UtilityRoutines::MakeUPPERCase(OASys.ComponentType(CompNum))));
+            if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
                 // construct fan object
-                state.dataHVACFan->fanObjs.emplace_back(
-                    new HVACFan::FanSystem(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum)));
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = state.dataHVACFan->fanObjs.size();
-            } else if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::CoilSystemWater) {
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, OASys.ComponentName(CompNum)));
+                OASys.ComponentIndex(CompNum) = state.dataHVACFan->fanObjs.size();
+            } else if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::CoilSystemWater ||
+                       OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
+                       OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
+                OASys.ComponentIndex(CompNum) = CompNum;
                 UnitarySystems::UnitarySys thisSys;
-                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
-                    state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
-            } else if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel) {
-                UnitarySystems::UnitarySys thisSys;
-                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
-                    state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
-            } else if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
-                UnitarySystems::UnitarySys thisSys;
-                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
-                    state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
-            } else if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Invalid) {
-                std::string thisComp = UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum));
+                OASys.compPointer[CompNum] = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, OASys.ComponentName(CompNum), false, 0);
+            } else if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Invalid) {
+                std::string thisComp = UtilityRoutines::MakeUPPERCase(OASys.ComponentType(CompNum));
                 if (thisComp == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" || thisComp == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::HeatXchngr;
+                    OASys.ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::HeatXchngr;
                 } else if (thisComp == "DEHUMIDIFIER:DESICCANT:SYSTEM") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::Desiccant;
+                    OASys.ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::Desiccant;
                 } else if (thisComp == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD" || thisComp == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" ||
                            thisComp == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" || thisComp == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::EvapCooler;
+                    OASys.ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::EvapCooler;
                 } else if (thisComp == "HUMIDIFIER:STEAM:GAS") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::Humidifier;
+                    OASys.ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::Humidifier;
                 } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid Outside Air Component=\"" +
-                                        state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum) + "\".");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid Outside Air Component=\"{}\".", CurrentModuleObject, AlphArray(1), OASys.ComponentType(CompNum)));
                     ErrorsFound = true;
                 }
             }
@@ -1211,7 +1176,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + '.');
+        ShowFatalError(state, format("{}Errors found in getting {}.", RoutineName, CurrentModuleObject));
     }
 
     AlphArray.deallocate();
@@ -5684,7 +5649,8 @@ int GetOASysNumHeatingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
                        OASysNumber,
                        OAHeatingCoil,
                        OACoolingCoil,
-                       OAHX);
+                       OAHX,
+                       CompNum);
         if (OAHeatingCoil) {
             ++NumHeatingCoils;
         }
@@ -5818,7 +5784,8 @@ int GetOASysNumCoolingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
                        OASysNumber,
                        OAHeatingCoil,
                        OACoolingCoil,
-                       OAHX);
+                       OAHX,
+                       CompNum);
         if (OACoolingCoil) {
             ++NumCoolingCoils;
         }
