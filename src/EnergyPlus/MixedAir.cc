@@ -637,13 +637,6 @@ void SimOAComponent(EnergyPlusData &state,
         OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
         if (Sim) {
-            if (state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] == nullptr) {
-                UnitarySystems::UnitarySys thisSys;
-                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] =
-                    thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
-                CompIndex = UnitarySystems::getUnitarySystemIndex(state, CompName) + 1;
-                UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
-            }
             bool HeatingActive = false;
             bool CoolingActive = false;
             Real64 OAUCoilOutTemp = 0.0;
@@ -666,12 +659,6 @@ void SimOAComponent(EnergyPlusData &state,
         }
         OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::CoilSystemWater) { // "CoilSystem:Cooling:Water"
-        if (state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] == nullptr) {
-            UnitarySystems::UnitarySys thisSys;
-            state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] =
-                thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
-            UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
-        }
         if (Sim) {
             bool HeatingActive = false;
             bool CoolingActive = false;
@@ -1186,8 +1173,12 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 UnitarySystems::UnitarySys thisSys;
                 state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
                     state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) =
-                    UnitarySystems::getUnitarySystemIndex(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum)) + 1;
+                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
+            } else if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
+                UnitarySystems::UnitarySys thisSys;
+                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
+                    state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
             } else if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Invalid) {
                 std::string thisComp = UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum));
                 if (thisComp == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" || thisComp == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
