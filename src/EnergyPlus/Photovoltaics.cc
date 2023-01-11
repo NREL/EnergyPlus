@@ -213,8 +213,9 @@ namespace Photovoltaics {
 
         GeneratorPower = state.dataPhotovoltaic->PVarray(GeneratorIndex).Report.DCPower;
         GeneratorEnergy = state.dataPhotovoltaic->PVarray(GeneratorIndex).Report.DCEnergy;
+        auto &thisPVarray = state.dataPhotovoltaic->PVarray;
         // PVT may add thermal
-        if (state.dataPhotovoltaic->PVarray(GeneratorIndex).CellIntegrationMode == CellIntegration::PVTSolarCollector) {
+        if (thisPVarray(GeneratorIndex).CellIntegrationMode == CellIntegration::PVTSolarCollector) {
             // get result for thermal power generation
             GetPVTThermalPowerProduction(state, GeneratorIndex, ThermalPower, ThermalEnergy);
         } else {
@@ -931,6 +932,7 @@ namespace Photovoltaics {
         Real64 Ee;
 
         ThisSurf = state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr;
+        auto &thisPVarray = state.dataPhotovoltaic->PVarray;
 
         //   get input from elsewhere in Energyplus for the current point in the simulation
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam = state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/m2)from DataHeatBalance
@@ -1007,13 +1009,13 @@ namespace Photovoltaics {
 
             } break;
             case CellIntegration::PVTSolarCollector: {
-                GetPVTTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).PVTPtr, state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback);
-                state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
-                    SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
-                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
-                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
-                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
+                GetPVTTsColl(state, thisPVarray(PVnum).PVTPtr, thisPVarray(PVnum).SNLPVCalc.Tback);
+                thisPVarray(PVnum).SNLPVCalc.Tcell =
+                    SandiaTcellFromTmodule(thisPVarray(PVnum).SNLPVCalc.Tback,
+                                           thisPVarray(PVnum).SNLPVinto.IcBeam,
+                                           thisPVarray(PVnum).SNLPVinto.IcDiffuse,
+                                           thisPVarray(PVnum).SNLPVModule.fd,
+                                           thisPVarray(PVnum).SNLPVModule.DT0);
             } break;
             default: {
                 ShowSevereError(state, "Sandia PV Simulation Temperature Modeling Mode Error in " + state.dataPhotovoltaic->PVarray(PVnum).Name);
@@ -1289,6 +1291,8 @@ namespace Photovoltaics {
         // convert ambient temperature from C to K
         Tambient = state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
 
+        auto &thisPVarray = state.dataPhotovoltaic->PVarray;
+
         if ((state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation > MinInsolation) && (RunFlag)) {
 
             // set initial values for eta iteration loop
@@ -1339,7 +1343,7 @@ namespace Photovoltaics {
                     CellTemp += DataGlobalConstants::KelvinConv;
                 } break;
                 case CellIntegration::PVTSolarCollector: {
-                    GetPVTTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).PVTPtr, CellTemp);
+                    GetPVTTsColl(state, thisPVarray(PVnum).PVTPtr, CellTemp);
                     CellTemp += DataGlobalConstants::KelvinConv;
                 } break;
                 default:
@@ -1429,7 +1433,7 @@ namespace Photovoltaics {
                 CellTemp += DataGlobalConstants::KelvinConv;
             } break;
             case CellIntegration::PVTSolarCollector: {
-                GetPVTTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).PVTPtr, CellTemp);
+                GetPVTTsColl(state, thisPVarray(PVnum).PVTPtr, CellTemp);
                 CellTemp += DataGlobalConstants::KelvinConv;
             } break;
             default: {
