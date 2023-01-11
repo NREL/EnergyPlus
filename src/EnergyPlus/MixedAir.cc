@@ -3006,7 +3006,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                     }
                     if (!FoundAreaZone) {
                         ShowWarningError(state,
-                                         format("{} = \"{}\", Zone=\"{}",
+                                         format("{} = \"{}\", Zone=\"{}\".",
                                                 CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)),
                                                 thisOAController.VentilationMechanicalName,
                                                 state.dataHeatBal->Zone(NumZone).Name));
