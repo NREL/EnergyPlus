@@ -1060,8 +1060,11 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 OASys.ControllerIndex.dimension(NumInList, 0);
                 for (int InListNum = 1; InListNum <= NumInList; ++InListNum) {
                     OASys.ControllerName(InListNum) = AlphArray(InListNum * 2 + 1);
-                    OASys.ControllerType(InListNum) = AlphArray(InListNum * 2); // will be either Controller:OutdoorAir or Controller:WaterCoil
-                    ++NumSimpControllers;
+                    OASys.ControllerType(InListNum) = AlphArray(InListNum * 2);
+                    // only count Controller:OutdoorAir types as valid simple controllers
+                    if (!UtilityRoutines::SameString(OASys.ControllerType(InListNum), CurrentModuleObjects(static_cast<int>(CMO::OAController)))) {
+                        ++NumSimpControllers;
+                    }
                 }
             } else {
                 ShowSevereError(state,
