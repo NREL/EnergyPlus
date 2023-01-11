@@ -140,6 +140,8 @@ using namespace ScheduleManager;
 using namespace DataSizing;
 using namespace FaultsManager;
 
+constexpr std::array<std::string_view, static_cast<int>(ControllerKind::Num)> ControllerKindNamesUC{"CONTROLLER:WATERCOIL", "CONTROLLER:OUTDOORAIR"};
+
 Array1D_string const CurrentModuleObjects(8,
                                           {"AirLoopHVAC:OutdoorAirSystem",
                                            "AirLoopHVAC:OutdoorAirSystem:EquipmentList",
@@ -457,8 +459,7 @@ void SimOAComponent(EnergyPlusData &state,
                     bool &OAHeatingCoil,  // TRUE indicates a heating coil has been found
                     bool &OACoolingCoil,  // TRUE indicates a cooling coil has been found
                     bool &OAHX,           // TRUE indicates a heat exchanger has been found
-                    int const CompNum
-)
+                    int const CompNum)
 {
 
     // SUBROUTINE INFORMATION
@@ -514,36 +515,36 @@ void SimOAComponent(EnergyPlusData &state,
     Real64 constexpr OAUCoilOutTemp = 0.0;
     bool constexpr ZoneEquipFlag = false;
 
-
-    if (CompTypeNum == SimAirServingZones::CompType::OAMixer_Num) { // 'OutdoorAir:Mixer'
+    switch (CompTypeNum) {
+    case SimAirServingZones::CompType::OAMixer_Num: { // OutdoorAir:Mixer
         if (Sim) {
             SimOAMixer(state, CompName, FirstHVACIteration, CompIndex);
         }
-
-        // Fan Types
-    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_Simple_CV) { // 'Fan:ConstantVolume'
+        break;
+    }
+    case SimAirServingZones::CompType::Fan_Simple_CV:    // Fan:ConstantVolume
+    case SimAirServingZones::CompType::Fan_Simple_VAV: { // Fan:VariableVolume
         if (Sim) {
             Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
         }
-    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_Simple_VAV) { // 'Fan:VariableVolume'
-        if (Sim) {
-            Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
-        }
-
-    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_System_Object) { // 'Fan:SystemModel'
+        break;
+    }
+    case SimAirServingZones::CompType::Fan_System_Object: {                    // Fan:SystemModel
         if (CompIndex == 0) {                                                  // 0 means has not been filled because of 1-based arrays in old fortran
             CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
         }
         if (Sim) {
             state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
         }
-    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) { // 'Fan:ComponentModel'
+        break;
+    }
+    case SimAirServingZones::CompType::Fan_ComponentModel: { // Fan:ComponentModel
         if (Sim) {
             Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
         }
-
-        // Coil Types
-    } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_Cooling) { // 'Coil:Cooling:Water'
+        break;
+    }
+    case SimAirServingZones::CompType::WaterCoil_Cooling: { // Coil:Cooling:Water
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -577,7 +578,8 @@ void SimOAComponent(EnergyPlusData &state,
             // should not include heat recovery coils in sizing since heat transfer at peak cooling is minimal.
             OACoolingCoil = true;
         }
-    } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
+    } break;
+    case SimAirServingZones::CompType::WaterCoil_SimpleHeat: { // Coil:Heating:Water
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -594,12 +596,14 @@ void SimOAComponent(EnergyPlusData &state,
             state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
+    } break;
+    case SimAirServingZones::CompType::SteamCoil_AirHeat: { // Coil:Heating:Steam
         if (Sim) {
             SimulateSteamCoilComponents(state, CompName, FirstHVACIteration, CompIndex, 0.0);
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
+    } break;
+    case SimAirServingZones::CompType::WaterCoil_DetailedCool: { // Coil:Cooling:Water:DetailedGeometry
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -616,19 +620,16 @@ void SimOAComponent(EnergyPlusData &state,
             state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
         }
         OACoolingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::Coil_ElectricHeat) { // 'Coil:Heating:Electric'
+    } break;
+    case SimAirServingZones::CompType::Coil_ElectricHeat: // Coil:Heating:Electric
+    case SimAirServingZones::CompType::Coil_GasHeat: {    // Coil:Heating:Fuel
         if (Sim) {
             //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
             SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex);
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::Coil_GasHeat) { // 'Coil:Heating:Fuel'
-        if (Sim) {
-            //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-            SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex);
-        }
-        OAHeatingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_CoolingHXAsst) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
+    } break;
+    case SimAirServingZones::CompType::WaterCoil_CoolingHXAsst: { // CoilSystem:Cooling:Water:HeatExchangerAssisted
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0)
@@ -647,7 +648,10 @@ void SimOAComponent(EnergyPlusData &state,
                 true;
         }
         OACoolingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
+    } break;
+    case SimAirServingZones::CompType::DXSystem:             // CoilSystem:Cooling:DX
+    case SimAirServingZones::CompType::CoilSystemWater:      // CoilSystem:Cooling:Water
+    case SimAirServingZones::CompType::UnitarySystemModel: { // AirloopHVAC:UnitarySystem
         if (Sim) {
             int compNum = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum);
             state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[compNum]->simulate(state,
@@ -663,58 +667,27 @@ void SimOAComponent(EnergyPlusData &state,
                                                                                       sensOut,
                                                                                       latOut);
         }
-        OACoolingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::CoilSystemWater) { // "CoilSystem:Cooling:Water"
-        if (Sim) {
-            int compNum = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum);
-            state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state,
-                                                                                        CompName,
-                                                                                        FirstHVACIteration,
-                                                                                        AirLoopNum,
-                                                                                        compNum,
-                                                                                        HeatingActive,
-                                                                                        CoolingActive,
-                                                                                        zoneOAUnitNum,
-                                                                                        OAUCoilOutTemp,
-                                                                                        ZoneEquipFlag,
-                                                                                        sensOut,
-                                                                                        latOut);
-        }
-        OACoolingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
-        if (Sim) {
-            int compNum = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum);
-            state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state,
-                                                                                        CompName,
-                                                                                        FirstHVACIteration,
-                                                                                        AirLoopNum,
-                                                                                        compNum,
-                                                                                        HeatingActive,
-                                                                                        CoolingActive,
-                                                                                        zoneOAUnitNum,
-                                                                                        OAUCoilOutTemp,
-                                                                                        ZoneEquipFlag,
-                                                                                        sensOut,
-                                                                                        latOut);
-        }
-        if (state.dataMixedAir->MyOneTimeCheckUnitarySysFlag(OASysNum)) {
+        if (state.dataMixedAir->MyOneTimeCheckUnitarySysFlag(OASysNum) && CompTypeNum == SimAirServingZones::CompType::UnitarySystemModel) {
             UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, OACoolingCoil, OAHeatingCoil, 0);
             UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
             if (Sim) state.dataMixedAir->MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
+        } else {
+            OACoolingCoil = true;
         }
-    } else if (CompTypeNum == SimAirServingZones::CompType::DXHeatPumpSystem) {
+    } break;
+    case SimAirServingZones::CompType::DXHeatPumpSystem: { // CoilSystem:IntegratedHeatPump:AirSource
         if (Sim) {
             SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == SimAirServingZones::CompType::CoilUserDefined) {
+    } break;
+    case SimAirServingZones::CompType::CoilUserDefined: { // Coil:UserDefined
         if (Sim) {
             SimCoilUserDefined(state, CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
         }
-        // Heat recovery
-    } else if (CompTypeNum ==
-               SimAirServingZones::CompType::HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
-        // 'HeatExchanger:Desiccant:BalancedFlow'
+    } break;
+    case SimAirServingZones::CompType::HeatXchngr: {
+        // HeatExchanger:AirToAir:FlatPlate, HeatExchanger:AirToAir:SensibleAndLatent, HeatExchanger:Desiccant:BalancedFlow
         if (Sim) {
             if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
                 AirloopPLR = 1.0;
@@ -752,46 +725,38 @@ void SimOAComponent(EnergyPlusData &state,
             }
         }
         OAHX = true;
-
-        // Desiccant Dehumidifier
-    } else if (CompTypeNum == SimAirServingZones::CompType::Desiccant) { // 'Dehumidifier:Desiccant:NoFans'
-        // 'Dehumidifier:Desiccant:System'
+    } break;
+    case SimAirServingZones::CompType::Desiccant: { // Dehumidifier:Desiccant:NoFans,  Dehumidifier:Desiccant:NoFans, Dehumidifier:Desiccant:System
         if (Sim) {
             SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
         }
         OAHX = true;
-
-        // Humidifiers
-    } else if (CompTypeNum == SimAirServingZones::CompType::Humidifier) { // 'Humidifier:Steam:Electric'
-        // 'Humidifier:Steam:Gas'
+    } break;
+    case SimAirServingZones::CompType::Humidifier: { // Humidifier:Steam:Electric Humidifier:Steam:Gas
         if (Sim) {
             SimHumidifier(state, CompName, FirstHVACIteration, CompIndex);
         }
-
-        // Unglazed Transpired Solar Collector
-    } else if (CompTypeNum == SimAirServingZones::CompType::Unglazed_SolarCollector) { // 'SolarCollector:UnglazedTranspired'
+    } break;
+    case SimAirServingZones::CompType::Unglazed_SolarCollector: { // SolarCollector:UnglazedTranspired
         if (Sim) {
             SimTranspiredCollector(state, CompName, CompIndex);
         }
-
-        // Air-based Photovoltaic-thermal flat plate collector
-    } else if (CompTypeNum == SimAirServingZones::CompType::PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
+    } break;
+    case SimAirServingZones::CompType::PVT_AirBased: { // SolarCollector:FlatPlate:PhotovoltaicThermal
         if (Sim) {
             if (CompIndex == 0) {
                 CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(state, CompName);
             }
             PhotovoltaicThermalCollectors::simPVTfromOASys(state, CompIndex, FirstHVACIteration);
         }
-
-        // Evaporative Cooler Types
-    } else if (CompTypeNum ==
-               SimAirServingZones::CompType::EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
-        // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
+    } break;
+    case SimAirServingZones::CompType::EvapCooler: { // EvaporativeCooler:Direct:CelDekPad, EvaporativeCooler:Indirect:CelDekPad
+        // EvaporativeCooler:Indirect:WetCoil, EvaporativeCooler:Indirect:ResearchSpecial
         if (Sim) {
             SimEvapCooler(state, CompName, CompIndex);
         }
-
-    } else if (CompTypeNum == SimAirServingZones::CompType::ZoneVRFasAirLoopEquip) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+    } break;
+    case SimAirServingZones::CompType::ZoneVRFasAirLoopEquip: { // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
         if (Sim) {
             int ControlledZoneNum = 0;
             bool HeatingActive = false;
@@ -816,8 +781,8 @@ void SimOAComponent(EnergyPlusData &state,
         } else {
             HVACVariableRefrigerantFlow::isVRFCoilPresent(state, CompName, OACoolingCoil, OAHeatingCoil);
         }
-
-    } else {
+    } break;
+    default:
         ShowFatalError(state, "Invalid Outside Air Component=" + CompType);
     }
 }
@@ -957,7 +922,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     lAlphaBlanks.dimension(MaxAlphas, true);
     lNumericBlanks.dimension(MaxNums, true);
 
-    std::string_view CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::ControllerList));
+    std::string CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::ControllerList));
     state.dataMixedAir->NumControllerLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
     state.dataMixedAir->ControllerLists.allocate(state.dataMixedAir->NumControllerLists);
@@ -981,13 +946,14 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
         thisControllerList.Name = AlphArray(1);
         thisControllerList.NumControllers = (NumAlphas - 1) / 2;
-        thisControllerList.ControllerType.allocate(thisControllerList.NumControllers);
+        thisControllerList.ControllerType.dimension(thisControllerList.NumControllers, ControllerKind::Invalid);
         thisControllerList.ControllerName.allocate(thisControllerList.NumControllers);
         AlphaNum = 2;
         for (int CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum) {
             if (UtilityRoutines::SameString(AlphArray(AlphaNum), "Controller:WaterCoil") ||
                 UtilityRoutines::SameString(AlphArray(AlphaNum), "Controller:OutdoorAir")) {
-                thisControllerList.ControllerType(CompNum) = AlphArray(AlphaNum);
+                thisControllerList.ControllerType(CompNum) =
+                    static_cast<ControllerKind>(getEnumerationValue(ControllerKindNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(AlphaNum))));
                 thisControllerList.ControllerName(CompNum) = AlphArray(AlphaNum + 1);
                 // loop over all previous controller lists to check if this controllers is also present on previous controllers
                 for (int previousListNum = 1; previousListNum < Item; ++previousListNum) {
@@ -2922,9 +2888,11 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 }
                 if (!FoundZone) {
                     ShowWarningError(state,
-                                     "Zone name = " + zone.Name + " in " + CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)) +
-                                         " object name = " + thisOAController.VentilationMechanicalName +
-                                         " is not on the same air loop as Controller:OutdoorAir = " + thisOAController.Name);
+                                     format("Zone name = {} in {} object name = {} is not on the same air loop as Controller:OutdoorAir = {}",
+                                            zone.Name,
+                                            CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)),
+                                            thisOAController.VentilationMechanicalName,
+                                            thisOAController.Name));
                     ShowContinueError(state, "This zone will not be used and the simulation will continue...");
                 }
             }
@@ -3000,12 +2968,13 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 }
                 if (!FoundAreaZone) {
                     ShowWarningError(state,
-                                     "Zone name = " + state.dataHeatBal->Zone(NumZone).Name + " is not accounted for by " +
-                                         CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)) +
-                                         " object name = " + thisOAController.VentilationMechanicalName);
+                                     format("Zone name = {} is not accounted for by {} object name = {}",
+                                            state.dataHeatBal->Zone(NumZone).Name,
+                                            CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)),
+                                            thisOAController.VentilationMechanicalName));
                     ShowContinueError(state, "Ventilation per unit floor area has not been specified for this zone, which is connected to");
-                    ShowContinueError(state,
-                                      "the air loop served by Controller:OutdoorAir = " + thisOAController.Name + ". Simulation will continue...");
+                    ShowContinueError(
+                        state, format("the air loop served by Controller:OutdoorAir = {}. Simulation will continue...", thisOAController.Name));
                 }
                 if (!FoundPeopleZone) {
                     // Loop through people objects to see if this zone has a people object and only then show a warning
@@ -3013,15 +2982,18 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                         if (state.dataHeatBal->People(PeopleNum).ZonePtr == NumZone) {
                             if (!FoundAreaZone) {
                                 ShowWarningError(state,
-                                                 "PEOPLE object for zone = " + state.dataHeatBal->Zone(NumZone).Name + " is not accounted for by " +
-                                                     CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)) +
-                                                     " object name = " + thisOAController.VentilationMechanicalName);
+                                                 format("PEOPLE object for zone = {} is not accounted for by {} object name = {}",
+                                                        state.dataHeatBal->Zone(NumZone).Name,
+                                                        CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)),
+                                                        thisOAController.VentilationMechanicalName));
+                                ShowContinueError(
+                                    state,
+                                    format(
+                                        "A \"PEOPLE\" object has been specified in the idf for this zone, but it is not included in this {} Object.",
+                                        CurrentModuleObjects(static_cast<int>(CMO::MechVentilation))));
                                 ShowContinueError(state,
-                                                  "A \"PEOPLE\" object has been specified in the idf for this zone, but it is not included in this " +
-                                                      CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)) + " Object.");
-                                ShowContinueError(state,
-                                                  "Check " + CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)) +
-                                                      " object. Simulation will continue.");
+                                                  format("Check {} object. Simulation will continue.",
+                                                         CurrentModuleObjects(static_cast<int>(CMO::MechVentilation))));
                             }
                         }
                     }
@@ -3034,9 +3006,10 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                     }
                     if (!FoundAreaZone) {
                         ShowWarningError(state,
-                                         CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)) + " = \"" +
-                                             thisOAController.VentilationMechanicalName + "\", Zone=\"" + state.dataHeatBal->Zone(NumZone).Name +
-                                             "\".");
+                                         format("{} = \"{}\", Zone=\"{}",
+                                                CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)),
+                                                thisOAController.VentilationMechanicalName,
+                                                state.dataHeatBal->Zone(NumZone).Name));
                         ShowContinueError(state,
                                           "No \"PEOPLE\" object has been specified in the idf for this zone, but the ventilation rate is > 0 in "
                                           "this Controller:MechanicalVentilation Object.");
@@ -3446,7 +3419,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, "Error in " + CurrentModuleObjects(static_cast<int>(CMO::OAController)) + "; program terminated");
+        ShowFatalError(state, format("Error in {}; program terminated", CurrentModuleObjects(static_cast<int>(CMO::OAController))));
     }
 } // namespace MixedAir
 
@@ -4163,7 +4136,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                         ZoneOAMin = ZoneOAMax;
                                         ++this->OAMaxMinLimitErrorCount;
                                         if (this->OAMaxMinLimitErrorCount < 2) {
-                                            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                            ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, this->Name));
                                             ShowContinueError(
                                                 state,
                                                 format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone "
@@ -4177,9 +4150,10 @@ void VentilationMechanicalProps::CalcMechVentController(
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(
                                                 state,
-                                                CurrentModuleObject + " = \"" + this->Name +
-                                                    "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone "
-                                                    "outdoor air rate is not greater than minimum zone outdoor air rate. Error continues...",
+                                                format("{} = \"{}\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum "
+                                                       "zone outdoor air rate is not greater than minimum zone outdoor air rate. Error continues...",
+                                                       CurrentModuleObject,
+                                                       this->Name),
                                                 this->OAMaxMinLimitErrorIndex);
                                         }
                                     }
@@ -4212,8 +4186,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             ++this->CO2MaxMinLimitErrorCount;
                                             if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlSchOcc) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                    ShowSevereError(state,
-                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, this->Name));
                                                     ShowContinueError(
                                                         state,
                                                         format("For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, "
@@ -4228,18 +4201,18 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(state,
-                                                                                   CurrentModuleObject + " = \"" + this->Name +
-                                                                                       "\", For System Outdoor Air Method = "
-                                                                                       "ProportionalControlBasedOnOccupancySchedule, maximum "
-                                                                                       "target CO2 concentration is not greater than minimum "
-                                                                                       "target CO2 concentration. Error continues...",
+                                                                                   format("{} = \"{}\", For System Outdoor Air Method = "
+                                                                                          "ProportionalControlBasedOnOccupancySchedule, maximum "
+                                                                                          "target CO2 concentration is not greater than minimum "
+                                                                                          "target CO2 concentration. Error continues...",
+                                                                                          CurrentModuleObject,
+                                                                                          this->Name),
                                                                                    this->CO2MaxMinLimitErrorIndex);
                                                 }
                                             }
                                             if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOcc) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                    ShowSevereError(state,
-                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, this->Name));
                                                     ShowContinueError(
                                                         state,
                                                         format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, "
@@ -4254,18 +4227,18 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(state,
-                                                                                   CurrentModuleObject + " = \"" + this->Name +
-                                                                                       "\", For System Outdoor Air Method = "
-                                                                                       "ProportionalControlBasedOnDesignOccupancy, maximum "
-                                                                                       "target CO2 concentration is not greater than minimum "
-                                                                                       "target CO2 concentration. Error continues...",
+                                                                                   format("{} = \"{}\", For System Outdoor Air Method = "
+                                                                                          "ProportionalControlBasedOnDesignOccupancy, maximum "
+                                                                                          "target CO2 concentration is not greater than minimum "
+                                                                                          "target CO2 concentration. Error continues...",
+                                                                                          CurrentModuleObject,
+                                                                                          this->Name),
                                                                                    this->CO2MaxMinLimitErrorIndex);
                                                 }
                                             }
                                             if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOARate) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                    ShowSevereError(state,
-                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, this->Name));
                                                     ShowContinueError(
                                                         state,
                                                         format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum "
@@ -4280,11 +4253,12 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(state,
-                                                                                   CurrentModuleObject + " = \"" + this->Name +
-                                                                                       "\", For System Outdoor Air Method = "
-                                                                                       "ProportionalControlBasedOnDesignOARate, maximum target "
-                                                                                       "CO2 concentration is not greater than minimum target CO2 "
-                                                                                       "concentration. Error continues...",
+                                                                                   format("{} = \"{}\", For System Outdoor Air Method = "
+                                                                                          "ProportionalControlBasedOnDesignOARate, maximum target "
+                                                                                          "CO2 concentration is not greater than minimum target CO2 "
+                                                                                          "concentration. Error continues...",
+                                                                                          CurrentModuleObject,
+                                                                                          this->Name),
                                                                                    this->CO2MaxMinLimitErrorIndex);
                                                 }
                                             }
@@ -4314,8 +4288,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             ++this->CO2GainErrorCount;
                                             if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlSchOcc) {
                                                 if (this->CO2GainErrorCount < 2) {
-                                                    ShowSevereError(state,
-                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, this->Name));
                                                     ShowContinueError(state,
                                                                       "For System Outdoor Air Method = "
                                                                       "ProportionalControlBasedOnOccupancySchedule, CO2 generation from people "
@@ -4329,16 +4302,17 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(
                                                         state,
-                                                        CurrentModuleObject + " = \"" + this->Name +
-                                                            "\", For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, "
-                                                            "CO2 generation from people is not greater than zero. Error continues...",
+                                                        format("{} = \"{}\", For System Outdoor Air Method = "
+                                                               "ProportionalControlBasedOnOccupancySchedule, "
+                                                               "CO2 generation from people is not greater than zero. Error continues...",
+                                                               CurrentModuleObject,
+                                                               this->Name),
                                                         this->CO2GainErrorIndex);
                                                 }
                                             }
                                             if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOcc) {
                                                 if (this->CO2GainErrorCount < 2) {
-                                                    ShowSevereError(state,
-                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, this->Name));
                                                     ShowContinueError(state,
                                                                       "For System Outdoor Air Method = "
                                                                       "ProportionalControlBasedOnDesignOccupancy, CO2 generation from people is "
@@ -4352,9 +4326,11 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(
                                                         state,
-                                                        CurrentModuleObject + " = \"" + this->Name +
-                                                            "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, CO2 "
-                                                            "generation from people is not greater than zero. Error continues...",
+                                                        format(
+                                                            "{} = \"{}\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, "
+                                                            "CO2 generation from people is not greater than zero. Error continues...",
+                                                            CurrentModuleObject,
+                                                            this->Name),
                                                         this->CO2GainErrorIndex);
                                                 }
                                             }
@@ -5077,7 +5053,7 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
             if (this->MaxOA > 0.0) {
                 OAFlowRatio = this->MinOA / this->MaxOA;
                 if (this->HighRHOAFlowRatio < OAFlowRatio) {
-                    ShowWarningError(state, CurrentModuleObject + " \"" + this->Name + "\"");
+                    ShowWarningError(state, format("{} \"{}\"", CurrentModuleObject, this->Name));
                     ShowContinueError(state, "... A fixed minimum outdoor air flow rate and high humidity control have been specified.");
                     ShowContinueError(state,
                                       "... The High Humidity Outdoor Air Flow Ratio is less than the ratio of the outdoor air controllers "
@@ -6080,7 +6056,9 @@ bool CheckForControllerWaterCoil(EnergyPlusData &state,
     for (Num = 1; Num <= state.dataMixedAir->NumControllerLists; ++Num) {
         for (CompNum = 1; CompNum <= state.dataMixedAir->ControllerLists(Num).NumControllers; ++CompNum) {
 
-            if (!UtilityRoutines::SameString(state.dataMixedAir->ControllerLists(Num).ControllerType(CompNum), ControllerType)) continue;
+            if (state.dataMixedAir->ControllerLists(Num).ControllerType(CompNum) !=
+                static_cast<ControllerKind>(getEnumerationValue(ControllerKindNamesUC, UtilityRoutines::MakeUPPERCase(ControllerType))))
+                continue;
             if (!UtilityRoutines::SameString(state.dataMixedAir->ControllerLists(Num).ControllerName(CompNum), ControllerName)) continue;
             OnControllerList = true;
             break;

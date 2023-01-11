@@ -110,6 +110,14 @@ namespace MixedAir {
         Num,
     };
 
+    enum class ControllerKind
+    {
+        Invalid = -1,
+        WaterCoil,  // Controller:WaterCoil
+        OutdoorAir, // Controller:OutdoorAir
+        Num
+    };
+
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.
     enum class CMO
@@ -146,14 +154,9 @@ namespace MixedAir {
     {
         // Members
         std::string Name;
-        int NumControllers; // number of controllers on list
-        Array1D_string ControllerType;
+        int NumControllers = 0; // number of controllers on list
+        EPVector<ControllerKind> ControllerType;
         Array1D_string ControllerName;
-
-        // Default Constructor
-        ControllerListProps() : NumControllers(0)
-        {
-        }
     };
 
     struct OAControllerProps // Derived type for Outside Air Controller data
@@ -420,8 +423,7 @@ namespace MixedAir {
                         bool &OAHeatingCoil,  // TRUE indicates a heating coil has been found
                         bool &OACoolingCoil,  // TRUE indicates a cooling coil has been found
                         bool &OAHX,           // TRUE indicates a heat exchanger has been found
-                        int const CompNum
-    );
+                        int const CompNum);
 
     void SimOAMixer(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int &CompIndex);
 

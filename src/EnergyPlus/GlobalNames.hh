@@ -79,7 +79,7 @@ namespace GlobalNames {
 
     void IntraObjUniquenessCheck(EnergyPlusData &state,
                                  std::string &NameToVerify,
-                                 std::string_view const &CurrentModuleObject,
+                                 std::string const &CurrentModuleObject,
                                  std::string_view FieldName,
                                  std::unordered_set<std::string> &UniqueStrings,
                                  bool &ErrorsFound);
