@@ -950,29 +950,23 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         thisControllerList.ControllerName.allocate(thisControllerList.NumControllers);
         AlphaNum = 2;
         for (int CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum) {
-            if (UtilityRoutines::SameString(AlphArray(AlphaNum), "Controller:WaterCoil") ||
-                UtilityRoutines::SameString(AlphArray(AlphaNum), "Controller:OutdoorAir")) {
-                thisControllerList.ControllerType(CompNum) =
-                    static_cast<ControllerKind>(getEnumerationValue(ControllerKindNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(AlphaNum))));
-                thisControllerList.ControllerName(CompNum) = AlphArray(AlphaNum + 1);
-                // loop over all previous controller lists to check if this controllers is also present on previous controllers
-                for (int previousListNum = 1; previousListNum < Item; ++previousListNum) {
-                    // loop over each of the controllers listed for this list
-                    auto &previousList(state.dataMixedAir->ControllerLists(previousListNum));
-                    for (int PreviousListControllerNum = 1; PreviousListControllerNum <= previousList.NumControllers; ++PreviousListControllerNum) {
-                        if ((previousList.ControllerType(PreviousListControllerNum) == thisControllerList.ControllerType(CompNum)) &&
-                            (previousList.ControllerName(PreviousListControllerNum) == thisControllerList.ControllerName(CompNum))) {
-                            ShowSevereError(state, format("Controller instance repeated in multiple {} objects", CurrentModuleObject));
-                            ShowContinueError(state, format("Found in {} = {}", CurrentModuleObject, thisControllerList.Name));
-                            ShowContinueError(state, format("Also found in {} = {}", CurrentModuleObject, previousList.Name));
-                            ErrorsFound = true;
-                        }
+            // Json will catch any object types that are not the correct key choice of Controller:OutdoorAir or Controller:WaterCoil
+            thisControllerList.ControllerType(CompNum) =
+                static_cast<ControllerKind>(getEnumerationValue(ControllerKindNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(AlphaNum))));
+            thisControllerList.ControllerName(CompNum) = AlphArray(AlphaNum + 1);
+            // loop over all previous controller lists to check if this controllers is also present on previous controllers
+            for (int previousListNum = 1; previousListNum < Item; ++previousListNum) {
+                // loop over each of the controllers listed for this list
+                auto &previousList(state.dataMixedAir->ControllerLists(previousListNum));
+                for (int PreviousListControllerNum = 1; PreviousListControllerNum <= previousList.NumControllers; ++PreviousListControllerNum) {
+                    if ((previousList.ControllerType(PreviousListControllerNum) == thisControllerList.ControllerType(CompNum)) &&
+                        (previousList.ControllerName(PreviousListControllerNum) == thisControllerList.ControllerName(CompNum))) {
+                        ShowSevereError(state, format("Controller instance repeated in multiple {} objects", CurrentModuleObject));
+                        ShowContinueError(state, format("Found in {} = {}", CurrentModuleObject, thisControllerList.Name));
+                        ShowContinueError(state, format("Also found in {} = {}", CurrentModuleObject, previousList.Name));
+                        ErrorsFound = true;
                     }
                 }
-            } else {
-                ShowSevereError(state, format("For {}=\"{}\" invalid {}", CurrentModuleObject, AlphArray(1), cAlphaFields(AlphaNum)));
-                ShowContinueError(state, "...entered=\"" + AlphArray(AlphaNum) + "\", should be Controller:WaterCoil or Controller:OutdoorAir.");
-                ErrorsFound = true;
             }
             AlphaNum += 2;
         }
