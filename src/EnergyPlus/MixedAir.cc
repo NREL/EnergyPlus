@@ -943,8 +943,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
-        thisControllerList.Name = AlphArray(1);
+        thisControllerList.Name = AlphArray(1); // no need to check if AlphaArray(1) is empty since Json will catch missing required fields
         thisControllerList.NumControllers = (NumAlphas - 1) / 2;
         thisControllerList.ControllerType.dimension(thisControllerList.NumControllers, ControllerKind::Invalid);
         thisControllerList.ControllerName.allocate(thisControllerList.NumControllers);
@@ -997,8 +996,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
-        OASys.Name = AlphArray(1);
+        OASys.Name = AlphArray(1); // no need to check if AlphaArray(1) is empty since Json will catch missing required fields
         if (!AlphArray(2).empty()) {
             GlobalNames::IntraObjUniquenessCheck(
                 state, AlphArray(2), CurrentModuleObject, cAlphaFields(2), state.dataMixedAir->ControllerListUniqueNames, ErrorsFound);
@@ -1342,10 +1340,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
 
             NumGroups = (NumAlphas + NumNums - 5) / 3;
             if (mod((NumAlphas + NumNums - 5), 3) != 0) ++NumGroups;
-            thisVentilationMechanical.Name = AlphArray(1);
-
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
-
+            thisVentilationMechanical.Name = AlphArray(1); // no need to check if AlphaArray(1) is empty since Json will catch missing required fields
             thisVentilationMechanical.SchName = AlphArray(2);
             if (lAlphaBlanks(2)) {
                 thisVentilationMechanical.SchPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -1978,8 +1973,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
-
+            // no need to check if AlphaArray(1) is empty since Json will catch missing required fields
             state.dataMixedAir->OAMixer(OutAirNum).Name = AlphArray(1);
             state.dataMixedAir->OAMixer(OutAirNum).MixNode = GetOnlySingleNode(state,
                                                                                AlphArray(2),
