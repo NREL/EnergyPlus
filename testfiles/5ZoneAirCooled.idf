@@ -3492,8 +3492,7 @@
     HTML;                    !- Column Separator
 
   Output:Table:SummaryReports,
-    AllSummary,              !- Report 1 Name
-    ZoneComponentLoadSummary;!- Report 2 Name
+    AllSummaryAndSizingPeriod; !- Report 1 Name
 
   Output:Surfaces:List,Details;
 
