@@ -73,8 +73,10 @@ namespace PhotovoltaicThermalCollectors {
 
     enum struct ThermEfficEnum
     {
+        Invalid = -1,
         SCHEDULED,
-        FIXED
+        FIXED,
+        Num
     };
 
     extern int NumPVT; // number of transpired collectors in model
@@ -124,15 +126,14 @@ namespace PhotovoltaicThermalCollectors {
         Real64 CollectorTemp;         // average solar collector temp (DegC)
         Real64 Tplen;                 // modeled drybulb temperature for air through BIPVT channel (DegC)
         Real64 Tcoll;                 // modeled temperature of BIPVT channel surface on PV side (DegC)
-        Real64 HrPlen;                // Modeled radiation coef for OSCM (W/m2-C)
-        Real64 HcPlen;                // Modeled Convection coef for OSCM (W/m2-C)
+        Real64 HrPlen = 1.0;          // Modeled radiation coef for OSCM (W/m2-C)
+        Real64 HcPlen = 10.0;         // Modeled Convection coef for OSCM (W/m2-C)
 
         // Default Constructor
         BIPVTModelStruct()
-            : OSCMPtr(0), SchedPtr(0), PVEffGapWidth(0.0), PVCellTransAbsProduct(0.0),
-              BackMatTranAbsProduct(0.0), CladTranAbsProduct(0.0), PVAreaFract(0.0), PVCellAreaFract(0.0), PVRTop(0.0), PVRBot(0.0), PVGEmiss(0.0),
-              BackMatEmiss(0.0), ThGlass(0.0), RIndGlass(0.0), ECoffGlass(0.0), LastCollectorTemp(0.0), CollectorTemp(0.0), Tplen(20.0), Tcoll(20.0),
-              HrPlen(1.0), HcPlen(10.0)
+            : OSCMPtr(0), SchedPtr(0), PVEffGapWidth(0.0), PVCellTransAbsProduct(0.0), BackMatTranAbsProduct(0.0), CladTranAbsProduct(0.0),
+              PVAreaFract(0.0), PVCellAreaFract(0.0), PVRTop(0.0), PVRBot(0.0), PVGEmiss(0.0), BackMatEmiss(0.0), ThGlass(0.0), RIndGlass(0.0),
+              ECoffGlass(0.0), LastCollectorTemp(0.0), CollectorTemp(0.0), Tplen(20.0), Tcoll(20.0)
         {
         }
     };
@@ -158,30 +159,30 @@ namespace PhotovoltaicThermalCollectors {
         }
     };
 
-    enum class PVTModelTypes
+    enum class PVTModelType
     {
         Invalid = -1,
-        SimplePVTmodel = 1001,
-        BIPVTmodel = 1002,
+        Simple = 1001,
+        BIPVT = 1002,
         Num
     };
 
     struct PVTCollectorStruct : PlantComponent
     {
         // Members
-        std::string Name;                                    // Name of PVT collector
-        DataPlant::PlantEquipmentType Type;                  // Plant Side Connection: 'Type' assigned in DataPlant
-        PlantLocation WPlantLoc;                             // Water plant loop component location
-        bool EnvrnInit;                                      // manage begin environment inits
-        bool SizingInit;                                     // manage when sizing is complete
-        std::string PVTModelName;                            // Name of PVT performance object
-        PVTModelTypes PVTModelType = PVTModelTypes::Invalid; // model type indicator
-        int SurfNum;                                         // surface index
-        std::string PVname;                                  // named Generator:Photovoltaic object
-        int PVnum;                                           // PV index
-        bool PVfound;                                        // init, need to delay get input until PV gotten
-        SimplePVTModelStruct Simple;                         // Simple performance data structure.
-        BIPVTModelStruct BIPVT;                              // BIPVT performance data structure.
+        std::string Name;                                  // Name of PVT collector
+        DataPlant::PlantEquipmentType Type;                // Plant Side Connection: 'Type' assigned in DataPlant
+        PlantLocation WPlantLoc;                           // Water plant loop component location
+        bool EnvrnInit;                                    // manage begin environment inits
+        bool SizingInit;                                   // manage when sizing is complete
+        std::string PVTModelName;                          // Name of PVT performance object
+        PVTModelType PVTModelType = PVTModelType::Invalid; // model type indicator
+        int SurfNum;                                       // surface index
+        std::string PVname;                                // named Generator:Photovoltaic object
+        int PVnum;                                         // PV index
+        bool PVfound;                                      // init, need to delay get input until PV gotten
+        SimplePVTModelStruct Simple;                       // Simple performance data structure.
+        BIPVTModelStruct BIPVT;                            // BIPVT performance data structure.
         WorkingFluidEnum WorkingFluidType;
         int PlantInletNodeNum;
         int PlantOutletNodeNum;
@@ -236,7 +237,7 @@ namespace PhotovoltaicThermalCollectors {
         void calculateBIPVT(EnergyPlusData &state);
 
         void calculateBIPVTMaxHeatGain(
-            EnergyPlusData &state, Real64 tsp, std::string Mode, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv);
+            EnergyPlusData &state, Real64 tsp, const std::string &Mode, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv);
 
         void solveLinSysBackSub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
@@ -271,7 +272,7 @@ namespace PhotovoltaicThermalCollectors {
 
     int GetAirOutletNodeNum(EnergyPlusData &state, std::string_view PVTName, bool &ErrorsFound);
 
-    void GetPVTmodelIndex(EnergyPlusData &state, int const SurfacePtr, int &PVTIndex);
+    int GetPVTmodelIndex(EnergyPlusData &state, int const SurfacePtr);
 
     void SetPVTQdotSource(EnergyPlusData &state, int const PVTNum, Real64 const QSource);
 

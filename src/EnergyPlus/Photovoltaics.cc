@@ -405,6 +405,7 @@ namespace Photovoltaics {
                                                          &PVArrayStruct::SurfaceName);
                 if (dupPtr != 0) dupPtr += PVnum; // to correct for shortened array in find item
                 if (dupPtr != 0) {
+                    auto &thisPVarray = state.dataPhotovoltaic->PVarray(dupPtr);
                     if (state.dataPhotovoltaic->PVarray(dupPtr).CellIntegrationMode == CellIntegration::SurfaceOutsideFace) {
                         ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
                         ShowContinueError(state, "When using IntegratedSurfaceOutsideFace heat transfer mode, only one PV array can be coupled");
@@ -429,12 +430,11 @@ namespace Photovoltaics {
                                               state.dataPhotovoltaic->PVarray(dupPtr).Name +
                                               " are using exterior vented surface = " + state.dataPhotovoltaic->PVarray(PVnum).SurfaceName);
                         ErrorsFound = true;
-                    } else if (state.dataPhotovoltaic->PVarray(dupPtr).CellIntegrationMode == CellIntegration::PVTSolarCollector) {
+                    } else if (thisPVarray.CellIntegrationMode == CellIntegration::PVTSolarCollector) {
                         ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
                         ShowContinueError(state, "When using PhotovoltaicThermalSolarCollector heat transfer mode, only one PV array can be coupled");
                         ShowContinueError(state,
-                                          "Both " + state.dataPhotovoltaic->PVarray(PVnum).Name + " and " +
-                                              state.dataPhotovoltaic->PVarray(dupPtr).Name +
+                                          "Both " + state.dataPhotovoltaic->PVarray(PVnum).Name + " and " + thisPVarray.Name +
                                               " are using PVT surface = " + state.dataPhotovoltaic->PVarray(PVnum).SurfaceName);
                         ErrorsFound = true;
                     }
@@ -748,7 +748,7 @@ namespace Photovoltaics {
             }
 
             if (state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode == CellIntegration::PVTSolarCollector) {
-                GetPVTmodelIndex(state, state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr, state.dataPhotovoltaic->PVarray(PVnum).PVTPtr);
+                state.dataPhotovoltaic->PVarray(PVnum).PVTPtr = GetPVTmodelIndex(state, state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr);
             }
         }
 
@@ -853,7 +853,7 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        using PhotovoltaicThermalCollectors::SetPVTQdotSource;
+        auto SetPVTQdotSource = PhotovoltaicThermalCollectors::SetPVTQdotSource;
         using TranspiredCollector::SetUTSCQdotSource;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -932,7 +932,7 @@ namespace Photovoltaics {
         Real64 Ee;
 
         ThisSurf = state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr;
-        auto &thisPVarray = state.dataPhotovoltaic->PVarray;
+        auto &thisPVarray = state.dataPhotovoltaic->PVarray(PVnum).PVTPtr;
 
         //   get input from elsewhere in Energyplus for the current point in the simulation
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam = state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/m2)from DataHeatBalance
@@ -1009,13 +1009,13 @@ namespace Photovoltaics {
 
             } break;
             case CellIntegration::PVTSolarCollector: {
-                GetPVTTsColl(state, thisPVarray(PVnum).PVTPtr, thisPVarray(PVnum).SNLPVCalc.Tback);
-                thisPVarray(PVnum).SNLPVCalc.Tcell =
-                    SandiaTcellFromTmodule(thisPVarray(PVnum).SNLPVCalc.Tback,
-                                           thisPVarray(PVnum).SNLPVinto.IcBeam,
-                                           thisPVarray(PVnum).SNLPVinto.IcDiffuse,
-                                           thisPVarray(PVnum).SNLPVModule.fd,
-                                           thisPVarray(PVnum).SNLPVModule.DT0);
+                GetPVTTsColl(state, thisPVarray, state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback);
+                state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tcell =
+                    SandiaTcellFromTmodule(state.dataPhotovoltaic->PVarray(PVnum).SNLPVCalc.Tback,
+                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam,
+                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.fd,
+                                           state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule.DT0);
             } break;
             default: {
                 ShowSevereError(state, "Sandia PV Simulation Temperature Modeling Mode Error in " + state.dataPhotovoltaic->PVarray(PVnum).Name);
