@@ -362,7 +362,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 RefPipInsCon;              // thermal conductivity of refrigerant pipe insulation [W/mk]
         Real64 SH;                        // VRF outdoor unit superheating degrees [C]
         Real64 SC;                        // VRF outdoor unit subcooling degrees [C]
-        Real64 SCHE;                      // Simultaneous Cooling and Heating Efficiency [C]
+        Real64 SCHE;                      // Simultaneous Cooling and Heating Efficiency [Btu/h/W]
         Real64 SHLow;                     // VRF outdoor unit superheating degrees lower limit [C]
         Real64 SCLow;                     // VRF outdoor unit subcooling degrees lower limit [C]
         Real64 SHHigh;                    // VRF outdoor unit superheating degrees uppler limit [C]
