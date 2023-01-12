@@ -2214,3 +2214,134 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
     EXPECT_EQ(state->dataWeatherManager->DataPeriods(2).EnYear, 0);
     EXPECT_FALSE(state->dataWeatherManager->DataPeriods(2).HasYearData);
 }
+
+TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
+{
+
+    // Test for #9709
+
+    int WYear = 0;
+    int WMonth = 0;
+    int WDay = 0;
+    int WHour = 0;
+    int WMinute = 0;
+    Real64 DryBulb = 0.0;
+    Real64 DewPoint = 0.0;
+    Real64 RelHum = 0.0;
+    Real64 AtmPress = 0.0;
+    Real64 ETHoriz = 0.0;
+    Real64 ETDirect = 0.0;
+    Real64 IRHoriz = 0.0;
+    Real64 GLBHoriz = 0.0;
+    Real64 DirectRad = 0.0;
+    Real64 DiffuseRad = 0.0;
+    Real64 GLBHorizIllum = 0.0;
+    Real64 DirectNrmIllum = 0.0;
+    Real64 DiffuseHorizIllum = 0.0;
+    Real64 ZenLum = 0.0;
+    Real64 WindDir = 0.0;
+    Real64 WindSpeed = 0.0;
+    Real64 TotalSkyCover = 0.0;
+    Real64 OpaqueSkyCover = 0.0;
+    Real64 Visibility = 0.0;
+    Real64 CeilHeight = 0.0;
+    Real64 PrecipWater = 0.0;
+    Real64 AerosolOptDepth = 0.0;
+    Real64 SnowDepth = 0.0;
+    Real64 DaysSinceLastSnow = 0.0;
+    Real64 Albedo = 0.0;
+    Real64 LiquidPrecip = 0.0;
+    int PresWeathObs = 0;
+    Array1D_int PresWeathConds(9);
+    bool ErrorFound = false;
+
+    // std::string WeatherDataLine = "1984,1,5,15,60,A7A7E8E8*0G9G9G9I9I9I9I9A7A7A7A7A7A7*0E8*0*0,14.4,2.2,44,103200,586,1415,307,357,581,115,37300,"
+    //                               "54200,16400,2230,240,3.1,1,0,20.0,22000,9,999999999,0,0.1570,0,88,0.000,0.0,0.0";
+
+    std::string WeatherDataLine =
+        "2018,1,5,15,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9,16.60,13.50,82,100997,588,1415,369,195,14,189,22230,1274,22230,"
+        "10584,320,10.00,9,9,777.7,1050,0,909999999,37,0.0840,0,88,0.200,0.0,0.0";
+
+    WeatherManager::InterpretWeatherDataLine(*state,
+                                             WeatherDataLine,
+                                             ErrorFound,
+                                             WYear,
+                                             WMonth,
+                                             WDay,
+                                             WHour,
+                                             WMinute,
+                                             DryBulb,
+                                             DewPoint,
+                                             RelHum,
+                                             AtmPress,
+                                             ETHoriz,
+                                             ETDirect,
+                                             IRHoriz,
+                                             GLBHoriz,
+                                             DirectRad,
+                                             DiffuseRad,
+                                             GLBHorizIllum,
+                                             DirectNrmIllum,
+                                             DiffuseHorizIllum,
+                                             ZenLum,
+                                             WindDir,
+                                             WindSpeed,
+                                             TotalSkyCover,
+                                             OpaqueSkyCover,
+                                             Visibility,
+                                             CeilHeight,
+                                             PresWeathObs,
+                                             PresWeathConds,
+                                             PrecipWater,
+                                             AerosolOptDepth,
+                                             SnowDepth,
+                                             DaysSinceLastSnow,
+                                             Albedo,
+                                             LiquidPrecip);
+
+    EXPECT_FALSE(ErrorFound);
+    EXPECT_EQ(0, PresWeathObs);
+    EXPECT_EQ(0, state->dataWeatherManager->Missed.WeathCodes);
+    EXPECT_EQ(9, PresWeathConds(1));
+    EXPECT_EQ(0, PresWeathConds(2));
+    EXPECT_EQ(9, PresWeathConds(3));
+    EXPECT_EQ(9, PresWeathConds(4));
+    EXPECT_EQ(9, PresWeathConds(5));
+    EXPECT_EQ(9, PresWeathConds(6));
+    EXPECT_EQ(9, PresWeathConds(7));
+    EXPECT_EQ(9, PresWeathConds(8));
+    EXPECT_EQ(9, PresWeathConds(9));
+
+    EXPECT_EQ(2018, WYear);
+    EXPECT_EQ(1, WMonth);
+    EXPECT_EQ(5, WDay);
+    EXPECT_EQ(15, WHour);
+    EXPECT_EQ(0, WMinute);
+    EXPECT_EQ(16.60, DryBulb);
+    EXPECT_EQ(13.50, DewPoint);
+    EXPECT_EQ(82.0, RelHum);
+    EXPECT_EQ(100997.0, AtmPress);
+    EXPECT_EQ(588.0, ETHoriz);
+    EXPECT_EQ(1415.0, ETDirect);
+    EXPECT_EQ(369.0, IRHoriz);
+    EXPECT_EQ(195.0, GLBHoriz);
+    EXPECT_EQ(14.0, DirectRad);
+    EXPECT_EQ(189.0, DiffuseRad);
+    EXPECT_EQ(22230.0, GLBHorizIllum);
+    EXPECT_EQ(1274.0, DirectNrmIllum);
+    EXPECT_EQ(22230.0, DiffuseHorizIllum);
+    EXPECT_EQ(10584.0, ZenLum);
+    EXPECT_EQ(320.0, WindDir);
+    EXPECT_EQ(10.00, WindSpeed);
+    EXPECT_EQ(9.0, TotalSkyCover);
+    EXPECT_EQ(9.0, OpaqueSkyCover);
+    EXPECT_EQ(777.7, Visibility);
+    EXPECT_EQ(1050.0, CeilHeight);
+
+    EXPECT_EQ(37.0, PrecipWater);
+    EXPECT_EQ(0.0840, AerosolOptDepth);
+    EXPECT_EQ(0.0, SnowDepth);
+    EXPECT_EQ(88, DaysSinceLastSnow);
+    EXPECT_EQ(0.200, Albedo);
+    EXPECT_EQ(0.0, LiquidPrecip);
+}
