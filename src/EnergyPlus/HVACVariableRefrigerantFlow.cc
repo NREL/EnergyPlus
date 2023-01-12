@@ -1165,7 +1165,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         }
         VRFRTF = min(1.0, (CyclingRatio / PartLoadFraction));
 
-        vrf.ElecCoolingPower = (vrf.RatedCoolingPower * TotCoolCapTempModFac) * TotCoolEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF;
+        vrf.ElecCoolingPower =
+            (vrf.RatedCoolingPower * TotCoolCapTempModFac * CoolingPLR) * TotCoolEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF;
     }
     if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) && HeatingPLR > 0.0) {
         vrf.OperatingMode = ModeHeatingOnly;
