@@ -104,7 +104,7 @@ namespace GlobalNames {
                                  std::string const &StringToDisplay);
 
     void VerifyUniqueBaseboardName(EnergyPlusData &state,
-                                   std::string const &TypeToVerify,
+                                   std::string_view const &TypeToVerify,
                                    std::string const &NameToVerify,
                                    bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
                                    std::string const &StringToDisplay);
