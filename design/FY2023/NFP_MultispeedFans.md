@@ -5,10 +5,12 @@ Improved Support for Multi-speed Fans
 
 **Florida Solar Energy Center**
 
+ - 1/12/23 (Final version) Final NFP
  - 1/9/23 (Second revision)
  - 11/30/22 (First revision)
  - 11/21/22 (Original draft)
- 
+
+
 ## Justification for New Feature ##
 
 Many Water-to-Air Heat Pump units and VRF indoor units in the market are equipped with multi-speed components to reduce energy use and noise. During actual operation, the fan air flow is coordinated with the compressor stage control. At low compression stage, the fan is going to run at low air flow rate. To support this operation, supply air flow ratio input fields (low, medium, high) should be added to the ZoneHVAC:WaterToAirHeatPump and ZoneHVAC:TerminalUnit:VariableRefrigerantFlow objects. In simulation, for each time step, the fan air flow shall cycle between adjacent speeds based on the cooling / heating capacity (or coordinate with the cooling / heating coil stage for variable speed water to air coils).
@@ -139,7 +141,22 @@ The object of UnitarySystemPerformance:Multispeed will be used in this new featu
 
 Warnings will be issued if UnitarySystem does not currently throw any warnings for inconsistent flow fractions between UnitarySystemPerformance:Multispeed and the Fan:SystemModel object, but speed fractions from UnitarySystemPerformance:Multispeed will be used.
 
-The alternative method will be included if I hvae time left: If UnitarySystemPerformance:Multispeed is specified, then use it. If not, check the fan inputs and use those.
+The alternative method will be included if I have time left: If UnitarySystemPerformance:Multispeed is specified, then use it. If not, check the fan inputs and use those.
+
+###Discussion in the E+ Technicalities on 1/11/23###
+
+NFP approach was discussed one more time. After the Technicalities, Rich and I also talked about approach for VRF teminal object. At the same time, Tianzhen send me an E-mail and informed me as below:
+
+Lixing,
+
+The version of VRF models ( AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl) developed by us collaborating with Daikin already can handle indoor fan speed control for indoor coil/unit. Your new feature should only apply to the VRF models developed by FSEC/Rich, which currently uses constant speed fan in indoor coil/units.
+
+Let me know if you have questions.
+
+Article attached fyi.
+
+Tianzhen
+
 
 ## Overview ##
 
@@ -153,6 +170,36 @@ Design Specification Multispeed Object Type
 Design Specification Multispeed Object Name
 
 The alternative method will be included if I hvae time left: If UnitarySystemPerformance:Multispeed is specified, then use it. If not, check the fan inputs and use those.
+
+### Final approach ###
+
+This section provides final approach after several rounds of discussion.
+
+
+#### ZoneHVAC:WaterToAirHeatPump ####
+
+ZoneHVAC:WaterToAirHeatPump allows two types of coils: Coil:Heating/Cooling:WaterToAirHeatPump:EquationFit and Coil:Heating/Cooling:WaterToAirHeatPump:VariableSpeedEquationFit.
+
+#####Coil:Heating/Cooling:WaterToAirHeatPump:EquationFit#####
+
+Allow multispeed airflow rate. If UnitarySystemPerformance:Multispeed is specified, then use it. If not, check the fan inputs and use those.
+
+#####Coil:Heating/Cooling:WaterToAirHeatPump:VariableSpeedEquationFit#####
+
+The object already defines coil properties at different speeds. I need to check the speed numbers of cooling and heating defined in the UnitarySystemPerformance:Multispeed or Fan:SystemModel to ensure they are equal. The rest of procedure will be similar to AirToAir Multispeed HP or VariableSpeedCoils in the UnitarySystem
+
+####ZoneHVAC:TerminalUnit:VariableRefrigerantFlow####
+
+ZoneHVAC:TerminalUnit:VariableRefrigerantFlow allows two types of coils: Coil:Heating/Cooling:DX:VariableRefrigerantFlow and Coil:HeatingCooling:DX:VariableRefrigerantFlow:FluidTemperatureControl.
+
+#####Coil:Heating/Cooling:DX:VariableRefrigerantFlow#####
+
+Since the current ZoneHVAC:TerminalUnit:VariableRefrigerantFlow only allows single speed coils, the multiple speed fan will be allowed after adding the UnitarySystemPerformance:Multispeed fields. The fan air flow cycles between adjacent speeds based on the cooling/heating capacity for Coil:Cooling:DX:VariableRefrigerantFlow and Coil:Heating:DX:VariableRefrigerantFlow only. This approach is simlar to Coil:Heating/Cooling:WaterToAirHeatPump:EquationFit
+
+#####Coil:Heating/Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl#####
+
+Since Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl and Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl require variable speed fans, the multiple speed fans are not applied to both coils. In addition, based on description provided by LBL, the coils can handle indoor fan speed control for indoor coil/unit. No effort is needed from this new feature.  
+  
 
 ## Approach ##
 
