@@ -148,7 +148,7 @@ namespace MixedAir {
     constexpr int limitFactorDemandLimit = 8; // Demand-limiting
     constexpr int limitFactorEMS = 9;         // EMS override
 
-    extern Array1D_string const CurrentModuleObjects;
+    extern const std::array<std::string_view, static_cast<int>(CMO::Num)> CurrentModuleObjects;
 
     struct ControllerListProps
     {
@@ -441,7 +441,7 @@ namespace MixedAir {
     void GetOAMixerInputs(EnergyPlusData &state);
 
     void ProcessOAControllerInputs(EnergyPlusData &state,
-                                   std::string const &CurrentModuleObject,
+                                   std::string_view const CurrentModuleObject,
                                    int const OutAirNum,
                                    Array1D_string const &AlphArray,
                                    int &NumAlphas,
