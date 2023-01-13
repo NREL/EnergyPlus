@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -296,8 +296,7 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
             if (availActuator.handleCount > 0) {
                 // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
                 bool foundActuator = false;
-                for (int ActuatorLoopUsed = 1; ActuatorLoopUsed <= thisState->dataRuntimeLang->numActuatorsUsed; ++ActuatorLoopUsed) {
-                    auto const &usedActuator = thisState->dataRuntimeLang->EMSActuatorUsed(ActuatorLoopUsed);
+                for (auto const &usedActuator : thisState->dataRuntimeLang->EMSActuatorUsed) {
                     if (usedActuator.ActuatorVariableNum == handle) {
                         EnergyPlus::ShowWarningError(
                             *thisState,

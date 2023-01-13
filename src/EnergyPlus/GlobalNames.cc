@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -161,8 +161,11 @@ void VerifyUniqueChillerName(
     }
 }
 
-void VerifyUniqueBaseboardName(
-    EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+void VerifyUniqueBaseboardName(EnergyPlusData &state,
+                               std::string_view const &TypeToVerify,
+                               std::string const &NameToVerify,
+                               bool &ErrorsFound,
+                               std::string const &StringToDisplay)
 {
 
     // SUBROUTINE INFORMATION:
@@ -178,7 +181,7 @@ void VerifyUniqueBaseboardName(
     auto const iter = state.dataGlobalNames->BaseboardNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->BaseboardNames.end()) {
         ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
+        ShowContinueError(state, format("...Current entry is Baseboard Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->BaseboardNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));

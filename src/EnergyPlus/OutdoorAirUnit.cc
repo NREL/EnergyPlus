@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -87,6 +86,7 @@
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -1800,10 +1800,10 @@ namespace OutdoorAirUnit {
 
             // Node condition
             if (OutAirUnit(OAUnitNum).ExtFan) {
-                state.dataLoopNodes->Node(InletNode).Temp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                state.dataLoopNodes->Node(InletNode).Temp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                 state.dataLoopNodes->Node(SFanOutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
             } else {
-                state.dataLoopNodes->Node(SFanOutletNode).Temp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                state.dataLoopNodes->Node(SFanOutletNode).Temp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
             }
             state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(SFanOutletNode).Temp;
 
@@ -1915,7 +1915,7 @@ namespace OutdoorAirUnit {
             // Control type check
             switch (UnitControlType) {
             case OAUnitCtrlType::Neutral: {
-                SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                SetPointTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                 // Neutral Control Condition
                 if (DesOATemp == SetPointTemp) {
                     OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -6949,8 +6949,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
     state->dataViewFactor->NumOfRadiantEnclosures = 4;
 
-    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
+    state->dataHeatBal->Zone(iZone).spaceIndexes.emplace_back(iZone);
+    state->dataHeatBal->space(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(iZone).HTSurfaceLast = 1;
     state->dataHeatBal->space(iZone).radiantEnclosureNum = 1;
 
     state->dataSurface->TotSurfaces = 4;
@@ -7111,8 +7112,10 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
     state->dataHeatBal->Zone(1).FloorArea = 100.;
     // Trick E+ into not iterating on Surfaces
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 0;
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 0;
 
     // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
     state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
@@ -7185,6 +7188,22 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
     state->dataSize->FinalSysSizing(1).loadSizingType = DataSizing::LoadSizing::Total;
 
+    // For #9772
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->SysSizInput(1).SizingOption = DataSizing::NonCoincident;
+    auto degC_to_F = [](Real64 celsius) constexpr
+    {
+        return celsius * (9.0 / 5.0) + 32.0;
+    };
+    constexpr Real64 coolMixTempSys = 26.2;
+    constexpr Real64 coolMixTempSysIP = degC_to_F(coolMixTempSys);
+    constexpr Real64 heatMixTempSys = -1.7;
+    constexpr Real64 heatMixTempSysIP = degC_to_F(heatMixTempSys);
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = coolMixTempSys;
+    state->dataSize->FinalSysSizing(1).HeatMixTemp = heatMixTempSys;
+
     state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
     state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).HeatPeakDD = heatDDNum;
     state->dataSize->SysSizPeakDDNum(state->dataHVACGlobal->NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
@@ -7248,6 +7267,28 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
     auto result = queryResult(query_2, "TabularDataWithStrings")[0][0];
     EXPECT_EQ(result, "0.0000");
+
+    // Test for #9772
+    {
+        {
+            const std::string queryCool = R"sql(
+            SELECT Value From TabularDataWithStrings
+             WHERE TableName = 'Cooling Peak Conditions'
+                AND ReportName = 'AirLoop Component Load Summary'
+                AND RowName = 'Mixed Air Temperature')sql";
+
+            EXPECT_EQ(coolMixTempSysIP, execAndReturnFirstDouble(queryCool));
+        }
+        {
+            const std::string queryHeat = R"sql(
+            SELECT Value From TabularDataWithStrings
+             WHERE TableName = 'Heating Peak Conditions'
+                AND ReportName = 'AirLoop Component Load Summary'
+                AND RowName = 'Mixed Air Temperature')sql";
+
+            EXPECT_EQ(heatMixTempSysIP, execAndReturnFirstDouble(queryHeat));
+        }
+    }
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodDesignDay)
@@ -8322,8 +8363,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
     state->dataViewFactor->NumOfRadiantEnclosures = 1;
 
-    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;
+    state->dataHeatBal->Zone(iZone).spaceIndexes.emplace_back(iZone);
+    state->dataHeatBal->space(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(iZone).HTSurfaceLast = 4;
     state->dataHeatBal->space(iZone).radiantEnclosureNum = 1;
     int radEnclosureNum = 1;
 

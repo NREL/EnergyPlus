@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -73,6 +72,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -334,7 +334,7 @@ namespace ExhaustAirSystemManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem. Preceding condition(s) causes termination.");
+            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
         }
     }
 
@@ -708,7 +708,7 @@ namespace ExhaustAirSystemManager {
         auto &thisExhInlet = state.dataLoopNodes->Node(InletNode);
         auto &thisExhOutlet = state.dataLoopNodes->Node(OutletNode);
         Real64 MassFlow = thisExhInlet.MassFlowRate;
-        Real64 Tin = state.dataHeatBalFanSys->ZT(thisExhCtrl.ZoneNum);
+        Real64 Tin = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisExhCtrl.ZoneNum).ZT;
         Real64 thisExhCtrlAvailScheVal = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum);
 
         if (present(FlowRatio)) {

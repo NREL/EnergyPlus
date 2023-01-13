@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,6 +81,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::PurchasedAirManager {
 
@@ -2178,6 +2179,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     //         END IF
 
     if (UnitOn) {
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ControlledZoneNum);
         // Calculate current minimum outdoor air flow rate based on design OA specifications and DCV or CO2 control
         CalcPurchAirMinOAMassFlow(state, PurchAirNum, ControlledZoneNum, OAMassFlowRate);
 
@@ -2246,7 +2248,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                           state.dataLoopNodes->Node(PurchAir(PurchAirNum).ZoneRecircAirNodeNum).Enthalpy))) {
 
                         // Calculate supply MassFlowRate based on sensible load but limit to Max Cooling Supply Air Flow Rate if specified
-                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
+                        CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                         DeltaT = (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                         if (DeltaT < -SmallTempDiff) {
                             SupplyMassFlowRate = QZnCoolSP / CpAir / DeltaT;
@@ -2269,7 +2271,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
             SupplyMassFlowRateForCool = 0.0;
             if (CoolOn) {
-                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
+                CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                 DeltaT = (PurchAir(PurchAirNum).MinCoolSuppAirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                 if (DeltaT < -SmallTempDiff) {
                     SupplyMassFlowRateForCool = QZnCoolSP / CpAir / DeltaT;
@@ -2344,7 +2346,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // In general, in the cooling section, don't let SupplyTemp be set to something that results in heating
             if (SupplyMassFlowRate > 0.0) {
                 // Calculate supply temp at SupplyMassFlowRate and recheck limit on Minimum Cooling Supply Air Temperature
-                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
+                CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                 PurchAir(PurchAirNum).SupplyTemp = QZnCoolSP / (CpAir * SupplyMassFlowRate) + state.dataLoopNodes->Node(ZoneNodeNum).Temp;
                 PurchAir(PurchAirNum).SupplyTemp = max(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MinCoolSuppAirTemp);
                 // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
@@ -2558,7 +2560,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
             SupplyMassFlowRateForHeat = 0.0;
             if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
-                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
+                CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                 DeltaT = (PurchAir(PurchAirNum).MaxHeatSuppAirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                 if (DeltaT > SmallTempDiff) {
                     SupplyMassFlowRateForHeat = QZnHeatSP / CpAir / DeltaT;
@@ -2634,7 +2636,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             if (SupplyMassFlowRate > 0.0) {
                 if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
                     // Calculate supply temp at SupplyMassFlowRate and check limit on Maximum Heating Supply Air Temperature
-                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
+                    CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                     PurchAir(PurchAirNum).SupplyTemp = QZnHeatSP / (CpAir * SupplyMassFlowRate) + state.dataLoopNodes->Node(ZoneNodeNum).Temp;
                     PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MaxHeatSuppAirTemp);
                     // This is the heating mode, so SupplyTemp can't be less than MixedAirTemp
@@ -2822,7 +2824,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
             SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
 
-            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
+            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             SysOutputProvided = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
             MoistOutputProvided =
                 SupplyMassFlowRate * (PurchAir(PurchAirNum).SupplyHumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat); // Latent rate, kg/s
@@ -2831,7 +2833,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             PurchAir(PurchAirNum).LatOutputToZone =
                 SupplyMassFlowRate * (SupplyEnthalpy - state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy) - PurchAir(PurchAirNum).SenOutputToZone;
 
-            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
+            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             if (PurchAir(PurchAirNum).OutdoorAir) {
                 PurchAir(PurchAirNum).OASenOutput =
                     OAMassFlowRate * CpAir * (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);

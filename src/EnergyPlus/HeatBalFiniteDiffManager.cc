@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,6 +74,7 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -2298,7 +2299,7 @@ namespace HeatBalFiniteDiffManager {
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(state.dataMstBal->HConvInFD(Surf));
 
-        Real64 const Tia(state.dataHeatBalFanSys->MAT(surface.Zone));
+        Real64 const Tia(state.dataZoneTempPredictorCorrector->zoneHeatBalance(surface.Zone).MAT);
 
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC

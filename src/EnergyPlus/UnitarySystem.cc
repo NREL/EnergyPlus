@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -101,6 +101,7 @@
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 namespace UnitarySystems {
@@ -8137,8 +8138,9 @@ namespace UnitarySystems {
                      state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag)) {
                     this->LoadSHR =
                         ZoneLoad / (ZoneLoad + state.dataUnitarySystems->MoistureLoad *
-                                                   Psychrometrics::PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(this->ControlZoneNum),
-                                                                                  state.dataHeatBalFanSys->MAT(this->ControlZoneNum)));
+                                                   Psychrometrics::PsyHgAirFnWTdb(
+                                                       state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ControlZoneNum).ZoneAirHumRat,
+                                                       state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ControlZoneNum).MAT));
                     if (this->LoadSHR < 0.0) {
                         this->LoadSHR = 0.0;
                     }

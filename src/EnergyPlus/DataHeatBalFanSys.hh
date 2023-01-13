@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,10 +65,7 @@ namespace DataHeatBalFanSys {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    // MODULE PARAMETER DEFINITIONS:
     constexpr Real64 MaxRadHeatFlux = 4000.0; // [W/m2] max limit for radiant heat flux at a surface due to HVAC equipment
-
-    // Controls for PredictorCorrector
 
     enum class PredictorCorrectorCtrl
     {
@@ -106,80 +103,9 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneQSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
     Array1D<Real64> ZoneQElecBaseboardToPerson;  // Sum of radiant gains to people from electric baseboard heaters
     Array1D<Real64> ZoneQCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
+
     // Zone air drybulb conditions variables
-    Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
-    Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
     Array1D<Real64> TempTstatAir; // temperature of air near the thermo stat
-    Array1D<Real64> ZT;           // Zone Air Temperature Averaged over the System Time Increment
-    Array1D<Real64> XMAT;         // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE
-    Array1D<Real64> XM2T;
-    Array1D<Real64> XM3T;
-    Array1D<Real64> XM4T;
-    Array1D<Real64> DSXMAT; // Down Stepped MAT history storage
-    Array1D<Real64> DSXM2T; // Down Stepped MAT history storage
-    Array1D<Real64> DSXM3T; // Down Stepped MAT history storage
-    Array1D<Real64> DSXM4T; // Down Stepped MAT history storage
-    Array1D<Real64> XMPT;   // Zone air temperature at previous time step
-
-    Array1D<Real64> ZTAVComf; // Zone Air Temperature Averaged over the Zone Time step used
-    // in thermal comfort models (currently Fang model only)
-    Array1D<Real64> ZoneAirHumRatAvgComf; // AIR Humidity Ratio averaged over the zone time
-    // step used in thermal comfort models (currently Fang model only)
-
-    // Zone Air moisture conditions variables
-    Array1D<Real64> ZoneAirHumRatAvg;  // AIR Humidity Ratio averaged over the zone time step
-    Array1D<Real64> ZoneAirHumRat;     // AIR Humidity Ratio
-    Array1D<Real64> WZoneTimeMinus1;   // Humidity ratio history terms for 3rd order derivative
-    Array1D<Real64> WZoneTimeMinus2;   // Time Minus 2 Zone Time Steps Term
-    Array1D<Real64> WZoneTimeMinus3;   // Time Minus 3 Zone Time Steps Term
-    Array1D<Real64> WZoneTimeMinus4;   // Time Minus 4 Zone Time Steps Term
-    Array1D<Real64> DSWZoneTimeMinus1; // DownStepped Humidity ratio history terms for 3rd order derivative
-    Array1D<Real64> DSWZoneTimeMinus2; // DownStepped Time Minus 2 Zone Time Steps Term
-    Array1D<Real64> DSWZoneTimeMinus3; // DownStepped Time Minus 3 Zone Time Steps Term
-    Array1D<Real64> DSWZoneTimeMinus4; // DownStepped Time Minus 4 Zone Time Steps Term
-    Array1D<Real64> WZoneTimeMinusP;   // Humidity ratio history terms at previous time step
-
-    Array1D<Real64> ZoneAirHumRatTemp;   // Temp zone air humidity ratio at time plus 1
-    Array1D<Real64> WZoneTimeMinus1Temp; // Zone air humidity ratio at previous timestep
-    Array1D<Real64> WZoneTimeMinus2Temp; // Zone air humidity ratio at timestep T-2
-    Array1D<Real64> WZoneTimeMinus3Temp; // Zone air humidity ratio at timestep T-3
-    Array1D<Real64> ZoneAirHumRatOld;    // Last Time Steps Zone AIR Humidity Ratio
-
-    Array1D<Real64> MCPI;                       // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTI;                      // INFILTRATION MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPV;                       // VENTILATION MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTV;                      // VENTILATION MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPM;                       // Mixing MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTM;                      // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPE;                       // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> EAMFL;                      // OUTDOOR AIR MASS FLOW for EarthTube
-    Array1D<Real64> EAMFLxHumRat;               // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
-    Array1D<Real64> MCPTE;                      // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPC;                       // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> CTMFL;                      // OUTDOOR AIR MASS FLOW for cooltower
-    Array1D<Real64> MCPTC;                      // COOLTOWER MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> ThermChimAMFL;              // OUTDOOR AIR MASS FLOW for THERMALCHIMNEY
-    Array1D<Real64> MCPTThermChim;              // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPThermChim;               // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> ZoneLatentGain;             // Latent Energy from each Zone (People, equipment)
-    Array1D<Real64> ZoneLatentGainExceptPeople; // Added for hybrid model -- Latent Energy from each Zone (equipment)
-    Array1D<Real64> OAMFL;                      // OUTDOOR AIR MASS FLOW (kg/s) for infiltration
-    Array1D<Real64> VAMFL;                      // OUTDOOR AIR MASS FLOW (kg/s) for ventilation
-    Array1D<Real64> NonAirSystemResponse;       // Convective heat addition rate from non forced air
-    // equipment such as baseboards plus heat from lights to
-    Array1D<Real64> SysDepZoneLoads; // Convective heat addition or subtraction rate from sources that
-    // depend on what is happening with the HVAC system. Such as:
-    // heat gain from lights to return air when return flow = 0; heat gain
-    // from air flow windows to return air when return air flow = 0;
-    // and heat removed by return air from refrigeration cases when
-    // return air flow = 0.
-    Array1D<Real64> SysDepZoneLoadsLagged; // SysDepZoneLoads saved to be added to zone heat balance next
-    // HVAC time step
-    Array1D<Real64> MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
-    Array1D<Real64> MDotOA;   // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
-
-    Array1D<Real64> MixingMassFlowZone;    // Mixing MASS FLOW (kg/s)
-    Array1D<Real64> MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
 
     Array1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
     Array1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
@@ -215,12 +141,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> RadSysToHBTinCoef;   // Outside heat balance coefficient that modifies Toutside
     Array1D<Real64> RadSysToHBQsrcCoef;  // Outside heat balance coefficient that modifies source/sink
 
-    // Moisture variables to carry info from HB to the Zone Temp Predictor-Corrector for Fan System
-    Array1D<Real64> SumHmAW;   // SUM OF ZONE AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
-    Array1D<Real64> SumHmARa;  // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
-    Array1D<Real64> SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
-    Array1D<Real64> SumHmARaZ;
-
     Array1D<Real64> TempZoneThermostatSetPoint;
     Array1D<Real64> AdapComfortCoolingSetPoint;
     Array1D<Real64> ZoneThermostatSetPointHi;
@@ -228,12 +148,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneThermostatSetPointHiAver;
     Array1D<Real64> ZoneThermostatSetPointLoAver;
 
-    Array1D<Real64> LoadCorrectionFactor; // PH 3/3/04
+    EPVector<Real64> LoadCorrectionFactor; // PH 3/3/04
 
-    Array1D<Real64> AIRRAT; // "air power capacity"  PH 3/5/04
-    Array1D<Real64> ZTM1;   // zone air temperature at previous timestep
-    Array1D<Real64> ZTM2;   // zone air temperature at timestep T-2
-    Array1D<Real64> ZTM3;   // zone air temperature at previous T-3
     // Hybrid Modeling
     Array1D<Real64> PreviousMeasuredZT1;     // Measured zone air temperature at previous timestep1
     Array1D<Real64> PreviousMeasuredZT2;     // Measured zone air temperature at previous timestep2
@@ -241,13 +157,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> PreviousMeasuredHumRat1; // Hybrid model zone humidity ratio at previous timestep
     Array1D<Real64> PreviousMeasuredHumRat2; // Hybrid model zone humidity ratio at previous timestep
     Array1D<Real64> PreviousMeasuredHumRat3; // Hybrid model zone humidity ratio at previous timestep
-    // Exact and Euler solutions
-    Array1D<Real64> ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
-    Array1D<Real64> ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
-    Array1D<Real64> ZoneT1;  // Zone temperature at the previous time step used in Exact and Euler method
-    Array1D<Real64> ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
-    Array1D<Real64> ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
-    Array1D<Real64> ZoneW1;  // Zone temperature at the previous time step used in Exact and Euler method
     EPVector<DataHVACGlobals::ThermostatType> TempControlType;
     EPVector<int> TempControlTypeRpt;
     EPVector<DataHVACGlobals::ThermostatType> ComfortControlType;

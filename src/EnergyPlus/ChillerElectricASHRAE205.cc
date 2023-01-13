@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -85,6 +84,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::ChillerElectricASHRAE205 {
 
@@ -149,7 +149,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         thisChiller.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
         ip->markObjectAsUsed(state.dataIPShortCut->cCurrentModuleObject, thisObjectName);
 
-        auto rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
+        std::string const rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
         fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), std::string(RoutineName));
         if (rep_file_path.empty()) {
             ErrorsFound = true;
@@ -195,8 +195,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         //            ErrorsFound = true;
         //        }
 
-        auto const evap_inlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "chilled_water_inlet_node_name");
-        auto const evap_outlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "chilled_water_outlet_node_name");
+        std::string const evap_inlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "chilled_water_inlet_node_name");
+        std::string const evap_outlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "chilled_water_outlet_node_name");
         if (evap_inlet_node_name.empty() || evap_outlet_node_name.empty()) {
             ShowSevereError(state, format("{}{}=\"{}\"", std::string{RoutineName}, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
             ShowContinueError(state, "Evaporator Inlet or Outlet Node Name is blank.");
@@ -225,8 +225,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         thisChiller.CondenserType = DataPlant::CondenserType::WaterCooled;
 
-        auto const cond_inlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "condenser_inlet_node_name");
-        auto const cond_outlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "condenser_outlet_node_name");
+        std::string const cond_inlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "condenser_inlet_node_name");
+        std::string const cond_outlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "condenser_outlet_node_name");
         if (cond_inlet_node_name.empty() || cond_outlet_node_name.empty()) {
             ShowSevereError(state, format("{}{}=\"{}\"", std::string{RoutineName}, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
             ShowContinueError(state, "Condenser Inlet or Outlet Node Name is blank.");
@@ -298,7 +298,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             AmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
         switch (thisChiller.AmbientTempType) {
         case AmbientTempIndicator::Schedule: {
-            const auto ambient_temp_schedule = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_schedule");
+            std::string const ambient_temp_schedule = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_schedule");
             thisChiller.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, ambient_temp_schedule);
             if (thisChiller.AmbientTempSchedule == 0) {
                 ShowSevereError(state,
@@ -312,7 +312,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             break;
         }
         case AmbientTempIndicator::TempZone: {
-            const auto ambient_temp_zone_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_zone_name");
+            std::string const ambient_temp_zone_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_zone_name");
             thisChiller.AmbientTempZone = UtilityRoutines::FindItemInList(ambient_temp_zone_name, state.dataHeatBal->Zone);
             if (thisChiller.AmbientTempZone == 0) {
                 ShowSevereError(state,
@@ -331,7 +331,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             break;
         }
         case AmbientTempIndicator::OutsideAir: {
-            const auto ambient_temp_outdoor_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_outdoor_air_node_name");
+            std::string const ambient_temp_outdoor_node =
+                ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_outdoor_air_node_name");
             thisChiller.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                         ambient_temp_outdoor_node,
                                                                                         ErrorsFound,
@@ -370,8 +371,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
         }
         // end Ambient temperature
-        const auto oil_cooler_inlet_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "oil_cooler_inlet_node_name");
-        const auto oil_cooler_outlet_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "oil_cooler_outlet_node_name");
+        std::string const oil_cooler_inlet_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "oil_cooler_inlet_node_name");
+        std::string const oil_cooler_outlet_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "oil_cooler_outlet_node_name");
         if (!oil_cooler_inlet_node.empty() && !oil_cooler_outlet_node.empty()) {
             thisChiller.OilCoolerInletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                  oil_cooler_inlet_node,
@@ -398,8 +399,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
                                                oil_cooler_outlet_node,
                                                "Oil Cooler Water Nodes");
         }
-        const auto aux_heat_inlet_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "auxiliary_inlet_node_name");
-        const auto aux_heat_outlet_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "auxiliary_outlet_node_name");
+        std::string const aux_heat_inlet_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "auxiliary_inlet_node_name");
+        std::string const aux_heat_outlet_node = ip->getAlphaFieldValue(fields, objectSchemaProps, "auxiliary_outlet_node_name");
         if (!aux_heat_inlet_node.empty() && !aux_heat_outlet_node.empty()) {
 
             thisChiller.AuxiliaryHeatInletNode = NodeInputManager::GetOnlySingleNode(state,
@@ -597,7 +598,7 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
         break;
     }
     case AmbientTempIndicator::TempZone: {
-        this->AmbientTemp = state.dataHeatBalFanSys->MAT(this->AmbientTempZone);
+        this->AmbientTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->AmbientTempZone).MAT;
         break;
     }
     case AmbientTempIndicator::OutsideAir: {

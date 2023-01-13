@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -245,7 +245,7 @@ namespace AirLoopHVACDOAS {
                     auto NodeArray = NodeNames.value();
                     thisMixer.numOfInletNodes = NodeArray.size();
                     int num = 0;
-                    for (auto NodeDOASName : NodeArray) {
+                    for (nlohmann::json &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("inlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
@@ -394,7 +394,7 @@ namespace AirLoopHVACDOAS {
                     auto NodeArray = NodeNames.value();
                     thisSplitter.numOfOutletNodes = NodeArray.size();
                     int num = 0;
-                    for (auto NodeDOASName : NodeArray) {
+                    for (nlohmann::json &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("outlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
