@@ -79,6 +79,8 @@ namespace PhotovoltaicThermalCollectors {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(ThermEfficEnum::Num)> ThermEfficTypeNamesUC = {"SCHEDULED", "FIXED"};
+
     extern int NumPVT; // number of transpired collectors in model
 
     struct SimplePVTModelStruct
