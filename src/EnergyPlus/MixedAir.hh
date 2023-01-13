@@ -486,7 +486,7 @@ namespace MixedAir {
 
     bool CheckForControllerWaterCoil(EnergyPlusData &state,
                                      DataAirLoop::ControllerKind ControllerType, // should be passed in as UPPERCASE
-                                     std::string const &ControllerName  // should be passed in as UPPERCASE
+                                     std::string const &ControllerName           // should be passed in as UPPERCASE
     );
 
     void CheckControllerLists(EnergyPlusData &state, bool &ErrFound);
