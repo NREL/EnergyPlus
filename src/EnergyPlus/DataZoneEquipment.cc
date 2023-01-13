@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -358,6 +358,10 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         // assigned to this node
         if (ControlledZoneNum > 0) {
             Zone(ControlledZoneNum).SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+            // SpaceHB TODO: For now, assign the same system node to the spaces in the zone
+            for (int spaceNum : Zone(ControlledZoneNum).spaceIndexes) {
+                state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+            }
         } // This error already detected and program will be terminated.
 
         ReturnNodeListName = AlphArray(6);

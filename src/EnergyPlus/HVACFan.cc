@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -299,8 +299,8 @@ namespace HVACFan {
                 } else { // use power curve
                     m_totEfficAtSpeed[loop] =
                         m_flowFractionAtSpeed[loop] * designAirVolFlowRate * deltaPress /
-                        (designElecPower * CurveManager::CurveValue(state, powerModFuncFlowFractionCurveIndex, m_flowFractionAtSpeed[loop]));
-                    m_powerFractionAtSpeed[loop] = CurveManager::CurveValue(state, powerModFuncFlowFractionCurveIndex, m_flowFractionAtSpeed[loop]);
+                        (designElecPower * Curve::CurveValue(state, powerModFuncFlowFractionCurveIndex, m_flowFractionAtSpeed[loop]));
+                    m_powerFractionAtSpeed[loop] = Curve::CurveValue(state, powerModFuncFlowFractionCurveIndex, m_flowFractionAtSpeed[loop]);
                 }
             }
         }
@@ -505,7 +505,7 @@ namespace HVACFan {
             m_fanTotalEff = numericArgs(9);
         }
         if (!isAlphaFieldBlank(7)) {
-            powerModFuncFlowFractionCurveIndex = CurveManager::GetCurveIndex(state, alphaArgs(7));
+            powerModFuncFlowFractionCurveIndex = Curve::GetCurveIndex(state, alphaArgs(7));
             if (powerModFuncFlowFractionCurveIndex == 0) {
                 ShowWarningError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + alphaFieldNames(7) + " = " + alphaArgs(7));
@@ -984,7 +984,7 @@ namespace HVACFan {
                     if (state.dataHVACGlobal->NightVentOn) {
                         localPowerFraction = 1.0; // not sure why, but legacy fan had this for night ventilation
                     } else {
-                        localPowerFraction = CurveManager::CurveValue(state, powerModFuncFlowFractionCurveIndex, localFlowFractionForPower);
+                        localPowerFraction = Curve::CurveValue(state, powerModFuncFlowFractionCurveIndex, localFlowFractionForPower);
                     }
                     Real64 localfanPower = max(0.0,
                                                locFanRunTimeFraction * localPowerFraction * m_maxAirMassFlowRate * localPressureRise[mode] /
@@ -1002,12 +1002,12 @@ namespace HVACFan {
                         Real64 powerFractionAtLowMin = 0.0;
                         Real64 fanPoweratLowMinimum = 0.0;
                         if (localFlowFractionForPower < minFlowFracLimitFanHeat) {
-                            powerFractionAtLowMin = CurveManager::CurveValue(state, powerModFuncFlowFractionCurveIndex, minFlowFracLimitFanHeat);
+                            powerFractionAtLowMin = Curve::CurveValue(state, powerModFuncFlowFractionCurveIndex, minFlowFracLimitFanHeat);
                             fanPoweratLowMinimum =
                                 powerFractionAtLowMin * m_maxAirMassFlowRate * localPressureRise[mode] / (localFanTotEff * m_rhoAirStdInit);
                             localfanPower = max(0.0, localFlowFractionForPower * fanPoweratLowMinimum / minFlowFracLimitFanHeat);
                         } else if (locFlowRatio < minFlowFracLimitFanHeat) {
-                            powerFractionAtLowMin = CurveManager::CurveValue(state, powerModFuncFlowFractionCurveIndex, minFlowFracLimitFanHeat);
+                            powerFractionAtLowMin = Curve::CurveValue(state, powerModFuncFlowFractionCurveIndex, minFlowFracLimitFanHeat);
                             fanPoweratLowMinimum =
                                 powerFractionAtLowMin * m_maxAirMassFlowRate * localPressureRise[mode] / (localFanTotEff * m_rhoAirStdInit);
                             localfanPower = max(0.0, locFlowRatio * fanPoweratLowMinimum / minFlowFracLimitFanHeat);

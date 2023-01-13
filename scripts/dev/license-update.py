@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -96,8 +96,29 @@
 # context of decent_ci. Python support came much later, so there are some
 # things (like how files and exclusions are handled) that are a little less
 # than uniform.
+#
+# For 2023, used the following to find some missed files:
+#
+#   $ ls -lR | grep -e '\.cpp$' -e '\.hpp$' -e '\.hh$' -e '\.cc$' -e '\.c$' -e '\.h$' |  wc -l
+#
+# and
+#
+#   $  find ./ | grep -e '\.py$' | grep -v third_party | grep -v readthedocs | grep -v bin | grep -v build | wc -l
+#
+# These are both pretty awful and need to be improved, and it would help if the
+# exclusions were uniform.
 
 import licensetext
+import argparse
+
+parser = argparse.ArgumentParser(description='Update the E+ license year.')
+parser.add_argument('-v', '--verbose', dest='verbose', action='store_true',
+                    default=False, help='operate verbosely')
+# Maybe next year
+#parser.add_argument('--update', dest='dryrun', action='store_false',
+#                    default=True, help='update the license year')
+
+args = parser.parse_args()
 
 TOOL_NAME = 'license-update'
 dryrun = True
@@ -105,8 +126,8 @@ dryrun = True
 #
 # Directories to check
 #
-cpp_dirs = ["./src/EnergyPlus/",
-            "./tst/EnergyPlus/unit/"]
+cpp_dirs = ["./src/",
+            "./tst/EnergyPlus/"]
 python_dirs = ["./"]
 
 # Get the C++ current text
@@ -125,6 +146,8 @@ if not dryrun:
 else:
     print('Skipping writing out LICENSE.txt')
 
+full_count = 1
+
 # Create C++ Replacer object
 replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
 
@@ -134,6 +157,7 @@ for base in cpp_dirs:
 
 print('\nC++ Summary')
 print(replacer.summary())
+full_count += len(replacer.replaced)
 
 # Get the Python current text
 current = licensetext.current_python()
@@ -151,4 +175,6 @@ for base in python_dirs:
     replacer.visit(base, exclude_patterns=patterns)
 
 print('\nPython Summary')
-print(replacer.summary())
+print(replacer.summary(full_report=args.verbose))
+full_count += len(replacer.replaced)
+print('\nFull count of files: %d' % full_count)

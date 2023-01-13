@@ -223,6 +223,7 @@ set(SRC
     DataWater.hh
     DataWindowEquivalentLayer.hh
     DataZoneControls.hh
+    DataZoneEnergyDemands.cc
     DataZoneEnergyDemands.hh
     DataZoneEquipment.cc
     DataZoneEquipment.hh

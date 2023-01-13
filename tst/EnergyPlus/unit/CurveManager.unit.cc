@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,15 +77,15 @@ TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ(1.0, state->dataCurveManager->PerfCurve(1).CurveMax);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(1.0, state->dataCurveManager->PerfCurve(1).outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
 
-    EXPECT_EQ(0.1, state->dataCurveManager->PerfCurve(1).CurveMin);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(0.1, state->dataCurveManager->PerfCurve(1).outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
 }
 
 TEST_F(EnergyPlusFixture, QuadraticCurve)
@@ -112,19 +112,19 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1).CurveMax);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1).outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
 
-    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).CurveMin);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
 
     double var1 = 1, var2 = 0.1, var3 = 20, var4 = 10;
     double expected_value = -3.3333 + (0.1 * 1) + (38.9 * 0.1) + (0.1 * 20) + (0.5 * 10);
-    EXPECT_EQ(expected_value, CurveManager::CurveValue(*state, 1, var1, var2, var3, var4));
+    EXPECT_EQ(expected_value, Curve::CurveValue(*state, 1, var1, var2, var3, var4));
 }
 
 TEST_F(EnergyPlusFixture, QuintLinearCurve)
@@ -154,19 +154,19 @@ TEST_F(EnergyPlusFixture, QuintLinearCurve)
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1).CurveMax);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1).outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
 
-    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).CurveMin);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
 
     double var1 = 1, var2 = 0.1, var3 = 0.5, var4 = 10, var5 = 15;
     double expected_value = -3.3333 + (0.1 * 1) + (38.9 * 0.1) + (0.1 * 0.5) + (0.5 * 10) + (1.5 * 15);
-    EXPECT_EQ(expected_value, CurveManager::CurveValue(*state, 1, var1, var2, var3, var4, var5));
+    EXPECT_EQ(expected_value, Curve::CurveValue(*state, 1, var1, var2, var3, var4, var5));
 }
 
 TEST_F(EnergyPlusFixture, TableLookup)
@@ -261,18 +261,18 @@ TEST_F(EnergyPlusFixture, TableLookup)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(3, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ("Table:Lookup", state->dataCurveManager->PerfCurve(1).ObjectType);
+    EXPECT_TRUE(compare_enums(Curve::InterpType::BtwxtMethod, state->dataCurveManager->PerfCurve(1).interpolationType));
     EXPECT_EQ("CAPMODFUNCOFWATERFLOW", state->dataCurveManager->PerfCurve(1).Name);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(0.0, state->dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
+    EXPECT_EQ(0.0, state->dataCurveManager->PerfCurve(1).outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(1.04, state->dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
+    EXPECT_EQ(1.04, state->dataCurveManager->PerfCurve(1).outputLimits.max);
 }
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
@@ -360,18 +360,18 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
+    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
+    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
 
     for (auto data_point : table_data) {
-        EXPECT_DOUBLE_EQ(data_point.first * data_point.second, CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+        EXPECT_DOUBLE_EQ(data_point.first * data_point.second, Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -461,19 +461,18 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
+    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
+    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
 
     for (auto data_point : table_data) {
-        EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_divisor,
-                         CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+        EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_divisor, Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -564,19 +563,19 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
+    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
+    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
 
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_auto_divisor,
-                         CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+                         Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -668,25 +667,25 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
+    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
+    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
 
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_auto_divisor / normalization_divisor,
-                         CurveManager::CurveValue(*state, 1, data_point.first, data_point.second));
+                         Curve::CurveValue(*state, 1, data_point.first, data_point.second));
     }
 }
 
 TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
 {
-    CurveManager::TableFile testTableFile = CurveManager::TableFile();
+    Curve::TableFile testTableFile = Curve::TableFile();
     fs::path testCSV = configured_source_directory() / "tst/EnergyPlus/unit/Resources/TestCarriageReturn.csv";
     testTableFile.filePath = testCSV;
     testTableFile.load(*state, testCSV);

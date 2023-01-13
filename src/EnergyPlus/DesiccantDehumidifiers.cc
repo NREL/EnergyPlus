@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -138,7 +138,7 @@ namespace DesiccantDehumidifiers {
     using namespace ScheduleManager;
     using namespace HeatingCoils;
     using namespace Fans;
-    using namespace CurveManager;
+    using namespace Curve;
     using namespace Psychrometrics;
     using FluidProperties::GetSatDensityRefrig;
 
@@ -1570,13 +1570,13 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ExhaustFanCurveIndex = GetCurveIndex(state, Alphas(15));
 
             if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
-                ErrorsFoundGeneric |= CurveManager::CheckCurveDims(state,
-                                                                   DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
-                                                                   {1},                                            // Valid dimensions
-                                                                   RoutineName,                                    // Routine name
-                                                                   CurrentModuleObject,                            // Object Type
-                                                                   DesicDehum(DesicDehumNum).Name,                 // Object Name
-                                                                   cAlphaFields(15));                              // Field Name
+                ErrorsFoundGeneric |= Curve::CheckCurveDims(state,
+                                                            DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
+                                                            {1},                                            // Valid dimensions
+                                                            RoutineName,                                    // Routine name
+                                                            CurrentModuleObject,                            // Object Type
+                                                            DesicDehum(DesicDehumNum).Name,                 // Object Name
+                                                            cAlphaFields(15));                              // Field Name
             }
 
             if (DesicDehum(DesicDehumNum).Preheat == Selection::Yes) {

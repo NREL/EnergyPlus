@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1217,7 +1217,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
 
         // Performance curves
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
+            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
@@ -1225,7 +1225,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
@@ -1233,7 +1233,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
@@ -1244,7 +1244,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
 
         // Performance curves
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9));
+            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9));
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
@@ -1252,7 +1252,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10));
+            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10));
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
@@ -1260,7 +1260,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX =
-            CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
+            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
@@ -1387,10 +1387,10 @@ void GetChillerHeaterInput(EnergyPlusData &state)
 
         // Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX > 0) {
-            Real64 CurveVal = CurveManager::CurveValue(state,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
+            Real64 CurveVal = Curve::CurveValue(state,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
                 ShowContinueError(state,
@@ -1401,10 +1401,10 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX > 0) {
-            Real64 CurveVal = CurveManager::CurveValue(state,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
+            Real64 CurveVal = Curve::CurveValue(state,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
                 ShowContinueError(state,
@@ -1415,8 +1415,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
-            Real64 CurveVal =
-                CurveManager::CurveValue(state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, 1.0);
+            Real64 CurveVal = Curve::CurveValue(state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, 1.0);
 
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
@@ -1430,7 +1429,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
             FoundNegValue = false;
             for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                Real64 CurveValTmp = CurveManager::CurveValue(
+                Real64 CurveValTmp = Curve::CurveValue(
                     state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, double(CurveCheck / 10.0));
                 if (CurveValTmp < 0.0) FoundNegValue = true;
                 CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
@@ -1448,10 +1447,10 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX > 0) {
-            Real64 CurveVal = CurveManager::CurveValue(state,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
+            Real64 CurveVal = Curve::CurveValue(state,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
                 ShowContinueError(state,
@@ -1462,10 +1461,10 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX > 0) {
-            Real64 CurveVal = CurveManager::CurveValue(state,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
-                                                       state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
+            Real64 CurveVal = Curve::CurveValue(state,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
+                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
                 ShowContinueError(state,
@@ -1476,8 +1475,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
-            Real64 CurveVal =
-                CurveManager::CurveValue(state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, 1.0);
+            Real64 CurveVal = Curve::CurveValue(state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, 1.0);
 
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
@@ -1491,7 +1489,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
             FoundNegValue = false;
             for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                Real64 CurveValTmp = CurveManager::CurveValue(
+                Real64 CurveValTmp = Curve::CurveValue(
                     state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, double(CurveCheck / 10.0));
                 if (CurveValTmp < 0.0) FoundNegValue = true;
                 CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
@@ -1509,15 +1507,15 @@ void GetChillerHeaterInput(EnergyPlusData &state)
             }
         }
 
-        CurveManager::GetCurveMinMaxValues(state,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MinPartLoadRatClgHtg,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxPartLoadRatClgHtg);
+        Curve::GetCurveMinMaxValues(state,
+                                    state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX,
+                                    state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MinPartLoadRatClgHtg,
+                                    state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxPartLoadRatClgHtg);
 
-        CurveManager::GetCurveMinMaxValues(state,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MinPartLoadRatCooling,
-                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxPartLoadRatCooling);
+        Curve::GetCurveMinMaxValues(state,
+                                    state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX,
+                                    state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MinPartLoadRatCooling,
+                                    state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxPartLoadRatCooling);
     }
 
     if (CHErrorsFound) {
@@ -1991,7 +1989,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             Real64 MinPartLoadRat; // Min allowed operating fraction of full load
             Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
 
-            CurveManager::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
+            Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
 
             // Chiller reference capacity
             Real64 ChillerRefCap = this->ChillerHeater(ChillerHeaterNum).RefCap;
@@ -1999,7 +1997,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             Real64 TempLowLimitEout = this->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut;
             Real64 EvapOutletTempSetPoint = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling;
             state.dataPlantCentralGSHP->ChillerCapFT =
-                CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
+                Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
             if (state.dataPlantCentralGSHP->ChillerCapFT < 0) {
                 if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
@@ -2143,9 +2141,9 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
 
             // Determine chiller compressor power and transfer heat calculation
             state.dataPlantCentralGSHP->ChillerEIRFT =
-                max(0.0, CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
+                max(0.0, Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
             state.dataPlantCentralGSHP->ChillerEIRFPLR =
-                max(0.0, CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
+                max(0.0, Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
 
             if (ReferenceCOP <= 0.0) {
                 CHPower = 0.0;
@@ -2508,14 +2506,14 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 Real64 MinPartLoadRat; // Min allowed operating fraction of full load
                 Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
 
-                CurveManager::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
+                Curve::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
                 Real64 ChillerRefCap = this->ChillerHeater(ChillerHeaterNum).RefCap;
                 Real64 ReferenceCOP = this->ChillerHeater(ChillerHeaterNum).RefCOP;
                 EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
                 Real64 TempLowLimitEout = this->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut;
                 Real64 EvapOutletTempSetPoint = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
                 state.dataPlantCentralGSHP->ChillerCapFT =
-                    CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
+                    Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
                 if (state.dataPlantCentralGSHP->ChillerCapFT < 0) {
                     if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
@@ -2621,10 +2619,10 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                     state.dataPlantCentralGSHP->ChillerFalseLoadRate = 0.0;
                 }
 
-                state.dataPlantCentralGSHP->ChillerEIRFT = max(
-                    0.0, CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
+                state.dataPlantCentralGSHP->ChillerEIRFT =
+                    max(0.0, Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
                 state.dataPlantCentralGSHP->ChillerEIRFPLR =
-                    max(0.0, CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
+                    max(0.0, Curve::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
                 CHPower =
                     (AvailChillerCap / ReferenceCOP) * state.dataPlantCentralGSHP->ChillerEIRFPLR * state.dataPlantCentralGSHP->ChillerEIRFT * FRAC;
 

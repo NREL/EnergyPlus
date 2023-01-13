@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3246,9 +3246,8 @@ namespace HeatRecovery {
         int SolFla;                  // Flag of solver
         Real64 constexpr NTU0(0.0);  // lower bound for NTU
         Real64 constexpr NTU1(50.0); // upper bound for NTU
-        std::array<Real64, 2> Par = {Eps, Z};
-
-        General::SolveRoot(state, Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par);
+        auto f = [Eps, Z](Real64 const NTU) { return 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Z) - 1.0) / Z * std::pow(NTU, 0.22)) - Eps; };
+        General::SolveRoot(state, Acc, MaxIte, SolFla, NTU, f, NTU0, NTU1);
 
         if (SolFla == -2) {
             ShowFatalError(state, "HeatRecovery: Bad initial bounds for NTU in GetNTUforCrossFlowBothUnmixed");
@@ -3257,36 +3256,6 @@ namespace HeatRecovery {
         }
 
         return NTU;
-    }
-
-    Real64 GetResidCrossFlowBothUnmixed([[maybe_unused]] EnergyPlusData &state,
-                                        Real64 const NTU,                // number of transfer units
-                                        std::array<Real64, 2> const &Par // par(1) = Eps, par(2) = Z
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Michael Wetter
-        //       DATE WRITTEN   March 1999
-        //       MODIFIED       Fred Buhl November 2000
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // From the formula Eps = f(NTU,Z) this function finds the
-        // residual of f(NTU,Z) - Eps for a cross flow heat exchanger,
-        // both streams unmixed.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the effectiveness - NTU heat exchanger formula for cross
-        // flow, both streams unmixed.
-
-        // REFERENCES:
-        // M. Wetter, Simulation Model Air-to-Air Plate Heat Exchanger
-        // LBNL Report 42354, 1999.
-        // Also see:
-        // ASHRAE HVAC 2 Toolkit, pages 4-3 through 4-5
-
-        return 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Par[1]) - 1.0) / Par[1] * std::pow(NTU, 0.22)) - Par[0];
     }
 
     void HeatExchCond::CheckModelBoundsTempEq(EnergyPlusData &state,

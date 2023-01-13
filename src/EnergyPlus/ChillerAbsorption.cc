@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -826,7 +826,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
             Real64 SteamDeltaT = this->GeneratorSubcool;
             Real64 SteamOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
             Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
-            auto curWaterIndex = waterIndex;
+            int curWaterIndex = waterIndex;
             Real64 CpWater =
                 FluidProperties::GetDensityGlycol(state, fluidNameWater, SteamOutletTemp, curWaterIndex, calcChillerAbsorption + this->Name);
             this->GenMassFlowRateMax = this->QGenerator / (HfgSteam + CpWater * SteamDeltaT);
@@ -1297,7 +1297,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                                                                0.0,
                                                                                this->SteamFluidIndex,
                                                                                moduleObjectType + this->Name);
-                auto curWaterIndex = waterIndex;
+                int curWaterIndex = waterIndex;
                 Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, GeneratorOutletTemp, curWaterIndex, RoutineName);
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                 this->SteamMassFlowRate = (this->NomCap * SteamInputRatNom) / ((HfgSteam) + (SteamDeltaT * CpWater));
@@ -1755,7 +1755,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
             Real64 SteamDeltaT = this->GeneratorSubcool;
             Real64 SteamOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
             Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
-            auto curWaterIndex = waterIndex;
+            int curWaterIndex = waterIndex;
             CpFluid =
                 FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, SteamOutletTemp, curWaterIndex, calcChillerAbsorption + this->Name);
             this->SteamMassFlowRate = this->QGenerator / (HfgSteam + CpFluid * SteamDeltaT);

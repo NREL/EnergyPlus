@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -334,9 +334,9 @@ namespace WaterToAirHeatPumpSimple {
             simpleWAHP.RatedEntWaterTemp = NumArray(6);
             simpleWAHP.RatedEntAirDrybulbTemp = NumArray(7);
             simpleWAHP.RatedEntAirWetbulbTemp = NumArray(8);
-            simpleWAHP.TotalCoolCapCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
-            simpleWAHP.SensCoolCapCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(7));  // convert curve name to number
-            simpleWAHP.CoolPowCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(8));      // convert curve name to number
+            simpleWAHP.TotalCoolCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+            simpleWAHP.SensCoolCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(7));  // convert curve name to number
+            simpleWAHP.CoolPowCurveIndex = Curve::GetCurveIndex(state, AlphArray(8));      // convert curve name to number
             if (simpleWAHP.TotalCoolCapCurveIndex == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, simpleWAHP.Name));
@@ -347,13 +347,13 @@ namespace WaterToAirHeatPumpSimple {
                 }
                 ErrorsFound = true;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            simpleWAHP.TotalCoolCapCurveIndex,
-                                                            {4},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            simpleWAHP.Name,
-                                                            "Total Cooling Capacity Curve Name");
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     simpleWAHP.TotalCoolCapCurveIndex,
+                                                     {4},
+                                                     RoutineName,
+                                                     CurrentModuleObject,
+                                                     simpleWAHP.Name,
+                                                     "Total Cooling Capacity Curve Name");
             }
             if (simpleWAHP.SensCoolCapCurveIndex == 0) {
                 if (lAlphaBlanks(7)) {
@@ -365,13 +365,13 @@ namespace WaterToAirHeatPumpSimple {
                 }
                 ErrorsFound = true;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            simpleWAHP.SensCoolCapCurveIndex,
-                                                            {5},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            simpleWAHP.Name,
-                                                            "Sensible Cooling Capacity Curve Name");
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     simpleWAHP.SensCoolCapCurveIndex,
+                                                     {5},
+                                                     RoutineName,
+                                                     CurrentModuleObject,
+                                                     simpleWAHP.Name,
+                                                     "Sensible Cooling Capacity Curve Name");
             }
             if (simpleWAHP.CoolPowCurveIndex == 0) {
                 if (lAlphaBlanks(8)) {
@@ -383,13 +383,13 @@ namespace WaterToAirHeatPumpSimple {
                 }
                 ErrorsFound = true;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            simpleWAHP.CoolPowCurveIndex,
-                                                            {4},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            simpleWAHP.Name,
-                                                            "Cooling Power Consumption Curve Name");
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     simpleWAHP.CoolPowCurveIndex,
+                                                     {4},
+                                                     RoutineName,
+                                                     CurrentModuleObject,
+                                                     simpleWAHP.Name,
+                                                     "Cooling Power Consumption Curve Name");
             }
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
             simpleWAHP.Twet_Rated = NumArray(9);
@@ -537,8 +537,8 @@ namespace WaterToAirHeatPumpSimple {
             simpleWAHP.RatedEntWaterTemp = NumArray(5);
             simpleWAHP.RatedEntAirDrybulbTemp = NumArray(6);
             simpleWAHP.RatioRatedHeatRatedTotCoolCap = NumArray(7);
-            simpleWAHP.HeatCapCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
-            simpleWAHP.HeatPowCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
+            simpleWAHP.HeatCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+            simpleWAHP.HeatPowCurveIndex = Curve::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
             if (simpleWAHP.HeatCapCurveIndex == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, simpleWAHP.Name));
@@ -549,7 +549,7 @@ namespace WaterToAirHeatPumpSimple {
                 }
                 ErrorsFound = true;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(
+                ErrorsFound |= Curve::CheckCurveDims(
                     state, simpleWAHP.HeatCapCurveIndex, {4}, RoutineName, CurrentModuleObject, simpleWAHP.Name, "Heating Capacity Curve Name");
             }
             if (simpleWAHP.HeatPowCurveIndex == 0) {
@@ -562,13 +562,13 @@ namespace WaterToAirHeatPumpSimple {
                 }
                 ErrorsFound = true;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            simpleWAHP.HeatPowCurveIndex,
-                                                            {4},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            simpleWAHP.Name,
-                                                            "Heating Power Consumption Curve Name");
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     simpleWAHP.HeatPowCurveIndex,
+                                                     {4},
+                                                     RoutineName,
+                                                     CurrentModuleObject,
+                                                     simpleWAHP.Name,
+                                                     "Heating Power Consumption Curve Name");
             }
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
             simpleWAHP.WaterInletNodeNum = GetOnlySingleNode(state,
@@ -1551,12 +1551,11 @@ namespace WaterToAirHeatPumpSimple {
                         RatedratioTWB = (RatedMixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         RatedratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
-                        PeakTotCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
+                        PeakTotCapTempModFac = Curve::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
                         RatedTotCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         RatedCoolPowerTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.CoolPowCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.CoolPowCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         // calculate the rated total capacity based on peak conditions
                         // note: the rated total capacity can be different than the total capacity at
                         // rated conditions if the capacity curve isn't normalized at the rated
@@ -1695,12 +1694,11 @@ namespace WaterToAirHeatPumpSimple {
                         RatedratioTWB = (RatedMixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         RatedratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
-                        PeakTotCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
+                        PeakTotCapTempModFac = Curve::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
                         RatedTotCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         RatedCoolPowerTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.CoolPowCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.CoolPowCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         // calculate the rated total capacity based on peak conditions
                         // note: the rated total capacity can be different than the total capacity at
                         // rated conditions if the capacity curve isn't normalized at the rated
@@ -1841,9 +1839,9 @@ namespace WaterToAirHeatPumpSimple {
                         RatedratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
                         PeakSensCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
-                        RatedSensCapTempModFac = CurveManager::CurveValue(
-                            state, simpleWatertoAirHP.SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
+                        RatedSensCapTempModFac =
+                            Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         // calculate the rated sensible capacity based on peak conditions
                         // note: the rated sensible capacity can be different than the sensible capacity
                         // at rated conditions if the capacity curve isn't normalized at the rated
@@ -1962,9 +1960,9 @@ namespace WaterToAirHeatPumpSimple {
                         RatedratioTWB = (RatedMixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         RatedratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         PeakSensCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
-                        RatedSensCapTempModFac = CurveManager::CurveValue(
-                            state, simpleWatertoAirHP.SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
+                        RatedSensCapTempModFac =
+                            Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         // Check curve output when rated mixed air wetbulb is the design mixed air wetbulb
                         // calculate the rated sensible capacity based on peak conditions
                         // note: the rated sensible capacity can be different than the sensible capacity
@@ -2420,10 +2418,9 @@ namespace WaterToAirHeatPumpSimple {
                         RatedHeatratioTDB = (RatedHeatMixDryBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         RatedHeatratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
-                        PeakHeatCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, HeatratioTDB, HeatratioTS, 1.0, 1.0);
+                        PeakHeatCapTempModFac = Curve::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, HeatratioTDB, HeatratioTS, 1.0, 1.0);
                         RatedHeatCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
                         // Check curve output when rated mixed air wetbulb is the design mixed air wetbulb
                         if (RatedHeatMixDryBulb == HeatMixTemp) {
                             if (RatedHeatCapTempModFac > 1.02 || RatedHeatCapTempModFac < 0.98) {
@@ -2536,12 +2533,11 @@ namespace WaterToAirHeatPumpSimple {
                         RatedHeatratioTDB = (RatedHeatMixDryBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         RatedHeatratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
-                        PeakHeatCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, HeatratioTDB, HeatratioTS, 1.0, 1.0);
+                        PeakHeatCapTempModFac = Curve::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, HeatratioTDB, HeatratioTS, 1.0, 1.0);
                         RatedHeatCapTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
                         RatedHeatPowerTempModFac =
-                            CurveManager::CurveValue(state, simpleWatertoAirHP.HeatPowCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, simpleWatertoAirHP.HeatPowCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
                         // Check curve output when rated mixed air wetbulb is the design mixed air wetbulb
                         if (RatedHeatMixDryBulb == HeatMixTemp) {
                             if (RatedHeatCapTempModFac > 1.02 || RatedHeatCapTempModFac < 0.98) {
@@ -2659,7 +2655,7 @@ namespace WaterToAirHeatPumpSimple {
 
                 // heating power calculations
                 RatedHeatPowerTempModFac =
-                    CurveManager::CurveValue(state, simpleWatertoAirHP.HeatPowCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
+                    Curve::CurveValue(state, simpleWatertoAirHP.HeatPowCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
                 simpleWatertoAirHP.RatedPowerHeat =
                     simpleWatertoAirHP.RatedCapHeatAtRatedCdts / (simpleWatertoAirHP.RatedCOPHeatAtRatedCdts * RatedHeatPowerTempModFac);
 
@@ -3166,12 +3162,11 @@ namespace WaterToAirHeatPumpSimple {
             }
 
             simpleWatertoAirHP.QLoadTotal =
-                TotalCapRated * CurveManager::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, ratioVL, ratioVS);
+                TotalCapRated * Curve::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, ratioVL, ratioVS);
             simpleWatertoAirHP.QSensible =
-                SensCapRated *
-                CurveManager::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, ratioVL, ratioVS);
+                SensCapRated * Curve::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, ratioVL, ratioVS);
             state.dataWaterToAirHeatPumpSimple->Winput =
-                CoolPowerRated * CurveManager::CurveValue(state, simpleWatertoAirHP.CoolPowCurveIndex, ratioTWB, ratioTS, ratioVL, ratioVS);
+                CoolPowerRated * Curve::CurveValue(state, simpleWatertoAirHP.CoolPowCurveIndex, ratioTWB, ratioTS, ratioVL, ratioVS);
 
             // Check if the Sensible Load is greater than the Total Cooling Load
             if (simpleWatertoAirHP.QSensible > simpleWatertoAirHP.QLoadTotal) {
@@ -3422,10 +3417,10 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         simpleWatertoAirHP.QLoadTotal =
-            HeatCapRated * CurveManager::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, ratioTDB, ratioTS, ratioVL, ratioVS);
+            HeatCapRated * Curve::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, ratioTDB, ratioTS, ratioVL, ratioVS);
         simpleWatertoAirHP.QSensible = simpleWatertoAirHP.QLoadTotal;
         state.dataWaterToAirHeatPumpSimple->Winput =
-            HeatPowerRated * CurveManager::CurveValue(state, simpleWatertoAirHP.HeatPowCurveIndex, ratioTDB, ratioTS, ratioVL, ratioVS);
+            HeatPowerRated * Curve::CurveValue(state, simpleWatertoAirHP.HeatPowCurveIndex, ratioTDB, ratioTS, ratioVL, ratioVS);
 
         // calculate coil outlet state variables
         LoadSideFullOutletEnthalpy = state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth + simpleWatertoAirHP.QLoadTotal / LoadSideFullMassFlowRate;
@@ -4061,8 +4056,8 @@ namespace WaterToAirHeatPumpSimple {
                     Real64 RatedratioTS = (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).RatedEntWaterTemp +
                                            state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) /
                                           Tref;
-                    Real64 RatedTotCapTempModFac = CurveManager::CurveValue(state, TotalCoolCapCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
-                    Real64 RatedCoolPowerTempModFac = CurveManager::CurveValue(state, CoolPowCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                    Real64 RatedTotCapTempModFac = Curve::CurveValue(state, TotalCoolCapCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                    Real64 RatedCoolPowerTempModFac = Curve::CurveValue(state, CoolPowCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                     if (RatedTotCapTempModFac > 1.02 || RatedTotCapTempModFac < 0.98) {
                         ShowWarningError(state,
                                          format("{}: Coil:Cooling:WaterToAirHeatPump:EquationFit=\"{}\"",
@@ -4088,7 +4083,7 @@ namespace WaterToAirHeatPumpSimple {
                                                 state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) /
                                                Tref;
                         Real64 RatedSensCapTempModFac =
-                            CurveManager::CurveValue(state, SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
+                            Curve::CurveValue(state, SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         if (RatedSensCapTempModFac > 1.02 || RatedSensCapTempModFac < 0.98) {
                             ShowWarningError(state,
                                              format("{}: Coil:Cooling:WaterToAirHeatPump:EquationFit=\"{}\"",
@@ -4112,9 +4107,8 @@ namespace WaterToAirHeatPumpSimple {
                     Real64 RatedHeatratioTS = (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).RatedEntWaterTemp +
                                                state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) /
                                               Tref;
-                    Real64 RatedHeatCapTempModFac = CurveManager::CurveValue(state, HeatCapCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
-                    Real64 RatedHeatPowerTempModFac =
-                        CurveManager::CurveValue(state, HeatPowCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
+                    Real64 RatedHeatCapTempModFac = Curve::CurveValue(state, HeatCapCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
+                    Real64 RatedHeatPowerTempModFac = Curve::CurveValue(state, HeatPowCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
                     if (RatedHeatCapTempModFac > 1.02 || RatedHeatCapTempModFac < 0.98) {
                         ShowWarningError(state,
                                          format("{}: Coil:Heating:WaterToAirHeatPump:EquationFit=\"{}\"",
