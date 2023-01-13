@@ -4778,4 +4778,25 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_WindAndStackArea)
     thisZone.WindDir = thisVentilation.EffAngle - 45;
     CalcAirFlowSimple(*state);
     EXPECT_NEAR(0.30, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
+
+    // Test at different orientations
+    std::vector<std::pair<Real64, Real64>> tests{
+        // Angle, Calculated Cw
+        {0, 0.0},    // -135°, blowing on the opposite side
+        {45, 0.05},  // -90, parallel wind
+        {90, 0.3},   // -45°, diagonal wind
+        {135, 0.55}, // 0°, "perpendicular" wind
+        {180, 0.3},  // 45°, diagonal wind
+        {225, 0.05}, // 90, parallel wind
+        {270, 0.0},  // 135°, opposite side
+        {315, 0.0},  // opposite side
+        {360, 0.0},  // opposite side
+    };
+
+    for (auto &[windDir, expectedCw] : tests) {
+        thisZone.WindDir = windDir;
+
+        CalcAirFlowSimple(*state);
+        EXPECT_NEAR(expectedCw, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
+    }
 }
