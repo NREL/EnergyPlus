@@ -1314,7 +1314,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Numerical & Analytical
 
-        Real64 pi(2.0 * std::acos(0.0));
+        Real64 pi(DataGlobalConstants::Pi);
         // BIPVT system geometry
         Real64 l = state.dataSurface->Surface(this->SurfNum).Height;
         Real64 w = state.dataSurface->Surface(this->SurfNum).Width;
