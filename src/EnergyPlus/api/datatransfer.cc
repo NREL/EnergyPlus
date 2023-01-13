@@ -296,8 +296,7 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
             if (availActuator.handleCount > 0) {
                 // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
                 bool foundActuator = false;
-                for (int ActuatorLoopUsed = 1; ActuatorLoopUsed <= thisState->dataRuntimeLang->numActuatorsUsed; ++ActuatorLoopUsed) {
-                    auto const &usedActuator = thisState->dataRuntimeLang->EMSActuatorUsed(ActuatorLoopUsed);
+                for (auto const &usedActuator : thisState->dataRuntimeLang->EMSActuatorUsed) {
                     if (usedActuator.ActuatorVariableNum == handle) {
                         EnergyPlus::ShowWarningError(
                             *thisState,
