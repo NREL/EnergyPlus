@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -91,6 +91,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -7373,10 +7374,14 @@ namespace Furnaces {
             if (state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex)
                     .IsSecondaryDXCoilInZone) { // assumes compressor is in same location as secondary coil
                 OutdoorDryBulbTemp =
-                    state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).SecZonePtr);
+                    state.dataZoneTempPredictorCorrector
+                        ->zoneHeatBalance(state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).SecZonePtr)
+                        .ZT;
             } else if (state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).IsSecondaryDXCoilInZone) {
                 OutdoorDryBulbTemp =
-                    state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).SecZonePtr);
+                    state.dataZoneTempPredictorCorrector
+                        ->zoneHeatBalance(state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).SecZonePtr)
+                        .ZT;
             } else {
                 if (state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum > 0) {
                     OutdoorDryBulbTemp = state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum).Temp;

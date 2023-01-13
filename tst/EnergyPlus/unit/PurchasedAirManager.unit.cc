@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,6 +72,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHeatBalance;
@@ -116,15 +117,13 @@ protected:
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 1000.0;
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 2000.0;
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
-        state->dataHeatBalFanSys->NonAirSystemResponse.allocate(1);
-        state->dataHeatBalFanSys->SysDepZoneLoads.allocate(1);
+        state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
         state->dataHeatBal->MassConservation.allocate(1);
         state->dataHeatBal->ZoneIntGain.allocate(1);
         state->dataHeatBal->spaceIntGain.allocate(1);
         state->dataHeatBal->spaceIntGainDevices.allocate(1);
         state->dataSurface->SurfaceWindow.allocate(1);
         state->dataHeatBal->RefrigCaseCredit.allocate(1);
-        state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
 
         state->dataHeatBalFanSys->TempControlType.allocate(1);
         state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
@@ -132,8 +131,7 @@ protected:
         state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-        state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-        state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.07;
+        state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.07;
 
         state->dataZoneEquip->ZoneEquipInputsFilled = false;
     }
@@ -397,8 +395,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
 
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
 
     AllocateHeatBalArrays(*state);
@@ -509,8 +507,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
 
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -631,8 +629,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -801,8 +799,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -909,8 +907,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -1057,8 +1055,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -1228,8 +1226,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -1401,8 +1399,6 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors

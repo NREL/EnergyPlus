@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,6 +78,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::CoolingPanelSimple {
 
@@ -848,7 +849,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
         int ZoneNum = ThisCP.ZonePtr;
-        state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf = SumHATsurf(state, ZoneNum);
+        state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
         ThisCP.CoolingPanelSrcAvg = 0.0;
         ThisCP.LastCoolingPanelSrc = 0.0;
         ThisCP.LastSysTimeElapsed = 0.0;
@@ -1241,7 +1242,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
         CoolingPanelOn = false;
     }
     // Calculate the "zone" temperature for determining the output of the cooling panel
-    Tzone = Xr * state.dataHeatBal->ZoneMRT(ZoneNum) + ((1.0 - Xr) * state.dataHeatBalFanSys->MAT(ZoneNum));
+    Tzone = Xr * state.dataHeatBal->ZoneMRT(ZoneNum) + ((1.0 - Xr) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
 
     // Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
     if (waterInletTemp >= Tzone) CoolingPanelOn = false;
@@ -1256,7 +1257,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     // iterate like in the low temperature radiant systems because the inlet water condition is known
     // not calculated.  So, we can deal with this upfront rather than after calculation and then more
     // iteration.
-    DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
+    DewPointTemp = PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
 
     if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 
@@ -1429,8 +1430,8 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             // that all energy radiated to people is converted to convective energy is
             // not very precise, but at least it conserves energy. The system impact to heat balance
             // should include this.
-            LoadMet = (SumHATsurf(state, ZoneNum) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) + (CoolingPanelCool * this->FracConvect) +
-                      (RadHeat * this->FracDistribPerson);
+            LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) +
+                      (CoolingPanelCool * this->FracConvect) + (RadHeat * this->FracDistribPerson);
         }
         this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
 
@@ -1469,13 +1470,13 @@ Real64 CoolingPanelParams::getCoolingPanelControlTemp(EnergyPlusData &state, int
 
     switch (this->controlType) {
     case ClgPanelCtrlType::MAT: {
-        return state.dataHeatBalFanSys->MAT(ZoneNum);
+        return state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
     } break;
     case ClgPanelCtrlType::MRT: {
         return state.dataHeatBal->ZoneMRT(ZoneNum);
     } break;
     case ClgPanelCtrlType::Operative: {
-        return 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+        return 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
     } break;
     case ClgPanelCtrlType::ODB: {
         return state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
@@ -1484,9 +1485,8 @@ Real64 CoolingPanelParams::getCoolingPanelControlTemp(EnergyPlusData &state, int
         return state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
     } break;
     default: { // Should never get here
-        ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
-        ShowFatalError(state, "Preceding condition causes termination.");
-        return -99990; // Compiler doesn't understand that a fatal error means the program will exit, so give an invalid value
+        assert(false);
+        return -99990; // Compiler wants a return value for every path, so give an invalid value
     } break;
     }
 }
@@ -1683,64 +1683,6 @@ void CoolingPanelParams::ReportCoolingPanel(EnergyPlusData &state)
     this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour;
     this->ConvEnergy = this->ConvPower * TimeStepSys * DataGlobalConstants::SecInHour;
     this->RadEnergy = this->RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
-}
-
-Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Rick Strand
-    //       DATE WRITTEN   Aug 2014
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
-    // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
-    // and should be updated accordingly.
-
-    // REFERENCES:
-    // Existing code for hot water baseboard models (radiant-convective variety)
-
-    // Using/Aliasing
-    using DataSurfaces::WinShadingType;
-
-    // Return value
-    Real64 SumHATsurf;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int SurfNum; // Surface number
-    Real64 Area; // Effective surface area
-    SumHATsurf = 0.0;
-
-    for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-
-        auto &ThisSurf(state.dataSurface->Surface(SurfNum));
-
-        Area = ThisSurf.Area;
-
-        if (ThisSurf.Class == DataSurfaces::SurfaceClass::Window) {
-
-            if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-            }
-
-            if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                // Window frame contribution
-                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                              (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
-            }
-
-            if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                              (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
-            }
-        }
-
-        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
-    }
-
-    return SumHATsurf;
 }
 
 } // namespace EnergyPlus::CoolingPanelSimple

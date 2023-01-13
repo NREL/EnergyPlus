@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1957,7 +1957,7 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // PURPOSE OF THIS SUBROUTINE:
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
-    auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1)).Group;
+    DataHeatBalance::MaterialGroup const MaterialGroup = state.dataMaterial->Material(LayerPoint(1)).Group;
     return BITF_TEST_ANY(BITF(MaterialGroup),
                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::Shade) |
                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |

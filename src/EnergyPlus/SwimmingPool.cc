@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,6 +80,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::SwimmingPool {
 
@@ -535,7 +536,8 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
         int ZoneNum = this->ZonePtr;
-        this->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
+        this->ZeroSourceSumHATsurf(ZoneNum) =
+            state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
         int SurfNum = this->SurfacePtr;
         this->QPoolSrcAvg(SurfNum) = 0.0;        // Initialize this variable to zero (pool parameters "off")
         this->HeatTransCoefsAvg(SurfNum) = 0.0;  // Initialize this variable to zero (pool parameters "off")
@@ -897,15 +899,17 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // initialize local variables
     int SurfNum = this->SurfacePtr;                         // surface number of floor that is the pool
     int ZoneNum = state.dataSurface->Surface(SurfNum).Zone; // index to zone array
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     // Convection coefficient calculation
-    Real64 HConvIn = 0.22 * std::pow(std::abs(this->PoolWaterTemp - state.dataHeatBalFanSys->MAT(ZoneNum)), 1.0 / 3.0) *
-                     this->CurCoverConvFac; // convection coefficient for pool
-    calcSwimmingPoolEvap(state, EvapRate, SurfNum, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+    Real64 HConvIn =
+        0.22 * std::pow(std::abs(this->PoolWaterTemp - thisZoneHB.MAT), 1.0 / 3.0) * this->CurCoverConvFac; // convection coefficient for pool
+    calcSwimmingPoolEvap(state, EvapRate, SurfNum, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
     this->MakeUpWaterMassFlowRate = EvapRate;
-    Real64 EvapEnergyLossPerArea =
-        -EvapRate * Psychrometrics::PsyHfgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->MAT(ZoneNum)) /
-        state.dataSurface->Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
+    Real64 EvapEnergyLossPerArea = -EvapRate *
+                                   Psychrometrics::PsyHfgAirFnWTdb(thisZoneHB.ZoneAirHumRat,
+                                                                   thisZoneHB.MAT) /
+                                   state.dataSurface->Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
     this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
     // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
     // to the air directly and added to the zone air heat balance
@@ -948,7 +952,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
     state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) =
-        SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * state.dataHeatBalFanSys->MAT(ZoneNum) +
+        SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * thisZoneHB.MAT +
         (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / state.dataGlobal->TimeStepZoneSec)) * Cp /
             state.dataSurface->Surface(SurfNum).Area;
     state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) =
@@ -956,8 +960,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
 
     // Finally take care of the latent and convective gains resulting from the pool
     state.dataHeatBalFanSys->SumConvPool(ZoneNum) += this->RadConvertToConvect;
-    state.dataHeatBalFanSys->SumLatentPool(ZoneNum) +=
-        EvapRate * Psychrometrics::PsyHfgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->MAT(ZoneNum));
+    state.dataHeatBalFanSys->SumLatentPool(ZoneNum) += EvapRate * Psychrometrics::PsyHfgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.MAT);
 }
 
 void SwimmingPoolData::calcSwimmingPoolEvap(EnergyPlusData &state,
@@ -1100,49 +1103,6 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
             }
         }
     }
-}
-
-Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Peter Graham Ellis
-    //       DATE WRITTEN   July 2003
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
-    // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector and should be updated accordingly.
-
-    Real64 SumHATsurf = 0.0; // Return value
-
-    for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-        Real64 Area = state.dataSurface->Surface(SurfNum).Area; // Effective surface area
-
-        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-            if (state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntShade ||
-                state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntBlind) {
-                // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-            }
-
-            if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                // Window frame contribution
-                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                              (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
-            }
-
-            if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
-                state.dataSurface->SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntShade &&
-                state.dataSurface->SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntBlind) {
-                // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                              (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
-            }
-        }
-
-        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
-    }
-
-    return SumHATsurf;
 }
 
 void ReportSwimmingPool(EnergyPlusData &state)

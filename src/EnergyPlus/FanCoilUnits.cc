@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2526,7 +2526,7 @@ namespace FanCoilUnits {
                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                     }
                 }
-                CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QUnitOut);
+                QUnitOut = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
 
                 // if heating
             } else if (UnitOn && QCoilHeatSP > SmallLoad &&
@@ -2692,7 +2692,7 @@ namespace FanCoilUnits {
                         }
                     }
                 }
-                CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QUnitOut);
+                QUnitOut = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
             } else {
                 // no action
                 QUnitOut = QUnitOutNoHC;
@@ -3346,7 +3346,7 @@ namespace FanCoilUnits {
             SpecHumOut = Node(OutletNode).HumRat;
             SpecHumIn = Node(InletNode).HumRat;
             LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-            CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QSensUnitOutNoATM);
+            QSensUnitOutNoATM = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
             QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
             // report variables
             FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
@@ -3369,7 +3369,7 @@ namespace FanCoilUnits {
             SpecHumOut = Node(OutletNode).HumRat;
             SpecHumIn = Node(InletNode).HumRat;
             LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-            CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QSensUnitOutNoATM);
+            QSensUnitOutNoATM = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
             QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
             // report variables
             FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
@@ -3847,21 +3847,17 @@ namespace FanCoilUnits {
             if (FanCoil(FanCoilNum).ATMixerType == ATMixer_SupplySide) {
                 // Now calculate the ATM mixer if it is on the supply side of the zone unit
                 SimATMixer(state, FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
-                CalcZoneSensibleOutput(Node(state.dataFanCoilUnits->ATMixOutNode).MassFlowRate,
-                                       Node(state.dataFanCoilUnits->ATMixOutNode).Temp,
-                                       Node(state.dataFanCoilUnits->ZoneNode).Temp,
-                                       Node(state.dataFanCoilUnits->ZoneNode).HumRat,
-                                       LoadMet);
+                LoadMet = calcZoneSensibleOutput(Node(state.dataFanCoilUnits->ATMixOutNode).MassFlowRate,
+                                                 Node(state.dataFanCoilUnits->ATMixOutNode).Temp,
+                                                 Node(state.dataFanCoilUnits->ZoneNode).Temp,
+                                                 Node(state.dataFanCoilUnits->ZoneNode).HumRat);
             } else {
                 // ATM Mixer on inlet side
-                CalcZoneSensibleOutput(AirMassFlow,
-                                       Node(OutletNode).Temp,
-                                       Node(state.dataFanCoilUnits->ZoneNode).Temp,
-                                       Node(state.dataFanCoilUnits->ZoneNode).HumRat,
-                                       LoadMet);
+                LoadMet = calcZoneSensibleOutput(
+                    AirMassFlow, Node(OutletNode).Temp, Node(state.dataFanCoilUnits->ZoneNode).Temp, Node(state.dataFanCoilUnits->ZoneNode).HumRat);
             }
         } else {
-            CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, LoadMet);
+            LoadMet = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
         }
     }
 

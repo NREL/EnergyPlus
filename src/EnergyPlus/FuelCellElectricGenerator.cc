@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -76,6 +75,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -2045,7 +2045,8 @@ namespace FuelCellElectricGenerator {
 
                 // get zone air temp
                 if (this->FCPM.ZoneID > 0) {
-                    this->FCPM.QdotSkin = this->FCPM.UAskin * (this->FCPM.TprodGasLeavingFCPM - state.dataHeatBalFanSys->ZT(this->FCPM.ZoneID));
+                    this->FCPM.QdotSkin = this->FCPM.UAskin * (this->FCPM.TprodGasLeavingFCPM -
+                                                               state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->FCPM.ZoneID).ZT);
                 }
 
             } else if (this->FCPM.SkinLossMode == DataGenerators::SkinLoss::QuadraticFuelNdot) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -96,8 +96,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
     state->dataHeatBal->Zone.allocate(1);
     state->dataGlobal->NumOfZones = 1;
-    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceLast = 1;
 
     state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
     HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
@@ -145,8 +147,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
     state->dataHeatBal->Zone.allocate(1);
     state->dataGlobal->NumOfZones = 1;
-    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceLast = 1;
 
     state->dataHeatBalSurf->SurfAbsSolarInt(1) = 0.0;
     HeatBalanceSurfaceManager::EvalInsideMovableInsulation(*state);

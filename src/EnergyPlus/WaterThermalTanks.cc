@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -89,6 +88,7 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::WaterThermalTanks {
 
@@ -624,6 +624,7 @@ void CalcWaterThermalTankZoneGains(EnergyPlusData &state)
     for (int WaterThermalTankNum = 1; WaterThermalTankNum <= state.dataWaterThermalTanks->numWaterThermalTank; ++WaterThermalTankNum) {
         auto &Tank = state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum);
         if (Tank.AmbientTempZone == 0) continue;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(Tank.AmbientTempZone);
         if (state.dataGlobal->DoingSizing) {
             // Initialize tank temperature to setpoint
             // (use HPWH or Desuperheater heating coil set point if applicable)
@@ -646,21 +647,20 @@ void CalcWaterThermalTankZoneGains(EnergyPlusData &state)
             switch (Tank.WaterThermalTankType) {
             case DataPlant::PlantEquipmentType::WtrHeaterMixed: {
                 QLossToZone = max(Tank.OnCycLossCoeff * Tank.OnCycLossFracToZone, Tank.OffCycLossCoeff * Tank.OffCycLossFracToZone) *
-                              (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
+                              (TankTemp - thisZoneHB.MAT);
                 break;
             }
             case DataPlant::PlantEquipmentType::WtrHeaterStratified: {
                 QLossToZone = max(Tank.Node(1).OnCycLossCoeff * Tank.SkinLossFracToZone, Tank.Node(1).OffCycLossCoeff * Tank.SkinLossFracToZone) *
-                              (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
+                              (TankTemp - thisZoneHB.MAT);
                 break;
             }
             case DataPlant::PlantEquipmentType::ChilledWaterTankMixed: {
-                QLossToZone = Tank.OffCycLossCoeff * Tank.OffCycLossFracToZone * (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
+                QLossToZone = Tank.OffCycLossCoeff * Tank.OffCycLossFracToZone * (TankTemp - thisZoneHB.MAT);
                 break;
             }
             case DataPlant::PlantEquipmentType::ChilledWaterTankStratified: {
-                QLossToZone =
-                    Tank.Node(1).OffCycLossCoeff * Tank.SkinLossFracToZone * (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
+                QLossToZone = Tank.Node(1).OffCycLossCoeff * Tank.SkinLossFracToZone * (TankTemp - thisZoneHB.MAT);
                 break;
             }
             default:
@@ -6219,7 +6219,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             break;
         }
         case WTTAmbientTemp::TempZone: {
-            this->AmbientTemp = state.dataHeatBalFanSys->MAT(this->AmbientTempZone);
+            this->AmbientTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->AmbientTempZone).MAT;
 
             break;
         }
@@ -6387,7 +6387,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         switch (state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempIndicator) {
         case CrankcaseHeaterControlTemp::Zone: {
             state.dataHVACGlobal->HPWHCrankcaseDBTemp =
-                state.dataHeatBalFanSys->MAT(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempZone);
+                state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempZone).MAT;
             break;
         }
         case CrankcaseHeaterControlTemp::Outdoors: {
