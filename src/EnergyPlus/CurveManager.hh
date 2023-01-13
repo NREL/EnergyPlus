@@ -145,7 +145,7 @@ namespace Curve {
         bool maxPresent = false;
     };
 
-    struct PerformanceCurveData
+    struct Curve
     {
         // Basic data
         std::string Name;                         // Curve Name
@@ -370,12 +370,15 @@ struct CurveManagerData : BaseGlobalStruct
     bool CurveValueMyBeginTimeStepFlag = false;
     bool FrictionFactorErrorHasOccurred = false;
     bool showFallbackMessage = true;
-    Array1D<Curve::PerformanceCurveData> PerfCurve;
+    Array1D<Curve::Curve *> PerfCurve;
     Curve::BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
 
     void clear_state() override
     {
+        for (Curve::Curve *p : PerfCurve) {
+            delete p;
+        }
         *this = CurveManagerData();
     }
 };

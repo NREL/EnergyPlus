@@ -152,15 +152,15 @@ namespace Curve {
         // Reset curve outputs prior to simulating air loops, plant loops, etc.
         // This allows the report variable for curve/table objects to show an inactive state.
 
-        for (auto &c : state.dataCurveManager->PerfCurve) {
-            c.output = DataLoopNode::SensedNodeFlagValue;
-            for (auto &i : c.inputs) {
+        for (auto c : state.dataCurveManager->PerfCurve) {
+            c->output = DataLoopNode::SensedNodeFlagValue;
+            for (auto &i : c->inputs) {
                 i = DataLoopNode::SensedNodeFlagValue;
             }
         }
     }
 
-    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1)
+    Real64 Curve::value(EnergyPlusData &state, Real64 V1)
     {
         if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1);
         switch (this->curveType) {
@@ -206,7 +206,7 @@ namespace Curve {
         }
     }
 
-    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2)
+    Real64 Curve::value(EnergyPlusData &state, Real64 V1, Real64 V2)
     {
         if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1, V2);
         switch (this->curveType) {
@@ -230,7 +230,7 @@ namespace Curve {
         }
     }
 
-    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3)
+    Real64 Curve::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3)
     {
         if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1, V2, V3);
         switch (this->curveType) {
@@ -256,7 +256,7 @@ namespace Curve {
         }
     }
 
-    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4)
+    Real64 Curve::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4)
     {
         if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1, V2, V3, V4);
         switch (this->curveType) {
@@ -267,7 +267,7 @@ namespace Curve {
         }
     }
 
-    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5)
+    Real64 Curve::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5)
     {
         if (this->interpolationType == InterpType::BtwxtMethod) return BtwxtTableInterpolation(state, V1, V2, V3, V4, V5);
         switch (this->curveType) {
@@ -279,7 +279,7 @@ namespace Curve {
         }
     }
 
-    Real64 PerformanceCurveData::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5, Real64 V6)
+    Real64 Curve::value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5, Real64 V6)
     {
         // tables are the only 6-D curves, for now at least
         return BtwxtTableInterpolation(state, V1, V2, V3, V4, V5, V6);
@@ -292,14 +292,15 @@ namespace Curve {
     {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
-        CurveValue = thisCurve.value(state, V1);
-        if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
-        if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
-        if (thisCurve.EMSOverrideOn) CurveValue = thisCurve.EMSOverrideCurveValue;
-        thisCurve.output = CurveValue;
-        thisCurve.inputs[0] = Var1;
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Real64 const V1(
+            max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min)); // 1st independent variable after limits imposed
+        CurveValue = thisCurve->value(state, V1);
+        if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
+        if (thisCurve->outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve->outputLimits.max);
+        if (thisCurve->EMSOverrideOn) CurveValue = thisCurve->EMSOverrideCurveValue;
+        thisCurve->output = CurveValue;
+        thisCurve->inputs[0] = Var1;
         return CurveValue;
     }
 
@@ -311,19 +312,21 @@ namespace Curve {
     {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
-        Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
-        CurveValue = thisCurve.value(state, V1, V2);
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Real64 const V1(
+            max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min)); // 1st independent variable after limits imposed
+        Real64 const V2(
+            max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min)); // 2nd independent variable after limits imposed
+        CurveValue = thisCurve->value(state, V1, V2);
 
-        if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
-        if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
+        if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
+        if (thisCurve->outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve->outputLimits.max);
 
-        if (thisCurve.EMSOverrideOn) CurveValue = thisCurve.EMSOverrideCurveValue;
+        if (thisCurve->EMSOverrideOn) CurveValue = thisCurve->EMSOverrideCurveValue;
 
-        thisCurve.output = CurveValue;
-        thisCurve.inputs[0] = Var1;
-        thisCurve.inputs[1] = Var2;
+        thisCurve->output = CurveValue;
+        thisCurve->inputs[0] = Var1;
+        thisCurve->inputs[1] = Var2;
 
         return CurveValue;
     }
@@ -337,21 +340,24 @@ namespace Curve {
     {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
-        Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
-        Real64 const V3(max(min(Var3, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min)); // 3rd independent variable after limits imposed
-        CurveValue = thisCurve.value(state, V1, V2, V3);
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Real64 const V1(
+            max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min)); // 1st independent variable after limits imposed
+        Real64 const V2(
+            max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min)); // 2nd independent variable after limits imposed
+        Real64 const V3(
+            max(min(Var3, thisCurve->inputLimits[2].max), thisCurve->inputLimits[2].min)); // 3rd independent variable after limits imposed
+        CurveValue = thisCurve->value(state, V1, V2, V3);
 
-        if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
-        if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
+        if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
+        if (thisCurve->outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve->outputLimits.max);
 
-        if (thisCurve.EMSOverrideOn) CurveValue = thisCurve.EMSOverrideCurveValue;
+        if (thisCurve->EMSOverrideOn) CurveValue = thisCurve->EMSOverrideCurveValue;
 
-        thisCurve.output = CurveValue;
-        thisCurve.inputs[0] = Var1;
-        thisCurve.inputs[1] = Var2;
-        thisCurve.inputs[2] = Var3;
+        thisCurve->output = CurveValue;
+        thisCurve->inputs[0] = Var1;
+        thisCurve->inputs[1] = Var2;
+        thisCurve->inputs[2] = Var3;
 
         return CurveValue;
     }
@@ -366,23 +372,27 @@ namespace Curve {
     {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
-        Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
-        Real64 const V3(max(min(Var3, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min)); // 3rd independent variable after limits imposed
-        Real64 const V4(max(min(Var4, thisCurve.inputLimits[3].max), thisCurve.inputLimits[3].min)); // 4th independent variable after limits imposed
-        CurveValue = thisCurve.value(state, V1, V2, V3, V4);
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Real64 const V1(
+            max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min)); // 1st independent variable after limits imposed
+        Real64 const V2(
+            max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min)); // 2nd independent variable after limits imposed
+        Real64 const V3(
+            max(min(Var3, thisCurve->inputLimits[2].max), thisCurve->inputLimits[2].min)); // 3rd independent variable after limits imposed
+        Real64 const V4(
+            max(min(Var4, thisCurve->inputLimits[3].max), thisCurve->inputLimits[3].min)); // 4th independent variable after limits imposed
+        CurveValue = thisCurve->value(state, V1, V2, V3, V4);
 
-        if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
-        if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
+        if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
+        if (thisCurve->outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve->outputLimits.max);
 
-        if (thisCurve.EMSOverrideOn) CurveValue = thisCurve.EMSOverrideCurveValue;
+        if (thisCurve->EMSOverrideOn) CurveValue = thisCurve->EMSOverrideCurveValue;
 
-        thisCurve.output = CurveValue;
-        thisCurve.inputs[0] = Var1;
-        thisCurve.inputs[1] = Var2;
-        thisCurve.inputs[2] = Var3;
-        thisCurve.inputs[3] = Var4;
+        thisCurve->output = CurveValue;
+        thisCurve->inputs[0] = Var1;
+        thisCurve->inputs[1] = Var2;
+        thisCurve->inputs[2] = Var3;
+        thisCurve->inputs[3] = Var4;
 
         return CurveValue;
     }
@@ -398,25 +408,30 @@ namespace Curve {
     {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
-        Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
-        Real64 const V3(max(min(Var3, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min)); // 3rd independent variable after limits imposed
-        Real64 const V4(max(min(Var4, thisCurve.inputLimits[3].max), thisCurve.inputLimits[3].min)); // 4th independent variable after limits imposed
-        Real64 const V5(max(min(Var5, thisCurve.inputLimits[4].max), thisCurve.inputLimits[4].min)); // 5th independent variable after limits imposed
-        CurveValue = thisCurve.value(state, V1, V2, V3, V4, V5);
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Real64 const V1(
+            max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min)); // 1st independent variable after limits imposed
+        Real64 const V2(
+            max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min)); // 2nd independent variable after limits imposed
+        Real64 const V3(
+            max(min(Var3, thisCurve->inputLimits[2].max), thisCurve->inputLimits[2].min)); // 3rd independent variable after limits imposed
+        Real64 const V4(
+            max(min(Var4, thisCurve->inputLimits[3].max), thisCurve->inputLimits[3].min)); // 4th independent variable after limits imposed
+        Real64 const V5(
+            max(min(Var5, thisCurve->inputLimits[4].max), thisCurve->inputLimits[4].min)); // 5th independent variable after limits imposed
+        CurveValue = thisCurve->value(state, V1, V2, V3, V4, V5);
 
-        if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
-        if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
+        if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
+        if (thisCurve->outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve->outputLimits.max);
 
-        if (thisCurve.EMSOverrideOn) CurveValue = thisCurve.EMSOverrideCurveValue;
+        if (thisCurve->EMSOverrideOn) CurveValue = thisCurve->EMSOverrideCurveValue;
 
-        thisCurve.output = CurveValue;
-        thisCurve.inputs[0] = Var1;
-        thisCurve.inputs[1] = Var2;
-        thisCurve.inputs[2] = Var3;
-        thisCurve.inputs[3] = Var4;
-        thisCurve.inputs[4] = Var5;
+        thisCurve->output = CurveValue;
+        thisCurve->inputs[0] = Var1;
+        thisCurve->inputs[1] = Var2;
+        thisCurve->inputs[2] = Var3;
+        thisCurve->inputs[3] = Var4;
+        thisCurve->inputs[4] = Var5;
 
         return CurveValue;
     }
@@ -434,33 +449,39 @@ namespace Curve {
 
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1(max(min(Var1, thisCurve.inputLimits[0].max), thisCurve.inputLimits[0].min)); // 1st independent variable after limits imposed
-        Real64 const V2(max(min(Var2, thisCurve.inputLimits[1].max), thisCurve.inputLimits[1].min)); // 2nd independent variable after limits imposed
-        Real64 const V3(max(min(Var3, thisCurve.inputLimits[2].max), thisCurve.inputLimits[2].min)); // 3rd independent variable after limits imposed
-        Real64 const V4(max(min(Var4, thisCurve.inputLimits[3].max), thisCurve.inputLimits[3].min)); // 4th independent variable after limits imposed
-        Real64 const V5(max(min(Var5, thisCurve.inputLimits[4].max), thisCurve.inputLimits[4].min)); // 5th independent variable after limits imposed
-        Real64 const V6(max(min(Var6, thisCurve.inputLimits[5].max), thisCurve.inputLimits[5].min)); // 6th independent variable after limits imposed
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Real64 const V1(
+            max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min)); // 1st independent variable after limits imposed
+        Real64 const V2(
+            max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min)); // 2nd independent variable after limits imposed
+        Real64 const V3(
+            max(min(Var3, thisCurve->inputLimits[2].max), thisCurve->inputLimits[2].min)); // 3rd independent variable after limits imposed
+        Real64 const V4(
+            max(min(Var4, thisCurve->inputLimits[3].max), thisCurve->inputLimits[3].min)); // 4th independent variable after limits imposed
+        Real64 const V5(
+            max(min(Var5, thisCurve->inputLimits[4].max), thisCurve->inputLimits[4].min)); // 5th independent variable after limits imposed
+        Real64 const V6(
+            max(min(Var6, thisCurve->inputLimits[5].max), thisCurve->inputLimits[5].min)); // 6th independent variable after limits imposed
 
-        CurveValue = thisCurve.value(state, V1, V2, V3, V4, V5, V6);
+        CurveValue = thisCurve->value(state, V1, V2, V3, V4, V5, V6);
 
-        if (thisCurve.outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve.outputLimits.min);
-        if (thisCurve.outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve.outputLimits.max);
+        if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
+        if (thisCurve->outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve->outputLimits.max);
 
-        if (thisCurve.EMSOverrideOn) CurveValue = thisCurve.EMSOverrideCurveValue;
+        if (thisCurve->EMSOverrideOn) CurveValue = thisCurve->EMSOverrideCurveValue;
 
-        thisCurve.output = CurveValue;
-        thisCurve.inputs[0] = Var1;
-        thisCurve.inputs[1] = Var2;
-        thisCurve.inputs[2] = Var3;
-        thisCurve.inputs[3] = Var4;
-        thisCurve.inputs[4] = Var5;
-        thisCurve.inputs[5] = Var6;
+        thisCurve->output = CurveValue;
+        thisCurve->inputs[0] = Var1;
+        thisCurve->inputs[1] = Var2;
+        thisCurve->inputs[2] = Var3;
+        thisCurve->inputs[3] = Var4;
+        thisCurve->inputs[4] = Var5;
+        thisCurve->inputs[5] = Var6;
 
         return CurveValue;
     }
 
-    Real64 PerformanceCurveData::valueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5)
+    Real64 Curve::valueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5)
     {
         if (state.dataCurveManager->showFallbackMessage) {
             ShowMessage(state, "Note: You have encountered a corner case in the EnergyPlus Curve:* evaluation code.");
@@ -648,6 +669,9 @@ namespace Curve {
 
         // allocate the data structure
         state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
+        for (int i = 1; i <= state.dataCurveManager->NumCurves; i++) {
+            state.dataCurveManager->PerfCurve(i) = new Curve();
+        }
         state.dataCurveManager->UniqueCurveNames.reserve(state.dataCurveManager->NumCurves);
         // initialize the array
 
@@ -676,27 +700,27 @@ namespace Curve {
                                                      ErrorsFound);
             ++CurveNum;
 
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
             // could add checks for blank numeric fields, and use field names for errors.
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::BiQuadratic;
-            thisCurve.numDims = 2;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::BiQuadratic;
+            thisCurve->numDims = 2;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 6; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(7);
-            thisCurve.inputLimits[0].max = Numbers(8);
-            thisCurve.inputLimits[1].min = Numbers(9);
-            thisCurve.inputLimits[1].max = Numbers(10);
+            thisCurve->inputLimits[0].min = Numbers(7);
+            thisCurve->inputLimits[0].max = Numbers(8);
+            thisCurve->inputLimits[1].min = Numbers(9);
+            thisCurve->inputLimits[1].max = Numbers(10);
             if (NumNumbers > 10 && !state.dataIPShortCut->lNumericFieldBlanks(11)) {
-                thisCurve.outputLimits.min = Numbers(11);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(11);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 11 && !state.dataIPShortCut->lNumericFieldBlanks(12)) {
-                thisCurve.outputLimits.max = Numbers(12);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(12);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(7) > Numbers(8)) { // error
@@ -758,32 +782,32 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
+            thisCurve->Name = Alphas(1);
 
-            thisCurve.curveType = CurveType::ChillerPartLoadWithLift;
-            thisCurve.numDims = 3;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->curveType = CurveType::ChillerPartLoadWithLift;
+            thisCurve->numDims = 3;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
 
             for (int in = 0; in < 12; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
 
-            thisCurve.inputLimits[0].min = Numbers(13);
-            thisCurve.inputLimits[0].max = Numbers(14);
-            thisCurve.inputLimits[1].min = Numbers(15);
-            thisCurve.inputLimits[1].max = Numbers(16);
-            thisCurve.inputLimits[2].min = Numbers(17);
-            thisCurve.inputLimits[2].max = Numbers(18);
+            thisCurve->inputLimits[0].min = Numbers(13);
+            thisCurve->inputLimits[0].max = Numbers(14);
+            thisCurve->inputLimits[1].min = Numbers(15);
+            thisCurve->inputLimits[1].max = Numbers(16);
+            thisCurve->inputLimits[2].min = Numbers(17);
+            thisCurve->inputLimits[2].max = Numbers(18);
 
             if (NumNumbers > 18 && !state.dataIPShortCut->lNumericFieldBlanks(19)) {
-                thisCurve.outputLimits.min = Numbers(19);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(19);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 19 && !state.dataIPShortCut->lNumericFieldBlanks(20)) {
-                thisCurve.outputLimits.max = Numbers(20);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(20);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (NumAlphas >= 2) {
@@ -830,24 +854,24 @@ namespace Curve {
                                                      CurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::Cubic;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::Cubic;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 4; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(5);
-            thisCurve.inputLimits[0].max = Numbers(6);
+            thisCurve->inputLimits[0].min = Numbers(5);
+            thisCurve->inputLimits[0].max = Numbers(6);
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
-                thisCurve.outputLimits.min = Numbers(7);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(7);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
-                thisCurve.outputLimits.max = Numbers(8);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(8);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(5) > Numbers(6)) { // error
@@ -894,24 +918,24 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::Quartic;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::Quartic;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 5; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(6);
-            thisCurve.inputLimits[0].max = Numbers(7);
+            thisCurve->inputLimits[0].min = Numbers(6);
+            thisCurve->inputLimits[0].max = Numbers(7);
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
-                thisCurve.outputLimits.min = Numbers(8);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(8);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 8 && !state.dataIPShortCut->lNumericFieldBlanks(9)) {
-                thisCurve.outputLimits.max = Numbers(9);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(9);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(6) > Numbers(7)) { // error
@@ -958,24 +982,24 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::Quadratic;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::Quadratic;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(4);
-            thisCurve.inputLimits[0].max = Numbers(5);
+            thisCurve->inputLimits[0].min = Numbers(4);
+            thisCurve->inputLimits[0].max = Numbers(5);
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                thisCurve.outputLimits.min = Numbers(6);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(6);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
-                thisCurve.outputLimits.max = Numbers(7);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(7);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(4) > Numbers(5)) { // error
@@ -1022,26 +1046,26 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::QuadraticLinear;
-            thisCurve.numDims = 2;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::QuadraticLinear;
+            thisCurve->numDims = 2;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 6; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(7);
-            thisCurve.inputLimits[0].max = Numbers(8);
-            thisCurve.inputLimits[1].min = Numbers(9);
-            thisCurve.inputLimits[1].max = Numbers(10);
+            thisCurve->inputLimits[0].min = Numbers(7);
+            thisCurve->inputLimits[0].max = Numbers(8);
+            thisCurve->inputLimits[1].min = Numbers(9);
+            thisCurve->inputLimits[1].max = Numbers(10);
             if (NumNumbers > 10 && !state.dataIPShortCut->lNumericFieldBlanks(11)) {
-                thisCurve.outputLimits.min = Numbers(11);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(11);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 11 && !state.dataIPShortCut->lNumericFieldBlanks(12)) {
-                thisCurve.outputLimits.max = Numbers(12);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(12);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(7) > Numbers(8)) { // error
@@ -1103,26 +1127,26 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::CubicLinear;
-            thisCurve.numDims = 2;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::CubicLinear;
+            thisCurve->numDims = 2;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 6; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(7);
-            thisCurve.inputLimits[0].max = Numbers(8);
-            thisCurve.inputLimits[1].min = Numbers(9);
-            thisCurve.inputLimits[1].max = Numbers(10);
+            thisCurve->inputLimits[0].min = Numbers(7);
+            thisCurve->inputLimits[0].max = Numbers(8);
+            thisCurve->inputLimits[1].min = Numbers(9);
+            thisCurve->inputLimits[1].max = Numbers(10);
             if (NumNumbers > 10 && !state.dataIPShortCut->lNumericFieldBlanks(11)) {
-                thisCurve.outputLimits.min = Numbers(11);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(11);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 11 && !state.dataIPShortCut->lNumericFieldBlanks(12)) {
-                thisCurve.outputLimits.max = Numbers(12);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(12);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(7) > Numbers(8)) { // error
@@ -1184,24 +1208,24 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::Linear;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::Linear;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 2; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(3);
-            thisCurve.inputLimits[0].max = Numbers(4);
+            thisCurve->inputLimits[0].min = Numbers(3);
+            thisCurve->inputLimits[0].max = Numbers(4);
             if (NumNumbers > 4 && !state.dataIPShortCut->lNumericFieldBlanks(5)) {
-                thisCurve.outputLimits.min = Numbers(5);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(5);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                thisCurve.outputLimits.max = Numbers(6);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(6);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(3) > Numbers(4)) { // error
@@ -1248,26 +1272,26 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::BiCubic;
-            thisCurve.numDims = 2;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::BiCubic;
+            thisCurve->numDims = 2;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 10; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(11);
-            thisCurve.inputLimits[0].max = Numbers(12);
-            thisCurve.inputLimits[1].min = Numbers(13);
-            thisCurve.inputLimits[1].max = Numbers(14);
+            thisCurve->inputLimits[0].min = Numbers(11);
+            thisCurve->inputLimits[0].max = Numbers(12);
+            thisCurve->inputLimits[1].min = Numbers(13);
+            thisCurve->inputLimits[1].max = Numbers(14);
             if (NumNumbers > 14 && !state.dataIPShortCut->lNumericFieldBlanks(15)) {
-                thisCurve.outputLimits.min = Numbers(15);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(15);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 15 && !state.dataIPShortCut->lNumericFieldBlanks(16)) {
-                thisCurve.outputLimits.max = Numbers(16);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(16);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(11) > Numbers(12)) { // error
@@ -1329,52 +1353,52 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::TriQuadratic;
-            thisCurve.numDims = 3;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve.tri2ndOrder[0] = Numbers(1);
-            thisCurve.tri2ndOrder[1] = Numbers(2);
-            thisCurve.tri2ndOrder[2] = Numbers(3);
-            thisCurve.tri2ndOrder[3] = Numbers(4);
-            thisCurve.tri2ndOrder[4] = Numbers(5);
-            thisCurve.tri2ndOrder[5] = Numbers(6);
-            thisCurve.tri2ndOrder[6] = Numbers(7);
-            thisCurve.tri2ndOrder[7] = Numbers(8);
-            thisCurve.tri2ndOrder[8] = Numbers(9);
-            thisCurve.tri2ndOrder[9] = Numbers(10);
-            thisCurve.tri2ndOrder[10] = Numbers(11);
-            thisCurve.tri2ndOrder[11] = Numbers(12);
-            thisCurve.tri2ndOrder[12] = Numbers(13);
-            thisCurve.tri2ndOrder[13] = Numbers(14);
-            thisCurve.tri2ndOrder[14] = Numbers(15);
-            thisCurve.tri2ndOrder[15] = Numbers(16);
-            thisCurve.tri2ndOrder[16] = Numbers(17);
-            thisCurve.tri2ndOrder[17] = Numbers(18);
-            thisCurve.tri2ndOrder[18] = Numbers(19);
-            thisCurve.tri2ndOrder[19] = Numbers(20);
-            thisCurve.tri2ndOrder[20] = Numbers(21);
-            thisCurve.tri2ndOrder[21] = Numbers(22);
-            thisCurve.tri2ndOrder[22] = Numbers(23);
-            thisCurve.tri2ndOrder[23] = Numbers(24);
-            thisCurve.tri2ndOrder[24] = Numbers(25);
-            thisCurve.tri2ndOrder[25] = Numbers(26);
-            thisCurve.tri2ndOrder[26] = Numbers(27);
-            thisCurve.inputLimits[0].min = Numbers(28);
-            thisCurve.inputLimits[0].max = Numbers(29);
-            thisCurve.inputLimits[1].min = Numbers(30);
-            thisCurve.inputLimits[1].max = Numbers(31);
-            thisCurve.inputLimits[2].min = Numbers(32);
-            thisCurve.inputLimits[2].max = Numbers(33);
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::TriQuadratic;
+            thisCurve->numDims = 3;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->tri2ndOrder[0] = Numbers(1);
+            thisCurve->tri2ndOrder[1] = Numbers(2);
+            thisCurve->tri2ndOrder[2] = Numbers(3);
+            thisCurve->tri2ndOrder[3] = Numbers(4);
+            thisCurve->tri2ndOrder[4] = Numbers(5);
+            thisCurve->tri2ndOrder[5] = Numbers(6);
+            thisCurve->tri2ndOrder[6] = Numbers(7);
+            thisCurve->tri2ndOrder[7] = Numbers(8);
+            thisCurve->tri2ndOrder[8] = Numbers(9);
+            thisCurve->tri2ndOrder[9] = Numbers(10);
+            thisCurve->tri2ndOrder[10] = Numbers(11);
+            thisCurve->tri2ndOrder[11] = Numbers(12);
+            thisCurve->tri2ndOrder[12] = Numbers(13);
+            thisCurve->tri2ndOrder[13] = Numbers(14);
+            thisCurve->tri2ndOrder[14] = Numbers(15);
+            thisCurve->tri2ndOrder[15] = Numbers(16);
+            thisCurve->tri2ndOrder[16] = Numbers(17);
+            thisCurve->tri2ndOrder[17] = Numbers(18);
+            thisCurve->tri2ndOrder[18] = Numbers(19);
+            thisCurve->tri2ndOrder[19] = Numbers(20);
+            thisCurve->tri2ndOrder[20] = Numbers(21);
+            thisCurve->tri2ndOrder[21] = Numbers(22);
+            thisCurve->tri2ndOrder[22] = Numbers(23);
+            thisCurve->tri2ndOrder[23] = Numbers(24);
+            thisCurve->tri2ndOrder[24] = Numbers(25);
+            thisCurve->tri2ndOrder[25] = Numbers(26);
+            thisCurve->tri2ndOrder[26] = Numbers(27);
+            thisCurve->inputLimits[0].min = Numbers(28);
+            thisCurve->inputLimits[0].max = Numbers(29);
+            thisCurve->inputLimits[1].min = Numbers(30);
+            thisCurve->inputLimits[1].max = Numbers(31);
+            thisCurve->inputLimits[2].min = Numbers(32);
+            thisCurve->inputLimits[2].max = Numbers(33);
             if (NumNumbers > 33 && !state.dataIPShortCut->lNumericFieldBlanks(34)) {
-                thisCurve.outputLimits.min = Numbers(34);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(34);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 34 && !state.dataIPShortCut->lNumericFieldBlanks(35)) {
-                thisCurve.outputLimits.max = Numbers(35);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(35);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(28) > Numbers(29)) { // error
@@ -1451,31 +1475,31 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::QuadLinear;
-            thisCurve.numDims = 4;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::QuadLinear;
+            thisCurve->numDims = 4;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 5; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(6);
-            thisCurve.inputLimits[0].max = Numbers(7);
-            thisCurve.inputLimits[1].min = Numbers(8);
-            thisCurve.inputLimits[1].max = Numbers(9);
-            thisCurve.inputLimits[2].min = Numbers(10);
-            thisCurve.inputLimits[2].max = Numbers(11);
-            thisCurve.inputLimits[3].min = Numbers(12);
-            thisCurve.inputLimits[3].max = Numbers(13);
+            thisCurve->inputLimits[0].min = Numbers(6);
+            thisCurve->inputLimits[0].max = Numbers(7);
+            thisCurve->inputLimits[1].min = Numbers(8);
+            thisCurve->inputLimits[1].max = Numbers(9);
+            thisCurve->inputLimits[2].min = Numbers(10);
+            thisCurve->inputLimits[2].max = Numbers(11);
+            thisCurve->inputLimits[3].min = Numbers(12);
+            thisCurve->inputLimits[3].max = Numbers(13);
 
             if (NumNumbers > 13 && !state.dataIPShortCut->lNumericFieldBlanks(14)) {
-                thisCurve.outputLimits.min = Numbers(14);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(14);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 14 && !state.dataIPShortCut->lNumericFieldBlanks(15)) {
-                thisCurve.outputLimits.max = Numbers(15);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(15);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             constexpr int NumVar = 4;
@@ -1530,32 +1554,32 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::QuintLinear;
-            thisCurve.numDims = 5;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::QuintLinear;
+            thisCurve->numDims = 5;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 6; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(7);
-            thisCurve.inputLimits[0].max = Numbers(8);
-            thisCurve.inputLimits[1].min = Numbers(9);
-            thisCurve.inputLimits[1].max = Numbers(10);
-            thisCurve.inputLimits[2].min = Numbers(11);
-            thisCurve.inputLimits[2].max = Numbers(12);
-            thisCurve.inputLimits[3].min = Numbers(13);
-            thisCurve.inputLimits[3].max = Numbers(14);
-            thisCurve.inputLimits[4].min = Numbers(15);
-            thisCurve.inputLimits[4].max = Numbers(16);
+            thisCurve->inputLimits[0].min = Numbers(7);
+            thisCurve->inputLimits[0].max = Numbers(8);
+            thisCurve->inputLimits[1].min = Numbers(9);
+            thisCurve->inputLimits[1].max = Numbers(10);
+            thisCurve->inputLimits[2].min = Numbers(11);
+            thisCurve->inputLimits[2].max = Numbers(12);
+            thisCurve->inputLimits[3].min = Numbers(13);
+            thisCurve->inputLimits[3].max = Numbers(14);
+            thisCurve->inputLimits[4].min = Numbers(15);
+            thisCurve->inputLimits[4].max = Numbers(16);
             if (NumNumbers > 16 && !state.dataIPShortCut->lNumericFieldBlanks(17)) {
-                thisCurve.outputLimits.min = Numbers(17);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(17);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 17 && !state.dataIPShortCut->lNumericFieldBlanks(18)) {
-                thisCurve.outputLimits.max = Numbers(18);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(18);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             constexpr int NumVar = 5;
@@ -1610,24 +1634,24 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::Exponent;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::Exponent;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(4);
-            thisCurve.inputLimits[0].max = Numbers(5);
+            thisCurve->inputLimits[0].min = Numbers(4);
+            thisCurve->inputLimits[0].max = Numbers(5);
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                thisCurve.outputLimits.min = Numbers(6);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(6);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
-                thisCurve.outputLimits.max = Numbers(7);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(7);
+                thisCurve->outputLimits.maxPresent = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
@@ -1663,27 +1687,27 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::FanPressureRise;
-            thisCurve.numDims = 2;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::FanPressureRise;
+            thisCurve->numDims = 2;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 4; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(5);
-            thisCurve.inputLimits[0].max = Numbers(6);
-            thisCurve.inputLimits[1].min = Numbers(7);
-            thisCurve.inputLimits[1].max = Numbers(8);
+            thisCurve->inputLimits[0].min = Numbers(5);
+            thisCurve->inputLimits[0].max = Numbers(6);
+            thisCurve->inputLimits[1].min = Numbers(7);
+            thisCurve->inputLimits[1].max = Numbers(8);
 
             if (NumNumbers > 8 && !state.dataIPShortCut->lNumericFieldBlanks(9)) {
-                thisCurve.outputLimits.min = Numbers(9);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(9);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 9 && !state.dataIPShortCut->lNumericFieldBlanks(10)) {
-                thisCurve.outputLimits.max = Numbers(10);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(10);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(5) > Numbers(6)) { // error
@@ -1731,25 +1755,25 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::ExponentialSkewNormal;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::ExponentialSkewNormal;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 4; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(5);
-            thisCurve.inputLimits[0].max = Numbers(6);
+            thisCurve->inputLimits[0].min = Numbers(5);
+            thisCurve->inputLimits[0].max = Numbers(6);
 
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
-                thisCurve.outputLimits.min = Numbers(7);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(7);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
-                thisCurve.outputLimits.max = Numbers(8);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(8);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(5) > Numbers(6)) { // error
@@ -1797,25 +1821,25 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::Sigmoid;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::Sigmoid;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 5; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(6);
-            thisCurve.inputLimits[0].max = Numbers(7);
+            thisCurve->inputLimits[0].min = Numbers(6);
+            thisCurve->inputLimits[0].max = Numbers(7);
 
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
-                thisCurve.outputLimits.min = Numbers(8);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(8);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 8 && !state.dataIPShortCut->lNumericFieldBlanks(9)) {
-                thisCurve.outputLimits.max = Numbers(9);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(9);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(6) > Numbers(7)) { // error
@@ -1863,25 +1887,25 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::RectangularHyperbola1;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::RectangularHyperbola1;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(4);
-            thisCurve.inputLimits[0].max = Numbers(5);
+            thisCurve->inputLimits[0].min = Numbers(4);
+            thisCurve->inputLimits[0].max = Numbers(5);
 
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                thisCurve.outputLimits.min = Numbers(6);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(6);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
-                thisCurve.outputLimits.max = Numbers(7);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(7);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(4) > Numbers(5)) { // error
@@ -1929,25 +1953,25 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::RectangularHyperbola2;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::RectangularHyperbola2;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(4);
-            thisCurve.inputLimits[0].max = Numbers(5);
+            thisCurve->inputLimits[0].min = Numbers(4);
+            thisCurve->inputLimits[0].max = Numbers(5);
 
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                thisCurve.outputLimits.min = Numbers(6);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(6);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
-                thisCurve.outputLimits.max = Numbers(7);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(7);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(4) > Numbers(5)) { // error
@@ -1995,25 +2019,25 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::ExponentialDecay;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::ExponentialDecay;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 3; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(4);
-            thisCurve.inputLimits[0].max = Numbers(5);
+            thisCurve->inputLimits[0].min = Numbers(4);
+            thisCurve->inputLimits[0].max = Numbers(5);
 
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                thisCurve.outputLimits.min = Numbers(6);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(6);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
-                thisCurve.outputLimits.max = Numbers(7);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(7);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (Numbers(4) > Numbers(5)) { // error
@@ -2061,25 +2085,25 @@ namespace Curve {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             ++CurveNum;
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-            thisCurve.Name = Alphas(1);
-            thisCurve.curveType = CurveType::DoubleExponentialDecay;
-            thisCurve.numDims = 1;
-            thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+            thisCurve->Name = Alphas(1);
+            thisCurve->curveType = CurveType::DoubleExponentialDecay;
+            thisCurve->numDims = 1;
+            thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
             for (int in = 0; in < 5; ++in) {
-                thisCurve.coeff[in] = Numbers(in + 1);
+                thisCurve->coeff[in] = Numbers(in + 1);
             }
-            thisCurve.inputLimits[0].min = Numbers(6);
-            thisCurve.inputLimits[0].max = Numbers(7);
+            thisCurve->inputLimits[0].min = Numbers(6);
+            thisCurve->inputLimits[0].max = Numbers(7);
 
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
-                thisCurve.outputLimits.min = Numbers(8);
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = Numbers(8);
+                thisCurve->outputLimits.minPresent = true;
             }
             if (NumNumbers > 8 && !state.dataIPShortCut->lNumericFieldBlanks(9)) {
-                thisCurve.outputLimits.max = Numbers(9);
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = Numbers(9);
+                thisCurve->outputLimits.maxPresent = true;
             }
 
             if (NumAlphas >= 2) {
@@ -2188,26 +2212,26 @@ namespace Curve {
                         ErrorsFound = true;
                     }
 
-                    auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+                    Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-                    thisCurve.Name = Alphas(1);
-                    thisCurve.numDims = 1;
+                    thisCurve->Name = Alphas(1);
+                    thisCurve->numDims = 1;
 
-                    thisCurve.interpolationType = InterpType::BtwxtMethod;
+                    thisCurve->interpolationType = InterpType::BtwxtMethod;
 
                     std::string contextString = format("{} \"{}\"", CurrentModuleObject, Alphas(1));
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                    Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
+                    Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
 
-                    thisCurve.inputLimits[0].min = 0.0;
-                    thisCurve.inputLimits[0].minPresent = true;
-                    thisCurve.inputLimits[0].max = 360.0;
-                    thisCurve.inputLimits[0].maxPresent = true;
+                    thisCurve->inputLimits[0].min = 0.0;
+                    thisCurve->inputLimits[0].minPresent = true;
+                    thisCurve->inputLimits[0].max = 360.0;
+                    thisCurve->inputLimits[0].maxPresent = true;
 
-                    thisCurve.outputLimits.min = -1.0;
-                    thisCurve.outputLimits.minPresent = true;
-                    thisCurve.outputLimits.max = 1.0;
-                    thisCurve.outputLimits.maxPresent = true;
+                    thisCurve->outputLimits.min = -1.0;
+                    thisCurve->outputLimits.minPresent = true;
+                    thisCurve->outputLimits.max = 1.0;
+                    thisCurve->outputLimits.maxPresent = true;
 
                     MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
@@ -2234,8 +2258,8 @@ namespace Curve {
                         gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
                         auto gridIndex = state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
-                        thisCurve.TableIndex = gridIndex;
-                        thisCurve.GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
+                        thisCurve->TableIndex = gridIndex;
+                        thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
                     }
                 }
             }
@@ -2275,7 +2299,7 @@ namespace Curve {
                     std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                    Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
+                    Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
 
                     // Find independent variable input data
                     if (state.dataCurveManager->btwxtManager.independentVarRefs.count(indVarName)) {
@@ -2408,16 +2432,16 @@ namespace Curve {
                 auto const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:Lookup", thisObjectName);
                 ++CurveNum;
-                auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
+                Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-                thisCurve.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                thisCurve.interpolationType = InterpType::BtwxtMethod;
+                thisCurve->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisCurve->interpolationType = InterpType::BtwxtMethod;
 
                 std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
 
-                std::string contextString = format("Table:Lookup \"{}\"", thisCurve.Name);
+                std::string contextString = format("Table:Lookup \"{}\"", thisCurve->Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
+                Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
 
                 // TODO: Actually use this to define output variable units
                 if (fields.count("output_unit_type")) {
@@ -2428,48 +2452,48 @@ namespace Curve {
                 }
 
                 int gridIndex = state.dataCurveManager->btwxtManager.getGridIndex(state, indVarListName, ErrorsFound);
-                thisCurve.TableIndex = gridIndex;
+                thisCurve->TableIndex = gridIndex;
                 int numDims = state.dataCurveManager->btwxtManager.getNumGridDims(gridIndex);
-                thisCurve.numDims = numDims;
+                thisCurve->numDims = numDims;
 
                 for (int i = 1; i <= std::min(6, numDims); ++i) {
                     double vMin, vMax;
                     std::tie(vMin, vMax) = varListLimits.at(indVarListName)[i - 1];
                     if (i == 1) {
-                        thisCurve.inputLimits[0].min = vMin;
-                        thisCurve.inputLimits[0].max = vMax;
+                        thisCurve->inputLimits[0].min = vMin;
+                        thisCurve->inputLimits[0].max = vMax;
                     } else if (i == 2) {
-                        thisCurve.inputLimits[1].min = vMin;
-                        thisCurve.inputLimits[1].max = vMax;
+                        thisCurve->inputLimits[1].min = vMin;
+                        thisCurve->inputLimits[1].max = vMax;
                     } else if (i == 3) {
-                        thisCurve.inputLimits[2].min = vMin;
-                        thisCurve.inputLimits[2].max = vMax;
+                        thisCurve->inputLimits[2].min = vMin;
+                        thisCurve->inputLimits[2].max = vMax;
                     } else if (i == 4) {
-                        thisCurve.inputLimits[3].min = vMin;
-                        thisCurve.inputLimits[3].max = vMax;
+                        thisCurve->inputLimits[3].min = vMin;
+                        thisCurve->inputLimits[3].max = vMax;
                     } else if (i == 5) {
-                        thisCurve.inputLimits[4].min = vMin;
-                        thisCurve.inputLimits[4].max = vMax;
+                        thisCurve->inputLimits[4].min = vMin;
+                        thisCurve->inputLimits[4].max = vMax;
                     } else if (i == 6) {
-                        thisCurve.inputLimits[5].min = vMin;
-                        thisCurve.inputLimits[5].max = vMax;
+                        thisCurve->inputLimits[5].min = vMin;
+                        thisCurve->inputLimits[5].max = vMax;
                     }
                 }
 
                 if (fields.count("minimum_output")) {
-                    thisCurve.outputLimits.min = fields.at("minimum_output").get<Real64>();
-                    thisCurve.outputLimits.minPresent = true;
+                    thisCurve->outputLimits.min = fields.at("minimum_output").get<Real64>();
+                    thisCurve->outputLimits.minPresent = true;
                 } else {
-                    thisCurve.outputLimits.min = -DBL_MAX;
-                    thisCurve.outputLimits.minPresent = false;
+                    thisCurve->outputLimits.min = -DBL_MAX;
+                    thisCurve->outputLimits.minPresent = false;
                 }
 
                 if (fields.count("maximum_output")) {
-                    thisCurve.outputLimits.max = fields.at("maximum_output").get<Real64>();
-                    thisCurve.outputLimits.maxPresent = true;
+                    thisCurve->outputLimits.max = fields.at("maximum_output").get<Real64>();
+                    thisCurve->outputLimits.maxPresent = true;
                 } else {
-                    thisCurve.outputLimits.max = DBL_MAX;
-                    thisCurve.outputLimits.maxPresent = false;
+                    thisCurve->outputLimits.max = DBL_MAX;
+                    thisCurve->outputLimits.maxPresent = false;
                 }
 
                 // Normalize data
@@ -2534,7 +2558,7 @@ namespace Curve {
                     ErrorsFound = true;
                 }
 
-                thisCurve.GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
+                thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
 
                 if (normalizeMethod == NM_AUTO_WITH_DIVISOR) {
                     auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
@@ -2562,17 +2586,17 @@ namespace Curve {
                         // this normalization. The result is multiplied by the input normalizationDivisor again for the AutomaticWithDivisor case, in
                         // which normalizeGridValues returns a compound scalar.
                         normalizationDivisor = state.dataCurveManager->btwxtManager.normalizeGridValues(
-                                                   gridIndex, thisCurve.GridValueIndex, normalizeTarget, normalizationDivisor) *
+                                                   gridIndex, thisCurve->GridValueIndex, normalizeTarget, normalizationDivisor) *
                                                normalizationDivisor;
                     }
                 }
 
                 if ((normalizeMethod == NM_DIVISOR_ONLY) || (normalizeMethod == NM_AUTO_WITH_DIVISOR)) {
-                    if (thisCurve.outputLimits.maxPresent) {
-                        thisCurve.outputLimits.max = thisCurve.outputLimits.max / normalizationDivisor;
+                    if (thisCurve->outputLimits.maxPresent) {
+                        thisCurve->outputLimits.max = thisCurve->outputLimits.max / normalizationDivisor;
                     }
-                    if (thisCurve.outputLimits.minPresent) {
-                        thisCurve.outputLimits.min = thisCurve.outputLimits.min / normalizationDivisor;
+                    if (thisCurve->outputLimits.minPresent) {
+                        thisCurve->outputLimits.min = thisCurve->outputLimits.min / normalizationDivisor;
                     }
                 }
             }
@@ -2714,24 +2738,24 @@ namespace Curve {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         for (auto &thisCurve : state.dataCurveManager->PerfCurve) {
-            for (int dim = 1; dim <= thisCurve.numDims; ++dim) {
+            for (int dim = 1; dim <= thisCurve->numDims; ++dim) {
                 std::string numStr = fmt::to_string(dim);
                 SetupOutputVariable(state,
                                     format("Performance Curve Input Variable {} Value", numStr),
                                     OutputProcessor::Unit::None,
-                                    thisCurve.inputs[dim - 1],
+                                    thisCurve->inputs[dim - 1],
                                     OutputProcessor::SOVTimeStepType::HVAC,
                                     OutputProcessor::SOVStoreType::Average,
-                                    thisCurve.Name);
+                                    thisCurve->Name);
             }
             // set the output up last so it shows up after the input in the csv file
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
-                                thisCurve.output,
+                                thisCurve->output,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
-                                thisCurve.Name);
+                                thisCurve->Name);
         }
 
         for (auto &thisPressCurve : state.dataBranchAirLoopPlant->PressureCurve) {
@@ -2768,7 +2792,7 @@ namespace Curve {
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (auto &thisCurve : state.dataCurveManager->PerfCurve) {
                 SetupEMSActuator(
-                    state, "Curve", thisCurve.Name, "Curve Result", "[unknown]", thisCurve.EMSOverrideOn, thisCurve.EMSOverrideCurveValue);
+                    state, "Curve", thisCurve->Name, "Curve Result", "[unknown]", thisCurve->EMSOverrideOn, thisCurve->EMSOverrideCurveValue);
             } // All performance curves
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
@@ -2784,13 +2808,13 @@ namespace Curve {
         }
     }
 
-    Real64 PerformanceCurveData::BtwxtTableInterpolation(EnergyPlusData &state,
-                                                         Real64 const Var1,           // 1st independent variable
-                                                         Optional<Real64 const> Var2, // 2nd independent variable
-                                                         Optional<Real64 const> Var3, // 3rd independent variable
-                                                         Optional<Real64 const> Var4, // 4th independent variable
-                                                         Optional<Real64 const> Var5, // 5th independent variable
-                                                         Optional<Real64 const> Var6  // 6th independent variable
+    Real64 Curve::BtwxtTableInterpolation(EnergyPlusData &state,
+                                          Real64 const Var1,           // 1st independent variable
+                                          Optional<Real64 const> Var2, // 2nd independent variable
+                                          Optional<Real64 const> Var3, // 3rd independent variable
+                                          Optional<Real64 const> Var4, // 4th independent variable
+                                          Optional<Real64 const> Var5, // 5th independent variable
+                                          Optional<Real64 const> Var6  // 6th independent variable
     )
     {
         // TODO: Generalize for N-dims
@@ -2825,7 +2849,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
+        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2907,8 +2931,8 @@ namespace Curve {
                         std::string_view curveFieldText)
     {
         // Returns true if errors found
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        int curveDim = thisCurve.numDims;
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        int curveDim = thisCurve->numDims;
         if (std::find(validDims.begin(), validDims.end(), curveDim) != validDims.end()) {
             // Compatible
             return false;
@@ -2922,7 +2946,7 @@ namespace Curve {
             }
             std::string plural1 = curveDim > 1 ? "s" : "";
             std::string plural2 = validDims[validDims.size() - 1] > 1 ? "s" : "";
-            ShowContinueError(state, format("...Input curve=\"{}\" has {} dimension{}.", thisCurve.Name, curveDim, plural1));
+            ShowContinueError(state, format("...Input curve=\"{}\" has {} dimension{}.", thisCurve->Name, curveDim, plural1));
             ShowContinueError(state, format("...Curve type must have {} dimension{}.", validString, plural2));
             return true;
         }
@@ -2941,7 +2965,7 @@ namespace Curve {
         // Given a curve index, returns the curve name
 
         if (CurveIndex > 0) {
-            return state.dataCurveManager->PerfCurve(CurveIndex).Name;
+            return state.dataCurveManager->PerfCurve(CurveIndex)->Name;
         } else {
             return "";
         }
@@ -2970,7 +2994,10 @@ namespace Curve {
         }
 
         if (state.dataCurveManager->NumCurves > 0) {
-            return UtilityRoutines::FindItemInList(CurveName, state.dataCurveManager->PerfCurve);
+            for (int Count = 1; Count <= (int)state.dataCurveManager->PerfCurve.size(); ++Count) {
+                if (CurveName == state.dataCurveManager->PerfCurve(Count)->Name) return Count;
+            }
+            return 0; // Not found
         } else {
             return 0;
         }
@@ -3030,19 +3057,19 @@ namespace Curve {
         // Given the curve index, returns the minimum and maximum values specified in the input
         // for the independent variables of the performance curve.
 
-        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Var1Min = thisCurve.inputLimits[0].min;
-        Var1Max = thisCurve.inputLimits[0].max;
-        if (present(Var2Min)) Var2Min = thisCurve.inputLimits[1].min;
-        if (present(Var2Max)) Var2Max = thisCurve.inputLimits[1].max;
-        if (present(Var3Min)) Var3Min = thisCurve.inputLimits[2].min;
-        if (present(Var3Max)) Var3Max = thisCurve.inputLimits[2].max;
-        if (present(Var4Min)) Var4Min = thisCurve.inputLimits[3].min;
-        if (present(Var4Max)) Var4Max = thisCurve.inputLimits[3].max;
-        if (present(Var5Min)) Var5Min = thisCurve.inputLimits[4].min;
-        if (present(Var5Max)) Var5Max = thisCurve.inputLimits[4].max;
-        if (present(Var6Min)) Var6Min = thisCurve.inputLimits[5].min;
-        if (present(Var6Max)) Var6Max = thisCurve.inputLimits[5].max;
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Var1Min = thisCurve->inputLimits[0].min;
+        Var1Max = thisCurve->inputLimits[0].max;
+        if (present(Var2Min)) Var2Min = thisCurve->inputLimits[1].min;
+        if (present(Var2Max)) Var2Max = thisCurve->inputLimits[1].max;
+        if (present(Var3Min)) Var3Min = thisCurve->inputLimits[2].min;
+        if (present(Var3Max)) Var3Max = thisCurve->inputLimits[2].max;
+        if (present(Var4Min)) Var4Min = thisCurve->inputLimits[3].min;
+        if (present(Var4Max)) Var4Max = thisCurve->inputLimits[3].max;
+        if (present(Var5Min)) Var5Min = thisCurve->inputLimits[4].min;
+        if (present(Var5Max)) Var5Max = thisCurve->inputLimits[4].max;
+        if (present(Var6Min)) Var6Min = thisCurve->inputLimits[5].min;
+        if (present(Var6Max)) Var6Max = thisCurve->inputLimits[5].max;
     }
 
     void SetCurveOutputMinMaxValues(EnergyPlusData &state,
@@ -3064,14 +3091,14 @@ namespace Curve {
         // Certain curve types have set limits (e.g., PLF curve should not be greater than 1 or less than 0.7).
 
         if (CurveIndex > 0 && CurveIndex <= state.dataCurveManager->NumCurves) {
-            auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
             if (present(CurveMin)) {
-                thisCurve.outputLimits.min = CurveMin;
-                thisCurve.outputLimits.minPresent = true;
+                thisCurve->outputLimits.min = CurveMin;
+                thisCurve->outputLimits.minPresent = true;
             }
             if (present(CurveMax)) {
-                thisCurve.outputLimits.max = CurveMax;
-                thisCurve.outputLimits.maxPresent = true;
+                thisCurve->outputLimits.max = CurveMax;
+                thisCurve->outputLimits.maxPresent = true;
             }
         } else {
             ShowSevereError(
@@ -3182,14 +3209,14 @@ namespace Curve {
         // See if it is valid
         if (TempCurveIndex > 0) {
             // We have to check the type of curve to make sure it is single independent variable type
-            CurveType GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex).curveType;
+            CurveType GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex)->curveType;
             {
-                if (state.dataCurveManager->PerfCurve(TempCurveIndex).numDims == 1) {
+                if (state.dataCurveManager->PerfCurve(TempCurveIndex)->numDims == 1) {
                     PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {
                     ShowSevereError(state, "Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
-                    ShowContinueError(state, format("Curve type detected: {}", Curve::objectNames[static_cast<int>(GenericCurveType)]));
+                    ShowContinueError(state, format("Curve type detected: {}", objectNames[static_cast<int>(GenericCurveType)]));
                     ShowContinueError(state, "Generic curves should be single independent variable such that DeltaP = f(mdot)");
                     ShowContinueError(state, " Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
                     ShowFatalError(state, "Errors in pressure simulation input cause program termination");

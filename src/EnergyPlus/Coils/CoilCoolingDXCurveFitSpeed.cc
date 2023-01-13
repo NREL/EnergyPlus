@@ -478,7 +478,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
         Real64 TotCapTempModFac = 1.0;
         if (indexCapFT > 0) {
-            if (state.dataCurveManager->PerfCurve(indexCapFT).numDims == 2) {
+            if (state.dataCurveManager->PerfCurve(indexCapFT)->numDims == 2) {
                 TotCapTempModFac = Curve::CurveValue(state, indexCapFT, inletWetBulb, condInletTemp);
             } else {
                 TotCapTempModFac = Curve::CurveValue(state, indexCapFT, condInletTemp);
@@ -545,7 +545,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
     Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
     if (indexEIRFT > 0) {
-        if (state.dataCurveManager->PerfCurve(indexEIRFT).numDims == 2) {
+        if (state.dataCurveManager->PerfCurve(indexEIRFT)->numDims == 2) {
             EIRTempModFac = Curve::CurveValue(state, indexEIRFT, inletWetBulb, condInletTemp);
         } else {
             EIRTempModFac = Curve::CurveValue(state, indexEIRFT, condInletTemp);

@@ -189,7 +189,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 CoilInWetBulb =
                                 Psychrometrics::PsyTwbFnTdbWPb(state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
                             if (this->dataTotCapCurveIndex > 0) {
-                                switch (state.dataCurveManager->PerfCurve(this->dataTotCapCurveIndex).numDims) {
+                                switch (state.dataCurveManager->PerfCurve(this->dataTotCapCurveIndex)->numDims) {
                                 case 1:
                                     TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb);
                                     break;
@@ -439,7 +439,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             }
                         }
                         if (this->dataTotCapCurveIndex > 0) {
-                            switch (state.dataCurveManager->PerfCurve(this->dataTotCapCurveIndex).numDims) {
+                            switch (state.dataCurveManager->PerfCurve(this->dataTotCapCurveIndex)->numDims) {
                             case 1:
                                 TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb);
                                 break;

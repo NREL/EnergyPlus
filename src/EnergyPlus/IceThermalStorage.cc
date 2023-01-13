@@ -891,7 +891,7 @@ namespace IceThermalStorage {
             }
 
             int dischargeCurveDim =
-                state.dataCurveManager->PerfCurve(state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum).numDims;
+                state.dataCurveManager->PerfCurve(state.dataIceThermalStorage->DetailedIceStorage(iceNum).DischargeCurveNum)->numDims;
             if (dischargeCurveDim != 2) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ": Discharge curve must have 2 independent variables");
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -935,7 +935,7 @@ namespace IceThermalStorage {
                 ErrorsFound = true;
             }
 
-            int chargeCurveDim = state.dataCurveManager->PerfCurve(state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum).numDims;
+            int chargeCurveDim = state.dataCurveManager->PerfCurve(state.dataIceThermalStorage->DetailedIceStorage(iceNum).ChargeCurveNum)->numDims;
             if (chargeCurveDim != 2) {
                 ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ": Charge curve must have 2 independent variables");
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));

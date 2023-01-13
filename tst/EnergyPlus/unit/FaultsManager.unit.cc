@@ -92,7 +92,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Allocate
     state->dataCurveManager->NumCurves = 1;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
+        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
     state->dataFans->NumFans = 2;
     state->dataFans->Fan.allocate(state->dataFans->NumFans);
@@ -100,16 +101,16 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs: fan curve
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1151.1;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 13.509;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.9105;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.0129;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 7.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 21.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::Cubic;
+    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1151.1;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 13.509;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = -0.9105;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = -0.0129;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 7.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 21.0;
 
     // Inputs:
     FanNum = 1;
@@ -343,23 +344,24 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
 
     // Allocate
     state->dataCurveManager->NumCurves = 1;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
+        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
     state->dataFans->NumFans = 1;
     state->dataFans->Fan.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 1151.1;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 13.509;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.9105;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.0129;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 7.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 21.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::Cubic;
+    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1151.1;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 13.509;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = -0.9105;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = -0.0129;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 7.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 21.0;
 
     // Inputs: fans
     FanNum = 1;

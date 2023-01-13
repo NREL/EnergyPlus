@@ -81,11 +81,11 @@ TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ(1.0, state->dataCurveManager->PerfCurve(1).outputLimits.max);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
+    EXPECT_EQ(1.0, state->dataCurveManager->PerfCurve(1)->outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.maxPresent);
 
-    EXPECT_EQ(0.1, state->dataCurveManager->PerfCurve(1).outputLimits.min);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
+    EXPECT_EQ(0.1, state->dataCurveManager->PerfCurve(1)->outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
 }
 
 TEST_F(EnergyPlusFixture, QuadraticCurve)
@@ -116,11 +116,11 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1).outputLimits.max);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
+    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1)->outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.maxPresent);
 
-    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).outputLimits.min);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
+    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1)->outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
 
     double var1 = 1, var2 = 0.1, var3 = 20, var4 = 10;
     double expected_value = -3.3333 + (0.1 * 1) + (38.9 * 0.1) + (0.1 * 20) + (0.5 * 10);
@@ -158,11 +158,11 @@ TEST_F(EnergyPlusFixture, QuintLinearCurve)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1).outputLimits.max);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
+    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1)->outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.maxPresent);
 
-    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).outputLimits.min);
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
+    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1)->outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
 
     double var1 = 1, var2 = 0.1, var3 = 0.5, var4 = 10, var5 = 15;
     double expected_value = -3.3333 + (0.1 * 1) + (38.9 * 0.1) + (0.1 * 0.5) + (0.5 * 10) + (1.5 * 15);
@@ -265,14 +265,14 @@ TEST_F(EnergyPlusFixture, TableLookup)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(3, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(compare_enums(Curve::InterpType::BtwxtMethod, state->dataCurveManager->PerfCurve(1).interpolationType));
-    EXPECT_EQ("CAPMODFUNCOFWATERFLOW", state->dataCurveManager->PerfCurve(1).Name);
+    EXPECT_TRUE(compare_enums(Curve::InterpType::BtwxtMethod, state->dataCurveManager->PerfCurve(1)->interpolationType));
+    EXPECT_EQ("CAPMODFUNCOFWATERFLOW", state->dataCurveManager->PerfCurve(1)->Name);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
-    EXPECT_EQ(0.0, state->dataCurveManager->PerfCurve(1).outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
+    EXPECT_EQ(0.0, state->dataCurveManager->PerfCurve(1)->outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
-    EXPECT_EQ(1.04, state->dataCurveManager->PerfCurve(1).outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.maxPresent);
+    EXPECT_EQ(1.04, state->dataCurveManager->PerfCurve(1)->outputLimits.max);
 }
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
@@ -364,11 +364,11 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
-    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
+    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1)->outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
-    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.maxPresent);
+    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1)->outputLimits.max);
 
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second, Curve::CurveValue(*state, 1, data_point.first, data_point.second));
@@ -465,11 +465,11 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
-    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
+    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1)->outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
-    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.maxPresent);
+    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1)->outputLimits.max);
 
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_divisor, Curve::CurveValue(*state, 1, data_point.first, data_point.second));
@@ -567,11 +567,11 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
-    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
+    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1)->outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
-    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.maxPresent);
+    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1)->outputLimits.max);
 
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_auto_divisor,
@@ -671,11 +671,11 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.minPresent);
-    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1).outputLimits.min);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.minPresent);
+    EXPECT_EQ(expected_curve_min, state->dataCurveManager->PerfCurve(1)->outputLimits.min);
 
-    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).outputLimits.maxPresent);
-    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1).outputLimits.max);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1)->outputLimits.maxPresent);
+    EXPECT_EQ(expected_curve_max, state->dataCurveManager->PerfCurve(1)->outputLimits.max);
 
     for (auto data_point : table_data) {
         EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_auto_divisor / normalization_divisor,

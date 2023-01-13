@@ -436,19 +436,20 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     EvapCond(EvapCoolNum).FanPowerModifierCurveIndex = CurveNum;
 
     state->dataCurveManager->NumCurves = 1;
-    state->dataCurveManager->PerfCurve.allocate(1);
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 0;
+    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
+        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = 0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 0;
 
     // make the call for dry full load operating condition
     EvapCond(EvapCoolNum).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(*state, EvapCoolNum, DryWetMode, FlowRatio);
@@ -733,13 +734,14 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
 
     int constexpr CurveNum = 1;
     state->dataCurveManager->NumCurves = 1;
-    state->dataCurveManager->PerfCurve.allocate(1);
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 1.0;
+    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
+        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 1.0;
 
     // set up the flow rates for a direct RDDSpecial
     thisEvapCooler.evapCoolerType = EvapCoolerType::DirectResearchSpecial;
