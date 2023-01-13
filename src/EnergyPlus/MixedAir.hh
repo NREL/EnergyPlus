@@ -57,6 +57,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -107,14 +108,6 @@ namespace MixedAir {
         Num,
     };
 
-    enum class ControllerKind
-    {
-        Invalid = -1,
-        WaterCoil,  // Controller:WaterCoil
-        OutdoorAir, // Controller:OutdoorAir
-        Num
-    };
-
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.
     enum class CMO
@@ -152,7 +145,7 @@ namespace MixedAir {
         // Members
         std::string Name;
         int NumControllers = 0; // number of controllers on list
-        EPVector<ControllerKind> ControllerType;
+        EPVector<DataAirLoop::ControllerKind> ControllerType;
         Array1D_string ControllerName;
     };
 

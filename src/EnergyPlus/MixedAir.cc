@@ -58,7 +58,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -96,7 +95,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
-#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
 #include <EnergyPlus/UnitarySystem.hh>
@@ -1007,12 +1005,15 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 OASys.NumControllers = NumInList;
                 OASys.ControllerName.allocate(NumInList);
                 OASys.ControllerType.allocate(NumInList);
+                OASys.controllerTypeEnum.dimension(NumInList, DataAirLoop::ControllerKind::Invalid);
                 OASys.ControllerIndex.dimension(NumInList, 0);
                 for (int InListNum = 1; InListNum <= NumInList; ++InListNum) {
                     OASys.ControllerName(InListNum) = AlphArray(InListNum * 2 + 1);
                     OASys.ControllerType(InListNum) = AlphArray(InListNum * 2);
+                    OASys.controllerTypeEnum(InListNum) = static_cast<DataAirLoop::ControllerKind>(
+                        getEnumerationValue(ControllerKindNamesUC, OASys.ControllerType(InListNum)));
                     // only count Controller:OutdoorAir types as valid simple controllers
-                    if (!UtilityRoutines::SameString(OASys.ControllerType(InListNum), CurrentModuleObjects[static_cast<int>(CMO::OAController)])) {
+                    if (OASys.controllerTypeEnum(InListNum) != DataAirLoop::ControllerKind::OutdoorAir) {
                         ++NumSimpControllers;
                     }
                 }
@@ -1042,7 +1043,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         auto &OASys = state.dataAirLoop->OutsideAirSys(OASysNum);
         for (int CompNum = 1; CompNum <= OASys.NumComponents; ++CompNum) {
             OASys.ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(
-                getEnumerationValue(CompTypeNamesUC, UtilityRoutines::MakeUPPERCase(OASys.ComponentType(CompNum))));
+                getEnumerationValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
             if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
                 // construct fan object
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, OASys.ComponentName(CompNum)));
@@ -1054,7 +1055,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 UnitarySystems::UnitarySys thisSys;
                 OASys.compPointer[CompNum] = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, OASys.ComponentName(CompNum), false, 0);
             } else if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Invalid) {
-                std::string const thisComp = UtilityRoutines::MakeUPPERCase(OASys.ComponentType(CompNum));
+                std::string const thisComp = OASys.ComponentType(CompNum);
                 if (thisComp == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" || thisComp == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
                     OASys.ComponentTypeEnum(CompNum) = SimAirServingZones::CompType::HeatXchngr;
                 } else if (thisComp == "DEHUMIDIFIER:DESICCANT:SYSTEM") {
@@ -1075,8 +1076,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
 
         // loop through the controllers in the controller list for OA system and save the pointer to the OA controller index
         for (int OAControllerNum = 1; OAControllerNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumControllers; ++OAControllerNum) {
-            if (UtilityRoutines::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerType(OAControllerNum),
-                                            CurrentModuleObjects[static_cast<int>(CMO::OAController)])) {
+            if (state.dataAirLoop->OutsideAirSys(OASysNum).controllerTypeEnum(OAControllerNum) == DataAirLoop::ControllerKind::OutdoorAir) {
                 state.dataAirLoop->OutsideAirSys(OASysNum).OAControllerName =
                     state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName(OAControllerNum);
                 break;
