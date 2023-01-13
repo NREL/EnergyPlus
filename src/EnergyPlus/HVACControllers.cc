@@ -475,7 +475,6 @@ void GetControllerInput(EnergyPlusData &state)
     // Using/Aliasing
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
-    using MixedAir::CheckForControllerWaterCoil;
     using NodeInputManager::GetOnlySingleNode;
     using SetPointManager::CtrlVarType;
     using SetPointManager::NodeHasSPMCtrlVarType;
@@ -615,7 +614,7 @@ void GetControllerInput(EnergyPlusData &state)
             ControllerProps(Num).MaxVolFlowActuated = NumArray(2);
             ControllerProps(Num).MinVolFlowActuated = NumArray(3);
 
-            if (!CheckForControllerWaterCoil(state, CurrentModuleObject, AlphArray(1))) {
+            if (!MixedAir::CheckForControllerWaterCoil(state, DataAirLoop::ControllerKind::WaterCoil, AlphArray(1))) {
                 ShowSevereError(
                     state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\" not found on any AirLoopHVAC:ControllerList.");
                 ErrorsFound = true;

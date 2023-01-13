@@ -1010,8 +1010,8 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 for (int InListNum = 1; InListNum <= NumInList; ++InListNum) {
                     OASys.ControllerName(InListNum) = AlphArray(InListNum * 2 + 1);
                     OASys.ControllerType(InListNum) = AlphArray(InListNum * 2);
-                    OASys.controllerTypeEnum(InListNum) = static_cast<DataAirLoop::ControllerKind>(
-                        getEnumerationValue(ControllerKindNamesUC, OASys.ControllerType(InListNum)));
+                    OASys.controllerTypeEnum(InListNum) =
+                        static_cast<DataAirLoop::ControllerKind>(getEnumerationValue(ControllerKindNamesUC, OASys.ControllerType(InListNum)));
                     // only count Controller:OutdoorAir types as valid simple controllers
                     if (OASys.controllerTypeEnum(InListNum) != DataAirLoop::ControllerKind::OutdoorAir) {
                         ++NumSimpControllers;
@@ -1042,8 +1042,8 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
         auto &OASys = state.dataAirLoop->OutsideAirSys(OASysNum);
         for (int CompNum = 1; CompNum <= OASys.NumComponents; ++CompNum) {
-            OASys.ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(
-                getEnumerationValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
+            OASys.ComponentTypeEnum(CompNum) =
+                static_cast<SimAirServingZones::CompType>(getEnumerationValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
             if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
                 // construct fan object
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, OASys.ComponentName(CompNum)));
@@ -5322,8 +5322,8 @@ int GetOAMixerMixedNodeNumber(EnergyPlusData &state, int const OAMixerNumber) //
 }
 
 bool CheckForControllerWaterCoil(EnergyPlusData &state,
-                                 std::string const &ControllerType, // should be passed in as UPPERCASE
-                                 std::string const &ControllerName  // should be passed in as UPPERCASE
+                                 DataAirLoop::ControllerKind ControllerType, // should be passed in as UPPERCASE
+                                 std::string const &ControllerName           // should be passed in as UPPERCASE
 )
 {
 
@@ -5344,9 +5344,7 @@ bool CheckForControllerWaterCoil(EnergyPlusData &state,
     for (int Num = 1; Num <= state.dataMixedAir->NumControllerLists; ++Num) {
         for (int CompNum = 1; CompNum <= state.dataMixedAir->ControllerLists(Num).NumControllers; ++CompNum) {
 
-            if (state.dataMixedAir->ControllerLists(Num).ControllerType(CompNum) !=
-                static_cast<ControllerKind>(getEnumerationValue(ControllerKindNamesUC, UtilityRoutines::MakeUPPERCase(ControllerType))))
-                continue;
+            if (state.dataMixedAir->ControllerLists(Num).ControllerType(CompNum) != ControllerType) continue;
             if (!UtilityRoutines::SameString(state.dataMixedAir->ControllerLists(Num).ControllerName(CompNum), ControllerName)) continue;
             OnControllerList = true;
             break;

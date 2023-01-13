@@ -485,7 +485,7 @@ namespace MixedAir {
     int GetOAMixerMixedNodeNumber(EnergyPlusData &state, int const OAMixerNumber); // Which Mixer
 
     bool CheckForControllerWaterCoil(EnergyPlusData &state,
-                                     std::string const &ControllerType, // should be passed in as UPPERCASE
+                                     DataAirLoop::ControllerKind ControllerType, // should be passed in as UPPERCASE
                                      std::string const &ControllerName  // should be passed in as UPPERCASE
     );
 
