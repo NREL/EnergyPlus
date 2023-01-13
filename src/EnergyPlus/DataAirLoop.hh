@@ -213,10 +213,10 @@ namespace DataAirLoop {
         Array1D_string ControllerType;
         EPVector<ControllerKind> controllerTypeEnum; // Controller:OutdoorAir or Controller:WaterCoil
         Array1D_int ControllerIndex;                 // Which one in list -- updated by routines called from here
-        Array1D_int InletNodeNum;       // component inlet node number
-        Array1D_int OutletNodeNum;      // component outlet node number
-        bool HeatExchangerFlag = false; // True to have a heat exchanger in the equipment list
-        int AirLoopDOASNum = -1;        // AirLoopHVAC:DedicatedOutdoorAirSystem number
+        Array1D_int InletNodeNum;                    // component inlet node number
+        Array1D_int OutletNodeNum;                   // component outlet node number
+        bool HeatExchangerFlag = false;              // True to have a heat exchanger in the equipment list
+        int AirLoopDOASNum = -1;                     // AirLoopHVAC:DedicatedOutdoorAirSystem number
     };
 
     struct AirLoopAFNData
