@@ -69,6 +69,7 @@
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/ThermalChimney.hh>
@@ -4685,4 +4686,96 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     EXPECT_NEAR(calcZoneSizing.CoolLoadNoDOAS, 0.0, 0.000001);
     EXPECT_NEAR(calcZoneSizing.HeatLatentLoadNoDOAS, 0.0, 0.000001);
     EXPECT_NEAR(calcZoneSizing.CoolLatentLoadNoDOAS, 2543.7, 0.1);
+}
+
+TEST_F(EnergyPlusFixture, CalcAirFlowSimple_WindAndStackArea)
+{
+    state->dataGlobal->NumOfZones = 1;
+
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    auto &thisZone = state->dataHeatBal->Zone(1);
+    thisZone.OutDryBulbTemp = 5.0;
+    thisZone.WindSpeed = 10.0;
+
+    state->dataEnvrn->OutBaroPress = 101400.;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.012;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+
+    Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
+        *state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, "Test"); // Density of air (kg/m^3)
+    Real64 CpAir = Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat);
+
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.MAT = 21.0;
+    thisZoneHB.ZoneAirHumRat = 0.0021;
+    thisZoneHB.MixingMAT = 20.0;
+
+    state->dataHeatBal->TotRefDoorMixing = 0;
+    state->dataHeatBal->TotMixing = 0;
+    state->dataHeatBal->TotCrossMixing = 0;
+    state->dataHeatBal->TotInfiltration = 0;
+    state->dataHeatBal->TotZoneAirBalance = 0;
+
+    state->dataHeatBal->TotVentilation = 1;
+    state->dataHeatBal->AirFlowFlag = true;
+
+    state->dataHeatBal->Ventilation.allocate(1);
+    auto &thisVentilation = state->dataHeatBal->Ventilation(1);
+    // Parameters we really care about
+    thisVentilation.ModelType = DataHeatBalance::VentilationModelType::WindAndStack;
+    thisVentilation.OpenEff = DataGlobalConstants::AutoCalculate;
+    thisVentilation.EffAngle = 135; // Effective angle
+    thisVentilation.OpenArea = 1.0;
+    thisVentilation.OpenAreaSchedPtr = -1; // Always on
+    thisVentilation.ZonePtr = 1;
+
+    thisVentilation.DiscCoef = 0.5;
+
+    // Height Difference. **This zeroes out the Volumetric flow driven by stack effect, leaving only the wind-driven one**
+    thisVentilation.DH = 0.0;
+
+    thisVentilation.MinIndoorTemperature = -99.0;
+    thisVentilation.MaxOutdoorTemperature = 99.0;
+    thisVentilation.DelTemperature = -100.0;
+
+    state->dataEarthTube->GetInputFlag = false;
+    state->dataCoolTower->GetInputFlag = false;
+    state->dataThermalChimneys->ThermalChimneyGetInputFlag = false;
+    state->dataThermalChimneys->TotThermalChimney = 0;
+
+    auto calcQw = [&AirDensity, &CpAir](Real64 MCP) {
+        // Since the stack effect is null, VVF (Design Ventilation Flow Rate m3/s) = Qw
+        //     MCP = AirDensity * CpAir * VVF
+        // <=> Qw = MCP / (AirDensity * CpAir)
+        return MCP / (AirDensity * CpAir);
+    };
+    Real64 areaTimesScheduleValueTimesWind = thisVentilation.OpenArea * 1 * thisZone.WindSpeed;
+    auto calcCw = [&calcQw, &areaTimesScheduleValueTimesWind](Real64 MCP) {
+        auto thisQw = calcQw(MCP);
+        // Qw = Cw * areaTimesScheduleValueTimesWind
+        return thisQw / areaTimesScheduleValueTimesWind;
+    };
+
+    // Initial test, for case where winds are "perpendicular" (ASHRAE terminology, meaning blowing directly towards the effective angle)
+    auto formatFailure = [&]() {
+        Real64 angle = 180.0 - std::abs(std::abs(thisZone.WindDir - thisVentilation.EffAngle) - 180);
+        return fmt::format("Failed for WindDir={} and EffAngle={}, absolute angle between opening and wind dir={}",
+                           thisZone.WindDir,
+                           thisVentilation.EffAngle,
+                           angle);
+    };
+    thisZone.WindDir = thisVentilation.EffAngle;
+    CalcAirFlowSimple(*state);
+    EXPECT_NEAR(0.55, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
+
+    // Diagonal winds
+    thisZone.WindDir = thisVentilation.EffAngle + 45;
+    CalcAirFlowSimple(*state);
+    EXPECT_NEAR(0.30, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
+
+    thisZone.WindDir = thisVentilation.EffAngle - 45;
+    CalcAirFlowSimple(*state);
+    EXPECT_NEAR(0.30, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
 }
