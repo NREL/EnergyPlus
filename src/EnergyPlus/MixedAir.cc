@@ -269,7 +269,7 @@ void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName,
         }
     }
 
-    InitOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
+    InitOutsideAirSys(state, OASysNum, AirLoopNum);
 
     SimOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
 }
@@ -771,7 +771,7 @@ void SimOAMixer(EnergyPlusData &state, std::string const &CompName, bool const F
         OAMixerNum = CompIndex;
     }
 
-    InitOAMixer(state, OAMixerNum, FirstHVACIteration);
+    InitOAMixer(state, OAMixerNum);
 
     CalcOAMixer(state, OAMixerNum);
 
@@ -2411,7 +2411,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
 // Beginning Initialization Section of the Module
 //******************************************************************************
 
-void InitOutsideAirSys(EnergyPlusData &state, int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
+void InitOutsideAirSys(EnergyPlusData &state, int const(OASysNum), int const AirLoopNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3266,7 +3266,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
 } // namespace MixedAir
 
-void InitOAMixer(EnergyPlusData &state, int const OAMixerNum, bool const FirstHVACIteration)
+void InitOAMixer(EnergyPlusData &state, int const OAMixerNum)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl

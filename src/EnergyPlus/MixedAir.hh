@@ -161,7 +161,6 @@ namespace MixedAir {
         // Members
         std::string Name;
         std::string ControllerType;
-        ControllerKind controllerType = ControllerKind::Invalid;
         MixedAirControllerType ControllerType_Num = MixedAirControllerType::None; // Parameter equivalent of controller type
         int OACtrlIndex = 0;
         LockoutType Lockout = LockoutType::NoLockoutPossible; // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
@@ -425,11 +424,11 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void InitOutsideAirSys(EnergyPlusData &state, int const OASysNum, int const AirLoopNum);
 
     void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void InitOAMixer(EnergyPlusData &state, int const OAMixerNum, bool const FirstHVACIteration);
+    void InitOAMixer(EnergyPlusData &state, int const OAMixerNum);
 
     // End of Initialization Section of the Module
     //******************************************************************************
