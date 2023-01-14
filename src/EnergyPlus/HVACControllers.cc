@@ -474,7 +474,7 @@ void GetControllerInput(EnergyPlusData &state)
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
     std::string CurrentModuleObject; // for ease in getting objects
     bool ErrorsFound(false);
-    bool NodeNotFound;         // flag true if the sensor node is on the coil air outlet node
+    bool NodeNotFound; // flag true if the sensor node is on the coil air outlet node
 
     int &NumControllers(state.dataHVACControllers->NumControllers);
     int &NumAirLoopStats(state.dataHVACControllers->NumAirLoopStats);
@@ -564,30 +564,30 @@ void GetControllerInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
             ControllerProps(Num).SensedNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                AlphArray(5),
-                                                                ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::ControllerWaterCoil,
-                                                                AlphArray(1),
-                                                                DataLoopNode::NodeFluidType::Blank,
-                                                                DataLoopNode::ConnectionType::Sensor,
-                                                                NodeInputManager::CompFluidStream::Primary,
-                                                                ObjectIsNotParent);
+                                                                                  AlphArray(5),
+                                                                                  ErrorsFound,
+                                                                                  DataLoopNode::ConnectionObjectType::ControllerWaterCoil,
+                                                                                  AlphArray(1),
+                                                                                  DataLoopNode::NodeFluidType::Blank,
+                                                                                  DataLoopNode::ConnectionType::Sensor,
+                                                                                  NodeInputManager::CompFluidStream::Primary,
+                                                                                  ObjectIsNotParent);
             ControllerProps(Num).ActuatedNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                  AlphArray(6),
-                                                                  ErrorsFound,
-                                                                  DataLoopNode::ConnectionObjectType::ControllerWaterCoil,
-                                                                  AlphArray(1),
-                                                                  DataLoopNode::NodeFluidType::Blank,
-                                                                  DataLoopNode::ConnectionType::Actuator,
-                                                                  NodeInputManager::CompFluidStream::Primary,
-                                                                  ObjectIsNotParent);
+                                                                                    AlphArray(6),
+                                                                                    ErrorsFound,
+                                                                                    DataLoopNode::ConnectionObjectType::ControllerWaterCoil,
+                                                                                    AlphArray(1),
+                                                                                    DataLoopNode::NodeFluidType::Blank,
+                                                                                    DataLoopNode::ConnectionType::Actuator,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                                    ObjectIsNotParent);
             ControllerProps(Num).Offset = NumArray(1);
             ControllerProps(Num).MaxVolFlowActuated = NumArray(2);
             ControllerProps(Num).MinVolFlowActuated = NumArray(3);
 
             if (!MixedAir::CheckForControllerWaterCoil(state, DataAirLoop::ControllerKind::WaterCoil, AlphArray(1))) {
-                ShowSevereError(
-                    state, format("{}{}=\"{}\" not found on any AirLoopHVAC:ControllerList.", RoutineName, CurrentModuleObject, AlphArray(1)));
+                ShowSevereError(state,
+                                format("{}{}=\"{}\" not found on any AirLoopHVAC:ControllerList.", RoutineName, CurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
@@ -1103,10 +1103,10 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
         Real64 rho = GetDensityGlycol(state,
-                               state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum).FluidName,
-                               DataGlobalConstants::CWInitConvTemp,
-                               state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum).FluidIndex,
-                               RoutineName);
+                                      state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum).FluidName,
+                                      DataGlobalConstants::CWInitConvTemp,
+                                      state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum).FluidIndex,
+                                      RoutineName);
 
         ControllerProps(ControlNum).MinActuated = rho * ControllerProps(ControlNum).MinVolFlowActuated;
         ControllerProps(ControlNum).MaxActuated = rho * ControllerProps(ControlNum).MaxVolFlowActuated;
@@ -1358,9 +1358,9 @@ void CalcSimpleController(EnergyPlusData &state,
     if (ControllerProps(ControlNum).NumCalcCalls == 1) {
         // Set min/max boundaries for root finder on first iteration
         RootFinder::InitializeRootFinder(state,
-                             RootFinders(ControlNum),
-                             ControllerProps(ControlNum).MinAvailActuated,
-                             ControllerProps(ControlNum).MaxAvailActuated); // XMin | XMax
+                                         RootFinders(ControlNum),
+                                         ControllerProps(ControlNum).MinAvailActuated,
+                                         ControllerProps(ControlNum).MaxAvailActuated); // XMin | XMax
 
         // Only allow to reuse initial evaluation if the air loop is up-to-date.
         // Set in SolveAirLoopControllers()
@@ -1461,10 +1461,10 @@ void FindRootSimpleController(EnergyPlusData &state,
     // Check for unconstrained/constrained convergence
     // Compute next candidate if not converged yet.
     RootFinder::IterateRootFinder(state,
-                      RootFinders(ControlNum),
-                      ControllerProps(ControlNum).ActuatedValue,
-                      ControllerProps(ControlNum).DeltaSensed,
-                      IsDoneFlag); // root finder's data | X | Y | not used
+                                  RootFinders(ControlNum),
+                                  ControllerProps(ControlNum).ActuatedValue,
+                                  ControllerProps(ControlNum).DeltaSensed,
+                                  IsDoneFlag); // root finder's data | X | Y | not used
 
     // Process root finder if converged or error
     // Map root finder status onto controller mode
@@ -1894,10 +1894,10 @@ void UpdateController(EnergyPlusData &state, int const ControlNum)
     switch (ControllerProps(ControlNum).ActuatorVar) {
     case CtrlVarType::Flow: { // 'Flow'
         PlantUtilities::SetActuatedBranchFlowRate(state,
-                                  ControllerProps(ControlNum).NextActuatedValue,
-                                  ControllerProps(ControlNum).ActuatedNode,
-                                  ControllerProps(ControlNum).ActuatedNodePlantLoc,
-                                  false);
+                                                  ControllerProps(ControlNum).NextActuatedValue,
+                                                  ControllerProps(ControlNum).ActuatedNode,
+                                                  ControllerProps(ControlNum).ActuatedNodePlantLoc,
+                                                  false);
         //     Node(ActuatedNode)%MassFlowRate = ControllerProps(ControlNum)%NextActuatedValue
     } break;
     default: {
@@ -2813,7 +2813,8 @@ void GetControllerActuatorNodeNum(EnergyPlusData &state,
     }
 
     NodeNotFound = true;
-    int ControlNum = UtilityRoutines::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
+    int ControlNum =
+        UtilityRoutines::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
     if (ControlNum > 0 && ControlNum <= state.dataHVACControllers->NumControllers) {
         WaterInletNodeNum = state.dataHVACControllers->ControllerProps(ControlNum).ActuatedNode;
         NodeNotFound = false;
