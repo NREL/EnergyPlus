@@ -233,7 +233,7 @@ void ManageControllers(EnergyPlusData &state,
     int ControllerType;
 
     auto &ControllerProps(state.dataHVACControllers->ControllerProps);
-    int &NumControllers(state.dataHVACControllers->NumControllers);
+    int NumControllers(state.dataHVACControllers->NumControllers);
     auto &CheckEquipName(state.dataHVACControllers->CheckEquipName);
     auto &RootFinders(state.dataHVACControllers->RootFinders);
 
@@ -457,7 +457,7 @@ void GetControllerInput(EnergyPlusData &state)
     //        \units m3/s
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     static constexpr std::string_view RoutineName("HVACControllers: GetControllerInput: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -469,7 +469,7 @@ void GetControllerInput(EnergyPlusData &state)
     Array1D<Real64> NumArray;
     Array1D_string AlphArray;
     Array1D_string cAlphaFields;     // Alpha field names
-    Array1D_string cNumericFields;   // Numeric field namesauto &
+    Array1D_string cNumericFields;   // Numeric field names
     Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
     std::string CurrentModuleObject; // for ease in getting objects
