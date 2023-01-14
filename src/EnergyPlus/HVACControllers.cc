@@ -233,7 +233,6 @@ void ManageControllers(EnergyPlusData &state,
     int ControllerType;
 
     auto &ControllerProps(state.dataHVACControllers->ControllerProps);
-    int NumControllers(state.dataHVACControllers->NumControllers);
     auto &CheckEquipName(state.dataHVACControllers->CheckEquipName);
     auto &RootFinders(state.dataHVACControllers->RootFinders);
 
@@ -253,11 +252,11 @@ void ManageControllers(EnergyPlusData &state,
         ControllerIndex = ControlNum;
     } else {
         ControlNum = ControllerIndex;
-        if (ControlNum > NumControllers || ControlNum < 1) {
+        if (ControlNum > state.dataHVACControllers->NumControllers || ControlNum < 1) {
             ShowFatalError(state,
                            format("ManageControllers: Invalid ControllerIndex passed={}, Number of controllers={}, Controller name={}",
                                   ControlNum,
-                                  NumControllers,
+                                  state.dataHVACControllers->NumControllers,
                                   ControllerName));
         }
         if (CheckEquipName(ControlNum)) {
@@ -476,8 +475,6 @@ void GetControllerInput(EnergyPlusData &state)
     bool ErrorsFound(false);
     bool NodeNotFound; // flag true if the sensor node is on the coil air outlet node
 
-    int &NumControllers(state.dataHVACControllers->NumControllers);
-    int &NumAirLoopStats(state.dataHVACControllers->NumAirLoopStats);
     auto &AirLoopStats(state.dataHVACControllers->AirLoopStats);
     auto &ControllerProps(state.dataHVACControllers->ControllerProps);
     auto &RootFinders(state.dataHVACControllers->RootFinders);
@@ -489,13 +486,13 @@ void GetControllerInput(EnergyPlusData &state)
 
     CurrentModuleObject = "Controller:WaterCoil";
     int NumSimpleControllers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    NumControllers = NumSimpleControllers;
+    state.dataHVACControllers->NumControllers = NumSimpleControllers;
 
     // Allocate stats data structure for each air loop and controller if needed
     if (state.dataSysVars->TrackAirLoopEnvFlag || state.dataSysVars->TraceAirLoopEnvFlag || state.dataSysVars->TraceHVACControllerEnvFlag) {
         if (NumPrimaryAirSys > 0) {
-            NumAirLoopStats = NumPrimaryAirSys;
-            AirLoopStats.allocate(NumAirLoopStats);
+            state.dataHVACControllers->NumAirLoopStats = NumPrimaryAirSys;
+            AirLoopStats.allocate(state.dataHVACControllers->NumAirLoopStats);
 
             // Allocate controller statistics data for each controller on each air loop
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
@@ -504,12 +501,12 @@ void GetControllerInput(EnergyPlusData &state)
         }
     }
 
-    if (NumControllers == 0) return;
+    if (state.dataHVACControllers->NumControllers == 0) return;
     // Condition of no controllers will be taken care of elsewhere, if necessary
 
-    ControllerProps.allocate(NumControllers);
-    RootFinders.allocate(NumControllers);
-    CheckEquipName.dimension(NumControllers, true);
+    ControllerProps.allocate(state.dataHVACControllers->NumControllers);
+    RootFinders.allocate(state.dataHVACControllers->NumControllers);
+    CheckEquipName.dimension(state.dataHVACControllers->NumControllers, true);
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNums);
     AlphArray.allocate(NumAlphas);
