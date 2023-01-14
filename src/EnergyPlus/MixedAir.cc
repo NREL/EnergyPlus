@@ -2902,7 +2902,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 bool AirLoopFound = false;
                 if (thisOASys <= 0) {
                     // Check outside air system name
-                    ShowWarningError(state, "Cannot find the AirLoopHVAC:OutdoorAirSystem for the OA Controller: " + thisOAController.Name);
+                    ShowWarningError(state, "Cannot find the AirLoopHVAC:OutdoorAirSystem for the OA Controller: " + loopOAController.Name);
                 } else {
                     // Find the primary air loop that has the outside air system
                     for (int thisAirLoop = 1; thisAirLoop <= state.dataHVACGlobal->NumPrimaryAirSys; ++thisAirLoop) {
@@ -2930,7 +2930,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 if (AirLoopFound && airLoopNum > 0) {
                     airloopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name; // OutsideAirSys(OASysIndex)%Name
                 } else {
-                    ShowWarningError(state, "Cannot find the primary air loop for the OA Controller: " + thisOAController.Name);
+                    ShowWarningError(state, "Cannot find the primary air loop for the OA Controller: " + loopOAController.Name);
                     airloopName = "AirLoop not found";
                 }
 
@@ -3063,7 +3063,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                                      loopOAController.EMSOARateValue);
                 }
 
-                if (thisOAController.VentMechObjectNum > 0 && airLoopNum > 0) {
+                if (loopOAController.VentMechObjectNum > 0 && airLoopNum > 0) {
                     SetupOutputVariable(state,
                                         "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
@@ -3071,7 +3071,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         airloopName);
-                    if (!state.dataMixedAir->VentilationMechanical(thisOAController.VentMechObjectNum).DCVFlag) {
+                    if (!state.dataMixedAir->VentilationMechanical(loopOAController.VentMechObjectNum).DCVFlag) {
                         state.dataAirLoop->AirLoopControlInfo(airLoopNum).AirLoopDCVFlag = false;
                     }
                 }
