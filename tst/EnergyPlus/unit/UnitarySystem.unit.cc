@@ -16155,7 +16155,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     int OASys2Index = state->dataAirLoop->OutsideAirSys(1).ComponentIndex(2); // <-- this here is the issue correction
     EnergyPlus::HVACSystemData *compPointer1 = state->dataAirLoop->OutsideAirSys(1).compPointer[OASys1Index];
     UnitarySys *unitarySys1 = dynamic_cast<UnitarySys *>(compPointer1); // mystery code to access system data from abstract class
-    assert(unitarySys1 != nullptr);                                     //  dyanmic_cast will return nullptr if the object is not really of that type
+    assert(unitarySys1 != nullptr);                                     // dyanmic_cast will return nullptr if the object is not really of that type
     EnergyPlus::HVACSystemData *compPointer2 = state->dataAirLoop->OutsideAirSys(1).compPointer[OASys2Index];
     UnitarySys *unitarySys2 = dynamic_cast<UnitarySys *>(compPointer2);
     assert(unitarySys2 != nullptr);
@@ -16165,12 +16165,27 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ("OA SYS COOLING COIL 2", unitarySys2->Name);
 
     // now call the OA system to make sure the above data is not corrupted
-    // it does not matter if the system runs or not, the test here is if the index has changed
+    // the test here is if the index has changed
     int OASysNum = 1;
     state->dataOutRptPredefined->subTable.allocate(5); //<-- have to set up a few of these table foot notes
     state->dataOutRptPredefined->pdstDXCoolCoil = 1;
     state->dataOutRptPredefined->pdstDXCoolCoil_2023 = 2;
     state->dataOutRptPredefined->pdstCoolCoil = 3;
+
+    state->dataSize->CurOASysNum = 1;
+    state->dataHVACGlobal->DoSetPointTest = true; // will check for set point at coil outlet node
+    state->dataEnvrn->StdRhoAir = 1.2;
+    int outdoorAirNodeNum = OASys1->AirInNode;
+    state->dataLoopNodes->Node(outdoorAirNodeNum).Temp = 25.0;
+    state->dataLoopNodes->Node(outdoorAirNodeNum).HumRat = 0.0145946;
+    state->dataLoopNodes->Node(outdoorAirNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(outdoorAirNodeNum).Temp, state->dataLoopNodes->Node(outdoorAirNodeNum).HumRat);
+    state->dataLoopNodes->Node(outdoorAirNodeNum).MassFlowRate = 1.3 * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(outdoorAirNodeNum).MassFlowRateMaxAvail = state->dataLoopNodes->Node(outdoorAirNodeNum).MassFlowRate;
+    Real64 OACoil1OutetSP = 20.0;
+    Real64 OACoil2OutetSP = 15.0;
+    state->dataLoopNodes->Node(OASys1->AirOutNode).TempSetPoint = OACoil1OutetSP;
+    state->dataLoopNodes->Node(OASys2->AirOutNode).TempSetPoint = OACoil2OutetSP;
 
     // now call where problem existed where ComponentIndex was corrupted
     MixedAir::SimOASysComponents(*state, OASysNum, FirstHVACIteration, AirLoopNum);
@@ -16186,6 +16201,52 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ("OA SYS COOLING COIL 1", unitarySys1->Name);
     EXPECT_EQ("OA SYS COOLING COIL 2", OASys2->Name);
     EXPECT_EQ("OA SYS COOLING COIL 2", unitarySys2->Name);
+
+    // check that coils did operate and target set point temperature
+    EXPECT_NEAR(OACoil1OutetSP, state->dataLoopNodes->Node(OASys1->AirOutNode).Temp, 0.0001);
+    EXPECT_NEAR(OACoil2OutetSP, state->dataLoopNodes->Node(OASys2->AirOutNode).Temp, 0.0001);
+
+    // set up parameters needed for a UnitarySystem object call in SimOAComponent
+    Real64 sensOut = 0.0;
+    Real64 latOut = 0.0;
+    state->dataLoopNodes->Node(OASys1->AirOutNode).Temp = 25.0; // reset coil outlet node temp so we know coil operated
+    EXPECT_GT(state->dataLoopNodes->Node(OASys1->AirOutNode).Temp, OACoil1OutetSP);
+
+    // previous call structure as if this system was a UnitarySystem object
+    // In SimOAComponents, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1) is passed to &CompIndex in SimOAComponent
+    // in this next call CompIndex is passed to UnitarySystem as &CompIndex in the simulate function
+    CompIndex = state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1);
+    state->dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(*state,
+                                                                                 OASys1->Name,
+                                                                                 FirstHVACIteration,
+                                                                                 AirLoopNum,
+                                                                                 CompIndex,
+                                                                                 HeatingActive,
+                                                                                 CoolingActive,
+                                                                                 CompIndex,
+                                                                                 OAUCoilOutTemp,
+                                                                                 ZoneEquipFlag,
+                                                                                 sensOut,
+                                                                                 latOut);
+
+    // check that coil did operate and target set point temperature
+    EXPECT_NEAR(OACoil1OutetSP, state->dataLoopNodes->Node(OASys1->AirOutNode).Temp, 0.0001);
+
+    // the above simulate call to a UnitarySystem object would overwrite state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1)
+    // because CompIndex is a reference to state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1)
+    // Now CoilSystem:Cooling:DX, CoilSystem:Cooling:Water and AirloopHVAC:UnitarySystem are treated the same way.
+    EXPECT_NE(CompIndex, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
+
+    // previous methods used to get CompIndex for CoilSystem:Cooling:DX
+    // these match which is why issue 9785 was hard to track down
+    // these 2 CoilSystem:Cooling:DX are the only objects in this unit test and are used in the OA System and coincidentally
+    // have an index of 0 and 1, 0+1 is the index to the OA equipment list for the 1st unit, as is 1+1 for the 2nd unit.
+    // CoilSystem objects used elsewhere in the simulation would mean these unit indexes would not be 0 and 1
+    // and this call would fail: state->dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate()
+    int CompIndex1 = UnitarySystems::getUnitarySystemIndex(*state, OASys1->Name) + 1;
+    int CompIndex2 = UnitarySystems::getUnitarySystemIndex(*state, OASys2->Name) + 1;
+    EXPECT_EQ(CompIndex1, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
+    EXPECT_EQ(CompIndex2, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(2));
 }
 
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
