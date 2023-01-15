@@ -1052,8 +1052,8 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                        OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
                        OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
                 OASys.ComponentIndex(CompNum) = CompNum;
-                UnitarySystems::UnitarySys thisSys;
-                OASys.compPointer[CompNum] = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, OASys.ComponentName(CompNum), false, 0);
+                OASys.compPointer[CompNum] =
+                    UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, OASys.ComponentName(CompNum), false, 0);
             } else if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Invalid) {
                 std::string const thisComp = OASys.ComponentType(CompNum);
                 if (thisComp == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" || thisComp == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
