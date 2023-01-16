@@ -296,8 +296,7 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
                        OASysNum,
                        OAHeatCoil,
                        OACoolCoil,
-                       OAHX,
-                       CompNum);
+                       OAHX);
         if (OAHX) ReSim = true;
     }
     // if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again in reverse
@@ -317,8 +316,7 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
                            OASysNum,
                            OAHeatCoil,
                            OACoolCoil,
-                           OAHX,
-                           CompNum);
+                           OAHX);
         }
         // now simulate again propagate current temps back through OA system
         for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
@@ -335,8 +333,7 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
                            OASysNum,
                            OAHeatCoil,
                            OACoolCoil,
-                           OAHX,
-                           CompNum);
+                           OAHX);
         }
     }
 }
@@ -442,8 +439,7 @@ void SimOAComponent(EnergyPlusData &state,
                     int const OASysNum,   // index to outside air system
                     bool &OAHeatingCoil,  // TRUE indicates a heating coil has been found
                     bool &OACoolingCoil,  // TRUE indicates a cooling coil has been found
-                    bool &OAHX,           // TRUE indicates a heat exchanger has been found
-                    int const CompNum)
+                    bool &OAHX)           // TRUE indicates a heat exchanger has been found
 {
 
     // SUBROUTINE INFORMATION
@@ -609,7 +605,7 @@ void SimOAComponent(EnergyPlusData &state,
     case SimAirServingZones::CompType::CoilSystemWater:      // CoilSystem:Cooling:Water
     case SimAirServingZones::CompType::UnitarySystemModel: { // AirloopHVAC:UnitarySystem
         if (Sim) {
-            int compNum = state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum);
+            int compNum = CompIndex; // use local so return value of compNum from simulate call does not overwrite CompIndex
             state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[compNum]->simulate(state,
                                                                                       CompName,
                                                                                       FirstHVACIteration,
@@ -5091,8 +5087,7 @@ int GetOASysNumHeatingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
                        OASysNumber,
                        OAHeatingCoil,
                        OACoolingCoil,
-                       OAHX,
-                       CompNum);
+                       OAHX);
         if (OAHeatingCoil) {
             ++NumHeatingCoils;
         }
@@ -5167,8 +5162,7 @@ int GetOASysNumCoolingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
                        OASysNumber,
                        OAHeatingCoil,
                        OACoolingCoil,
-                       OAHX,
-                       CompNum);
+                       OAHX);
         if (OACoolingCoil) {
             ++NumCoolingCoils;
         }

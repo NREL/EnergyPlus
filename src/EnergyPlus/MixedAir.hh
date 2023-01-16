@@ -379,8 +379,7 @@ namespace MixedAir {
                         int const OASysNum,   // index to outside air system
                         bool &OAHeatingCoil,  // TRUE indicates a heating coil has been found
                         bool &OACoolingCoil,  // TRUE indicates a cooling coil has been found
-                        bool &OAHX,           // TRUE indicates a heat exchanger has been found
-                        int const CompNum);
+                        bool &OAHX);          // TRUE indicates a heat exchanger has been found
 
     void SimOAMixer(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int &CompIndex);
 
