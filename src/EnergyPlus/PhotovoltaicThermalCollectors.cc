@@ -1583,7 +1583,7 @@ namespace PhotovoltaicThermalCollectors {
                 f[i] = 0.0;
                 y[i] = 0.0;
             }
-            for (i = 0; i <= (m ^ 2 - 1); i++) {
+            for (i = 0; i <= ((m ^ 2) - 1); i++) {
                 jj[i] = 0.0;
             }
             jj[0] = hconvt + hrad_surr + hpvg_pv;
@@ -1671,7 +1671,7 @@ namespace PhotovoltaicThermalCollectors {
                         jj[p * m + j] = dummy1;
                     }
                 }
-                for (j = i + 1; j <= (m - 1); j++) {
+                for (j = (i + 1); j <= (m - 1); j++) {
                     if (std::abs(jj[i * m + i]) < small) jj[i * m + i] = small;
                     mm = jj[j * m + i] / jj[i * m + i];
                     f[j] = f[j] - mm * f[i];
