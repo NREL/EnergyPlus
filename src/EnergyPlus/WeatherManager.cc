@@ -3480,8 +3480,8 @@ namespace WeatherManager {
 
         // Do the first five.  (To get to the DataSource field)
         {
-            auto nth_pos = nth_occurrence(current_line, ',', 5);
-            const bool succeeded = readList(current_line.substr(pos, nth_pos), WYear, WMonth, WDay, WHour, WMinute);
+            auto nth_pos = nth_occurrence(current_line, ',', 5); // Returns the position **after** the nth occurrence of ','
+            const bool succeeded = readList(current_line.substr(pos, (nth_pos - 1) - pos), WYear, WMonth, WDay, WHour, WMinute);
             if (!succeeded) {
                 ShowSevereError(state, "Invalid Date info in Weather Line");
                 ShowContinueError(state, fmt::format("Entire Data Line={}", Line));
@@ -3508,6 +3508,7 @@ namespace WeatherManager {
             ShowFatalError(state, "Program terminates due to previous condition.");
         }
 
+        // index, unlike nth_occurrence returns the position of the search char, not the position after it
         pos = index(Line, ','); // WYear
         if (pos == std::string::npos) {
             ShowSevereError(
@@ -3522,7 +3523,7 @@ namespace WeatherManager {
         {
             auto nth_pos = nth_occurrence(current_line, ',', 21);
 
-            const bool succeeded = readList(current_line.substr(0, nth_pos),
+            const bool succeeded = readList(current_line.substr(0, nth_pos - 1),
                                             DryBulb,
                                             DewPoint,
                                             RelHum,
@@ -3546,7 +3547,7 @@ namespace WeatherManager {
                                             RField21);
 
             if (!succeeded) ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-            current_line.remove_prefix(nth_pos + 1);
+            current_line.remove_prefix(nth_pos);
         }
         pos = index(current_line, ',');
         std::string PresWeathCodes;
