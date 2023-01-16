@@ -1938,7 +1938,7 @@ namespace PhotovoltaicThermalCollectors {
         // mine PVT derived type that has the surface.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PVTNum;   // temporary
+        int PVTNum; // temporary
         int thisPVT;
         bool Found;
         int PVTIndex(0);

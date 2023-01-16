@@ -172,19 +172,19 @@ namespace PhotovoltaicThermalCollectors {
     struct PVTCollectorStruct : PlantComponent
     {
         // Members
-        std::string Name;                                  // Name of PVT collector
-        DataPlant::PlantEquipmentType Type;                // Plant Side Connection: 'Type' assigned in DataPlant
-        PlantLocation WPlantLoc;                           // Water plant loop component location
-        bool EnvrnInit;                                    // manage begin environment inits
-        bool SizingInit;                                   // manage when sizing is complete
-        std::string PVTModelName;                          // Name of PVT performance object
+        std::string Name;                               // Name of PVT collector
+        DataPlant::PlantEquipmentType Type;             // Plant Side Connection: 'Type' assigned in DataPlant
+        PlantLocation WPlantLoc;                        // Water plant loop component location
+        bool EnvrnInit;                                 // manage begin environment inits
+        bool SizingInit;                                // manage when sizing is complete
+        std::string PVTModelName;                       // Name of PVT performance object
         PVTModelType ModelType = PVTModelType::Invalid; // model type indicator
-        int SurfNum;                                       // surface index
-        std::string PVname;                                // named Generator:Photovoltaic object
-        int PVnum;                                         // PV index
-        bool PVfound;                                      // init, need to delay get input until PV gotten
-        SimplePVTModelStruct Simple;                       // Simple performance data structure.
-        BIPVTModelStruct BIPVT;                            // BIPVT performance data structure.
+        int SurfNum;                                    // surface index
+        std::string PVname;                             // named Generator:Photovoltaic object
+        int PVnum;                                      // PV index
+        bool PVfound;                                   // init, need to delay get input until PV gotten
+        SimplePVTModelStruct Simple;                    // Simple performance data structure.
+        BIPVTModelStruct BIPVT;                         // BIPVT performance data structure.
         WorkingFluidEnum WorkingFluidType;
         int PlantInletNodeNum;
         int PlantOutletNodeNum;
