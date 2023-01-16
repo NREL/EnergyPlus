@@ -3557,128 +3557,48 @@ namespace WeatherManager {
             PresWeathCodes = "999999999";
         }
         current_line.remove_prefix(pos + 1);
-        pos = index(current_line, ',');
-        if (pos != std::string::npos) {
-            if (pos != 0) {
-                bool error = false;
-                PrecipWater = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
-                if (error) {
-                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-                }
-            } else {
-                PrecipWater = 999.0;
+
+        bool reachedEndOfCommands = false;
+        auto readNextNumber = [&reachedEndOfCommands, &state, &WYear, &WMonth, &WDay, &WHour, &WMinute, &Line, &current_line](Real64 &target) {
+            if (reachedEndOfCommands) {
+                target = 999.0;
+                return;
             }
-            current_line.remove_prefix(pos + 1);
-            pos = index(current_line, ',');
+            auto pos = index(current_line, ',');
+            // We found a comma
             if (pos != std::string::npos) {
+                // Content is not empty
                 if (pos != 0) {
                     bool error = false;
-                    AerosolOptDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
+                    target = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                     if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
                 } else {
-                    AerosolOptDepth = 999.0;
+                    target = 999.0;
                 }
                 current_line.remove_prefix(pos + 1);
-                pos = index(current_line, ',');
-                if (pos != std::string::npos) {
-                    if (pos != 0) {
-                        bool error = false;
-                        SnowDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
-                        if (error) {
-                            ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-                        }
-                    } else {
-                        SnowDepth = 999.0;
-                    }
-                    current_line.remove_prefix(pos + 1);
-                    pos = index(current_line, ',');
-                    if (pos != std::string::npos) {
-                        if (pos != 0) {
-                            bool error = false;
-                            DaysSinceLastSnow = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
-                            if (error) {
-                                ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-                            }
-                        } else {
-                            DaysSinceLastSnow = 999.0;
-                        }
-                        current_line.remove_prefix(pos + 1);
-                        pos = index(current_line, ',');
-                        if (pos != std::string::npos) {
-                            if (pos != 0) {
-                                bool error = false;
-                                Albedo = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
-                                if (error) {
-                                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-                                }
-                            } else {
-                                Albedo = 999.0;
-                            }
-                            current_line.remove_prefix(pos + 1);
-                            pos = index(current_line, ',');
-                            if (pos != std::string::npos) {
-                                if (pos != 0) {
-                                    bool error = false;
-                                    LiquidPrecip = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
-                                    if (error) {
-                                        ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-                                    }
-                                } else {
-                                    LiquidPrecip = 999.0;
-                                }
-                                current_line.remove_prefix(pos + 1);
-                                pos = index(current_line, ',');
-                            } else {
-                                LiquidPrecip = 999.0;
-                            }
-                        } else {
-                            Albedo = 999.0;
-                            LiquidPrecip = 999.0;
-                        }
-                    } else {
-                        bool error = false;
-                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
-                        if (error) {
-                            ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-                        }
-                        Albedo = 999.0;
-                        LiquidPrecip = 999.0;
-                    }
+            } else {
+                // Couldn't find next comma, but we need to process the potential current number
+                reachedEndOfCommands = true;
+                if (current_line.empty()) {
+                    target = 999.0;
                 } else {
                     bool error = false;
-                    SnowDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
+                    target = UtilityRoutines::ProcessNumber(current_line, error);
                     if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
-                    DaysSinceLastSnow = 999.0;
-                    Albedo = 999.0;
-                    LiquidPrecip = 999.0;
                 }
-            } else {
-                bool error = false;
-                AerosolOptDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
-                if (error) {
-                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-                }
-                SnowDepth = 999.0;
-                DaysSinceLastSnow = 999.0;
-                Albedo = 999.0;
-                LiquidPrecip = 999.0;
             }
-        } else {
-            bool error = false;
-            PrecipWater = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
-            if (error) {
-                ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
-            }
-            AerosolOptDepth = 999.0;
-            SnowDepth = 999.0;
-            DaysSinceLastSnow = 999.0;
-            Albedo = 999.0;
-            LiquidPrecip = 999.0;
-        }
+        };
+
+        readNextNumber(PrecipWater);
+        readNextNumber(AerosolOptDepth);
+        readNextNumber(SnowDepth);
+        readNextNumber(DaysSinceLastSnow);
+        readNextNumber(Albedo);
+        readNextNumber(LiquidPrecip);
 
         WObs = nint(RField21);
         if (WObs == 0) { // Obs Indicator indicates Weather Codes valid
