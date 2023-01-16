@@ -160,12 +160,6 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Get input for PVT and BIPVT objects
 
-        int Item;                // Item to be "gotten"
-        int NumAlphas;           // Number of Alphas for each GetObjectItem call
-        int NumNumbers;          // Number of Numbers for each GetObjectItem call
-        int IOStatus;            // Used in GetObjectItem
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-
         // Object Data
         Array1D<SimplePVTModelStruct> tmpSimplePVTperf;
         Array1D<BIPVTModelStruct> tmpBIPVTperf;
@@ -396,14 +390,14 @@ namespace PhotovoltaicThermalCollectors {
                     thisPVT.Simple = tmpSimplePVTperf(ThisParamObj); // entire structure assigned
                     // do one-time setups on input data
                     thisPVT.AreaCol = state.dataSurface->Surface(thisPVT.SurfNum).Area * thisPVT.Simple.ThermalActiveFract;
-                    thisPVT.PVTModelType = PVTModelType::Simple;
+                    thisPVT.ModelType = PVTModelType::Simple;
                 } else {
                     ThisParamObj = UtilityRoutines::FindItemInList(PVT(Item).PVTModelName, tmpBIPVTperf);
                     if (ThisParamObj > 0) {
                         thisPVT.BIPVT = tmpBIPVTperf(ThisParamObj); // entire structure assigned
                         // do one-time setups on input data
                         thisPVT.AreaCol = state.dataSurface->Surface(thisPVT.SurfNum).Area;
-                        thisPVT.PVTModelType = PVTModelType::BIPVT;
+                        thisPVT.ModelType = PVTModelType::BIPVT;
                     } else {
                         ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
                         ShowContinueError(state,
@@ -956,7 +950,7 @@ namespace PhotovoltaicThermalCollectors {
         // decide if PVT should be in cooling or heat mode and if it should be bypassed or not
 
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
-            if ((this->PVTModelType == PVTModelType::Simple) || (this->PVTModelType == PVTModelType::BIPVT)) {
+            if ((this->ModelType == PVTModelType::Simple) || (this->ModelType == PVTModelType::BIPVT)) {
                 if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
@@ -984,7 +978,7 @@ namespace PhotovoltaicThermalCollectors {
             }
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
-            if (this->PVTModelType == PVTModelType::Simple) {
+            if (this->ModelType == PVTModelType::Simple) {
                 if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     this->HeatingUseful = true;
@@ -1011,11 +1005,9 @@ namespace PhotovoltaicThermalCollectors {
 
         // METHODOLOGY EMPLOYED:
 
-        static constexpr std::string_view RoutineName("CalcPVTcollectors");
-
-        if (this->PVTModelType == PVTModelType::Simple) {
+        if (this->ModelType == PVTModelType::Simple) {
             calculateSimplePVT(state);
-        } else if (this->PVTModelType == PVTModelType::BIPVT) {
+        } else if (this->ModelType == PVTModelType::BIPVT) {
             calculateBIPVT(state);
         }
     }
@@ -1213,7 +1205,6 @@ namespace PhotovoltaicThermalCollectors {
         Real64 PotentialHeatGain(0.0);
         Real64 Eff(0.0);
         Real64 Tcollector(Tinlet);
-        Real64 small_num(1.0e-10);
         std::string Mode("Heating");
 
         if (this->HeatingUseful && this->BypassDamperOff && (GetCurrentScheduleValue(state, this->BIPVT.SchedPtr) > 0.0)) {
@@ -1327,7 +1318,6 @@ namespace PhotovoltaicThermalCollectors {
         Real64 area_pv = w * l * this->BIPVT.PVAreaFract;                        // total area of pv modules
         Real64 area_wall_total = w * l;                                          // total area of wall
         Real64 length_conv = l;                                                  // length for wind convection coefficient calc
-        Real64 area_bld_surf = state.dataSurface->Surface(this->SurfNum).Area;
         auto shape_bld_surf = state.dataSurface->Surface(this->SurfNum).Shape;
 
         if (shape_bld_surf != EnergyPlus::DataSurfaces::SurfaceShape::Rectangle) {
@@ -1426,7 +1416,6 @@ namespace PhotovoltaicThermalCollectors {
         Real64 y[3];                                                          // solution array for tpvg,tpv, and t1
         int m(3);                                                             // parameter for number of unknwons
         int i;                                                                // index
-        constexpr int MaxNumIter(50);                                         // maximum number of iterations
         int iter(0);                                                          // iteration counter
 
         emiss_2 = state.dataConstruction->Construct(state.dataSurface->Surface(this->SurfNum).Construction)
@@ -1654,7 +1643,7 @@ namespace PhotovoltaicThermalCollectors {
         // Solve a system of linear equations using Gaussian elimination and back substitution method.
 
         Real64 sum, dummy1, dummy2, mm, small(1.0e-10);
-        int i, j, kk, ii, p, k, m(3);
+        int i, j, ii, p, k, m(3);
         bool coeff_not_zero;
 
         for (i = 0; i < m; i++) {
@@ -1791,7 +1780,7 @@ namespace PhotovoltaicThermalCollectors {
                     Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, state.dataLoopNodes->Node(OutletNode).HumRat);
 
                 // update the OtherSideConditionsModel coefficients for BIPVT
-                if (this->PVTModelType == PVTModelType::BIPVT) {
+                if (this->ModelType == PVTModelType::BIPVT) {
                     thisOSCM = this->BIPVT.OSCMPtr;
                     state.dataSurface->OSCM(thisOSCM).TConv = this->BIPVT.Tplen;
                     state.dataSurface->OSCM(thisOSCM).HConv = this->BIPVT.HcPlen;
@@ -1950,7 +1939,6 @@ namespace PhotovoltaicThermalCollectors {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVTNum;   // temporary
-        int ThisSurf; // temporary
         int thisPVT;
         bool Found;
         int PVTIndex(0);
@@ -2004,7 +1992,7 @@ namespace PhotovoltaicThermalCollectors {
         // object oriented "Get" routine for collector surface temperature
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (state.dataPhotovoltaicThermalCollector->PVT(PVTNum).PVTModelType == PVTModelType::BIPVT) {
+        if (state.dataPhotovoltaicThermalCollector->PVT(PVTNum).ModelType == PVTModelType::BIPVT) {
             TsColl = state.dataPhotovoltaicThermalCollector->PVT(PVTNum).BIPVT.LastCollectorTemp;
         }
     }
