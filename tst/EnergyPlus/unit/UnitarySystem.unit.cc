@@ -16009,21 +16009,24 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     // thisSys->m_OKToPrintSizing = true;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -200.0;
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -200.0 / 2500940.0;
+    auto &zoneSysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1);
+    auto &zoneSysMoistureDemand = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1);
+    zoneSysEnergyDemand.RemainingOutputRequired = -1000.0;
+    zoneSysEnergyDemand.RemainingOutputReqToCoolSP = -1000.0;
+    zoneSysEnergyDemand.RemainingOutputReqToHeatSP = -200.0;
+    zoneSysMoistureDemand.RemainingOutputReqToDehumidSP = -200.0 / 2500940.0;
     // test COOLING condition
     int zoneNodeNum = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
-    state->dataLoopNodes->Node(zoneNodeNum).Temp = 24.0;      // 24C db
-    state->dataLoopNodes->Node(zoneNodeNum).HumRat = 0.01522; // 17C wb
-    state->dataLoopNodes->Node(zoneNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(zoneNodeNum).Temp, state->dataLoopNodes->Node(zoneNodeNum).HumRat);
-    state->dataLoopNodes->Node(zoneNodeNum).Press = state->dataEnvrn->OutBaroPress;
+    auto &zoneNode = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode);
+    zoneNode.Temp = 24.0;      // 24C db
+    zoneNode.HumRat = 0.01522; // 17C wb
+    zoneNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
+    zoneNode.Press = state->dataEnvrn->OutBaroPress;
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = state->dataLoopNodes->Node(zoneNodeNum).HumRat;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(zoneNodeNum).Temp;
+    auto &zoneHeatBalance = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    zoneHeatBalance.ZoneAirHumRat = zoneNode.HumRat;
+    zoneHeatBalance.MAT = zoneNode.Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -16031,20 +16034,19 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlTypeRpt.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
-    int mixedAirNodeNum = state->dataMixedAir->OAMixer(1).MixNode;
-    state->dataLoopNodes->Node(mixedAirNodeNum).Temp = 23.822;      // 24C db
-    state->dataLoopNodes->Node(mixedAirNodeNum).HumRat = 0.0145946; // 17C wb
-    state->dataLoopNodes->Node(mixedAirNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(mixedAirNodeNum).Temp, state->dataLoopNodes->Node(mixedAirNodeNum).HumRat);
-    state->dataLoopNodes->Node(mixedAirNodeNum).Press = state->dataEnvrn->OutBaroPress;
+    auto &mixedAirNode = state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).MixNode);
+    mixedAirNode.Temp = 23.822;      // 24C db
+    mixedAirNode.HumRat = 0.0145946; // 17C wb
+    mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);
+    mixedAirNode.Press = state->dataEnvrn->OutBaroPress;
     Real64 SenOutput;
     Real64 LatOutput;
 
     // OperatingMode 3 above the range
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -227.705;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -227.705;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -50.0;
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -0.007806893;
+    zoneSysEnergyDemand.RemainingOutputRequired = -227.705;
+    zoneSysEnergyDemand.RemainingOutputReqToCoolSP = -227.705;
+    zoneSysEnergyDemand.RemainingOutputReqToHeatSP = -50.0;
+    zoneSysMoistureDemand.RemainingOutputReqToDehumidSP = -0.007806893;
     state->dataEnvrn->StdRhoAir = 1.2043;
     thisSys->simulate(*state,
                       compName,
@@ -16058,14 +16060,15 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
                       ZoneEquipFlag,
                       SenOutput,
                       LatOutput);
-    EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.OperatingMode, 3);
-    EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 1.0);
+    auto &coilCoolingDX = state->dataCoilCooingDX->coilCoolingDXs[0];
+    EXPECT_EQ(coilCoolingDX.performance.OperatingMode, 3);
+    EXPECT_EQ(coilCoolingDX.performance.ModeRatio, 1.0);
     EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
     EXPECT_NEAR(SenOutput, -227.705, 0.1);
     EXPECT_NEAR(LatOutput, -1531, 0.1);
     // Check outlet for temperature below saturation
-    Real64 coilOutletTemp = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirDryBulbTemp;
-    Real64 coilOutletHumRat = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirHumRat;
+    Real64 coilOutletTemp = coilCoolingDX.outletAirDryBulbTemp;
+    Real64 coilOutletHumRat = coilCoolingDX.outletAirHumRat;
     Real64 coilOutletEnthalpy = Psychrometrics::PsyHFnTdbW(coilOutletTemp, coilOutletHumRat);
     Real64 coilOutletTSat = Psychrometrics::PsyTsatFnHPb(*state, coilOutletEnthalpy, state->dataEnvrn->OutBaroPress);
     EXPECT_TRUE(coilOutletTemp >= coilOutletTSat);
@@ -16073,20 +16076,18 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
     thisSys->m_ZoneSequenceHeatingNum = 0;
-    state->dataLoopNodes->Node(zoneNodeNum).HumRat = 0.0114544; // 17C wb
-    state->dataLoopNodes->Node(zoneNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(zoneNodeNum).Temp, state->dataLoopNodes->Node(zoneNodeNum).HumRat);
-    state->dataLoopNodes->Node(mixedAirNodeNum).Temp = 24.18496;    // 24C db
-    state->dataLoopNodes->Node(mixedAirNodeNum).HumRat = 0.0121542; // 17C wb
-    state->dataLoopNodes->Node(mixedAirNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(mixedAirNodeNum).Temp, state->dataLoopNodes->Node(mixedAirNodeNum).HumRat);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = state->dataLoopNodes->Node(1).HumRat;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(1).Temp;
+    zoneNode.HumRat = 0.0114544; // 17C wb
+    zoneNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
+    mixedAirNode.Temp = 24.18496;    // 24C db
+    mixedAirNode.HumRat = 0.0121542; // 17C wb
+    mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);
+    zoneHeatBalance.ZoneAirHumRat = state->dataLoopNodes->Node(1).HumRat;
+    zoneHeatBalance.MAT = state->dataLoopNodes->Node(1).Temp;
 
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -397.162;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -397.162;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -3601.8;
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -1.1696238E-4;
+    zoneSysEnergyDemand.RemainingOutputRequired = -397.162;
+    zoneSysEnergyDemand.RemainingOutputReqToCoolSP = -397.162;
+    zoneSysEnergyDemand.RemainingOutputReqToHeatSP = -3601.8;
+    zoneSysMoistureDemand.RemainingOutputReqToDehumidSP = -1.1696238E-4;
     thisSys->simulate(*state,
                       compName,
                       FirstHVACIteration,
@@ -16099,15 +16100,15 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
                       ZoneEquipFlag,
                       SenOutput,
                       LatOutput);
-    EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.OperatingMode, 3);
-    EXPECT_NEAR(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.1991, 0.001);
+    EXPECT_EQ(coilCoolingDX.performance.OperatingMode, 3);
+    EXPECT_NEAR(coilCoolingDX.performance.ModeRatio, 0.1991, 0.001);
     EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
     EXPECT_NEAR(thisSys->CoilSHR, 0.5266, 0.001);
     EXPECT_NEAR(SenOutput, -397.032, 0.1);
     EXPECT_NEAR(LatOutput, -338.8, 0.1);
     // Check outlet for temperature below saturation
-    coilOutletTemp = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirDryBulbTemp;
-    coilOutletHumRat = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirHumRat;
+    coilOutletTemp = coilCoolingDX.outletAirDryBulbTemp;
+    coilOutletHumRat = coilCoolingDX.outletAirHumRat;
     coilOutletEnthalpy = Psychrometrics::PsyHFnTdbW(coilOutletTemp, coilOutletHumRat);
     coilOutletTSat = Psychrometrics::PsyTsatFnHPb(*state, coilOutletEnthalpy, state->dataEnvrn->OutBaroPress);
     EXPECT_TRUE(coilOutletTemp >= coilOutletTSat);
@@ -16115,9 +16116,9 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     // OperatingMode 2
     thisSys->m_ZoneSequenceCoolingNum = 0;
     thisSys->m_ZoneSequenceHeatingNum = 0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.00;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2000.00;
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -1.1696238E-5;
+    zoneSysEnergyDemand.RemainingOutputRequired = -2000.00;
+    zoneSysEnergyDemand.RemainingOutputReqToCoolSP = -2000.00;
+    zoneSysMoistureDemand.RemainingOutputReqToDehumidSP = -1.1696238E-5;
     thisSys->simulate(*state,
                       compName,
                       FirstHVACIteration,
@@ -16130,33 +16131,34 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
                       ZoneEquipFlag,
                       SenOutput,
                       LatOutput);
-    EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.OperatingMode, 1);
-    EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.0);
+    EXPECT_EQ(coilCoolingDX.performance.OperatingMode, 1);
+    EXPECT_EQ(coilCoolingDX.performance.ModeRatio, 0.0);
     EXPECT_NEAR(thisSys->LoadSHR, 0.98533, 0.001);
     EXPECT_NEAR(thisSys->CoilSHR, 0.98246, 0.001);
     EXPECT_NEAR(SenOutput, -2000.0, 0.5);
     EXPECT_NEAR(LatOutput, -1077.6, 0.1);
-    coilOutletTemp = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirDryBulbTemp;
-    coilOutletHumRat = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirHumRat;
+    coilOutletTemp = coilCoolingDX.outletAirDryBulbTemp;
+    coilOutletHumRat = coilCoolingDX.outletAirHumRat;
     coilOutletEnthalpy = Psychrometrics::PsyHFnTdbW(coilOutletTemp, coilOutletHumRat);
     coilOutletTSat = Psychrometrics::PsyTsatFnHPb(*state, coilOutletEnthalpy, state->dataEnvrn->OutBaroPress);
     EXPECT_TRUE(coilOutletTemp >= coilOutletTSat);
 
-    // test OA system pointer and ComponentIndex
+    // Test OA system pointer and ComponentIndex
     // PR #9786 corrected an issue with the index that points to the object pointer
-    // these tests compares information from the UnitarySystem object and the pointer stored on the OutsideAirSys array
-    // these should match if information is stored in the correct place according to the index used to store that information
-    EXPECT_EQ(1, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
-    EXPECT_EQ("OA SYS COOLING COIL 1", state->dataAirLoop->OutsideAirSys(1).ComponentName(1));
-    EXPECT_EQ(2, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(2));
-    EXPECT_EQ("OA SYS COOLING COIL 2", state->dataAirLoop->OutsideAirSys(1).ComponentName(2));
+    // These tests compares information from the UnitarySystem object and the pointer stored on the OutsideAirSys array
+    // These should match if information is stored in the correct place according to the index used to store that information
+    auto &outsideAirSys = state->dataAirLoop->OutsideAirSys(1);
+    EXPECT_EQ(1, outsideAirSys.ComponentIndex(1));
+    EXPECT_EQ("OA SYS COOLING COIL 1", outsideAirSys.ComponentName(1));
+    EXPECT_EQ(2, outsideAirSys.ComponentIndex(2));
+    EXPECT_EQ("OA SYS COOLING COIL 2", outsideAirSys.ComponentName(2));
 
-    int OASys1Index = state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1); // <-- this here is the issue correction
-    int OASys2Index = state->dataAirLoop->OutsideAirSys(1).ComponentIndex(2); // <-- this here is the issue correction
-    EnergyPlus::HVACSystemData *compPointer1 = state->dataAirLoop->OutsideAirSys(1).compPointer[OASys1Index];
+    int OASys1Index = outsideAirSys.ComponentIndex(1); // <-- this here is the issue correction
+    int OASys2Index = outsideAirSys.ComponentIndex(2); // <-- this here is the issue correction
+    EnergyPlus::HVACSystemData *compPointer1 = outsideAirSys.compPointer[OASys1Index];
     UnitarySys *unitarySys1 = dynamic_cast<UnitarySys *>(compPointer1); // mystery code to access system data from abstract class
     assert(unitarySys1 != nullptr);                                     // dyanmic_cast will return nullptr if the object is not really of that type
-    EnergyPlus::HVACSystemData *compPointer2 = state->dataAirLoop->OutsideAirSys(1).compPointer[OASys2Index];
+    EnergyPlus::HVACSystemData *compPointer2 = outsideAirSys.compPointer[OASys2Index];
     UnitarySys *unitarySys2 = dynamic_cast<UnitarySys *>(compPointer2);
     assert(unitarySys2 != nullptr);
     EXPECT_EQ("OA SYS COOLING COIL 1", OASys1->Name);      // UnitarySystems::UnitarySys *OASys1 = &state->dataUnitarySystems->unitarySys[0]
@@ -16164,8 +16166,8 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ("OA SYS COOLING COIL 2", OASys2->Name);
     EXPECT_EQ("OA SYS COOLING COIL 2", unitarySys2->Name);
 
-    // now call the OA system to make sure the above data is not corrupted
-    // the test here is if the index has changed
+    // Now call the OA system to make sure the above data is not corrupted
+    // The test here is if the index has changed
     int OASysNum = 1;
     state->dataOutRptPredefined->subTable.allocate(5); //<-- have to set up a few of these table foot notes
     state->dataOutRptPredefined->pdstDXCoolCoil = 1;
@@ -16173,80 +16175,79 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataOutRptPredefined->pdstCoolCoil = 3;
 
     state->dataSize->CurOASysNum = 1;
-    state->dataHVACGlobal->DoSetPointTest = true; // will check for set point at coil outlet node
+    state->dataHVACGlobal->DoSetPointTest = true; // will check for node set point temperature at coil outlet node
     state->dataEnvrn->StdRhoAir = 1.2;
-    int outdoorAirNodeNum = OASys1->AirInNode;
-    state->dataLoopNodes->Node(outdoorAirNodeNum).Temp = 25.0;
-    state->dataLoopNodes->Node(outdoorAirNodeNum).HumRat = 0.0145946;
-    state->dataLoopNodes->Node(outdoorAirNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(outdoorAirNodeNum).Temp, state->dataLoopNodes->Node(outdoorAirNodeNum).HumRat);
-    state->dataLoopNodes->Node(outdoorAirNodeNum).MassFlowRate = 1.3 * state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(outdoorAirNodeNum).MassFlowRateMaxAvail = state->dataLoopNodes->Node(outdoorAirNodeNum).MassFlowRate;
-    Real64 OACoil1OutetSP = 20.0;
-    Real64 OACoil2OutetSP = 15.0;
-    state->dataLoopNodes->Node(OASys1->AirOutNode).TempSetPoint = OACoil1OutetSP;
-    state->dataLoopNodes->Node(OASys2->AirOutNode).TempSetPoint = OACoil2OutetSP;
+    auto &OASysAirInNode1 = state->dataLoopNodes->Node(OASys1->AirInNode);
+    auto &OASysAirInNode2 = state->dataLoopNodes->Node(OASys2->AirInNode);
+    auto &OASysAirOutNode1 = state->dataLoopNodes->Node(OASys1->AirOutNode);
+    auto &OASysAirOutNode2 = state->dataLoopNodes->Node(OASys2->AirOutNode);
+    OASysAirInNode1.Temp = 25.0; // corresponds to outdoor air node
+    OASysAirInNode1.HumRat = 0.0145946;
+    OASysAirInNode1.Enthalpy = Psychrometrics::PsyHFnTdbW(OASysAirInNode1.Temp, OASysAirInNode1.HumRat);
+    OASysAirInNode1.MassFlowRate = 1.3 * state->dataEnvrn->StdRhoAir;
+    OASysAirInNode1.MassFlowRateMaxAvail = OASysAirInNode1.MassFlowRate;
+    Real64 OACoil1OutletSP = 20.0;
+    Real64 OACoil2OutletSP = 15.0;
+    OASysAirOutNode1.TempSetPoint = OACoil1OutletSP;
+    OASysAirOutNode2.TempSetPoint = OACoil2OutletSP;
 
-    // now call where problem existed where ComponentIndex was corrupted
+    // Now call where problem existed where ComponentIndex was corrupted
     MixedAir::SimOASysComponents(*state, OASysNum, FirstHVACIteration, AirLoopNum);
 
-    // now check to see if the index is the same as before
-    EXPECT_EQ(1, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
-    EXPECT_EQ("OA SYS COOLING COIL 1", state->dataAirLoop->OutsideAirSys(1).ComponentName(OASys1Index));
-    EXPECT_EQ(2, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(2));
-    EXPECT_EQ("OA SYS COOLING COIL 2", state->dataAirLoop->OutsideAirSys(1).ComponentName(OASys2Index));
+    // Now check to see if the index is the same as before
+    EXPECT_EQ(1, outsideAirSys.ComponentIndex(1));
+    EXPECT_EQ("OA SYS COOLING COIL 1", outsideAirSys.ComponentName(OASys1Index));
+    EXPECT_EQ(2, outsideAirSys.ComponentIndex(2));
+    EXPECT_EQ("OA SYS COOLING COIL 2", outsideAirSys.ComponentName(OASys2Index));
 
-    // this checks the UnitarySystem objects as well as the state->dataAirLoop->OutsideAirSys(1).compPointer[] objects
+    // This checks the UnitarySystem objects as well as the state->dataAirLoop->OutsideAirSys(1).compPointer[] objects
     EXPECT_EQ("OA SYS COOLING COIL 1", OASys1->Name);
     EXPECT_EQ("OA SYS COOLING COIL 1", unitarySys1->Name);
     EXPECT_EQ("OA SYS COOLING COIL 2", OASys2->Name);
     EXPECT_EQ("OA SYS COOLING COIL 2", unitarySys2->Name);
 
-    // check that coils did operate and target set point temperature
-    EXPECT_NEAR(OACoil1OutetSP, state->dataLoopNodes->Node(OASys1->AirOutNode).Temp, 0.0001);
-    EXPECT_NEAR(OACoil2OutetSP, state->dataLoopNodes->Node(OASys2->AirOutNode).Temp, 0.0001);
+    // Check that coils did operate and target set point temperature
+    EXPECT_NEAR(OACoil1OutletSP, OASysAirOutNode1.Temp, 0.0001);
+    EXPECT_NEAR(OACoil2OutletSP, OASysAirOutNode2.Temp, 0.0001);
 
-    // set up parameters needed for a UnitarySystem object call in SimOAComponent
-    Real64 sensOut = 0.0;
-    Real64 latOut = 0.0;
-    state->dataLoopNodes->Node(OASys1->AirOutNode).Temp = 25.0; // reset coil outlet node temp so we know coil operated
-    EXPECT_GT(state->dataLoopNodes->Node(OASys1->AirOutNode).Temp, OACoil1OutetSP);
+    OASysAirOutNode1.Temp = 25.0; // reset coil outlet node temp so we know coil operated
+    EXPECT_GT(OASysAirOutNode1.Temp, OACoil1OutletSP);
 
-    // previous call structure as if this system was a UnitarySystem object
+    // Previous call structure as if this system was a UnitarySystem object
     // In SimOAComponents, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1) is passed to &CompIndex in SimOAComponent
     // in this next call CompIndex is passed to UnitarySystem as &CompIndex in the simulate function
-    CompIndex = state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1);
-    state->dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(*state,
-                                                                                 OASys1->Name,
-                                                                                 FirstHVACIteration,
-                                                                                 AirLoopNum,
-                                                                                 CompIndex,
-                                                                                 HeatingActive,
-                                                                                 CoolingActive,
-                                                                                 CompIndex,
-                                                                                 OAUCoilOutTemp,
-                                                                                 ZoneEquipFlag,
-                                                                                 sensOut,
-                                                                                 latOut);
+    CompIndex = outsideAirSys.ComponentIndex(1);
+    outsideAirSys.compPointer[CompIndex]->simulate(*state,
+                                                   OASys1->Name,
+                                                   FirstHVACIteration,
+                                                   AirLoopNum,
+                                                   CompIndex,
+                                                   HeatingActive,
+                                                   CoolingActive,
+                                                   CompIndex,
+                                                   OAUCoilOutTemp,
+                                                   ZoneEquipFlag,
+                                                   SenOutput,
+                                                   LatOutput);
 
-    // check that coil did operate and target set point temperature
-    EXPECT_NEAR(OACoil1OutetSP, state->dataLoopNodes->Node(OASys1->AirOutNode).Temp, 0.0001);
+    // Check that coil did operate and target set point temperature
+    EXPECT_NEAR(OACoil1OutletSP, OASysAirOutNode1.Temp, 0.0001);
 
-    // the above simulate call to a UnitarySystem object would overwrite state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1)
+    // The above simulate call to a UnitarySystem object would overwrite state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1)
     // because CompIndex is a reference to state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1)
     // Now CoilSystem:Cooling:DX, CoilSystem:Cooling:Water and AirloopHVAC:UnitarySystem are treated the same way.
-    EXPECT_NE(CompIndex, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
+    EXPECT_NE(CompIndex, outsideAirSys.ComponentIndex(1)); // <-- would have corrupted index to compPointer
 
-    // previous methods used to get CompIndex for CoilSystem:Cooling:DX
-    // these match which is why issue 9785 was hard to track down
-    // these 2 CoilSystem:Cooling:DX are the only objects in this unit test and are used in the OA System and coincidentally
+    // Previous methods used to get CompIndex for CoilSystem:Cooling:DX
+    // These match which is why issue 9785 was hard to track down
+    // These 2 CoilSystem:Cooling:DX are the only objects in this unit test and are used in the OA System and coincidentally
     // have an index of 0 and 1, 0+1 is the index to the OA equipment list for the 1st unit, as is 1+1 for the 2nd unit.
     // CoilSystem objects used elsewhere in the simulation would mean these unit indexes would not be 0 and 1
     // and this call would fail: state->dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate()
     int CompIndex1 = UnitarySystems::getUnitarySystemIndex(*state, OASys1->Name) + 1;
     int CompIndex2 = UnitarySystems::getUnitarySystemIndex(*state, OASys2->Name) + 1;
-    EXPECT_EQ(CompIndex1, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
-    EXPECT_EQ(CompIndex2, state->dataAirLoop->OutsideAirSys(1).ComponentIndex(2));
+    EXPECT_EQ(CompIndex1, outsideAirSys.ComponentIndex(1));
+    EXPECT_EQ(CompIndex2, outsideAirSys.ComponentIndex(2));
 }
 
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
