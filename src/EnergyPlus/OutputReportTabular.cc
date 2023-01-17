@@ -15710,6 +15710,11 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                         airLoopCoolTable.diffDesignPeak = airLoopHeatTable.designPeakLoad - airLoopHeatTable.peakDesSensLoad;
                     }
                 }
+
+                // Coincident and NonCoincident alike
+                airLoopCoolTable.mixAirTemp = finalSysSizing.MixTempAtCoolPeak;
+                airLoopHeatTable.mixAirTemp = finalSysSizing.HeatMixTemp;
+
                 ComputeEngineeringChecks(airLoopCoolTable);
                 ComputeEngineeringChecks(airLoopHeatTable);
 
