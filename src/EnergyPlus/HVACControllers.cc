@@ -738,8 +738,7 @@ void ResetController(EnergyPlusData &state, int const ControlNum, bool const DoW
     auto &RootFinders(state.dataHVACControllers->RootFinders(ControlNum));
 
     Real64 NoFlowResetValue = 0.0;
-    PlantUtilities::SetActuatedBranchFlowRate(
-        state, NoFlowResetValue, ControllerProps.ActuatedNode, ControllerProps.ActuatedNodePlantLoc, true);
+    PlantUtilities::SetActuatedBranchFlowRate(state, NoFlowResetValue, ControllerProps.ActuatedNode, ControllerProps.ActuatedNodePlantLoc, true);
 
     //  ENDIF
 
@@ -1278,11 +1277,8 @@ void SizeController(EnergyPlusData &state, int const ControlNum)
             (0.001 / (2100.0 * max(ControllerProps.MaxVolFlowActuated, SmallWaterVolFlow))) * (DataConvergParams::HVACEnergyToler / 10.0);
         // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
         ControllerProps.Offset = min(0.1 * DataConvergParams::HVACTemperatureToler, ControllerProps.Offset);
-        BaseSizer::reportSizerOutput(state,
-                                     ControllerProps.ControllerType,
-                                     ControllerProps.ControllerName,
-                                     "Controller Convergence Tolerance",
-                                     ControllerProps.Offset);
+        BaseSizer::reportSizerOutput(
+            state, ControllerProps.ControllerType, ControllerProps.ControllerName, "Controller Convergence Tolerance", ControllerProps.Offset);
     }
 }
 
@@ -2523,10 +2519,8 @@ void TraceIndividualController(EnergyPlusData &state,
     } break;
     default: {
         // Should never happen
-        ShowFatalError(state,
-                       format("TraceIndividualController: Invalid Operation passed={}, Controller name={}",
-                              Operation,
-                              ControllerProps.ControllerName));
+        ShowFatalError(
+            state, format("TraceIndividualController: Invalid Operation passed={}, Controller name={}", Operation, ControllerProps.ControllerName));
     } break;
     }
 
