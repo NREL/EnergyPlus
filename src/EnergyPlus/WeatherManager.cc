@@ -3558,12 +3558,12 @@ namespace WeatherManager {
         }
         current_line.remove_prefix(pos + 1);
 
-        bool reachedEndOfCommands = false;
-        auto readNextNumber = [&reachedEndOfCommands, &state, &WYear, &WMonth, &WDay, &WHour, &WMinute, &Line, &current_line](Real64 &target) {
+        auto readNextNumber =
+            [reachedEndOfCommands = false, &state, &WYear, &WMonth, &WDay, &WHour, &WMinute, &Line, &current_line]() mutable -> Real64 {
             if (reachedEndOfCommands) {
-                target = 999.0;
-                return;
+                return 999.0;
             }
+            Real64 target;
             std::string_view::size_type pos = index(current_line, ',');
             // We found a comma
             if (pos != std::string::npos) {
@@ -3591,14 +3591,15 @@ namespace WeatherManager {
                     }
                 }
             }
+            return target;
         };
 
-        readNextNumber(PrecipWater);
-        readNextNumber(AerosolOptDepth);
-        readNextNumber(SnowDepth);
-        readNextNumber(DaysSinceLastSnow);
-        readNextNumber(Albedo);
-        readNextNumber(LiquidPrecip);
+        PrecipWater = readNextNumber();
+        AerosolOptDepth = readNextNumber();
+        SnowDepth = readNextNumber();
+        DaysSinceLastSnow = readNextNumber();
+        Albedo = readNextNumber();
+        LiquidPrecip = readNextNumber();
 
         WObs = nint(RField21);
         if (WObs == 0) { // Obs Indicator indicates Weather Codes valid
