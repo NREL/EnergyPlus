@@ -469,7 +469,7 @@ void SimOAComponent(EnergyPlusData &state,
     switch (CompTypeNum) {
     case SimAirServingZones::CompType::OAMixer_Num: { // OutdoorAir:Mixer
         if (Sim) {
-            SimOAMixer(state, CompName, FirstHVACIteration, CompIndex);
+            SimOAMixer(state, CompName, CompIndex);
         }
         break;
     }
@@ -737,7 +737,7 @@ void SimOAComponent(EnergyPlusData &state,
     }
 }
 
-void SimOAMixer(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int &CompIndex)
+void SimOAMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:

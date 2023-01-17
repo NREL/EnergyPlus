@@ -381,7 +381,7 @@ namespace MixedAir {
                         bool &OACoolingCoil,  // TRUE indicates a cooling coil has been found
                         bool &OAHX);          // TRUE indicates a heat exchanger has been found
 
-    void SimOAMixer(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int &CompIndex);
+    void SimOAMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
 
     void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum);
 

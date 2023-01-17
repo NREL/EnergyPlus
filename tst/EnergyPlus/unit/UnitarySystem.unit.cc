@@ -16016,7 +16016,6 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     zoneSysEnergyDemand.RemainingOutputReqToHeatSP = -200.0;
     zoneSysMoistureDemand.RemainingOutputReqToDehumidSP = -200.0 / 2500940.0;
     // test COOLING condition
-    int zoneNodeNum = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
     auto &zoneNode = state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode);
     zoneNode.Temp = 24.0;      // 24C db
     zoneNode.HumRat = 0.01522; // 17C wb
@@ -16178,7 +16177,6 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataHVACGlobal->DoSetPointTest = true; // will check for node set point temperature at coil outlet node
     state->dataEnvrn->StdRhoAir = 1.2;
     auto &OASysAirInNode1 = state->dataLoopNodes->Node(OASys1->AirInNode);
-    auto &OASysAirInNode2 = state->dataLoopNodes->Node(OASys2->AirInNode);
     auto &OASysAirOutNode1 = state->dataLoopNodes->Node(OASys1->AirOutNode);
     auto &OASysAirOutNode2 = state->dataLoopNodes->Node(OASys2->AirOutNode);
     OASysAirInNode1.Temp = 25.0; // corresponds to outdoor air node
