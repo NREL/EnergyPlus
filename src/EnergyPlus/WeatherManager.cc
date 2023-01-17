@@ -3480,7 +3480,7 @@ namespace WeatherManager {
 
         // Do the first five.  (To get to the DataSource field)
         {
-            auto nth_pos = nth_occurrence(current_line, ',', 5); // Returns the position **after** the nth occurrence of ','
+            std::string_view::size_type nth_pos = nth_occurrence(current_line, ',', 5); // Returns the position **after** the nth occurrence of ','
             const bool succeeded = readList(current_line.substr(pos, (nth_pos - 1) - pos), WYear, WMonth, WDay, WHour, WMinute);
             if (!succeeded) {
                 ShowSevereError(state, "Invalid Date info in Weather Line");
@@ -3521,7 +3521,7 @@ namespace WeatherManager {
         // Now read more numerics with List Directed I/O (note there is another "character" field lurking)
         Real64 RField21;
         {
-            auto nth_pos = nth_occurrence(current_line, ',', 21);
+            std::string_view::size_type nth_pos = nth_occurrence(current_line, ',', 21);
 
             const bool succeeded = readList(current_line.substr(0, nth_pos - 1),
                                             DryBulb,
@@ -3564,7 +3564,7 @@ namespace WeatherManager {
                 target = 999.0;
                 return;
             }
-            auto pos = index(current_line, ',');
+            std::string_view::size_type pos = index(current_line, ',');
             // We found a comma
             if (pos != std::string::npos) {
                 // Content is not empty
