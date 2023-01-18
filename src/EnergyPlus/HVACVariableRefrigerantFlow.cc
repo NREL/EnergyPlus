@@ -9359,8 +9359,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
         }
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if ((NoCompOutput <= QZnReq && QZnReq < -DataHVACGlobals::SmallLoad) ||
-            (QZnReq >= -DataHVACGlobals::SmallLoad && NoCompOutput <= QZnReq && !HRCoolingMode)) {
+        if (NoCompOutput <= QZnReq && ((QZnReq < -DataHVACGlobals::SmallLoad) || (QZnReq >= -DataHVACGlobals::SmallLoad && !HRCoolingMode))) {
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = false;
             if (!this->SuppHeatingCoilPresent) {
                 PartLoadRatio = 0.0;
@@ -12656,8 +12655,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         if (NoCompOutput <= QZnReq) return;
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if ((NoCompOutput <= QZnReq && QZnReq < -DataHVACGlobals::SmallLoad) ||
-            (QZnReq >= -DataHVACGlobals::SmallLoad && NoCompOutput <= QZnReq && !HRCoolingMode)) {
+        if (NoCompOutput <= QZnReq && ((QZnReq < -DataHVACGlobals::SmallLoad) || (QZnReq >= -DataHVACGlobals::SmallLoad && !HRCoolingMode))) {
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = false;
             if (!this->SuppHeatingCoilPresent) {
                 PartLoadRatio = 0.0;
