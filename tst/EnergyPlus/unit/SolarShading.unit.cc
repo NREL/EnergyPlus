@@ -70,6 +70,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
@@ -1091,7 +1092,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(*state, 2, 9, 4));
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
-    ;
+
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
@@ -3901,4 +3902,77 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
     }
 #endif
+}
+
+TEST_F(EnergyPlusFixture, ShadowCalculation_CSV)
+{
+
+    // Test for #9753
+    state->dataSurface->TotSurfaces = 2;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface(1).Name = "ZN001:WALL001";
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Name = "ZN001:WALL002";
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Construction = 1;
+
+    state->files.shade.open_as_stringstream();
+
+    HeatBalanceManager::OpenShadingFile(*state);
+
+    std::string expected_values = "Surface Name,ZN001:WALL001,ZN001:WALL002,\n";
+    {
+        auto const stream_str = state->files.shade.get_output();
+        EXPECT_EQ(expected_values, stream_str);
+    }
+    // reset
+    state->files.shade.open_as_stringstream();
+
+    int constexpr NumTimeSteps(2);
+    int constexpr HoursInDay(24);
+
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->DoWeathSim = true;
+    state->dataSysVars->ReportExtShadingSunlitFrac = true;
+
+    state->dataGlobal->BeginDayFlag = true;
+    state->dataGlobal->WarmupFlag = false;
+    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataGlobal->NumOfTimeStepInHour = NumTimeSteps;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 25;
+
+    state->dataHeatBal->SurfSunlitFrac.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
+
+    for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
+        for (int TS = 1; TS <= state->dataGlobal->NumOfTimeStepInHour; ++TS) {
+            if (TS == state->dataGlobal->NumOfTimeStepInHour) {
+                expected_values += fmt::format(" 01/25 {:02}:00,", iHour);
+            } else {
+                expected_values += fmt::format(" 01/25 {:02}:30,", iHour - 1);
+            }
+
+            for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
+                expected_values += fmt::format("{:10.8F},", 0.0);
+            }
+            expected_values += "\n";
+        }
+    }
+
+    state->dataHeatBal->TotConstructs = 2;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+    state->dataConstruction->Construct(1).TotLayers = 1;
+    state->dataConstruction->Construct(1).TypeIsWindow = false;
+    state->dataSurface->SurfWinSolarDiffusing.allocate(state->dataSurface->TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
+    WindowManager::initWindowModel(*state);
+
+    state->dataSolarShading->GetInputFlag = false;
+    HeatBalanceManager::InitHeatBalance(*state);
+
+    {
+        auto const stream_str = state->files.shade.get_output();
+        EXPECT_EQ(expected_values, stream_str);
+    }
 }

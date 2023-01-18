@@ -6627,7 +6627,7 @@ namespace HeatBalanceManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             print(state.files.shade, "{},", state.dataSurface->Surface(SurfNum).Name);
         }
-        print(state.files.shade, "()\n");
+        print(state.files.shade, "\n");
     }
     void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
     {
