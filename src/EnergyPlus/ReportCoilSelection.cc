@@ -1264,7 +1264,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                                               SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
         }
 
-        auto finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
+        auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
         c->isCoilSizingForTotalLoad = (finalSysSizing.coolingPeakLoad == DataSizing::PeakLoad::TotalCooling);
         c->oaPeakTemp = finalSysSizing.OutTempAtCoolPeak;
         c->oaPeakVolFlow = finalSysSizing.DesOutAirVolFlow;
@@ -1735,7 +1735,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->coilDesMassFlow = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatMassFlow;
             c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
         } else if (curSysNum > 0 && allocated(state.dataSize->FinalSysSizing)) {
-            auto finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
+            auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
             if (curOASysNum > 0 && allocated(OASysEqSizing)) {
                 if (OASysEqSizing(curOASysNum).AirFlow) {
                     c->coilDesVolFlow = OASysEqSizing(curOASysNum).AirVolFlow;
