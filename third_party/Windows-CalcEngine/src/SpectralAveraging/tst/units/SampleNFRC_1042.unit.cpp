@@ -666,8 +666,8 @@ public:
 
 TEST_F(TestSampleNFRC_1042, TestSampleEnergy)
 {
-    Real64 lowLambda = 0.3;
-    Real64 highLambda = 2.5;
+    auto lowLambda = 0.3;
+    auto highLambda = 2.5;
 
     auto aSample = getSample();
     auto transmittedSolar = aSample->getEnergy(lowLambda, highLambda, Property::T, Side::Front);
@@ -694,8 +694,8 @@ TEST_F(TestSampleNFRC_1042, TestSampleEnergy)
 
 TEST_F(TestSampleNFRC_1042, TestSampleProperties)
 {
-    Real64 lowLambda = 0.3;
-    Real64 highLambda = 2.5;
+    auto lowLambda = 0.3;
+    auto highLambda = 2.5;
 
     auto aSample = getSample();
     auto transmittance = aSample->getProperty(lowLambda, highLambda, Property::T, Side::Front);

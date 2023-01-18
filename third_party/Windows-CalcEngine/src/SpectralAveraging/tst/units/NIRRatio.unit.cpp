@@ -148,8 +148,8 @@ protected:
     {
         auto solarRadiation = getSolarRadiation();
 
-        Real64 lowLambda = 0.38;
-        Real64 highLambda = 0.78;
+        auto lowLambda = 0.38;
+        auto highLambda = 0.78;
 
         m_NIRRatio = std::make_shared<CNIRRatio>(solarRadiation, lowLambda, highLambda);
     }

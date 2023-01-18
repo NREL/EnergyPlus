@@ -92,8 +92,8 @@ TEST_F(EquivalentSpecularLayer_102_103_IR_Range, TestNoAvailableData)
     const auto blackBodyTemperature = 300;
     const auto sourceData = SpectralAveraging::BlackBodySpectrum(wl, blackBodyTemperature);
 
-    const Real64 minLambda = 5.0;
-    const Real64 maxLambda = 100.0;
+    const auto minLambda = 5.0;
+    const auto maxLambda = 100.0;
 
     double thickness = 3.048e-3;   // [m]
     EXPECT_THROW(

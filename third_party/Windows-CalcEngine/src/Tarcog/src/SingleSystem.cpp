@@ -223,18 +223,18 @@ namespace Tarcog
         void CSingleSystem::initializeStartValues()
         {
             auto const startX = 0.001;
-            const double thickness = m_IGU.getThickness() + startX + 0.01;
-            const double tOut = m_Environment.at(Environment::Outdoor)->getGasTemperature();
-            const double tInd = m_Environment.at(Environment::Indoor)->getGasTemperature();
+            const auto thickness = m_IGU.getThickness() + startX + 0.01;
+            const auto tOut = m_Environment.at(Environment::Outdoor)->getGasTemperature();
+            const auto tInd = m_Environment.at(Environment::Indoor)->getGasTemperature();
 
-            const double deltaTemp = (tInd - tOut) / thickness;
+            const auto deltaTemp = (tInd - tOut) / thickness;
 
             auto aLayers = m_IGU.getLayers();
 
             const auto aLayer = aLayers.front();
             auto currentXPosition = startX;
             auto aSurface = aLayer->getSurface(Side::Front);
-            double curTemp = tOut + currentXPosition * deltaTemp;
+            auto curTemp = tOut + currentXPosition * deltaTemp;
 
             aSurface->initializeStart(curTemp);
 

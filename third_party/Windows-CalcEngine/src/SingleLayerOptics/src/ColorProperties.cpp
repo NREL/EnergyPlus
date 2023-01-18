@@ -62,7 +62,7 @@ namespace SingleLayerOptics
                                                t_Scattering,
                                                t_Theta,
                                                t_Phi);
-        double Y = 100
+        auto Y = 100
                  * m_LayerY->getPropertySimple(m_LayerX->getMinLambda(),
                                                m_LayerX->getMaxLambda(),
                                                t_Property,
@@ -88,9 +88,9 @@ namespace SingleLayerOptics
                                  double const t_Phi)
     {
         auto tri = getTrichromatic(t_Property, t_Side, t_Scattering, t_Theta, t_Phi);
-        double X = 0.0125313 * (tri.X - 0.1901);
-        double Y = 0.0125313 * (tri.Y - 0.2);
-        double Z = 0.0125313 * (tri.Z - 0.2178);
+        auto X = 0.0125313 * (tri.X - 0.1901);
+        auto Y = 0.0125313 * (tri.Y - 0.2);
+        auto Z = 0.0125313 * (tri.Z - 0.2178);
 
         /// According to https://www.w3.org/Graphics/Color/srgb.pdf
         const FenestrationCommon::SquareMatrix T({{3.2406255, -1.537208, -0.4986286},

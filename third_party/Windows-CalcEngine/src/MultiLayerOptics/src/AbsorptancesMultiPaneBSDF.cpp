@@ -136,7 +136,7 @@ namespace MultiLayerOptics
 
     void CAbsorptancesMultiPaneBSDF::calculateState(const double minLambda, const double maxLambda)
     {
-        const size_t numOfWavelengths = m_CommonWavelengths.size();
+        const auto numOfWavelengths = m_CommonWavelengths.size();
         auto matrixSize = m_TausF[0][0].size();
 
         // calculation of forward r and t coefficients

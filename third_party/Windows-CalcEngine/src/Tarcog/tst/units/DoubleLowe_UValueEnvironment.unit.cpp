@@ -130,7 +130,7 @@ TEST_F(TestDoubleLoweUValueEnvironment, Test1)
     auto effectiveSystemConductivity{aSystem->getEffectiveSystemConductivity(aRun)};
     EXPECT_NEAR(0.051424, effectiveSystemConductivity, 1e-6);
 
-    Real64 thickness{aSystem->thickness(aRun)};
+    auto thickness{aSystem->thickness(aRun)};
     EXPECT_NEAR(0.021595, thickness, 1e-6);
 
     auto numOfIter = aSystem->getNumberOfIterations(aRun);

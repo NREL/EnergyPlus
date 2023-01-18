@@ -17,11 +17,11 @@ protected:
     virtual void SetUp()
     {
         // create material
-        const Real64 Tmat = 0.0;
-        const Real64 Rfmat = 0.1;
+        const auto Tmat = 0.0;
+        const auto Rfmat = 0.1;
         const auto Rbmat = 0.1;
-        const Real64 minLambda = 5.0;
-        const Real64 maxLambda = 40.0;
+        const auto minLambda = 5.0;
+        const auto maxLambda = 40.0;
         const auto aMaterial = SingleLayerOptics::Material::singleBandMaterial(
           Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 

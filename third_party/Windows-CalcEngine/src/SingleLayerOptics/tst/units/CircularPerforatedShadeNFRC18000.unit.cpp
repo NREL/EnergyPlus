@@ -19,19 +19,19 @@ protected:
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Quarter);
 
         // create material
-        const Real64 Tmat = 0.0;
-        const Real64 Rfmat = 0.137;
-        const Real64 Rbmat = 0.16;
-        const Real64 minLambda = 5.0;
-        const Real64 maxLambda = 100.0;
+        const auto Tmat = 0.0;
+        const auto Rfmat = 0.137;
+        const auto Rbmat = 0.16;
+        const auto minLambda = 5.0;
+        const auto maxLambda = 100.0;
         const auto aMaterial =
           Material::singleBandMaterial(Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 
         // make cell geometry
-        const Real64 thickness_31111{0.00023};
-        const Real64 x = 0.00169;        // m
-        const Real64 y = 0.00169;        // m
-        const Real64 radius = 0.00058;   // m
+        const auto thickness_31111{0.00023};
+        const auto x = 0.00169;        // m
+        const auto y = 0.00169;        // m
+        const auto radius = 0.00058;   // m
 
         // Perforated layer is created here
         m_Shade = CBSDFLayerMaker::getCircularPerforatedLayer(

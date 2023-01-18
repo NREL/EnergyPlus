@@ -147,8 +147,8 @@ namespace Viewer
 
         auto C1 = coeffC();
         auto C2 = t_Segment->coeffC();
-        double x = 0.0;
-        double y = 0.0;
+        auto x = 0.0;
+        auto y = 0.0;
 
         if(std::abs(A1) > ViewerConstants::DISTANCE_TOLERANCE)
         {

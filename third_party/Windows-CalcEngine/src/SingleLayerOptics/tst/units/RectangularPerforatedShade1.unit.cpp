@@ -17,20 +17,20 @@ protected:
     virtual void SetUp()
     {
         // create material
-        const Real64 Tmat = 0.0;
-        const Real64 Rfmat = 0.7;
+        const auto Tmat = 0.0;
+        const auto Rfmat = 0.7;
         const auto Rbmat = 0.7;
-        const Real64 minLambda = 0.3;
-        const Real64 maxLambda = 2.5;
+        const auto minLambda = 0.3;
+        const auto maxLambda = 2.5;
         const auto aMaterial =
           Material::singleBandMaterial(Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 
         // make cell geometry
-        const Real64 x = 19.05;         // mm
-        const Real64 y = 19.05;         // mm
-        const Real64 thickness = 0.6;   // mm
-        const Real64 xHole = 3.175;     // mm
-        const Real64 yHole = 6.35;      // mm
+        const auto x = 19.05;         // mm
+        const auto y = 19.05;         // mm
+        const auto thickness = 0.6;   // mm
+        const auto xHole = 3.175;     // mm
+        const auto yHole = 6.35;      // mm
 
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Quarter);
 

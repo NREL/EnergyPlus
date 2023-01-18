@@ -798,7 +798,7 @@ public:
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties0degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 0.0;
@@ -809,8 +809,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties0degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -827,7 +827,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties0degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties10degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 10.0;
@@ -838,8 +838,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties10degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -856,7 +856,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties10degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties20degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 20.0;
@@ -867,8 +867,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties20degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -885,7 +885,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties20degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties30degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 30.0;
@@ -896,8 +896,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties30degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -914,7 +914,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties30degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties40degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 40.0;
@@ -925,8 +925,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties40degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -943,7 +943,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties40degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties50degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 50.0;
@@ -954,8 +954,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties50degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -972,7 +972,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties50degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties60degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 60.0;
@@ -983,8 +983,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties60degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -1001,7 +1001,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties60degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties70degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 70.0;
@@ -1012,8 +1012,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties70degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -1030,7 +1030,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties70degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties80degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 80.0;
@@ -1041,8 +1041,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties80degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -1059,7 +1059,7 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties80degrees)
 
 TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties90degrees)
 {
-    Real64 thickness = 5.715e-3;   // [m]
+    auto thickness = 5.715e-3;   // [m]
     auto layerType = MaterialType::Monolithic;
 
     auto angle = 90.0;
@@ -1070,8 +1070,8 @@ TEST_F(TestSampleNFRC_103_Angular_Photopic, TestProperties90degrees)
       std::make_shared<CAngularSpectralSample>(aMeasuredSample, thickness, layerType);
 
     // VISIBLE (PHOTOPIC) RANGE
-    Real64 lowLambda = 0.38;
-    Real64 highLambda = 0.78;
+    auto lowLambda = 0.38;
+    auto highLambda = 0.78;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);

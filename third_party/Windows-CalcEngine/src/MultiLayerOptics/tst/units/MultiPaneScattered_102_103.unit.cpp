@@ -184,7 +184,7 @@ protected:
     void SetUp() override
     {
         // Create material from samples
-        Real64 thickness = 3.048e-3;   // [m]
+        auto thickness = 3.048e-3;   // [m]
         auto aMaterial_102 = SingleLayerOptics::Material::nBandMaterial(
           loadSampleData_NFRC_102(), thickness, MaterialType::Monolithic, WavelengthRange::Solar);
         thickness = 5.715e-3;   // [m]
@@ -246,10 +246,10 @@ TEST_F(MultiPaneScattered_102_103, TestSpecular1)
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.225847, R_dif_dif, 1e-6);
 
-    double A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
+    auto A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.096730, A_dir1, 1e-6);
 
-    double A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
+    auto A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.133556, A_dir2, 1e-6);
 
     auto A_dif1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Diffuse, theta, phi);
@@ -296,10 +296,10 @@ TEST_F(MultiPaneScattered_102_103, TestSpecular2)
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.225847, R_dif_dif, 1e-6);
 
-    double A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
+    auto A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.096730, A_dir1, 1e-6);
 
-    double A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
+    auto A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.133556, A_dir2, 1e-6);
 
     auto A_dif1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Diffuse, theta, phi);
@@ -346,10 +346,10 @@ TEST_F(MultiPaneScattered_102_103, TestSpecular3)
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.225847, R_dif_dif, 1e-6);
 
-    double A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
+    auto A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.111936, A_dir1, 1e-6);
 
-    double A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
+    auto A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.144501, A_dir2, 1e-6);
 
     auto A_dif1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Diffuse, theta, phi);

@@ -666,10 +666,10 @@ public:
 
 TEST_F(TestSampleNFRC_1042_Angular, TestSampleProperties)
 {
-    Real64 lowLambda = 0.3;
-    Real64 highLambda = 2.5;
+    auto lowLambda = 0.3;
+    auto highLambda = 2.5;
 
-    Real64 thickness = 3.18e-3;   // [m]
+    auto thickness = 3.18e-3;   // [m]
 
     auto layerType = MaterialType::Coated;
 

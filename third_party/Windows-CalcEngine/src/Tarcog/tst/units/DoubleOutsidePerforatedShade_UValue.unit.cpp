@@ -40,10 +40,10 @@ protected:
         auto shadeLayerConductance = 0.12;
 
         // make cell geometry
-        const Real64 thickness_31111{0.00023};
-        const Real64 x = 0.00169;        // m
-        const Real64 y = 0.00169;        // m
-        const Real64 radius = 0.00058;   // m
+        const auto thickness_31111{0.00023};
+        const auto x = 0.00169;        // m
+        const auto y = 0.00169;        // m
+        const auto radius = 0.00058;   // m
 
         const auto CellDimension{
           ThermalPermeability::Perforated::diameterToXYDimension(2 * radius)};

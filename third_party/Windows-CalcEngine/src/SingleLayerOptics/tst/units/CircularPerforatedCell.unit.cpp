@@ -18,19 +18,19 @@ protected:
     virtual void SetUp()
     {
         // create material
-        const Real64 Tmat = 0.1;
-        const Real64 Rfmat = 0.7;
-        const Real64 Rbmat = 0.8;
-        const Real64 minLambda = 0.3;
-        const Real64 maxLambda = 2.5;
+        const auto Tmat = 0.1;
+        const auto Rfmat = 0.7;
+        const auto Rbmat = 0.8;
+        const auto minLambda = 0.3;
+        const auto maxLambda = 2.5;
         const auto aMaterial =
           Material::singleBandMaterial(Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 
         // make cell geometry
-        const Real64 x = 10;          // mm
-        const Real64 y = 10;          // mm
-        const Real64 thickness = 1;   // mm
-        const Real64 radius = 5;      // mm
+        const auto x = 10;          // mm
+        const auto y = 10;          // mm
+        const auto thickness = 1;   // mm
+        const auto radius = 5;      // mm
         m_DescriptionCell = std::make_shared<CCircularCellDescription>(x, y, thickness, radius);
 
         m_PerforatedCell = std::make_shared<CPerforatedCell>(aMaterial, m_DescriptionCell);

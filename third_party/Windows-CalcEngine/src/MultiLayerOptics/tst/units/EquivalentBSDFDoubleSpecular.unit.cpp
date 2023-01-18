@@ -110,10 +110,10 @@ protected:
            {2.400, 0.8320, 0.0700, 0.0700}, {2.450, 0.8260, 0.0690, 0.0690},
            {2.500, 0.8220, 0.0680, 0.0680}});
 
-        const Real64 thickness = 3.048e-3;   // [m]
+        const auto thickness = 3.048e-3;   // [m]
         const MaterialType aType = MaterialType::Monolithic;
-        const Real64 minLambda = 0.3;
-        const Real64 maxLambda = 2.5;
+        const auto minLambda = 0.3;
+        const auto maxLambda = 2.5;
         const auto aMaterial = SingleLayerOptics::Material::nBandMaterial(
           aMeasurements_102, thickness, aType, minLambda, maxLambda);
 

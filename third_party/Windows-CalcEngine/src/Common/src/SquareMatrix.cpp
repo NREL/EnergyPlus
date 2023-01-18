@@ -103,7 +103,7 @@ namespace FenestrationCommon
 
             for(auto i = int(size); i >= 0; --i)
             {
-                double x = 0.0;
+                auto x = 0.0;
                 for(auto j = i + 1; j <= int(size); ++j)
                 {
                     x = x + aLu(size_t(i), size_t(j)) * invMat(size_t(j), size_t(m));

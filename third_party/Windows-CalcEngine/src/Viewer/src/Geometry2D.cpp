@@ -262,7 +262,7 @@ namespace Viewer
 
     // Not used for now. Commented to avoid warnings
     // double CGeometry2D::intersectionWithYAxis( double const tanPhi, CPoint2D const& t_Point ) {
-    // 	Real64 y = 0.0;
+    // 	auto y = 0.0;
     // 	if ( tanPhi != 0 ) {
     // 		auto x1 = t_Point.y() / tanPhi;
     // 		auto x = x1 + t_Point.x();

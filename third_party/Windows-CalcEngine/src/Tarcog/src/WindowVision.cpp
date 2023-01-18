@@ -272,7 +272,7 @@ namespace Tarcog::ISO15099
 
     double WindowVision::frameProjectedArea() const
     {
-        double area{0.0};
+        auto area{0.0};
 
         for(const auto & system : m_Frame)
         {
@@ -284,7 +284,7 @@ namespace Tarcog::ISO15099
 
     double WindowVision::edgeOfGlassArea() const
     {
-        double area{0.0};
+        auto area{0.0};
 
         for(const auto & [key, frame] : m_Frame)
         {

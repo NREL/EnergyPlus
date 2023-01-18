@@ -32,7 +32,7 @@ protected:
         //////////////////////////////////////////////////////////
         /// First layer
         //////////////////////////////////////////////////////////
-        const Real64 thickness = 0.003;    // [m]
+        const auto thickness = 0.003;    // [m]
         const auto conductivity = 1.0;   // [W/m2K]
         const auto emissFront = 0.84;
         const auto emissBack = 0.84;

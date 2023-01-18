@@ -29,11 +29,11 @@ protected:
                                                                 {0.320, 0.1000, 0.0470, 0.0480}});
 
 
-        const Real64 thickness = 3.048e-3;   // [m]
+        const auto thickness = 3.048e-3;   // [m]
         const MaterialType aType = MaterialType::Monolithic;
         // WavelengthRange aRange = WavelengthRange::Solar;
-        const Real64 minLambda = 0.3;
-        const Real64 maxLambda = 2.5;
+        const auto minLambda = 0.3;
+        const auto maxLambda = 2.5;
         const auto aMaterial =
           Material::nBandMaterial(aMeasurements, thickness, aType, minLambda, maxLambda);
 
