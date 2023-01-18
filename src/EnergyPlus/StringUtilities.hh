@@ -137,6 +137,8 @@ inline auto nth_occurrence(std::string_view input_str, std::string_view search_s
     return pos;
 }
 
+// Returns the position **after** the nth occurrence of the search_char, eg:
+// eg: Given a string test="aa,bb,cc", nth_occurrence(test, ',', x), for x = 1 it gives 3, and for x = 2 it gives 6
 inline auto nth_occurrence(std::string_view input_str, char const search_char, std::size_t Nth)
 {
     if (Nth == 0) return std::string_view::npos;

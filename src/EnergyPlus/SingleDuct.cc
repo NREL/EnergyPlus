@@ -6262,7 +6262,7 @@ void setATMixerSizingProperties(EnergyPlusData &state,
     if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).MixerType == DataHVACGlobals::ATMixer_SupplySide) {
         // check if user has selected No to account for DOAS system
         if (FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
-            if (!FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
+            if (!FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOASControl::NeutralSup) {
                 ShowWarningError(state, "AirTerminal:SingleDuct:Mixer: " + state.dataSingleDuct->SysATMixer(inletATMixerIndex).Name);
                 ShowContinueError(
                     state,
@@ -6277,7 +6277,7 @@ void setATMixerSizingProperties(EnergyPlusData &state,
     }
     // check if user has selected Yes to account for DOAS system
     if (FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
-        if (FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
+        if (FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOASControl::NeutralSup) {
             ShowWarningError(state, "AirTerminal:SingleDuct:Mixer: " + state.dataSingleDuct->SysATMixer(inletATMixerIndex).Name);
             ShowContinueError(state, " Inlet side Air Terminal Mixer automatically adjusts zone equipment coil sizing.");
             ShowContinueError(state,

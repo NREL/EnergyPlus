@@ -977,7 +977,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->PlantSizData(1).ExitTemp = 6.0;
     state->dataSize->PlantSizData(1).PlantLoopName = "CHW LOOP";
-    state->dataSize->PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Cooling;
     state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;

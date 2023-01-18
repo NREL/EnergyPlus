@@ -68,15 +68,11 @@
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -722,11 +718,11 @@ void SizeZoneEquipment(EnergyPlusData &state)
 }
 
 void CalcDOASSupCondsForSizing(EnergyPlusData &state,
-                               Real64 OutDB,        // outside air temperature [C]
-                               Real64 OutHR,        // outside humidity ratio [kg Water / kg Dry Air]
-                               int DOASControl,     // dedicated outside air control strategy
-                               Real64 DOASLowTemp,  // DOAS low setpoint [C]
-                               Real64 DOASHighTemp, // DOAS high setpoint [C]
+                               Real64 OutDB,                        // outside air temperature [C]
+                               Real64 OutHR,                        // outside humidity ratio [kg Water / kg Dry Air]
+                               DataSizing::DOASControl DOASControl, // dedicated outside air control strategy
+                               Real64 DOASLowTemp,                  // DOAS low setpoint [C]
+                               Real64 DOASHighTemp,                 // DOAS high setpoint [C]
                                Real64 W90H, // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
                                Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
                                Real64 &DOASSupTemp, // DOAS supply temperature [C]
@@ -754,7 +750,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     DOASSupTemp = 0.0;
     DOASSupHR = 0.0;
     // neutral supply air
-    if (DOASControl == 1) {
+    if (DOASControl == DataSizing::DOASControl::NeutralSup) {
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASLowTemp;
             DOASSupHR = OutHR;
@@ -768,7 +764,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     }
 
     // neutral dehumidified supply air
-    else if (DOASControl == 2) { //
+    else if (DOASControl == DataSizing::DOASControl::NeutralDehumSup) { //
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASHighTemp;
             DOASSupHR = OutHR;
@@ -779,7 +775,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     }
 
     // cold supply air
-    else if (DOASControl == 3) {
+    else if (DOASControl == DataSizing::DOASControl::CoolSup) {
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASHighTemp;
             DOASSupHR = OutHR;
@@ -846,8 +842,8 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             } else {
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneNum = ZoneIndex;
             }
-            if (state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == FromDDCalc ||
-                state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == FromDDCalc) {
+            if (state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == AirflowSizingMethod::FromDDCalc ||
+                state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == AirflowSizingMethod::FromDDCalc) {
                 if (!ZoneTempPredictorCorrector::VerifyThermostatInZone(state, state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                     if (!state.dataGlobal->isPulseZoneSizing) {
                         ShowWarningError(state,
@@ -2778,7 +2774,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             // Now take into account the user specified sizing factor and user specified cooling design air flow rate
             TotCoolSizMult = 0.0;
             // Calculate a sizing factor from the user specified cooling design air flow rate
-            if (finalZoneSizing.InpDesCoolAirFlow > 0.0 && finalZoneSizing.CoolAirDesMethod == InpDesAirFlow &&
+            if (finalZoneSizing.InpDesCoolAirFlow > 0.0 && finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::InpDesAirFlow &&
                 finalZoneSizing.DesCoolVolFlow > 0.0) {
                 TotCoolSizMult = (finalZoneSizing.InpDesCoolAirFlow / finalZoneSizing.DesCoolVolFlow) * finalZoneSizing.CoolSizingFactor;
                 // If no user specified cooling design air flow rate input, use the user specified szing factor
@@ -2834,7 +2830,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             // Save a set of design cooling air flow rates greater than or equal to the specified minimums without MinOA
             {
                 Real64 MaxOfMinCoolVolFlowNoOA = 0.0; // max of the user specified design cooling minimum flows without min OA flow [m3/s]
-                if (finalZoneSizing.CoolAirDesMethod == DesAirFlowWithLim) {
+                if (finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim) {
                     MaxOfMinCoolVolFlowNoOA = max(finalZoneSizing.DesCoolMinAirFlow, finalZoneSizing.DesCoolMinAirFlow2);
                 }
                 Real64 MaxOfMinCoolMassFlowNoOA =
@@ -2874,7 +2870,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             // Now make sure that the design cooling air flow rates are greater than or equal to the specified minimums including MinOA
             {
                 Real64 MaxOfMinCoolVolFlow = 0.0; // max of the user specified design cooling minimum flows and min OA flow [m3/s]
-                if (finalZoneSizing.CoolAirDesMethod == DesAirFlowWithLim) {
+                if (finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim) {
                     MaxOfMinCoolVolFlow = max(finalZoneSizing.DesCoolMinAirFlow, finalZoneSizing.DesCoolMinAirFlow2, finalZoneSizing.MinOA);
                 } else {
                     MaxOfMinCoolVolFlow = finalZoneSizing.MinOA;
@@ -2949,11 +2945,11 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             // sizing factor)
             TotHeatSizMult = 0.0;
             // Calculate a sizing factor from the user specified heating design air flow rate
-            if (finalZoneSizing.InpDesHeatAirFlow > 0.0 && finalZoneSizing.HeatAirDesMethod == InpDesAirFlow &&
+            if (finalZoneSizing.InpDesHeatAirFlow > 0.0 && finalZoneSizing.HeatAirDesMethod == AirflowSizingMethod::InpDesAirFlow &&
                 finalZoneSizing.DesHeatVolFlow > 0.0) {
                 TotHeatSizMult = (finalZoneSizing.InpDesHeatAirFlow / finalZoneSizing.DesHeatVolFlow) * finalZoneSizing.HeatSizingFactor;
                 // Calculate a sizing factor from the user specified max heating design air flow rates
-            } else if (finalZoneSizing.HeatAirDesMethod == DesAirFlowWithLim && finalZoneSizing.DesHeatVolFlow > 0.0) {
+            } else if (finalZoneSizing.HeatAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim && finalZoneSizing.DesHeatVolFlow > 0.0) {
                 MaxHeatVolFlow = max(finalZoneSizing.DesHeatMaxAirFlow,
                                      finalZoneSizing.DesHeatMaxAirFlow2,
                                      finalZoneSizing.DesCoolVolFlow * finalZoneSizing.DesHeatMaxAirFlowFrac);
@@ -5521,10 +5517,60 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (thisVentilation.OpenEff != DataGlobalConstants::AutoCalculate) {
                 Cw = thisVentilation.OpenEff;
             } else {
-                // linear interpolation between effective angle and wind direction
-                angle = std::abs(WindDirExt - thisVentilation.EffAngle);
-                if (angle > 180.0) angle -= 180.0;
-                Cw = 0.55 + angle / 180.0 * (0.3 - 0.55);
+                //   Wind Dir (β1)                                        90°, min effectiveness
+                //           ▲                                     (ϕ3) .  ▲
+                //     .   ϕ │    Opening Normal (α)                       │  .  Angle (ϕ1)
+                //      . ┌──┼─┐ x    . (β4)                     Wind      │
+                //       .▼  │ ▼x   .                  <=>       Blowing   │
+                //        .  │ x  .                              Opposite  │         . (ϕ4)
+                //         . │x                                  Side      │
+                //  ─────────┼─────────► North = 0°          (ϕ2).─────────┴─────────► Opening Normal = 0°, max effectiveness
+                //          .│.
+                //         . │ .
+                //        .  │  .
+                //  (β2) .   │   . (β3)
+                //
+                // This is the absolute angle between opening normal and the wind direction, in the [0, 180] range:
+                // * 0 means that it's blowing directly towards the opening (what ASHRAE HoF calls "Perpendicular winds"), so maximum effectiveness
+                //       │  │
+                //       ▼  ▼
+                //    ┌──====──┐
+                //    │        │
+                //    └────────┘
+                //
+                // * 90 means that the wind direction is perpendicular to the normal (the wind is blowing parallel to the opening's plane), so
+                // effectiveness is very small
+                //      ~~~~►
+                //      ~~~~►
+                //    ┌──====──┐
+                //    │        │
+                //    └────────┘
+                //
+                // * Anything >90 means the wind is blowing in the opposite direction (on the other side), so effectiveness is nil
+                //    ┌──====──┐
+                //    │        │
+                //    └────────┘
+                //       ▲  ▲
+                //       │  │
+
+                angle = 180.0 - std::abs(std::abs(WindDirExt - thisVentilation.EffAngle) - 180);
+                if (angle > 90.0) {
+                    Cw = 0.0; // blowing on the opposite side of the opening
+                } else {
+                    // Linear interpolation between effective angle and wind direction
+                    // ASHRAE HoF 2009 (Ch 16.14, Equation 37), Q = Cw*A*U, and it describes Cw as :
+                    // > Cw = effectiness of openings (Cw is assumed to be 0.5 to 0.6 for perpendicular winds and 0.25 to 0.35 for diagonal winds)
+                    //
+                    // | ASHRAE description  | min  | max  | mean | Angle* |
+                    // |---------------------|------|------|------|--------|
+                    // | Perpendicular winds | 0.5  | 0.6  | 0.55 | 0      |
+                    // | Diagonal winds      | 0.25 | 0.35 | 0.3  | 45     |
+                    //
+                    // * Angle is using our convention described above
+                    constexpr Real64 slope = (0.3 - 0.55) / (45 - 0.0);
+                    constexpr Real64 intercept = 0.55;
+                    Cw = intercept + angle * slope;
+                }
             }
             if (thisVentilation.DiscCoef != DataGlobalConstants::AutoCalculate) {
                 Cd = thisVentilation.DiscCoef;
@@ -6384,7 +6430,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
     for (int ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         if (state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS) {
             auto &zoneSizingInput = state.dataSize->ZoneSizingInput(ZoneSizIndex);
-            if (zoneSizingInput.DOASControlStrategy == DOANeutralSup) {
+            if (zoneSizingInput.DOASControlStrategy == DOASControl::NeutralSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 21.1;
                     zoneSizingInput.DOASHighSetpoint = 23.9;
@@ -6399,7 +6445,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            zoneSizingInput.DOASLowSetpoint,
                                            zoneSizingInput.DOASHighSetpoint,
                                            headerAlreadyPrinted);
-            } else if (zoneSizingInput.DOASControlStrategy == DOANeutralDehumSup) {
+            } else if (zoneSizingInput.DOASControlStrategy == DataSizing::DOASControl::NeutralDehumSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 14.4;
                     zoneSizingInput.DOASHighSetpoint = 22.2;
@@ -6414,7 +6460,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            zoneSizingInput.DOASLowSetpoint,
                                            zoneSizingInput.DOASHighSetpoint,
                                            headerAlreadyPrinted);
-            } else if (zoneSizingInput.DOASControlStrategy == DOACoolSup) {
+            } else if (zoneSizingInput.DOASControlStrategy == DOASControl::CoolSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 12.2;
                     zoneSizingInput.DOASHighSetpoint = 14.4;
