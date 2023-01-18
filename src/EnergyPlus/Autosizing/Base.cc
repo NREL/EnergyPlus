@@ -116,7 +116,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     dataEMSOverrideON = state.dataSize->DataEMSOverrideON;
     dataEMSOverride = state.dataSize->DataEMSOverride;
     this->dataAutosizable = state.dataSize->DataAutosizable;
-    this->minOA = DataSizing::MinOA;
+    this->minOA = DataSizing::OAControl::MinOA;
     this->dataConstantUsedForSizing = state.dataSize->DataConstantUsedForSizing;
     this->dataFractionUsedForSizing = state.dataSize->DataFractionUsedForSizing;
     state.dataSize->DataConstantUsedForSizing = 0.0; // reset here instead of in component model?
@@ -230,7 +230,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 
     if (this->curSysNum > 0 && this->curSysNum <= this->numPrimaryAirSys) {
         if (this->sysSizingRunDone) {
-            for (auto &sizingInput : this->sysSizingInputData) {
+            for (auto const &sizingInput : this->sysSizingInputData) {
                 if (sizingInput.AirLoopNum == this->curSysNum) {
                     this->sizingDesRunThisAirSys = true;
                     break;
@@ -250,7 +250,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
             this->sizingDesValueFromParent = this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent;
         }
         if (this->zoneSizingRunDone) {
-            for (auto &sizingInput : this->zoneSizingInput) {
+            for (auto const &sizingInput : this->zoneSizingInput) {
                 if (sizingInput.ZoneNum == this->curZoneEqNum) {
                     this->sizingDesRunThisZone = true;
                     break;
@@ -768,7 +768,7 @@ void BaseSizer::clearState()
     getLastErrorMessages();
 
     // global sizing data
-    minOA = 0.0;
+    minOA = DataSizing::OAControl::Invalid;
 
     // global Data* sizing constants
     dataEMSOverrideON = false;

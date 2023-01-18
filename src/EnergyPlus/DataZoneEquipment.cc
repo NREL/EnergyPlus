@@ -358,6 +358,10 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         // assigned to this node
         if (ControlledZoneNum > 0) {
             Zone(ControlledZoneNum).SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+            // SpaceHB TODO: For now, assign the same system node to the spaces in the zone
+            for (int spaceNum : Zone(ControlledZoneNum).spaceIndexes) {
+                state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+            }
         } // This error already detected and program will be terminated.
 
         ReturnNodeListName = AlphArray(6);

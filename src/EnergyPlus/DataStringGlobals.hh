@@ -82,6 +82,8 @@ namespace DataStringGlobals {
     char constexpr CharSemicolon(';'); // semicolon
     char constexpr CharTab('\t');      // tab
     char constexpr CharSpace(' ');     // space
+    constexpr std::string_view zonePrefix = "Zone";
+    constexpr std::string_view spacePrefix = "Space";
 
     extern std::string const VerString;        // String that represents version information
     extern std::string const MatchVersion;     // String to be matched by Version object

@@ -61,7 +61,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -80,6 +79,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::PipeHeatTransfer {
 
@@ -1050,7 +1050,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
             state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
         } break;
         case EnvrnPtr::ZoneEnv: {
-            state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->EnvrZonePtr).MAT;
         } break;
         case EnvrnPtr::ScheduleEnv: {
             state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
@@ -1735,7 +1735,6 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
         12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}; // Prandtl number (dimensionless)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int idx;
     Real64 InterpFrac;
     Real64 NuD;
     Real64 ReD;
@@ -1748,22 +1747,21 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     LoopNum = this->plantLoc.loopNum;
 
     // since the fluid properties routine doesn't have Prandtl, we'll just use water values
-    idx = 0;
+    int idx = 0;
     while (idx < NumOfPropDivisions) {
         if (Temperature < Temps[idx]) {
-            if (idx == 1) {
-                PRactual = Pr[idx];
-            } else if (idx > NumOfPropDivisions) {
-                PRactual = Pr[NumOfPropDivisions - 1];
-            } else {
-                InterpFrac = (Temperature - Temps[idx - 1]) / (Temps[idx] - Temps[idx - 1]);
-                PRactual = Pr[idx - 1] + InterpFrac * (Pr[idx] - Pr[idx - 1]);
-            }
-            break; // DO loop
-        } else {
-            PRactual = Pr[NumOfPropDivisions - 1];
+            break;
         }
         ++idx;
+    }
+
+    if (idx == 0) {
+        PRactual = Pr[idx];
+    } else if (idx >= NumOfPropDivisions) {
+        PRactual = Pr[NumOfPropDivisions - 1];
+    } else {
+        InterpFrac = (Temperature - Temps[idx - 1]) / (Temps[idx] - Temps[idx - 1]);
+        PRactual = Pr[idx - 1] + InterpFrac * (Pr[idx] - Pr[idx - 1]);
     }
 
     // look up conductivity and viscosity
@@ -1866,7 +1864,7 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
             AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
         } break;
         case EnvrnPtr::ZoneEnv: {
-            AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+            AirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->EnvrZonePtr).MAT;
             AirVel = RoomAirVel;
         } break;
         default:
