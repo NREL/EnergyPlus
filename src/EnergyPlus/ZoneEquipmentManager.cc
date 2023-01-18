@@ -5521,10 +5521,60 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (thisVentilation.OpenEff != DataGlobalConstants::AutoCalculate) {
                 Cw = thisVentilation.OpenEff;
             } else {
-                // linear interpolation between effective angle and wind direction
-                angle = std::abs(WindDirExt - thisVentilation.EffAngle);
-                if (angle > 180.0) angle -= 180.0;
-                Cw = 0.55 + angle / 180.0 * (0.3 - 0.55);
+                //   Wind Dir (β1)                                        90°, min effectiveness
+                //           ▲                                     (ϕ3) .  ▲
+                //     .   ϕ │    Opening Normal (α)                       │  .  Angle (ϕ1)
+                //      . ┌──┼─┐ x    . (β4)                     Wind      │
+                //       .▼  │ ▼x   .                  <=>       Blowing   │
+                //        .  │ x  .                              Opposite  │         . (ϕ4)
+                //         . │x                                  Side      │
+                //  ─────────┼─────────► North = 0°          (ϕ2).─────────┴─────────► Opening Normal = 0°, max effectiveness
+                //          .│.
+                //         . │ .
+                //        .  │  .
+                //  (β2) .   │   . (β3)
+                //
+                // This is the absolute angle between opening normal and the wind direction, in the [0, 180] range:
+                // * 0 means that it's blowing directly towards the opening (what ASHRAE HoF calls "Perpendicular winds"), so maximum effectiveness
+                //       │  │
+                //       ▼  ▼
+                //    ┌──====──┐
+                //    │        │
+                //    └────────┘
+                //
+                // * 90 means that the wind direction is perpendicular to the normal (the wind is blowing parallel to the opening's plane), so
+                // effectiveness is very small
+                //      ~~~~►
+                //      ~~~~►
+                //    ┌──====──┐
+                //    │        │
+                //    └────────┘
+                //
+                // * Anything >90 means the wind is blowing in the opposite direction (on the other side), so effectiveness is nil
+                //    ┌──====──┐
+                //    │        │
+                //    └────────┘
+                //       ▲  ▲
+                //       │  │
+
+                angle = 180.0 - std::abs(std::abs(WindDirExt - thisVentilation.EffAngle) - 180);
+                if (angle > 90.0) {
+                    Cw = 0.0; // blowing on the opposite side of the opening
+                } else {
+                    // Linear interpolation between effective angle and wind direction
+                    // ASHRAE HoF 2009 (Ch 16.14, Equation 37), Q = Cw*A*U, and it describes Cw as :
+                    // > Cw = effectiness of openings (Cw is assumed to be 0.5 to 0.6 for perpendicular winds and 0.25 to 0.35 for diagonal winds)
+                    //
+                    // | ASHRAE description  | min  | max  | mean | Angle* |
+                    // |---------------------|------|------|------|--------|
+                    // | Perpendicular winds | 0.5  | 0.6  | 0.55 | 0      |
+                    // | Diagonal winds      | 0.25 | 0.35 | 0.3  | 45     |
+                    //
+                    // * Angle is using our convention described above
+                    constexpr Real64 slope = (0.3 - 0.55) / (45 - 0.0);
+                    constexpr Real64 intercept = 0.55;
+                    Cw = intercept + angle * slope;
+                }
             }
             if (thisVentilation.DiscCoef != DataGlobalConstants::AutoCalculate) {
                 Cd = thisVentilation.DiscCoef;
