@@ -13028,9 +13028,9 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
 }
 
 Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &state,
-                                                                int const VRFTUNum,     // Index to VRF terminal unit
-                                                                Real64 PartLoadRatio,   // part load ratio of the coil
-                                                                bool FirstHVACIteration // FirstHVACIteration flag
+                                                                int const VRFTUNum,                      // Index to VRF terminal unit
+                                                                Real64 PartLoadRatio,                    // part load ratio of the coil
+                                                                [[maybe_unused]] bool FirstHVACIteration // FirstHVACIteration flag
 )
 {
     // SUBROUTINE INFORMATION:
