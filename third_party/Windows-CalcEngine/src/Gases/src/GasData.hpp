@@ -16,7 +16,7 @@ namespace Gases
     public:
         CGasData();
         CGasData(CGasData const & t_GasData);
-        CGasData(std::string_view t_Name,
+        CGasData(std::string const & t_Name,
                  double const t_Wght,
                  double const t_SpecHeatRatio,
                  CIntCoeff const & t_Cp,
