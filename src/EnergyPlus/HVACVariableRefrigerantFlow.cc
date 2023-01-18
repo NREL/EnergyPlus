@@ -13110,7 +13110,7 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
 
     FanSpdRatioMax = 1.0;
 
-    auto f = [&state, FirstHVACIteration, VRFTUNum, DXCoilNum, QCoilReq, TeTc, PartLoadRatio](Real64 const FanSpdRatio) {
+    auto f = [&state, VRFTUNum, DXCoilNum, QCoilReq, TeTc, PartLoadRatio](Real64 const FanSpdRatio) {
         using DXCoils::ControlVRFIUCoil;
         using Fans::SimulateFanComponents;
         using Psychrometrics::PsyHFnTdbW;

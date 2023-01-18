@@ -1432,9 +1432,6 @@ void FindRootSimpleController(EnergyPlusData &state,
     auto &ControllerProps(state.dataHVACControllers->ControllerProps);
     auto &RootFinders(state.dataHVACControllers->RootFinders);
 
-    // Obtain actuated and sensed nodes
-    int SensedNode = ControllerProps(ControlNum).SensedNode;
-
     // Update root finder with latest solution point
     // Check for unconstrained/constrained convergence
     // Compute next candidate if not converged yet.
