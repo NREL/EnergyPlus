@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -150,24 +150,20 @@ namespace HVACDXHeatPumpSystem {
                                 bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    Real64 DXHeatingCoilResidual(EnergyPlusData &state,
-                                 Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1D<Real64> const &Par // par(1) = DX coil number
-    );
-
-    //******************************************************************************
-
     Real64 VSCoilCyclingResidual(EnergyPlusData &state,
-                                 Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1D<Real64> const &Par  // par(1) = DX coil number
-    );
+                                 Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                 int CoilIndex,
+                                 Real64 desiredTemp,
+                                 int FanOpMode);
 
     //******************************************************************************
 
     Real64 VSCoilSpeedResidual(EnergyPlusData &state,
-                               Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1D<Real64> const &Par // par(1) = DX coil number
-    );
+                               Real64 SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               int CoilIndex,
+                               Real64 desiredTemp,
+                               int speedNumber,
+                               int FanOpMode);
 
     int GetHeatingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName, bool &InletNodeErrFlag);
 

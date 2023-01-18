@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4707,7 +4707,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     Real64 UnitFlowToler;   // flow rate tolerance
     Real64 QDelivered;
     Real64 FracDelivered;
-    Array1D<Real64> Par(11);
     int SolFlag;
     Real64 ErrTolerance;
     Real64 MaxSteamCap; // steam coil capacity at full load

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -103,7 +104,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
 
 // USE STATEMENTS:
 using namespace DataEnvironment;
-using namespace DataHeatBalFanSys;
 using namespace DataHeatBalance;
 using namespace DataSurfaces;
 
@@ -339,152 +339,81 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     // Following used for reporting
     state.dataHeatBal->ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
+    if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+        state.dataHeatBal->spaceAirRpt.allocate(state.dataGlobal->NumOfZones);
+    }
 
     for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+        std::string_view name = state.dataHeatBal->Zone(Loop).Name;
+        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(Loop);
+        thisZnAirRpt.setUpOutputVars(state, DataStringGlobals::zonePrefix, name);
+        if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+            for (int spaceNum : state.dataHeatBal->Zone(Loop).spaceIndexes) {
+                state.dataHeatBal->spaceAirRpt(spaceNum).setUpOutputVars(
+                    state, DataStringGlobals::spacePrefix, state.dataHeatBal->space(spaceNum).Name);
+            }
+        }
+
         // CurrentModuleObject='Zone'
-        SetupOutputVariable(state,
-                            "Zone Mean Air Temperature",
-                            OutputProcessor::Unit::C,
-                            state.dataHeatBal->ZnAirRpt(Loop).MeanAirTemp,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Operative Temperature",
-                            OutputProcessor::Unit::C,
-                            state.dataHeatBal->ZnAirRpt(Loop).OperativeTemp,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Mean Air Dewpoint Temperature",
-                            OutputProcessor::Unit::C,
-                            state.dataHeatBal->ZnAirRpt(Loop).MeanAirDewPointTemp,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Mean Air Humidity Ratio",
-                            OutputProcessor::Unit::kgWater_kgDryAir,
-                            state.dataHeatBal->ZnAirRpt(Loop).MeanAirHumRat,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Internal Convective Heat Gain Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumIntGains,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Surface Convection Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumHADTsurfs,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Interzone Air Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumMCpDTzones,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Outdoor Air Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumMCpDtInfil,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance System Air Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumMCpDTsystem,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance System Convective Heat Gain Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumNonAirSystem,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Air Energy Storage Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).CzdTdt,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
             SetupOutputVariable(state,
                                 "Zone Phase Change Material Melting Enthalpy",
                                 OutputProcessor::Unit::J_kg,
-                                state.dataHeatBal->ZnAirRpt(Loop).SumEnthalpyM,
+                                thisZnAirRpt.SumEnthalpyM,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
+                                name);
             SetupOutputVariable(state,
                                 "Zone Phase Change Material Freezing Enthalpy",
                                 OutputProcessor::Unit::J_kg,
-                                state.dataHeatBal->ZnAirRpt(Loop).SumEnthalpyH,
+                                thisZnAirRpt.SumEnthalpyH,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Air Heat Balance Deviation Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZnAirRpt(Loop).imBalance,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
+                                name);
         }
 
         SetupOutputVariable(state,
                             "Zone Exfiltration Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExfilTotalLoss,
+                            thisZnAirRpt.ExfilTotalLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exfiltration Sensible Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExfilSensiLoss,
+                            thisZnAirRpt.ExfilSensiLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exfiltration Latent Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExfilLatentLoss,
+                            thisZnAirRpt.ExfilLatentLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exhaust Air Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExhTotalLoss,
+                            thisZnAirRpt.ExhTotalLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exhaust Air Sensible Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExhSensiLoss,
+                            thisZnAirRpt.ExhSensiLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exhaust Air Latent Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExhLatentLoss,
+                            thisZnAirRpt.ExhLatentLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
     }
 
     SetupOutputVariable(state,
@@ -3475,7 +3404,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             int space1 = thisAirBoundaryMixing.space1;
             int space2 = thisAirBoundaryMixing.space2;
             int zone1 = state.dataHeatBal->space(space1).zoneNum;
-            int zone2 = state.dataHeatBal->space(space1).zoneNum;
+            int zone2 = state.dataHeatBal->space(space2).zoneNum;
             auto &thisCrossMizing = state.dataHeatBal->CrossMixing(mixingNum);
             thisCrossMizing.Name = fmt::format("Air Boundary Mixing Zones {} and {}", zone1, zone2);
             thisCrossMizing.spaceIndex = space1;
@@ -3486,7 +3415,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             thisCrossMizing.fromSpaceIndex = space2;
         }
         assert(mixingNum == state.dataHeatBal->TotCrossMixing);
-        for (int mixingRepNum = 1; mixingRepNum <= state.dataHeatBal->TotMixing; ++mixingRepNum) {
+        for (int mixingRepNum = 1; mixingRepNum <= state.dataHeatBal->TotCrossMixing; ++mixingRepNum) {
             int zoneNum = state.dataHeatBal->CrossMixing(mixingRepNum).ZonePtr;
             if (zoneNum > 0) {
                 std::string const &zoneName = state.dataHeatBal->Zone(zoneNum).Name;
@@ -4429,6 +4358,11 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         ShowSevereError(state, "Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones.");
         ErrorsFound = true;
     }
+    if (NumOfAirModels > 0) {
+        state.dataRoomAirMod->IsZoneDV.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataRoomAirMod->IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataRoomAirMod->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
+    }
 
     for (AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -4592,6 +4526,17 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         // this used to be an if (NumOfAirModels == 0) block, but both the IF and the ELSE had the same content, these two lines:
         state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + state.dataHeatBal->Zone(ZoneNum).Name;
         state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
+        // set global flag for non-mixing model
+        if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
+            state.dataRoomAirMod->anyNonMixingRoomAirModel = true;
+        }
+    }
+
+    if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
+            ShowSevereError(state, "Non-Mixing RoomAirModelType is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
+            ErrorsFound = true;
+        }
     }
 
     // Write RoomAir Model details onto EIO file
@@ -4796,12 +4741,13 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
     Real64 thisMRTFraction;   // temp working value for radiative fraction/weight
 
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
         // The mean air temperature is actually ZTAV which is the average
         // temperature of the air temperatures at the system time step for the
         // entire zone time step.
-        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = state.dataHeatBalFanSys->ZTAV(ZoneLoop);
-        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneLoop);
-        state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (state.dataHeatBalFanSys->ZTAV(ZoneLoop) + state.dataHeatBal->ZoneMRT(ZoneLoop));
+        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = thisZoneHB.ZTAV;
+        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = thisZoneHB.ZoneAirHumRatAvg;
+        state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (thisZoneHB.ZTAV + state.dataHeatBal->ZoneMRT(ZoneLoop));
         state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirDewPointTemp =
             PsyTdpFnWPb(state, state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
@@ -4820,7 +4766,7 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                         thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                     }
                     state.dataHeatBal->ZnAirRpt(ZoneLoop).ThermOperativeTemp =
-                        (1.0 - thisMRTFraction) * state.dataHeatBalFanSys->ZTAV(ZoneLoop) + thisMRTFraction * state.dataHeatBal->ZoneMRT(ZoneLoop);
+                        (1.0 - thisMRTFraction) * thisZoneHB.ZTAV + thisMRTFraction * state.dataHeatBal->ZoneMRT(ZoneLoop);
                 }
             }
         }

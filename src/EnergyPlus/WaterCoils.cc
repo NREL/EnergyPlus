@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1609,10 +1609,6 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
             // Now use SolveRoot to "invert" the cooling coil model to obtain the UA given the specified design inlet and outlet conditions
             // Note that the UAs we have obtained so far are rough estimates that are the starting points for the the following iterative
             //   calulation of the actual UAs.
-            state.dataWaterCoils->Par(1) = state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad;
-            state.dataWaterCoils->Par(2) = double(CoilNum);
-            state.dataWaterCoils->Par(3) = double(ContFanCycCoil); // fan operating mode
-            state.dataWaterCoils->Par(4) = 1.0;                    // part-load ratio
             state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp;
             state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat;
             state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp;
@@ -5676,45 +5672,6 @@ void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, A
     }
 }
 
-Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state,
-                                   Real64 const UA,           // UA of coil
-                                   Array1D<Real64> const &Par // par(1) = design coil load [W]
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   November 2001
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Design Coil Load - Coil Heating Output) / Design Coil Load.
-    // Coil Heating Output depends on the UA which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Puts UA into the water coil data structure, calls CalcSimpleHeatingCoil, and calculates
-    // the residual as defined above.
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int CoilIndex;
-    int FanOpMode;
-    Real64 PartLoadRatio;
-
-    CoilIndex = int(Par(2));
-    FanOpMode = (Par(3) == 1.0 ? CycFanCycCoil : ContFanCycCoil);
-    PartLoadRatio = Par(4);
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilVariable = UA;
-    CalcSimpleHeatingCoil(state, CoilIndex, FanOpMode, PartLoadRatio, state.dataWaterCoils->SimCalc);
-    Residuum = (Par(1) - state.dataWaterCoils->WaterCoil(CoilIndex).TotWaterHeatingCoilRate) / Par(1);
-    state.dataSize->DataDesignCoilCapacity = state.dataWaterCoils->WaterCoil(CoilIndex).TotWaterHeatingCoilRate;
-
-    return Residuum;
-}
-
 // Iterate Routine for Cooling Coil
 
 void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
@@ -6514,13 +6471,10 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int SolFla;             // Flag of solver
-    Real64 T0;              // lower bound for Tprov [C]
-    Real64 T1;              // upper bound for Tprov [C]
-    Real64 Tprov(0.0);      // provisional value of drybulb temperature [C]
-    Array1D<Real64> Par(3); // Par(1) = desired enthaply H [J/kg]
-                            // Par(2) = desired relative humidity (0.0 - 1.0)
-                            // Par(3) = barometric pressure [N/m2 (Pascals)]
+    int SolFla;        // Flag of solver
+    Real64 T0;         // lower bound for Tprov [C]
+    Real64 T1;         // upper bound for Tprov [C]
+    Real64 Tprov(0.0); // provisional value of drybulb temperature [C]
 
     T0 = 1.0;
     T1 = 50.0;

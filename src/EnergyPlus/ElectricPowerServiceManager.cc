@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -81,6 +80,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindTurbine.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -2550,7 +2550,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             break;
         }
         case InverterModelType::CurveFuncOfPower: {
-            curveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+            curveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (curveNum_ == 0) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -2855,7 +2855,7 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
     case InverterModelType::CurveFuncOfPower: {
 
         Real64 normalizedPower = dCPowerIn_ / ratedPower_;
-        efficiency_ = CurveManager::CurveValue(state, curveNum_, normalizedPower);
+        efficiency_ = Curve::CurveValue(state, curveNum_, normalizedPower);
         efficiency_ = max(efficiency_, minEfficiency_);
         efficiency_ = min(efficiency_, maxEfficiency_);
 
@@ -3004,7 +3004,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
 
         case ConverterModelType::CurveFuncOfPower: {
             maxPower_ = state.dataIPShortCut->rNumericArgs(2);
-            curveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+            curveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (curveNum_ == 0) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -3205,7 +3205,7 @@ void ACtoDCConverter::calcEfficiency(EnergyPlusData &state)
     }
     case ConverterModelType::CurveFuncOfPower: {
         Real64 normalizedPower = aCPowerIn_ / maxPower_;
-        efficiency_ = CurveManager::CurveValue(state, curveNum_, normalizedPower);
+        efficiency_ = Curve::CurveValue(state, curveNum_, normalizedPower);
         break;
     }
     default:
@@ -3364,7 +3364,7 @@ ElectricStorage::ElectricStorage( // main constructor
         }
 
         case StorageModelType::KIBaMBattery: {
-            chargeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // voltage calculation for charging
+            chargeCurveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // voltage calculation for charging
             if (chargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -3378,15 +3378,15 @@ ElectricStorage::ElectricStorage( // main constructor
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " cannot be blank. But no entry found.");
                 errorsFound = true;
             } else {
-                errorsFound |= CurveManager::CheckCurveDims(state,
-                                                            chargeCurveNum_,                            // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            routineName,                                // Routine name
-                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                            name_,                                      // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(4)); // Field Name
+                errorsFound |= Curve::CheckCurveDims(state,
+                                                     chargeCurveNum_,                            // Curve index
+                                                     {1},                                        // Valid dimensions
+                                                     routineName,                                // Routine name
+                                                     state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                     name_,                                      // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(4)); // Field Name
             }
-            dischargeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // voltage calculation for discharging
+            dischargeCurveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // voltage calculation for discharging
             if (dischargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -3400,13 +3400,13 @@ ElectricStorage::ElectricStorage( // main constructor
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " cannot be blank. But no entry found.");
                 errorsFound = true;
             } else {
-                errorsFound |= CurveManager::CheckCurveDims(state,
-                                                            dischargeCurveNum_,                         // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            routineName,                                // Routine name
-                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                            name_,                                      // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
+                errorsFound |= Curve::CheckCurveDims(state,
+                                                     dischargeCurveNum_,                         // Curve index
+                                                     {1},                                        // Valid dimensions
+                                                     routineName,                                // Routine name
+                                                     state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                     name_,                                      // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
             }
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "Yes")) {
@@ -3423,7 +3423,7 @@ ElectricStorage::ElectricStorage( // main constructor
             }
 
             if (lifeCalculation_ == BatteryDegradationModelType::LifeCalculationYes) {
-                lifeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // Battery life calculation
+                lifeCurveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // Battery life calculation
                 if (lifeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     ShowSevereError(state,
                                     std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
@@ -3439,13 +3439,13 @@ ElectricStorage::ElectricStorage( // main constructor
                                           state.dataIPShortCut->cAlphaArgs(6) + " = Yes. But no entry found.");
                     errorsFound = true;
                 } else {
-                    errorsFound |= CurveManager::CheckCurveDims(state,
-                                                                lifeCurveNum_,                              // Curve index
-                                                                {1},                                        // Valid dimensions
-                                                                routineName,                                // Routine name
-                                                                state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                                name_,                                      // Object Name
-                                                                state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
+                    errorsFound |= Curve::CheckCurveDims(state,
+                                                         lifeCurveNum_,                              // Curve index
+                                                         {1},                                        // Valid dimensions
+                                                         routineName,                                // Routine name
+                                                         state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                         name_,                                      // Object Name
+                                                         state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
                 }
 
                 cycleBinNum_ = state.dataIPShortCut->rNumericArgs(14);
@@ -3924,7 +3924,7 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
 
                 for (auto binNum = 0; binNum < cycleBinNum_; ++binNum) {
                     //       Battery damage is calculated by accumulating the impact from each cycle.
-                    batteryDamage_ += oneNmb0_[binNum] / CurveManager::CurveValue(state, lifeCurveNum_, (double(binNum) / double(cycleBinNum_)));
+                    batteryDamage_ += oneNmb0_[binNum] / Curve::CurveValue(state, lifeCurveNum_, (double(binNum) / double(cycleBinNum_)));
                 }
             }
         } else if (storageModelMode_ == StorageModelType::LiIonNmcBattery) {
@@ -4110,7 +4110,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         T0 = std::abs(qmax / I0);                                                                       // Initial Assumption
         qmaxf = qmax * k * c * T0 / (1.0 - std::exp(-k * T0) + c * (k * T0 - 1.0 + std::exp(-k * T0))); // Initial calculation of a function qmax(I)
         Real64 Xf = q0 / qmaxf;
-        Ef = E0d + CurveManager::CurveValue(state, chargeCurveNum_, Xf); // E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
+        Ef = E0d + Curve::CurveValue(state, chargeCurveNum_, Xf); // E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
         Volt = Ef - I0 * internalR_;
         Real64 Inew = 0.0;
         if (Volt != 0.0) {
@@ -4127,7 +4127,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
             T0 = Tnew;
             qmaxf = qmax * k * c * T0 / (1.0 - std::exp(-k * T0) + c * (k * T0 - 1.0 + std::exp(-k * T0)));
             Xf = q0 / qmaxf;
-            Ef = E0d + CurveManager::CurveValue(state, chargeCurveNum_, Xf); // E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
+            Ef = E0d + Curve::CurveValue(state, chargeCurveNum_, Xf); // E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
             Volt = Ef - I0 * internalR_;
             Inew = Pw / Volt;
             Tnew = std::abs(qmaxf / Inew); // ***Always positive here
@@ -4208,7 +4208,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
                 qmaxf = RHS;
             }
             Real64 Xf = (qmax - q0) / qmaxf;
-            Ef = E0c + CurveManager::CurveValue(state, dischargeCurveNum_, Xf);
+            Ef = E0c + Curve::CurveValue(state, dischargeCurveNum_, Xf);
             Volt = Ef - I0 * internalR_;
         }
         if (Volt < cutoffV_) {
@@ -4293,7 +4293,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     // Set the temperature the battery sees
     if (zoneNum_ > 0) {
         // If in a zone, use the zone temperature
-        battState.thermal->T_room = state.dataHeatBalFanSys->ZT(zoneNum_);
+        battState.thermal->T_room = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum_).ZT;
     } else {
         // If outside, use outdoor temperature
         battState.thermal->T_room = state.dataEnvrn->OutDryBulbTemp;
@@ -4411,7 +4411,7 @@ bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
     Real64 qmaxf = qmax * k * c * curT0 /
                    (1.0 - std::exp(-k * curT0) + c * (k * curT0 - 1.0 + std::exp(-k * curT0))); // Initial calculation of a function qmax(I)
     Real64 Xf = (qmax - q0) / qmaxf;
-    Real64 Ef = E0c + CurveManager::CurveValue(state, CurveNum, Xf); // E0d+Ac*Xf+Cc*X/(Dc-Xf)
+    Real64 Ef = E0c + Curve::CurveValue(state, CurveNum, Xf); // E0d+Ac*Xf+Cc*X/(Dc-Xf)
     curVolt = Ef - curI0 * InternalR;
     Real64 Inew = Pw / curVolt;
     Real64 Tnew = qmaxf / Inew;
@@ -4430,7 +4430,7 @@ bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
             Xf = 1.0;
         }
 
-        Ef = E0c + CurveManager::CurveValue(state, CurveNum, Xf); // E0c+Ad*Xf+Cd*X/(Dd-Xf)
+        Ef = E0c + Curve::CurveValue(state, CurveNum, Xf); // E0c+Ad*Xf+Cd*X/(Dd-Xf)
         curVolt = Ef - curI0 * InternalR;
         // add div by zero protection #5301
         if (curVolt != 0.0) {

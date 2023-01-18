@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -230,7 +230,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 
     if (this->curSysNum > 0 && this->curSysNum <= this->numPrimaryAirSys) {
         if (this->sysSizingRunDone) {
-            for (auto &sizingInput : this->sysSizingInputData) {
+            for (auto const &sizingInput : this->sysSizingInputData) {
                 if (sizingInput.AirLoopNum == this->curSysNum) {
                     this->sizingDesRunThisAirSys = true;
                     break;
@@ -250,7 +250,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
             this->sizingDesValueFromParent = this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent;
         }
         if (this->zoneSizingRunDone) {
-            for (auto &sizingInput : this->zoneSizingInput) {
+            for (auto const &sizingInput : this->zoneSizingInput) {
                 if (sizingInput.ZoneNum == this->curZoneEqNum) {
                     this->sizingDesRunThisZone = true;
                     break;

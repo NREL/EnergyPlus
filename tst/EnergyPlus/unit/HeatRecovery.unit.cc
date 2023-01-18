@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3913,6 +3913,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
+    state->dataSize->SysSizPeakDDNum.allocate(state->dataSize->NumSysSizInput);
     state->dataSize->CurSysNum = 1;    // primary air system
     state->dataSize->CurOASysNum = 0;  // no OA system
     state->dataSize->CurZoneEqNum = 0; // size it based on system
