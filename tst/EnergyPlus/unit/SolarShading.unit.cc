@@ -3948,7 +3948,7 @@ TEST_F(EnergyPlusFixture, ShadowCalculation_CSV)
     for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
         for (int TS = 1; TS <= state->dataGlobal->NumOfTimeStepInHour; ++TS) {
             if (TS == state->dataGlobal->NumOfTimeStepInHour) {
-                expected_values += fmt::format(" 01/25 {:02}:00,", iHour, 0);
+                expected_values += fmt::format(" 01/25 {:02}:00,", iHour);
             } else {
                 expected_values += fmt::format(" 01/25 {:02}:30,", iHour - 1);
             }
