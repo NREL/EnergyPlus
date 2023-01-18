@@ -167,7 +167,7 @@ struct BaseSizer
     bool zoneEqVentedSlab = false; // ventilated slab zone equipment
 
     // global sizing data
-    Real64 minOA = 0.0;
+    DataSizing::OAControl minOA = DataSizing::OAControl::Invalid;
 
     // global Data* sizing constants
     bool dataEMSOverrideON = false;

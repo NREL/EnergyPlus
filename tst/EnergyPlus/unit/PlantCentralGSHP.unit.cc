@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlnt->PlantLoop(PltSizNum).FluidName = "WATER";
     state->dataSize->PlantSizData(PltSizNum).DesVolFlowRate = 1.0;
     state->dataSize->PlantSizData(PltSizNum).DeltaT = 10.0;
-    state->dataSize->PlantSizData(PltSizNum).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(PltSizNum).LoopType = DataSizing::TypeOfPlantLoop::Cooling;
     // Assign to the wrapper
     state->dataPlantCentralGSHP->Wrapper(1).CWPlantLoc.loopNum = PltSizNum;
 
@@ -132,7 +132,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex = 1;
     state->dataPlnt->PlantLoop(PltSizCondNum).FluidName = "WATER";
     state->dataSize->PlantSizData(PltSizCondNum).DeltaT = 5.6;
-    state->dataSize->PlantSizData(PltSizCondNum).LoopType = DataSizing::CondenserLoop;
+    state->dataSize->PlantSizData(PltSizCondNum).LoopType = DataSizing::TypeOfPlantLoop::Condenser;
     // Assign to the wrapper
     state->dataPlantCentralGSHP->Wrapper(1).GLHEPlantLoc.loopNum = PltSizCondNum;
 

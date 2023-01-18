@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -153,11 +154,11 @@ namespace ZoneEquipmentManager {
     void UpdateZoneEquipment(EnergyPlusData &state, bool &SimAir);
 
     void CalcDOASSupCondsForSizing(EnergyPlusData &state,
-                                   Real64 OutDB,        // outside air temperature [C]
-                                   Real64 OutHR,        // outside humidity ratio [kg Water / kg Dry Air]
-                                   int DOASControl,     // dedicated outside air control strategy
-                                   Real64 DOASLowTemp,  // DOAS low setpoint [C]
-                                   Real64 DOASHighTemp, // DOAS high setpoint [C]
+                                   Real64 OutDB,                        // outside air temperature [C]
+                                   Real64 OutHR,                        // outside humidity ratio [kg Water / kg Dry Air]
+                                   DataSizing::DOASControl DOASControl, // dedicated outside air control strategy
+                                   Real64 DOASLowTemp,                  // DOAS low setpoint [C]
+                                   Real64 DOASHighTemp,                 // DOAS high setpoint [C]
                                    Real64 W90H, // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
                                    Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
                                    Real64 &DOASSupTemp, // DOAS supply temperature [C]
