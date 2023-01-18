@@ -12658,7 +12658,6 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         if (NoCompOutput <= QZnReq && ((QZnReq < -DataHVACGlobals::SmallLoad) || (QZnReq >= -DataHVACGlobals::SmallLoad && !HRCoolingMode))) {
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = false;
             if (!this->SuppHeatingCoilPresent) {
-                PartLoadRatio = 0.0;
                 return;
             }
         }
