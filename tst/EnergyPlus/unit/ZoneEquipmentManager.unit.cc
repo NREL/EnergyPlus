@@ -2185,9 +2185,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType.ZnCoolDgnSAMethod = 1;
             thisSizingType.ZnHeatDgnSAMethod = 1;
             thisSizingType.ZoneDesignSpecOAIndex = 1;
-            thisSizingType.CoolAirDesMethod = 1;
-            thisSizingType.HeatAirDesMethod = 1;
-            thisSizingType.DOASControlStrategy = 1;
+            thisSizingType.CoolAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
+            thisSizingType.HeatAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
+            thisSizingType.DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
             thisSizingType.ZoneNum = 1;
             thisSizingType.TimeStepNumAtHeatMax = 1;
             thisSizingType.TimeStepNumAtCoolMax = 1;
@@ -2380,9 +2380,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType2.ZnCoolDgnSAMethod = 1;
             thisSizingType2.ZnHeatDgnSAMethod = 1;
             thisSizingType2.ZoneDesignSpecOAIndex = 1;
-            thisSizingType2.CoolAirDesMethod = 1;
-            thisSizingType2.HeatAirDesMethod = 1;
-            thisSizingType2.DOASControlStrategy = 1;
+            thisSizingType2.CoolAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
+            thisSizingType2.HeatAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
+            thisSizingType2.DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
             thisSizingType2.ZoneNum = 1;
             thisSizingType2.TimeStepNumAtHeatMax = 1;
             thisSizingType2.TimeStepNumAtCoolMax = 1;

@@ -84,13 +84,12 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
     // locals
     Real64 OutDB;        // outside air temperature [C]
     Real64 OutHR;        // outside humidity ratio [kg Water / kg Dry Air]
-    int DOASControl;     // dedicated outside air control strategy
     Real64 DOASLowTemp;  // DOAS low setpoint [C]
     Real64 DOASHighTemp; // DOAS high setpoint [C]
     Real64 DOASSupTemp;  // DOAS supply temperature [C]
     Real64 DOASSupHR;    // DOAS supply humidity ratio [kg H2O / kg dry air]
     // neutral supply air
-    DOASControl = 1;
+    DataSizing::DOASControl DOASControl = DataSizing::DOASControl::NeutralSup;
     DOASLowTemp = 21.1;
     DOASHighTemp = 23.9;
     OutDB = 10.0;
@@ -109,7 +108,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
     EXPECT_DOUBLE_EQ(22.3, DOASSupTemp);
     EXPECT_DOUBLE_EQ(0.0085, DOASSupHR);
     // neutral dehumidified supply air
-    DOASControl = 2;
+    DOASControl = DataSizing::DOASControl::NeutralDehumSup;
     DOASLowTemp = 14.4;
     DOASHighTemp = 22.2;
     OutDB = 11;
@@ -123,7 +122,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
     EXPECT_DOUBLE_EQ(22.2, DOASSupTemp);
     EXPECT_DOUBLE_EQ(0.0092, DOASSupHR);
     // cold supply air
-    DOASControl = 3;
+    DOASControl = DataSizing::DOASControl::CoolSup;
     DOASLowTemp = 12.2;
     DOASHighTemp = 14.4;
     OutDB = 11;
@@ -218,8 +217,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataEnvrn->StdBaroPress = 101325.;
     state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
     state->dataSize->CalcFinalZoneSizing(2).MinOA = 0.11;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = 3;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASControlStrategy = 3;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = DataSizing::DOASControl::CoolSup;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASControlStrategy = DataSizing::DOASControl::CoolSup;
     state->dataEnvrn->OutDryBulbTemp = 28.;
     state->dataEnvrn->OutHumRat = 0.017;
     state->dataLoopNodes->Node(4).Temp = 22;
@@ -320,7 +319,7 @@ TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)
     state->dataSize->ZoneSizingInput(1).AccountForDOAS = false;
     state->dataSize->ZoneSizingInput(2).AccountForDOAS = true;
 
-    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DOANeutralSup;
+    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DOASControl::NeutralSup;
     state->dataSize->ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     state->dataSize->ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
     AutoCalcDOASControlStrategy(*state);
@@ -342,7 +341,7 @@ TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)
     EXPECT_DOUBLE_EQ(22.6, state->dataSize->ZoneSizingInput(2).DOASHighSetpoint);
     EXPECT_DOUBLE_EQ(21.5, state->dataSize->ZoneSizingInput(2).DOASLowSetpoint);
 
-    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DOANeutralDehumSup;
+    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DataSizing::DOASControl::NeutralDehumSup;
     state->dataSize->ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     state->dataSize->ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
     AutoCalcDOASControlStrategy(*state);
@@ -364,7 +363,7 @@ TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)
     EXPECT_DOUBLE_EQ(22.6, state->dataSize->ZoneSizingInput(2).DOASHighSetpoint);
     EXPECT_DOUBLE_EQ(13.9, state->dataSize->ZoneSizingInput(2).DOASLowSetpoint);
 
-    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DOACoolSup;
+    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DataSizing::DOASControl::CoolSup;
     state->dataSize->ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     state->dataSize->ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
     AutoCalcDOASControlStrategy(*state);

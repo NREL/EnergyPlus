@@ -116,7 +116,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     dataEMSOverrideON = state.dataSize->DataEMSOverrideON;
     dataEMSOverride = state.dataSize->DataEMSOverride;
     this->dataAutosizable = state.dataSize->DataAutosizable;
-    this->minOA = DataSizing::MinOA;
+    this->minOA = DataSizing::OAControl::MinOA;
     this->dataConstantUsedForSizing = state.dataSize->DataConstantUsedForSizing;
     this->dataFractionUsedForSizing = state.dataSize->DataFractionUsedForSizing;
     state.dataSize->DataConstantUsedForSizing = 0.0; // reset here instead of in component model?
@@ -768,7 +768,7 @@ void BaseSizer::clearState()
     getLastErrorMessages();
 
     // global sizing data
-    minOA = 0.0;
+    minOA = DataSizing::OAControl::Invalid;
 
     // global Data* sizing constants
     dataEMSOverrideON = false;
