@@ -1161,7 +1161,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 // Check for duplicate spaces
                 for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
                     if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
-                        ShowSevereError(state, format("SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=()", thisOAReq.Name));
+                        ShowSevereError(state, format("SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList={}", thisOAReq.Name));
                         ShowContinueError(state, format("Space Name={} appears more than once in the list.", thisSpaceName));
                         dsoaError = true;
                         ErrorsFound = true;
