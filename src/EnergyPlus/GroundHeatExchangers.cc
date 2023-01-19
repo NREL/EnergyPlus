@@ -2490,8 +2490,8 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         auto &instancesValue = instances.value();
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
-            auto const &objName = it.key();
-            auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objName = it.key();
+            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             std::shared_ptr<GLHEVertProps> thisObj(new GLHEVertProps(state, objNameUC, instance));
             state.dataGroundHeatExchanger->vertPropsVector.push_back(thisObj);
@@ -2511,8 +2511,8 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         auto &instancesValue = instances.value();
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
-            auto const &objName = it.key();
-            auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objName = it.key();
+            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             std::shared_ptr<GLHEResponseFactors> thisObj(new GLHEResponseFactors(state, objNameUC, instance));
             state.dataGroundHeatExchanger->responseFactorsVector.push_back(thisObj);
@@ -2532,8 +2532,8 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         auto &instancesValue = instances.value();
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
-            auto const &objName = it.key();
-            auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objName = it.key();
+            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             std::shared_ptr<GLHEVertArray> thisObj(new GLHEVertArray(state, objNameUC, instance));
             state.dataGroundHeatExchanger->vertArraysVector.push_back(thisObj);
@@ -2553,8 +2553,8 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         auto &instancesValue = instances.value();
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
-            auto const &objName = it.key();
-            auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objName = it.key();
+            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             std::shared_ptr<GLHEVertSingle> thisObj(new GLHEVertSingle(state, objNameUC, instance));
             state.dataGroundHeatExchanger->singleBoreholesVector.push_back(thisObj);
@@ -2574,8 +2574,8 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         auto &instancesValue = instances.value();
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
-            auto const &objName = it.key();
-            auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objName = it.key();
+            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             state.dataGroundHeatExchanger->verticalGLHE.emplace_back(state, objNameUC, instance);
         }
@@ -2596,8 +2596,8 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         auto &instancesValue = instances.value();
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
-            auto const &objName = it.key();
-            auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objName = it.key();
+            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             state.dataGroundHeatExchanger->slinkyGLHE.emplace_back(state, objNameUC, instance);
         }

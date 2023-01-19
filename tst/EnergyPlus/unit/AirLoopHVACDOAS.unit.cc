@@ -72,6 +72,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -4010,7 +4011,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -8318,7 +8319,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

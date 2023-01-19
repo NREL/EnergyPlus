@@ -220,7 +220,7 @@ namespace UnitarySystems {
 
     void DesignSpecMSHP::getDesignSpecMSHPdata(EnergyPlusData &state, bool errorsFound)
     {
-        std::string cCurrentModuleObject = "UnitarySystemPerformance:Multispeed";
+        std::string const &cCurrentModuleObject = "UnitarySystemPerformance:Multispeed";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -257,7 +257,7 @@ namespace UnitarySystems {
                 // **********************************************************************************************************
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 DesignSpecMSHP thisDesignSpec;
 
                 thisDesignSpec.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
@@ -302,7 +302,7 @@ namespace UnitarySystems {
                             }
                         }
                     } else if (numSpeedInputs < maxSpeeds) {
-                        ShowSevereError(state, cCurrentModuleObject + ": Error getting inputs for system named: " + thisObjectName);
+                        ShowSevereError(state, format("{}: Error getting inputs for system named: {}", cCurrentModuleObject, thisObjectName));
                         ShowContinueError(state,
                                           format("Number of speed inputs ({:.0T} is less than number of speeds ({:.0T}).",
                                                  Real64(numSpeedInputs),
@@ -1665,8 +1665,8 @@ namespace UnitarySystems {
                 // this probably needs to be more specific. Letting heating coil size itself if user has scalable sizing
                 if (this->m_HVACSizingIndex <= 0) state.dataSize->DXCoolCap = CoolCapAtPeak;
                 // CoilSystem does not size the cooling coil (#8761)
-                if (BITF_TEST_ANY(BITF(this->m_sysType),
-                                  BITF(SysType::Unitary) | BITF(SysType::PackagedAC) | BITF(SysType::PackagedHP) | BITF(SysType::PackagedWSHP))) {
+                if ((this->m_sysType == SysType::Unitary) || (this->m_sysType == SysType::PackagedAC) || (this->m_sysType == SysType::PackagedHP) ||
+                    (this->m_sysType == SysType::PackagedWSHP)) {
                     EqSizing.CoolingCapacity = true;
                     EqSizing.DesCoolingLoad = CoolCapAtPeak;
                 }
@@ -6923,14 +6923,14 @@ namespace UnitarySystems {
     void UnitarySys::getDXCoilSystemData(
         EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
-        std::string cCurrentModuleObject = "CoilSystem:Cooling:DX";
+        std::string const &cCurrentModuleObject = "CoilSystem:Cooling:DX";
         int numCoilSystemDX = 0;
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
                 // only get the current data once all data has been read in and vector unitarySys has been initialized
                 // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
@@ -7061,7 +7061,7 @@ namespace UnitarySystems {
                 auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
                 for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
-                    auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                    std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
                     // only get the current data once all data has been read in and vector unitarySys has been initialized
                     // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
@@ -7222,7 +7222,7 @@ namespace UnitarySystems {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
                 if (!UtilityRoutines::SameString(CoilSysName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
 
@@ -7356,7 +7356,7 @@ namespace UnitarySystems {
         EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
 
-        std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
+        std::string const &cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
         int zoneUnitaryNum = 0;
         int airloopUnitaryNum = 0;
@@ -7369,7 +7369,7 @@ namespace UnitarySystems {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 // only get the current data once all data has been read in and vector unitarySys has been initialized
                 // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
                 if (!UtilityRoutines::SameString(objectName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
