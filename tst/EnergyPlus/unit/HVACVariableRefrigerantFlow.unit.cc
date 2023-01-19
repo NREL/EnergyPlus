@@ -18105,8 +18105,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputRequired = -6000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputReqToCoolSP = -6000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputReqToHeatSP = 0.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired = 5000.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputReqToHeatSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired = 2500.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputReqToHeatSP = 2500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputReqToCoolSP = 0.0;
 
     ProcessScheduleInput(*state);
@@ -18233,20 +18233,25 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
 
     // TU2 test; run terminal unit 2
     VRFTUNum = zone_num_TU2;
-    FirstHVACIteration = false;
+    FirstHVACIteration = true;
     state->dataSize->CurZoneEqNum = zone_num_TU2;
+    InitVRF(*state, VRFTUNum, zone_num_TU2, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    state->dataHVACVarRefFlow->OACompOnMassFlow = 0.1;
+    state->dataHVACVarRefFlow->OACompOffMassFlow = 0.1;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired;
+    SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    FirstHVACIteration = false;
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     ReportVRFTerminalUnit(*state, VRFTUNum);
 
     // test the TU2 outputs; TU2 supp heating coil provides the heating requirement
-    EXPECT_NEAR(212.3, TU2_fan.FanPower, 0.1);
+    EXPECT_NEAR(27.1, TU2_fan.FanPower, 0.1); // 212.3
     EXPECT_EQ(0.0, TU2_dx_clg_coil.SensCoolingEnergyRate);
     EXPECT_EQ(0.0, VRFTU2.TotalCoolingRate);
-    EXPECT_NEAR(5000.0, VRFTU2.TerminalUnitSensibleRate, 0.1);
+    EXPECT_NEAR(2500.0, VRFTU2.TerminalUnitSensibleRate, 0.1);
     EXPECT_EQ(0.0, TU2_dx_htg_coil.TotalHeatingEnergyRate);
-    EXPECT_NEAR(4787.7, VRFTU2.SuppHeatingCoilLoad, 0.1);
-    EXPECT_NEAR(4787.7, TU2_supp_htg_coil.HeatingCoilRate, 0.1);
+    EXPECT_NEAR(4585.6, VRFTU2.SuppHeatingCoilLoad, 0.1);
+    EXPECT_NEAR(4585.6, TU2_supp_htg_coil.HeatingCoilRate, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
@@ -20213,8 +20218,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputRequired = -6000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputReqToCoolSP = -6000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputReqToHeatSP = 0.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired = 5000.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputReqToHeatSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired = 2500.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputReqToHeatSP = 2500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputReqToCoolSP = 0.0;
 
     ProcessScheduleInput(*state);
@@ -20341,23 +20346,32 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
 
     // TU2 test; run terminal unit 2
     VRFTUNum = zone_num_TU2;
-    FirstHVACIteration = false;
+    FirstHVACIteration = true;
     state->dataSize->CurZoneEqNum = zone_num_TU2;
+    InitVRF(*state, VRFTUNum, zone_num_TU2, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    state->dataHVACVarRefFlow->OACompOnMassFlow = 0.1;
+    state->dataHVACVarRefFlow->OACompOffMassFlow = 0.1;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired;
+    SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    FirstHVACIteration = false;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired;
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     ReportVRFTerminalUnit(*state, VRFTUNum);
 
     // test the TU2 outputs; TU2 supp heating coil scheduled off
-    EXPECT_NEAR(212.3, TU2_fan.FanPower, 0.1);
+    EXPECT_NEAR(27.1, TU2_fan.FanPower, 0.1);
     EXPECT_EQ(0.0, TU2_dx_clg_coil.SensCoolingEnergyRate);
-    EXPECT_EQ(0.0, VRFTU2.TotalCoolingRate);
-    EXPECT_NEAR(212.3, VRFTU2.TerminalUnitSensibleRate, 0.1);
+    EXPECT_NEAR(2085.6, VRFTU2.SensibleCoolingRate, 0.1);
+    EXPECT_NEAR(3961.64, VRFTU2.TotalCoolingRate, 0.1);
+    EXPECT_NEAR(VRFTU2.TotalCoolingRate, VRFTU2.SensibleCoolingRate + VRFTU2.LatentCoolingRate, 0.1);
+    EXPECT_NEAR(-2085.6, VRFTU2.TerminalUnitSensibleRate, 0.1);
     EXPECT_EQ(0.0, TU2_dx_htg_coil.TotalHeatingEnergyRate);
-    EXPECT_NEAR(212.3, TU2_fan.FanPower + TU2_supp_htg_coil.HeatingCoilRate, 0.1);
+    EXPECT_NEAR(27.1, TU2_fan.FanPower + TU2_supp_htg_coil.HeatingCoilRate, 0.1);
     EXPECT_NEAR(0.0, TU2_supp_htg_coil.HeatingCoilRate, 0.1);
-    EXPECT_NEAR(4787.7, VRFTU2.SuppHeatingCoilLoad, 0.1);
-    EXPECT_NEAR(
-        VRFTU2.SuppHeatingCoilLoad, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired - TU2_fan.FanPower, 0.1);
+    EXPECT_NEAR(4585.6, VRFTU2.SuppHeatingCoilLoad, 0.1);
+    EXPECT_NEAR(VRFTU2.SuppHeatingCoilLoad,
+                state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU2).RemainingOutputRequired - VRFTU2.TerminalUnitSensibleRate,
+                0.1);
 }
 
 } // end of namespace EnergyPlus
