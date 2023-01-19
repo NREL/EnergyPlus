@@ -99,15 +99,7 @@ namespace HeatBalanceManager {
 
     void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
     void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
-    void ValidateMaterialRoughness(EnergyPlusData &state,
-                                   int const MaterNum,           // Which Material number being validated.
-                                   std::string const &Roughness, // Roughness String
-                                   bool &ErrorsFound             // If errors found
-    );
 
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 

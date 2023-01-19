@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 
 #include <EnergyPlus/Data/CommonIncludes.hh>
@@ -4336,17 +4337,17 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
                       sensOut,
                       latOut);
 
-    auto unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("ZONE EXHAUST NODE", state->dataLoopNodes->NodeID); // was Node 1
-    auto coolingCoilAirInletNodeIndex =
+    int unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("ZONE EXHAUST NODE", state->dataLoopNodes->NodeID); // was Node 1
+    int coolingCoilAirInletNodeIndex =
         UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID); // was Node 3
-    auto coolingCoilAirOutletNodeIndex =
+    int coolingCoilAirOutletNodeIndex =
         UtilityRoutines::FindItemInList("WATER HEATING COIL AIR INLET NODE", state->dataLoopNodes->NodeID); // was Node 6
-    auto heatingCoilAirOutletNodeIndex =
-        UtilityRoutines::FindItemInList("WATER HEATING COIL AIR OUTLET NODE", state->dataLoopNodes->NodeID);                    // was Node 7
-    auto suppHeatingAirOutletNodeIndex = UtilityRoutines::FindItemInList("ZONE 2 INLET NODE", state->dataLoopNodes->NodeID);    // was Node 2
-    auto coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);        // was Node 10
-    auto heatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("HWINLETNODE", state->dataLoopNodes->NodeID);         // was Node 4
-    auto suppHeatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("SUPPHWINLETNODE", state->dataLoopNodes->NodeID); // was Node 8
+    int heatingCoilAirOutletNodeIndex =
+        UtilityRoutines::FindItemInList("WATER HEATING COIL AIR OUTLET NODE", state->dataLoopNodes->NodeID);                   // was Node 7
+    int suppHeatingAirOutletNodeIndex = UtilityRoutines::FindItemInList("ZONE 2 INLET NODE", state->dataLoopNodes->NodeID);    // was Node 2
+    int coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);        // was Node 10
+    int heatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("HWINLETNODE", state->dataLoopNodes->NodeID);         // was Node 4
+    int suppHeatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("SUPPHWINLETNODE", state->dataLoopNodes->NodeID); // was Node 8
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
@@ -15947,7 +15948,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

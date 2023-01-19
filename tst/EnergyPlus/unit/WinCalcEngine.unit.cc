@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <WCEMultiLayerOptics.hpp>
@@ -94,7 +95,7 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEClear)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     WindowManager::initWindowModel(*state);
     WindowManager::InitWindowOpticalCalculations(*state);
@@ -103,8 +104,8 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEClear)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
-    const auto minLambda{0.3};
-    const auto maxLambda{2.5};
+    constexpr Real64 minLambda{0.3};
+    constexpr Real64 maxLambda{2.5};
 
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(
@@ -190,7 +191,7 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEVenetian)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     WindowManager::initWindowModel(*state);
     WindowManager::InitWindowOpticalCalculations(*state);
@@ -199,8 +200,8 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEVenetian)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
-    const auto minLambda{0.3};
-    const auto maxLambda{2.5};
+    constexpr Real64 minLambda{0.3};
+    constexpr Real64 maxLambda{2.5};
 
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(
@@ -269,7 +270,7 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEShade)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     WindowManager::initWindowModel(*state);
     WindowManager::InitWindowOpticalCalculations(*state);
@@ -278,8 +279,8 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEShade)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
-    const auto minLambda{0.3};
-    const auto maxLambda{2.5};
+    constexpr Real64 minLambda{0.3};
+    constexpr Real64 maxLambda{2.5};
 
     // Transmittance Front
     const auto Tfront_dir_dir = solarLayer->getPropertySimple(

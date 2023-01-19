@@ -1826,7 +1826,7 @@ namespace EMSManager {
         bool returnValue;
 
         returnValue = false;
-        for (auto loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
+        for (int loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
             if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == state.dataLoopNodes->NodeID(nodeNum) &&
                 UtilityRoutines::SameString(state.dataRuntimeLang->Sensor(loop).OutputVarName, varName)) {
                 returnValue = true;
