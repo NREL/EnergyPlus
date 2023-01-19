@@ -67,13 +67,13 @@ namespace EnergyPlus::GlobalNames {
 
 void IntraObjUniquenessCheck(EnergyPlusData &state,
                              std::string &NameToVerify,
-                             std::string const &CurrentModuleObject,
+                             std::string_view const CurrentModuleObject,
                              std::string_view FieldName,
                              std::unordered_set<std::string> &UniqueStrings,
                              bool &ErrorsFound)
 {
     if (NameToVerify.empty()) {
-        ShowSevereError(state, "E+ object type " + CurrentModuleObject + " cannot have a blank " + std::string{FieldName} + " field");
+        ShowSevereError(state, format("E+ object type {} cannot have a blank {} field", CurrentModuleObject, FieldName));
         ErrorsFound = true;
         NameToVerify = "xxxxx";
         return;
@@ -84,7 +84,7 @@ void IntraObjUniquenessCheck(EnergyPlusData &state,
         UniqueStrings.emplace(NameToVerify);
     } else {
         ErrorsFound = true;
-        ShowSevereError(state, CurrentModuleObject + " has a duplicate field " + NameToVerify);
+        ShowSevereError(state, format("{} has a duplicate field {}", CurrentModuleObject, NameToVerify));
     }
 }
 
