@@ -1344,7 +1344,6 @@ namespace WindowAC {
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DXCoils::SimDXCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using MixedAir::SimOAMixer;
 
         int OutletNode;     // unit air outlet node
         int InletNode;      // unit air inlet node
@@ -1366,7 +1365,7 @@ namespace WindowAC {
             state.dataLoopNodes->Node(AirRelNode).MassFlowRate = state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
         }
         AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        SimOAMixer(state, state.dataWindowAC->WindAC(WindACNum).OAMixName, FirstHVACIteration, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
+        MixedAir::SimOAMixer(state, state.dataWindowAC->WindAC(WindACNum).OAMixName, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
 
         // if blow through, simulate fan then coil. For draw through, simulate coil then fan.
         if (state.dataWindowAC->WindAC(WindACNum).FanPlace == BlowThru) {
