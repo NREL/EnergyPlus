@@ -1306,7 +1306,7 @@ namespace OutputReportPredefined {
     }
 
     void PreDefTableEntry(
-        EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
+        EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, ObjexxFCL::Optional_int_const numSigDigits)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

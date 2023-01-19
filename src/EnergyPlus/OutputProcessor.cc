@@ -3657,13 +3657,13 @@ namespace OutputProcessor {
         std::string const &reportIDString,          // The ID of the time stamp
         std::string const &DayOfSimChr,             // the number of days simulated so far
         bool writeToSQL,
-        Optional_int_const Month,           // the month of the reporting interval
-        Optional_int_const DayOfMonth,      // The day of the reporting interval
-        Optional_int_const Hour,            // The hour of the reporting interval
-        Optional<Real64 const> EndMinute,   // The last minute in the reporting interval
-        Optional<Real64 const> StartMinute, // The starting minute of the reporting interval
-        Optional_int_const DST,             // A flag indicating whether daylight savings time is observed
-        Optional_string_const DayType       // The day tied for the data (e.g., Monday)
+        ObjexxFCL::Optional_int_const Month,           // the month of the reporting interval
+        ObjexxFCL::Optional_int_const DayOfMonth,      // The day of the reporting interval
+        ObjexxFCL::Optional_int_const Hour,            // The hour of the reporting interval
+        ObjexxFCL::Optional<Real64 const> EndMinute,   // The last minute in the reporting interval
+        ObjexxFCL::Optional<Real64 const> StartMinute, // The starting minute of the reporting interval
+        ObjexxFCL::Optional_int_const DST,             // A flag indicating whether daylight savings time is observed
+        ObjexxFCL::Optional_string_const DayType       // The day tied for the data (e.g., Monday)
     )
     {
 
@@ -3841,7 +3841,7 @@ namespace OutputProcessor {
                                            std::string_view const variableName,      // The variable's actual name
                                            TimeStepType const timeStepType,
                                            OutputProcessor::Unit const unitsForVar, // The variables units
-                                           Optional_string_const customUnitName,
+                                           ObjexxFCL::Optional_string_const customUnitName,
                                            std::string_view const ScheduleName)
     {
 
@@ -5066,17 +5066,17 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                      // Associated Key for this variable
-                         Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this frequency
-                         Optional_string_const ResourceTypeKey,                  // Meter Resource Type (Electricity, Gas, etc)
-                         Optional_string_const EndUseKey,                        // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         Optional_string_const EndUseSubKey,                     // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         Optional_string_const GroupKey,                         // Meter Super Group Key (Building, System, Plant)
-                         Optional_string_const ZoneKey,                          // Meter Zone Key (zone name)
-                         Optional_int_const ZoneMult,                            // Zone Multiplier, defaults to 1
-                         Optional_int_const ZoneListMult,                        // Zone List Multiplier, defaults to 1
-                         Optional_int_const indexGroupKey,                       // Group identifier for SQL output
-                         Optional_string_const customUnitName,                   // the custom name for the units from EMS definition of units
-                         Optional_string_const SpaceType                         // Space type (applicable for Building group only)
+                         ObjexxFCL::Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this frequency
+                         ObjexxFCL::Optional_string_const ResourceTypeKey,                  // Meter Resource Type (Electricity, Gas, etc)
+                         ObjexxFCL::Optional_string_const EndUseKey,                        // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         ObjexxFCL::Optional_string_const EndUseSubKey,                     // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         ObjexxFCL::Optional_string_const GroupKey,                         // Meter Super Group Key (Building, System, Plant)
+                         ObjexxFCL::Optional_string_const ZoneKey,                          // Meter Zone Key (zone name)
+                         ObjexxFCL::Optional_int_const ZoneMult,                            // Zone Multiplier, defaults to 1
+                         ObjexxFCL::Optional_int_const ZoneListMult,                        // Zone List Multiplier, defaults to 1
+                         ObjexxFCL::Optional_int_const indexGroupKey,                       // Group identifier for SQL output
+                         ObjexxFCL::Optional_string_const customUnitName,                   // the custom name for the units from EMS definition of units
+                         ObjexxFCL::Optional_string_const SpaceType                         // Space type (applicable for Building group only)
 )
 {
 
@@ -5325,8 +5325,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                      // Associated Key for this variable
-                         Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this freqency
-                         Optional_int_const indexGroupKey                        // Group identifier for SQL output
+                         ObjexxFCL::Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this freqency
+                         ObjexxFCL::Optional_int_const indexGroupKey                        // Group identifier for SQL output
 )
 {
 
@@ -8379,7 +8379,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
                              OutputProcessor::StoreType const StateType,
                              OutputProcessor::VariableType const VariableType,
                              OutputProcessor::Unit const unitsForVar,
-                             Optional_string_const customUnitName // the custom name for the units from EMS definition of units
+                             ObjexxFCL::Optional_string_const customUnitName // the custom name for the units from EMS definition of units
 )
 {
 

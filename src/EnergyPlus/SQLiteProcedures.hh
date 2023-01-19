@@ -173,25 +173,25 @@ public:
 
     void createSQLiteReportDataRecord(int const recordIndex,
                                       Real64 const value,
-                                      Optional_int_const reportingInterval = _,
-                                      Optional<Real64 const> minValue = _,
-                                      Optional_int_const minValueDate = _,
-                                      Optional<Real64 const> maxValue = _,
-                                      Optional_int_const maxValueDate = _,
-                                      Optional_int_const minutesPerTimeStep = _);
+                                      ObjexxFCL::Optional_int_const reportingInterval = _,
+                                      ObjexxFCL::Optional<Real64 const> minValue = _,
+                                      ObjexxFCL::Optional_int_const minValueDate = _,
+                                      ObjexxFCL::Optional<Real64 const> maxValue = _,
+                                      ObjexxFCL::Optional_int_const maxValueDate = _,
+                                      ObjexxFCL::Optional_int_const minutesPerTimeStep = _);
 
     void createSQLiteTimeIndexRecord(int const reportingInterval,
                                      int const recordIndex,
                                      int const CumlativeSimulationDays,
                                      int const curEnvirNum,
                                      int const simulationYear,
-                                     Optional_int_const Month = _,
-                                     Optional_int_const DayOfMonth = _,
-                                     Optional_int_const Hour = _,
-                                     Optional<Real64 const> EndMinute = _,
-                                     Optional<Real64 const> StartMinute = _,
-                                     Optional_int_const DST = _,
-                                     Optional_string_const DayType = _,
+                                     ObjexxFCL::Optional_int_const Month = _,
+                                     ObjexxFCL::Optional_int_const DayOfMonth = _,
+                                     ObjexxFCL::Optional_int_const Hour = _,
+                                     ObjexxFCL::Optional<Real64 const> EndMinute = _,
+                                     ObjexxFCL::Optional<Real64 const> StartMinute = _,
+                                     ObjexxFCL::Optional_int_const DST = _,
+                                     ObjexxFCL::Optional_string_const DayType = _,
                                      bool const warmupFlag = false);
 
     void createYearlyTimeIndexRecord(int const simulationYear, int const curEnvirNum);

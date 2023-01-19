@@ -242,8 +242,8 @@ namespace UnitVentilator {
                                       int const UnitVentNum,                                       // Unit index in unit ventilator array
                                       bool const FirstHVACIteration,                               // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,                                             // load met by unit (watts)
-                                      Optional_int_const OpMode = DataHVACGlobals::ContFanCycCoil, // Fan Type
-                                      Optional<Real64 const> PartLoadFrac = 1.0                    // Part Load Ratio of coil and fan
+                                      ObjexxFCL::Optional_int_const OpMode = DataHVACGlobals::ContFanCycCoil, // Fan Type
+                                      ObjexxFCL::Optional<Real64 const> PartLoadFrac = 1.0                    // Part Load Ratio of coil and fan
     );
 
     void SimUnitVentOAMixer(EnergyPlusData &state,

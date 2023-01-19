@@ -859,7 +859,7 @@ namespace OutputReportTabular {
 
     void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
 
-    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, Optional_bool_const isBold = _);
+    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, ObjexxFCL::Optional_bool_const isBold = _);
 
     void WriteTable(EnergyPlusData &state,
                     Array2S_string const body, // row,column

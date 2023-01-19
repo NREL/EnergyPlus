@@ -132,7 +132,7 @@ namespace VariableSpeedCoils {
                                Real64 const SpeedRatio,               // compressor speed ratio
                                Real64 const SensLoad,                 // Sensible demand load [W]
                                Real64 const LatentLoad,               // Latent demand load [W]
-                               Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
+                               ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
     )
     {
 
@@ -8063,9 +8063,9 @@ namespace VariableSpeedCoils {
     void SetVarSpeedCoilData(EnergyPlusData &state,
                              int const WSHPNum,                    // Number of OA Controller
                              bool &ErrorsFound,                    // Set to true if certain errors found
-                             Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
-                             Optional_int CompanionHeatingCoilNum, // Index to heating coil for cooling coil = SimpleWSHPNum
-                             Optional_int MSHPDesignSpecIndex      // index to UnitarySystemPerformance:Multispeed object
+                             ObjexxFCL::Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
+                             ObjexxFCL::Optional_int CompanionHeatingCoilNum, // Index to heating coil for cooling coil = SimpleWSHPNum
+                             ObjexxFCL::Optional_int MSHPDesignSpecIndex      // index to UnitarySystemPerformance:Multispeed object
     )
     {
 

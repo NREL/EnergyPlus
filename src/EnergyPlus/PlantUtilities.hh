@@ -155,8 +155,8 @@ namespace PlantUtilities {
     void SafeCopyPlantNode(EnergyPlusData &state,
                            int InletNodeNum,
                            int OutletNodeNum,
-                           Optional_int_const LoopNum = _,
-                           Optional<Real64 const> OutletTemp = _ // set on outlet node if present and water.
+                           ObjexxFCL::Optional_int_const LoopNum = _,
+                           ObjexxFCL::Optional<Real64 const> OutletTemp = _ // set on outlet node if present and water.
     );
 
     Real64 BoundValueToNodeMinMaxAvail(EnergyPlusData &state, Real64 ValueToBound, int NodeNumToBoundWith);
@@ -174,17 +174,17 @@ namespace PlantUtilities {
                                  DataPlant::PlantEquipmentType CompType,
                                  PlantLocation &plantLoc,
                                  bool &errFlag,
-                                 Optional<Real64 const> LowLimitTemp = _,
-                                 Optional<Real64 const> HighLimitTemp = _,
-                                 Optional_int CountMatchPlantLoops = _,
-                                 Optional_int_const InletNodeNumber = _,
-                                 Optional_int_const SingleLoopSearch = _);
+                                 ObjexxFCL::Optional<Real64 const> LowLimitTemp = _,
+                                 ObjexxFCL::Optional<Real64 const> HighLimitTemp = _,
+                                 ObjexxFCL::Optional_int CountMatchPlantLoops = _,
+                                 ObjexxFCL::Optional_int_const InletNodeNumber = _,
+                                 ObjexxFCL::Optional_int_const SingleLoopSearch = _);
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                                   std::string_view const CallerName, // really used for error messages
                                   int NodeNum,                       // index in Node structure of node to be scanned
                                   PlantLocation &pLantLoc,           // return value for location
-                                  Optional_int CompNum = _);
+                                  ObjexxFCL::Optional_int CompNum = _);
 
     bool AnyPlantLoopSidesNeedSim(EnergyPlusData &state);
 
@@ -198,7 +198,7 @@ namespace PlantUtilities {
                            int NodeNumIn,                        // component water inlet node
                            int NodeNumOut,                       // component water outlet node
                            bool &ErrorsFound,                    // set to true if there's an error
-                           Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
+                           ObjexxFCL::Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
     );
 
     bool verifyTwoNodeNumsOnSamePlantLoop(EnergyPlusData &state, int nodeIndexA, int nodeIndexB);

@@ -121,7 +121,7 @@ namespace ZoneEquipmentManager {
                                     int ZoneNum,
                                     Real64 SysOutputProvided,               // sensible output provided by zone equipment (W)
                                     Real64 LatOutputProvided,               // latent output provided by zone equipment (kg/s)
-                                    Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
+                                    ObjexxFCL::Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
     );
 
     void CalcZoneMassBalance(EnergyPlusData &state, bool FirstHVACIteration);

@@ -116,17 +116,17 @@ namespace HVACFan {
 
     void FanSystem::simulate(
         EnergyPlusData &state,
-        Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction = current flow/ max design flow
+        ObjexxFCL::Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction = current flow/ max design flow
                                              // rate.  It is not exactly the same as the legacy speed ratio that was used with SimulateFanComponents.
-        Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
-        Optional_bool_const zoneCompTurnFansOff, // can be used as turn Fans OFF signal from ZoneHVAC component
-        Optional<Real64 const>
+        ObjexxFCL::Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
+        ObjexxFCL::Optional_bool_const zoneCompTurnFansOff, // can be used as turn Fans OFF signal from ZoneHVAC component
+        ObjexxFCL::Optional<Real64 const>
             pressureRise, // Pressure difference to use for DeltaPress, for rating DX coils at a different pressure without entire duct system
-        Optional<Real64 const> massFlowRate1,    // Mass flow rate in operating mode 1 [kg/s]
-        Optional<Real64 const> runTimeFraction1, // Run time fraction in operating mode 1
-        Optional<Real64 const> massFlowRate2,    // Mass flow rate in operating mode 2 [kg/s]
-        Optional<Real64 const> runTimeFraction2, // Run time fraction in opearating mode 2
-        Optional<Real64 const> pressureRise2     // Pressure difference for operating mode 2
+        ObjexxFCL::Optional<Real64 const> massFlowRate1,    // Mass flow rate in operating mode 1 [kg/s]
+        ObjexxFCL::Optional<Real64 const> runTimeFraction1, // Run time fraction in operating mode 1
+        ObjexxFCL::Optional<Real64 const> massFlowRate2,    // Mass flow rate in operating mode 2 [kg/s]
+        ObjexxFCL::Optional<Real64 const> runTimeFraction2, // Run time fraction in opearating mode 2
+        ObjexxFCL::Optional<Real64 const> pressureRise2     // Pressure difference for operating mode 2
     )
     {
 
@@ -696,13 +696,13 @@ namespace HVACFan {
 
     void
     FanSystem::calcSimpleSystemFan(EnergyPlusData &state,
-                                   Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
-                                   Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
-                                   Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
-                                   Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
-                                   Optional<Real64 const> flowRatio2,   // Flow ratio in operating mode 2
-                                   Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
-                                   Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
+                                   ObjexxFCL::Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
+                                   ObjexxFCL::Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
+                                   ObjexxFCL::Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
+                                   ObjexxFCL::Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
+                                   ObjexxFCL::Optional<Real64 const> flowRatio2,   // Flow ratio in operating mode 2
+                                   ObjexxFCL::Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
+                                   ObjexxFCL::Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
     )
     {
         std::vector<Real64> localPressureRise; // [0] is operating mode 1, [1] is operating mode 2

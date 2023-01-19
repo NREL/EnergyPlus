@@ -489,9 +489,9 @@ namespace ThermalComfort {
     }
 
     void CalcThermalComfortFanger(EnergyPlusData &state,
-                                  Optional_int_const PNum,     // People number for thermal comfort control
-                                  Optional<Real64 const> Tset, // Temperature setpoint for thermal comfort control
-                                  Optional<Real64> PMVResult   // PMV value for thermal comfort control
+                                  ObjexxFCL::Optional_int_const PNum,     // People number for thermal comfort control
+                                  ObjexxFCL::Optional<Real64 const> Tset, // Temperature setpoint for thermal comfort control
+                                  ObjexxFCL::Optional<Real64> PMVResult   // PMV value for thermal comfort control
     )
     {
 
@@ -2676,8 +2676,8 @@ namespace ThermalComfort {
     void CalcThermalComfortAdaptiveASH55(
         EnergyPlusData &state,
         bool const initiate,              // true if supposed to initiate
-        Optional_bool_const wthrsim,      // true if this is a weather simulation
-        Optional<Real64 const> avgdrybulb // approximate avg drybulb for design day.  will be used as previous period in design day
+        ObjexxFCL::Optional_bool_const wthrsim,      // true if this is a weather simulation
+        ObjexxFCL::Optional<Real64 const> avgdrybulb // approximate avg drybulb for design day.  will be used as previous period in design day
     )
     {
 
@@ -2922,8 +2922,8 @@ namespace ThermalComfort {
     void CalcThermalComfortAdaptiveCEN15251(
         EnergyPlusData &state,
         bool const initiate,              // true if supposed to initiate
-        Optional_bool_const wthrsim,      // true if this is a weather simulation
-        Optional<Real64 const> avgdrybulb // approximate avg drybulb for design day.  will be used as previous period in design day
+        ObjexxFCL::Optional_bool_const wthrsim,      // true if this is a weather simulation
+        ObjexxFCL::Optional<Real64 const> avgdrybulb // approximate avg drybulb for design day.  will be used as previous period in design day
     )
     {
 

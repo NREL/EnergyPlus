@@ -171,7 +171,7 @@ constexpr std::array<std::string_view, static_cast<int>(SurfacesType::Num)> Surf
                                                                                                 "ALLINTERIORFLOORS"};
 void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                                   const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                  Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
+                                  ObjexxFCL::Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
 )
 {
 
@@ -3196,7 +3196,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
                                 int const SurfNum,                          // surface number for which coefficients are being calculated
                                 const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                 Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
-                                Optional<Array1S<Real64> const> Vhc         // Velocity array for forced convection coeff calculation
+                                ObjexxFCL::Optional<Array1S<Real64> const> Vhc         // Velocity array for forced convection coeff calculation
 )
 {
 

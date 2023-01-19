@@ -219,11 +219,11 @@ namespace Curve {
     Real64 CurveValue(EnergyPlusData &state,
                       int CurveIndex,                  // index of curve in curve array
                       Real64 Var1,                     // 1st independent variable
-                      Optional<Real64 const> Var2 = _, // 2nd independent variable
-                      Optional<Real64 const> Var3 = _, // 3rd independent variable
-                      Optional<Real64 const> Var4 = _, // 4th independent variable
-                      Optional<Real64 const> Var5 = _, // 5th independent variable
-                      Optional<Real64 const> Var6 = _  // 6th independent variable
+                      ObjexxFCL::Optional<Real64 const> Var2 = _, // 2nd independent variable
+                      ObjexxFCL::Optional<Real64 const> Var3 = _, // 3rd independent variable
+                      ObjexxFCL::Optional<Real64 const> Var4 = _, // 4th independent variable
+                      ObjexxFCL::Optional<Real64 const> Var5 = _, // 5th independent variable
+                      ObjexxFCL::Optional<Real64 const> Var6 = _  // 6th independent variable
     );
 
     void GetCurveInput(EnergyPlusData &state);
@@ -235,20 +235,20 @@ namespace Curve {
     Real64 PerformanceCurveObject(EnergyPlusData &state,
                                   int CurveIndex,                  // index of curve in curve array
                                   Real64 Var1,                     // 1st independent variable
-                                  Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                  Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                  Optional<Real64 const> Var4 = _, // 4th independent variable
-                                  Optional<Real64 const> Var5 = _  // 5th independent variable
+                                  ObjexxFCL::Optional<Real64 const> Var2 = _, // 2nd independent variable
+                                  ObjexxFCL::Optional<Real64 const> Var3 = _, // 3rd independent variable
+                                  ObjexxFCL::Optional<Real64 const> Var4 = _, // 4th independent variable
+                                  ObjexxFCL::Optional<Real64 const> Var5 = _  // 5th independent variable
     );
 
     Real64 BtwxtTableInterpolation(EnergyPlusData &state,
                                    int CurveIndex,                  // index of curve in curve array
                                    Real64 Var1,                     // 1st independent variable
-                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                   Optional<Real64 const> Var4 = _, // 4th independent variable
-                                   Optional<Real64 const> Var5 = _, // 5th independent variable
-                                   Optional<Real64 const> Var6 = _);
+                                   ObjexxFCL::Optional<Real64 const> Var2 = _, // 2nd independent variable
+                                   ObjexxFCL::Optional<Real64 const> Var3 = _, // 3rd independent variable
+                                   ObjexxFCL::Optional<Real64 const> Var4 = _, // 4th independent variable
+                                   ObjexxFCL::Optional<Real64 const> Var5 = _, // 5th independent variable
+                                   ObjexxFCL::Optional<Real64 const> Var6 = _);
 
     bool IsCurveInputTypeValid(std::string const &InInputType); // index of curve in curve array
 
@@ -281,23 +281,23 @@ namespace Curve {
                               int CurveIndex,               // index of curve in curve array
                               Real64 &Var1Min,              // Minimum values of 1st independent variable
                               Real64 &Var1Max,              // Maximum values of 1st independent variable
-                              Optional<Real64> Var2Min = _, // Minimum values of 2nd independent variable
-                              Optional<Real64> Var2Max = _, // Maximum values of 2nd independent variable
-                              Optional<Real64> Var3Min = _, // Minimum values of 3rd independent variable
-                              Optional<Real64> Var3Max = _, // Maximum values of 3rd independent variable
-                              Optional<Real64> Var4Min = _, // Minimum values of 4th independent variable
-                              Optional<Real64> Var4Max = _, // Maximum values of 4th independent variable
-                              Optional<Real64> Var5Min = _, // Minimum values of 5th independent variable
-                              Optional<Real64> Var5Max = _, // Maximum values of 5th independent variable
-                              Optional<Real64> Var6Min = _, // Minimum values of 6th independent variable
-                              Optional<Real64> Var6Max = _  // Maximum values of 6th independent variable
+                              ObjexxFCL::Optional<Real64> Var2Min = _, // Minimum values of 2nd independent variable
+                              ObjexxFCL::Optional<Real64> Var2Max = _, // Maximum values of 2nd independent variable
+                              ObjexxFCL::Optional<Real64> Var3Min = _, // Minimum values of 3rd independent variable
+                              ObjexxFCL::Optional<Real64> Var3Max = _, // Maximum values of 3rd independent variable
+                              ObjexxFCL::Optional<Real64> Var4Min = _, // Minimum values of 4th independent variable
+                              ObjexxFCL::Optional<Real64> Var4Max = _, // Maximum values of 4th independent variable
+                              ObjexxFCL::Optional<Real64> Var5Min = _, // Minimum values of 5th independent variable
+                              ObjexxFCL::Optional<Real64> Var5Max = _, // Maximum values of 5th independent variable
+                              ObjexxFCL::Optional<Real64> Var6Min = _, // Minimum values of 6th independent variable
+                              ObjexxFCL::Optional<Real64> Var6Max = _  // Maximum values of 6th independent variable
     );
 
     void SetCurveOutputMinMaxValues(EnergyPlusData &state,
                                     int CurveIndex,                      // index of curve in curve array
                                     bool &ErrorsFound,                   // TRUE when errors occur
-                                    Optional<Real64 const> CurveMin = _, // Minimum value of curve output
-                                    Optional<Real64 const> CurveMax = _  // Maximum values of curve output
+                                    ObjexxFCL::Optional<Real64 const> CurveMin = _, // Minimum value of curve output
+                                    ObjexxFCL::Optional<Real64 const> CurveMax = _  // Maximum values of curve output
     );
 
     void GetPressureSystemInput(EnergyPlusData &state);
@@ -318,7 +318,7 @@ namespace Curve {
                                      const std::string &cFieldName,        // object field name
                                      const std::string &cFieldValue,       // user input curve name
                                      Real64 Var1,                          // required 1st independent variable
-                                     Optional<Real64 const> Var2 = _);     // 2nd independent variable
+                                     ObjexxFCL::Optional<Real64 const> Var2 = _);     // 2nd independent variable
 
 } // namespace Curve
 

@@ -116,10 +116,10 @@ void SimulateFanComponents(EnergyPlusData &state,
                            std::string_view const CompName,
                            bool const FirstHVACIteration,
                            int &CompIndex,
-                           Optional<Real64 const> SpeedRatio,
-                           Optional_bool_const ZoneCompTurnFansOn,  // Turn fans ON signal from ZoneHVAC component
-                           Optional_bool_const ZoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
-                           Optional<Real64 const> PressureRise      // Pressure difference to use for DeltaPress
+                           ObjexxFCL::Optional<Real64 const> SpeedRatio,
+                           ObjexxFCL::Optional_bool_const ZoneCompTurnFansOn,  // Turn fans ON signal from ZoneHVAC component
+                           ObjexxFCL::Optional_bool_const ZoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
+                           ObjexxFCL::Optional<Real64 const> PressureRise      // Pressure difference to use for DeltaPress
 )
 {
 
@@ -1663,7 +1663,7 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     }
 }
 
-void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise)
+void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Real64 const> PressureRise)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1861,7 +1861,7 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real
     }
 }
 
-void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio)
+void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Real64 const> SpeedRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2596,7 +2596,7 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
                                   std::string_view FanType,   // must match fan types in this module
                                   std::string_view FanName,   // must match fan names for the fan type
                                   bool &ErrorsFound,          // set to true if problem
-                                  Optional_int_const FanIndex // index to fan
+                                  ObjexxFCL::Optional_int_const FanIndex // index to fan
 )
 {
 
@@ -2804,7 +2804,7 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
 int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
                                std::string &FanType, // must match fan types in this module (set if nonzero index passed)
                                std::string &FanName, // must match fan names for the fan type (set if nonzero index passed)
-                               Optional_int IndexIn  // optional fan index if fan type and name are unknown or index needs setting
+                               ObjexxFCL::Optional_int IndexIn  // optional fan index if fan type and name are unknown or index needs setting
 )
 {
 
@@ -2860,8 +2860,8 @@ void SetFanData(EnergyPlusData &state,
                 int const FanNum,                     // Index of fan
                 bool &ErrorsFound,                    // Set to true if certain errors found
                 std::string const &FanName,           // Name of fan
-                Optional<Real64 const> MaxAirVolFlow, // Fan air volumetric flow rate    [m3/s]
-                Optional<Real64 const> MinAirVolFlow  // Fan air volumetric flow rate    [m3/s]
+                ObjexxFCL::Optional<Real64 const> MaxAirVolFlow, // Fan air volumetric flow rate    [m3/s]
+                ObjexxFCL::Optional<Real64 const> MinAirVolFlow  // Fan air volumetric flow rate    [m3/s]
 )
 {
 

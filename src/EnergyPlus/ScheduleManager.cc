@@ -2880,7 +2880,7 @@ namespace ScheduleManager {
     }
 
     void GetScheduleValuesForDay(
-        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay, Optional_int_const CurDayofWeek)
+        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, ObjexxFCL::Optional_int_const JDay, ObjexxFCL::Optional_int_const CurDayofWeek)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie

@@ -3125,17 +3125,17 @@ namespace PlantPipingSystemsManager {
                                   Real64 const DirExtentMax,
                                   RegionType const DirDirection,
                                   bool const PartitionsExist,
-                                  Optional_int BasementWallXIndex,
-                                  Optional_int BasementFloorYIndex,
-                                  Optional_int XIndex,
-                                  Optional_int XWallIndex,
-                                  Optional_int InsulationXIndex,
-                                  Optional_int YIndex,
-                                  Optional_int YFloorIndex,
-                                  Optional_int InsulationYIndex,
-                                  Optional_int ZIndex,
-                                  Optional_int ZWallIndex,
-                                  Optional_int InsulationZIndex)
+                                  ObjexxFCL::Optional_int BasementWallXIndex,
+                                  ObjexxFCL::Optional_int BasementFloorYIndex,
+                                  ObjexxFCL::Optional_int XIndex,
+                                  ObjexxFCL::Optional_int XWallIndex,
+                                  ObjexxFCL::Optional_int InsulationXIndex,
+                                  ObjexxFCL::Optional_int YIndex,
+                                  ObjexxFCL::Optional_int YFloorIndex,
+                                  ObjexxFCL::Optional_int InsulationYIndex,
+                                  ObjexxFCL::Optional_int ZIndex,
+                                  ObjexxFCL::Optional_int ZWallIndex,
+                                  ObjexxFCL::Optional_int InsulationZIndex)
     {
 
         // FUNCTION INFORMATION:

@@ -17240,7 +17240,7 @@ void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle)
     }
 }
 
-void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, Optional_bool_const isBold)
+void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, ObjexxFCL::Optional_bool_const isBold)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer

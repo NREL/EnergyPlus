@@ -4197,7 +4197,7 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
                                 int const ZoneNum,
                                 Real64 const SysOutputProvided,     // sensible output provided by zone equipment (W)
                                 Real64 const LatOutputProvided,     // latent output provided by zone equipment (kg/s)
-                                Optional_int_const EquipPriorityNum // index in PrioritySimOrder for this update
+                                ObjexxFCL::Optional_int_const EquipPriorityNum // index in PrioritySimOrder for this update
 )
 {
 

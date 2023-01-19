@@ -266,9 +266,9 @@ namespace WaterCoils {
                                      std::string_view CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
-                                     Optional<Real64> QActual = _,
-                                     Optional_int_const FanOpMode = _,
-                                     Optional<Real64 const> PartLoadRatio = _);
+                                     ObjexxFCL::Optional<Real64> QActual = _,
+                                     ObjexxFCL::Optional_int_const FanOpMode = _,
+                                     ObjexxFCL::Optional<Real64 const> PartLoadRatio = _);
 
     void GetWaterCoilInput(EnergyPlusData &state);
 
@@ -514,9 +514,9 @@ namespace WaterCoils {
     void SetWaterCoilData(EnergyPlusData &state,
                           int const CoilNum,                           // index of hot water heating Coil
                           bool &ErrorsFound,                           // Set to true if certain errors found
-                          Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
-                          Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
-                          Optional_bool heatRecoveryCoil = _           // true if water coil is connected to heat recovery loop
+                          ObjexxFCL::Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+                          ObjexxFCL::Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
+                          ObjexxFCL::Optional_bool heatRecoveryCoil = _           // true if water coil is connected to heat recovery loop
     );
 
     // estimate heating coil design inlet water temperature for autosizing UA-value

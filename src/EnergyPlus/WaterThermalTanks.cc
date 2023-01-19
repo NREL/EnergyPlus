@@ -10667,7 +10667,7 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
     }
 }
 
-void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum)
+void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, ObjexxFCL::Optional_int_const LoopNum)
 {
 
     // SUBROUTINE INFORMATION:

@@ -212,7 +212,7 @@ void ManageControllers(EnergyPlusData &state,
                        bool &IsConvergedFlag,
                        bool &IsUpToDateFlag,
                        bool &BypassOAController,
-                       Optional_bool AllowWarmRestartFlag)
+                       ObjexxFCL::Optional_bool AllowWarmRestartFlag)
 {
 
     // SUBROUTINE INFORMATION:

@@ -107,12 +107,12 @@ namespace HVACHXAssistedCoolingCoil {
                                   Real64 const PartLoadRatio,                        // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
                                   int const FanOpMode,                         // Allows the parent object to control fan operation
-                                  Optional_bool_const HXUnitEnable = _,        // flag to enable heat exchanger heat recovery
-                                  Optional<Real64 const> OnOffAFR = _,         // Ratio of compressor ON air mass flow rate to AVERAGE over time step
-                                  Optional_bool_const EconomizerFlag = _,      // OA sys or air loop economizer status
-                                  Optional<Real64> QTotOut = _,                // the total cooling output of unit
-                                  Optional_int_const DehumidificationMode = _, // Optional dehumbidication mode
-                                  Optional<Real64 const> LoadSHR = _           // Optional coil SHR pass over
+                                  ObjexxFCL::Optional_bool_const HXUnitEnable = _,        // flag to enable heat exchanger heat recovery
+                                  ObjexxFCL::Optional<Real64 const> OnOffAFR = _,         // Ratio of compressor ON air mass flow rate to AVERAGE over time step
+                                  ObjexxFCL::Optional_bool_const EconomizerFlag = _,      // OA sys or air loop economizer status
+                                  ObjexxFCL::Optional<Real64> QTotOut = _,                // the total cooling output of unit
+                                  ObjexxFCL::Optional_int_const DehumidificationMode = _, // Optional dehumbidication mode
+                                  ObjexxFCL::Optional<Real64 const> LoadSHR = _           // Optional coil SHR pass over
     );
 
     void GetHXAssistedCoolingCoilInput(EnergyPlusData &state);
@@ -126,10 +126,10 @@ namespace HVACHXAssistedCoolingCoil {
                                    Real64 const PartLoadRatio,                        // Cooling coil part load ratio
                                    bool const HXUnitOn,                               // Flag to enable heat exchanger
                                    int const FanOpMode,                               // Allows parent object to control fan operation
-                                   Optional<Real64 const> OnOffAirFlow = _,     // Ratio of compressor ON air mass flow to AVERAGE over time step
-                                   Optional_bool_const EconomizerFlag = _,      // OA (or airloop) econommizer status
-                                   Optional_int_const DehumidificationMode = _, // Optional dehumbidication mode
-                                   [[maybe_unused]] Optional<Real64 const> LoadSHR = _ // Optional coil SHR pass over
+                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlow = _,     // Ratio of compressor ON air mass flow to AVERAGE over time step
+                                   ObjexxFCL::Optional_bool_const EconomizerFlag = _,      // OA (or airloop) econommizer status
+                                   ObjexxFCL::Optional_int_const DehumidificationMode = _, // Optional dehumbidication mode
+                                   [[maybe_unused]] ObjexxFCL::Optional<Real64 const> LoadSHR = _ // Optional coil SHR pass over
     );
 
     void GetHXDXCoilIndex(EnergyPlusData &state,
@@ -154,14 +154,14 @@ namespace HVACHXAssistedCoolingCoil {
                             std::string const &CoilType,         // must match coil types in this module
                             std::string const &CoilName,         // must match coil names for the coil type
                             bool &ErrorsFound,                   // set to true if problem
-                            Optional_bool_const PrintWarning = _ // prints warning message if true
+                            ObjexxFCL::Optional_bool_const PrintWarning = _ // prints warning message if true
     );
 
     int GetCoilObjectTypeNum(EnergyPlusData &state,
                              std::string const &CoilType,         // must match coil types in this module
                              std::string const &CoilName,         // must match coil names for the coil type
                              bool &ErrorsFound,                   // set to true if problem
-                             Optional_bool_const PrintWarning = _ // prints warning message if true
+                             ObjexxFCL::Optional_bool_const PrintWarning = _ // prints warning message if true
     );
 
     int GetCoilInletNode(EnergyPlusData &state,

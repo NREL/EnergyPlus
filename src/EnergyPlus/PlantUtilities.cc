@@ -1401,8 +1401,8 @@ void RegisterPlantCompDesignFlow(EnergyPlusData &state,
 void SafeCopyPlantNode(EnergyPlusData &state,
                        int const InletNodeNum,
                        int const OutletNodeNum,
-                       Optional_int_const LoopNum,
-                       [[maybe_unused]] Optional<Real64 const> OutletTemp // set on outlet node if present and water.
+                       ObjexxFCL::Optional_int_const LoopNum,
+                       [[maybe_unused]] ObjexxFCL::Optional<Real64 const> OutletTemp // set on outlet node if present and water.
 )
 {
 
@@ -1612,11 +1612,11 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                              DataPlant::PlantEquipmentType CompType,
                              PlantLocation &plantLoc,
                              bool &errFlag,
-                             Optional<Real64 const> LowLimitTemp,
-                             Optional<Real64 const> HighLimitTemp,
-                             Optional_int CountMatchPlantLoops,
-                             Optional_int_const InletNodeNumber,
-                             Optional_int_const SingleLoopSearch)
+                             ObjexxFCL::Optional<Real64 const> LowLimitTemp,
+                             ObjexxFCL::Optional<Real64 const> HighLimitTemp,
+                             ObjexxFCL::Optional_int CountMatchPlantLoops,
+                             ObjexxFCL::Optional_int_const InletNodeNumber,
+                             ObjexxFCL::Optional_int_const SingleLoopSearch)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1743,7 +1743,7 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                               std::string_view const CallerName, // really used for error messages
                               int const NodeNum,                 // index in Node structure of node to be scanned
                               PlantLocation &pLantLoc,           // return value for location
-                              Optional_int CompNum)
+                              ObjexxFCL::Optional_int CompNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1909,7 +1909,7 @@ int MyPlantSizingIndex(EnergyPlusData &state,
                        int const NodeNumIn,                   // component water inlet node
                        [[maybe_unused]] int const NodeNumOut, // component water outlet node
                        bool &ErrorsFound,                     // set to true if there's an error, unchanged otherwise
-                       Optional_bool_const SupressErrors      // used for WSHP's where condenser loop may not be on a plant loop
+                       ObjexxFCL::Optional_bool_const SupressErrors      // used for WSHP's where condenser loop may not be on a plant loop
 )
 {
 

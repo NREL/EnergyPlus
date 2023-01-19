@@ -1752,8 +1752,8 @@ namespace UnitHeater {
                                   int const UnitHeatNum,               // Unit index in unit heater array
                                   bool const FirstHVACIteration,       // flag for 1st HVAV iteration in the time step
                                   Real64 &LoadMet,                     // load met by unit (watts)
-                                  Optional_int_const OpMode,           // fan operating mode
-                                  Optional<Real64 const> PartLoadRatio // part-load ratio
+                                  ObjexxFCL::Optional_int_const OpMode,           // fan operating mode
+                                  ObjexxFCL::Optional<Real64 const> PartLoadRatio // part-load ratio
     )
     {
 

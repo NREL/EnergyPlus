@@ -193,8 +193,8 @@ namespace SolarCollectors {
                                     Real64 &ReflSys,                   // cover system solar reflectance
                                     Real64 &AbsCover1,                 // Inner cover solar absorptance
                                     Real64 &AbsCover2,                 // Outer cover solar absorptance
-                                    Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
-                                    Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
+                                    ObjexxFCL::Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
+                                    ObjexxFCL::Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
         ) const;
 
         void CalcSolarCollector(EnergyPlusData &state);

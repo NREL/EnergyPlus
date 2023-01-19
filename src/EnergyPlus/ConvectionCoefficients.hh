@@ -269,7 +269,7 @@ namespace ConvectionCoefficients {
 
     void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                                       const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                      Optional_int_const ZoneToResimulate = _     // if passed in, then only calculate surfaces that have this zone
+                                      ObjexxFCL::Optional_int_const ZoneToResimulate = _     // if passed in, then only calculate surfaces that have this zone
     );
 
     void InitExteriorConvectionCoeff(EnergyPlusData &state,
@@ -326,7 +326,7 @@ namespace ConvectionCoefficients {
                                     int SurfNum,                                // surface number for which coefficients are being calculated
                                     const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                     Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
-                                    Optional<Array1S<Real64> const> Vhc = _     // Velocity array for forced convection coeff calculation
+                                    ObjexxFCL::Optional<Array1S<Real64> const> Vhc = _     // Velocity array for forced convection coeff calculation
     );
 
     Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int ZoneNum);

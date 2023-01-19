@@ -1632,8 +1632,8 @@ namespace SolarCollectors {
                                                Real64 &ReflSys,               // cover system solar reflectance
                                                Real64 &AbsCover1,             // Inner cover solar absorbtance
                                                Real64 &AbsCover2,             // Outer cover solar absorbtance
-                                               Optional_bool_const InOUTFlag, // flag for calc. diffuse solar refl of cover from inside out
-                                               Optional<Real64> RefSysDiffuse // cover system solar reflectance from inner to outer cover
+                                               ObjexxFCL::Optional_bool_const InOUTFlag, // flag for calc. diffuse solar refl of cover from inside out
+                                               ObjexxFCL::Optional<Real64> RefSysDiffuse // cover system solar reflectance from inner to outer cover
     ) const
     {
 
