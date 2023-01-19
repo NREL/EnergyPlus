@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <string>
@@ -1440,12 +1441,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     int SuppHeatCoilAirInletNode;    // supplemental heating coil air inlet node
     int SuppHeatCoilAirOutletNode;   // supplemental heating coil air outlet node
     int ZoneTerminalUnitListNum;     // Used to find connection between VRFTU, TUList and VRF condenser
-    Real64 CurveVal;                 // Used to verify modifier curves equal 1 at rated conditions
-    Real64 MinCurveVal;              // used for testing PLF curve output
-    Real64 MinCurvePLR;              // used for testing PLF curve output
-    Real64 MaxCurveVal;              // used for testing PLF curve output
-    Real64 MaxCurvePLR;              // used for testing PLF curve output
-    Real64 CurveInput;               // index used for testing PLF curve output
 
     // InputProcessor routines
     int NumParams = 0; // Number of arguments
@@ -1605,6 +1600,27 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             thisTUList.ZoneTUName(TUNum) = cAlphaArgs(TUNum + 1);
         }
     }
+
+    auto checkCurveMinMaxOutput = [&state](int CurveIndex) -> std::array<Real64, 4> {
+        Real64 MinCurveVal = 999.0;
+        Real64 MaxCurveVal = -999.0;
+        Real64 MinCurvePLR = 0.0;
+        Real64 MaxCurvePLR = 1.0;
+
+        for (int i = 0; i <= 100; ++i) { // 0 to 1.0 with 0.01 increment
+            const Real64 CurveInput = i / 100.0;
+            Real64 CurveVal = CurveValue(state, CurveIndex, CurveInput);
+            if (CurveVal < MinCurveVal) {
+                MinCurveVal = CurveVal;
+                MinCurvePLR = CurveInput;
+            }
+            if (CurveVal > MaxCurveVal) {
+                MaxCurveVal = CurveVal;
+                MaxCurvePLR = CurveInput;
+            }
+        }
+        return {MinCurvePLR, MinCurveVal, MaxCurvePLR, MaxCurveVal};
+    };
 
     // read all VRF condenser objects: Algorithm Type 1_system curve based model
     cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow";
@@ -1775,21 +1791,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                  cAlphaFieldNames(12));  // Field Name
             if (!ErrorsFound) {
                 //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
-                MinCurveVal = 999.0;
-                MaxCurveVal = -999.0;
-                CurveInput = 0.0;
-                while (CurveInput <= 1.0) {
-                    CurveVal = CurveValue(state, thisVrfSys.CoolPLFFPLR, CurveInput);
-                    if (CurveVal < MinCurveVal) {
-                        MinCurveVal = CurveVal;
-                        MinCurvePLR = CurveInput;
-                    }
-                    if (CurveVal > MaxCurveVal) {
-                        MaxCurveVal = CurveVal;
-                        MaxCurvePLR = CurveInput;
-                    }
-                    CurveInput += 0.01;
-                }
+                auto [MinCurvePLR, MinCurveVal, MaxCurvePLR, MaxCurveVal] = checkCurveMinMaxOutput(thisVrfSys.CoolPLFFPLR);
+
                 if (MinCurveVal < 0.7) {
                     ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\" has out of range values.");
@@ -1981,21 +1984,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                  cAlphaFieldNames(23));  // Field Name
 
             if (!ErrorsFound) {
-                MinCurveVal = 999.0;
-                MaxCurveVal = -999.0;
-                CurveInput = 0.0;
-                while (CurveInput <= 1.0) {
-                    CurveVal = CurveValue(state, thisVrfSys.HeatPLFFPLR, CurveInput);
-                    if (CurveVal < MinCurveVal) {
-                        MinCurveVal = CurveVal;
-                        MinCurvePLR = CurveInput;
-                    }
-                    if (CurveVal > MaxCurveVal) {
-                        MaxCurveVal = CurveVal;
-                        MaxCurvePLR = CurveInput;
-                    }
-                    CurveInput += 0.01;
-                }
+                auto [MinCurvePLR, MinCurveVal, MaxCurvePLR, MaxCurveVal] = checkCurveMinMaxOutput(thisVrfSys.HeatPLFFPLR);
+
                 if (MinCurveVal < 0.7) {
                     ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(23) + "=\"" + cAlphaArgs(23) + "\" has out of range values.");
