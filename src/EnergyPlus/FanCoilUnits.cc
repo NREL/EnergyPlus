@@ -3586,7 +3586,6 @@ namespace FanCoilUnits {
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using MixedAir::SimOAMixer;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
         using WaterCoils::SimulateWaterCoilComponents;
@@ -3666,7 +3665,7 @@ namespace FanCoilUnits {
             }
             Node(FanCoil(FanCoilNum).AirReliefNode).MassFlowRate = Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRate;
             AirMassFlow = Node(InletNode).MassFlowRate;
-            SimOAMixer(state, FanCoil(FanCoilNum).OAMixName, FirstHVACIteration, FanCoil(FanCoilNum).OAMixIndex);
+            MixedAir::SimOAMixer(state, FanCoil(FanCoilNum).OAMixName, FanCoil(FanCoilNum).OAMixIndex);
         }
 
         if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::CycFan) {

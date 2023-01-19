@@ -2280,7 +2280,7 @@ namespace HVACUnitaryBypassVAV {
                 Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp,
                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerInletAirNode).HumRat);
         }
-        MixedAir::SimOAMixer(state, CBVAV(CBVAVNum).OAMixName, FirstHVACIteration, CBVAV(CBVAVNum).OAMixIndex);
+        MixedAir::SimOAMixer(state, CBVAV(CBVAVNum).OAMixName, CBVAV(CBVAVNum).OAMixIndex);
 
         if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
