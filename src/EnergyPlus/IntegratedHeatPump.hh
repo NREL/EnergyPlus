@@ -50,7 +50,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.fwd.hh>
-#include <ObjexxFCL/Optional.fwd.hh>
+#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -263,7 +263,7 @@ namespace IntegratedHeatPump {
                 Real64 const LatentLoad,                   // Latent demand load [W]
                 bool const IsCallbyWH,                     // whether the call from the water heating loop or air loop, true = from water heating loop
                 bool const FirstHVACIteration,             // TRUE if First iteration of simulation
-                Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
+                ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
     void GetIHPInput(EnergyPlusData &state);

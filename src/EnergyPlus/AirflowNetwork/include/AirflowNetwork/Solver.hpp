@@ -260,9 +260,9 @@ namespace AirflowNetwork {
                     int const FLAG               // mode of operation
         );
 
-        void manage_balance(Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
-                            Optional_int_const Iter = _,                // Iteration number
-                            Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
+        void manage_balance(ObjexxFCL::Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
+                            ObjexxFCL::Optional_int_const Iter = _,                // Iteration number
+                            ObjexxFCL::Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
         );
 
         void get_input();
@@ -302,7 +302,7 @@ namespace AirflowNetwork {
         void calculate_GC_balance();
         void mrxinv(int NORDER);
         void report();
-        void update(Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
+        void update(ObjexxFCL::Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
         void venting_control(int i,                              // AirflowNetwork surface number
                              Real64 &OpenFactor                  // Window or door opening factor (used to calculate airflow)
         );
