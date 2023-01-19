@@ -18217,7 +18217,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
     state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
     state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
     state->dataHVACVarRefFlow->TerminalUnitList(1).IsSimulated = true;
-    VRFTU1.coolingCoilActive = true;
 
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputRequired;
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
@@ -20326,7 +20325,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
     state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
     state->dataHVACVarRefFlow->TerminalUnitList(1).IsSimulated = true;
-    VRFTU1.coolingCoilActive = true;
 
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zone_num_TU1).RemainingOutputRequired;
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
