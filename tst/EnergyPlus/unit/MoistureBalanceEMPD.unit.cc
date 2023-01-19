@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    Material::GetMaterialData(*state, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -180,13 +180,13 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    Material::GetMaterialData(*state, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
     MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput(*state);
 
-    const Material::MaterialProperties &material = state->dataMaterial->Material(1);
-    ASSERT_NEAR(material.EMPDSurfaceDepth, 0.014143, 0.000001);
-    ASSERT_NEAR(material.EMPDDeepDepth, 0.064810, 0.000001);
+    const Material::MaterialProperties *material = state->dataMaterial->Material(1);
+    ASSERT_NEAR(material->EMPDSurfaceDepth, 0.014143, 0.000001);
+    ASSERT_NEAR(material->EMPDDeepDepth, 0.064810, 0.000001);
 }
 
 TEST_F(EnergyPlusFixture, EMPDRcoating)
@@ -217,7 +217,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    Material::GetMaterialData(*state, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    Material::GetMaterialData(*state, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataConstruction->Construct.allocate(constNum);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(constNum);
     construction.TotLayers = constNum;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("WOOD", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -346,7 +346,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 
     using Psychrometrics::PsyRhFnTdbRhov;
 
-    auto const &material(state->dataMaterial->Material(1));
+    auto const *material(state->dataMaterial->Material(1));
 
     Real64 Tsat(0.0);
     state->dataHeatBalSurf->SurfTempIn.allocate(surfNum);
@@ -358,14 +358,14 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     Real64 RV_Deep_Old = state->dataMstBalEMPD->RVdeepOld(surfNum);
     Real64 RVaver = state->dataMstBalEMPD->RVSurfLayerOld(surfNum);
     Real64 RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
-    Real64 dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
-                    material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
+    Real64 dU_dRH = material->MoistACoeff * material->MoistBCoeff * pow(RHaver, material->MoistBCoeff - 1) +
+                    material->MoistCCoeff * material->MoistDCoeff * pow(RHaver, material->MoistDCoeff - 1);
 
     // Convert stored vapor density to RH.
     Real64 RH_deep_layer_old = PsyRhFnTdbRhov(*state, Taver, RV_Deep_Old);
     Real64 RH_surf_layer_old = PsyRhFnTdbRhov(*state, Taver, RVaver);
     Real64 mass_flux_surf_deep_max =
-        material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (state->dataGlobal->TimeStepZone * 3600.0);
+        material->EMPDDeepDepth * material->Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (state->dataGlobal->TimeStepZone * 3600.0);
 
     Real64 hm_deep_layer = 6.9551289450635225e-05;
     Real64 mass_flux_surf_deep_result = hm_deep_layer * (RVaver - RV_Deep_Old);

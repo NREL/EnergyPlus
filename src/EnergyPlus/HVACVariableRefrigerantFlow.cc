@@ -5864,7 +5864,6 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     using Fans::GetFanVolFlow;
     using FluidProperties::GetDensityGlycol;
 
-    using MixedAir::SimOAMixer;
     using PlantUtilities::InitComponentNodes;
     using ScheduleManager::GetCurrentScheduleValue;
     using SingleDuct::SimATMixer;
@@ -7249,10 +7248,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         }
     } else {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed)
-            SimOAMixer(state,
-                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
-                       FirstHVACIteration,
-                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+            MixedAir::SimOAMixer(
+                state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
     }
     OnOffAirFlowRatio = 1.0;
 
@@ -7330,10 +7327,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                             state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate =
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
-                            SimOAMixer(state,
-                                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
-                                       FirstHVACIteration,
-                                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+                            MixedAir::SimOAMixer(
+                                state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                         } else {
                             state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                         }
@@ -7388,10 +7383,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                             state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate =
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow;
-                            SimOAMixer(state,
-                                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
-                                       FirstHVACIteration,
-                                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+                            MixedAir::SimOAMixer(
+                                state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                         } else {
                             state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate =
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
@@ -7431,10 +7424,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                             state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate =
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
-                            SimOAMixer(state,
-                                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
-                                       FirstHVACIteration,
-                                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+                            MixedAir::SimOAMixer(
+                                state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                         } else {
                             state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate =
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
@@ -7488,10 +7479,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirMassFlow;
-                        SimOAMixer(state,
-                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
-                                   FirstHVACIteration,
-                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+                        MixedAir::SimOAMixer(
+                            state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                     } else {
                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
@@ -7536,10 +7525,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).MassFlowRate =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirMassFlow;
-                        SimOAMixer(state,
-                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
-                                   FirstHVACIteration,
-                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+                        MixedAir::SimOAMixer(
+                            state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
                     } else {
                         state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                     }
@@ -9649,7 +9636,6 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     // Simulates the unit components sequentially in the air flow direction.
 
     using DXCoils::SimDXCoil;
-    using MixedAir::SimOAMixer;
     using SingleDuct::SimATMixer;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
@@ -9692,7 +9678,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         }
     } else {
         // ATMixOutNode = 0;
-        if (this->OAMixerUsed) SimOAMixer(state, this->OAMixerName, FirstHVACIteration, this->OAMixerIndex);
+        if (this->OAMixerUsed) MixedAir::SimOAMixer(state, this->OAMixerName, this->OAMixerIndex);
     }
     // if blow through, simulate fan then coils
     if (this->FanPlace == DataHVACGlobals::BlowThru) {
@@ -10209,7 +10195,6 @@ void InitializeOperatingMode(EnergyPlusData &state,
     // Scans each zone coil and determines the load based on control
     // Moved from Init to clean up and localize code segments
 
-    using MixedAir::SimOAMixer;
     using ScheduleManager::GetCurrentScheduleValue;
 
     Real64 ZoneDeltaT;       // zone temperature difference from setpoint
@@ -10318,10 +10303,8 @@ void InitializeOperatingMode(EnergyPlusData &state,
                 } else {
                     // simulate OA Mixer
                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerUsed)
-                        SimOAMixer(state,
-                                   state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerName,
-                                   FirstHVACIteration,
-                                   state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerIndex);
+                        MixedAir::SimOAMixer(
+                            state, state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerName, state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerIndex);
                 }
             }
             // identify a coil inlet temperature
@@ -10439,10 +10422,9 @@ void InitializeOperatingMode(EnergyPlusData &state,
                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxHeatAirMassFlow;
                                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerOANodeNum).MassFlowRate =
                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatOutAirMassFlow;
-                                        SimOAMixer(state,
-                                                   state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerName,
-                                                   FirstHVACIteration,
-                                                   state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerIndex);
+                                        MixedAir::SimOAMixer(state,
+                                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerName,
+                                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerIndex);
                                     } else {
                                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate =
                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxHeatAirMassFlow;
@@ -10493,10 +10475,9 @@ void InitializeOperatingMode(EnergyPlusData &state,
                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxCoolAirMassFlow;
                                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerOANodeNum).MassFlowRate =
                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolOutAirMassFlow;
-                                        SimOAMixer(state,
-                                                   state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerName,
-                                                   FirstHVACIteration,
-                                                   state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerIndex);
+                                        MixedAir::SimOAMixer(state,
+                                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerName,
+                                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerIndex);
                                     } else {
                                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate =
                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxCoolAirMassFlow;
@@ -11084,7 +11065,6 @@ void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(EnergyPlusData &state,
     //       A new physics based VRF model applicable for Fluid Temperature Control.
 
     using namespace DataZoneEnergyDemands;
-    using MixedAir::SimOAMixer;
     using Psychrometrics::PsyHFnTdbW;
     using SingleDuct::SimATMixer;
 
@@ -12891,7 +12871,6 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //        A new physics based VRF model applicable for Fluid Temperature Control.
     using DXCoils::SimDXCoil;
-    using MixedAir::SimOAMixer;
     using SingleDuct::SimATMixer;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
@@ -12946,7 +12925,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     } else {
         ATMixOutNode2 = 0;
         // simulate OA Mixer
-        if (this->OAMixerUsed) SimOAMixer(state, this->OAMixerName, FirstHVACIteration, this->OAMixerIndex);
+        if (this->OAMixerUsed) MixedAir::SimOAMixer(state, this->OAMixerName, this->OAMixerIndex);
     }
     // if blow through, simulate fan then coils
     if (this->FanPlace == DataHVACGlobals::BlowThru) {
@@ -13093,9 +13072,9 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
 }
 
 Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &state,
-                                                                int const VRFTUNum,     // Index to VRF terminal unit
-                                                                Real64 PartLoadRatio,   // part load ratio of the coil
-                                                                bool FirstHVACIteration // FirstHVACIteration flag
+                                                                int const VRFTUNum,                      // Index to VRF terminal unit
+                                                                Real64 PartLoadRatio,                    // part load ratio of the coil
+                                                                [[maybe_unused]] bool FirstHVACIteration // FirstHVACIteration flag
 )
 {
     // SUBROUTINE INFORMATION:
@@ -13175,10 +13154,9 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
 
     FanSpdRatioMax = 1.0;
 
-    auto f = [&state, FirstHVACIteration, VRFTUNum, DXCoilNum, QCoilReq, TeTc, PartLoadRatio](Real64 const FanSpdRatio) {
+    auto f = [&state, VRFTUNum, DXCoilNum, QCoilReq, TeTc, PartLoadRatio](Real64 const FanSpdRatio) {
         using DXCoils::ControlVRFIUCoil;
         using Fans::SimulateFanComponents;
-        using MixedAir::SimOAMixer;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
 
@@ -13215,10 +13193,8 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
 
         // Simulation the OAMixer if there is any
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-            SimOAMixer(state,
-                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
-                       FirstHVACIteration,
-                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+            MixedAir::SimOAMixer(
+                state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
             OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
             Tin = state.dataLoopNodes->Node(OAMixNode).Temp;
             Win = state.dataLoopNodes->Node(OAMixNode).HumRat;

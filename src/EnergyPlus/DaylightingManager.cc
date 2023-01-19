@@ -95,6 +95,7 @@
 #include <EnergyPlus/SurfaceOctree.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 namespace EnergyPlus::DaylightingManager {
 
@@ -3258,7 +3259,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 // Exterior building surface is nearest hit
                 if (!state.dataConstruction->Construct(ObsConstrNum).TypeIsWindow) {
                     // Obstruction is not a window, i.e., is an opaque surface
-                    ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
+                    ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1))->AbsorpVisible;
                 } else {
                     // Obstruction is a window; assume it is bare
                     ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
@@ -3291,8 +3292,8 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / DataGlobalConstants::Pi;
             }
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
-            auto l2(state.dataDaylightingManager->GILSK.index(iHour, 1));
-            auto l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
+            int l2(state.dataDaylightingManager->GILSK.index(iHour, 1));
+            int l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
             for (ISky = 1; ISky <= 4; ++ISky, ++l2, ++l3) { // [ l2 ] == ( ISky, iHour ) // [ l3 ] == ( ISky, 1, iHour )
                 XAVWLSK(ISky) = state.dataDaylightingManager->GILSK[l2] * SkyReflVisLum;
                 state.dataDaylightingManager->AVWLSK[l3] += XAVWLSK(ISky) * TVISB;
@@ -3311,7 +3312,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             // Make all transmitted light diffuse for a TDD with a bare diffuser
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->WLUMSK));
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
-            auto l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
+            int l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
             for (ISky = 1; ISky <= 4; ++ISky, ++l3) { // [ l3 ] == ( ISky, 1, iHour )
                 state.dataDaylightingManager->AVWLSK[l3] += state.dataDaylightingManager->WLUMSK[l3];
                 if (ISky == 1) {
@@ -3353,7 +3354,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                     (state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi));
             Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SurfSunCosHourly(iHour));
             assert(equal_dimensions(state.dataDaylightingManager->EDIRSK, state.dataDaylightingManager->AVWLSK));
-            auto l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
+            int l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
             for (ISky = 1; ISky <= 4; ++ISky, ++l) { // [ l ] == ( iHour, 1, ISky )
                 if (PHRAY > 0.0) {                   // Ray heads upward to sky
                     ELUM = DayltgSkyLuminance(state, ISky, THRAY, PHRAY);
@@ -3516,11 +3517,11 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             } else {
                                 SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                             }
-                            TransBmBmMult(JB) = General::BlindBeamBeamTrans(ProfAng,
-                                                                            SlatAng,
-                                                                            state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                                                            state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                                                            state.dataHeatBal->Blind(BlNum).SlatThickness);
+                            TransBmBmMult(JB) = WindowManager::BlindBeamBeamTrans(ProfAng,
+                                                                                  SlatAng,
+                                                                                  state.dataHeatBal->Blind(BlNum).SlatWidth,
+                                                                                  state.dataHeatBal->Blind(BlNum).SlatSeparation,
+                                                                                  state.dataHeatBal->Blind(BlNum).SlatThickness);
                             state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) = RAYCOS(3) * TVISS * TransBmBmMult(JB) * ObTransDisk;
 
                             // do this only once for fixed slat blinds
@@ -3691,11 +3692,11 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                     } else {
                                         SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                                     }
-                                    TransBmBmMultRefl(JB) = General::BlindBeamBeamTrans(ProfAng,
-                                                                                        SlatAng,
-                                                                                        state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                                                                        state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                                                                        state.dataHeatBal->Blind(BlNum).SlatThickness);
+                                    TransBmBmMultRefl(JB) = WindowManager::BlindBeamBeamTrans(ProfAng,
+                                                                                              SlatAng,
+                                                                                              state.dataHeatBal->Blind(BlNum).SlatWidth,
+                                                                                              state.dataHeatBal->Blind(BlNum).SlatSeparation,
+                                                                                              state.dataHeatBal->Blind(BlNum).SlatThickness);
                                     state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) +=
                                         SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(JB);
 
@@ -5768,7 +5769,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
         // Lambda function for the octree to test for surface hit and update transmittance if hit
         auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
             if (!surface.IsShadowPossibleObstruction) return false; // Do Consider separate octree without filtered surfaces
-            auto const sClass(surface.Class);
+            DataSurfaces::SurfaceClass const sClass(surface.Class);
             if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
                 PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);
                 if (hit) { // Building element is hit (assumed opaque)
@@ -5858,7 +5859,7 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
-            auto const sClass(surface.Class);
+            DataSurfaces::SurfaceClass const sClass(surface.Class);
             if ((surface.IsShadowing) ||                         // Shadowing surface
                 ((surface.SolarEnclIndex == window_Enclosure) && // Surface is in same zone as window
                  (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
@@ -5957,7 +5958,7 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
-            auto const sClass(surface.Class);
+            DataSurfaces::SurfaceClass const sClass(surface.Class);
             if ((surface.IsShadowing) ||                          // Shadowing surface
                 ((surface.SolarEnclIndex == window2_Enclosure) && // Surface is in same zone as window
                  (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
@@ -7230,10 +7231,11 @@ void DayltgInteriorIllum(EnergyPlusData &state,
         auto &thisSpace = state.dataHeatBal->space(spaceNum);
         for (int IWin = thisSpace.WindowSurfaceFirst; IWin <= thisSpace.WindowSurfaceLast; ++IWin) {
             if (state.dataSurface->Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
-            bool anyGlareControl = BITF_TEST_ANY(BITF(state.dataSurface->SurfWinShadingFlag(IWin)),
-                                                 BITF(WinShadingType::IntShadeConditionallyOff) | BITF(WinShadingType::GlassConditionallyLightened) |
-                                                     BITF(WinShadingType::ExtShadeConditionallyOff) | BITF(WinShadingType::IntBlindConditionallyOff) |
-                                                     BITF(WinShadingType::ExtBlindConditionallyOff));
+            bool anyGlareControl = (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::IntShadeConditionallyOff) ||
+                                   (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::GlassConditionallyLightened) ||
+                                   (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::ExtShadeConditionallyOff) ||
+                                   (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::IntBlindConditionallyOff) ||
+                                   (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::ExtBlindConditionallyOff);
             if (anyGlareControl) {
                 state.dataSurface->SurfWinShadingFlag(IWin) = WinShadingType::ShadeOff;
             }
@@ -7608,7 +7610,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
     // Using/Aliasing
     using DaylightingDevices::TransTDD;
-    using General::InterpProfAng;
     using General::POLYF;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -7922,7 +7923,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         if (!state.dataConstruction->Construct(ObsConstrNum).TypeIsWindow) {
                             // Obstruction is not a window, i.e., is an opaque surface
                             ObsVisRefl =
-                                1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
+                                1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1))->AbsorpVisible;
                         } else {
                             // Obstruction is a window; assume it is bare
                             ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
@@ -8127,11 +8128,13 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                         if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
-                        TransBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                        TransBlBmDiffFront =
+                            WindowManager::InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             ReflGlDiffDiffBack = state.dataConstruction->Construct(IConst).ReflectVisDiffBack;
-                            ReflBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                            ReflBlBmDiffFront =
+                                WindowManager::InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                             ReflBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                             TransBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
                             TransMult(JB) = TVISBR * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
@@ -8149,9 +8152,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             td2 = state.dataConstruction->Construct(IConst).tBareVisDiff(2);
                             rbd1 = state.dataConstruction->Construct(IConst).rbBareVisDiff(1);
                             rfd2 = state.dataConstruction->Construct(IConst).rfBareVisDiff(2);
-                            tfshBd = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                            tfshBd = WindowManager::InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
                             tfshd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
-                            rfshB = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                            rfshB = WindowManager::InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                             rbshd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                             if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                 TransMult(JB) =
@@ -8172,11 +8175,11 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                         }
                         DayltgInterReflectedIllumTransBmBmMult(JB) =
-                            TVISBR * General::BlindBeamBeamTrans(ProfAng,
-                                                                 SlatAng,
-                                                                 state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                                                 state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                                                 state.dataHeatBal->Blind(BlNum).SlatThickness);
+                            TVISBR * WindowManager::BlindBeamBeamTrans(ProfAng,
+                                                                       SlatAng,
+                                                                       state.dataHeatBal->Blind(BlNum).SlatWidth,
+                                                                       state.dataHeatBal->Blind(BlNum).SlatSeparation,
+                                                                       state.dataHeatBal->Blind(BlNum).SlatThickness);
                     } // End of loop over slat angles
 
                 } else { // Diffusing glass
@@ -8346,12 +8349,14 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         // As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                         // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
 
-                        TransBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                        TransBlBmDiffFront =
+                            WindowManager::InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             // TH CR 8121, 7/7/2010
-                            // ReflBlBmDiffFront = InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                            ReflBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                            // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
+                            ReflBlBmDiffFront =
+                                WindowManager::InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
 
                             // TH added 7/12/2010 for CR 8121
                             ReflBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
@@ -8368,8 +8373,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                         } else { // Between-glass blind
                             t1 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
-                            tfshBd = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
-                            rfshB = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                            tfshBd = WindowManager::InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                            rfshB = WindowManager::InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                             if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                 TransMult(JB) =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
@@ -8385,11 +8390,11 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                         }
                         DayltgInterReflectedIllumTransBmBmMult(JB) =
-                            TVISBSun * General::BlindBeamBeamTrans(ProfAng,
-                                                                   SlatAng,
-                                                                   state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                                                   state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                                                   state.dataHeatBal->Blind(BlNum).SlatThickness);
+                            TVISBSun * WindowManager::BlindBeamBeamTrans(ProfAng,
+                                                                         SlatAng,
+                                                                         state.dataHeatBal->Blind(BlNum).SlatWidth,
+                                                                         state.dataHeatBal->Blind(BlNum).SlatSeparation,
+                                                                         state.dataHeatBal->Blind(BlNum).SlatThickness);
                     } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
                     if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
@@ -10418,7 +10423,7 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
     // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
 
     auto const &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-    auto const &thisSolEnclosureName = state.dataViewFactor->EnclSolInfo(enclNum).Name;
+    std::string const &thisSolEnclosureName = state.dataViewFactor->EnclSolInfo(enclNum).Name;
     if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0 && thisEnclDaylight.NumOfDayltgExtWins > 0) {
         for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
             auto &thisDaylightCtrl = state.dataDaylightingData->daylightControl(controlNum);
