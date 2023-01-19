@@ -2524,12 +2524,12 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     // Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HP)
     cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl";
-    for (VRFNum = state.dataHVACVarRefFlow->NumVRFCond_SysCurve + 1;
-         VRFNum <= state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP;
-         ++VRFNum) {
+    for (int thisNum = 1; thisNum <= state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP; ++thisNum) {
+        VRFNum = state.dataHVACVarRefFlow->NumVRFCond_SysCurve + thisNum;
+
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
-                                                                 VRFNum,
+                                                                 thisNum,
                                                                  cAlphaArgs,
                                                                  NumAlphas,
                                                                  rNumericArgs,
@@ -2949,13 +2949,12 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     // Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HR)
     cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR";
-    for (VRFNum = state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP + 1;
-         VRFNum <= state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP +
-                       state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HR;
-         ++VRFNum) {
+    for (int thisNum = 1; thisNum <= state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HR; ++thisNum) {
+
+        VRFNum = state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP + thisNum;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
-                                                                 VRFNum,
+                                                                 thisNum,
                                                                  cAlphaArgs,
                                                                  NumAlphas,
                                                                  rNumericArgs,
