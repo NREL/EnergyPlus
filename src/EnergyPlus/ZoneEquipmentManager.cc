@@ -801,19 +801,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Obtains data from Zone Sizing and Zone Equipment objects already input.
 
-    int NumOfTimeStepInDay; // number of zone time steps in a day
-    int DesDayNum;          // design day index
-    // unused  INTEGER :: DesDayEnvrnNum   ! design day index
-    int ZoneSizNum;           // zone sizing input index
-    Real64 TotPeopleInZone;   // total (maximum) number of people in a zone
-    int PeopleNum;            // index of People structure
-    Real64 OAFromPeople(0.0); // min OA calculated from zone occupancy [m3/s]
-    Real64 OAFromArea(0.0);   // min OA calculated from zone area and OA flow per area [m3/s]
-    bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
-    Real64 SchMax(0.0);       // maximum people multiplier value
-    Real64 OAVolumeFlowRate;  // outside air flow rate (m3/s)
-    bool UseOccSchFlag;       // flag to use occupancy schedule when calculating OA
-    bool UseMinOASchFlag;     // flag to use min OA schedule when calculating OA
+    bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
     // TODO MJW: Punt for now, sometimes unit test will get here and need these to be allocated, but simulations need them sooner
     if (!state.dataHeatBal->ZoneIntGain.allocated()) {
@@ -823,9 +811,9 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     for (int ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         int ZoneIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
         if (ZoneIndex == 0) {
-            ShowSevereError(state,
-                            "SetUpZoneSizingArrays: Sizing:Zone=\"" + state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName +
-                                "\" references unknown zone");
+            ShowSevereError(
+                state,
+                format("SetUpZoneSizingArrays: Sizing:Zone=\"{}\" references unknown zone", state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName));
             ErrorsFound = true;
         }
         if (std::any_of(state.dataZoneEquip->ZoneEquipConfig.begin(), state.dataZoneEquip->ZoneEquipConfig.end(), [](EquipConfiguration const &e) {
@@ -836,8 +824,8 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             if (ZoneIndex == 0) {
                 if (!state.dataGlobal->isPulseZoneSizing) {
                     ShowWarningError(state,
-                                     "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName +
-                                         "\", Zone is not found in the Controlled Zones List");
+                                     format("SetUpZoneSizingArrays: Requested Sizing for Zone=\"{}\", Zone is not found in the Controlled Zones List",
+                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName));
                 }
             } else {
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneNum = ZoneIndex;
@@ -847,9 +835,9 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 if (!ZoneTempPredictorCorrector::VerifyThermostatInZone(state, state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                     if (!state.dataGlobal->isPulseZoneSizing) {
                         ShowWarningError(state,
-                                         "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" +
-                                             state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName +
-                                             "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)");
+                                         format("SetUpZoneSizingArrays: Requested Sizing for Zone=\"{}\", Zone has no thermostat (ref: "
+                                                "ZoneControl:Thermostat, et al)",
+                                                state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName));
                     }
                 }
             }
@@ -868,7 +856,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->TermUnitFinalZoneSizing.allocate(state.dataSize->NumAirTerminalUnits);
     state.dataSize->DesDayWeath.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-    NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
+    int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
     state.dataZoneEquipmentManager->AvgData.allocate(NumOfTimeStepInDay);
     state.dataSize->CoolPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->HeatPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
@@ -885,7 +873,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->ZoneSizThermSetPtHi = 0.0;
     state.dataSize->ZoneSizThermSetPtLo = 1000.0;
 
-    for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
+    for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
         auto &thisDesDayWeather = state.dataSize->DesDayWeath(DesDayNum);
         thisDesDayWeather.Temp.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         thisDesDayWeather.HumRat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -894,366 +882,202 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         thisDesDayWeather.HumRat = 0.0;
         thisDesDayWeather.Press = 0.0;
     }
+
     // Fill zone sizing arrays from input array
-    for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
-        for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-            auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
-            if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+    for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
+        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
+        if (!zoneEquipConfig.IsControlled) continue;
+
+        // For each Zone Sizing object, find the corresponding controlled zone
+        int ZoneSizNum = UtilityRoutines::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+        auto &zoneSizingInput = (ZoneSizNum > 0) ? state.dataSize->ZoneSizingInput(ZoneSizNum) : state.dataSize->ZoneSizingInput(1);
+
+        for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &zoneSizing = state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum);
             auto &calcZoneSizing = state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum);
-            zoneSizing.ZoneName = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneName;
+            zoneSizing.ZoneName = zoneEquipConfig.ZoneName;
             zoneSizing.ZoneNum = CtrlZoneNum;
-            calcZoneSizing.ZoneName = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneName;
+            calcZoneSizing.ZoneName = zoneEquipConfig.ZoneName;
             calcZoneSizing.ZoneNum = CtrlZoneNum;
-            // For each Zone Sizing object, find the corresponding controlled zone
-            ZoneSizNum = UtilityRoutines::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
-            if (ZoneSizNum > 0) { // move data from zone sizing input
-                auto &zoneSizingInput = state.dataSize->ZoneSizingInput(ZoneSizNum);
-                zoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
-                zoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
-                zoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
-                zoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
-                zoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
-                zoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
-                zoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
-                zoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
-                zoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
-                zoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
-                zoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
-                zoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
-                zoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
-                zoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
-                zoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
-                zoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
-                zoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
-                zoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
-                zoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
-                zoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
-                zoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
-                zoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
-                zoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
-                zoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
-                zoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
-                zoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
-                zoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
-                zoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
-                zoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
-                zoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
-                zoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
-                zoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
-                calcZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
-                calcZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
-                calcZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
-                calcZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
-                calcZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
-                calcZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
-                calcZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
-                calcZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
-                calcZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
-                calcZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
-                calcZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
-                calcZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
-                calcZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
-                calcZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
-                calcZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
-                calcZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
-                calcZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
-                calcZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
-                calcZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
-                calcZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
-                calcZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
-                calcZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
-                calcZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
-                calcZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
-                calcZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
-                calcZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
-                calcZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
-                calcZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
-                calcZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
-                calcZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
-                calcZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
-                calcZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
-                calcZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
-                calcZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
-                calcZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
-                calcZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
-            } else { // Every controlled zone must be simulated, so set missing inputs to the first
-                auto &zoneSizingInput = state.dataSize->ZoneSizingInput(1);
-                // LKL I think this is sufficient for warning -- no need for array
-                if (DesDayNum == 1) {
-                    if (!state.dataGlobal->isPulseZoneSizing) {
-                        ShowWarningError(state,
-                                         "SetUpZoneSizingArrays: Sizing for Zone=\"" + state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneName +
-                                             "\" will use Sizing:Zone specifications listed for Zone=\"" + zoneSizingInput.ZoneName + "\".");
-                    }
-                    // Following needs to be implemented first:
-                    //          CALL ShowContinueError(state, '  A better option would be to set up global ZoneList objects for Sizing:Zone
-                    //          objects.')
+
+            if (DesDayNum == 1 && ZoneSizNum == 0) { // LKL I think this is sufficient for warning -- no need for array
+                if (!state.dataGlobal->isPulseZoneSizing) {
+                    ShowWarningError(
+                        state,
+                        format("SetUpZoneSizingArrays: Sizing for Zone=\"{}\" will use Sizing:Zone specifications listed for Zone=\"{}\".",
+                               state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneName,
+                               zoneSizingInput.ZoneName));
                 }
-                zoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
-                zoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
-                zoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
-                zoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
-                zoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
-                zoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
-                zoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
-                zoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
-                zoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
-                zoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
-                zoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
-                zoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
-                zoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
-                zoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
-                zoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
-                zoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
-                zoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
-                zoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
-                zoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
-                zoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
-                zoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
-                zoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
-                zoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
-                zoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
-                zoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
-                zoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
-                zoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
-                zoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
-                zoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
-                zoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
-                zoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
-                zoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
-                zoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
-                zoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
-                zoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
-                zoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
-                calcZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
-                calcZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
-                calcZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
-                calcZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
-                calcZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
-                calcZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
-                calcZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
-                calcZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
-                calcZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
-                calcZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
-                calcZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
-                calcZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
-                calcZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
-                calcZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
-                calcZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
-                calcZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
-                calcZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
-                calcZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
-                calcZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
-                calcZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
-                calcZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
-                calcZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
-                calcZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
-                calcZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
-                calcZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
-                calcZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
-                calcZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
-                calcZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
-                calcZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
-                calcZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
-                calcZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
-                calcZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
-                calcZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
-                calcZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
-                calcZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
-                calcZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
             }
+
+            zoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
+            zoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
+            zoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
+            zoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
+            zoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
+            zoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
+            zoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
+            zoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
+            zoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
+            zoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
+            zoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
+            zoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
+            zoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
+            zoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
+            zoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
+            zoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
+            zoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
+            zoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
+            zoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
+            zoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
+            zoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
+            zoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
+            zoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
+            zoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
+            zoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
+            zoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
+            zoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
+            zoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
+            zoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
+            zoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
+            zoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
+            zoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
+            calcZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
+            calcZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
+            calcZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
+            calcZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
+            calcZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
+            calcZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
+            calcZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
+            calcZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
+            calcZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
+            calcZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
+            calcZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
+            calcZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
+            calcZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
+            calcZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
+            calcZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
+            calcZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
+            calcZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
+            calcZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
+            calcZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
+            calcZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
+            calcZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
+            calcZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
+            calcZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
+            calcZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
+            calcZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
+            calcZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
+            calcZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
+            calcZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
+            calcZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
+            calcZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
+            calcZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
+            calcZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
+            calcZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
+            calcZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
+            calcZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
+            calcZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
+
             zoneSizing.allocateMemberArrays(NumOfTimeStepInDay);
             calcZoneSizing.allocateMemberArrays(NumOfTimeStepInDay);
         }
-    }
 
-    for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
         auto &finalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
         auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
-        if (!zoneEquipConfig.IsControlled) continue;
         finalZoneSizing.ZoneName = zoneEquipConfig.ZoneName;
         finalZoneSizing.ZoneNum = CtrlZoneNum;
         calcFinalZoneSizing.ZoneName = zoneEquipConfig.ZoneName;
         calcFinalZoneSizing.ZoneNum = CtrlZoneNum;
-        ZoneSizNum = UtilityRoutines::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
-        if (ZoneSizNum > 0) { // move data from zone sizing input
-            auto &zoneSizingInput = state.dataSize->ZoneSizingInput(ZoneSizNum);
-            finalZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
-            finalZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
-            finalZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
-            finalZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
-            finalZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
-            finalZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
-            finalZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
-            finalZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
-            finalZoneSizing.ZoneAirDistributionIndex = zoneSizingInput.ZoneAirDistributionIndex;
-            finalZoneSizing.ZoneDesignSpecOAIndex = zoneSizingInput.ZoneDesignSpecOAIndex;
-            finalZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
-            finalZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
-            finalZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
-            finalZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
-            finalZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
-            finalZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
-            finalZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
-            finalZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
-            finalZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
-            finalZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
-            finalZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
-            finalZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
-            finalZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
-            finalZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
-            finalZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
-            finalZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
-            finalZoneSizing.ZoneADEffCooling = zoneSizingInput.ZoneADEffCooling;
-            finalZoneSizing.ZoneADEffHeating = zoneSizingInput.ZoneADEffHeating;
-            finalZoneSizing.ZoneSecondaryRecirculation = zoneSizingInput.ZoneSecondaryRecirculation;
-            finalZoneSizing.ZoneVentilationEff = zoneSizingInput.ZoneVentilationEff;
-            finalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
-            finalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
-            finalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
-            finalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
-            finalZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
-            finalZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
-            finalZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
-            finalZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
-            finalZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
-            finalZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
-            finalZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
-            finalZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
-            calcFinalZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
-            calcFinalZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
-            calcFinalZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
-            calcFinalZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
-            calcFinalZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
-            calcFinalZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
-            calcFinalZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
-            calcFinalZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
-            calcFinalZoneSizing.ZoneAirDistributionIndex = zoneSizingInput.ZoneAirDistributionIndex;
-            calcFinalZoneSizing.ZoneDesignSpecOAIndex = zoneSizingInput.ZoneDesignSpecOAIndex;
-            calcFinalZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
-            calcFinalZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
-            calcFinalZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
-            calcFinalZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
-            calcFinalZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
-            calcFinalZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
-            calcFinalZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
-            calcFinalZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
-            calcFinalZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
-            calcFinalZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
-            calcFinalZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
-            calcFinalZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
-            calcFinalZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
-            calcFinalZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
-            calcFinalZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
-            calcFinalZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
-            calcFinalZoneSizing.ZoneADEffCooling = zoneSizingInput.ZoneADEffCooling;
-            calcFinalZoneSizing.ZoneADEffHeating = zoneSizingInput.ZoneADEffHeating;
-            calcFinalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
-            calcFinalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
-            calcFinalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
-            calcFinalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
-            calcFinalZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
-            calcFinalZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
-            calcFinalZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
-            calcFinalZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
-            calcFinalZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
-            calcFinalZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
-            calcFinalZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
-            calcFinalZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
-        } else { // Every controlled zone must be simulated, so set missing inputs to the first
-            auto &zoneSizingInput = state.dataSize->ZoneSizingInput(1);
-            finalZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
-            finalZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
-            finalZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
-            finalZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
-            finalZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
-            finalZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
-            finalZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
-            finalZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
-            finalZoneSizing.ZoneAirDistributionIndex = zoneSizingInput.ZoneAirDistributionIndex;
-            finalZoneSizing.ZoneDesignSpecOAIndex = zoneSizingInput.ZoneDesignSpecOAIndex;
-            finalZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
-            finalZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
-            finalZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
-            finalZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
-            finalZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
-            finalZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
-            finalZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
-            finalZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
-            finalZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
-            finalZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
-            finalZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
-            finalZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
-            finalZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
-            finalZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
-            finalZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
-            finalZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
-            finalZoneSizing.ZoneADEffCooling = zoneSizingInput.ZoneADEffCooling;
-            finalZoneSizing.ZoneADEffHeating = zoneSizingInput.ZoneADEffHeating;
-            finalZoneSizing.ZoneSecondaryRecirculation = zoneSizingInput.ZoneSecondaryRecirculation;
-            finalZoneSizing.ZoneVentilationEff = zoneSizingInput.ZoneVentilationEff;
-            finalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
-            finalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
-            finalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
-            finalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
-            finalZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
-            finalZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
-            finalZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
-            finalZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
-            finalZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
-            finalZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
-            finalZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
-            finalZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
-            calcFinalZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
-            calcFinalZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
-            calcFinalZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
-            calcFinalZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
-            calcFinalZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
-            calcFinalZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
-            calcFinalZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
-            calcFinalZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
-            calcFinalZoneSizing.ZoneAirDistributionIndex = zoneSizingInput.ZoneAirDistributionIndex;
-            calcFinalZoneSizing.ZoneDesignSpecOAIndex = zoneSizingInput.ZoneDesignSpecOAIndex;
-            calcFinalZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
-            calcFinalZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
-            calcFinalZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
-            calcFinalZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
-            calcFinalZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
-            calcFinalZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
-            calcFinalZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
-            calcFinalZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
-            calcFinalZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
-            calcFinalZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
-            calcFinalZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
-            calcFinalZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
-            calcFinalZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
-            calcFinalZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
-            calcFinalZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
-            calcFinalZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
-            calcFinalZoneSizing.ZoneADEffCooling = zoneSizingInput.ZoneADEffCooling;
-            calcFinalZoneSizing.ZoneADEffHeating = zoneSizingInput.ZoneADEffHeating;
-            calcFinalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
-            calcFinalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
-            calcFinalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
-            calcFinalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
-            calcFinalZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
-            calcFinalZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
-            calcFinalZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
-            calcFinalZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
-            calcFinalZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
-            calcFinalZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
-            calcFinalZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
-            calcFinalZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
-        }
+
+        finalZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
+        finalZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
+        finalZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
+        finalZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
+        finalZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
+        finalZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
+        finalZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
+        finalZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
+        finalZoneSizing.ZoneAirDistributionIndex = zoneSizingInput.ZoneAirDistributionIndex;
+        finalZoneSizing.ZoneDesignSpecOAIndex = zoneSizingInput.ZoneDesignSpecOAIndex;
+        finalZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
+        finalZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
+        finalZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
+        finalZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
+        finalZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
+        finalZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
+        finalZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
+        finalZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
+        finalZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
+        finalZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
+        finalZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
+        finalZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
+        finalZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
+        finalZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
+        finalZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
+        finalZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
+        finalZoneSizing.ZoneADEffCooling = zoneSizingInput.ZoneADEffCooling;
+        finalZoneSizing.ZoneADEffHeating = zoneSizingInput.ZoneADEffHeating;
+        finalZoneSizing.ZoneSecondaryRecirculation = zoneSizingInput.ZoneSecondaryRecirculation;
+        finalZoneSizing.ZoneVentilationEff = zoneSizingInput.ZoneVentilationEff;
+        finalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
+        finalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
+        finalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
+        finalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
+        finalZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
+        finalZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
+        finalZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
+        finalZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
+        finalZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
+        finalZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
+        finalZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
+        finalZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
+        calcFinalZoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
+        calcFinalZoneSizing.ZnHeatDgnSAMethod = zoneSizingInput.ZnHeatDgnSAMethod;
+        calcFinalZoneSizing.CoolDesTemp = zoneSizingInput.CoolDesTemp;
+        calcFinalZoneSizing.HeatDesTemp = zoneSizingInput.HeatDesTemp;
+        calcFinalZoneSizing.CoolDesTempDiff = zoneSizingInput.CoolDesTempDiff;
+        calcFinalZoneSizing.HeatDesTempDiff = zoneSizingInput.HeatDesTempDiff;
+        calcFinalZoneSizing.CoolDesHumRat = zoneSizingInput.CoolDesHumRat;
+        calcFinalZoneSizing.HeatDesHumRat = zoneSizingInput.HeatDesHumRat;
+        calcFinalZoneSizing.ZoneAirDistributionIndex = zoneSizingInput.ZoneAirDistributionIndex;
+        calcFinalZoneSizing.ZoneDesignSpecOAIndex = zoneSizingInput.ZoneDesignSpecOAIndex;
+        calcFinalZoneSizing.CoolAirDesMethod = zoneSizingInput.CoolAirDesMethod;
+        calcFinalZoneSizing.HeatAirDesMethod = zoneSizingInput.HeatAirDesMethod;
+        calcFinalZoneSizing.InpDesCoolAirFlow = zoneSizingInput.DesCoolAirFlow;
+        calcFinalZoneSizing.DesCoolMinAirFlowPerArea = zoneSizingInput.DesCoolMinAirFlowPerArea;
+        calcFinalZoneSizing.DesCoolMinAirFlow = zoneSizingInput.DesCoolMinAirFlow;
+        calcFinalZoneSizing.DesCoolMinAirFlowFrac = zoneSizingInput.DesCoolMinAirFlowFrac;
+        calcFinalZoneSizing.InpDesHeatAirFlow = zoneSizingInput.DesHeatAirFlow;
+        calcFinalZoneSizing.DesHeatMaxAirFlowPerArea = zoneSizingInput.DesHeatMaxAirFlowPerArea;
+        calcFinalZoneSizing.DesHeatMaxAirFlow = zoneSizingInput.DesHeatMaxAirFlow;
+        calcFinalZoneSizing.DesHeatMaxAirFlowFrac = zoneSizingInput.DesHeatMaxAirFlowFrac;
+        calcFinalZoneSizing.HeatSizingFactor = zoneSizingInput.HeatSizingFactor;
+        calcFinalZoneSizing.CoolSizingFactor = zoneSizingInput.CoolSizingFactor;
+        calcFinalZoneSizing.AccountForDOAS = zoneSizingInput.AccountForDOAS;
+        calcFinalZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
+        calcFinalZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
+        calcFinalZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
+        calcFinalZoneSizing.ZoneADEffCooling = zoneSizingInput.ZoneADEffCooling;
+        calcFinalZoneSizing.ZoneADEffHeating = zoneSizingInput.ZoneADEffHeating;
+        calcFinalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
+        calcFinalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
+        calcFinalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
+        calcFinalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
+        calcFinalZoneSizing.zoneRHDehumidifySchIndex = zoneSizingInput.zoneRHDehumidifySchIndex;
+        calcFinalZoneSizing.zoneRHHumidifySchIndex = zoneSizingInput.zoneRHHumidifySchIndex;
+        calcFinalZoneSizing.ZnLatCoolDgnSAMethod = zoneSizingInput.ZnLatCoolDgnSAMethod;
+        calcFinalZoneSizing.LatentCoolDesHumRat = zoneSizingInput.LatentCoolDesHumRat;
+        calcFinalZoneSizing.CoolDesHumRatDiff = zoneSizingInput.CoolDesHumRatDiff;
+        calcFinalZoneSizing.ZnLatHeatDgnSAMethod = zoneSizingInput.ZnLatHeatDgnSAMethod;
+        calcFinalZoneSizing.LatentHeatDesHumRat = zoneSizingInput.LatentHeatDesHumRat;
+        calcFinalZoneSizing.HeatDesHumRatDiff = zoneSizingInput.HeatDesHumRatDiff;
+
         finalZoneSizing.allocateMemberArrays(NumOfTimeStepInDay);
         calcFinalZoneSizing.allocateMemberArrays(NumOfTimeStepInDay);
 
         // setup CalcFinalZoneSizing structure for use with EMS, some as sensors, some as actuators
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-
-            // actuate  REAL(r64)             :: DesHeatMassFlow          = 0.0d0   ! zone design heating air mass flow rate [kg/s]
             SetupEMSInternalVariable(
                 state, "Final Zone Design Heating Air Mass Flow Rate", finalZoneSizing.ZoneName, "[kg/s]", finalZoneSizing.DesHeatMassFlow);
             SetupEMSInternalVariable(state,
@@ -1356,16 +1180,16 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 if (thisSpaceNum > 0) {
                     thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
                 } else {
-                    ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                    ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
+                    ShowSevereError(state, format("SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList={}", thisOAReq.Name));
+                    ShowContinueError(state, format("Space Name={} not found.", thisSpaceName));
                     dsoaError = true;
                     ErrorsFound = true;
                 }
                 // Check for duplicate spaces
                 for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
                     if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
-                        ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                        ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in the list.");
+                        ShowSevereError(state, format("SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList={}", thisOAReq.Name));
+                        ShowContinueError(state, format("Space Name={} appears more than once in the list.", thisSpaceName));
                         dsoaError = true;
                         ErrorsFound = true;
                     }
@@ -1383,7 +1207,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         auto &finalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
         auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
         // Use the max occupancy PEOPLE structure to calculate design min OA for each zone from the outside air flow per person input
-        TotPeopleInZone = 0.0;
+        Real64 TotPeopleInZone = 0.0;
         Real64 ZoneMinOccupancy = 0.;
         int DSOAPtr = finalZoneSizing.ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
         if ((DSOAPtr > 0) && !dsoaError) {
@@ -1408,11 +1232,11 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             finalZoneSizing.DesOAFlowPerArea = thisOAReq.desFlowPerZoneArea(state, CtrlZoneNum);
         }
 
-        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+        for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
             if (state.dataHeatBal->People(PeopleNum).ZonePtr == CtrlZoneNum) {
                 auto &people = state.dataHeatBal->People(PeopleNum);
                 TotPeopleInZone += (people.NumberOfPeople * thisZone.Multiplier * thisZone.ListMultiplier);
-                SchMax = ScheduleManager::GetScheduleMaxValue(state, people.NumberOfPeoplePtr);
+                Real64 SchMax = ScheduleManager::GetScheduleMaxValue(state, people.NumberOfPeoplePtr);
                 if (SchMax > 0) {
                     finalZoneSizing.ZonePeakOccupancy = TotPeopleInZone * SchMax;
                 } else {
@@ -1422,8 +1246,8 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             }
         }
         finalZoneSizing.TotalZoneFloorArea = (thisZone.FloorArea * thisZone.Multiplier * thisZone.ListMultiplier);
-        OAFromPeople = finalZoneSizing.DesOAFlowPPer * TotPeopleInZone;
-        OAFromArea = finalZoneSizing.DesOAFlowPerArea * finalZoneSizing.TotalZoneFloorArea;
+        Real64 OAFromPeople = finalZoneSizing.DesOAFlowPPer * TotPeopleInZone;
+        Real64 OAFromArea = finalZoneSizing.DesOAFlowPerArea * finalZoneSizing.TotalZoneFloorArea;
         finalZoneSizing.TotPeopleInZone = TotPeopleInZone;
         finalZoneSizing.TotalOAFromPeople = OAFromPeople;
         finalZoneSizing.TotalOAFromArea = OAFromArea;
@@ -1436,14 +1260,15 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         state.dataHeatBal->ZonePreDefRep(CtrlZoneNum).VozMin = (ZoneMinOccupancy * finalZoneSizing.DesOAFlowPPer + OAFromArea) / MinEz;
 
         // Calculate the design min OA flow rate for this zone
-        UseOccSchFlag = false;
-        UseMinOASchFlag = false;
+        // flag to use occupancy schedule when calculating OA
+        bool UseOccSchFlag = false;
+        // flag to use min OA schedule when calculating OA
+        bool UseMinOASchFlag = false;
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr;                                     // store for later use
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex = finalZoneSizing.ZoneAirDistributionIndex; // store for later use
+        Real64 OAVolumeFlowRate = 0.0;
         if (!dsoaError) {
             OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, CtrlZoneNum, UseOccSchFlag, UseMinOASchFlag);
-        } else {
-            OAVolumeFlowRate = 0.0;
         }
 
         // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir
@@ -1474,7 +1299,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         finalZoneSizing.InpDesHeatAirFlow *= zoneMultiplier;
         calcFinalZoneSizing.InpDesHeatAirFlow *= zoneMultiplier;
 
-        for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
+        for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &zoneSizing = state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum);
             zoneSizing.MinOA = finalZoneSizing.MinOA;
             state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).MinOA = calcFinalZoneSizing.MinOA;
