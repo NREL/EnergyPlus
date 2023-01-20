@@ -169,7 +169,7 @@ void WaterThermalTankData::onInitLoopEquip(EnergyPlusData &state, const PlantLoc
     } else {
         this->SizeTankForDemandSide(state);
         this->SizeDemandSidePlantConnections(state);
-        this->SizeSupplySidePlantConnections(state);
+        this->SizeSupplySidePlantConnections(state, this->SrcSidePlantLoc.loopNum);
         this->SizeTankForSupplySide(state);
     }
 
@@ -10667,7 +10667,7 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
     }
 }
 
-void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, ObjexxFCL::Optional_int_const LoopNum)
+void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, int tmpLoopNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -10692,13 +10692,6 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
 
     Real64 tmpUseDesignVolFlowRate = this->UseDesignVolFlowRate;
     Real64 tmpSourceDesignVolFlowRate = this->SourceDesignVolFlowRate;
-
-    int tmpLoopNum;
-    if (!present(LoopNum)) {
-        tmpLoopNum = this->SrcSidePlantLoc.loopNum;
-    } else {
-        tmpLoopNum = LoopNum;
-    }
 
     if ((this->UseInletNode > 0) && (tmpLoopNum == this->UseSidePlantLoc.loopNum)) {
         if (this->UseDesignVolFlowRateWasAutoSized) {

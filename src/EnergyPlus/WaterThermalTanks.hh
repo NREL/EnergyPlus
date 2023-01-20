@@ -788,7 +788,7 @@ namespace WaterThermalTanks {
 
         void MinePlantStructForInfo(EnergyPlusData &state);
 
-        void SizeSupplySidePlantConnections(EnergyPlusData &state, ObjexxFCL::Optional_int_const LoopNum = _);
+        void SizeSupplySidePlantConnections(EnergyPlusData &state, int tmpLoopNum);
 
         void CalcWaterThermalTank(EnergyPlusData &state);
 
@@ -875,10 +875,10 @@ namespace WaterThermalTanks {
 
         void CalcDesuperheaterWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
-        Real64 PLRResidualWaterThermalTank(EnergyPlusData &state,
-                                           Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                           Array1D<Real64> const &Par // par(1) = HP set point temperature [C]
-        );
+        //Real64 PLRResidualWaterThermalTank(EnergyPlusData &state,
+        //                                   Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        //                                   Array1D<Real64> const &Par // par(1) = HP set point temperature [C]
+        //);
 
         void CalcHeatPumpWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
