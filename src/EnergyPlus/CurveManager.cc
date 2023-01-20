@@ -1900,7 +1900,7 @@ namespace Curve {
             auto const &indVarInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:IndependentVariable");
             for (auto &instance : indVarInstances.items()) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
                 state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName), fields);
             }
@@ -1916,7 +1916,7 @@ namespace Curve {
             for (auto &instance : indVarListInstances.items()) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
                 std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
 
@@ -2056,7 +2056,7 @@ namespace Curve {
             for (auto &instance : lookupInstances.items()) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:Lookup", thisObjectName);
                 ++CurveNum;
                 auto &thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
@@ -2519,9 +2519,9 @@ namespace Curve {
         } break;
         case CurveType::TriQuadratic: {
             auto const &Tri2ndOrder(curve.tri2ndOrder);
-            auto const V1s(V1 * V1);
-            auto const V2s(V2 * V2);
-            auto const V3s(V3 * V3);
+            Real64 const V1s(V1 * V1);
+            Real64 const V2s(V2 * V2);
+            Real64 const V3s(V3 * V3);
             CurveValue = Tri2ndOrder[0] + Tri2ndOrder[1] * V1s + Tri2ndOrder[2] * V1 + Tri2ndOrder[3] * V2s + Tri2ndOrder[4] * V2 +
                          Tri2ndOrder[5] * V3s + Tri2ndOrder[6] * V3 + Tri2ndOrder[7] * V1s * V2s + Tri2ndOrder[8] * V1 * V2 +
                          Tri2ndOrder[9] * V1 * V2s + Tri2ndOrder[10] * V1s * V2 + Tri2ndOrder[11] * V1s * V3s + Tri2ndOrder[12] * V1 * V3 +

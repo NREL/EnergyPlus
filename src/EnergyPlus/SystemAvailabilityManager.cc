@@ -1303,7 +1303,7 @@ namespace SystemAvailabilityManager {
         }
 
         bool ErrorsFound = false;
-        std::string cCurrentModuleObject = "AvailabilityManagerAssignmentList";
+        std::string const &cCurrentModuleObject = "AvailabilityManagerAssignmentList";
         auto &ip = state.dataInputProcessing->inputProcessor;
 
         state.dataSystemAvailabilityManager->NumAvailManagerLists = ip->getNumObjectsFound(state, cCurrentModuleObject);
@@ -1319,7 +1319,7 @@ namespace SystemAvailabilityManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++Item;
                 auto const &objectFields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 auto &mgrList = state.dataSystemAvailabilityManager->ListData(Item);
                 mgrList.Name = thisObjectName;
@@ -2294,7 +2294,7 @@ namespace SystemAvailabilityManager {
         for (int Index = 1; Index <= NumZones; ++Index) { // loop over zones in list
             int ZoneNum = ZonePtrList(Index);
             {
-                auto const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
+                DataHVACGlobals::ThermostatType const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
                 if ((tstatType == DataHVACGlobals::ThermostatType::SingleHeating) || (tstatType == DataHVACGlobals::ThermostatType::SingleHeatCool)) {
                     if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <

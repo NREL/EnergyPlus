@@ -147,15 +147,15 @@ void ControlCompOutput(EnergyPlusData &state,
 bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const MinFlow);
 
 void CheckSysSizing(EnergyPlusData &state,
-                    std::string const &CompType, // Component Type (e.g. Chiller:Electric)
-                    std::string const &CompName  // Component Name (e.g. Big Chiller)
+                    std::string_view const CompType, // Component Type (e.g. Chiller:Electric)
+                    std::string const &CompName      // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bool &AirLoopWasSized);
 
 void CheckZoneSizing(EnergyPlusData &state,
-                     std::string const &CompType, // Component Type (e.g. Chiller:Electric)
-                     std::string const &CompName  // Component Name (e.g. Big Chiller)
+                     std::string_view const CompType, // Component Type (e.g. Chiller:Electric)
+                     std::string const &CompName      // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisZoneForSizing(EnergyPlusData &state,

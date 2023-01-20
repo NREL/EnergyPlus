@@ -198,7 +198,7 @@ namespace HVACFan {
             m_deltaTemp = 0.0;
             m_powerLossToAir = 0.0;
             m_fanEnergy = 0.0;
-            for (auto loop = 0; loop < m_numSpeeds; ++loop) {
+            for (int loop = 0; loop < m_numSpeeds; ++loop) {
                 m_fanRunTimeFractionAtSpeed[loop] = 0.0;
             }
             m_objEnvrnFlag = false;
@@ -287,7 +287,7 @@ namespace HVACFan {
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) { // set up values at speeds
             m_massFlowAtSpeed.resize(m_numSpeeds, 0.0);
             m_totEfficAtSpeed.resize(m_numSpeeds, 0.0);
-            for (auto loop = 0; loop < m_numSpeeds; ++loop) {
+            for (int loop = 0; loop < m_numSpeeds; ++loop) {
                 m_massFlowAtSpeed[loop] = m_maxAirMassFlowRate * m_flowFractionAtSpeed[loop];
                 if (m_powerFractionInputAtSpeed[loop]) { // use speed power fraction
                     if (designElecPower > 0.0) {
@@ -572,7 +572,7 @@ namespace HVACFan {
             }
             // check that flow fractions are increasing
             bool increasingOrderError = false;
-            for (auto loop = 0; loop < (m_numSpeeds - 1); ++loop) {
+            for (int loop = 0; loop < (m_numSpeeds - 1); ++loop) {
                 if (m_flowFractionAtSpeed[loop] > m_flowFractionAtSpeed[loop + 1]) {
                     increasingOrderError = true;
                 }
@@ -589,7 +589,7 @@ namespace HVACFan {
         // check if power curve present when any speeds have no power fraction
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1 && powerModFuncFlowFractionCurveIndex == 0) {
             bool foundMissingPowerFraction = false;
-            for (auto loop = 0; loop < m_numSpeeds; ++loop) {
+            for (int loop = 0; loop < m_numSpeeds; ++loop) {
                 if (!m_powerFractionInputAtSpeed[loop]) {
                     foundMissingPowerFraction = true;
                 }
@@ -825,7 +825,7 @@ namespace HVACFan {
         m_fanPower = 0.0;
         m_outletAirMassFlowRate = 0.0;
         if (speedControl == SpeedControlMethod::Discrete) {
-            for (auto loop = 0; loop < m_numSpeeds; ++loop) {
+            for (int loop = 0; loop < m_numSpeeds; ++loop) {
                 m_fanRunTimeFractionAtSpeed[loop] = 0.0;
             }
         }
@@ -881,7 +881,7 @@ namespace HVACFan {
                             } else {
                                 lowSideSpeed = 0; // hush up cppcheck
                                 hiSideSpeed = 0;  // hush up cppcheck
-                                for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
+                                for (int loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFlowRatio) && (locFlowRatio <= m_flowFractionAtSpeed[loop + 1])) {
                                         lowSideSpeed = loop;
                                         hiSideSpeed = loop + 1;
@@ -936,7 +936,7 @@ namespace HVACFan {
                             } else {
                                 lowSideSpeed = 0; // hush up cppcheck
                                 hiSideSpeed = 0;  // hush up cppcheck
-                                for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
+                                for (int loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFanRunTimeFraction) &&
                                         (locFanRunTimeFraction <= m_flowFractionAtSpeed[loop + 1])) {
                                         lowSideSpeed = loop;

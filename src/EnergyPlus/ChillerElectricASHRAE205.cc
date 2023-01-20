@@ -140,7 +140,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
     auto const &objectSchemaProps = ip->getObjectSchemaProps(state, state.dataIPShortCut->cCurrentModuleObject);
     for (auto &instance : ChillerInstances.items()) {
         auto const &fields = instance.value();
-        auto const &thisObjectName = instance.key();
+        std::string const &thisObjectName = instance.key();
         GlobalNames::VerifyUniqueChillerName(
             state, state.dataIPShortCut->cCurrentModuleObject, thisObjectName, ErrorsFound, state.dataIPShortCut->cCurrentModuleObject + " Name");
 
@@ -513,7 +513,8 @@ void ASHRAE205ChillerSpecs::oneTimeInit_new(EnergyPlusData &state)
                                                 this->AuxiliaryHeatInletNode,
                                                 _);
     }
-#if 0  // If and when heat recovery is implemented, uncomment
+// If and when heat recovery is implemented, uncomment
+#if 0
         if (this->HeatRecActive) {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
@@ -683,8 +684,9 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
     }
     // Recalculate volumetric flow rates from component mass flow rates if necessary
 
-#if 0  // Revisit when heat recovery implemented
-       // Initialize heat recovery flow rates at node
+// Revisit when heat recovery implemented
+#if 0
+      // Initialize heat recovery flow rates at node
         if (this->HeatRecActive) {
 
             // check if inlet limit active and if exceeded.
@@ -1488,7 +1490,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
                                                                                         this->InterpolationType);
     this->QEvaporator = lookupVariablesCooling.net_evaporator_capacity * this->ChillerCyclingRatio;
 
-    auto evapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpEvap;
+    Real64 evapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpEvap;
     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - evapDeltaTemp;
 
     // TODO: Revisit fault
