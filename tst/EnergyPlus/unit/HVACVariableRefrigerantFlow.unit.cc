@@ -18490,15 +18490,15 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
     EXPECT_EQ(1, state->dataHVACVarRefFlow->VRFTU(3).VRFSysNum);
 
     EXPECT_EQ("VRF HEAT PUMP SYS", state->dataHVACVarRefFlow->VRF(1).Name);
-    EXPECT_EQ(AlgorithmType::SysCurve, state->dataHVACVarRefFlow->VRF(1).VRFAlgorithmTypeNum);
+    EXPECT_TRUE(compare_enums(AlgorithmType::SysCurve, state->dataHVACVarRefFlow->VRF(1).VRFAlgorithmTypeNum));
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(1).HeatRecoveryUsed);
 
     EXPECT_EQ("VRF HEAT PUMP FLUIDCTRL", state->dataHVACVarRefFlow->VRF(2).Name);
-    EXPECT_EQ(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(2).VRFAlgorithmTypeNum);
+    EXPECT_TRUE(compare_enums(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(2).VRFAlgorithmTypeNum));
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(2).HeatRecoveryUsed);
 
     EXPECT_EQ("VRF HEAT PUMP FLUIDCTRL_HR", state->dataHVACVarRefFlow->VRF(3).Name);
-    EXPECT_EQ(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(3).VRFAlgorithmTypeNum);
+    EXPECT_TRUE(compare_enums(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(3).VRFAlgorithmTypeNum));
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(3).HeatRecoveryUsed);
 }
 
