@@ -771,15 +771,15 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
 
             switch (state.dataSize->PlantSizData(PltSizNumSupSide).LoopType) {
 
-            case DataSizing::HeatingLoop:
-            case DataSizing::SteamLoop: {
+            case DataSizing::TypeOfPlantLoop::Heating:
+            case DataSizing::TypeOfPlantLoop::Steam: {
                 tmpDeltaTloopToLoop =
                     std::abs((state.dataSize->PlantSizData(PltSizNumSupSide).ExitTemp - state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT) -
                              state.dataSize->PlantSizData(PltSizNumDmdSide).ExitTemp);
                 break;
             }
-            case DataSizing::CoolingLoop:
-            case DataSizing::CondenserLoop: {
+            case DataSizing::TypeOfPlantLoop::Cooling:
+            case DataSizing::TypeOfPlantLoop::Condenser: {
                 tmpDeltaTloopToLoop =
                     std::abs((state.dataSize->PlantSizData(PltSizNumSupSide).ExitTemp + state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT) -
                              state.dataSize->PlantSizData(PltSizNumDmdSide).ExitTemp);
@@ -842,14 +842,14 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
 
         if (PltSizNumSupSide > 0) {
             switch (state.dataSize->PlantSizData(PltSizNumSupSide).LoopType) {
-            case DataSizing::HeatingLoop:
-            case DataSizing::SteamLoop: {
+            case DataSizing::TypeOfPlantLoop::Heating:
+            case DataSizing::TypeOfPlantLoop::Steam: {
                 state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp =
                     (state.dataSize->PlantSizData(PltSizNumSupSide).ExitTemp - state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT);
                 break;
             }
-            case DataSizing::CoolingLoop:
-            case DataSizing::CondenserLoop: {
+            case DataSizing::TypeOfPlantLoop::Cooling:
+            case DataSizing::TypeOfPlantLoop::Condenser: {
                 state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp =
                     (state.dataSize->PlantSizData(PltSizNumSupSide).ExitTemp + state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT);
                 break;

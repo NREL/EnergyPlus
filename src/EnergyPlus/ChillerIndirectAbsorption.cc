@@ -1053,7 +1053,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 state, "Chiller:Absorption:Indirect", this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
         } else {
             for (int PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
-                if (state.dataSize->PlantSizData(PltSizIndex).LoopType == DataSizing::SteamLoop) {
+                if (state.dataSize->PlantSizData(PltSizIndex).LoopType == DataSizing::TypeOfPlantLoop::Steam) {
                     PltSizSteamNum = PltSizIndex;
                 }
             }
@@ -1064,7 +1064,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 state, "Chiller:Absorption:Indirect", this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
         } else {
             for (int PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
-                if (state.dataSize->PlantSizData(PltSizIndex).LoopType == DataSizing::HeatingLoop) {
+                if (state.dataSize->PlantSizData(PltSizIndex).LoopType == DataSizing::TypeOfPlantLoop::Heating) {
                     PltSizHeatingNum = PltSizIndex;
                 }
             }

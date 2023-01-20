@@ -170,7 +170,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             auto const &surface = state.dataSurface->Surface(surfaceNumber);
             state.dataSQLiteProcedures->sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
-        for (int materialNum = 1; materialNum <= state.dataHeatBal->TotMaterials; ++materialNum) {
+        for (int materialNum = 1; materialNum <= state.dataMaterial->TotMaterials; ++materialNum) {
             state.dataSQLiteProcedures->sqlite->addMaterialData(materialNum, state.dataMaterial->Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= state.dataHeatBal->TotConstructs; ++constructNum) {
@@ -1758,14 +1758,14 @@ void SQLite::addSQLiteZoneSizingRecord(std::string const &zoneName,   // the nam
     }
 }
 
-void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,      // the name of the system
-                                         std::string const &LoadType,     // either "Cooling" or "Heating"
-                                         std::string const &PeakLoadType, // either "Sensible" or "Total"
-                                         Real64 const &UserDesCap,        // User  Design Capacity
-                                         Real64 const &CalcDesVolFlow,    // Calculated Cooling Design Air Flow Rate
-                                         Real64 const &UserDesVolFlow,    // User Cooling Design Air Flow Rate
-                                         std::string const &DesDayName,   // the name of the design day that produced the peak
-                                         std::string const &PeakHrMin     // time stamp of the peak
+void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,    // the name of the system
+                                         std::string_view LoadType,     // either "Cooling" or "Heating"
+                                         std::string_view PeakLoadType, // either "Sensible" or "Total"
+                                         Real64 const UserDesCap,       // User  Design Capacity
+                                         Real64 const CalcDesVolFlow,   // Calculated Cooling Design Air Flow Rate
+                                         Real64 const UserDesVolFlow,   // User Cooling Design Air Flow Rate
+                                         std::string const &DesDayName, // the name of the design day that produced the peak
+                                         std::string const &PeakHrMin   // time stamp of the peak
 )
 {
     if (m_writeOutputToSQLite) {
@@ -2124,7 +2124,7 @@ void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData c
     zoneGroups.push_back(std::make_unique<ZoneGroup>(m_errorStream, m_db, number, zoneGroupData));
 }
 
-void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const &materialData)
+void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const *materialData)
 {
     materials.push_back(std::make_unique<Material>(m_errorStream, m_db, number, materialData));
 }

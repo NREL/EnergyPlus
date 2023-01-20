@@ -461,7 +461,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 19 - Airloop Equipment, with min OA
     state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.02;
-    state->dataSize->FinalSysSizing(1).HeatOAOption = DataSizing::MinOA;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = DataSizing::OAControl::MinOA;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 1;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;

@@ -445,7 +445,7 @@ namespace HeatBalanceIntRadExchange {
         if (state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) != state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(SurfNum)) {
             auto const &thissurf(state.dataSurface->Surface(SurfNum));
             Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal -
-                                         state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).AbsorpThermal);
+                                         state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->AbsorpThermal);
             if (AbsorpDiff > 0.01) {
                 MovableInsulationChange = true;
             }
@@ -603,7 +603,7 @@ namespace HeatBalanceIntRadExchange {
 
                 NoUserInputF = true;
 
-                std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:BySurfaceName";
+                constexpr std::string_view cCurrentModuleObject = "ZoneProperty:UserViewFactors:BySurfaceName";
                 int NumZonesWithUserFbyS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
                 if (NumZonesWithUserFbyS > 0) {
 
@@ -817,7 +817,7 @@ namespace HeatBalanceIntRadExchange {
             print(state.files.eio, "{}\n", "! <Solar View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
         }
 
-        std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:BySurfaceName";
+        const std::string &cCurrentModuleObject = "ZoneProperty:UserViewFactors:BySurfaceName";
         int NumZonesWithUserFbyS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumZonesWithUserFbyS > 0) AlignInputViewFactors(state, cCurrentModuleObject, ErrorsFound);
 
@@ -1958,7 +1958,7 @@ namespace HeatBalanceIntRadExchange {
             // Find pivot row in column i below diagonal
             int iPiv = i;
             Real64 aPiv(std::abs(A(i, i)));
-            auto ik(A.index(i, i + 1));
+            int ik(A.index(i, i + 1));
             for (int k = i + 1; k <= u; ++k, ++ik) {
                 Real64 const aAki(std::abs(A[ik])); // [ ik ] == ( i, k )
                 if (aAki > aPiv) {
@@ -1970,8 +1970,8 @@ namespace HeatBalanceIntRadExchange {
 
             // Swap row i with pivot row
             if (iPiv != i) {
-                auto ji(A.index(l, i));    // [ ji ] == ( j, i )
-                auto pj(A.index(l, iPiv)); // [ pj ] == ( j, iPiv )
+                int ji(A.index(l, i));    // [ ji ] == ( j, i )
+                int pj(A.index(l, iPiv)); // [ pj ] == ( j, iPiv )
                 for (int j = l; j <= u; ++j, ji += n, pj += n) {
                     Real64 const Aij(A[ji]);
                     A[ji] = A[pj];
@@ -1988,8 +1988,8 @@ namespace HeatBalanceIntRadExchange {
                 Real64 const multiplier(A(i, k) * Aii_inv);
                 A(i, k) = multiplier;
                 if (multiplier != 0.0) {
-                    auto ji(A.index(i + 1, i)); // [ ji ] == ( j, i )
-                    auto jk(A.index(i + 1, k)); // [ jk ] == ( j, k )
+                    int ji(A.index(i + 1, i)); // [ ji ] == ( j, i )
+                    int jk(A.index(i + 1, k)); // [ jk ] == ( j, k )
                     for (int j = i + 1; j <= u; ++j, ji += n, jk += n) {
                         A[jk] -= multiplier * A[ji];
                     }
@@ -2008,15 +2008,15 @@ namespace HeatBalanceIntRadExchange {
         // Perform back-substitution on [U|I] to put inverse in I
         for (int k = u; k >= l; --k) {
             Real64 const Akk_inv(1.0 / A(k, k));
-            auto jk(A.index(l, k)); // [ jk ] == ( j, k )
+            int jk(A.index(l, k)); // [ jk ] == ( j, k )
             for (int j = l; j <= u; ++j, jk += n) {
                 I[jk] *= Akk_inv;
             }
-            auto ik(A.index(k, l));             // [ ik ] == ( i, k )
+            int ik(A.index(k, l));              // [ ik ] == ( i, k )
             for (int i = l; i < k; ++i, ++ik) { // Eliminate kth column entries from I in rows above k
                 Real64 const Aik(A[ik]);
-                auto ji(A.index(l, i)); // [ ji ] == ( j, i )
-                auto jk(A.index(l, k)); // [ jk ] == ( k, j )
+                int ji(A.index(l, i)); // [ ji ] == ( j, i )
+                int jk(A.index(l, k)); // [ jk ] == ( k, j )
                 for (int j = l; j <= u; ++j, ji += n, jk += n) {
                     I[ji] -= Aik * I[jk];
                 }

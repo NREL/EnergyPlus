@@ -63,6 +63,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1123,7 +1124,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, localErrorsFound);
+    Material::GetMaterialData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetConstructData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);

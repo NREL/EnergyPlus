@@ -120,7 +120,7 @@ public:
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, Material::MaterialProperties const &materialData);
+    void addMaterialData(int const number, Material::MaterialProperties const *materialData);
     void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
@@ -210,14 +210,14 @@ public:
                                    Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
-    void addSQLiteSystemSizingRecord(std::string const &SysName,      // the name of the system
-                                     std::string const &LoadType,     // either "Cooling" or "Heating"
-                                     std::string const &PeakLoadType, // either "Sensible" or "Total"
-                                     Real64 const &UserDesCap,        // User  Design Capacity
-                                     Real64 const &CalcDesVolFlow,    // Calculated Cooling Design Air Flow Rate
-                                     Real64 const &UserDesVolFlow,    // User Cooling Design Air Flow Rate
-                                     std::string const &DesDayName,   // the name of the design day that produced the peak
-                                     std::string const &PeakHrMin     // time stamp of the peak
+    void addSQLiteSystemSizingRecord(std::string const &SysName,    // the name of the system
+                                     std::string_view LoadType,     // either "Cooling" or "Heating"
+                                     std::string_view PeakLoadType, // either "Sensible" or "Total"
+                                     Real64 const UserDesCap,       // User  Design Capacity
+                                     Real64 const CalcDesVolFlow,   // Calculated Cooling Design Air Flow Rate
+                                     Real64 const UserDesVolFlow,   // User Cooling Design Air Flow Rate
+                                     std::string const &DesDayName, // the name of the design day that produced the peak
+                                     std::string const &PeakHrMin   // time stamp of the peak
     );
 
     void addSQLiteComponentSizingRecord(std::string_view CompType, // the type of the component
@@ -562,12 +562,12 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 EnergyPlus::Material::MaterialProperties const &materialData)
-            : SQLiteData(errorStream, db), number(materialNumber), name(materialData.Name), group(materialData.Group),
-              roughness(materialData.Roughness), conductivity(materialData.Conductivity), density(materialData.Density),
-              isoMoistCap(materialData.IsoMoistCap), porosity(materialData.Porosity), resistance(materialData.Resistance), rOnly(materialData.ROnly),
-              specHeat(materialData.SpecHeat), thermGradCoef(materialData.ThermGradCoef), thickness(materialData.Thickness),
-              vaporDiffus(materialData.VaporDiffus)
+                 EnergyPlus::Material::MaterialProperties const *materialData)
+            : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->Group),
+              roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
+              isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance),
+              rOnly(materialData->ROnly), specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef),
+              thickness(materialData->Thickness), vaporDiffus(materialData->VaporDiffus)
         {
         }
 
@@ -576,7 +576,7 @@ private:
     private:
         int const number;
         std::string const &name;
-        DataHeatBalance::MaterialGroup const &group;
+        EnergyPlus::Material::MaterialGroup const &group;
         DataSurfaces::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;
