@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/member.functions.hh>
 
