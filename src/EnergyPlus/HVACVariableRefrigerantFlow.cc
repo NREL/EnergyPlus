@@ -1633,8 +1633,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         } else {
             thisVrfSys.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
             if (thisVrfSys.SchedPtr == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\" invalid data");
-                ShowContinueError(state, "Invalid-not found " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                ShowSevereError(state, format("{}=\"{}\" invalid data", cCurrentModuleObject, thisVrfSys.Name));
+                ShowContinueError(state, format("Invalid-not found {}=\"{}\".", cAlphaFieldNames(2), cAlphaArgs(2)));
                 ErrorsFound = true;
             }
         }
@@ -1778,8 +1778,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto [MinCurvePLR, MinCurveVal, MaxCurvePLR, MaxCurveVal] = checkCurveMinMaxOutput(thisVrfSys.CoolPLFFPLR);
 
                 if (MinCurveVal < 0.7) {
-                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", invalid");
-                    ShowContinueError(state, "..." + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\" has out of range values.");
+                    ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisVrfSys.Name));
+                    ShowContinueError(state, format("...{}=\"{}\" has out of range values.", cAlphaFieldNames(12), cAlphaArgs(12)));
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
@@ -1787,8 +1787,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 if (MaxCurveVal > 1.0) {
-                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", invalid");
-                    ShowContinueError(state, "..." + cAlphaFieldNames(12) + " = " + cAlphaArgs(12) + " has out of range value.");
+                    ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisVrfSys.Name));
+                    ShowContinueError(state, format("...{}=\"{}\" has out of range values.", cAlphaFieldNames(12), cAlphaArgs(12)));
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
@@ -1806,7 +1806,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfSys.MinOATHeating = rNumericArgs(8);
         thisVrfSys.MaxOATHeating = rNumericArgs(9);
         if (thisVrfSys.MinOATHeating >= thisVrfSys.MaxOATHeating) {
-            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\"");
+            ShowSevereError(state, format("{}, \"{}\"", cCurrentModuleObject, thisVrfSys.Name));
             ShowContinueError(state,
                               format("... {} ({:.3T}) must be less than maximum ({:.3T}).",
                                      cNumericFieldNames(8),
@@ -1914,9 +1914,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         } else if (UtilityRoutines::SameString(cAlphaArgs(19), "DRYBULBTEMPERATURE")) {
             thisVrfSys.HeatingPerformanceOATType = DataHVACGlobals::DryBulbIndicator;
         } else {
-            ShowSevereError(state,
-                            cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" illegal " + cAlphaFieldNames(19) +
-                                " input for this object = " + cAlphaArgs(19));
+            ShowSevereError(
+                state,
+                format(
+                    "{}, \"{}\" illegal {} input for this object = {}", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(19), cAlphaArgs(19)));
             ShowContinueError(state, "... input must be WETBULBTEMPERATURE or DRYBULBTEMPERATURE.");
             ErrorsFound = true;
         }
@@ -1971,8 +1972,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto [MinCurvePLR, MinCurveVal, MaxCurvePLR, MaxCurveVal] = checkCurveMinMaxOutput(thisVrfSys.HeatPLFFPLR);
 
                 if (MinCurveVal < 0.7) {
-                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", invalid");
-                    ShowContinueError(state, "..." + cAlphaFieldNames(23) + "=\"" + cAlphaArgs(23) + "\" has out of range values.");
+                    ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisVrfSys.Name));
+                    ShowContinueError(state, format("...{}=\"{}\" has out of range values.", cAlphaFieldNames(23), cAlphaArgs(23)));
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
@@ -1980,8 +1981,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 if (MaxCurveVal > 1.0) {
-                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", invalid");
-                    ShowContinueError(state, "..." + cAlphaFieldNames(23) + " = " + cAlphaArgs(23) + " has out of range value.");
+                    ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisVrfSys.Name));
+                    ShowContinueError(state, format("...{}=\"{}\" has out of range values.", cAlphaFieldNames(23), cAlphaArgs(23)));
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
@@ -1997,8 +1998,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (thisVrfSys.CoolEIRFPLR1 > 0) {
             Curve::GetCurveMinMaxValues(state, thisVrfSys.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
             if (minEIRfLowPLRXInput > thisVrfSys.MinPLR) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", invalid");
-                ShowContinueError(state, "..." + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) + " has out of range value.");
+                ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisVrfSys.Name));
+                ShowContinueError(state, format("...{} = {} has out of range value.", cAlphaFieldNames(9), cAlphaArgs(9)));
                 ShowContinueError(state,
                                   format("...Curve minimum value of X = {:.3T} must be <= Minimum Heat Pump Part-Load Ratio = {:.3T}.",
                                          minEIRfLowPLRXInput,
@@ -2006,8 +2007,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ErrorsFound = true;
             }
             if (maxEIRfLowPLRXInput < 1.0) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", suspicious");
-                ShowContinueError(state, "..." + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) + " has unexpected value.");
+                ShowWarningError(state, format("{}{}=\"{}\", suspicious", RoutineName, cCurrentModuleObject, thisVrfSys.Name));
+                ShowContinueError(state, format("...{} = {} has unexpected value.", cAlphaFieldNames(9), cAlphaArgs(9)));
                 ShowContinueError(state,
                                   format("...Curve maximum value of X = {:.3T} should be 1 and will result in lower energy use than expected.",
                                          maxEIRfLowPLRXInput));
@@ -2018,8 +2019,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (thisVrfSys.HeatEIRFPLR1 > 0) {
             Curve::GetCurveMinMaxValues(state, thisVrfSys.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
             if (minEIRfLowPLRXInput > thisVrfSys.MinPLR) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", invalid");
-                ShowContinueError(state, "..." + cAlphaFieldNames(20) + " = " + cAlphaArgs(20) + " has out of range value.");
+                ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisVrfSys.Name));
+                ShowContinueError(state, format("...{} = {} has out of range value.", cAlphaFieldNames(20), cAlphaArgs(20)));
                 ShowContinueError(state,
                                   format("...Curve minimum value of X = {:.3T} must be <= Minimum Heat Pump Part-Load Ratio = {:.3T}.",
                                          minEIRfLowPLRXInput,
@@ -2027,8 +2028,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ErrorsFound = true;
             }
             if (maxEIRfLowPLRXInput < 1.0) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVrfSys.Name + "\", suspicious");
-                ShowContinueError(state, "..." + cAlphaFieldNames(20) + " = " + cAlphaArgs(20) + " has unexpected value.");
+                ShowWarningError(state, format("{}{}=\"{}\", suspicious", RoutineName, cCurrentModuleObject, thisVrfSys.Name));
+                ShowContinueError(state, format("...{} = {} has unexpected value.", cAlphaFieldNames(20), cAlphaArgs(20)));
                 ShowContinueError(state,
                                   format("...Curve maximum value of X = {:.3T} should be 1 and will result in lower energy use than expected.",
                                          maxEIRfLowPLRXInput));
@@ -2037,41 +2038,34 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         thisVrfSys.MasterZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(24), state.dataHeatBal->Zone);
 
-        if (UtilityRoutines::SameString(cAlphaArgs(25), "LoadPriority")) {
-            thisVrfSys.ThermostatPriority = ThermostatCtrlType::LoadPriority;
-        } else if (UtilityRoutines::SameString(cAlphaArgs(25), "ZonePriority")) {
-            thisVrfSys.ThermostatPriority = ThermostatCtrlType::ZonePriority;
-        } else if (UtilityRoutines::SameString(cAlphaArgs(25), "ThermostatOffsetPriority")) {
-            thisVrfSys.ThermostatPriority = ThermostatCtrlType::ThermostatOffsetPriority;
-        } else if (UtilityRoutines::SameString(cAlphaArgs(25), "Scheduled")) {
-            thisVrfSys.ThermostatPriority = ThermostatCtrlType::ScheduledPriority;
-        } else if (UtilityRoutines::SameString(cAlphaArgs(25), "MasterThermostatPriority")) {
-            thisVrfSys.ThermostatPriority = ThermostatCtrlType::MasterThermostatPriority;
+        thisVrfSys.ThermostatPriority = static_cast<ThermostatCtrlType>(getEnumerationValue(ThermostatCtrlTypeUC, cAlphaArgs(25)));
+
+        if (thisVrfSys.ThermostatPriority == ThermostatCtrlType::MasterThermostatPriority) {
             if (thisVrfSys.MasterZonePtr == 0) {
-                ShowSevereError(state, cCurrentModuleObject + " = \"" + thisVrfSys.Name + "\"");
-                ShowContinueError(state, cAlphaFieldNames(24) + " must be entered when " + cAlphaFieldNames(25) + " = " + cAlphaArgs(25));
+                ShowSevereError(state, format("{} = \"{}\"", cCurrentModuleObject, thisVrfSys.Name));
+                ShowContinueError(state, format("{} must be entered when {} = {}", cAlphaFieldNames(24), cAlphaFieldNames(25), cAlphaArgs(25)));
                 ErrorsFound = true;
             }
-        } else {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfSys.Name);
-            ShowContinueError(state, "Illegal " + cAlphaFieldNames(25) + " = " + cAlphaArgs(25));
+        } else if (thisVrfSys.ThermostatPriority == ThermostatCtrlType::Invalid) {
+            ShowSevereError(state, format("{} = \"{}\"", cCurrentModuleObject, thisVrfSys.Name));
+            ShowContinueError(state, format("Illegal {} = {}", cAlphaFieldNames(25), cAlphaArgs(25)));
             ErrorsFound = true;
         }
 
         if (thisVrfSys.ThermostatPriority == ThermostatCtrlType::ScheduledPriority) {
             thisVrfSys.SchedPriorityPtr = GetScheduleIndex(state, cAlphaArgs(26));
             if (thisVrfSys.SchedPriorityPtr == 0) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfSys.Name);
-                ShowContinueError(state, "..." + cAlphaFieldNames(26) + " = " + cAlphaArgs(26) + " not found.");
-                ShowContinueError(state, "A schedule name is required when " + cAlphaFieldNames(25) + " = " + cAlphaArgs(25));
+                ShowSevereError(state, format("{} = \"{}\"", cCurrentModuleObject, thisVrfSys.Name));
+                ShowContinueError(state, format("...{} = {} not found.", cAlphaFieldNames(26), cAlphaArgs(26)));
+                ShowContinueError(state, format("A schedule name is required when {}={}", cAlphaFieldNames(25), cAlphaArgs(25)));
                 ErrorsFound = true;
             }
         }
 
         thisVrfSys.ZoneTUListPtr = UtilityRoutines::FindItemInList(cAlphaArgs(27), state.dataHVACVarRefFlow->TerminalUnitList);
         if (thisVrfSys.ZoneTUListPtr == 0) {
-            ShowSevereError(state, cCurrentModuleObject + " = \"" + thisVrfSys.Name + "\"");
-            ShowContinueError(state, cAlphaFieldNames(27) + " = " + cAlphaArgs(27) + " not found.");
+            ShowSevereError(state, format("{} = \"{}\"", cCurrentModuleObject, thisVrfSys.Name));
+            ShowContinueError(state, format("{} = {} not found.", cAlphaFieldNames(27), cAlphaArgs(27)));
             ErrorsFound = true;
         }
 
@@ -2082,8 +2076,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             } else if (UtilityRoutines::SameString(cAlphaArgs(28), "Yes")) {
                 thisVrfSys.HeatRecoveryUsed = true;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfSys.Name);
-                ShowContinueError(state, "Illegal " + cAlphaFieldNames(28) + " = " + cAlphaArgs(28));
+                ShowSevereError(state, format("{} = \"{}\"", cCurrentModuleObject, thisVrfSys.Name));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFieldNames(28), cAlphaArgs(28)));
                 ErrorsFound = true;
             }
         }
@@ -2124,11 +2118,11 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfSys.MaxOATCCHeater = rNumericArgs(19);
 
         if (!lAlphaFieldBlanks(31)) {
-            if (UtilityRoutines::SameString(cAlphaArgs(31), "ReverseCycle")) thisVrfSys.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
-            if (UtilityRoutines::SameString(cAlphaArgs(31), "Resistive")) thisVrfSys.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+            thisVrfSys.DefrostStrategy =
+                static_cast<StandardRatings::DefrostStrat>(getEnumerationValue(StandardRatings::DefrostStratUC, cAlphaArgs(31)));
             if (thisVrfSys.DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" " + cAlphaFieldNames(31) + " not found: " + cAlphaArgs(31));
+                                format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(31), cAlphaArgs(31)));
                 ErrorsFound = true;
             }
         } else {
@@ -2136,11 +2130,13 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         if (!lAlphaFieldBlanks(32)) {
-            if (UtilityRoutines::SameString(cAlphaArgs(32), "Timed")) thisVrfSys.DefrostControl = StandardRatings::HPdefrostControl::Timed;
-            if (UtilityRoutines::SameString(cAlphaArgs(32), "OnDemand")) thisVrfSys.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+            thisVrfSys.DefrostControl =
+                static_cast<StandardRatings::HPdefrostControl>(getEnumerationValue(StandardRatings::HPdefrostControlUC, cAlphaArgs(32)));
+
             if (thisVrfSys.DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" " + cAlphaFieldNames(32) + " not found: " + cAlphaArgs(32));
+                                format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(32), cAlphaArgs(32)));
+
                 ErrorsFound = true;
             }
         } else {
@@ -2160,15 +2156,15 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                      cAlphaFieldNames(33));    // Field Name
             } else {
                 if (thisVrfSys.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
-                    ShowSevereError(state,
-                                    cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" " + cAlphaFieldNames(33) + " not found:" + cAlphaArgs(33));
+                    ShowSevereError(
+                        state, format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(33), cAlphaArgs(33)));
                     ErrorsFound = true;
                 }
             }
         } else {
             if (thisVrfSys.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" " + cAlphaFieldNames(33) + " not found:" + cAlphaArgs(33));
+                                format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(33), cAlphaArgs(33)));
                 ErrorsFound = true;
             }
         }
@@ -2177,7 +2173,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfSys.DefrostCapacity = rNumericArgs(21);
         if (thisVrfSys.DefrostCapacity == 0.0 && thisVrfSys.DefrostStrategy == StandardRatings::DefrostStrat::Resistive) {
             ShowWarningError(
-                state, cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" " + cNumericFieldNames(21) + " = 0.0 for defrost strategy = RESISTIVE.");
+                state,
+                format("{}, \"{}\" {} = 0.0 for defrost strategy = RESISTIVE.", cCurrentModuleObject, thisVrfSys.Name, cNumericFieldNames(21)));
         }
 
         thisVrfSys.MaxOATDefrost = rNumericArgs(22);
@@ -2190,11 +2187,11 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 thisVrfSys.CondenserType = DataHeatBalance::RefrigCondenserType::Water;
                 thisVrfSys.VRFType = PlantEquipmentType::HeatPumpVRF;
                 if (thisVrfSys.HeatingPerformanceOATType == DataHVACGlobals::WetBulbIndicator) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfSys.Name);
-                    ShowContinueError(state, cAlphaFieldNames(34) + " = " + cAlphaArgs(34));
-                    ShowContinueError(state, "Illegal " + cAlphaFieldNames(19) + " input for this object = " + cAlphaArgs(19));
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisVrfSys.Name));
+                    ShowContinueError(state, format("{} = {}", cAlphaFieldNames(34), cAlphaArgs(34)));
+                    ShowContinueError(state, format("Illegal {} input for this object = {}", cAlphaFieldNames(19), cAlphaArgs(19)));
                     ShowContinueError(state, "... input must be DRYBULBTEMPERATURE when Condenser Type is WaterCooled.");
-                    ShowContinueError(state, "... " + cAlphaFieldNames(19) + " will be reset to DRYBULBTEMPERATURE and simulation continues.");
+                    ShowContinueError(state, format("... {} will be reset to DRYBULBTEMPERATURE and simulation continues.", cAlphaFieldNames(19)));
                 }
             }
             if (thisVrfSys.CondenserType == DataHeatBalance::RefrigCondenserType::Invalid) {
@@ -2224,8 +2221,11 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                 ObjectIsNotParent);
                 if (!CheckOutAirNodeNumber(state, thisVrfSys.CondenserNodeNum)) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" " + cAlphaFieldNames(35) +
-                                        " not a valid Outdoor Air Node = " + cAlphaArgs(35));
+                                    format("{}, \"{}\" {} not a valid Outdoor Air Node = {}",
+                                           cCurrentModuleObject,
+                                           thisVrfSys.Name,
+                                           cAlphaFieldNames(35),
+                                           cAlphaArgs(35)));
                     ShowContinueError(state, "...node name does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
                 }
@@ -2258,15 +2258,15 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                   ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, thisVrfSys.Name, cAlphaArgs(35), cAlphaArgs(36), "Condenser Water Nodes");
         } else if (lAlphaFieldBlanks(36) && thisVrfSys.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
-            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" " + cAlphaFieldNames(36) + " is blank.");
+            ShowSevereError(state, format("{}, \"{}\" {} is blank.", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(36)));
             ShowContinueError(state, "...node name must be entered when Condenser Type = WaterCooled.");
             ErrorsFound = true;
         }
 
         if (lAlphaFieldBlanks(23)) {
             if (thisVrfSys.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
-                ShowSevereError(state, cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\" " + cNumericFieldNames(23) + " is blank.");
-                ShowContinueError(state, "...input is required when " + cAlphaFieldNames(34) + " = " + cAlphaArgs(34));
+                ShowSevereError(state, format("{}, \"{}\" {} is blank.", cCurrentModuleObject, thisVrfSys.Name, cNumericFieldNames(23)));
+                ShowContinueError(state, format("...input is required when {} = {}", cAlphaFieldNames(34), cAlphaArgs(34)));
                 ErrorsFound = true;
             }
         } else {
@@ -2295,7 +2295,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         //   Basin heater power as a function of temperature must be greater than or equal to 0
         thisVrfSys.BasinHeaterPowerFTempDiff = rNumericArgs(27);
         if (rNumericArgs(27) < 0.0) {
-            ShowSevereError(state, cCurrentModuleObject + " = \"" + thisVrfSys.Name + "\", " + cNumericFieldNames(27) + " must be >= 0");
+            ShowSevereError(state, format("{}, \"{}\" {} must be >= 0", cCurrentModuleObject, thisVrfSys.Name, cNumericFieldNames(27)));
             ErrorsFound = true;
         }
 
@@ -2305,18 +2305,19 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 thisVrfSys.BasinHeaterSetPointTemp = 2.0;
             }
             if (thisVrfSys.BasinHeaterSetPointTemp < 2.0) {
-                ShowWarningError(state,
-                                 cCurrentModuleObject + " = \"" + thisVrfSys.Name + "\", " + cNumericFieldNames(28) +
-                                     " is less than 2 deg C. Freezing could occur.");
+                ShowWarningError(
+                    state,
+                    format(
+                        "{}, \"{}\" {} is less than 2 deg C. Freezing could occur.", cCurrentModuleObject, thisVrfSys.Name, cNumericFieldNames(28)));
             }
         }
 
         if (!lAlphaFieldBlanks(38)) {
             thisVrfSys.BasinHeaterSchedulePtr = GetScheduleIndex(state, cAlphaArgs(38));
             if (thisVrfSys.BasinHeaterSchedulePtr == 0) {
-                ShowWarningError(state,
-                                 cCurrentModuleObject + " = \"" + thisVrfSys.Name + "\", " + cAlphaFieldNames(38) + " = \"" + cAlphaArgs(38) +
-                                     "\" was not found.");
+                ShowSevereError(
+                    state,
+                    format("{} = \"{}\", {} = \"{}\" was not found.", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(38), cAlphaArgs(38)));
                 ShowContinueError(state, "Basin heater will be available to operate throughout the simulation.");
             }
         }
@@ -2327,8 +2328,9 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             bool FuelTypeError(false);
             UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(cAlphaArgs(39), thisVrfSys.FuelType, thisVrfSys.FuelTypeNum, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError(state,
-                                cCurrentModuleObject + ", \"" + thisVrfSys.Name + "\", " + cAlphaFieldNames(39) + " not found = " + cAlphaArgs(39));
+                ShowSevereError(
+                    state,
+                    format("{} = \"{}\", {} = \"{}\" was not found.", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(39), cAlphaArgs(39)));
                 ShowContinueError(
                     state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
@@ -2343,8 +2345,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 thisVrfSys.MinOATHeatRecovery = rNumericArgs(29);
                 if (thisVrfSys.MinOATHeatRecovery < thisVrfSys.MinOATCooling || thisVrfSys.MinOATHeatRecovery < thisVrfSys.MinOATHeating) {
                     ShowWarningError(state,
-                                     cCurrentModuleObject + " = \"" + thisVrfSys.Name + "\", " + cNumericFieldNames(29) +
-                                         " is less than the minimum temperature in heat pump mode.");
+                                     format("{} = \"{}\", {} is less than the minimum temperature in heat pump mode.",
+                                            cCurrentModuleObject,
+                                            thisVrfSys.Name,
+                                            cNumericFieldNames(29)));
                     ShowContinueError(state, format("...{} = {:.2T} C", cNumericFieldNames(29), thisVrfSys.MinOATHeatRecovery));
                     ShowContinueError(state, format("...Minimum Outdoor Temperature in Cooling Mode = {:.2T} C", thisVrfSys.MinOATCooling));
                     ShowContinueError(state, format("...Minimum Outdoor Temperature in Heating Mode = {:.2T} C", thisVrfSys.MinOATHeating));
@@ -2361,8 +2365,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 thisVrfSys.MaxOATHeatRecovery = rNumericArgs(30);
                 if (thisVrfSys.MaxOATHeatRecovery > thisVrfSys.MaxOATCooling || thisVrfSys.MaxOATHeatRecovery > thisVrfSys.MaxOATHeating) {
                     ShowWarningError(state,
-                                     cCurrentModuleObject + " = \"" + thisVrfSys.Name + "\", " + cNumericFieldNames(30) +
-                                         " is greater than the maximum temperature in heat pump mode.");
+                                     format("{} = \"{}\", {} is greater than the maximum temperature in heat pump mode.",
+                                            cCurrentModuleObject,
+                                            thisVrfSys.Name,
+                                            cNumericFieldNames(30)));
                     ShowContinueError(state, format("...{} = {:.2T} C", cNumericFieldNames(30), thisVrfSys.MaxOATHeatRecovery));
                     ShowContinueError(state, format("...Maximum Outdoor Temperature in Cooling Mode = {:.2T} C", thisVrfSys.MaxOATCooling));
                     ShowContinueError(state, format("...Maximum Outdoor Temperature in Heating Mode = {:.2T} C", thisVrfSys.MaxOATHeating));
