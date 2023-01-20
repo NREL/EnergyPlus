@@ -2000,7 +2000,9 @@ namespace WaterToAirHeatPumpSimple {
 
                                 // adjust for system air flow -- capacity is based on heating design day calcs
                                 // adjust by ratio of system to heating air flow rate and temperature delta across the coil at these different airflow
-                                RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes) * HeatdTratio;
+                                if (HeatingAirVolFlowRateDes > 0) {
+                                    RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes) * HeatdTratio;
+                                }
 
                                 if (RatedCapCoolSensAutoSized) {
                                     // adjust sensible capacity assuming that the SHR is constant
@@ -2584,7 +2586,9 @@ namespace WaterToAirHeatPumpSimple {
                         RatedCapCoolTotalDes = RatedCapCoolHeatDD;
                         // adjust for system air flow -- capacity is based on heating design day calcs
                         // adjust by ratio of system to heating air flow rate and temperature delta across the coil at these different airflow
-                        RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes) * HeatdTratio;
+                        if (HeatingAirVolFlowRateDes > 0) {
+                            RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes) * HeatdTratio;
+                        }
                         // calculate ajustment factor over previous capacity for sensible capacity adjustment
                         Real64 CapCoolAdjFac = RatedCapCoolTotalDes / state.dataSize->DXCoolCap;
                         // update cooling coil rated capacity after adjustments based on heating coil size
