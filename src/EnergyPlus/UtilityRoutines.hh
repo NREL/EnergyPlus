@@ -50,12 +50,12 @@
 
 // C++ Headers
 #include <functional>
+#include <optional>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
-#include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 #include <GSL/span.h>
@@ -130,32 +130,38 @@ template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inli
 
 bool env_var_on(std::string const &env_var_str);
 
-using OptionalOutputFileRef = ObjexxFCL::Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
+using OptionalOutputFileRef = std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
-void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
-void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowSevereError(EnergyPlusData &state,
+                     std::string const &ErrorMessage,
+                     OptionalOutputFileRef OutUnit1 = {},
+                     OptionalOutputFileRef OutUnit2 = {});
 
 void ShowSevereMessage(EnergyPlusData &state,
                        std::string const &ErrorMessage,
-                       OptionalOutputFileRef OutUnit1 = _,
-                       OptionalOutputFileRef OutUnit2 = _);
+                       OptionalOutputFileRef OutUnit1 = {},
+                       OptionalOutputFileRef OutUnit2 = {});
 
-void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
 void ShowContinueErrorTimeStamp(EnergyPlusData &state,
                                 std::string const &Message,
-                                OptionalOutputFileRef OutUnit1 = _,
-                                OptionalOutputFileRef OutUnit2 = _);
+                                OptionalOutputFileRef OutUnit1 = {},
+                                OptionalOutputFileRef OutUnit2 = {});
 
-void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
-void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowWarningError(EnergyPlusData &state,
+                      std::string const &ErrorMessage,
+                      OptionalOutputFileRef OutUnit1 = {},
+                      OptionalOutputFileRef OutUnit2 = {});
 
 void ShowWarningMessage(EnergyPlusData &state,
                         std::string const &ErrorMessage,
-                        OptionalOutputFileRef OutUnit1 = _,
-                        OptionalOutputFileRef OutUnit2 = _);
+                        OptionalOutputFileRef OutUnit1 = {},
+                        OptionalOutputFileRef OutUnit2 = {});
 
 void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
                                    std::string const &Message,             // Message automatically written to "error file" at end of simulation
@@ -201,7 +207,10 @@ void StoreRecurringErrorMessage(EnergyPlusData &state,
                                 std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
 );
 
-void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowErrorMessage(EnergyPlusData &state,
+                      std::string const &ErrorMessage,
+                      OptionalOutputFileRef OutUnit1 = {},
+                      OptionalOutputFileRef OutUnit2 = {});
 
 void SummarizeErrors(EnergyPlusData &state);
 

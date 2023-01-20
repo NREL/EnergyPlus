@@ -1611,11 +1611,11 @@ void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, Op
         // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
         if (state.dataGlobal->printConsoleOutput) std::cout << ErrorMessage << '\n';
     }
-    if (present(OutUnit1)) {
-        print(OutUnit1(), "  {}", ErrorMessage);
+    if (OutUnit1) {
+        print(OutUnit1.value(), "  {}", ErrorMessage);
     }
-    if (present(OutUnit2)) {
-        print(OutUnit2(), "  {}", ErrorMessage);
+    if (OutUnit2) {
+        print(OutUnit2.value(), "  {}", ErrorMessage);
     }
     // std::string tmp = "  " + ErrorMessage + '\n';
     // if (errorCallback) DataGlobals::errorCallback(tmp.c_str());
