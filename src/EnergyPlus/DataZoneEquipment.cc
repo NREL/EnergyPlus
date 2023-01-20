@@ -407,7 +407,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 getEnumerationValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::MakeUPPERCase(loadDistName)));
             if (thisZoneEquipList.LoadDistScheme == DataZoneEquipment::LoadDist::Invalid) {
                 ShowSevereError(state, format("{}{} = \"{}, Invalid choice\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                ShowContinueError(state, "..." + cAlphaFields(2) + "=\"" + AlphArray(2) + "\".");
+                ShowContinueError(state, format("...load_distribution_scheme=\"{}\".", loadDistName));
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
