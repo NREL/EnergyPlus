@@ -12250,9 +12250,9 @@ namespace Furnaces {
     }
 
     void SetVSHPAirFlow(EnergyPlusData &state,
-                        int const FurnaceNum,             // Unit index
-                        Real64 const PartLoadRatio,       // unit part load ratio
-                        Real64 &OnOffAirFlowRatio,        // ratio of compressor ON airflow to average airflow over timestep
+                        int const FurnaceNum,                        // Unit index
+                        Real64 const PartLoadRatio,                  // unit part load ratio
+                        Real64 &OnOffAirFlowRatio,                   // ratio of compressor ON airflow to average airflow over timestep
                         ObjexxFCL::Optional_int_const SpeedNum,      // Speed number
                         ObjexxFCL::Optional<Real64 const> SpeedRatio // Speed ratio
     )

@@ -231,14 +231,14 @@ namespace ThermalComfort {
 
     void CalcThermalComfortAdaptiveASH55(
         EnergyPlusData &state,
-        bool const initiate,                  // true if supposed to initiate
+        bool const initiate,                             // true if supposed to initiate
         ObjexxFCL::Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         ObjexxFCL::Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );
 
     void CalcThermalComfortAdaptiveCEN15251(
         EnergyPlusData &state,
-        bool const initiate,                  // true if supposed to initiate
+        bool const initiate,                             // true if supposed to initiate
         ObjexxFCL::Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         ObjexxFCL::Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );

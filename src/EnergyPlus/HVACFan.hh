@@ -156,14 +156,15 @@ namespace HVACFan {
 
         void set_size(EnergyPlusData &state);
 
-        void calcSimpleSystemFan(EnergyPlusData &state,
-                                 ObjexxFCL::Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
-                                 ObjexxFCL::Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
-                                 ObjexxFCL::Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
-                                 ObjexxFCL::Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
-                                 ObjexxFCL::Optional<Real64 const> flowRatio2,   // Flow ratio in operating mode 2
-                                 ObjexxFCL::Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
-                                 ObjexxFCL::Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
+        void
+        calcSimpleSystemFan(EnergyPlusData &state,
+                            ObjexxFCL::Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
+                            ObjexxFCL::Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
+                            ObjexxFCL::Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
+                            ObjexxFCL::Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
+                            ObjexxFCL::Optional<Real64 const> flowRatio2,   // Flow ratio in operating mode 2
+                            ObjexxFCL::Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
+                            ObjexxFCL::Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
         );
 
         void update(EnergyPlusData &state) const;

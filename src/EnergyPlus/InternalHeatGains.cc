@@ -8389,7 +8389,9 @@ namespace InternalHeatGains {
         }
     }
 
-    void UpdateInternalGainValues(EnergyPlusData &state, ObjexxFCL::Optional_bool_const SuppressRadiationUpdate, ObjexxFCL::Optional_bool_const SumLatentGains)
+    void UpdateInternalGainValues(EnergyPlusData &state,
+                                  ObjexxFCL::Optional_bool_const SuppressRadiationUpdate,
+                                  ObjexxFCL::Optional_bool_const SumLatentGains)
     {
 
         // SUBROUTINE INFORMATION:

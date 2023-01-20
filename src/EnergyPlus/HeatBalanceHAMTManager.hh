@@ -129,8 +129,12 @@ namespace HeatBalanceHAMTManager {
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid);
 
-    void interp(
-        int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, ObjexxFCL::Optional<Real64> outgrad = _);
+    void interp(int const ndata,
+                const Array1D<Real64> &xx,
+                const Array1D<Real64> &yy,
+                Real64 const invalue,
+                Real64 &outvalue,
+                ObjexxFCL::Optional<Real64> outgrad = _);
 
     Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature);
 

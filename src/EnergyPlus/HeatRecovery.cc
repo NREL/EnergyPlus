@@ -108,10 +108,10 @@ namespace HeatRecovery {
         "NONE", "EXHAUSTONLY", "EXHAUSTAIRRECIRCULATION", "MINIMUMEXHAUSTTEMPERATURE"};
 
     void SimHeatRecovery(EnergyPlusData &state,
-                         std::string_view CompName,               // name of the heat exchanger unit
-                         bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
-                         int &CompIndex,                          // Pointer to Component
-                         int const FanOpMode,                     // Supply air fan operating mode
+                         std::string_view CompName,                          // name of the heat exchanger unit
+                         bool const FirstHVACIteration,                      // TRUE if 1st HVAC simulation of system timestep
+                         int &CompIndex,                                     // Pointer to Component
+                         int const FanOpMode,                                // Supply air fan operating mode
                          ObjexxFCL::Optional<Real64 const> HXPartLoadRatio,  // Part load ratio requested of DX compressor
                          ObjexxFCL::Optional_bool_const HXUnitEnable,        // Flag to operate heat exchanger
                          ObjexxFCL::Optional_int_const CompanionCoilIndex,   // index of companion cooling coil
@@ -1683,10 +1683,11 @@ namespace HeatRecovery {
         }
     }
 
-    void HeatExchCond::CalcAirToAirPlateHeatExch(EnergyPlusData &state,
-                                                 bool const HXUnitOn,                // flag to simulate heat exchager heat recovery
-                                                 ObjexxFCL::Optional_bool_const EconomizerFlag, // economizer flag pass by air loop or OA sys
-                                                 ObjexxFCL::Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
+    void
+    HeatExchCond::CalcAirToAirPlateHeatExch(EnergyPlusData &state,
+                                            bool const HXUnitOn,                           // flag to simulate heat exchager heat recovery
+                                            ObjexxFCL::Optional_bool_const EconomizerFlag, // economizer flag pass by air loop or OA sys
+                                            ObjexxFCL::Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
     )
     {
 
@@ -1861,13 +1862,14 @@ namespace HeatRecovery {
         this->ElecUseRate = ElecCons;
     }
 
-    void HeatExchCond::CalcAirToAirGenericHeatExch(EnergyPlusData &state,
-                                                   bool const HXUnitOn,                   // flag to simulate heat exchanger heat recovery
-                                                   bool const FirstHVACIteration,         // first HVAC iteration flag
-                                                   int const FanOpMode,                   // Supply air fan operating mode (1=cycling, 2=constant)
-                                                   ObjexxFCL::Optional_bool_const EconomizerFlag,    // economizer flag pass by air loop or OA sys
-                                                   ObjexxFCL::Optional_bool_const HighHumCtrlFlag,   // high humidity control flag passed by airloop or OA sys
-                                                   ObjexxFCL::Optional<Real64 const> HXPartLoadRatio //
+    void HeatExchCond::CalcAirToAirGenericHeatExch(
+        EnergyPlusData &state,
+        bool const HXUnitOn,                              // flag to simulate heat exchanger heat recovery
+        bool const FirstHVACIteration,                    // first HVAC iteration flag
+        int const FanOpMode,                              // Supply air fan operating mode (1=cycling, 2=constant)
+        ObjexxFCL::Optional_bool_const EconomizerFlag,    // economizer flag pass by air loop or OA sys
+        ObjexxFCL::Optional_bool_const HighHumCtrlFlag,   // high humidity control flag passed by airloop or OA sys
+        ObjexxFCL::Optional<Real64 const> HXPartLoadRatio //
     )
     {
 
@@ -2148,7 +2150,7 @@ namespace HeatRecovery {
             //   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
             if (this->ControlToTemperatureSetPoint) {
                 if ((this->SupInTemp - this->SupOutTemp) != 0.0) {
-                    if ((this->SupInTemp < HXTempSetPoint && this->SupOutTemp > HXTempSetPoint) ||
+                    if ((this->SupInTemp<HXTempSetPoint &&this->SupOutTemp> HXTempSetPoint) ||
                         (this->SupInTemp > HXTempSetPoint && this->SupOutTemp < HXTempSetPoint)) {
                         ControlFraction = max(0.0, min(1.0, std::abs((this->SupInTemp - HXTempSetPoint) / (this->SupInTemp - this->SupOutTemp))));
                     } else if ((this->SupInTemp < this->SupOutTemp && this->SupOutTemp < HXTempSetPoint) ||
@@ -2387,12 +2389,12 @@ namespace HeatRecovery {
 
     void HeatExchCond::CalcDesiccantBalancedHeatExch(
         EnergyPlusData &state,
-        bool const HXUnitOn,                // flag to simulate heat exchager heat recovery
-        bool const FirstHVACIteration,      // First HVAC iteration flag
-        int const FanOpMode,                // Supply air fan operating mode (1=cycling, 2=constant)
-        Real64 const PartLoadRatio,         // Part load ratio requested of DX compressor
-        int const CompanionCoilIndex,       // index of companion cooling coil
-        bool const RegenInletIsOANode,      // Flag to determine if regen side inlet is OANode, if so this air stream cycles
+        bool const HXUnitOn,                           // flag to simulate heat exchager heat recovery
+        bool const FirstHVACIteration,                 // First HVAC iteration flag
+        int const FanOpMode,                           // Supply air fan operating mode (1=cycling, 2=constant)
+        Real64 const PartLoadRatio,                    // Part load ratio requested of DX compressor
+        int const CompanionCoilIndex,                  // index of companion cooling coil
+        bool const RegenInletIsOANode,                 // Flag to determine if regen side inlet is OANode, if so this air stream cycles
         ObjexxFCL::Optional_bool_const EconomizerFlag, // economizer flag pass by air loop or OA sys
         ObjexxFCL::Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
     )
@@ -4976,9 +4978,9 @@ namespace HeatRecovery {
     }
 
     void SetHeatExchangerData(EnergyPlusData &state,
-                              int const HXNum,                     // Index of HX
-                              bool &ErrorsFound,                   // Set to true if certain errors found
-                              std::string const &HXName,           // Name of HX
+                              int const HXNum,                                // Index of HX
+                              bool &ErrorsFound,                              // Set to true if certain errors found
+                              std::string const &HXName,                      // Name of HX
                               ObjexxFCL::Optional<Real64> SupplyAirVolFlow,   // HX supply air flow rate    [m3/s]
                               ObjexxFCL::Optional<Real64> SecondaryAirVolFlow // HX secondary air flow rate [m3/s]
     )

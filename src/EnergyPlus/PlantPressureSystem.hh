@@ -68,7 +68,7 @@ namespace PlantPressureSystem {
         bool FirstHVACIteration,                                                        // System flag
         DataPlant::PressureCall CallType,                                               // Enumerated call type
         DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid, // Loop side num for specific branch simulation
-        ObjexxFCL::Optional_int_const BranchNum = _                                                // Branch num for specific branch simulation
+        ObjexxFCL::Optional_int_const BranchNum = _                                     // Branch num for specific branch simulation
     );
 
     void InitPressureDrop(EnergyPlusData &state, int LoopNum, bool FirstHVACIteration);

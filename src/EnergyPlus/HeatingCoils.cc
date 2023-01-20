@@ -3702,8 +3702,8 @@ namespace HeatingCoils {
     }
 
     void SetHeatingCoilData(EnergyPlusData &state,
-                            int const CoilNum,                       // Number of electric or gas heating Coil
-                            bool &ErrorsFound,                       // Set to true if certain errors found
+                            int const CoilNum,                                  // Number of electric or gas heating Coil
+                            bool &ErrorsFound,                                  // Set to true if certain errors found
                             ObjexxFCL::Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
                             ObjexxFCL::Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this coil is used
     )

@@ -1627,11 +1627,11 @@ namespace SolarCollectors {
     }
 
     void CollectorData::CalcTransRefAbsOfCover(EnergyPlusData &state,
-                                               Real64 const IncidentAngle,    // Angle of incidence (radians)
-                                               Real64 &TransSys,              // cover system solar transmittance
-                                               Real64 &ReflSys,               // cover system solar reflectance
-                                               Real64 &AbsCover1,             // Inner cover solar absorbtance
-                                               Real64 &AbsCover2,             // Outer cover solar absorbtance
+                                               Real64 const IncidentAngle,               // Angle of incidence (radians)
+                                               Real64 &TransSys,                         // cover system solar transmittance
+                                               Real64 &ReflSys,                          // cover system solar reflectance
+                                               Real64 &AbsCover1,                        // Inner cover solar absorbtance
+                                               Real64 &AbsCover2,                        // Outer cover solar absorbtance
                                                ObjexxFCL::Optional_bool_const InOUTFlag, // flag for calc. diffuse solar refl of cover from inside out
                                                ObjexxFCL::Optional<Real64> RefSysDiffuse // cover system solar reflectance from inner to outer cover
     ) const

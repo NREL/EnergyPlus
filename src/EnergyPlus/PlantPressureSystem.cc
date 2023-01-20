@@ -101,7 +101,7 @@ void SimPressureDropSystem(EnergyPlusData &state,
                            bool const FirstHVACIteration,           // System flag
                            DataPlant::PressureCall const CallType,  // Enumerated call type
                            DataPlant::LoopSideLocation LoopSideNum, // Loop side num for specific branch simulation
-                           ObjexxFCL::Optional_int_const BranchNum             // Branch num for specific branch simulation
+                           ObjexxFCL::Optional_int_const BranchNum  // Branch num for specific branch simulation
 )
 {
 

@@ -2879,8 +2879,11 @@ namespace ScheduleManager {
         return GetDayScheduleIndex;
     }
 
-    void GetScheduleValuesForDay(
-        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, ObjexxFCL::Optional_int_const JDay, ObjexxFCL::Optional_int_const CurDayofWeek)
+    void GetScheduleValuesForDay(EnergyPlusData &state,
+                                 int const ScheduleIndex,
+                                 Array2S<Real64> DayValues,
+                                 ObjexxFCL::Optional_int_const JDay,
+                                 ObjexxFCL::Optional_int_const CurDayofWeek)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie

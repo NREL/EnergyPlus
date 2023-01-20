@@ -6211,7 +6211,7 @@ void GetATMixer(EnergyPlusData &state,
 }
 
 void SetATMixerPriFlow(EnergyPlusData &state,
-                       int const ATMixerNum,                     // Air terminal mixer index
+                       int const ATMixerNum,                                // Air terminal mixer index
                        ObjexxFCL::Optional<Real64 const> PriAirMassFlowRate // Air terminal mixer primary air mass flow rate [kg/s]
 )
 {

@@ -108,7 +108,9 @@ namespace InternalHeatGains {
 
     void CheckLightsReplaceableMinMaxForZone(EnergyPlusData &state, int const WhichZone); // Zone Number
 
-    void UpdateInternalGainValues(EnergyPlusData &state, ObjexxFCL::Optional_bool_const SuppressRadiationUpdate = _, ObjexxFCL::Optional_bool_const SumLatentGains = _);
+    void UpdateInternalGainValues(EnergyPlusData &state,
+                                  ObjexxFCL::Optional_bool_const SuppressRadiationUpdate = _,
+                                  ObjexxFCL::Optional_bool_const SumLatentGains = _);
 
     Real64 zoneSumAllInternalConvectionGains(EnergyPlusData &state,
                                              int const zoneNum); // zone index pointer to sum gains for

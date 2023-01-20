@@ -2593,9 +2593,9 @@ void GetFanType(EnergyPlusData &state,
 }
 
 Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
-                                  std::string_view FanType,   // must match fan types in this module
-                                  std::string_view FanName,   // must match fan names for the fan type
-                                  bool &ErrorsFound,          // set to true if problem
+                                  std::string_view FanType,              // must match fan types in this module
+                                  std::string_view FanName,              // must match fan names for the fan type
+                                  bool &ErrorsFound,                     // set to true if problem
                                   ObjexxFCL::Optional_int_const FanIndex // index to fan
 )
 {
@@ -2802,9 +2802,9 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
 }
 
 int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
-                               std::string &FanType, // must match fan types in this module (set if nonzero index passed)
-                               std::string &FanName, // must match fan names for the fan type (set if nonzero index passed)
-                               ObjexxFCL::Optional_int IndexIn  // optional fan index if fan type and name are unknown or index needs setting
+                               std::string &FanType,           // must match fan types in this module (set if nonzero index passed)
+                               std::string &FanName,           // must match fan names for the fan type (set if nonzero index passed)
+                               ObjexxFCL::Optional_int IndexIn // optional fan index if fan type and name are unknown or index needs setting
 )
 {
 
@@ -2857,9 +2857,9 @@ int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
 }
 
 void SetFanData(EnergyPlusData &state,
-                int const FanNum,                     // Index of fan
-                bool &ErrorsFound,                    // Set to true if certain errors found
-                std::string const &FanName,           // Name of fan
+                int const FanNum,                                // Index of fan
+                bool &ErrorsFound,                               // Set to true if certain errors found
+                std::string const &FanName,                      // Name of fan
                 ObjexxFCL::Optional<Real64 const> MaxAirVolFlow, // Fan air volumetric flow rate    [m3/s]
                 ObjexxFCL::Optional<Real64 const> MinAirVolFlow  // Fan air volumetric flow rate    [m3/s]
 )

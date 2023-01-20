@@ -3275,9 +3275,9 @@ namespace DesiccantDehumidifiers {
     }
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
-                               int const DesicDehumNum,          // Desiccant dehumidifier unit index
-                               bool const FirstHVACIteration,    // flag for first HVAC iteration in the time step
-                               Real64 const RegenCoilLoad,       // heating coil load to be met (Watts)
+                               int const DesicDehumNum,                     // Desiccant dehumidifier unit index
+                               bool const FirstHVACIteration,               // flag for first HVAC iteration in the time step
+                               Real64 const RegenCoilLoad,                  // heating coil load to be met (Watts)
                                ObjexxFCL::Optional<Real64> RegenCoilLoadmet // heating load met
     )
     {

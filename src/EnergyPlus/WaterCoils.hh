@@ -512,8 +512,8 @@ namespace WaterCoils {
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
     void SetWaterCoilData(EnergyPlusData &state,
-                          int const CoilNum,                           // index of hot water heating Coil
-                          bool &ErrorsFound,                           // Set to true if certain errors found
+                          int const CoilNum,                                      // index of hot water heating Coil
+                          bool &ErrorsFound,                                      // Set to true if certain errors found
                           ObjexxFCL::Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
                           ObjexxFCL::Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
                           ObjexxFCL::Optional_bool heatRecoveryCoil = _           // true if water coil is connected to heat recovery loop

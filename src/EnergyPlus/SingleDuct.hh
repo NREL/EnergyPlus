@@ -362,7 +362,7 @@ namespace SingleDuct {
     );
 
     void SetATMixerPriFlow(EnergyPlusData &state,
-                           int ATMixerNum,                               // Air terminal mixer index
+                           int ATMixerNum,                                          // Air terminal mixer index
                            ObjexxFCL::Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
     );
 

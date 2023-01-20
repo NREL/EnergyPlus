@@ -578,13 +578,13 @@ namespace WindowEquivalentLayer {
                     Real64 &U           // returned: U factor, W/m2-K
     );
 
-    void ASHWAT_Solar(int const NL,                          // # of layers
-                      Array1S<CFSSWP> const LSWP_ON,         // layer SW (solar) properties (off-normal adjusted)
-                      CFSSWP const &SWP_ROOM,                // effective SW (solar) properties of room
-                      Real64 const IBEAM,                    // incident beam insolation (W/m2 aperture)
-                      Real64 const IDIFF,                    // incident diffuse insolation (W/m2 aperture)
-                      Real64 const ILIGHTS,                  // incident diffuse insolation (W/m2 aperture)
-                      Array1S<Real64> SOURCE,                // returned: layer-by-layer flux of absorbed
+    void ASHWAT_Solar(int const NL,                                     // # of layers
+                      Array1S<CFSSWP> const LSWP_ON,                    // layer SW (solar) properties (off-normal adjusted)
+                      CFSSWP const &SWP_ROOM,                           // effective SW (solar) properties of room
+                      Real64 const IBEAM,                               // incident beam insolation (W/m2 aperture)
+                      Real64 const IDIFF,                               // incident diffuse insolation (W/m2 aperture)
+                      Real64 const ILIGHTS,                             // incident diffuse insolation (W/m2 aperture)
+                      Array1S<Real64> SOURCE,                           // returned: layer-by-layer flux of absorbed
                       ObjexxFCL::Optional<Array1S<Real64>> SourceBD = _ // returned: layer-by-layer flux of absorbed
     );
 
@@ -641,8 +641,8 @@ namespace WindowEquivalentLayer {
     );
 
     bool RB_SWP(EnergyPlusData &state,
-                CFSLAYER const &L,               // RB layer
-                CFSSWP &LSWP,                    // returned: equivalent layer properties set
+                CFSLAYER const &L,                          // RB layer
+                CFSSWP &LSWP,                               // returned: equivalent layer properties set
                 ObjexxFCL::Optional<Real64 const> THETA = _ // incident angle, 0 <= theta <= PI/2
     );
 
@@ -651,8 +651,8 @@ namespace WindowEquivalentLayer {
     );
 
     bool IS_SWP(EnergyPlusData &state,
-                CFSLAYER const &L,               // PD layer
-                CFSSWP &LSWP,                    // returned: equivalent layer properties set
+                CFSLAYER const &L,                          // PD layer
+                CFSSWP &LSWP,                               // returned: equivalent layer properties set
                 ObjexxFCL::Optional<Real64 const> THETA = _ // incident angle, 0 <= theta <= PI/2
     );
 
@@ -664,8 +664,8 @@ namespace WindowEquivalentLayer {
     );
 
     bool PD_SWP(EnergyPlusData &state,
-                CFSLAYER const &L,                    // PD layer
-                CFSSWP &LSWP,                         // returned: equivalent layer properties set
+                CFSLAYER const &L,                               // PD layer
+                CFSSWP &LSWP,                                    // returned: equivalent layer properties set
                 ObjexxFCL::Optional<Real64 const> OHM_V_RAD = _, // vertical VB profile angles, radians
                 ObjexxFCL::Optional<Real64 const> OHM_H_RAD = _  // horizonatl VB profile angles, radians
     );
@@ -676,8 +676,8 @@ namespace WindowEquivalentLayer {
     );
 
     bool VB_SWP(EnergyPlusData &state,
-                CFSLAYER const &L,               // VB layer
-                CFSSWP &LSWP,                    // returned: equivalent off-normal properties
+                CFSLAYER const &L,                          // VB layer
+                CFSSWP &LSWP,                               // returned: equivalent off-normal properties
                 ObjexxFCL::Optional<Real64 const> OMEGA = _ // incident profile angle (radians)
     );
 
@@ -707,9 +707,9 @@ namespace WindowEquivalentLayer {
     bool IsVBLayer(CFSLAYER const &L);
 
     void BuildGap(EnergyPlusData &state,
-                  CFSGAP &G,                        // returned
-                  int const GType,                  // gap type (gtyOPENin, gtyOPENout or gtySEALED)
-                  Real64 &TAS,                      // gap thickness, m
+                  CFSGAP &G,                                   // returned
+                  int const GType,                             // gap type (gtyOPENin, gtyOPENout or gtySEALED)
+                  Real64 &TAS,                                 // gap thickness, m
                   ObjexxFCL::Optional<Real64 const> xTMan = _, // re density calc -- temp (C) and pressure (Pa)
                   ObjexxFCL::Optional<Real64 const> xPMan = _  // re density calc -- temp (C) and pressure (Pa)
     );

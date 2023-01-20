@@ -165,7 +165,7 @@ namespace HysteresisPhaseChange {
                     phaseChangeState = PhaseChangeStates::FREEZING;
                     this->enthNew =
                         this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
-                } else if (this->enthNew < this->enthalpyF && this->enthNew > this->enthalpyM) {
+                } else if (this->enthNew<this->enthalpyF &&this->enthNew> this->enthalpyM) {
                     phaseChangeState = PhaseChangeStates::TRANSITION;
                     this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthOld - (this->specHeatTransition * prevTempTD));
                 } else if (this->enthNew < this->enthalpyF && updatedTempTDT > phaseChangeTempReverse) {
@@ -191,11 +191,11 @@ namespace HysteresisPhaseChange {
                 this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthOld - (this->specHeatTransition * prevTempTD));
                 this->enthalpyM = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 this->enthalpyF = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
-                if (updatedTempTDT < phaseChangeTempReverse && this->enthNew > this->enthalpyF) {
+                if (updatedTempTDT<phaseChangeTempReverse &&this->enthNew> this->enthalpyF) {
                     phaseChangeState = PhaseChangeStates::FREEZING;
                     this->enthNew =
                         this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
-                } else if (this->enthNew < this->enthalpyF && this->enthNew > this->enthalpyM &&
+                } else if (this->enthNew<this->enthalpyF &&this->enthNew> this->enthalpyM &&
                            (updatedTempTDT < prevTempTD || updatedTempTDT > prevTempTD)) {
                     phaseChangeState = PhaseChangeStates::TRANSITION;
                     this->enthNew =
@@ -211,7 +211,7 @@ namespace HysteresisPhaseChange {
                 this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
                 this->enthalpyM = this->getEnthalpy(updatedTempTDT, this->peakTempMelting, this->deltaTempMeltingLow, this->deltaTempMeltingHigh);
                 this->enthalpyF = this->getEnthalpy(updatedTempTDT, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh);
-                if (this->enthNew < this->enthalpyF && this->enthNew > this->enthalpyM) {
+                if (this->enthNew<this->enthalpyF &&this->enthNew> this->enthalpyM) {
                     phaseChangeState = PhaseChangeStates::TRANSITION;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));
@@ -226,7 +226,7 @@ namespace HysteresisPhaseChange {
                 if (this->enthNew < this->enthOld && updatedTempTDT < prevTempTD) {
                     phaseChangeState = PhaseChangeStates::TRANSITION;
                     this->enthNew = (this->specHeatTransition * updatedTempTDT) + (this->enthOld - (this->specHeatTransition * prevTempTD));
-                } else if (this->enthNew < this->enthalpyF && this->enthNew > this->enthalpyM && updatedTempTDT < prevTempTD) {
+                } else if (this->enthNew<this->enthalpyF &&this->enthNew> this->enthalpyM && updatedTempTDT < prevTempTD) {
                     phaseChangeState = PhaseChangeStates::TRANSITION;
                     this->enthNew =
                         (this->specHeatTransition * updatedTempTDT) + (this->enthRev - (this->specHeatTransition * phaseChangeTempReverse));

@@ -193,11 +193,11 @@ namespace PlantUtilities {
     void ShowBranchesOnLoop(EnergyPlusData &state, int LoopNum); // Loop number of loop
 
     int MyPlantSizingIndex(EnergyPlusData &state,
-                           std::string const &CompType,          // component description
-                           std::string_view CompName,            // user name of component
-                           int NodeNumIn,                        // component water inlet node
-                           int NodeNumOut,                       // component water outlet node
-                           bool &ErrorsFound,                    // set to true if there's an error
+                           std::string const &CompType,                     // component description
+                           std::string_view CompName,                       // user name of component
+                           int NodeNumIn,                                   // component water inlet node
+                           int NodeNumOut,                                  // component water outlet node
+                           bool &ErrorsFound,                               // set to true if there's an error
                            ObjexxFCL::Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
     );
 

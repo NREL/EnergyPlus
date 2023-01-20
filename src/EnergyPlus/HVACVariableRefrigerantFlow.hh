@@ -797,12 +797,12 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         void CalcVRF_FluidTCtrl(EnergyPlusData &state,
-                                int VRFTUNum,                          // Index to VRF terminal unit
-                                bool FirstHVACIteration,               // flag for 1st HVAC iteration in the time step
-                                Real64 PartLoadRatio,                  // compressor part load fraction
-                                Real64 &LoadMet,                       // load met by unit (W)
-                                Real64 &OnOffAirFlowRatio,             // ratio of ON air flow to average air flow
-                                Real64 &SuppHeatCoilLoad,              // supplemental heating coil load (W)
+                                int VRFTUNum,                                     // Index to VRF terminal unit
+                                bool FirstHVACIteration,                          // flag for 1st HVAC iteration in the time step
+                                Real64 PartLoadRatio,                             // compressor part load fraction
+                                Real64 &LoadMet,                                  // load met by unit (W)
+                                Real64 &OnOffAirFlowRatio,                        // ratio of ON air flow to average air flow
+                                Real64 &SuppHeatCoilLoad,                         // supplemental heating coil load (W)
                                 ObjexxFCL::Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
         );
 
@@ -833,12 +833,12 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         void CalcVRF(EnergyPlusData &state,
-                     int const VRFTUNum,                    // Unit index in VRF terminal unit array
-                     bool const FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
-                     Real64 const PartLoadRatio,            // compressor part load fraction
-                     Real64 &LoadMet,                       // load met by unit (W)
-                     Real64 &OnOffAirFlowRatio,             // ratio of ON air flow to average air flow
-                     Real64 &SuppHeatCoilLoad,              // supplemental heating coil load (W)
+                     int const VRFTUNum,                               // Unit index in VRF terminal unit array
+                     bool const FirstHVACIteration,                    // flag for 1st HVAC iteration in the time step
+                     Real64 const PartLoadRatio,                       // compressor part load fraction
+                     Real64 &LoadMet,                                  // load met by unit (W)
+                     Real64 &OnOffAirFlowRatio,                        // ratio of ON air flow to average air flow
+                     Real64 &SuppHeatCoilLoad,                         // supplemental heating coil load (W)
                      ObjexxFCL::Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
         );
 
