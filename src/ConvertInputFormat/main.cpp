@@ -72,7 +72,7 @@ enum class OutputTypes
     BSON
 };
 
-template <typename... Args> void displayMessage(std::string_view str_format, Args &&...args)
+template <typename... Args> void displayMessage(std::string_view str_format, Args &&... args)
 {
     fmt::print(std::cout, str_format, args...);
     std::cout.write("\n", 1);
