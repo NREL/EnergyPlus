@@ -3867,6 +3867,7 @@ namespace LowTempRadiantSystem {
                 // system as a function of the water inlet temperature (flow rate is also in there
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
                 ConstrNum = Surface(SurfNum).Construction;
+                auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
 
                 if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
 
@@ -3879,9 +3880,9 @@ namespace LowTempRadiantSystem {
                     Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                    Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
-                    Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
-                    Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
+                    Ch = thisConstruct.CTFTSourceQ(0);
+                    Ci = thisConstruct.CTFTSourceIn(0);
+                    Cj = thisConstruct.CTFTSourceOut(0);
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -4070,6 +4071,8 @@ namespace LowTempRadiantSystem {
                                                                      this->DesignObjectPtr,
                                                                      typeOfRadiantSystem);
 
+                            ConstrNum = Surface(SurfNum).Construction;
+                            auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
                             if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
                                 Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
@@ -4079,9 +4082,9 @@ namespace LowTempRadiantSystem {
                                 Ce = state.dataHeatBalFanSys->RadSysToHBTinCoef(SurfNum);
                                 Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
                                 Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                                Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
-                                Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
-                                Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
+                                Ch = thisConstruct.CTFTSourceQ(0);
+                                Ci = thisConstruct.CTFTSourceIn(0);
+                                Cj = thisConstruct.CTFTSourceOut(0);
                                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
@@ -4884,6 +4887,7 @@ namespace LowTempRadiantSystem {
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
 
                 ConstrNum = Surface(SurfNum).Construction;
+                auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
 
                 Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                 Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -4894,9 +4898,9 @@ namespace LowTempRadiantSystem {
                 Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                 Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
-                Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
-                Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
+                Ch = thisConstruct.CTFTSourceQ(0);
+                Ci = thisConstruct.CTFTSourceIn(0);
+                Cj = thisConstruct.CTFTSourceOut(0);
 
                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));

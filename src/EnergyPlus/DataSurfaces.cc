@@ -531,7 +531,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.EnclIndex = SolarEnclIndex;
     calcHashKey.TAirRef = state.dataSurface->SurfTAirRef(SurfNum);
 
-    auto extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+    int extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
     if (extBoundCond > 0) {
         calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
         calcHashKey.ExtEnclIndex = state.dataSurface->Surface(extBoundCond).SolarEnclIndex;

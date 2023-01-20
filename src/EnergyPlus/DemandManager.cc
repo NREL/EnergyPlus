@@ -340,7 +340,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     int IOStat;    // IO Status when calling get input subroutine
     bool ErrorsFound(false);
 
-    std::string cCurrentModuleObject = "DemandManagerAssignmentList";
+    constexpr std::string_view cCurrentModuleObject = "DemandManagerAssignmentList";
     state.dataDemandManager->NumDemandManagerList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataDemandManager->NumDemandManagerList > 0) {

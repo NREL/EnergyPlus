@@ -881,9 +881,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber !=
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
-
-            if (BITF_TEST_ANY(BITF(state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType),
-                              BITF(DataLoopNode::ConnectionType::Actuator) | BITF(DataLoopNode::ConnectionType::Sensor))) {
+            if ((state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::Actuator) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::Sensor)) {
                 continue;
             }
 
@@ -913,9 +912,9 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
 
-            if (BITF_TEST_ANY(BITF(state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType),
-                              BITF(DataLoopNode::ConnectionType::Actuator) | BITF(DataLoopNode::ConnectionType::Sensor) |
-                                  BITF(DataLoopNode::ConnectionType::OutsideAir))) {
+            if ((state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::Actuator) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::Sensor) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::OutsideAir)) {
                 continue;
             }
 
@@ -948,8 +947,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber !=
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
-            if (BITF_TEST_ANY(BITF(state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType),
-                              BITF(DataLoopNode::ConnectionType::SetPoint) | BITF(DataLoopNode::ConnectionType::OutsideAir))) {
+            if ((state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::SetPoint) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::OutsideAir)) {
                 continue;
             }
 
@@ -1082,10 +1081,13 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber !=
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
-            if (BITF_TEST_ANY(BITF(state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType),
-                              BITF(DataLoopNode::ConnectionType::Outlet) | BITF(DataLoopNode::ConnectionType::ZoneReturn) |
-                                  BITF(DataLoopNode::ConnectionType::ZoneExhaust) | BITF(DataLoopNode::ConnectionType::InducedAir) |
-                                  BITF(DataLoopNode::ConnectionType::ReliefAir) | BITF(DataLoopNode::ConnectionType::OutsideAir))) {
+
+            if ((state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::Outlet) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::ZoneReturn) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::ZoneExhaust) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::InducedAir) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::ReliefAir) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::OutsideAir)) {
                 MatchedAtLeastOne = true;
                 continue;
             }
@@ -1301,9 +1303,9 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName ==
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeName) {
 
-                if (BITF_TEST_ANY(BITF(state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType),
-                                  BITF(DataLoopNode::ConnectionType::Sensor) | BITF(DataLoopNode::ConnectionType::Actuator) |
-                                      BITF(DataLoopNode::ConnectionType::SetPoint))) {
+                if ((state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::Actuator) ||
+                    (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::Sensor) ||
+                    (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == DataLoopNode::ConnectionType::SetPoint)) {
                     continue;
                 }
 
@@ -2081,11 +2083,11 @@ void TestInletOutletNodes(EnergyPlusData &state)
 }
 
 void TestCompSet(EnergyPlusData &state,
-                 std::string const &CompType,   // Component Type
-                 std::string_view CompName,     // Component Name
-                 std::string const &InletNode,  // Inlet Node Name
-                 std::string const &OutletNode, // Outlet Node Name
-                 std::string const &Description // Description of Node Pair (for warning message)
+                 std::string_view const CompType, // Component Type
+                 std::string_view CompName,       // Component Name
+                 std::string const &InletNode,    // Inlet Node Name
+                 std::string const &OutletNode,   // Outlet Node Name
+                 std::string const &Description   // Description of Node Pair (for warning message)
 )
 {
 

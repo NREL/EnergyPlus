@@ -1419,7 +1419,7 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
         for (auto const &obj : object.value()) {
             auto const &find_extensions = obj.find(extension_key);
             if (find_extensions != obj.end()) {
-                auto const size = find_extensions.value().size();
+                size_t const size = find_extensions.value().size();
                 if (size > max_size) max_size = size;
             }
         }
@@ -1501,7 +1501,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
 
     for (auto const &obj : *objects) {
         if (obj.find(extension_key) != obj.end()) {
-            auto const size = obj[extension_key].size();
+            size_t const size = obj[extension_key].size();
             if (size > max_size) max_size = size;
         }
     }
