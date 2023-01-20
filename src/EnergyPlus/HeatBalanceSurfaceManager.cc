@@ -4554,16 +4554,19 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
         auto *thisMaterial = state.dataMaterial->Material(MaterNum);
         if (thisMaterial->AbsorpSolarEMSOverrideOn) {
             thisMaterial->AbsorpSolar = max(min(thisMaterial->AbsorpSolarEMSOverride, 0.9999), 0.0001);
+            thisMaterial->AbsorpSolar = std::clamp(thisMaterial->AbsorpSolarEMSOverride, 0.0001, 0.9999);
         } else {
             thisMaterial->AbsorpSolar = thisMaterial->AbsorpSolarInput;
         }
         if (thisMaterial->AbsorpThermalEMSOverrideOn) {
             thisMaterial->AbsorpThermal = max(min(thisMaterial->AbsorpThermalEMSOverride, 0.9999), 0.0001);
+            thisMaterial->AbsorpThermal = std::clamp(thisMaterial->AbsorpThermalEMSOverride, 0.0001, 0.9999);
         } else {
             thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalInput;
         }
         if (thisMaterial->AbsorpVisibleEMSOverrideOn) {
             thisMaterial->AbsorpVisible = max(min(thisMaterial->AbsorpVisibleEMSOverride, 0.9999), 0.0001);
+            thisMaterial->AbsorpVisible = std::clamp(thisMaterial->AbsorpVisibleEMSOverride, 0.0001, 0.9999);
         } else {
             thisMaterial->AbsorpVisible = thisMaterial->AbsorpVisibleInput;
         }

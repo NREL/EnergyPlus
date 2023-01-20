@@ -3068,7 +3068,7 @@ namespace FanCoilUnits {
             }
 
             MinSAMassFlowRate =
-                min(max(OAMassFlow, FanCoil(FanCoilNum).MaxAirMassFlow * FanCoil(FanCoilNum).LowSpeedRatio), FanCoil(FanCoilNum).MaxAirMassFlow);
+                std::clamp(OAMassFlow, FanCoil(FanCoilNum).MaxAirMassFlow * FanCoil(FanCoilNum).LowSpeedRatio, FanCoil(FanCoilNum).MaxAirMassFlow);
             MaxSAMassFlowRate = FanCoil(FanCoilNum).MaxAirMassFlow;
             state.dataFanCoilUnits->HeatingLoad = false;
             state.dataFanCoilUnits->CoolingLoad = false;

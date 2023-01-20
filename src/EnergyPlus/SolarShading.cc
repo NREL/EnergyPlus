@@ -9927,7 +9927,7 @@ void WindowShadingManager(EnergyPlusData &state)
                                                          state.dataSurface->SurfWinProfileAng(ISurf));
                         ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
                         if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-                            ProfAng = min(max(ProfAng, -DataGlobalConstants::PiOvr2), DataGlobalConstants::PiOvr2);
+                            ProfAng = std::clamp(ProfAng, -DataGlobalConstants::PiOvr2, DataGlobalConstants::PiOvr2);
                         }
                         int ProfAngIndex = int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1;
                         state.dataSurface->SurfWinProfAngIndex(ISurf) = ProfAngIndex;
@@ -10072,7 +10072,7 @@ void WindowShadingManager(EnergyPlusData &state)
                         // Calculate blind interpolation factors and indices.
                         if (state.dataSurface->SurfWinMovableSlats(ISurf)) {
                             if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
-                                SlatAng = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
+                                SlatAng = std::clamp(SlatAng, 0.0, DataGlobalConstants::Pi);
                             }
                             Real64 SlatsAngIndex = 1 + int(SlatAng * DeltaAng_inv);
                             state.dataSurface->SurfWinSlatsAngIndex(ISurf) = SlatsAngIndex;
@@ -11628,8 +11628,8 @@ void ComputeWinShadeAbsorpFactors(EnergyPlusData &state)
                         }
                         AbsorpEff = state.dataMaterial->Material(MatNumSh)->AbsorpSolar /
                                     (state.dataMaterial->Material(MatNumSh)->AbsorpSolar + state.dataMaterial->Material(MatNumSh)->Trans + 0.0001);
-                        AbsorpEff = min(max(AbsorpEff, 0.0001),
-                                        0.999); // Constrain to avoid problems with following log eval
+                        AbsorpEff = std::clamp(AbsorpEff, 0.0001,
+                                               0.999); // Constrain to avoid problems with following log eval
                         state.dataSurface->SurfWinShadeAbsFacFace1(SurfNum) = (1.0 - std::exp(0.5 * std::log(1.0 - AbsorpEff))) / AbsorpEff;
                         state.dataSurface->SurfWinShadeAbsFacFace2(SurfNum) = 1.0 - state.dataSurface->SurfWinShadeAbsFacFace1(SurfNum);
                     }

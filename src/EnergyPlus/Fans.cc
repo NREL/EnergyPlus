@@ -1184,7 +1184,7 @@ void InitFan(EnergyPlusData &state,
     Fan(FanNum).MassFlowRateMaxAvail =
         min(state.dataLoopNodes->Node(OutletNode).MassFlowRateMax, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
     Fan(FanNum).MassFlowRateMinAvail =
-        min(max(state.dataLoopNodes->Node(OutletNode).MassFlowRateMin, state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail),
+        std::clamp(state.dataLoopNodes->Node(OutletNode).MassFlowRateMin, state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail,
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
 
     // Load the node data in this section for the component simulation

@@ -1295,7 +1295,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac);
     // apply model math
     MaxAirVolFlowRateDuringReheatDes =
-        min(max(MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate),
+        std::clamp(MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate,
             state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
     // EXPECT zone floor area == 0, others as calculated above
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea, 0.0);
@@ -1311,7 +1311,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         min(1.0, (state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac);
     MaxAirVolFlowRateDuringReheatDes =
-        min(max(MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate),
+        std::clamp(MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate,
             state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
 
     // EXPECT zone floor area > 0, others as calculated above

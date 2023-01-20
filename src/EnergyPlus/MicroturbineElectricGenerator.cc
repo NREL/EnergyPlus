@@ -1331,7 +1331,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         ++AncPowerCalcIterIndex; // Increment iteration loop counter
 
         //     Calculate operating power output (gross)
-        elecPowerGenerated = min(max(0.0, MyLoad + ancillaryPowerRate), FullLoadPowerOutput);
+        elecPowerGenerated = std::clamp(0.0, MyLoad + ancillaryPowerRate, FullLoadPowerOutput);
 
         //     Calculate PLR, but must be between the minPLR and maxPLR
         if (FullLoadPowerOutput > 0.0) {

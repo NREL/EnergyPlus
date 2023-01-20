@@ -1882,7 +1882,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                 PriAirMassFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow *
                                  (state.dataLoopNodes->Node(SecNode).Temp - MixTempNeeded) /
                                  max(SmallTempDiff, state.dataLoopNodes->Node(SecNode).Temp - state.dataLoopNodes->Node(PriNode).Temp);
-                PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
+                PriAirMassFlow = std::clamp(PriAirMassFlow, PriAirMassFlowMin, PriAirMassFlowMax);
             }
             SecAirMassFlow = max(0.0, state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirMassFlow - PriAirMassFlow);
         }
@@ -2189,7 +2189,7 @@ void CalcParallelPIU(EnergyPlusData &state,
             // CpAir*PriAirMassFlow*(Node(PriNode)%Temp - Node(ZoneNodeNum)%Temp) = QZnReq
             PriAirMassFlow =
                 QZnReq / (CpAirZn * min(-SmallTempDiff, (state.dataLoopNodes->Node(PriNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
-            PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
+            PriAirMassFlow = std::clamp(PriAirMassFlow, PriAirMassFlowMin, PriAirMassFlowMax);
             // check for fan on or off
             if ((PriAirMassFlow > state.dataPowerInductionUnits->PIU(PIUNum).FanOnAirMassFlow) && !ReheatRequired) {
                 SecAirMassFlow = 0.0; // Fan is off unless reheat is required; no secondary air; also reset fan flag
@@ -2202,7 +2202,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                     (QZnReq -
                      CpAirZn * SecAirMassFlow * (state.dataLoopNodes->Node(SecNode).Temp + FanDeltaTemp - state.dataLoopNodes->Node(ZoneNode).Temp)) /
                     (CpAirZn * min(-SmallTempDiff, (state.dataLoopNodes->Node(PriNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
-                PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
+                PriAirMassFlow = std::clamp(PriAirMassFlow, PriAirMassFlowMin, PriAirMassFlowMax);
                 SecAirMassFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirMassFlow;
             }
         }
