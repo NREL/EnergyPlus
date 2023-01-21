@@ -1221,7 +1221,6 @@ void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Messag
             state.dataGlobal->errorCallback(Error::Continue, m);
         }
     } else {
-        const auto m = format(" **   ~~~   ** {}", Message);
         const auto postfix = format("{}{}, at Simulation time={} {}",
                                     cEnvHeader,
                                     state.dataEnvrn->EnvironmentName,
@@ -1230,10 +1229,10 @@ void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Messag
         ShowErrorMessage(state, format(" **   ~~~   ** {}", Message));
         ShowErrorMessage(state, format(" **   ~~~   ** {}", postfix), OutUnit1, OutUnit2);
         if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(m);
+            state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(Message);
         }
         if (state.dataGlobal->errorCallback) {
-            state.dataGlobal->errorCallback(Error::Continue, m);
+            state.dataGlobal->errorCallback(Error::Continue, Message);
             state.dataGlobal->errorCallback(Error::Continue, postfix);
         }
     }
