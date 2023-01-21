@@ -1593,11 +1593,8 @@ namespace WindowComplexManager {
                 }
             }                   // back surf loop
             if (TotHits == 0) { // this should not happen--means a ray has gotten lost
-                //    CALL ShowWarningError(state, 'BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost')
-            } else {
-                KBkSurf = BSHit.KBkSurf;
-                JSurf = BSHit.HitSurf;
-                ++Geom.NSurfInt(KBkSurf);
+                //    CALL ShowWarningError(state, format("BSDF--Zone surfaces do not completely enclose zone--transmitted ray
+                //    lost{}{}{}{}{}{}{}{}{}{}{}", ), }, else, {, KBkSurf, =, BSHit.KBkSurf;, JSurf, =, BSHit.HitSurf;, Geom.NSurfInt(KBkSurf));
                 TmpSurfInt(Geom.NSurfInt(KBkSurf), KBkSurf) = IRay;
                 VecNorm = state.dataSurface->Surface(JSurf).OutNormVec;
                 TmpSjdotN(Geom.NSurfInt(KBkSurf), KBkSurf) = dot(Geom.sTrn(IRay), VecNorm);
@@ -3178,9 +3175,9 @@ namespace WindowComplexManager {
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
             ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
             if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
-                ShowContinueError(state, "surface name = " + state.dataSurface->Surface(SurfNum).Name);
+                ShowContinueError(state, format("surface name = {}", state.dataSurface->Surface(SurfNum).Name));
             }
-            ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowContinueError(state, format("construction name = {}", state.dataConstruction->Construct(ConstrNum).Name));
             ShowFatalError(state, "halting because of error in tarcog");
         } else if (CalcCondition == DataBSDFWindow::Condition::Winter) {
             state.dataHeatBal->NominalU(ConstrNum) = ufactor;

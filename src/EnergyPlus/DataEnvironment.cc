@@ -289,11 +289,11 @@ void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, 
 {
     // Using/Aliasing
 
-    ShowSevereError(state, "SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
+    ShowSevereError(state, format("SetOutBulbTempAt: {} Outdoor Temperatures < -100 C", Settings));
     ShowContinueError(state, format("...check {} Heights - Maximum {} Height=[{:.0R}].", Settings, Settings, max_height));
     if (max_height >= 20000.0) {
         ShowContinueError(state, "...according to your maximum Z height, your building is somewhere in the Stratosphere.");
-        ShowContinueError(state, "...look at " + Settings + " Name= " + SettingsName);
+        ShowContinueError(state, format("...look at {} Name= {}", Settings, SettingsName));
     }
     ShowFatalError(state, "Program terminates due to preceding condition(s).");
 }

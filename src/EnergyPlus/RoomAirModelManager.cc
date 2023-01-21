@@ -274,7 +274,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cUserDefinedControlObject;
         if (state.dataRoomAirMod->numTempDistContrldZones == 0) {
             if (state.dataRoomAirMod->NumAirTempPatterns != 0) { // user may have missed control object
-                ShowWarningError(state, "Missing " + cCurrentModuleObject + " object needed to use roomair temperature patterns");
+                ShowWarningError(state, format("Missing {} object needed to use roomair temperature patterns", cCurrentModuleObject));
                 // ErrorsFound = .TRUE.
             }
             return;
@@ -302,10 +302,9 @@ namespace RoomAirModelManager {
             // first get zone ID
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (ZoneNum == 0) { // throw error
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
-                    state, "Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                    state, format("Invalid-not found {}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
                 return; // halt to avoid hard crash
             }
@@ -319,11 +318,11 @@ namespace RoomAirModelManager {
             } else {
                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID == 0) {
-                    ShowSevereError(
-                        state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                    ShowContinueError(state,
-                                      "Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                          "\".");
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\", invalid data.", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(
+                        state,
+                        format("Invalid-not found {}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -332,10 +331,9 @@ namespace RoomAirModelManager {
                 state.dataIPShortCut->cAlphaArgs(4); // Schedule Name for Leading Pattern Control for this Zone
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).PatternSchedID = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).PatternSchedID == 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
-                    state, "Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
+                    state, format("Invalid-not found {}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 ErrorsFound = true;
             }
 
@@ -375,9 +373,8 @@ namespace RoomAirModelManager {
             if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::UserDefined) continue;
             if (state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).IsUsed) continue; // There is a Room Air Temperatures object for this zone
             ShowSevereError(state,
-                            std::string{RoutineName} + "AirModel for Zone=[" + state.dataHeatBal->Zone(ZoneNum).Name +
-                                "] is indicated as \"User Defined\".");
-            ShowContinueError(state, "...but missing a " + cCurrentModuleObject + " object for control.");
+                            format("{}AirModel for Zone=[{}] is indicated as \"User Defined\".", RoutineName, state.dataHeatBal->Zone(ZoneNum).Name));
+            ShowContinueError(state, format("...but missing a {} object for control.", cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -452,8 +449,8 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
                     DataRoomAirModel::UserDefinedPatternMode::SensibleHeating;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -467,7 +464,7 @@ namespace RoomAirModelManager {
             if (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient ==
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.LowGradient) {
                 ShowWarningError(state, format("Upper and lower gradients equal, use {} instead ", cTempPatternConstGradientObject));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
             if ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.UpperBoundTempScale ==
                  state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.LowerBoundTempScale) &&
@@ -478,7 +475,7 @@ namespace RoomAirModelManager {
                  (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
                   DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone))) {
                 // throw error, will cause divide by zero when used for scaling
-                ShowSevereError(state, "Error in temperature scale in " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Error in temperature scale in {}: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             if ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient ==
@@ -488,7 +485,7 @@ namespace RoomAirModelManager {
                  (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
                   DataRoomAirModel::UserDefinedPatternMode::SensibleHeating))) {
                 // throw error, will cause divide by zero when used for scaling
-                ShowSevereError(state, "Error in load scale in " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Error in load scale in {}: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -537,8 +534,8 @@ namespace RoomAirModelManager {
             for (i = 2; i <= NumPairs; ++i) {
                 if (state.dataRoomAirMod->RoomAirPattern(thisPattern).VertPatrn.ZetaPatrn(i) <
                     state.dataRoomAirMod->RoomAirPattern(thisPattern).VertPatrn.ZetaPatrn(i - 1)) {
-                    ShowSevereError(state,
-                                    "Zeta values not in increasing order in " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(
+                        state, format("Zeta values not in increasing order in {}: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -571,7 +568,8 @@ namespace RoomAirModelManager {
             NumPairs = NumNumbers - 4;
 
             if (NumPairs != (NumAlphas - 1)) {
-                ShowSevereError(state, "Error in number of entries in " + cCurrentModuleObject + " object: " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state,
+                                format("Error in number of entries in {} object: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             state.dataRoomAirMod->RoomAirPattern(thisPattern).MapPatrn.SurfName.allocate(NumPairs);
@@ -590,7 +588,8 @@ namespace RoomAirModelManager {
                 if (found != 0) {
                     state.dataRoomAirMod->RoomAirPattern(thisPattern).MapPatrn.SurfID(i) = found;
                 } else {
-                    ShowSevereError(state, "Surface name not found in " + cCurrentModuleObject + " object: " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state,
+                                    format("Surface name not found in {} object: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -683,8 +682,8 @@ namespace RoomAirModelManager {
 
         if (state.dataRoomAirMod->TotNumOfAirNodes <= 0) {
             // no air node object is found, terminate the program
-            ShowSevereError(state, "No " + cCurrentModuleObject + " objects found in input.");
-            ShowContinueError(state, "The OneNodeDisplacementVentilation model requires " + cCurrentModuleObject + " objects");
+            ShowSevereError(state, format("No {} objects found in input.", cCurrentModuleObject));
+            ShowContinueError(state, format("The OneNodeDisplacementVentilation model requires {} objects", cCurrentModuleObject));
             ErrorsFound = true;
             return;
         } else {
@@ -715,8 +714,8 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr =
                 UtilityRoutines::FindItemInList(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, state.dataHeatBal->Zone);
             if (state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             } else {
                 ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
@@ -743,8 +742,8 @@ namespace RoomAirModelManager {
                 } else if (nodeType == "RETURN") {
                     state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ReturnAir;
                 } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -764,11 +763,13 @@ namespace RoomAirModelManager {
                         nodeType == "REESROOM2" || nodeType == "REESROOM3" || nodeType == "REESROOM4") {
                         // terminate the program due to a severe error in the specified input
                         ShowSevereError(state,
-                                        "GetAirNodeData: " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\" invalid air node specification.");
-                        ShowContinueError(state,
-                                          "Mundt Room Air Model: No surface names specified.  Air node=\"" +
-                                              state.dataRoomAirMod->AirNode(AirNodeNum).Name + " requires name of surfaces associated with it.");
+                                        format("GetAirNodeData: {}=\"{}\" invalid air node specification.",
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(
+                            state,
+                            format("Mundt Room Air Model: No surface names specified.  Air node=\"{} requires name of surfaces associated with it.",
+                                   state.dataRoomAirMod->AirNode(AirNodeNum).Name));
                         ErrorsFound = true;
                     } else {
                     }
@@ -786,10 +787,10 @@ namespace RoomAirModelManager {
                     if (nodeType == "INLET" || nodeType == "CONTROL" || nodeType == "RETURN" || nodeType == "PLUME1" || nodeType == "PLUME2" ||
                         nodeType == "PLUME3") {
                         ShowWarningError(
-                            state, "GetAirNodeData: " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid linkage");
+                            state, format("GetAirNodeData: {}=\"{}\" invalid linkage", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
-                                          "Mundt Room Air Model: No surface names needed.  Air node=\"" +
-                                              state.dataRoomAirMod->AirNode(AirNodeNum).Name + " does not relate to any surfaces.");
+                                          format("Mundt Room Air Model: No surface names needed.  Air node=\"{} does not relate to any surfaces.",
+                                                 state.dataRoomAirMod->AirNode(AirNodeNum).Name));
                         SurfNeeded = false;
                     } else {
                     }
@@ -807,10 +808,12 @@ namespace RoomAirModelManager {
 
                     // terminate the program due to a severe error in the specified input
                     if ((NumSurfsInvolved) > NumOfSurfs) {
-                        ShowFatalError(state,
-                                       "GetAirNodeData: Mundt Room Air Model: Number of surfaces connected to " +
-                                           state.dataRoomAirMod->AirNode(AirNodeNum).Name + " is greater than number of surfaces in " +
-                                           state.dataHeatBal->Zone(ZoneNum).Name);
+                        ShowFatalError(
+                            state,
+                            format(
+                                "GetAirNodeData: Mundt Room Air Model: Number of surfaces connected to {} is greater than number of surfaces in {}",
+                                state.dataRoomAirMod->AirNode(AirNodeNum).Name,
+                                state.dataHeatBal->Zone(ZoneNum).Name));
                         return;
                     }
 
@@ -838,8 +841,9 @@ namespace RoomAirModelManager {
                     // report warning error since surface names are specified correctly
                     if ((NumSurfsInvolved) != SurfCount) {
                         ShowWarningError(state,
-                                         "GetAirNodeData: Mundt Room Air Model: Some surface names specified for " +
-                                             state.dataRoomAirMod->AirNode(AirNodeNum).Name + " are not in " + state.dataHeatBal->Zone(ZoneNum).Name);
+                                         format("GetAirNodeData: Mundt Room Air Model: Some surface names specified for {} are not in {}",
+                                                state.dataRoomAirMod->AirNode(AirNodeNum).Name,
+                                                state.dataHeatBal->Zone(ZoneNum).Name));
                     }
                 }
             }
@@ -899,13 +903,14 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = "RoomAirSettings:OneNodeDisplacementVentilation";
         NumOfMundtContrl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumOfMundtContrl > state.dataGlobal->NumOfZones) {
-            ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
-            ShowContinueError(state, "There cannot be more " + cCurrentModuleObject + " objects than number of zones.");
+            ShowSevereError(state, format("Too many {} objects in input file", cCurrentModuleObject));
+            ShowContinueError(state, format("There cannot be more {} objects than number of zones.", cCurrentModuleObject));
             ErrorsFound = true;
         }
 
         if (NumOfMundtContrl == 0) {
-            ShowWarningError(state, "No " + cCurrentModuleObject + " objects found, program assumes no convection or infiltration gains near floors");
+            ShowWarningError(state,
+                             format("No {} objects found, program assumes no convection or infiltration gains near floors", cCurrentModuleObject));
             return;
         }
 
@@ -926,15 +931,16 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (ZoneNum == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Not a valid zone name.");
                 ErrorsFound = true;
                 continue;
             }
             if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) {
                 ShowSevereError(
-                    state, "Zone specified=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", Air Model type is not OneNodeDisplacementVentilation.");
+                    state,
+                    format("Zone specified=\"{}\", Air Model type is not OneNodeDisplacementVentilation.", state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
                     state, format("Air Model Type for zone={}", ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]));
                 ErrorsFound = true;
@@ -996,8 +1002,8 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Zone Name not found.");
                 ErrorsFound = true;
             } else {
@@ -1008,13 +1014,13 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->ZoneUCSDDV(Loop).SchedGainsPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataRoomAirMod->ZoneUCSDDV(Loop).SchedGainsPtr == 0) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, " Schedule name must be input.");
                     ErrorsFound = true;
                 } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Schedule name was not found.");
                     ErrorsFound = true;
                 }
@@ -1080,8 +1086,8 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Zone name was not found.");
                 ErrorsFound = true;
             } else {
@@ -1092,13 +1098,13 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->ZoneUCSDCV(Loop).SchedGainsPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataRoomAirMod->ZoneUCSDCV(Loop).SchedGainsPtr == 0) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Schedule name field is blank.");
                     ErrorsFound = true;
                 } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Schedule name was not found.");
                     ErrorsFound = true;
                 }
@@ -1118,21 +1124,21 @@ namespace RoomAirModelManager {
                 if (state.dataHeatBal->People(Loop2).Fanger) {
                     if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::Invalid) {
                         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                            ShowSevereError(state,
-                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                            ShowSevereError(
+                                state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                            ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                             ShowContinueError(state,
-                                              "Airflow region used for thermal comfort evaluation is required for Zone=" +
-                                                  state.dataIPShortCut->cAlphaArgs(1));
+                                              format("Airflow region used for thermal comfort evaluation is required for Zone={}",
+                                                     state.dataIPShortCut->cAlphaArgs(1)));
                             ShowContinueError(state, "Field is blank, please choose Jet or Recirculation.");
                             ErrorsFound = true;
                         } else {
-                            ShowSevereError(state,
-                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                            ShowSevereError(
+                                state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                            ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                             ShowContinueError(state,
-                                              "Airflow region used for thermal comfort evaluation is required for Zone=" +
-                                                  state.dataIPShortCut->cAlphaArgs(1));
+                                              format("Airflow region used for thermal comfort evaluation is required for Zone={}",
+                                                     state.dataIPShortCut->cAlphaArgs(1)));
                             ShowContinueError(state, "Please choose Jet or Recirculation.");
                             ErrorsFound = true;
                         }
@@ -1149,7 +1155,7 @@ namespace RoomAirModelManager {
                                                     state.afn->MultizoneZoneData,
                                                     &AirflowNetwork::MultizoneZoneProp::ZoneName);
             if (Loop2 == 0) {
-                ShowSevereError(state, "Problem with " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Problem with {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "AirflowNetwork airflow model must be active in this zone");
                 ErrorsFound = true;
             }
@@ -1168,8 +1174,8 @@ namespace RoomAirModelManager {
                     if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::SCR) {
                         if (state.afn->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent != 0.50) {
                             state.dataRoomAirMod->AirModel(ThisZone).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
-                            ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                            ShowWarningError(state, "Roomair model will not be applied for Zone=" + state.dataIPShortCut->cAlphaArgs(1) + '.');
+                            ShowWarningError(state, format("Problem with {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                            ShowWarningError(state, format("Roomair model will not be applied for Zone={}.", state.dataIPShortCut->cAlphaArgs(1)));
                             ShowContinueError(
                                 state,
                                 format("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was={:.2R}",
@@ -1242,8 +1248,8 @@ namespace RoomAirModelManager {
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirMod->ZoneUCSDUI(Loop).ZonePtr) = Loop;
             if (state.dataRoomAirMod->ZoneUCSDUI(Loop).ZonePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Zone name was not found.");
                 ErrorsFound = true;
             } else {
@@ -1261,8 +1267,8 @@ namespace RoomAirModelManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "LinearBarGrille")) {
                 state.dataRoomAirMod->ZoneUCSDUI(Loop).DiffuserType = Diffuser::LinBarGrille;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             // 1st number is Number of Diffusers per Zone
@@ -1313,8 +1319,8 @@ namespace RoomAirModelManager {
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirMod->ZoneUCSDUE(Loop).ZonePtr) = Loop;
             if (state.dataRoomAirMod->ZoneUCSDUE(Loop).ZonePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Zone name was not found.");
                 ErrorsFound = true;
             } else {
@@ -1332,8 +1338,8 @@ namespace RoomAirModelManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "LinearBarGrille")) {
                 state.dataRoomAirMod->ZoneUCSDUE(Loop).DiffuserType = Diffuser::LinBarGrille;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             // 1st number is Number of Diffusers per Zone
@@ -1417,8 +1423,8 @@ namespace RoomAirModelManager {
         state.dataRoomAirMod->NumOfRoomAirflowNetControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRoomAirMod->NumOfRoomAirflowNetControl == 0) return;
         if (state.dataRoomAirMod->NumOfRoomAirflowNetControl > state.dataGlobal->NumOfZones) {
-            ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
-            ShowContinueError(state, "There cannot be more " + cCurrentModuleObject + " objects than number of zones.");
+            ShowSevereError(state, format("Too many {} objects in input file", cCurrentModuleObject));
+            ShowContinueError(state, format("There cannot be more {} objects than number of zones.", cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -1442,17 +1448,18 @@ namespace RoomAirModelManager {
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereError(state,
-                                "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " +
-                                    state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(2)));
                 ShowContinueError(state, "Not a valid zone name.");
                 ErrorsFound = true;
                 continue;
             }
             if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 ShowSevereError(state,
-                                "GetRoomAirflowNetworkData: Zone specified='" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "', Air Model type is not AirflowNetwork.");
+                                format("GetRoomAirflowNetworkData: Zone specified='{}', Air Model type is not AirflowNetwork.",
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
                     state, format("Air Model Type for zone ={}", ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]));
                 ErrorsFound = true;
@@ -1471,7 +1478,8 @@ namespace RoomAirModelManager {
                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes);
             } else {
                 ShowSevereError(
-                    state, "GetRoomAirflowNetworkData: Incomplete input in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    state,
+                    format("GetRoomAirflowNetworkData: Incomplete input in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -1487,9 +1495,10 @@ namespace RoomAirModelManager {
                                                               state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes);
             if (AirCntrlNodeNum == 0) {
                 ShowSevereError(state,
-                                "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " +
-                                    state.dataIPShortCut->cAlphaArgs(3));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                       state.dataIPShortCut->cAlphaFieldNames(3),
+                                       state.dataIPShortCut->cAlphaArgs(3)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Not a valid RoomAir:Node:AirflowNetwork name for this zone.");
                 ErrorsFound = true;
                 continue;
@@ -1521,9 +1530,10 @@ namespace RoomAirModelManager {
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereError(state,
-                                "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " +
-                                    state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Not a valid zone name.");
                 ErrorsFound = true;
                 continue;
@@ -1534,9 +1544,10 @@ namespace RoomAirModelManager {
                                                           state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes);
             if (RAFNNodeNum == 0) {
                 ShowSevereError(state,
-                                "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " +
-                                    state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Not a valid RoomAir:Node:AirflowNetwork name.");
                 ErrorsFound = true;
                 continue;
@@ -1599,9 +1610,10 @@ namespace RoomAirModelManager {
                     if (allocated(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask)) {
                         // throw error found twice
                         ShowSevereError(state,
-                                        "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                        format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state, "Duplicate RoomAir:Node:AirflowNetwork:AdjacentSurfaceList name.");
                         ErrorsFound = true;
                     } else {
@@ -1631,9 +1643,10 @@ namespace RoomAirModelManager {
                         }
                         if (NumSurfsThisNode != SurfCount) {
                             ShowSevereError(state,
-                                            "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " +
-                                                state.dataIPShortCut->cAlphaArgs(1));
-                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                            format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                                   state.dataIPShortCut->cAlphaFieldNames(1),
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
+                            ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                             ShowContinueError(state, "Some surface names were not found in the zone");
                             ErrorsFound = true;
                         }
@@ -1643,9 +1656,10 @@ namespace RoomAirModelManager {
             }                 // loop over zones
             if (!foundList) { // throw error
                 ShowSevereError(state,
-                                "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " +
-                                    state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Did not find a RoomAir:Node:AirflowNetwork object that references this object");
                 ErrorsFound = true;
             }
@@ -1668,10 +1682,10 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (mod((NumAlphas + NumNumbers - 1), 3) != 0) {
-                ShowSevereError(state, "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("GetRoomAirflowNetworkData: For {}: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  "Extensible field set are not evenly divisable by 3. Number of data entries = " +
-                                      fmt::to_string(NumAlphas + NumNumbers - 1));
+                                  format("Extensible field set are not evenly divisable by 3. Number of data entries = {}",
+                                         fmt::to_string(NumAlphas + NumNumbers - 1)));
                 ErrorsFound = true;
                 break;
             }
@@ -1692,10 +1706,11 @@ namespace RoomAirModelManager {
                     int maxNumGains = numInputGains * numSpacesInZone;
                     if (allocated(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain)) {
                         ShowSevereError(state,
-                                        "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Duplicate " + cCurrentModuleObject + " name.");
+                                        format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(state, format("Duplicate {} name.", cCurrentModuleObject));
                         ErrorsFound = true;
                     } else {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain.allocate(maxNumGains);
@@ -1712,9 +1727,10 @@ namespace RoomAirModelManager {
                                     static_cast<DataHeatBalance::IntGainType>(TypeNum);
                             } else {
                                 ShowSevereError(state,
-                                                "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(gainsLoop * 2) +
-                                                    " = " + state.dataIPShortCut->cAlphaArgs(gainsLoop * 2));
-                                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                                       state.dataIPShortCut->cAlphaFieldNames(gainsLoop * 2),
+                                                       state.dataIPShortCut->cAlphaArgs(gainsLoop * 2)));
+                                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                                 ShowContinueError(state, "incorrect type of internal gain");
                                 ErrorsFound = true;
                                 continue;
@@ -1746,9 +1762,10 @@ namespace RoomAirModelManager {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).NumIntGains = numGainsFound;
                             } else {
                                 ShowSevereError(state,
-                                                "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(gainsLoop * 2 + 1) +
-                                                    " = " + state.dataIPShortCut->cAlphaArgs(gainsLoop * 2 + 1));
-                                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                                       state.dataIPShortCut->cAlphaFieldNames(gainsLoop * 2 + 1),
+                                                       state.dataIPShortCut->cAlphaArgs(gainsLoop * 2 + 1)));
+                                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                                 ShowContinueError(state, "Internal gain did not match correctly");
                                 ErrorsFound = true;
                             }
@@ -1775,10 +1792,10 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (mod((NumAlphas + NumNumbers - 1), 4) != 0) {
-                ShowSevereError(state, "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("GetRoomAirflowNetworkData: For {}: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  "Extensible field set are not evenly divisable by 4. Number of data entries = " +
-                                      fmt::to_string(NumAlphas + NumNumbers - 1));
+                                  format("Extensible field set are not evenly divisable by 4. Number of data entries = {}",
+                                         fmt::to_string(NumAlphas + NumNumbers - 1)));
                 ErrorsFound = true;
                 break;
             }
@@ -1798,10 +1815,11 @@ namespace RoomAirModelManager {
                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).NumHVACs = numEquip;
                     if (allocated(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC)) {
                         ShowSevereError(state,
-                                        "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Duplicate " + cCurrentModuleObject + " name.");
+                                        format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(state, format("Duplicate {} name.", cCurrentModuleObject));
                         ErrorsFound = true;
                     } else {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC.allocate(numEquip);
@@ -1813,10 +1831,10 @@ namespace RoomAirModelManager {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).TypeOfNum = TypeNum;
                             } else {
                                 ShowSevereError(state,
-                                                "GetRoomAirflowNetworkData: Invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(2 + (EquipLoop - 1) * 2) + " = " +
-                                                    state.dataIPShortCut->cAlphaArgs(2 + (EquipLoop - 1) * 2));
-                                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                                       state.dataIPShortCut->cAlphaFieldNames(2 + (EquipLoop - 1) * 2),
+                                                       state.dataIPShortCut->cAlphaArgs(2 + (EquipLoop - 1) * 2)));
+                                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                                 ShowContinueError(state, "incorrect type of HVACEquipment");
                                 ErrorsFound = true;
                             }
@@ -1829,11 +1847,12 @@ namespace RoomAirModelManager {
                             TotNumEquip = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ZoneHVACTerminalTypes(TypeNum));
                             if (TotNumEquip == 0) {
                                 ShowSevereError(state,
-                                                "GetRoomAirflowNetworkData: No such " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(2 + (EquipLoop - 1) * 2) + " = " +
-                                                    state.dataIPShortCut->cAlphaArgs(2 + (EquipLoop - 1) * 2));
+                                                format("GetRoomAirflowNetworkData: No such {} = {}",
+                                                       state.dataIPShortCut->cAlphaFieldNames(2 + (EquipLoop - 1) * 2),
+                                                       state.dataIPShortCut->cAlphaArgs(2 + (EquipLoop - 1) * 2)));
                                 ShowContinueError(
-                                    state, "is available in the input file in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                    state,
+                                    format("is available in the input file in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                                 ErrorsFound = true;
                             }
                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).SupplyFraction =
@@ -1852,10 +1871,10 @@ namespace RoomAirModelManager {
 
                             if (!IntEquipError) {
                                 ShowSevereError(state,
-                                                "GetRoomAirflowNetworkData: Invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3 + (EquipLoop - 1) * 2) + " = " +
-                                                    state.dataIPShortCut->cAlphaArgs(2 + (EquipLoop - 1) * 2));
-                                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                                format("GetRoomAirflowNetworkData: Invalid {} = {}",
+                                                       state.dataIPShortCut->cAlphaFieldNames(3 + (EquipLoop - 1) * 2),
+                                                       state.dataIPShortCut->cAlphaArgs(2 + (EquipLoop - 1) * 2)));
+                                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                                 ShowContinueError(state, "Internal gain did not match correctly");
                                 ErrorsFound = true;
                             }
@@ -1878,7 +1897,8 @@ namespace RoomAirModelManager {
                 }
                 if (std::abs(SumFraction - 1.0) > 0.001) {
                     ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone volume fractions do not sum to 1.0");
-                    ShowContinueError(state, "Entered in RoomAir:Node:AirflowNetwork with Zone Name = " + state.dataHeatBal->Zone(ZoneNum).Name);
+                    ShowContinueError(state,
+                                      format("Entered in RoomAir:Node:AirflowNetwork with Zone Name = {}", state.dataHeatBal->Zone(ZoneNum).Name));
                     ShowContinueError(state, "The Fraction of Zone Air Volume values across all the nodes needs to sum to 1.0.");
                     ShowContinueError(state, format("The sum of fractions entered = {:.3R}", SumFraction));
                     ErrorsFound = true;
@@ -1909,8 +1929,9 @@ namespace RoomAirModelManager {
                         if (std::abs(SumFraction - 1.0) > 0.001) {
                             ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, internal gain fractions do not sum to 1.0");
                             ShowContinueError(state,
-                                              "Entered in RoomAir:Node:AirflowNetwork with Zone Name = " + state.dataHeatBal->Zone(ZoneNum).Name +
-                                                  ", Intrnal gain name = " + Name);
+                                              format("Entered in RoomAir:Node:AirflowNetwork with Zone Name = {}, Intrnal gain name = {}",
+                                                     state.dataHeatBal->Zone(ZoneNum).Name,
+                                                     Name));
                             ShowContinueError(state, "The Fraction of internal gain across all the nodes needs to sum to 1.0.");
                             ShowContinueError(state, format("The sum of fractions entered = {:.3R}", SumFraction));
                             ErrorsFound = true;
@@ -2144,7 +2165,7 @@ namespace RoomAirModelManager {
 
                 if (std::abs((state.dataRoomAirModelMgr->Z2ofZone - state.dataRoomAirModelMgr->Z1ofZone) -
                              state.dataHeatBal->Zone(ZNum).CeilingHeight) > state.dataRoomAirModelMgr->CeilingHeightDiffMaximum) {
-                    ShowWarningError(state, "RoomAirManager: Inconsistent ceiling heights in Zone: " + state.dataHeatBal->Zone(ZNum).Name);
+                    ShowWarningError(state, format("RoomAirManager: Inconsistent ceiling heights in Zone: {}", state.dataHeatBal->Zone(ZNum).Name));
                     ShowContinueError(state, format("Lowest height=[{:.3R}].", state.dataRoomAirModelMgr->Z1ofZone));
                     ShowContinueError(state, format("Highest height=[{:.3R}].", state.dataRoomAirModelMgr->Z2ofZone));
                     ShowContinueError(state, format("Ceiling height=[{:.3R}].", state.dataHeatBal->Zone(ZNum).CeilingHeight));
@@ -2764,11 +2785,11 @@ namespace RoomAirModelManager {
                         state.dataRoomAirMod->IsZoneCV(state.dataRoomAirModelMgr->Loop) = false;
                         state.dataRoomAirMod->AirModel(state.dataRoomAirModelMgr->Loop).SimAirModel = false;
                         ShowSevereError(state,
-                                        "Unmixed Flow: Cross Ventilation cannot be applied for Zone=" +
-                                            state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        format("Unmixed Flow: Cross Ventilation cannot be applied for Zone={}",
+                                               state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name));
                         ShowContinueError(state,
-                                          "An HVAC system is present in the zone. Fully mixed airflow model will be used for Zone=" +
-                                              state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                          format("An HVAC system is present in the zone. Fully mixed airflow model will be used for Zone={}",
+                                                 state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name));
                         continue;
                     }
                     // CurrentModuleObject='RoomAirSettings:CrossVentilation'
@@ -3022,7 +3043,8 @@ namespace RoomAirModelManager {
 
         if (RAFNNodeNum == 0) {
             Errorfound = true;
-            ShowSevereError(state, "Could not find RoomAir:Node:AirflowNetwork number with AirflowNetwork:IntraZone:Node Name='" + RAFNNodeName);
+            ShowSevereError(state,
+                            format("Could not find RoomAir:Node:AirflowNetwork number with AirflowNetwork:IntraZone:Node Name='{}", RAFNNodeName));
         }
     }
 
