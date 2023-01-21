@@ -9323,8 +9323,10 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
     int TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
     bool HRCoolingMode = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList);
     bool HRHeatingMode = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList);
+    auto &thisVRFCond = state.dataHVACVarRefFlow->VRF(VRFCond);
+    auto &thisVRFTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
 
-    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+    if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
         this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
     } else {
@@ -9366,7 +9368,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
     // Otherwise the coil needs to turn on. Get full load result
     PartLoadRatio = 1.0;
     if (!DXCoolingCoilOprCtrl) PartLoadRatio = 0.0;
-    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+    if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
         this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
     } else {
@@ -9376,15 +9378,16 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
 
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
+        auto &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
         if ((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
-            (this->isSetPointControlled && this->suppTempSetPoint > state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp)) {
+            (this->isSetPointControlled && this->suppTempSetPoint > thisSuppHeatCoilAirInletNode.Temp)) {
             Real64 ZoneLoad = 0.0;
             Real64 LoadToHeatingSP = 0.0;
             Real64 LoadToCoolingSP = 0.0;
             if (this->isSetPointControlled) {
-                Real64 mDot = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
-                Real64 Tin = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp;
-                Real64 Win = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).HumRat;
+                Real64 mDot = thisSuppHeatCoilAirInletNode.MassFlowRate;
+                Real64 Tin = thisSuppHeatCoilAirInletNode.Temp;
+                Real64 Win = thisSuppHeatCoilAirInletNode.HumRat;
                 Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(Win);
                 SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
                 this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
@@ -9423,13 +9426,12 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
         this->SuppHeatPartLoadRatio = 0.0;
     }
 
-    if ((VRFCoolingMode && !state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed) ||
-        (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && HRCoolingMode)) {
+    if ((VRFCoolingMode && !thisVRFCond.HeatRecoveryUsed) || (thisVRFCond.HeatRecoveryUsed && HRCoolingMode)) {
         // Since we are cooling, we expect FullOutput < NoCompOutput
         // If the QZnReq <= FullOutput the unit needs to run full out
         if (QZnReq <= FullOutput) {
             // if no coil present in terminal unit, no need to reset PLR?
-            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolingCoilPresent) {
+            if (thisVRFTU.CoolingCoilPresent) {
                 PartLoadRatio = 1.0;
                 // the zone set point could be exceeded if set point control is used so protect against that
                 if (this->isSetPointControlled) {
@@ -9442,8 +9444,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 return;
             }
         }
-    } else if ((VRFHeatingMode && !state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed) ||
-               (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && HRHeatingMode)) {
+    } else if ((VRFHeatingMode && !thisVRFCond.HeatRecoveryUsed) || (thisVRFCond.HeatRecoveryUsed && HRHeatingMode)) {
         // Since we are heating, we expect FullOutput > NoCompOutput
         // If the QZnReq >= FullOutput the unit needs to run full out
         if (QZnReq >= FullOutput) {
@@ -9505,7 +9506,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
             while (ContinueIter && TempMaxPLR < 1.0) {
                 TempMaxPLR += 0.1;
 
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
                     // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                     this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                 } else {
@@ -9522,7 +9523,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 TempMaxPLR = TempMinPLR;
                 TempMinPLR -= 0.01;
 
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
                     // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                     this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                 } else {
@@ -9542,7 +9543,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                             state, format(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = {}", MaxIte));
                         ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadRatio));
 
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                        if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             this->CalcVRF_FluidTCtrl(
                                 state, VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -9565,7 +9566,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 }
             } else if (SolFla == -2) {
                 if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
-                    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FirstIterfailed == 0) {
+                    if (thisVRFTU.FirstIterfailed == 0) {
                         ShowWarningMessage(state, DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
                         ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
@@ -9579,14 +9580,14 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                         ShowRecurringWarningErrorAtEnd(state,
                                                        DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                            "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
-                                                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FirstIterfailed);
+                                                       thisVRFTU.FirstIterfailed);
                     }
                 }
                 PartLoadRatio = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
             }
         } else if (SolFla == -2) {
             if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
-                if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FirstIterfailed == 0) {
+                if (thisVRFTU.FirstIterfailed == 0) {
                     ShowWarningMessage(state, DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
                     ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                     ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
@@ -12602,6 +12603,8 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     VRFHeatingMode = state.dataHVACVarRefFlow->HeatingLoad(VRFCond);
     HRCoolingMode = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList);
     HRHeatingMode = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList);
+    auto &thisVRFCond = state.dataHVACVarRefFlow->VRF(VRFCond);
+    auto &thisVRFTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
 
     // The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
 
@@ -12649,25 +12652,28 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     if (!DXCoolingCoilOprCtrl) PartLoadRatio = 0.0;
     this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
     if (this->CoolingCoilPresent) {
-        this->coilInNodeT = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode).Temp;
-        this->coilInNodeW = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode).HumRat;
+        auto &thisAirInNode = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode);
+        this->coilInNodeT = thisAirInNode.Temp;
+        this->coilInNodeW = thisAirInNode.HumRat;
     } else {
-        this->coilInNodeT = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode).Temp;
-        this->coilInNodeW = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode).HumRat;
+        auto &thisAirInNode = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode);
+        this->coilInNodeT = thisAirInNode.Temp;
+        this->coilInNodeW = thisAirInNode.HumRat;
     }
 
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
+        auto &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
         if (((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
              (((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad) && QZnReq <= 0.0)) ||
-            (this->isSetPointControlled && this->suppTempSetPoint > state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp)) {
+            (this->isSetPointControlled && this->suppTempSetPoint > thisSuppHeatCoilAirInletNode.Temp)) {
             Real64 ZoneLoad = 0.0;
             Real64 LoadToHeatingSP = 0.0;
             Real64 LoadToCoolingSP = 0.0;
             if (this->isSetPointControlled) {
-                Real64 mDot = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
-                Real64 Tin = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp;
-                Real64 Win = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).HumRat;
+                Real64 mDot = thisSuppHeatCoilAirInletNode.MassFlowRate;
+                Real64 Tin = thisSuppHeatCoilAirInletNode.Temp;
+                Real64 Win = thisSuppHeatCoilAirInletNode.HumRat;
                 Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(Win);
                 SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
                 this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
@@ -12706,13 +12712,12 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         this->SuppHeatPartLoadRatio = 0.0;
     }
 
-    if ((VRFCoolingMode && !state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed) ||
-        (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && HRCoolingMode)) {
+    if ((VRFCoolingMode && !thisVRFCond.HeatRecoveryUsed) || (thisVRFCond.HeatRecoveryUsed && HRCoolingMode)) {
         // Since we are cooling, we expect FullOutput < NoCompOutput
         // If the QZnReq <= FullOutput the unit needs to run full out
         if (QZnReq <= FullOutput) {
             // if no coil present in terminal unit, no need to reset PLR?
-            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolingCoilPresent) {
+            if (thisVRFTU.CoolingCoilPresent) {
                 PartLoadRatio = 1.0;
                 // the zone set point could be exceeded if set point control is used so protect against that
                 if (this->isSetPointControlled) {
@@ -12731,8 +12736,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
                 return;
             }
         }
-    } else if ((VRFHeatingMode && !state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed) ||
-               (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && HRHeatingMode)) {
+    } else if ((VRFHeatingMode && !thisVRFCond.HeatRecoveryUsed) || (thisVRFCond.HeatRecoveryUsed && HRHeatingMode)) {
         // Since we are heating, we expect FullOutput > NoCompOutput
         // If the QZnReq >= FullOutput the unit needs to run full out
         if (QZnReq >= FullOutput) {
