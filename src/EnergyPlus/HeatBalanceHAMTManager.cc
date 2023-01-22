@@ -292,14 +292,16 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataMaterial->Material(matid)->ROnly) {
+            auto *thisMaterial = state.dataMaterial->Material(matid);
+            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+            if (thisMaterialChild->ROnly) {
                 ShowWarningError(state,
                                  cHAMTObject1 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
 
-            state.dataMaterial->Material(matid)->Porosity = NumArray(1);
-            state.dataMaterial->Material(matid)->iwater = NumArray(2);
+            thisMaterialChild->Porosity = NumArray(1);
+            thisMaterialChild->iwater = NumArray(2);
         }
 
         HAMTitems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
@@ -326,7 +328,9 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataMaterial->Material(matid)->ROnly) {
+            auto *thisMaterial = state.dataMaterial->Material(matid);
+            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+            if (thisMaterialChild->ROnly) {
                 ShowWarningError(state,
                                  cHAMTObject2 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
@@ -334,41 +338,43 @@ namespace HeatBalanceHAMTManager {
 
             Numid = 1;
 
-            state.dataMaterial->Material(matid)->niso = int(NumArray(Numid));
+            thisMaterialChild->niso = int(NumArray(Numid));
 
-            for (iso = 1; iso <= state.dataMaterial->Material(matid)->niso; ++iso) {
+            for (iso = 1; iso <= thisMaterialChild->niso; ++iso) {
                 ++Numid;
-                state.dataMaterial->Material(matid)->isorh(iso) = NumArray(Numid);
+                thisMaterialChild->isorh(iso) = NumArray(Numid);
                 ++Numid;
-                state.dataMaterial->Material(matid)->isodata(iso) = NumArray(Numid);
+                thisMaterialChild->isodata(iso) = NumArray(Numid);
             }
 
-            ++state.dataMaterial->Material(matid)->niso;
-            state.dataMaterial->Material(matid)->isorh(state.dataMaterial->Material(matid)->niso) = rhmax;
-            state.dataMaterial->Material(matid)->isodata(state.dataMaterial->Material(matid)->niso) =
-                state.dataMaterial->Material(matid)->Porosity * wdensity;
+            ++thisMaterialChild->niso;
+            thisMaterialChild->isorh(thisMaterialChild->niso) = rhmax;
+            thisMaterialChild->isodata(thisMaterialChild->niso) =
+                thisMaterialChild->Porosity * wdensity;
 
-            ++state.dataMaterial->Material(matid)->niso;
-            state.dataMaterial->Material(matid)->isorh(state.dataMaterial->Material(matid)->niso) = 0.0;
-            state.dataMaterial->Material(matid)->isodata(state.dataMaterial->Material(matid)->niso) = 0.0;
+            ++thisMaterialChild->niso;
+            thisMaterialChild->isorh(thisMaterialChild->niso) = 0.0;
+            thisMaterialChild->isodata(thisMaterialChild->niso) = 0.0;
         }
 
         // check the isotherm
         for (matid = 1; matid <= state.dataMaterial->TotMaterials; ++matid) {
-            if (state.dataMaterial->Material(matid)->niso > 0) {
+            auto *thisMaterial = state.dataMaterial->Material(matid);
+            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+            if (thisMaterialChild->niso > 0) {
                 // - First sort
-                for (jj = 1; jj <= state.dataMaterial->Material(matid)->niso - 1; ++jj) {
-                    for (ii = jj + 1; ii <= state.dataMaterial->Material(matid)->niso; ++ii) {
-                        if (state.dataMaterial->Material(matid)->isorh(jj) > state.dataMaterial->Material(matid)->isorh(ii)) {
+                for (jj = 1; jj <= thisMaterialChild->niso - 1; ++jj) {
+                    for (ii = jj + 1; ii <= thisMaterialChild->niso; ++ii) {
+                        if (thisMaterialChild->isorh(jj) > thisMaterialChild->isorh(ii)) {
 
-                            dumrh = state.dataMaterial->Material(matid)->isorh(jj);
-                            dumdata = state.dataMaterial->Material(matid)->isodata(jj);
+                            dumrh = thisMaterialChild->isorh(jj);
+                            dumdata = thisMaterialChild->isodata(jj);
 
-                            state.dataMaterial->Material(matid)->isorh(jj) = state.dataMaterial->Material(matid)->isorh(ii);
-                            state.dataMaterial->Material(matid)->isodata(jj) = state.dataMaterial->Material(matid)->isodata(ii);
+                            thisMaterialChild->isorh(jj) = thisMaterialChild->isorh(ii);
+                            thisMaterialChild->isodata(jj) = thisMaterialChild->isodata(ii);
 
-                            state.dataMaterial->Material(matid)->isorh(ii) = dumrh;
-                            state.dataMaterial->Material(matid)->isodata(ii) = dumdata;
+                            thisMaterialChild->isorh(ii) = dumrh;
+                            thisMaterialChild->isodata(ii) = dumdata;
                         }
                     }
                 }
@@ -376,19 +382,19 @@ namespace HeatBalanceHAMTManager {
                 isoerrrise = false;
                 for (ii = 1; ii <= 100; ++ii) {
                     avflag = true;
-                    for (jj = 1; jj <= state.dataMaterial->Material(matid)->niso - 1; ++jj) {
-                        if (state.dataMaterial->Material(matid)->isodata(jj) > state.dataMaterial->Material(matid)->isodata(jj + 1)) {
+                    for (jj = 1; jj <= thisMaterialChild->niso - 1; ++jj) {
+                        if (thisMaterialChild->isodata(jj) > thisMaterialChild->isodata(jj + 1)) {
                             isoerrrise = true;
-                            avdata = (state.dataMaterial->Material(matid)->isodata(jj) + state.dataMaterial->Material(matid)->isodata(jj + 1)) / 2.0;
-                            state.dataMaterial->Material(matid)->isodata(jj) = avdata;
-                            state.dataMaterial->Material(matid)->isodata(jj + 1) = avdata;
+                            avdata = (thisMaterialChild->isodata(jj) + thisMaterialChild->isodata(jj + 1)) / 2.0;
+                            thisMaterialChild->isodata(jj) = avdata;
+                            thisMaterialChild->isodata(jj + 1) = avdata;
                             avflag = false;
                         }
                     }
                     if (avflag) break;
                 }
                 if (isoerrrise) {
-                    ShowWarningError(state, cHAMTObject2 + " data not rising - Check material " + state.dataMaterial->Material(matid)->Name);
+                    ShowWarningError(state, cHAMTObject2 + " data not rising - Check material " + thisMaterialChild->Name);
                     ShowContinueError(state, "Isotherm data has been fixed, and the simulation continues.");
                 }
             }
@@ -418,7 +424,9 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataMaterial->Material(matid)->ROnly) {
+            auto *thisMaterial = state.dataMaterial->Material(matid);
+            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+            if (thisMaterialChild->ROnly) {
                 ShowWarningError(state,
                                  cHAMTObject3 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
@@ -426,19 +434,19 @@ namespace HeatBalanceHAMTManager {
 
             Numid = 1;
 
-            state.dataMaterial->Material(matid)->nsuc = NumArray(Numid);
-            for (suc = 1; suc <= state.dataMaterial->Material(matid)->nsuc; ++suc) {
+            thisMaterialChild->nsuc = NumArray(Numid);
+            for (suc = 1; suc <= thisMaterialChild->nsuc; ++suc) {
                 ++Numid;
-                state.dataMaterial->Material(matid)->sucwater(suc) = NumArray(Numid);
+                thisMaterialChild->sucwater(suc) = NumArray(Numid);
                 ++Numid;
-                state.dataMaterial->Material(matid)->sucdata(suc) = NumArray(Numid);
+                thisMaterialChild->sucdata(suc) = NumArray(Numid);
             }
 
-            ++state.dataMaterial->Material(matid)->nsuc;
-            state.dataMaterial->Material(matid)->sucwater(state.dataMaterial->Material(matid)->nsuc) =
-                state.dataMaterial->Material(matid)->isodata(state.dataMaterial->Material(matid)->niso);
-            state.dataMaterial->Material(matid)->sucdata(state.dataMaterial->Material(matid)->nsuc) =
-                state.dataMaterial->Material(matid)->sucdata(state.dataMaterial->Material(matid)->nsuc - 1);
+            ++thisMaterialChild->nsuc;
+            thisMaterialChild->sucwater(thisMaterialChild->nsuc) =
+                thisMaterialChild->isodata(thisMaterialChild->niso);
+            thisMaterialChild->sucdata(thisMaterialChild->nsuc) =
+                thisMaterialChild->sucdata(thisMaterialChild->nsuc - 1);
         }
 
         HAMTitems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
@@ -464,26 +472,28 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataMaterial->Material(matid)->ROnly) {
+            auto *thisMaterial = state.dataMaterial->Material(matid);
+            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+            if (thisMaterialChild->ROnly) {
                 ShowWarningError(state,
                                  cHAMTObject4 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
             Numid = 1;
 
-            state.dataMaterial->Material(matid)->nred = NumArray(Numid);
-            for (red = 1; red <= state.dataMaterial->Material(matid)->nred; ++red) {
+            thisMaterialChild->nred = NumArray(Numid);
+            for (red = 1; red <= thisMaterialChild->nred; ++red) {
                 ++Numid;
-                state.dataMaterial->Material(matid)->redwater(red) = NumArray(Numid);
+                thisMaterialChild->redwater(red) = NumArray(Numid);
                 ++Numid;
-                state.dataMaterial->Material(matid)->reddata(red) = NumArray(Numid);
+                thisMaterialChild->reddata(red) = NumArray(Numid);
             }
 
-            ++state.dataMaterial->Material(matid)->nred;
-            state.dataMaterial->Material(matid)->redwater(state.dataMaterial->Material(matid)->nred) =
-                state.dataMaterial->Material(matid)->isodata(state.dataMaterial->Material(matid)->niso);
-            state.dataMaterial->Material(matid)->reddata(state.dataMaterial->Material(matid)->nred) =
-                state.dataMaterial->Material(matid)->reddata(state.dataMaterial->Material(matid)->nred - 1);
+            ++thisMaterialChild->nred;
+            thisMaterialChild->redwater(thisMaterialChild->nred) =
+                thisMaterialChild->isodata(thisMaterialChild->niso);
+            thisMaterialChild->reddata(thisMaterialChild->nred) =
+                thisMaterialChild->reddata(thisMaterialChild->nred - 1);
         }
 
         HAMTitems =
@@ -509,7 +519,9 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataMaterial->Material(matid)->ROnly) {
+            auto *thisMaterial = state.dataMaterial->Material(matid);
+            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+            if (thisMaterialChild->ROnly) {
                 ShowWarningError(state,
                                  cHAMTObject5 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
@@ -517,20 +529,20 @@ namespace HeatBalanceHAMTManager {
 
             Numid = 1;
 
-            state.dataMaterial->Material(matid)->nmu = NumArray(Numid);
-            if (state.dataMaterial->Material(matid)->nmu > 0) {
-                for (mu = 1; mu <= state.dataMaterial->Material(matid)->nmu; ++mu) {
+            thisMaterialChild->nmu = NumArray(Numid);
+            if (thisMaterialChild->nmu > 0) {
+                for (mu = 1; mu <= thisMaterialChild->nmu; ++mu) {
                     ++Numid;
-                    state.dataMaterial->Material(matid)->murh(mu) = NumArray(Numid);
+                    thisMaterialChild->murh(mu) = NumArray(Numid);
                     ++Numid;
-                    state.dataMaterial->Material(matid)->mudata(mu) = NumArray(Numid);
+                    thisMaterialChild->mudata(mu) = NumArray(Numid);
                 }
 
-                ++state.dataMaterial->Material(matid)->nmu;
-                state.dataMaterial->Material(matid)->murh(state.dataMaterial->Material(matid)->nmu) =
-                    state.dataMaterial->Material(matid)->isorh(state.dataMaterial->Material(matid)->niso);
-                state.dataMaterial->Material(matid)->mudata(state.dataMaterial->Material(matid)->nmu) =
-                    state.dataMaterial->Material(matid)->mudata(state.dataMaterial->Material(matid)->nmu - 1);
+                ++thisMaterialChild->nmu;
+                thisMaterialChild->murh(thisMaterialChild->nmu) =
+                    thisMaterialChild->isorh(thisMaterialChild->niso);
+                thisMaterialChild->mudata(thisMaterialChild->nmu) =
+                    thisMaterialChild->mudata(thisMaterialChild->nmu - 1);
             }
         }
 
@@ -557,27 +569,29 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataMaterial->Material(matid)->ROnly) {
+            auto *thisMaterial = state.dataMaterial->Material(matid);
+            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+            if (thisMaterialChild->ROnly) {
                 ShowWarningError(state,
                                  cHAMTObject6 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
             Numid = 1;
 
-            state.dataMaterial->Material(matid)->ntc = NumArray(Numid);
-            if (state.dataMaterial->Material(matid)->ntc > 0) {
-                for (tc = 1; tc <= state.dataMaterial->Material(matid)->ntc; ++tc) {
+            thisMaterialChild->ntc = NumArray(Numid);
+            if (thisMaterialChild->ntc > 0) {
+                for (tc = 1; tc <= thisMaterialChild->ntc; ++tc) {
                     ++Numid;
-                    state.dataMaterial->Material(matid)->tcwater(tc) = NumArray(Numid);
+                    thisMaterialChild->tcwater(tc) = NumArray(Numid);
                     ++Numid;
-                    state.dataMaterial->Material(matid)->tcdata(tc) = NumArray(Numid);
+                    thisMaterialChild->tcdata(tc) = NumArray(Numid);
                 }
 
-                ++state.dataMaterial->Material(matid)->ntc;
-                state.dataMaterial->Material(matid)->tcwater(state.dataMaterial->Material(matid)->ntc) =
-                    state.dataMaterial->Material(matid)->isodata(state.dataMaterial->Material(matid)->niso);
-                state.dataMaterial->Material(matid)->tcdata(state.dataMaterial->Material(matid)->ntc) =
-                    state.dataMaterial->Material(matid)->tcdata(state.dataMaterial->Material(matid)->ntc - 1);
+                ++thisMaterialChild->ntc;
+                thisMaterialChild->tcwater(thisMaterialChild->ntc) =
+                    thisMaterialChild->isodata(thisMaterialChild->niso);
+                thisMaterialChild->tcdata(thisMaterialChild->ntc) =
+                    thisMaterialChild->tcdata(thisMaterialChild->ntc - 1);
             }
         }
 
@@ -680,59 +694,61 @@ namespace HeatBalanceHAMTManager {
             if (conid == 0) continue;
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
                 matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
-                if (state.dataMaterial->Material(matid)->ROnly) {
+                auto *thisMaterial = state.dataMaterial->Material(matid);
+                auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+                if (thisMaterialChild->ROnly) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name +
                                         " cannot contain R-only value materials.");
-                    ShowContinueError(state, "Reference Material=\"" + state.dataMaterial->Material(matid)->Name + "\".");
+                    ShowContinueError(state, "Reference Material=\"" + thisMaterialChild->Name + "\".");
                     ++errorCount;
                     continue;
                 }
 
-                if (state.dataMaterial->Material(matid)->nmu < 0) {
+                if (thisMaterialChild->nmu < 0) {
                     ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
-                                      "Reference Material=\"" + state.dataMaterial->Material(matid)->Name +
+                                      "Reference Material=\"" + thisMaterialChild->Name +
                                           "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.");
                     ++errorCount;
                 }
 
-                if (state.dataMaterial->Material(matid)->niso < 0) {
+                if (thisMaterialChild->niso < 0) {
                     ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(
-                        state, "Reference Material=\"" + state.dataMaterial->Material(matid)->Name + "\" does not have required isotherm data.");
+                        state, "Reference Material=\"" + thisMaterialChild->Name + "\" does not have required isotherm data.");
                     ++errorCount;
                 }
-                if (state.dataMaterial->Material(matid)->nsuc < 0) {
+                if (thisMaterialChild->nsuc < 0) {
                     ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
-                                      "Reference Material=\"" + state.dataMaterial->Material(matid)->Name +
+                                      "Reference Material=\"" + thisMaterialChild->Name +
                                           "\" does not have required liquid transport coefficient (suction) data.");
                     ++errorCount;
                 }
-                if (state.dataMaterial->Material(matid)->nred < 0) {
+                if (thisMaterialChild->nred < 0) {
                     ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
-                                      "Reference Material=\"" + state.dataMaterial->Material(matid)->Name +
+                                      "Reference Material=\"" + thisMaterialChild->Name +
                                           "\" does not have required liquid transport coefficient (redistribution) data.");
                     ++errorCount;
                 }
-                if (state.dataMaterial->Material(matid)->ntc < 0) {
-                    if (state.dataMaterial->Material(matid)->Conductivity > 0) {
+                if (thisMaterialChild->ntc < 0) {
+                    if (thisMaterialChild->Conductivity > 0) {
                         ShowWarningError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state,
-                                          "Reference Material=\"" + state.dataMaterial->Material(matid)->Name +
+                                          "Reference Material=\"" + thisMaterialChild->Name +
                                               "\" does not have thermal conductivity data. Using fixed value.");
-                        state.dataMaterial->Material(matid)->ntc = 2;
-                        state.dataMaterial->Material(matid)->tcwater(1) = 0.0;
-                        state.dataMaterial->Material(matid)->tcdata(1) = state.dataMaterial->Material(matid)->Conductivity;
-                        state.dataMaterial->Material(matid)->tcwater(2) =
-                            state.dataMaterial->Material(matid)->isodata(state.dataMaterial->Material(matid)->niso);
-                        state.dataMaterial->Material(matid)->tcdata(2) = state.dataMaterial->Material(matid)->Conductivity;
+                        thisMaterialChild->ntc = 2;
+                        thisMaterialChild->tcwater(1) = 0.0;
+                        thisMaterialChild->tcdata(1) = thisMaterialChild->Conductivity;
+                        thisMaterialChild->tcwater(2) =
+                            thisMaterialChild->isodata(thisMaterialChild->niso);
+                        thisMaterialChild->tcdata(2) = thisMaterialChild->Conductivity;
                     } else {
                         ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state,
-                                          "Reference Material=\"" + state.dataMaterial->Material(matid)->Name +
+                                          "Reference Material=\"" + thisMaterialChild->Name +
                                               "\" does not have required thermal conductivity data.");
                         ++errorCount;
                     }
@@ -740,37 +756,37 @@ namespace HeatBalanceHAMTManager {
 
                 // convert material water content to RH
 
-                waterd = state.dataMaterial->Material(matid)->iwater * state.dataMaterial->Material(matid)->Density;
-                interp(state.dataMaterial->Material(matid)->niso,
-                       state.dataMaterial->Material(matid)->isodata,
-                       state.dataMaterial->Material(matid)->isorh,
+                waterd = thisMaterialChild->iwater * thisMaterialChild->Density;
+                interp(thisMaterialChild->niso,
+                       thisMaterialChild->isodata,
+                       thisMaterialChild->isorh,
                        waterd,
-                       state.dataMaterial->Material(matid)->irh);
+                       thisMaterialChild->irh);
 
-                state.dataMaterial->Material(matid)->divs =
-                    int(state.dataMaterial->Material(matid)->Thickness / state.dataMaterial->Material(matid)->divsize) +
-                    state.dataMaterial->Material(matid)->divmin;
-                if (state.dataMaterial->Material(matid)->divs > state.dataMaterial->Material(matid)->divmax) {
-                    state.dataMaterial->Material(matid)->divs = state.dataMaterial->Material(matid)->divmax;
+                thisMaterialChild->divs =
+                    int(thisMaterialChild->Thickness / thisMaterialChild->divsize) +
+                    thisMaterialChild->divmin;
+                if (thisMaterialChild->divs > thisMaterialChild->divmax) {
+                    thisMaterialChild->divs = thisMaterialChild->divmax;
                 }
                 // Check length of cell - reduce number of divisions if necessary
                 Real64 const sin_negPIOvr2 = std::sin(-DataGlobalConstants::Pi / 2.0);
                 while (true) {
-                    testlen = state.dataMaterial->Material(matid)->Thickness *
-                              ((std::sin(DataGlobalConstants::Pi * (-1.0 / double(state.dataMaterial->Material(matid)->divs)) -
+                    testlen = thisMaterialChild->Thickness *
+                              ((std::sin(DataGlobalConstants::Pi * (-1.0 / double(thisMaterialChild->divs)) -
                                          DataGlobalConstants::Pi / 2.0) /
                                 2.0) -
                                (sin_negPIOvr2 / 2.0));
                     if (testlen > adjdist) break;
-                    --state.dataMaterial->Material(matid)->divs;
-                    if (state.dataMaterial->Material(matid)->divs < 1) {
+                    --thisMaterialChild->divs;
+                    if (thisMaterialChild->divs < 1) {
                         ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
-                        ShowContinueError(state, "Reference Material=\"" + state.dataMaterial->Material(matid)->Name + "\" is too thin.");
+                        ShowContinueError(state, "Reference Material=\"" + thisMaterialChild->Name + "\" is too thin.");
                         ++errorCount;
                         break;
                     }
                 }
-                state.dataHeatBalHAMTMgr->TotCellsMax += state.dataMaterial->Material(matid)->divs;
+                state.dataHeatBalHAMTMgr->TotCellsMax += thisMaterialChild->divs;
             }
             state.dataHeatBalHAMTMgr->TotCellsMax += 7;
         }
@@ -842,31 +858,32 @@ namespace HeatBalanceHAMTManager {
             conid = state.dataSurface->Surface(sid).Construction;
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
                 matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
-
-                for (did = 1; did <= state.dataMaterial->Material(matid)->divs; ++did) {
+                auto *thisMaterial = state.dataMaterial->Material(matid);
+                auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+                for (did = 1; did <= thisMaterialChild->divs; ++did) {
                     ++cid;
 
                     cells(cid).matid = matid;
                     cells(cid).sid = sid;
 
-                    cells(cid).temp = state.dataMaterial->Material(matid)->itemp;
-                    cells(cid).tempp1 = state.dataMaterial->Material(matid)->itemp;
-                    cells(cid).tempp2 = state.dataMaterial->Material(matid)->itemp;
+                    cells(cid).temp = thisMaterialChild->itemp;
+                    cells(cid).tempp1 = thisMaterialChild->itemp;
+                    cells(cid).tempp2 = thisMaterialChild->itemp;
 
-                    cells(cid).rh = state.dataMaterial->Material(matid)->irh;
-                    cells(cid).rhp1 = state.dataMaterial->Material(matid)->irh;
-                    cells(cid).rhp2 = state.dataMaterial->Material(matid)->irh;
+                    cells(cid).rh = thisMaterialChild->irh;
+                    cells(cid).rhp1 = thisMaterialChild->irh;
+                    cells(cid).rhp2 = thisMaterialChild->irh;
 
-                    cells(cid).density = state.dataMaterial->Material(matid)->Density;
-                    cells(cid).spech = state.dataMaterial->Material(matid)->SpecHeat;
+                    cells(cid).density = thisMaterialChild->Density;
+                    cells(cid).spech = thisMaterialChild->SpecHeat;
 
                     // Make cells smaller near the surface
                     cells(cid).length(1) =
-                        state.dataMaterial->Material(matid)->Thickness *
-                        ((std::sin(DataGlobalConstants::Pi * (-double(did) / double(state.dataMaterial->Material(matid)->divs)) -
+                        thisMaterialChild->Thickness *
+                        ((std::sin(DataGlobalConstants::Pi * (-double(did) / double(thisMaterialChild->divs)) -
                                    DataGlobalConstants::Pi / 2.0) /
                           2.0) -
-                         (std::sin(DataGlobalConstants::Pi * (-double(did - 1) / double(state.dataMaterial->Material(matid)->divs)) -
+                         (std::sin(DataGlobalConstants::Pi * (-double(did - 1) / double(thisMaterialChild->divs)) -
                                    DataGlobalConstants::Pi / 2.0) /
                           2.0));
 
@@ -1132,14 +1149,15 @@ namespace HeatBalanceHAMTManager {
 
             for (cid = Extcell(sid) + 1; cid <= Intcell(sid) - 1; ++cid) {
                 matid = cells(cid).matid;
+                auto *thisMaterial = state.dataMaterial->Material(matid);
+                auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+                cells(cid).temp = thisMaterialChild->itemp;
+                cells(cid).tempp1 = thisMaterialChild->itemp;
+                cells(cid).tempp2 = thisMaterialChild->itemp;
 
-                cells(cid).temp = state.dataMaterial->Material(matid)->itemp;
-                cells(cid).tempp1 = state.dataMaterial->Material(matid)->itemp;
-                cells(cid).tempp2 = state.dataMaterial->Material(matid)->itemp;
-
-                cells(cid).rh = state.dataMaterial->Material(matid)->irh;
-                cells(cid).rhp1 = state.dataMaterial->Material(matid)->irh;
-                cells(cid).rhp2 = state.dataMaterial->Material(matid)->irh;
+                cells(cid).rh = thisMaterialChild->irh;
+                cells(cid).rhp1 = thisMaterialChild->irh;
+                cells(cid).rhp2 = thisMaterialChild->irh;
             }
             state.dataHeatBalHAMTMgr->MyEnvrnFlag(sid) = false;
         }
@@ -1251,33 +1269,35 @@ namespace HeatBalanceHAMTManager {
                 cells(cid).vpp1 = RHtoVP(state, cells(cid).rhp1, cells(cid).tempp1);
                 cells(cid).vpsat = PsyPsatFnTemp(state, cells(cid).tempp1);
                 if (matid > 0) {
-                    interp(state.dataMaterial->Material(matid)->niso,
-                           state.dataMaterial->Material(matid)->isorh,
-                           state.dataMaterial->Material(matid)->isodata,
+                    auto *thisMaterial = state.dataMaterial->Material(matid);
+                    auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+                    interp(thisMaterialChild->niso,
+                           thisMaterialChild->isorh,
+                           thisMaterialChild->isodata,
                            cells(cid).rhp1,
                            cells(cid).water,
                            cells(cid).dwdphi);
                     if (state.dataEnvrn->IsRain && state.dataHeatBalHAMTMgr->rainswitch) {
-                        interp(state.dataMaterial->Material(matid)->nsuc,
-                               state.dataMaterial->Material(matid)->sucwater,
-                               state.dataMaterial->Material(matid)->sucdata,
+                        interp(thisMaterialChild->nsuc,
+                               thisMaterialChild->sucwater,
+                               thisMaterialChild->sucdata,
                                cells(cid).water,
                                cells(cid).dw);
                     } else {
-                        interp(state.dataMaterial->Material(matid)->nred,
-                               state.dataMaterial->Material(matid)->redwater,
-                               state.dataMaterial->Material(matid)->reddata,
+                        interp(thisMaterialChild->nred,
+                               thisMaterialChild->redwater,
+                               thisMaterialChild->reddata,
                                cells(cid).water,
                                cells(cid).dw);
                     }
-                    interp(state.dataMaterial->Material(matid)->nmu,
-                           state.dataMaterial->Material(matid)->murh,
-                           state.dataMaterial->Material(matid)->mudata,
+                    interp(thisMaterialChild->nmu,
+                           thisMaterialChild->murh,
+                           thisMaterialChild->mudata,
                            cells(cid).rhp1,
                            cells(cid).mu);
-                    interp(state.dataMaterial->Material(matid)->ntc,
-                           state.dataMaterial->Material(matid)->tcwater,
-                           state.dataMaterial->Material(matid)->tcdata,
+                    interp(thisMaterialChild->ntc,
+                           thisMaterialChild->tcwater,
+                           thisMaterialChild->tcdata,
                            cells(cid).water,
                            cells(cid).wthermalc);
                 }

@@ -2124,9 +2124,10 @@ void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData c
     zoneGroups.push_back(std::make_unique<ZoneGroup>(m_errorStream, m_db, number, zoneGroupData));
 }
 
-void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const *materialData)
+void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialBase const *materialData)
 {
-    materials.push_back(std::make_unique<Material>(m_errorStream, m_db, number, materialData));
+    auto const *materialDataChild = dynamic_cast<const EnergyPlus::Material::MaterialChild *>(materialData);
+    materials.push_back(std::make_unique<Material>(m_errorStream, m_db, number, materialDataChild));
 }
 void SQLite::addConstructionData(int const number,
                                  EnergyPlus::Construction::ConstructionProps const &constructionData,

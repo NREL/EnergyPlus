@@ -2866,22 +2866,23 @@ namespace WindowComplexManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
             auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
+            auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
 
-            if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
-                (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
+            if ((thisMaterialChild->Group == Material::MaterialGroup::WindowGlass) ||
+                (thisMaterialChild->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
-                thick(IGlass) = thisMaterial->Thickness;
-                scon(IGlass) = thisMaterial->Conductivity;
-                emis(2 * IGlass - 1) = thisMaterial->AbsorpThermalFront;
-                emis(2 * IGlass) = thisMaterial->AbsorpThermalBack;
-                tir(2 * IGlass - 1) = thisMaterial->TransThermal;
-                tir(2 * IGlass) = thisMaterial->TransThermal;
-                YoungsMod(IGlass) = thisMaterial->YoungModulus;
-                PoissonsRat(IGlass) = thisMaterial->PoissonsRatio;
-            } else if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowShade) {
+                thick(IGlass) = thisMaterialChild->Thickness;
+                scon(IGlass) = thisMaterialChild->Conductivity;
+                emis(2 * IGlass - 1) = thisMaterialChild->AbsorpThermalFront;
+                emis(2 * IGlass) = thisMaterialChild->AbsorpThermalBack;
+                tir(2 * IGlass - 1) = thisMaterialChild->TransThermal;
+                tir(2 * IGlass) = thisMaterialChild->TransThermal;
+                YoungsMod(IGlass) = thisMaterialChild->YoungModulus;
+                PoissonsRat(IGlass) = thisMaterialChild->PoissonsRatio;
+            } else if (thisMaterialChild->Group == Material::MaterialGroup::ComplexWindowShade) {
                 ++IGlass;
-                TempInt = thisMaterial->ComplexShadePtr;
+                TempInt = thisMaterialChild->ComplexShadePtr;
                 LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
 
                 thick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Thickness;
@@ -2904,19 +2905,19 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
-            } else if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) {
+            } else if (thisMaterialChild->Group == Material::MaterialGroup::ComplexWindowGap) {
                 ++IGap;
-                gap(IGap) = thisMaterial->Thickness;
-                presure(IGap) = thisMaterial->Pressure;
+                gap(IGap) = thisMaterialChild->Thickness;
+                presure(IGap) = thisMaterialChild->Pressure;
 
-                DeflectionPtr = thisMaterial->DeflectionStatePtr;
+                DeflectionPtr = thisMaterialChild->DeflectionStatePtr;
                 if (DeflectionPtr != 0) {
                     GapDefMax(IGap) = state.dataHeatBal->DeflectionState(DeflectionPtr).DeflectedThickness;
                 } else {
                     GapDefMax(IGap) = gap(IGap);
                 }
 
-                PillarPtr = thisMaterial->SupportPillarPtr;
+                PillarPtr = thisMaterialChild->SupportPillarPtr;
 
                 if (PillarPtr != 0) {
                     SupportPlr(IGap) = 1;
@@ -2924,25 +2925,27 @@ namespace WindowComplexManager {
                     PillarRadius(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Radius;
                 }
 
-                GasPointer = thisMaterial->GasPointer;
+                GasPointer = thisMaterialChild->GasPointer;
 
-                nmix(IGap + 1) = state.dataMaterial->Material(GasPointer)->NumberOfGasesInMixture;
+                auto const *thisMaterialGasPt = state.dataMaterial->Material(GasPointer);
+                auto const *thisMaterialGasPtChild = dynamic_cast<const Material::MaterialChild *>(thisMaterialGasPt);
+                nmix(IGap + 1) = thisMaterialGasPtChild->NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    frct(IMix, IGap + 1) = state.dataMaterial->Material(GasPointer)->GasFract(IMix);
+                    frct(IMix, IGap + 1) = thisMaterialGasPtChild->GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
                     bool feedData(false);
-                    CheckGasCoefs(state.dataMaterial->Material(GasPointer)->GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
+                    CheckGasCoefs(thisMaterialGasPtChild->GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
-                        wght(iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasWght(IMix);
-                        gama(iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasSpecHeatRatio(IMix);
+                        wght(iprop(IMix, IGap + 1)) = thisMaterialGasPtChild->GasWght(IMix);
+                        gama(iprop(IMix, IGap + 1)) = thisMaterialGasPtChild->GasSpecHeatRatio(IMix);
                         for (i = 1; i <= 3; ++i) {
-                            gcon(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasCon(i, IMix);
-                            gvis(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasVis(i, IMix);
-                            gcp(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasCp(i, IMix);
+                            gcon(i, iprop(IMix, IGap + 1)) = thisMaterialGasPtChild->GasCon(i, IMix);
+                            gvis(i, iprop(IMix, IGap + 1)) = thisMaterialGasPtChild->GasVis(i, IMix);
+                            gcp(i, iprop(IMix, IGap + 1)) = thisMaterialGasPtChild->GasCp(i, IMix);
                         }
                     } // IF feedData THEN
                 }

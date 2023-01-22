@@ -3259,7 +3259,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 // Exterior building surface is nearest hit
                 if (!state.dataConstruction->Construct(ObsConstrNum).TypeIsWindow) {
                     // Obstruction is not a window, i.e., is an opaque surface
-                    ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1))->AbsorpVisible;
+                    ObsVisRefl = 1.0 - dynamic_cast<Material::MaterialChild *>(
+                                           state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)))
+                                           ->AbsorpVisible;
                 } else {
                     // Obstruction is a window; assume it is bare
                     ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
@@ -7922,8 +7924,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         // Exterior building surface is nearest hit
                         if (!state.dataConstruction->Construct(ObsConstrNum).TypeIsWindow) {
                             // Obstruction is not a window, i.e., is an opaque surface
-                            ObsVisRefl =
-                                1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1))->AbsorpVisible;
+                            ObsVisRefl = 1.0 - dynamic_cast<Material::MaterialChild *>(
+                                                   state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)))
+                                                   ->AbsorpVisible;
                         } else {
                             // Obstruction is a window; assume it is bare
                             ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;

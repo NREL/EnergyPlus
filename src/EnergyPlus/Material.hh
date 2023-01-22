@@ -132,17 +132,28 @@ namespace Material {
     constexpr std::array<std::string_view, static_cast<int>(SlatAngleType::Num)> SlatAngleTypeUC = {
         "FIXEDSLATANGLE", "MAXIMIZESOLAR", "BLOCKBEAMSOLAR"};
 
-    struct MaterialProperties
+    struct MaterialBase
     {
         // Members
-        std::string Name;              // Name of material layer
-        Material::MaterialGroup Group; // Material group type (see Material Parameters above.  Currently
+        std::string Name = "";                                            // Name of material layer
+        Material::MaterialGroup Group = Material::MaterialGroup::Invalid; // Material group type (see Material Parameters above.  Currently
+
+        virtual bool dummy() {
+            return true;
+        }
+    };
+
+    struct MaterialChild : public MaterialBase
+    {
+        DataSurfaces::SurfaceRoughness Roughness =
+            DataSurfaces::SurfaceRoughness::Invalid; // Surface roughness index (See Surface Roughness parameters
+        // above.  Current: VerySmooth, Smooth, MediumSmooth,
+        // MediumRough, Rough, VeryRough)
+        Real64 Thickness = 0.0; // Layer thickness (m)
+        // so that dynamic_cast can work
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
-        DataSurfaces::SurfaceRoughness Roughness; // Surface roughness index (See Surface Roughness parameters
-        // above.  Current: VerySmooth, Smooth, MediumSmooth,
-        // MediumRough, Rough, VeryRough)
         // Thermo-physical material properties
         Real64 Conductivity; // Thermal conductivity of layer (W/m2K)
         Real64 Density;      // Layer density (kg/m3)
@@ -154,7 +165,6 @@ namespace Material {
         Real64 SpecHeat;      // Layer specific heat (J/kgK)
         Real64 ThermGradCoef; // Thermal-gradient coefficient for moisture capacity
         // based on the water vapor density (kg/kgK)
-        Real64 Thickness;          // Layer thickness (m)
         Real64 VaporDiffus;        // Layer vapor diffusivity
         Array1D<GasType> gasTypes; // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
         //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
@@ -323,12 +333,11 @@ namespace Material {
         // material
 
         // Default Constructor
-        MaterialProperties()
-            : Group(Material::MaterialGroup::Invalid), Roughness(DataSurfaces::SurfaceRoughness::Invalid), Conductivity(0.0), Density(0.0),
-              IsoMoistCap(0.0), Porosity(0.0), Resistance(0.0), ROnly(false), SpecHeat(0.0), ThermGradCoef(0.0), Thickness(0.0), VaporDiffus(0.0),
-              gasTypes(5, GasType::Custom), GlassSpectralDataPtr(0), NumberOfGasesInMixture(0), GasCon(3, 5, 0.0), GasVis(3, 5, 0.0),
-              GasCp(3, 5, 0.0), GasWght(5, 0.0), GasSpecHeatRatio(5, 0.0), GasFract(5, 0.0), AbsorpSolar(0.0), AbsorpSolarInput(0.0),
-              AbsorpSolarEMSOverrideOn(false), AbsorpSolarEMSOverride(0.0), AbsorpThermal(0.0), AbsorpThermalInput(0.0),
+        MaterialChild()
+            : Conductivity(0.0), Density(0.0), IsoMoistCap(0.0), Porosity(0.0), Resistance(0.0), ROnly(false), SpecHeat(0.0), ThermGradCoef(0.0),
+              VaporDiffus(0.0), gasTypes(5, GasType::Custom), GlassSpectralDataPtr(0), NumberOfGasesInMixture(0), GasCon(3, 5, 0.0),
+              GasVis(3, 5, 0.0), GasCp(3, 5, 0.0), GasWght(5, 0.0), GasSpecHeatRatio(5, 0.0), GasFract(5, 0.0), AbsorpSolar(0.0),
+              AbsorpSolarInput(0.0), AbsorpSolarEMSOverrideOn(false), AbsorpSolarEMSOverride(0.0), AbsorpThermal(0.0), AbsorpThermalInput(0.0),
               AbsorpThermalEMSOverrideOn(false), AbsorpThermalEMSOverride(0.0), AbsorpVisible(0.0), AbsorpVisibleInput(0.0),
               AbsorpVisibleEMSOverrideOn(false), AbsorpVisibleEMSOverride(0.0), Trans(0.0), TransVis(0.0), GlassTransDirtFactor(1.0),
               SolarDiffusing(false), ReflectShade(0.0), ReflectShadeVis(0.0), AbsorpThermalBack(0.0), AbsorpThermalFront(0.0),
@@ -355,6 +364,10 @@ namespace Material {
               GlassSpecAngFRefleDataPtr(0), GlassSpecAngBRefleDataPtr(0)
         {
         }
+
+        bool dummy() {
+            return false;
+        }
     };
 
     void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
@@ -363,7 +376,7 @@ namespace Material {
 
 struct MaterialData : BaseGlobalStruct
 {
-    EPVector<Material::MaterialProperties *> Material;
+    EPVector<Material::MaterialBase *> Material;
     int TotMaterials = 0; // Total number of unique materials (layers) in this simulation
 
     void clear_state() override
