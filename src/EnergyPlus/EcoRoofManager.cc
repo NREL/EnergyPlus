@@ -565,7 +565,7 @@ namespace EcoRoofManager {
         thisEcoRoof->MoistureMax = thisMatChild->Porosity;           // Max moisture content in soil
         thisEcoRoof->MoistureResidual = thisMatChild->MinMoisture;   // Min moisture content in soil
         thisEcoRoof->Moisture = thisMatChild->InitMoisture;          // Initial moisture content in soil
-        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture;  // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
+        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture;       // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
 
         thisEcoRoof->SoilThickness = thisMatChild->Thickness; // Total thickness of soil layer (m)
 
@@ -715,9 +715,9 @@ namespace EcoRoofManager {
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
         if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
-            thisEcoRoof->Moisture = thisMatChild->InitMoisture;         // Initial moisture content in soil
+            thisEcoRoof->Moisture = thisMatChild->InitMoisture;    // Initial moisture content in soil
             thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // Start the root zone moisture at the same value as the surface.
-            thisEcoRoof->Alphag = 1.0 - thisMatChild->AbsorpSolar;      // albedo rather than absorptivity
+            thisEcoRoof->Alphag = 1.0 - thisMatChild->AbsorpSolar; // albedo rather than absorptivity
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && thisEcoRoof->CalcEcoRoofMyEnvrnFlag) {

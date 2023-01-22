@@ -138,7 +138,8 @@ namespace Material {
         std::string Name = "";                                            // Name of material layer
         Material::MaterialGroup Group = Material::MaterialGroup::Invalid; // Material group type (see Material Parameters above.  Currently
 
-        virtual bool dummy() {
+        virtual bool dummy()
+        {
             return true;
         }
     };
@@ -365,7 +366,8 @@ namespace Material {
         {
         }
 
-        bool dummy() {
+        bool dummy()
+        {
             return false;
         }
     };

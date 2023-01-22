@@ -349,8 +349,7 @@ namespace HeatBalanceHAMTManager {
 
             ++thisMaterialChild->niso;
             thisMaterialChild->isorh(thisMaterialChild->niso) = rhmax;
-            thisMaterialChild->isodata(thisMaterialChild->niso) =
-                thisMaterialChild->Porosity * wdensity;
+            thisMaterialChild->isodata(thisMaterialChild->niso) = thisMaterialChild->Porosity * wdensity;
 
             ++thisMaterialChild->niso;
             thisMaterialChild->isorh(thisMaterialChild->niso) = 0.0;
@@ -443,10 +442,8 @@ namespace HeatBalanceHAMTManager {
             }
 
             ++thisMaterialChild->nsuc;
-            thisMaterialChild->sucwater(thisMaterialChild->nsuc) =
-                thisMaterialChild->isodata(thisMaterialChild->niso);
-            thisMaterialChild->sucdata(thisMaterialChild->nsuc) =
-                thisMaterialChild->sucdata(thisMaterialChild->nsuc - 1);
+            thisMaterialChild->sucwater(thisMaterialChild->nsuc) = thisMaterialChild->isodata(thisMaterialChild->niso);
+            thisMaterialChild->sucdata(thisMaterialChild->nsuc) = thisMaterialChild->sucdata(thisMaterialChild->nsuc - 1);
         }
 
         HAMTitems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
@@ -490,10 +487,8 @@ namespace HeatBalanceHAMTManager {
             }
 
             ++thisMaterialChild->nred;
-            thisMaterialChild->redwater(thisMaterialChild->nred) =
-                thisMaterialChild->isodata(thisMaterialChild->niso);
-            thisMaterialChild->reddata(thisMaterialChild->nred) =
-                thisMaterialChild->reddata(thisMaterialChild->nred - 1);
+            thisMaterialChild->redwater(thisMaterialChild->nred) = thisMaterialChild->isodata(thisMaterialChild->niso);
+            thisMaterialChild->reddata(thisMaterialChild->nred) = thisMaterialChild->reddata(thisMaterialChild->nred - 1);
         }
 
         HAMTitems =
@@ -539,10 +534,8 @@ namespace HeatBalanceHAMTManager {
                 }
 
                 ++thisMaterialChild->nmu;
-                thisMaterialChild->murh(thisMaterialChild->nmu) =
-                    thisMaterialChild->isorh(thisMaterialChild->niso);
-                thisMaterialChild->mudata(thisMaterialChild->nmu) =
-                    thisMaterialChild->mudata(thisMaterialChild->nmu - 1);
+                thisMaterialChild->murh(thisMaterialChild->nmu) = thisMaterialChild->isorh(thisMaterialChild->niso);
+                thisMaterialChild->mudata(thisMaterialChild->nmu) = thisMaterialChild->mudata(thisMaterialChild->nmu - 1);
             }
         }
 
@@ -588,10 +581,8 @@ namespace HeatBalanceHAMTManager {
                 }
 
                 ++thisMaterialChild->ntc;
-                thisMaterialChild->tcwater(thisMaterialChild->ntc) =
-                    thisMaterialChild->isodata(thisMaterialChild->niso);
-                thisMaterialChild->tcdata(thisMaterialChild->ntc) =
-                    thisMaterialChild->tcdata(thisMaterialChild->ntc - 1);
+                thisMaterialChild->tcwater(thisMaterialChild->ntc) = thisMaterialChild->isodata(thisMaterialChild->niso);
+                thisMaterialChild->tcdata(thisMaterialChild->ntc) = thisMaterialChild->tcdata(thisMaterialChild->ntc - 1);
             }
         }
 
@@ -715,8 +706,7 @@ namespace HeatBalanceHAMTManager {
 
                 if (thisMaterialChild->niso < 0) {
                     ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
-                    ShowContinueError(
-                        state, "Reference Material=\"" + thisMaterialChild->Name + "\" does not have required isotherm data.");
+                    ShowContinueError(state, "Reference Material=\"" + thisMaterialChild->Name + "\" does not have required isotherm data.");
                     ++errorCount;
                 }
                 if (thisMaterialChild->nsuc < 0) {
@@ -742,14 +732,12 @@ namespace HeatBalanceHAMTManager {
                         thisMaterialChild->ntc = 2;
                         thisMaterialChild->tcwater(1) = 0.0;
                         thisMaterialChild->tcdata(1) = thisMaterialChild->Conductivity;
-                        thisMaterialChild->tcwater(2) =
-                            thisMaterialChild->isodata(thisMaterialChild->niso);
+                        thisMaterialChild->tcwater(2) = thisMaterialChild->isodata(thisMaterialChild->niso);
                         thisMaterialChild->tcdata(2) = thisMaterialChild->Conductivity;
                     } else {
                         ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state,
-                                          "Reference Material=\"" + thisMaterialChild->Name +
-                                              "\" does not have required thermal conductivity data.");
+                                          "Reference Material=\"" + thisMaterialChild->Name + "\" does not have required thermal conductivity data.");
                         ++errorCount;
                     }
                 }
@@ -757,15 +745,9 @@ namespace HeatBalanceHAMTManager {
                 // convert material water content to RH
 
                 waterd = thisMaterialChild->iwater * thisMaterialChild->Density;
-                interp(thisMaterialChild->niso,
-                       thisMaterialChild->isodata,
-                       thisMaterialChild->isorh,
-                       waterd,
-                       thisMaterialChild->irh);
+                interp(thisMaterialChild->niso, thisMaterialChild->isodata, thisMaterialChild->isorh, waterd, thisMaterialChild->irh);
 
-                thisMaterialChild->divs =
-                    int(thisMaterialChild->Thickness / thisMaterialChild->divsize) +
-                    thisMaterialChild->divmin;
+                thisMaterialChild->divs = int(thisMaterialChild->Thickness / thisMaterialChild->divsize) + thisMaterialChild->divmin;
                 if (thisMaterialChild->divs > thisMaterialChild->divmax) {
                     thisMaterialChild->divs = thisMaterialChild->divmax;
                 }
@@ -773,9 +755,7 @@ namespace HeatBalanceHAMTManager {
                 Real64 const sin_negPIOvr2 = std::sin(-DataGlobalConstants::Pi / 2.0);
                 while (true) {
                     testlen = thisMaterialChild->Thickness *
-                              ((std::sin(DataGlobalConstants::Pi * (-1.0 / double(thisMaterialChild->divs)) -
-                                         DataGlobalConstants::Pi / 2.0) /
-                                2.0) -
+                              ((std::sin(DataGlobalConstants::Pi * (-1.0 / double(thisMaterialChild->divs)) - DataGlobalConstants::Pi / 2.0) / 2.0) -
                                (sin_negPIOvr2 / 2.0));
                     if (testlen > adjdist) break;
                     --thisMaterialChild->divs;
@@ -880,11 +860,9 @@ namespace HeatBalanceHAMTManager {
                     // Make cells smaller near the surface
                     cells(cid).length(1) =
                         thisMaterialChild->Thickness *
-                        ((std::sin(DataGlobalConstants::Pi * (-double(did) / double(thisMaterialChild->divs)) -
-                                   DataGlobalConstants::Pi / 2.0) /
+                        ((std::sin(DataGlobalConstants::Pi * (-double(did) / double(thisMaterialChild->divs)) - DataGlobalConstants::Pi / 2.0) /
                           2.0) -
-                         (std::sin(DataGlobalConstants::Pi * (-double(did - 1) / double(thisMaterialChild->divs)) -
-                                   DataGlobalConstants::Pi / 2.0) /
+                         (std::sin(DataGlobalConstants::Pi * (-double(did - 1) / double(thisMaterialChild->divs)) - DataGlobalConstants::Pi / 2.0) /
                           2.0));
 
                     cells(cid).origin(1) = runor + cells(cid).length(1) / 2.0;
@@ -1278,28 +1256,12 @@ namespace HeatBalanceHAMTManager {
                            cells(cid).water,
                            cells(cid).dwdphi);
                     if (state.dataEnvrn->IsRain && state.dataHeatBalHAMTMgr->rainswitch) {
-                        interp(thisMaterialChild->nsuc,
-                               thisMaterialChild->sucwater,
-                               thisMaterialChild->sucdata,
-                               cells(cid).water,
-                               cells(cid).dw);
+                        interp(thisMaterialChild->nsuc, thisMaterialChild->sucwater, thisMaterialChild->sucdata, cells(cid).water, cells(cid).dw);
                     } else {
-                        interp(thisMaterialChild->nred,
-                               thisMaterialChild->redwater,
-                               thisMaterialChild->reddata,
-                               cells(cid).water,
-                               cells(cid).dw);
+                        interp(thisMaterialChild->nred, thisMaterialChild->redwater, thisMaterialChild->reddata, cells(cid).water, cells(cid).dw);
                     }
-                    interp(thisMaterialChild->nmu,
-                           thisMaterialChild->murh,
-                           thisMaterialChild->mudata,
-                           cells(cid).rhp1,
-                           cells(cid).mu);
-                    interp(thisMaterialChild->ntc,
-                           thisMaterialChild->tcwater,
-                           thisMaterialChild->tcdata,
-                           cells(cid).water,
-                           cells(cid).wthermalc);
+                    interp(thisMaterialChild->nmu, thisMaterialChild->murh, thisMaterialChild->mudata, cells(cid).rhp1, cells(cid).mu);
+                    interp(thisMaterialChild->ntc, thisMaterialChild->tcwater, thisMaterialChild->tcdata, cells(cid).water, cells(cid).wthermalc);
                 }
             }
 

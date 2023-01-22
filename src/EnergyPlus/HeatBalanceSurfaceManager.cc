@@ -2343,7 +2343,7 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
         int const MaterialIndex(state.dataSurface->SurfMaterialMovInsulExt(SurfNum));
         auto const *thisMaterial = state.dataMaterial->Material(MaterialIndex);
         auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-        Material::MaterialGroup const MaterialGroupNum(thisMaterialChild->Group );
+        Material::MaterialGroup const MaterialGroupNum(thisMaterialChild->Group);
         state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * thisMaterialChild->Resistance);
         if (MaterialGroupNum == Material::MaterialGroup::WindowGlass || MaterialGroupNum == Material::MaterialGroup::GlassEquivalentLayer) {
@@ -2372,7 +2372,7 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
         int const MaterialIndex(state.dataSurface->SurfMaterialMovInsulInt(SurfNum));
         auto const *thisMaterial = state.dataMaterial->Material(MaterialIndex);
         auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-        Material::MaterialGroup const MaterialGroupNum(thisMaterialChild->Group );
+        Material::MaterialGroup const MaterialGroupNum(thisMaterialChild->Group);
         state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * thisMaterialChild->Resistance);
         if (MaterialGroupNum == Material::MaterialGroup::WindowGlass || MaterialGroupNum == Material::MaterialGroup::GlassEquivalentLayer) {

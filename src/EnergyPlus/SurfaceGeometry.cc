@@ -11765,7 +11765,7 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Screen:EquivalentLayer",
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
-                    Material::MaterialGroup const MaterialLayerGroup = thisMaterialChild->Group ;
+                    Material::MaterialGroup const MaterialLayerGroup = thisMaterialChild->Group;
                     if ((MaterialLayerGroup == Material::MaterialGroup::WindowSimpleGlazing) ||
                         (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::DrapeEquivalentLayer) ||
@@ -13713,21 +13713,17 @@ namespace SurfaceGeometry {
             thisConstructTot.LayerPoint({1, Construction::MaxLayersInConstruct}) = 0;
             thisConstructTot.LayerPoint(1) = stormMaterial;
             thisConstructTot.LayerPoint(2) = gapMaterial;
-            thisConstructTot.LayerPoint({3, TotLayersOld + 2}) =
-                state.dataConstruction->Construct(oldConstruction).LayerPoint({1, TotLayersOld});
+            thisConstructTot.LayerPoint({3, TotLayersOld + 2}) = state.dataConstruction->Construct(oldConstruction).LayerPoint({1, TotLayersOld});
             thisConstructTot.Name = name;
             thisConstructTot.TotLayers = TotLayersOld + 2;
-            thisConstructTot.TotSolidLayers =
-                state.dataConstruction->Construct(oldConstruction).TotSolidLayers + 1;
-            thisConstructTot.TotGlassLayers =
-                state.dataConstruction->Construct(oldConstruction).TotGlassLayers + 1;
+            thisConstructTot.TotSolidLayers = state.dataConstruction->Construct(oldConstruction).TotSolidLayers + 1;
+            thisConstructTot.TotGlassLayers = state.dataConstruction->Construct(oldConstruction).TotGlassLayers + 1;
             thisConstructTot.TypeIsWindow = true;
             thisConstructTot.InsideAbsorpVis = 0.0;
             thisConstructTot.OutsideAbsorpVis = 0.0;
             thisConstructTot.InsideAbsorpSolar = 0.0;
             thisConstructTot.OutsideAbsorpSolar = 0.0;
-            thisConstructTot.InsideAbsorpThermal =
-                state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
+            thisConstructTot.InsideAbsorpThermal = state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
             auto const *thisMaterial = state.dataMaterial->Material(stormMaterial);
             auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
             thisConstructTot.OutsideAbsorpThermal = thisMaterialChild->AbsorpThermalFront;
@@ -13775,8 +13771,7 @@ namespace SurfaceGeometry {
             thisConstructTot.W5FrameDivider = 0;
             thisConstructTot.FromWindow5DataFile = false;
             thisConstructTot.W5FileMullionWidth = 0.0;
-            thisConstructTot.W5FileMullionOrientation =
-                DataWindowEquivalentLayer::Orientation::Invalid;
+            thisConstructTot.W5FileMullionOrientation = DataWindowEquivalentLayer::Orientation::Invalid;
             thisConstructTot.W5FileGlazingSysWidth = 0.0;
             thisConstructTot.W5FileGlazingSysHeight = 0.0;
             for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {

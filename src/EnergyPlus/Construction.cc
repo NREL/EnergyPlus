@@ -243,8 +243,8 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                         ShowContinueError(state,
                                           format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
                         if (thisMaterialChild->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
-                            ShowContinueError(state,
-                                              format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterialChild->Thickness));
+                            ShowContinueError(
+                                state, format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterialChild->Thickness));
                             ShowContinueError(state,
                                               format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                      DataHeatBalance::ThinMaterialLayerThreshold));
@@ -271,10 +271,10 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
         // If not a resistive layer, nothing further is required
         // for this layer.
 
-        if (ResLayer(Layer)) {                    // Resistive layer-check for R-value, etc.
-            ++NumResLayers;                       // Increment number of resistive layers
+        if (ResLayer(Layer)) {                         // Resistive layer-check for R-value, etc.
+            ++NumResLayers;                            // Increment number of resistive layers
             lr(Layer) = thisMaterialChild->Resistance; // User defined thermal resistivity
-            if (lr(Layer) < RValueLowLimit) {     // User didn't define enough
+            if (lr(Layer) < RValueLowLimit) {          // User didn't define enough
                 // parameters to calculate CTFs for a building element
                 // containing this layer.
 

@@ -1762,7 +1762,7 @@ namespace HeatBalanceManager {
                 if (thisConstruct.LayerPoint(Layer) > 0) {
                     auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
                     auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-                    MaterialLayerGroup = thisMaterialChild->Group ;
+                    MaterialLayerGroup = thisMaterialChild->Group;
                     if (MaterialLayerGroup == Material::MaterialGroup::WindowGlass) ++iMatGlass;
                     if ((MaterialLayerGroup == Material::MaterialGroup::GlassEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
@@ -1808,8 +1808,7 @@ namespace HeatBalanceManager {
                     auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
                     auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
                     state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += state.dataHeatBal->NominalR(thisConstruct.LayerPoint(Layer));
-                    if (thisMaterialChild->Group == Material::MaterialGroup::RegularMaterial &&
-                        !thisMaterialChild->ROnly) {
+                    if (thisMaterialChild->Group == Material::MaterialGroup::RegularMaterial && !thisMaterialChild->ROnly) {
                         state.dataHeatBal->NoRegularMaterialsUsed = false;
                     }
                 }
@@ -2451,7 +2450,8 @@ namespace HeatBalanceManager {
                 (MatChild->Group == Material::MaterialGroup::Shade || MatChild->Group == Material::MaterialGroup::WindowBlind ||
                  MatChild->Group == Material::MaterialGroup::Screen || MatChild->Group == Material::MaterialGroup::GlassEquivalentLayer ||
                  MatChild->Group == Material::MaterialGroup::GapEquivalentLayer || MatChild->Group == Material::MaterialGroup::ShadeEquivalentLayer ||
-                 MatChild->Group == Material::MaterialGroup::DrapeEquivalentLayer || MatChild->Group == Material::MaterialGroup::ScreenEquivalentLayer ||
+                 MatChild->Group == Material::MaterialGroup::DrapeEquivalentLayer ||
+                 MatChild->Group == Material::MaterialGroup::ScreenEquivalentLayer ||
                  MatChild->Group == Material::MaterialGroup::BlindEquivalentLayer || Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
@@ -4865,7 +4865,8 @@ namespace HeatBalanceManager {
                     auto const *thisMaterial = state.dataMaterial->Material(MatNum);
                     auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
                     if (thisMaterialChild->Group == Material::MaterialGroup::WindowGlass) {
-                        state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
+                        state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
+                            thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
                     } else if (thisMaterialChild->Group == Material::MaterialGroup::WindowGas ||
                                thisMaterialChild->Group == Material::MaterialGroup::WindowGasMixture) {
                         // If mixture, use conductivity of first gas in mixture
@@ -5910,7 +5911,8 @@ namespace HeatBalanceManager {
             if (thisMaterialChild->SimpleWindowSHGC <= 0.15) {
                 thisMaterialChild->Trans = 0.41040 * thisMaterialChild->SimpleWindowSHGC;
             } else { // > 0.15
-                thisMaterialChild->Trans = 0.085775 * pow_2(thisMaterialChild->SimpleWindowSHGC) + 0.963954 * thisMaterialChild->SimpleWindowSHGC - 0.084958;
+                thisMaterialChild->Trans =
+                    0.085775 * pow_2(thisMaterialChild->SimpleWindowSHGC) + 0.963954 * thisMaterialChild->SimpleWindowSHGC - 0.084958;
             }
         } else { // interpolate. 3.4 <= Ufactor <= 4.5
 
@@ -5962,14 +5964,14 @@ namespace HeatBalanceManager {
         // step 6. determine visible properties.
         if (thisMaterialChild->SimpleWindowVTinputByUser) {
             thisMaterialChild->TransVis = thisMaterialChild->SimpleWindowVisTran;
-            thisMaterialChild->ReflectVisBeamBack =
-                -0.7409 * pow_3(thisMaterialChild->TransVis) + 1.6531 * pow_2(thisMaterialChild->TransVis) - 1.2299 * thisMaterialChild->TransVis + 0.4545;
+            thisMaterialChild->ReflectVisBeamBack = -0.7409 * pow_3(thisMaterialChild->TransVis) + 1.6531 * pow_2(thisMaterialChild->TransVis) -
+                                                    1.2299 * thisMaterialChild->TransVis + 0.4545;
             if (thisMaterialChild->TransVis + thisMaterialChild->ReflectVisBeamBack >= 1.0) {
                 thisMaterialChild->ReflectVisBeamBack = 0.999 - thisMaterialChild->TransVis;
             }
 
-            thisMaterialChild->ReflectVisBeamFront =
-                -0.0622 * pow_3(thisMaterialChild->TransVis) + 0.4277 * pow_2(thisMaterialChild->TransVis) - 0.4169 * thisMaterialChild->TransVis + 0.2399;
+            thisMaterialChild->ReflectVisBeamFront = -0.0622 * pow_3(thisMaterialChild->TransVis) + 0.4277 * pow_2(thisMaterialChild->TransVis) -
+                                                     0.4169 * thisMaterialChild->TransVis + 0.2399;
             if (thisMaterialChild->TransVis + thisMaterialChild->ReflectVisBeamFront >= 1.0) {
                 thisMaterialChild->ReflectVisBeamFront = 0.999 - thisMaterialChild->TransVis;
             }
