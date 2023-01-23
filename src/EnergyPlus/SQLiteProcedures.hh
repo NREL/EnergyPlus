@@ -120,7 +120,7 @@ public:
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, Material::MaterialBase const *materialData);
+    void addMaterialData(int const number, Material::MaterialChild const *materialData);
     void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);

@@ -109,7 +109,7 @@ using namespace DataMoistureBalanceEMPD;
 
 Real64 CalcDepthFromPeriod(EnergyPlusData &state,
                            Real64 const period,              // in seconds
-                           Material::MaterialBase const *mat // material
+                           Material::MaterialChild const *mat // material
 )
 {
 
@@ -121,19 +121,18 @@ Real64 CalcDepthFromPeriod(EnergyPlusData &state,
     // Calculate saturation vapor pressure at assumed temperature
     Real64 const PV_sat = Psychrometrics::PsyPsatFnTemp(state, T, "CalcDepthFromPeriod");
 
-    auto const *matChild = dynamic_cast<const Material::MaterialChild *>(mat);
     // Calculate slope of moisture sorption curve
-    Real64 const slope_MC = matChild->MoistACoeff * matChild->MoistBCoeff * std::pow(RH, matChild->MoistBCoeff - 1) +
-                            matChild->MoistCCoeff * matChild->MoistDCoeff * std::pow(RH, matChild->MoistDCoeff - 1);
+    Real64 const slope_MC = mat->MoistACoeff * mat->MoistBCoeff * std::pow(RH, mat->MoistBCoeff - 1) +
+                            mat->MoistCCoeff * mat->MoistDCoeff * std::pow(RH, mat->MoistDCoeff - 1);
 
     // Equation for the diffusivity of water vapor in air
     Real64 const diffusivity_air = 2.0e-7 * std::pow(T + 273.15, 0.81) / P_amb;
 
     // Convert mu to diffusivity [kg/m^2-s-Pa]
-    Real64 const EMPDdiffusivity = diffusivity_air / matChild->EMPDmu;
+    Real64 const EMPDdiffusivity = diffusivity_air / mat->EMPDmu;
 
     // Calculate penetration depth
-    Real64 const PenetrationDepth = std::sqrt(EMPDdiffusivity * PV_sat * period / (matChild->Density * slope_MC * DataGlobalConstants::Pi));
+    Real64 const PenetrationDepth = std::sqrt(EMPDdiffusivity * PV_sat * period / (mat->Density * slope_MC * DataGlobalConstants::Pi));
 
     return PenetrationDepth;
 }
@@ -238,12 +237,12 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
         materialChild->MoistCCoeff = MaterialProps(4);
         materialChild->MoistDCoeff = MaterialProps(5);
         if (state.dataIPShortCut->lNumericFieldBlanks(6) || MaterialProps(6) == DataGlobalConstants::AutoCalculate) {
-            materialChild->EMPDSurfaceDepth = CalcDepthFromPeriod(state, 24 * 3600, material); // 1 day
+            materialChild->EMPDSurfaceDepth = CalcDepthFromPeriod(state, 24 * 3600, materialChild); // 1 day
         } else {
             materialChild->EMPDSurfaceDepth = MaterialProps(6);
         }
         if (state.dataIPShortCut->lNumericFieldBlanks(7) || MaterialProps(7) == DataGlobalConstants::AutoCalculate) {
-            materialChild->EMPDDeepDepth = CalcDepthFromPeriod(state, 21 * 24 * 3600, material); // 3 weeks
+            materialChild->EMPDDeepDepth = CalcDepthFromPeriod(state, 21 * 24 * 3600, materialChild); // 3 weeks
         } else {
             materialChild->EMPDDeepDepth = MaterialProps(7);
         }

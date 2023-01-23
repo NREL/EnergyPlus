@@ -1645,7 +1645,7 @@ namespace HeatBalFiniteDiffManager {
                     Real64 const lTE(matFD_TempEnth.index(2, 1));
                     Real64 RhoS(matChild->Density);
                     if (matChild->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
+                        adjustPropertiesForPhaseChange(state, i, Surf, matChild, TD_i, TDT_i, Cp, RhoS, kt);
                         SurfaceFD(Surf).EnthalpyF = matChild->phaseChange->enthalpyF;
                         SurfaceFD(Surf).EnthalpyM = matChild->phaseChange->enthalpyM;
                     } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >=
@@ -1817,7 +1817,7 @@ namespace HeatBalFiniteDiffManager {
         Real64 const lTE(matFD_TempEnth.index(2, 1));
         Real64 RhoS(matChild->Density);
         if (matChild->phaseChange) {
-            adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
+            adjustPropertiesForPhaseChange(state, i, Surf, matChild, TD_i, TDT_i, Cp, RhoS, kt);
             ktA1 = matChild->phaseChange->getConductivity(TDT_ip);
             ktA2 = matChild->phaseChange->getConductivity(TDT_mi);
         } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >= 0.0) { // Phase change material: Use TempEnth data
@@ -2035,7 +2035,7 @@ namespace HeatBalFiniteDiffManager {
 
                     // Check for PCM second layer
                     if (mat2Child->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, Surf, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2);
+                        adjustPropertiesForPhaseChange(state, i, Surf, mat2Child, TD_i, TDT_i, Cp2, RhoS2, kt2);
                     } else if ((matFD_sum < 0.0) && (matFD2_sum > 0.0)) {            // Phase change material Layer2, Use TempEnth Data
                         Real64 const Enth2Old(terpld(matFD2_TempEnth, TD_i, 1, 2));  // 1: Temperature, 2: Thermal conductivity
                         Real64 const Enth2New(terpld(matFD2_TempEnth, TDT_i, 1, 2)); // 1: Temperature, 2: Thermal conductivity
@@ -2090,7 +2090,7 @@ namespace HeatBalFiniteDiffManager {
 
                     // Check for PCM layer before R layer
                     if (matChild->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp1, RhoS1, kt1);
+                        adjustPropertiesForPhaseChange(state, i, Surf, matChild, TD_i, TDT_i, Cp1, RhoS1, kt1);
                     } else if ((matFD_sum > 0.0) && (matFD2_sum < 0.0)) {           // Phase change material Layer1, Use TempEnth Data
                         Real64 const Enth1Old(terpld(matFD_TempEnth, TD_i, 1, 2));  // 1: Temperature, 2: Thermal conductivity
                         Real64 const Enth1New(terpld(matFD_TempEnth, TDT_i, 1, 2)); // 1: Temperature, 2: Thermal conductivity
@@ -2185,10 +2185,10 @@ namespace HeatBalFiniteDiffManager {
                     } // Phase change material check
 
                     if (matChild->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp1, RhoS1, kt1);
+                        adjustPropertiesForPhaseChange(state, i, Surf, matChild, TD_i, TDT_i, Cp1, RhoS1, kt1);
                     }
                     if (mat2Child->phaseChange) {
-                        adjustPropertiesForPhaseChange(state, i, Surf, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2);
+                        adjustPropertiesForPhaseChange(state, i, Surf, mat2Child, TD_i, TDT_i, Cp2, RhoS2, kt2);
                     }
 
                     // EMS Conductivity 1 Override
@@ -2365,7 +2365,7 @@ namespace HeatBalFiniteDiffManager {
                 assert(matFD_TempEnth.u2() >= 3);
                 Real64 const lTE(matFD_TempEnth.index(2, 1));
                 if (matChild->phaseChange) {
-                    adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
+                    adjustPropertiesForPhaseChange(state, i, Surf, matChild, TD_i, TDT_i, Cp, RhoS, kt);
                 } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >=
                            0.0) {                                     // Phase change material: Use TempEnth data
                     EnthOld(i) = terpld(matFD_TempEnth, TD_i, 1, 2);  // 1: Temperature, 2: Enthalpy
@@ -2625,7 +2625,7 @@ namespace HeatBalFiniteDiffManager {
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,
                                         int finiteDifferenceLayerIndex,
                                         int surfaceIndex,
-                                        const Material::MaterialBase *materialDefinition,
+                                        const Material::MaterialChild *materialDefinition,
                                         Real64 temperaturePrevious,
                                         Real64 temperatureUpdated,
                                         Real64 &updatedSpecificHeat,
