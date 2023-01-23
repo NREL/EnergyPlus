@@ -822,9 +822,9 @@ void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
 {
     for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
         if (!thisHP.companionCoilName.empty()) {
-            auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
-            auto &thisCoilType = thisHP.EIRHPType;
-            auto targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
+            std::string const &thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
+            DataPlant::PlantEquipmentType thisCoilType = thisHP.EIRHPType;
+            std::string const &targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
             for (auto &potentialCompanionCoil : state.dataEIRPlantLoopHeatPump->heatPumps) {
                 auto &potentialCompanionType = potentialCompanionCoil.EIRHPType;
                 auto potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
@@ -904,7 +904,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                 EIRPlantLoopHeatPump thisPLHP;

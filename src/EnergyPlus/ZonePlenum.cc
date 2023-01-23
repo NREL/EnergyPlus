@@ -94,9 +94,9 @@ void SimAirZonePlenum(EnergyPlusData &state,
                       std::string_view CompName,
                       DataZoneEquipment::AirLoopHVACZone const iCompType,
                       int &CompIndex,
-                      Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
-                      Optional_bool_const FirstCall,          // Autodesk:OPTIONAL Used without PRESENT check
-                      Optional_bool PlenumInletChanged        // Autodesk:OPTIONAL Used without PRESENT check
+                      ObjexxFCL::Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
+                      ObjexxFCL::Optional_bool_const FirstCall,          // Autodesk:OPTIONAL Used without PRESENT check
+                      ObjexxFCL::Optional_bool PlenumInletChanged        // Autodesk:OPTIONAL Used without PRESENT check
 )
 {
 

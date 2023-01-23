@@ -127,24 +127,24 @@ constexpr std::array<std::string_view, static_cast<int>(AirLoopHVACCompType::Num
     "AIRLOOPHVAC:SUPPLYPLENUM", "AIRLOOPHVAC:ZONESPLITTER", "AIRLOOPHVAC:ZONEMIXER", "AIRLOOPHVAC:RETURNPLENUM"};
 
 void ControlCompOutput(EnergyPlusData &state,
-                       std::string const &CompName,           // the component Name
-                       std::string const &CompType,           // Type of component
-                       int &CompNum,                          // Index of component in component array
-                       bool const FirstHVACIteration,         // flag for 1st HVAV iteration in the time step
-                       Real64 const QZnReq,                   // zone load to be met
-                       int const ActuatedNode,                // node that controls unit output
-                       Real64 const MaxFlow,                  // maximum water flow
-                       Real64 const MinFlow,                  // minimum water flow
-                       Real64 const ControlOffset,            // really the tolerance
-                       int &ControlCompTypeNum,               // Internal type num for CompType
-                       int &CompErrIndex,                     // for Recurring error call
-                       Optional_int_const TempInNode,         // inlet node for output calculation
-                       Optional_int_const TempOutNode,        // outlet node for output calculation
-                       Optional<Real64 const> AirMassFlow,    // air mass flow rate
-                       Optional_int_const Action,             // 1=reverse; 2=normal
-                       Optional_int_const EquipIndex,         // Identifier for equipment of Outdoor Air Unit "ONLY"
-                       PlantLocation const &plantLoc,         // for plant components, Location
-                       Optional_int_const ControlledZoneIndex // controlled zone index for the zone containing the component
+                       std::string const &CompName,                      // the component Name
+                       std::string const &CompType,                      // Type of component
+                       int &CompNum,                                     // Index of component in component array
+                       bool const FirstHVACIteration,                    // flag for 1st HVAV iteration in the time step
+                       Real64 const QZnReq,                              // zone load to be met
+                       int const ActuatedNode,                           // node that controls unit output
+                       Real64 const MaxFlow,                             // maximum water flow
+                       Real64 const MinFlow,                             // minimum water flow
+                       Real64 const ControlOffset,                       // really the tolerance
+                       int &ControlCompTypeNum,                          // Internal type num for CompType
+                       int &CompErrIndex,                                // for Recurring error call
+                       ObjexxFCL::Optional_int_const TempInNode,         // inlet node for output calculation
+                       ObjexxFCL::Optional_int_const TempOutNode,        // outlet node for output calculation
+                       ObjexxFCL::Optional<Real64 const> AirMassFlow,    // air mass flow rate
+                       ObjexxFCL::Optional_int_const Action,             // 1=reverse; 2=normal
+                       ObjexxFCL::Optional_int_const EquipIndex,         // Identifier for equipment of Outdoor Air Unit "ONLY"
+                       PlantLocation const &plantLoc,                    // for plant components, Location
+                       ObjexxFCL::Optional_int_const ControlledZoneIndex // controlled zone index for the zone containing the component
 )
 {
 
@@ -645,8 +645,8 @@ bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const Mi
 }
 
 void CheckSysSizing(EnergyPlusData &state,
-                    std::string const &CompType, // Component Type (e.g. Chiller:Electric)
-                    std::string const &CompName  // Component Name (e.g. Big Chiller)
+                    std::string_view const CompType, // Component Type (e.g. Chiller:Electric)
+                    std::string const &CompName      // Component Name (e.g. Big Chiller)
 )
 {
 
@@ -664,7 +664,7 @@ void CheckSysSizing(EnergyPlusData &state,
     // Checks SysSizingRunDone flag. If false throws a fatal error.
 
     if (!state.dataSize->SysSizingRunDone) {
-        ShowSevereError(state, "For autosizing of " + CompType + ' ' + CompName + ", a system sizing run must be done.");
+        ShowSevereError(state, format("For autosizing of {} {}, a system sizing run must be done.", CompType, CompName));
         if (state.dataSize->NumSysSizInput == 0) {
             ShowContinueError(state, "No \"Sizing:System\" objects were entered.");
         }
@@ -699,8 +699,8 @@ void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bo
 }
 
 void CheckZoneSizing(EnergyPlusData &state,
-                     std::string const &CompType, // Component Type (e.g. Chiller:Electric)
-                     std::string const &CompName  // Component Name (e.g. Big Chiller)
+                     std::string_view const CompType, // Component Type (e.g. Chiller:Electric)
+                     std::string const &CompName      // Component Name (e.g. Big Chiller)
 )
 {
 
@@ -718,7 +718,7 @@ void CheckZoneSizing(EnergyPlusData &state,
     // Checks ZoneSizingRunDone flag. If false throws a fatal error.
 
     if (!state.dataSize->ZoneSizingRunDone) {
-        ShowSevereError(state, "For autosizing of " + CompType + ' ' + CompName + ", a zone sizing run must be done.");
+        ShowSevereError(state, format("For autosizing of {} {}, a zone sizing run must be done.", CompType, CompName));
         if (state.dataSize->NumZoneSizingInput == 0) {
             ShowContinueError(state, "No \"Sizing:Zone\" objects were entered.");
         }
@@ -862,12 +862,12 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
                                   Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
                                   Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
-                                  Optional<Real64> HcGapRpt,
-                                  Optional<Real64> HrGapRpt,
-                                  Optional<Real64> IscRpt,
-                                  Optional<Real64> MdotVentRpt,
-                                  Optional<Real64> VdotWindRpt,
-                                  Optional<Real64> VdotBuoyRpt)
+                                  ObjexxFCL::Optional<Real64> HcGapRpt,
+                                  ObjexxFCL::Optional<Real64> HrGapRpt,
+                                  ObjexxFCL::Optional<Real64> IscRpt,
+                                  ObjexxFCL::Optional<Real64> MdotVentRpt,
+                                  ObjexxFCL::Optional<Real64> VdotWindRpt,
+                                  ObjexxFCL::Optional<Real64> VdotBuoyRpt)
 {
 
     // SUBROUTINE INFORMATION:
@@ -994,7 +994,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         InitExteriorConvectionCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
-        AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+        AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermal;
         TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
         TsBaffK = TmpTsBaf + DataGlobalConstants::KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero

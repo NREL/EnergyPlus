@@ -114,19 +114,19 @@ namespace HVACFan {
         }
     }
 
-    void FanSystem::simulate(
-        EnergyPlusData &state,
-        Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction = current flow/ max design flow
-                                             // rate.  It is not exactly the same as the legacy speed ratio that was used with SimulateFanComponents.
-        Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
-        Optional_bool_const zoneCompTurnFansOff, // can be used as turn Fans OFF signal from ZoneHVAC component
-        Optional<Real64 const>
-            pressureRise, // Pressure difference to use for DeltaPress, for rating DX coils at a different pressure without entire duct system
-        Optional<Real64 const> massFlowRate1,    // Mass flow rate in operating mode 1 [kg/s]
-        Optional<Real64 const> runTimeFraction1, // Run time fraction in operating mode 1
-        Optional<Real64 const> massFlowRate2,    // Mass flow rate in operating mode 2 [kg/s]
-        Optional<Real64 const> runTimeFraction2, // Run time fraction in opearating mode 2
-        Optional<Real64 const> pressureRise2     // Pressure difference for operating mode 2
+    void FanSystem::simulate(EnergyPlusData &state,
+                             ObjexxFCL::Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction
+                                                                             // = current flow/ max design flow rate.  It is not exactly the same as
+                                                                             // the legacy speed ratio that was used with SimulateFanComponents.
+                             ObjexxFCL::Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
+                             ObjexxFCL::Optional_bool_const zoneCompTurnFansOff, // can be used as turn Fans OFF signal from ZoneHVAC component
+                             ObjexxFCL::Optional<Real64 const> pressureRise,  // Pressure difference to use for DeltaPress, for rating DX coils at a
+                                                                              // different pressure without entire duct system
+                             ObjexxFCL::Optional<Real64 const> massFlowRate1, // Mass flow rate in operating mode 1 [kg/s]
+                             ObjexxFCL::Optional<Real64 const> runTimeFraction1, // Run time fraction in operating mode 1
+                             ObjexxFCL::Optional<Real64 const> massFlowRate2,    // Mass flow rate in operating mode 2 [kg/s]
+                             ObjexxFCL::Optional<Real64 const> runTimeFraction2, // Run time fraction in opearating mode 2
+                             ObjexxFCL::Optional<Real64 const> pressureRise2     // Pressure difference for operating mode 2
     )
     {
 
@@ -198,7 +198,7 @@ namespace HVACFan {
             m_deltaTemp = 0.0;
             m_powerLossToAir = 0.0;
             m_fanEnergy = 0.0;
-            for (auto loop = 0; loop < m_numSpeeds; ++loop) {
+            for (int loop = 0; loop < m_numSpeeds; ++loop) {
                 m_fanRunTimeFractionAtSpeed[loop] = 0.0;
             }
             m_objEnvrnFlag = false;
@@ -287,7 +287,7 @@ namespace HVACFan {
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) { // set up values at speeds
             m_massFlowAtSpeed.resize(m_numSpeeds, 0.0);
             m_totEfficAtSpeed.resize(m_numSpeeds, 0.0);
-            for (auto loop = 0; loop < m_numSpeeds; ++loop) {
+            for (int loop = 0; loop < m_numSpeeds; ++loop) {
                 m_massFlowAtSpeed[loop] = m_maxAirMassFlowRate * m_flowFractionAtSpeed[loop];
                 if (m_powerFractionInputAtSpeed[loop]) { // use speed power fraction
                     if (designElecPower > 0.0) {
@@ -572,7 +572,7 @@ namespace HVACFan {
             }
             // check that flow fractions are increasing
             bool increasingOrderError = false;
-            for (auto loop = 0; loop < (m_numSpeeds - 1); ++loop) {
+            for (int loop = 0; loop < (m_numSpeeds - 1); ++loop) {
                 if (m_flowFractionAtSpeed[loop] > m_flowFractionAtSpeed[loop + 1]) {
                     increasingOrderError = true;
                 }
@@ -589,7 +589,7 @@ namespace HVACFan {
         // check if power curve present when any speeds have no power fraction
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1 && powerModFuncFlowFractionCurveIndex == 0) {
             bool foundMissingPowerFraction = false;
-            for (auto loop = 0; loop < m_numSpeeds; ++loop) {
+            for (int loop = 0; loop < m_numSpeeds; ++loop) {
                 if (!m_powerFractionInputAtSpeed[loop]) {
                     foundMissingPowerFraction = true;
                 }
@@ -694,15 +694,15 @@ namespace HVACFan {
         EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
     }
 
-    void
-    FanSystem::calcSimpleSystemFan(EnergyPlusData &state,
-                                   Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
-                                   Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
-                                   Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
-                                   Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
-                                   Optional<Real64 const> flowRatio2,   // Flow ratio in operating mode 2
-                                   Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
-                                   Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
+    void FanSystem::calcSimpleSystemFan(
+        EnergyPlusData &state,
+        ObjexxFCL::Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
+        ObjexxFCL::Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
+        ObjexxFCL::Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
+        ObjexxFCL::Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
+        ObjexxFCL::Optional<Real64 const> flowRatio2,   // Flow ratio in operating mode 2
+        ObjexxFCL::Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
+        ObjexxFCL::Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
     )
     {
         std::vector<Real64> localPressureRise; // [0] is operating mode 1, [1] is operating mode 2
@@ -825,7 +825,7 @@ namespace HVACFan {
         m_fanPower = 0.0;
         m_outletAirMassFlowRate = 0.0;
         if (speedControl == SpeedControlMethod::Discrete) {
-            for (auto loop = 0; loop < m_numSpeeds; ++loop) {
+            for (int loop = 0; loop < m_numSpeeds; ++loop) {
                 m_fanRunTimeFractionAtSpeed[loop] = 0.0;
             }
         }
@@ -881,7 +881,7 @@ namespace HVACFan {
                             } else {
                                 lowSideSpeed = 0; // hush up cppcheck
                                 hiSideSpeed = 0;  // hush up cppcheck
-                                for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
+                                for (int loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFlowRatio) && (locFlowRatio <= m_flowFractionAtSpeed[loop + 1])) {
                                         lowSideSpeed = loop;
                                         hiSideSpeed = loop + 1;
@@ -936,7 +936,7 @@ namespace HVACFan {
                             } else {
                                 lowSideSpeed = 0; // hush up cppcheck
                                 hiSideSpeed = 0;  // hush up cppcheck
-                                for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
+                                for (int loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFanRunTimeFraction) &&
                                         (locFanRunTimeFraction <= m_flowFractionAtSpeed[loop + 1])) {
                                         lowSideSpeed = loop;

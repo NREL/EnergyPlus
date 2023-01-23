@@ -404,9 +404,9 @@ namespace UnitVentilator {
                     Fans::GetFanType(state, unitVent.FanName, unitVent.FanType_Num, errFlag, CurrentModuleObject, unitVent.Name);
 
                     {
-                        if ((BITF_TEST_ANY(BITF(unitVent.FanType_Num),
-                                           BITF(DataHVACGlobals::FanType_SimpleConstVolume) | BITF(DataHVACGlobals::FanType_SimpleVAV) |
-                                               BITF(DataHVACGlobals::FanType_SimpleOnOff)))) {
+                        if ((unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) ||
+                            (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleVAV) ||
+                            (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff)) {
 
                             if (errFlag) {
                                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, unitVent.Name));
@@ -3005,11 +3005,11 @@ namespace UnitVentilator {
     }
 
     void CalcUnitVentilatorComponents(EnergyPlusData &state,
-                                      int const UnitVentNum,              // Unit index in unit ventilator array
-                                      bool const FirstHVACIteration,      // flag for 1st HVAV iteration in the time step
-                                      Real64 &LoadMet,                    // load met by unit (watts)
-                                      Optional_int_const OpMode,          // Fan Type
-                                      Optional<Real64 const> PartLoadFrac // Part Load Ratio of coil and fan
+                                      int const UnitVentNum,                         // Unit index in unit ventilator array
+                                      bool const FirstHVACIteration,                 // flag for 1st HVAV iteration in the time step
+                                      Real64 &LoadMet,                               // load met by unit (watts)
+                                      ObjexxFCL::Optional_int_const OpMode,          // Fan Type
+                                      ObjexxFCL::Optional<Real64 const> PartLoadFrac // Part Load Ratio of coil and fan
     )
     {
 

@@ -505,6 +505,18 @@ namespace ScheduleManager {
             NumCSVAllColumnsSchedules =
                 schedule_file_shading_result->second["header"].get<std::set<std::string>>().size() - 1; // -1 to account for timestamp column
 
+            if (schedule_file_shading_result->second["header"].back().get<std::string>() == "()") {
+                ShowWarningError(state,
+                                 format("{}{}=\"{}\" Removing last column of the CSV since it has '()' for the surface name.",
+                                        RoutineName,
+                                        CurrentModuleObject,
+                                        Alphas(1)));
+                ShowContinueError(state, "This was a problem in E+ 22.2.0 and below, consider removing it from the file to suppress this warning.");
+                schedule_file_shading_result->second["header"].erase(NumCSVAllColumnsSchedules);
+                schedule_file_shading_result->second["values"].erase(NumCSVAllColumnsSchedules);
+                --NumCSVAllColumnsSchedules;
+            }
+
             if (rowCnt != rowLimitCount) {
                 if (rowCnt < rowLimitCount) {
                     ShowSevereError(state, format("{}{}=\"{}\" {} data values read.", RoutineName, CurrentModuleObject, Alphas(1), rowCnt));
@@ -2867,8 +2879,11 @@ namespace ScheduleManager {
         return GetDayScheduleIndex;
     }
 
-    void GetScheduleValuesForDay(
-        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay, Optional_int_const CurDayofWeek)
+    void GetScheduleValuesForDay(EnergyPlusData &state,
+                                 int const ScheduleIndex,
+                                 Array2S<Real64> DayValues,
+                                 ObjexxFCL::Optional_int_const JDay,
+                                 ObjexxFCL::Optional_int_const CurDayofWeek)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie

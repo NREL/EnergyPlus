@@ -141,9 +141,9 @@ void SimulateWaterCoilComponents(EnergyPlusData &state,
                                  std::string_view CompName,
                                  bool const FirstHVACIteration,
                                  int &CompIndex,
-                                 Optional<Real64> QActual,
-                                 Optional_int_const FanOpMode,
-                                 Optional<Real64 const> PartLoadRatio)
+                                 ObjexxFCL::Optional<Real64> QActual,
+                                 ObjexxFCL::Optional_int_const FanOpMode,
+                                 ObjexxFCL::Optional<Real64 const> PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3548,7 +3548,7 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
         // 1
         //);             } // CoefPointer
         auto const &dry_fin_eff_coef(state.dataWaterCoils->WaterCoil(CoilNum).DryFinEfficncyCoef);
-        auto DryFinEfficncy_pow(1.0);
+        Real64 DryFinEfficncy_pow(1.0);
         for (CoefPointer = 1; CoefPointer <= 5; ++CoefPointer) {
             DryCoilEfficiency += dry_fin_eff_coef(CoefPointer) * DryFinEfficncy_pow;
             DryFinEfficncy_pow *= DryFinEfficncy;
@@ -6845,11 +6845,11 @@ int GetWaterCoilAvailScheduleIndex(EnergyPlusData &state,
 }
 
 void SetWaterCoilData(EnergyPlusData &state,
-                      int const CoilNum,                       // Number of hot water heating Coil
-                      bool &ErrorsFound,                       // Set to true if certain errors found
-                      Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-                      Optional_int DesiccantDehumIndex,        // Index for the desiccant dehum system where this caoil is used
-                      Optional_bool heatRecoveryCoil)          // true if water coil is connected to heat recovery loop
+                      int const CoilNum,                                  // Number of hot water heating Coil
+                      bool &ErrorsFound,                                  // Set to true if certain errors found
+                      ObjexxFCL::Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+                      ObjexxFCL::Optional_int DesiccantDehumIndex,        // Index for the desiccant dehum system where this caoil is used
+                      ObjexxFCL::Optional_bool heatRecoveryCoil)          // true if water coil is connected to heat recovery loop
 {
 
     // FUNCTION INFORMATION:

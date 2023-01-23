@@ -127,7 +127,7 @@ namespace InternalHeatGains {
     using namespace DataSurfaces;
 
     void ManageInternalHeatGains(EnergyPlusData &state,
-                                 Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
+                                 ObjexxFCL::Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
 
         // SUBROUTINE INFORMATION:
@@ -3788,7 +3788,7 @@ namespace InternalHeatGains {
             int counter = 0;
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(objectType, instance.key());
 
                 // For incoming idf, maintain object order
@@ -8389,7 +8389,9 @@ namespace InternalHeatGains {
         }
     }
 
-    void UpdateInternalGainValues(EnergyPlusData &state, Optional_bool_const SuppressRadiationUpdate, Optional_bool_const SumLatentGains)
+    void UpdateInternalGainValues(EnergyPlusData &state,
+                                  ObjexxFCL::Optional_bool_const SuppressRadiationUpdate,
+                                  ObjexxFCL::Optional_bool_const SumLatentGains)
     {
 
         // SUBROUTINE INFORMATION:

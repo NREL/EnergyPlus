@@ -7538,8 +7538,8 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineName("CalcWaterThermalTankStratified");
     constexpr Real64 TemperatureConvergenceCriteria = 0.0001;
-    const Real64 SubTimestepMax = 60.0 * 10.0; // seconds
-    constexpr Real64 SubTimestepMin = 10.0;    // seconds
+    constexpr Real64 SubTimestepMax = 60.0 * 10.0; // seconds
+    constexpr Real64 SubTimestepMin = 10.0;        // seconds
     Real64 dt;
 
     // Tank object reference
@@ -10667,7 +10667,7 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
     }
 }
 
-void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum)
+void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, ObjexxFCL::Optional_int_const LoopNum)
 {
 
     // SUBROUTINE INFORMATION:

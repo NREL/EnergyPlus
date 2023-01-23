@@ -116,7 +116,8 @@ char *listAllAPIDataCSV(EnergyPlusState state)
     // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
     // this function, and undefined behavior will occur.
     // instead make a deep copy, and the user must manage the new char * pointer
-    char *p = new char[std::strlen(output.c_str())];
+    // strcpy copies including the null-terminator, strlen doesn't include it
+    char *p = new char[std::strlen(output.c_str()) + 1];
     std::strcpy(p, output.c_str());
     return p;
 }

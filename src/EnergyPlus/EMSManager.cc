@@ -257,9 +257,9 @@ namespace EMSManager {
     // MODULE SUBROUTINES:
 
     void ManageEMS(EnergyPlusData &state,
-                   EMSCallFrom const iCalledFrom,         // indicates where subroutine was called from, parameters in DataGlobals.
-                   bool &anyProgramRan,                   // true if any Erl programs ran for this call
-                   Optional_int_const ProgramManagerToRun // specific program manager to run
+                   EMSCallFrom const iCalledFrom,                    // indicates where subroutine was called from, parameters in DataGlobals.
+                   bool &anyProgramRan,                              // true if any Erl programs ran for this call
+                   ObjexxFCL::Optional_int_const ProgramManagerToRun // specific program manager to run
     )
     {
 
@@ -1826,7 +1826,7 @@ namespace EMSManager {
         bool returnValue;
 
         returnValue = false;
-        for (auto loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
+        for (int loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
             if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == state.dataLoopNodes->NodeID(nodeNum) &&
                 UtilityRoutines::SameString(state.dataRuntimeLang->Sensor(loop).OutputVarName, varName)) {
                 returnValue = true;
