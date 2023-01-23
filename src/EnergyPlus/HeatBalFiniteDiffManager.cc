@@ -235,8 +235,6 @@ namespace HeatBalFiniteDiffManager {
 
                 // Load the material derived type from the input data.
                 MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
-                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
-                auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
@@ -244,6 +242,8 @@ namespace HeatBalFiniteDiffManager {
                     ErrorsFound = true;
                     continue;
                 }
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
+                auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
 
                 if (thisMaterialChild->Group != Material::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
