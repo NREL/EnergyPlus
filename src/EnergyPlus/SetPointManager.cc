@@ -5200,7 +5200,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                                cSetPointManagerType,
                                                                state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name));
                                         ShowContinueError(state,
-                                                          format("Found Single Speed Cooling Tower, Cooling Tower={}{}{}{}{}",
+                                                          format("Found Single Speed Cooling Tower, Cooling Tower={}",
                                                                  state.dataPlnt->PlantLoop(LoopNum)
                                                                      .LoopSide(LoopSideLocation::Supply)
                                                                      .Branch(BranchNum)
@@ -5307,7 +5307,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                                    state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name));
                                             ShowContinueError(state, "only one chiller can be used with this setpoint manager on each loop");
                                             ShowContinueError(state,
-                                                              format("Found more than one chiller, chiller ={}{}{}{}{}",
+                                                              format("Found more than one chiller, chiller ={}",
                                                                      state.dataPlnt->PlantLoop(LoopNum)
                                                                          .LoopSide(LoopSideLocation::Demand)
                                                                          .Branch(BranchNum)

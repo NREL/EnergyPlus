@@ -676,8 +676,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                 ShowWarningError(state,
                                  format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
-                    state,
-                    format("Capacity ratio as a function of temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions."));
+                    state, "Capacity ratio as a function of temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions.");
                 ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
             }
         }
@@ -688,8 +687,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                 ShowWarningError(state,
                                  format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
-                    state,
-                    format("Energy input ratio as a function of temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions."));
+                    state, "Energy input ratio as a function of temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions.");
                 ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
             }
         }
@@ -700,9 +698,9 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state,
-                                  format("Energy input ratio as a function of part-load ratio curve output is not equal to 1.0 (+ or - 10%) at "
-                                         "reference conditions."));
+                ShowContinueError(
+                    state,
+                    "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0 (+ or - 10%) at reference conditions.");
                 ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
             }
         }

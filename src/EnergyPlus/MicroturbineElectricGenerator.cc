@@ -271,7 +271,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                         state,
                         format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                     ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
-                    ShowContinueError(state, format("...Curve output at reference conditions should equal 1 (+-10%)."));
+                    ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
                     ShowContinueError(state,
                                       format("...Reference combustion air inlet temperature = {:.4T} C",
                                              state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp));
@@ -304,7 +304,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                         state,
                         format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                     ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(3), AlphArray(3)));
-                    ShowContinueError(state, format("... Curve output at reference condition should equal 1 (+-10%)."));
+                    ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                     ShowContinueError(state,
                                       format("... Reference combustion air inlet temperature = {:.4T} C",
                                              state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp));
@@ -333,7 +333,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                         state,
                         format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                     ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
-                    ShowContinueError(state, format("... Curve output at a part-load ratio of 1 should equal 1 (+-10%)."));
+                    ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                     ShowContinueError(state, format("... Curve output = {:.4T}", ElecEfficFPLROutput));
                 }
 
@@ -426,7 +426,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                         state,
                         format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                     ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
-                    ShowContinueError(state, format("... Curve output at reference conditions should equal 1 (+-10%)."));
+                    ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
                     ShowContinueError(state,
                                       format("... Reference Electrical Power Output           = {:.2T} W",
                                              state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput));
@@ -570,7 +570,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                         ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
-                        ShowContinueError(state, format("... Curve output at reference conditions should equal 1 (+-10%)."));
+                        ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference combustion air inlet temperature      = {:.4T} C",
                                                  state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp));
@@ -597,7 +597,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                         ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(12), AlphArray(12)));
-                        ShowContinueError(state, format("... Curve output at a part-load ratio of 1 should equal 1 (+-10%)."));
+                        ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                         ShowContinueError(state, format("... Curve output = {:.4T}", HeatRecRateFPLROutput));
                     }
                 }
@@ -620,7 +620,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                         ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(13), AlphArray(13)));
-                        ShowContinueError(state, format("... Curve output at reference condition should equal 1 (+-10%)."));
+                        ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference inlet water temperature temperature      = {:.4T} C",
                                                  state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefInletWaterTemp));
@@ -646,7 +646,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                         ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(14), AlphArray(14)));
-                        ShowContinueError(state, format("... Curve output at reference condition should equal 1 (+-10%)."));
+                        ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference Heat Recovery Water Flow Rate      = {:.4T} m3/s",
                                                  state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate));
@@ -808,7 +808,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                         ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(17), AlphArray(17)));
-                        ShowContinueError(state, format("... Curve output at reference condition should equal 1 (+-10%)."));
+                        ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference combustion air inlet temperature      = {:.4T} C",
                                                  state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp));
@@ -833,7 +833,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                         ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(18), AlphArray(18)));
-                        ShowContinueError(state, format("... Curve output at a part-load ratio of 1 should equal 1 (+-10%)."));
+                        ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                         ShowContinueError(state, format("... Curve output = {:.4T}", ExhFlowFPLROutput));
                     }
                 }
@@ -857,7 +857,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                         ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(19), AlphArray(19)));
-                        ShowContinueError(state, format("... Curve output at reference condition should equal 1 (+-10%)."));
+                        ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference combustion air inlet temperature      = {:.4T} C",
                                                  state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp));
@@ -882,7 +882,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
                         ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(20), AlphArray(20)));
-                        ShowContinueError(state, format("... Curve output at a part-load ratio of 1 should equal 1 (+-10%)."));
+                        ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                         ShowContinueError(state, format("... Curve output = {:.4T}", ExhOutAirTempFPLROutput));
                     }
                 }

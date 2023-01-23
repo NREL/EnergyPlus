@@ -1165,7 +1165,7 @@ namespace VariableSpeedCoils {
                                             RoutineName,
                                             CurrentModuleObject,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...{} is < 2 {C}. Freezing could occur.", cNumericFields(12)));
+                    ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(12)));
                     ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(12)));
                 }
             }

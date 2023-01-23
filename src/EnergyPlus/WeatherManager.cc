@@ -193,8 +193,7 @@ namespace WeatherManager {
             underwaterBoundary.WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (underwaterBoundary.WaterTempScheduleIndex == 0) {
                 ShowSevereError(
-                    state,
-                    format("{}{}\" not found", R"(Water temperature schedule for "SurfaceProperty:Underwater" named ")", underwaterBoundary.Name));
+                    state, format(R"(Water temperature schedule for "SurfaceProperty:Underwater" named "{} not found)", underwaterBoundary.Name));
                 errorsFound = true;
             }
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
@@ -203,10 +202,9 @@ namespace WeatherManager {
             } else {
                 underwaterBoundary.VelocityScheduleIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (underwaterBoundary.WaterTempScheduleIndex == 0) {
-                    ShowSevereError(state,
-                                    format("{}{}\" not found",
-                                           R"(Free stream velocity schedule for "SurfaceProperty:Underwater" named ")",
-                                           underwaterBoundary.Name));
+                    ShowSevereError(
+                        state,
+                        format(R"(Free stream velocity schedule for "SurfaceProperty:Underwater" named {} not found")", underwaterBoundary.Name));
                     errorsFound = true;
                 }
             }

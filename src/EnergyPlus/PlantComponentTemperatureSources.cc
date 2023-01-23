@@ -544,8 +544,7 @@ namespace PlantComponentTemperatureSources {
             } else {
                 ShowSevereError(state, format("Input error for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  format("{}{}\"",
-                                         R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")",
+                                  format(R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered {})",
                                          state.dataIPShortCut->cAlphaArgs(4)));
                 ErrorsFound = true;
             }

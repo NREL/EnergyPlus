@@ -1333,7 +1333,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     state,
                     format(
                         "{}=\"{}\" invalid PMV values {}=\"{}\" entered.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                ShowContinueError(state, format("..Values outside of range [-3,+3]."));
+                ShowContinueError(state, "..Values outside of range [-3,+3].");
                 ErrorsFound = true;
             }
         }
@@ -1376,7 +1376,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     state,
                     format(
                         "{}=\"{}\" invalid PMV values {}=\"{}\" entered.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                ShowContinueError(state, format("..Values outside of range [-3,+3]."));
+                ShowContinueError(state, "..Values outside of range [-3,+3].");
                 ErrorsFound = true;
             }
         }
@@ -1419,7 +1419,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     state,
                     format(
                         "{}=\"{}\" invalid PMV values {}=\"{}\" entered.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                ShowContinueError(state, format("..Values outside of range [-3,+3]."));
+                ShowContinueError(state, "..Values outside of range [-3,+3].");
                 ErrorsFound = true;
             }
         }
@@ -1469,7 +1469,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     state,
                     format(
                         "{}=\"{}\" invalid PMV values {}=\"{}\" entered.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
-                ShowContinueError(state, format("..Values outside of range [-3,+3]."));
+                ShowContinueError(state, "..Values outside of range [-3,+3].");
                 ErrorsFound = true;
             }
             ValidScheduleControlType = CheckScheduleValueMinMax(state, dualSetpointHeatCoolFanger.CoolPMVSchedIndex, ">=", -3.0, "<=", 3.0);
@@ -1478,7 +1478,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     state,
                     format(
                         "{}=\"{}\" invalid PMV values {}=\"{}\" entered.", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
-                ShowContinueError(state, format("..Values outside of range [-3,+3]."));
+                ShowContinueError(state, "..Values outside of range [-3,+3].");
                 ErrorsFound = true;
             }
         }

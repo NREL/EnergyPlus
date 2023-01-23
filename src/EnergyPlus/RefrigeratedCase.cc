@@ -2351,9 +2351,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                       "This rating type requires ");
                     ShowContinueError(
                         state,
-                        format("{}{}\".",
-                               R"(the "TabularRHxDT1xTRoom" correction curve.  Verify that a valid "TabularRHxDT1xTRoom" curve is specified in ")",
-                               cAlphaFieldNames(AlphaNum + 1)));
+                        format(
+                            R"(the "TabularRHxDT1xTRoom" correction curve.  Verify that a valid "TabularRHxDT1xTRoom" curve is specified in "{}".)",
+                            cAlphaFieldNames(AlphaNum + 1)));
                 }
             } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "LinearSHR60")) {
                 WarehouseCoil(CoilID).SHRCorrType = SHRCorrectionType::SHR60;
@@ -6883,7 +6883,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 ShowSevereError(state,
                                 format("{}{}, The transcritical refrigeration system, \"{}\", is specified to be \"TwoStage\", "
                                        "however, the \"{}\" is not given.",
-                                       std::string{RoutineName} + CurrentModuleObject,
+                                       RoutineName,
+                                       CurrentModuleObject,
                                        TransSystem(TransRefrigSysNum).Name,
                                        cAlphaFieldNames(AlphaNum)));
                 ErrorsFound = true;
@@ -6892,7 +6893,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 ShowWarningError(state,
                                  format("{}{}, The transcritical refrigeration system, \"{}\", is specified to be \"SingleStage\", "
                                         "however, a \"{}\" was found.  The low pressure compressors will be ignored and will not simulated.",
-                                        std::string{RoutineName} + CurrentModuleObject,
+                                        RoutineName,
+                                        CurrentModuleObject,
                                         TransSystem(TransRefrigSysNum).Name,
                                         cAlphaFieldNames(AlphaNum)));
             } else if ((!(lAlphaBlanks(AlphaNum))) && (TransSystem(TransRefrigSysNum).TransSysType == 2)) {

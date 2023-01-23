@@ -511,8 +511,7 @@ namespace ScheduleManager {
                                         RoutineName,
                                         CurrentModuleObject,
                                         Alphas(1)));
-                ShowContinueError(state,
-                                  format("This was a problem in E+ 22.2.0 and below, consider removing it from the file to suppress this warning."));
+                ShowContinueError(state, "This was a problem in E+ 22.2.0 and below, consider removing it from the file to suppress this warning.");
                 schedule_file_shading_result->second["header"].erase(NumCSVAllColumnsSchedules);
                 schedule_file_shading_result->second["values"].erase(NumCSVAllColumnsSchedules);
                 --NumCSVAllColumnsSchedules;
@@ -1078,7 +1077,7 @@ namespace ScheduleManager {
                 DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state,
-                                    format("{}{}=\"{}\", {} \"{}\" not Found{}{}",
+                                    format("{}{}=\"{}\", {} \"{}\" not Found",
                                            RoutineName,
                                            CurrentModuleObject,
                                            Alphas(1),
@@ -1120,7 +1119,7 @@ namespace ScheduleManager {
                 DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state,
-                                    format("{}{}=\"{}\", {} \"{}\" not Found{}{}",
+                                    format("{}{}=\"{}\", {} \"{}\" not Found",
                                            RoutineName,
                                            CurrentModuleObject,
                                            Alphas(1),
@@ -1207,7 +1206,7 @@ namespace ScheduleManager {
                 WeekIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex), state.dataScheduleMgr->WeekSchedule({1, NumRegWeekSchedules}));
                 if (WeekIndex == 0) {
                     ShowSevereError(state,
-                                    format("{}{}=\"{}\", {}=\"{}\" not found.{}{}",
+                                    format("{}{}=\"{}\", {}=\"{}\" not found.",
                                            RoutineName,
                                            CurrentModuleObject,
                                            Alphas(1),
@@ -1250,7 +1249,7 @@ namespace ScheduleManager {
             }
             if (any_eq(DaysInYear, 0)) {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\" has missing days in its schedule pointers{}{}",
+                                format("{}{}=\"{}\" has missing days in its schedule pointers",
                                        RoutineName,
                                        CurrentModuleObject,
                                        state.dataScheduleMgr->Schedule(LoopIndex).Name),
@@ -1259,7 +1258,7 @@ namespace ScheduleManager {
             }
             if (any_gt(DaysInYear, 1)) {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\" has overlapping days in its schedule pointers{}{}",
+                                format("{}{}=\"{}\" has overlapping days in its schedule pointers",
                                        RoutineName,
                                        CurrentModuleObject,
                                        state.dataScheduleMgr->Schedule(LoopIndex).Name),
@@ -1590,7 +1589,7 @@ namespace ScheduleManager {
             }
             if (any_eq(DaysInYear, 0)) {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\" has missing days in its schedule pointers{}{}",
+                                format("{}{}=\"{}\" has missing days in its schedule pointers",
                                        RoutineName,
                                        CurrentModuleObject,
                                        state.dataScheduleMgr->Schedule(SchNum).Name),
@@ -1599,7 +1598,7 @@ namespace ScheduleManager {
             }
             if (any_gt(DaysInYear, 1)) {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\" has overlapping days in its schedule pointers{}{}",
+                                format("{}{}=\"{}\" has overlapping days in its schedule pointers",
                                        RoutineName,
                                        CurrentModuleObject,
                                        state.dataScheduleMgr->Schedule(SchNum).Name),

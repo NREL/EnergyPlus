@@ -1311,7 +1311,7 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", freeze possible", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} is < 2 {C}. Freezing could occur.", cNumericFields(17)));
+                ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(17)));
                 ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(18)));
             }
         }
@@ -1944,7 +1944,7 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", freeze possible", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} is < 2 {C}. Freezing could occur.", cNumericFields(7)));
+                ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(7)));
                 ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(7)));
             }
         }
@@ -2915,7 +2915,7 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", freeze possible", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} is < 2 {C}. Freezing could occur.", cNumericFields(18)));
+                ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(18)));
                 ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(18)));
             }
         }
@@ -4102,7 +4102,7 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", freeze possible", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} is less than 2 {C}. Freezing could occur.", cNumericFields(5)));
+                ShowContinueError(state, format("...{} is less than 2 {{C}}. Freezing could occur.", cNumericFields(5)));
                 ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(5)));
             }
         }

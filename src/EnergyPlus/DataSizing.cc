@@ -853,8 +853,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                ZoneMaxCO2,
                                                ZoneMinCO2));
                                     ShowContinueError(state,
-                                                      format("\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
-                                                             "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues..."));
+                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
@@ -877,8 +877,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                ZoneMaxCO2,
                                                ZoneMinCO2));
                                     ShowContinueError(state,
-                                                      format("\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
-                                                             "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues..."));
+                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
@@ -922,8 +922,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                              "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
                                                              thisZone.Name));
                                     ShowContinueError(state,
-                                                      format("\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
-                                                             "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues..."));
+                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(state,
@@ -943,8 +943,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                              "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
                                                              thisZone.Name));
                                     ShowContinueError(state,
-                                                      format("\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
-                                                             "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues..."));
+                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(state,
