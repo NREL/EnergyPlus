@@ -127,7 +127,7 @@ namespace InternalHeatGains {
     using namespace DataSurfaces;
 
     void ManageInternalHeatGains(EnergyPlusData &state,
-                                 Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
+                                 ObjexxFCL::Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
 
         // SUBROUTINE INFORMATION:
@@ -8389,7 +8389,9 @@ namespace InternalHeatGains {
         }
     }
 
-    void UpdateInternalGainValues(EnergyPlusData &state, Optional_bool_const SuppressRadiationUpdate, Optional_bool_const SumLatentGains)
+    void UpdateInternalGainValues(EnergyPlusData &state,
+                                  ObjexxFCL::Optional_bool_const SuppressRadiationUpdate,
+                                  ObjexxFCL::Optional_bool_const SumLatentGains)
     {
 
         // SUBROUTINE INFORMATION:

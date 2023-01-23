@@ -7722,7 +7722,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     }
 }
 
-void SetCompFlowRate(EnergyPlusData &state, int const VRFTUNum, int const VRFCond, Optional_bool_const UseCurrentMode)
+void SetCompFlowRate(EnergyPlusData &state, int const VRFTUNum, int const VRFCond, ObjexxFCL::Optional_bool_const UseCurrentMode)
 {
 
     // SUBROUTINE INFORMATION:
@@ -9614,13 +9614,13 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
 }
 
 void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
-                                       int const VRFTUNum,                // Unit index in VRF terminal unit array
-                                       bool const FirstHVACIteration,     // flag for 1st HVAC iteration in the time step
-                                       Real64 const PartLoadRatio,        // compressor part load fraction
-                                       Real64 &LoadMet,                   // load met by unit (W)
-                                       Real64 &OnOffAirFlowRatio,         // ratio of ON air flow to average air flow
-                                       Real64 &SuppHeatCoilLoad,          // supplemental heating coil load (W)
-                                       Optional<Real64> LatOutputProvided // delivered latent capacity (kgWater/s)
+                                       int const VRFTUNum,                           // Unit index in VRF terminal unit array
+                                       bool const FirstHVACIteration,                // flag for 1st HVAC iteration in the time step
+                                       Real64 const PartLoadRatio,                   // compressor part load fraction
+                                       Real64 &LoadMet,                              // load met by unit (W)
+                                       Real64 &OnOffAirFlowRatio,                    // ratio of ON air flow to average air flow
+                                       Real64 &SuppHeatCoilLoad,                     // supplemental heating coil load (W)
+                                       ObjexxFCL::Optional<Real64> LatOutputProvided // delivered latent capacity (kgWater/s)
 )
 {
 
@@ -12851,13 +12851,13 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
 }
 
 void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
-                                                  int const VRFTUNum,                // Index to VRF terminal unit
-                                                  bool const FirstHVACIteration,     // flag for 1st HVAC iteration in the time step
-                                                  Real64 const PartLoadRatio,        // compressor part load fraction
-                                                  Real64 &LoadMet,                   // load met by unit (W)
-                                                  Real64 &OnOffAirFlowRatio,         // ratio of ON air flow to average air flow
-                                                  Real64 &SuppHeatCoilLoad,          // supplemental heating coil load (W)
-                                                  Optional<Real64> LatOutputProvided // delivered latent capacity (W)
+                                                  int const VRFTUNum,                           // Index to VRF terminal unit
+                                                  bool const FirstHVACIteration,                // flag for 1st HVAC iteration in the time step
+                                                  Real64 const PartLoadRatio,                   // compressor part load fraction
+                                                  Real64 &LoadMet,                              // load met by unit (W)
+                                                  Real64 &OnOffAirFlowRatio,                    // ratio of ON air flow to average air flow
+                                                  Real64 &SuppHeatCoilLoad,                     // supplemental heating coil load (W)
+                                                  ObjexxFCL::Optional<Real64> LatOutputProvided // delivered latent capacity (W)
 )
 {
 

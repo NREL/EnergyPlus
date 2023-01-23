@@ -236,7 +236,7 @@ namespace HVACControllers {
                            bool &IsConvergedFlag,
                            bool &IsUpToDateFlag,
                            bool &BypassOAController,
-                           Optional_bool AllowWarmRestartFlag = _);
+                           ObjexxFCL::Optional_bool AllowWarmRestartFlag = _);
 
     void GetControllerInput(EnergyPlusData &state);
 

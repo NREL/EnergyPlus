@@ -1675,9 +1675,9 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                                              this->ChillerEIRFPLRIndex,
                                              this->MinUnloadRat,
                                              IPLV,
-                                             Optional<const Real64>(),
+                                             ObjexxFCL::Optional<const Real64>(),
                                              ObjexxFCL::Optional_int_const(),
-                                             Optional<const Real64>());
+                                             ObjexxFCL::Optional<const Real64>());
             this->IPLVFlag = false;
         }
         // create predefined report
