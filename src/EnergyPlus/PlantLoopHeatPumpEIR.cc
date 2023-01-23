@@ -1468,13 +1468,15 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                     // if (this->DeltaTErrCount < 1 && !state.dataGlobal->WarmupFlag) {
                     if (!state.dataGlobal->WarmupFlag) {
                         // ++this->DeltaTErrCount;
-                        ShowWarningError(state, "Evaporator DeltaTemp = 0 in mass flow calculation (Tevapin = Tevapout setpoint temp).");
+                        ShowWarningError(state, "FFHP evaporator DeltaTemp = 0 in mass flow calculation (Tevapin = Tevapout setpoint temp).");
                         ShowContinueErrorTimeStamp(state, "");
                         // } else if (!state.dataGlobal->WarmupFlag) {
                         // ++this->ChillerCapFTError;
                         ShowWarningError( // RecurringWarningErrorAtEnd(
                             state,
-                            format("{} \"{}\": Evaporator DeltaTemp = 0 in mass flow calculation warning continues...", this->EIRHPType, this->name));
+                            format("{} \"{}\": FFHP evaporator DeltaTemp = 0 in mass flow calculation warning continues...",
+                                   DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                   this->name));
                         // this->DeltaTErrCountIndex,
                         // evapDeltaTemp,
                         // evapDeltaTemp);
