@@ -268,7 +268,7 @@ void SimulateVRF(EnergyPlusData &state,
     // after all VRF terminal units have been simulated, call the VRF condenser model
     if (all(state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).IsSimulated)) {
 
-        if (state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+        if (state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             state.dataHVACVarRefFlow->VRF(VRFCondenser).CalcVRFCondenser_FluidTCtrl(state);
         } else {
@@ -1631,7 +1631,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         state.dataHVACVarRefFlow->VRF(VRFNum).Name = cAlphaArgs(1);
         state.dataHVACVarRefFlow->VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
-        state.dataHVACVarRefFlow->VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmType::SysCurve;
+        state.dataHVACVarRefFlow->VRF(VRFNum).VRFAlgorithmType = AlgorithmType::SysCurve;
         if (lAlphaFieldBlanks(2)) {
             state.dataHVACVarRefFlow->VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
@@ -2544,7 +2544,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         state.dataHVACVarRefFlow->VRF(VRFNum).Name = cAlphaArgs(1);
         state.dataHVACVarRefFlow->VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
-        state.dataHVACVarRefFlow->VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmType::FluidTCtrl;
+        state.dataHVACVarRefFlow->VRF(VRFNum).VRFAlgorithmType = AlgorithmType::FluidTCtrl;
         state.dataHVACVarRefFlow->VRF(VRFNum).FuelType = "Electricity";
         state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
@@ -2973,7 +2973,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).ThermostatPriority = ThermostatCtrlType::LoadPriority;
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatRecoveryUsed = true;
         state.dataHVACVarRefFlow->VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
-        state.dataHVACVarRefFlow->VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmType::FluidTCtrl;
+        state.dataHVACVarRefFlow->VRF(VRFNum).VRFAlgorithmType = AlgorithmType::FluidTCtrl;
         state.dataHVACVarRefFlow->VRF(VRFNum).FuelType = "Electricity";
         state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
@@ -3563,7 +3563,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0) {
                 // VRFTU Supply Air Fan Object Type must be Fan:VariableVolume if VRF Algorithm Type is AlgorithmTypeFluidTCtrl
-                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum ==
+                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType ==
                         AlgorithmType::FluidTCtrl &&
                     !(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SimpleVAV ||
                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject)) {
@@ -3575,7 +3575,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
                 // VRFTU Supply Air Fan Object Type must be Fan:OnOff or Fan:ConstantVolume if VRF Algorithm Type is AlgorithmTypeSysCurve
-                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum ==
+                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType ==
                         AlgorithmType::SysCurve &&
                     !(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ||
@@ -3743,7 +3743,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
         } else {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0) {
-                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum ==
+                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType ==
                     AlgorithmType::FluidTCtrl) {
                     // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 
@@ -3955,7 +3955,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
         } else {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0) {
-                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum ==
+                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType ==
                     AlgorithmType::FluidTCtrl) {
                     // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 
@@ -4766,7 +4766,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             //   curve is present if the corresponding coil is entered in the terminal unit.
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0) {
 
-                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum !=
+                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType !=
                     AlgorithmType::FluidTCtrl) {
 
                     if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CoolingCapacity <= 0 &&
@@ -4820,7 +4820,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0) {
 
-                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum !=
+                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType !=
                     AlgorithmType::FluidTCtrl) {
 
                     if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatingCapacity <= 0 &&
@@ -4971,7 +4971,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
             if (state.dataHVACVarRefFlow->VRFTU(VRFNum).VRFSysNum > 0) {
                 if (state.dataHVACVarRefFlow->TerminalUnitList(NumList).NumTUInList == 1 &&
-                    state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmType::SysCurve) {
+                    state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFNum).VRFSysNum).VRFAlgorithmType == AlgorithmType::SysCurve) {
                     if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFNum).VRFSysNum).HeatRecoveryUsed) {
                         ShowWarningError(state, "ZoneTerminalUnitList \"" + state.dataHVACVarRefFlow->TerminalUnitList(NumList).Name + "\"");
                         ShowWarningError(state, "...Only 1 Terminal Unit connected to system and heat recovery is selected.");
@@ -5231,7 +5231,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             OutputProcessor::SOVStoreType::Average,
                             state.dataHVACVarRefFlow->VRF(NumCond).Name);
 
-        if (state.dataHVACVarRefFlow->VRF(NumCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+        if (state.dataHVACVarRefFlow->VRF(NumCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
             // For VRF_FluidTCtrl Model
             SetupOutputVariable(state,
                                 "VRF Heat Pump Compressor Electricity Rate",
@@ -7292,7 +7292,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         !state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled) {
         SetCompFlowRate(state, VRFTUNum, VRFCond, true);
 
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                 state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -7333,7 +7333,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                         }
 
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                                 state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -7390,7 +7390,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                         }
 
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                                 state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -7431,7 +7431,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                         }
 
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                                 state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -7486,7 +7486,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                     }
 
-                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                             state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -7531,7 +7531,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                         state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                     }
 
-                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                             state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -8659,7 +8659,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
         Real64 SuppHeatCoilLoad = 0.0;
         // simulate the TU to size the coils
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                 state, VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad);
@@ -8699,7 +8699,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             }
         }
 
-        if (FoundAll && (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::SysCurve)) {
+        if (FoundAll && (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::SysCurve)) {
             // Size VRF rated cooling/heating capacity (VRF-SysCurve Model)
 
             // Size VRF( VRFCond ).CoolingCapacity
@@ -8871,7 +8871,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             }
         }
 
-        if (FoundAll && (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl)) {
+        if (FoundAll && (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl)) {
             // Size VRF rated evaporative capacity (VRF-FluidTCtrl Model)
             // Set piping correction factors to 1.0 here for reporting to eio output - recalculated every time step in
             // VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl
@@ -9219,7 +9219,7 @@ void SimVRF(EnergyPlusData &state,
     Real64 PartLoadRatio(1.0);
     Real64 SuppHeatCoilLoad(0.0); // supplemental heating coil load (W)
 
-    if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+    if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(
             state, VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -9320,13 +9320,13 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
     bool VRFCoolingMode = state.dataHVACVarRefFlow->CoolingLoad(VRFCond);
     bool VRFHeatingMode = state.dataHVACVarRefFlow->HeatingLoad(VRFCond);
     int IndexToTUInTUList = this->IndexToTUInTUList;
-    int TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
+    auto &thisVRFCond = state.dataHVACVarRefFlow->VRF(VRFCond);
+    int TUListIndex = thisVRFCond.ZoneTUListPtr;
     bool HRCoolingMode = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList);
     bool HRHeatingMode = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList);
-    auto &thisVRFCond = state.dataHVACVarRefFlow->VRF(VRFCond);
     auto &thisVRFTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
 
-    if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+    if (thisVRFCond.VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
         this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
     } else {
@@ -9350,7 +9350,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
         }
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if (NoCompOutput <= QZnReq && ((QZnReq < -DataHVACGlobals::SmallLoad) || (QZnReq >= -DataHVACGlobals::SmallLoad && !HRCoolingMode))) {
+        if (NoCompOutput <= QZnReq && ((QZnReq < -DataHVACGlobals::SmallLoad) || (QZnReq >= DataHVACGlobals::SmallLoad && !HRCoolingMode))) {
             DXCoolingCoilOprCtrl = false;
             if (!this->SuppHeatingCoilPresent) {
                 PartLoadRatio = 0.0;
@@ -9368,7 +9368,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
     // Otherwise the coil needs to turn on. Get full load result
     PartLoadRatio = 1.0;
     if (!DXCoolingCoilOprCtrl) PartLoadRatio = 0.0;
-    if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+    if (thisVRFCond.VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
         this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
     } else {
@@ -9480,7 +9480,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
             bool setPointControlled = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled;
             Real64 nonConstOnOffAirFlowRatio = OnOffAirFlowRatio;
 
-            if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+            if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                     state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, nonConstOnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -9506,7 +9506,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
             while (ContinueIter && TempMaxPLR < 1.0) {
                 TempMaxPLR += 0.1;
 
-                if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                if (thisVRFCond.VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                     // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                     this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                 } else {
@@ -9523,7 +9523,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 TempMaxPLR = TempMinPLR;
                 TempMinPLR -= 0.01;
 
-                if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                if (thisVRFCond.VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                     // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                     this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                 } else {
@@ -9543,7 +9543,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                             state, format(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = {}", MaxIte));
                         ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadRatio));
 
-                        if (thisVRFCond.VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                        if (thisVRFCond.VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             this->CalcVRF_FluidTCtrl(
                                 state, VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -10398,7 +10398,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
                 if (state.dataHVACVarRefFlow->VRFTU(TUIndex).OpMode == DataHVACGlobals::ContFanCycCoil) {
                     SetCompFlowRate(state, TUIndex, VRFCond);
 
-                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                         state.dataHVACVarRefFlow->VRFTU(TUIndex).CalcVRF_FluidTCtrl(
                             state, TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -10432,7 +10432,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
                                     }
 
                                     // recalculate using correct flow rate
-                                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).CalcVRF_FluidTCtrl(
                                             state, TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -10484,7 +10484,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).MaxCoolAirMassFlow;
                                     }
 
-                                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                                    if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).CalcVRF_FluidTCtrl(
                                             state, TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -10593,7 +10593,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
         if (state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).OpMode == DataHVACGlobals::ContFanCycCoil) {
             SetCompFlowRate(state, state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex, VRFCond);
 
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+            if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                 state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex)
                     .CalcVRF_FluidTCtrl(state,
@@ -12598,12 +12598,12 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = 0.0;
     VRFCond = this->VRFSysNum;
     IndexToTUInTUList = this->IndexToTUInTUList;
-    TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
+    auto &thisVRFCond = state.dataHVACVarRefFlow->VRF(VRFCond);
+    TUListIndex = thisVRFCond.ZoneTUListPtr;
     VRFCoolingMode = state.dataHVACVarRefFlow->CoolingLoad(VRFCond);
     VRFHeatingMode = state.dataHVACVarRefFlow->HeatingLoad(VRFCond);
     HRCoolingMode = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList);
     HRHeatingMode = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList);
-    auto &thisVRFCond = state.dataHVACVarRefFlow->VRF(VRFCond);
     auto &thisVRFTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
 
     // The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
@@ -12636,7 +12636,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         if (NoCompOutput <= QZnReq) return;
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if (NoCompOutput <= QZnReq && ((QZnReq < -DataHVACGlobals::SmallLoad) || (QZnReq >= -DataHVACGlobals::SmallLoad && !HRCoolingMode))) {
+        if (NoCompOutput <= QZnReq && ((QZnReq < -DataHVACGlobals::SmallLoad) || (QZnReq >= DataHVACGlobals::SmallLoad && !HRCoolingMode))) {
             DXCoolingCoilOprCtrl = false;
             if (!this->SuppHeatingCoilPresent) {
                 return;
@@ -12771,7 +12771,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
             bool setPointControlled = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled;
             Real64 nonConstOnOffAirFlowRatio = OnOffAirFlowRatio;
 
-            if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+            if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                     state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, nonConstOnOffAirFlowRatio, SuppHeatCoilLoad);

@@ -360,7 +360,7 @@ protected:
         int condNodeNum = 1;
 
         VRFCond.VRFSystemTypeNum = 1;
-        VRFCond.VRFAlgorithmTypeNum = AlgorithmType::SysCurve;
+        VRFCond.VRFAlgorithmType = AlgorithmType::SysCurve;
         VRFCond.SchedPtr = 1;
         VRFCond.CoolingCapacity = 10000.0;
         VRFCond.CoolingCOP = 3.0;

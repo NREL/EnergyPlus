@@ -136,7 +136,7 @@ namespace HVACVariableRefrigerantFlow {
         // Members
         std::string Name;                      // Name of the VRF Terminal Unit
         int VRFSystemTypeNum;                  // integer equivalent of system type
-        AlgorithmType VRFAlgorithmTypeNum;     // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
+        AlgorithmType VRFAlgorithmType;     // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
         DataPlant::PlantEquipmentType VRFType; // integer equivalent of index to DataPlant type
         PlantLocation SourcePlantLoc;          // plant data for water-cooled only
         Real64 WaterCondenserDesignMassFlow;   // plant data for water-cooled only
@@ -372,7 +372,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // Default Constructor
         VRFCondenserEquipment()
-            : VRFSystemTypeNum(0), VRFAlgorithmTypeNum(AlgorithmType::Invalid), VRFType(DataPlant::PlantEquipmentType::Invalid), SourcePlantLoc{},
+            : VRFSystemTypeNum(0), VRFAlgorithmType(AlgorithmType::Invalid), VRFType(DataPlant::PlantEquipmentType::Invalid), SourcePlantLoc{},
               WaterCondenserDesignMassFlow(0.0), WaterCondenserMassFlow(0.0), QCondenser(0.0), QCondEnergy(0.0), CondenserSideOutletTemp(0.0),
               SchedPtr(-1), CoolingCapacity(0.0), TotalCoolingCapacity(0.0), CoolingCombinationRatio(1.0), VRFCondPLR(0.0), VRFCondRTF(0.0),
               VRFCondCyclingRatio(0.0), CondenserInletTemp(0.0), CoolingCOP(0.0), OperatingCoolingCOP(0.0), RatedCoolingPower(0.0),
