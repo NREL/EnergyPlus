@@ -257,9 +257,9 @@ namespace EMSManager {
     // MODULE SUBROUTINES:
 
     void ManageEMS(EnergyPlusData &state,
-                   EMSCallFrom const iCalledFrom,         // indicates where subroutine was called from, parameters in DataGlobals.
-                   bool &anyProgramRan,                   // true if any Erl programs ran for this call
-                   Optional_int_const ProgramManagerToRun // specific program manager to run
+                   EMSCallFrom const iCalledFrom,                    // indicates where subroutine was called from, parameters in DataGlobals.
+                   bool &anyProgramRan,                              // true if any Erl programs ran for this call
+                   ObjexxFCL::Optional_int_const ProgramManagerToRun // specific program manager to run
     )
     {
 

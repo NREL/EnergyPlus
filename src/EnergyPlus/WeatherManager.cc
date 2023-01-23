@@ -1551,10 +1551,10 @@ namespace WeatherManager {
     void SetDSTDateRanges(EnergyPlusData &state,
                           Array1D_int const &MonWeekDay, // Weekday of each day 1 of month
                           Array1D_int &DSTIdx,           // DST Index for each julian day (1:366)
-                          Optional_int DSTActStMon,
-                          Optional_int DSTActStDay,
-                          Optional_int DSTActEnMon,
-                          Optional_int DSTActEnDay)
+                          ObjexxFCL::Optional_int DSTActStMon,
+                          ObjexxFCL::Optional_int DSTActStDay,
+                          ObjexxFCL::Optional_int DSTActEnMon,
+                          ObjexxFCL::Optional_int DSTActEnDay)
     {
 
         // SUBROUTINE INFORMATION:

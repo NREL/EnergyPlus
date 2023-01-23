@@ -50,7 +50,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.fwd.hh>
-#include <ObjexxFCL/Optional.fwd.hh>
+#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -353,11 +353,11 @@ namespace VariableSpeedCoils {
                                Real64 &FanDelayTime,                              // Fan delay time, time delay for the HP's fan to
                                DataHVACGlobals::CompressorOperation CompressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
-                               int const SpeedNum,                        // compressor speed number
-                               Real64 const SpeedRatio,                   // compressor speed ratio
-                               Real64 const SensLoad,                     // Sensible demand load [W]
-                               Real64 const LatentLoad,                   // Latent demand load [W]
-                               Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
+                               int const SpeedNum,                                   // compressor speed number
+                               Real64 const SpeedRatio,                              // compressor speed ratio
+                               Real64 const SensLoad,                                // Sensible demand load [W]
+                               Real64 const LatentLoad,                              // Latent demand load [W]
+                               ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
     void GetVarSpeedCoilInput(EnergyPlusData &state);
@@ -464,11 +464,11 @@ namespace VariableSpeedCoils {
     Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state, int const CoilIndex);
 
     void SetVarSpeedCoilData(EnergyPlusData &state,
-                             int const WSHPNum,                        // Number of OA Controller
-                             bool &ErrorsFound,                        // Set to true if certain errors found
-                             Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
-                             Optional_int CompanionHeatingCoilNum = _, // Index to heating coil for cooling coil = SimpleWSHPNum
-                             Optional_int MSHPDesignSpecIndex = _      // index to UnitarySystemPerformance:Multispeed object
+                             int const WSHPNum,                                   // Number of OA Controller
+                             bool &ErrorsFound,                                   // Set to true if certain errors found
+                             ObjexxFCL::Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
+                             ObjexxFCL::Optional_int CompanionHeatingCoilNum = _, // Index to heating coil for cooling coil = SimpleWSHPNum
+                             ObjexxFCL::Optional_int MSHPDesignSpecIndex = _      // index to UnitarySystemPerformance:Multispeed object
     );
 
     void UpdateVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum);

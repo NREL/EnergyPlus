@@ -6386,14 +6386,14 @@ bool CFSUFactor(EnergyPlusData &state,
     return CFSUFactor;
 }
 
-void ASHWAT_Solar(int const NL,                      // # of layers
-                  Array1S<CFSSWP> const LSWP_ON,     // layer SW (solar) properties (off-normal adjusted)
-                  CFSSWP const &SWP_ROOM,            // effective SW (solar) properties of room
-                  Real64 const IBEAM,                // incident beam insolation (W/m2 aperture)
-                  Real64 const IDIFF,                // incident diffuse insolation (W/m2 aperture)
-                  Real64 const ILIGHTS,              // incident diffuse insolation (W/m2 aperture)
-                  Array1S<Real64> SOURCE,            // returned: layer-by-layer flux of absorbed
-                  Optional<Array1S<Real64>> SourceBD // returned: layer-by-layer flux of absorbed
+void ASHWAT_Solar(int const NL,                                 // # of layers
+                  Array1S<CFSSWP> const LSWP_ON,                // layer SW (solar) properties (off-normal adjusted)
+                  CFSSWP const &SWP_ROOM,                       // effective SW (solar) properties of room
+                  Real64 const IBEAM,                           // incident beam insolation (W/m2 aperture)
+                  Real64 const IDIFF,                           // incident diffuse insolation (W/m2 aperture)
+                  Real64 const ILIGHTS,                         // incident diffuse insolation (W/m2 aperture)
+                  Array1S<Real64> SOURCE,                       // returned: layer-by-layer flux of absorbed
+                  ObjexxFCL::Optional<Array1S<Real64>> SourceBD // returned: layer-by-layer flux of absorbed
 )
 {
     // SUBROUTINE INFORMATION:
@@ -6946,12 +6946,12 @@ void Specular_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP) // short 
     Real64 RAT_TAU;
     Real64 RAT_1MR;
 
-    //#if 1
+    // #if 1
     Specular_RATDiff(state, RAT_1MR, RAT_TAU);
-    //#else
-    //    ! estimate diffuse properties as 60 deg angle of incidence
-    //    CALL Specular_RAT60( RAT_TAU, RAT_1MR)
-    //#endif
+    // #else
+    //     ! estimate diffuse properties as 60 deg angle of incidence
+    //     CALL Specular_RAT60( RAT_TAU, RAT_1MR)
+    // #endif
     SWP.TAUS_DD = RAT_TAU * SWP.TAUSFBB;
     SWP.RHOSFDD = 1.0 - RAT_1MR * (1.0 - SWP.RHOSFBB);
     SWP.RHOSBDD = 1.0 - RAT_1MR * (1.0 - SWP.RHOSBBB);
@@ -6991,9 +6991,9 @@ bool RB_LWP(CFSLAYER const &L, // RB layer
 }
 
 bool RB_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // RB layer
-            CFSSWP &LSWP,                // returned: equivalent layer properties set
-            Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
+            CFSLAYER const &L,                      // RB layer
+            CFSSWP &LSWP,                           // returned: equivalent layer properties set
+            ObjexxFCL::Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
 )
 {
     // FUNCTION INFORMATION:
@@ -7079,9 +7079,9 @@ bool IS_LWP(CFSLAYER const &L, // IS layer
 }
 
 bool IS_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // PD layer
-            CFSSWP &LSWP,                // returned: equivalent layer properties set
-            Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
+            CFSLAYER const &L,                      // PD layer
+            CFSSWP &LSWP,                           // returned: equivalent layer properties set
+            ObjexxFCL::Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
 )
 {
     // FUNCTION INFORMATION:
@@ -7199,10 +7199,10 @@ bool PD_LWP(EnergyPlusData &state,
 }
 
 bool PD_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,                // PD layer
-            CFSSWP &LSWP,                     // returned: equivalent layer properties set
-            Optional<Real64 const> OHM_V_RAD, // vertical VB profile angles, radians
-            Optional<Real64 const> OHM_H_RAD  // horizonatl VB profile angles, radians
+            CFSLAYER const &L,                           // PD layer
+            CFSSWP &LSWP,                                // returned: equivalent layer properties set
+            ObjexxFCL::Optional<Real64 const> OHM_V_RAD, // vertical VB profile angles, radians
+            ObjexxFCL::Optional<Real64 const> OHM_H_RAD  // horizonatl VB profile angles, radians
 )
 {
     // FUNCTION INFORMATION:
@@ -7324,9 +7324,9 @@ bool VB_LWP(EnergyPlusData &state,
 }
 
 bool VB_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // VB layer
-            CFSSWP &LSWP,                // returned: equivalent off-normal properties
-            Optional<Real64 const> OMEGA // incident profile angle (radians)
+            CFSLAYER const &L,                      // VB layer
+            CFSSWP &LSWP,                           // returned: equivalent off-normal properties
+            ObjexxFCL::Optional<Real64 const> OMEGA // incident profile angle (radians)
 )
 {
     // FUNCTION INFORMATION:
@@ -7675,11 +7675,11 @@ bool IsVBLayer(CFSLAYER const &L)
 }
 
 void BuildGap(EnergyPlusData &state,
-              CFSGAP &G,                    // returned
-              int const GType,              // gap type (gtyOPENin, gtyOPENout or gtySEALED)
-              Real64 &TAS,                  // gap thickness, m
-              Optional<Real64 const> xTMan, // re density calc -- temp (C) and pressure (Pa)
-              Optional<Real64 const> xPMan  // re density calc -- temp (C) and pressure (Pa)
+              CFSGAP &G,                               // returned
+              int const GType,                         // gap type (gtyOPENin, gtyOPENout or gtySEALED)
+              Real64 &TAS,                             // gap thickness, m
+              ObjexxFCL::Optional<Real64 const> xTMan, // re density calc -- temp (C) and pressure (Pa)
+              ObjexxFCL::Optional<Real64 const> xPMan  // re density calc -- temp (C) and pressure (Pa)
 )
 {
 
@@ -8021,7 +8021,7 @@ Real64 EffectiveEPSLB(CFSTY const &FS) // Complex Fenestration
 bool FEQX(Real64 const a, // values to compare, fractional tolerance
           Real64 const b,
           Real64 const tolF,
-          Optional<Real64> tolAbs // absolute tolerance
+          ObjexxFCL::Optional<Real64> tolAbs // absolute tolerance
 )
 {
     // FUNCTION INFORMATION:
