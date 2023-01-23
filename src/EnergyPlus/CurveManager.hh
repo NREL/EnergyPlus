@@ -183,11 +183,6 @@ namespace Curve {
                                        Optional<Real64 const> Var6 = _);
     };
 
-    //    struct CurveLinear : PerformanceCurveData
-    //    {
-    //
-    //    };
-
     // Table file objects
     class TableFile
     {
