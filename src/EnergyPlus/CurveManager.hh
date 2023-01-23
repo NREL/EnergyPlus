@@ -175,7 +175,7 @@ namespace Curve {
         Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5, Real64 V6);
         Real64 valueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5);
         Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                       Real64 Var1,                     // 1st independent variable
+                                       Real64 Var1,                                // 1st independent variable
                                        ObjexxFCL::Optional<Real64 const> Var2 = _, // 2nd independent variable
                                        ObjexxFCL::Optional<Real64 const> Var3 = _, // 3rd independent variable
                                        ObjexxFCL::Optional<Real64 const> Var4 = _, // 4th independent variable

@@ -2809,7 +2809,7 @@ namespace Curve {
     }
 
     Real64 Curve::BtwxtTableInterpolation(EnergyPlusData &state,
-                                          Real64 const Var1,           // 1st independent variable
+                                          Real64 const Var1,                      // 1st independent variable
                                           ObjexxFCL::Optional<Real64 const> Var2, // 2nd independent variable
                                           ObjexxFCL::Optional<Real64 const> Var3, // 3rd independent variable
                                           ObjexxFCL::Optional<Real64 const> Var4, // 4th independent variable
