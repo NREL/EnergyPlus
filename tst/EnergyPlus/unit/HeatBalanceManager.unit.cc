@@ -345,17 +345,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
         Material::MaterialChild *p = new Material::MaterialChild;
         state->dataMaterial->Material.push_back(p);
     }
-    auto *material1Child = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
-    auto *material2Child = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
-    auto *material3Child = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(3));
-    material1Child->Name = "GLASS";
-    material2Child->Name = "AIRGAP";
-    material3Child->Name = "GLASS";
+    auto *material1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    auto *material2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
+    auto *material3 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(3));
+    material1->Name = "GLASS";
+    material2->Name = "AIRGAP";
+    material3->Name = "GLASS";
 
     // Material layer group index
-    material1Child->Group = Material::MaterialGroup::WindowGlass;
-    material2Child->Group = Material::MaterialGroup::WindowGas;
-    material3Child->Group = Material::MaterialGroup::WindowGlass;
+    material1->Group = Material::MaterialGroup::WindowGlass;
+    material2->Group = Material::MaterialGroup::WindowGas;
+    material3->Group = Material::MaterialGroup::WindowGlass;
 
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
@@ -721,15 +721,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     bool ErrorsFound(false);
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    auto const *thisMaterial = state->dataMaterial->Material(1);
-    auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
+    auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(1));
 
     // check the "Material:RoofVegetation" names
-    EXPECT_EQ(thisMaterialChild->Name, "THICKSOIL");
+    EXPECT_EQ(thisMaterial->Name, "THICKSOIL");
     // check maximum (saturated) moisture content
-    EXPECT_EQ(0.4, thisMaterialChild->Porosity);
+    EXPECT_EQ(0.4, thisMaterial->Porosity);
     // check initial moisture Content was reset
-    EXPECT_EQ(0.4, thisMaterialChild->InitMoisture); // reset from 0.45 to 0.4 during get input
+    EXPECT_EQ(0.4, thisMaterial->InitMoisture); // reset from 0.45 to 0.4 during get input
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
@@ -1784,9 +1783,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
     Material::GetMaterialData(*state, errorsfound);
 
     EXPECT_FALSE(errorsfound);
-    auto const *thisMaterial = state->dataMaterial->Material(1);
-    auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-    EXPECT_NEAR(thisMaterialChild->Resistance, 0.158, 0.0001);
+    auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(1));
+    EXPECT_NEAR(thisMaterial->Resistance, 0.158, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)

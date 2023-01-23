@@ -240,8 +240,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofFirstTimeTest)
     state->dataSurface->Surface.allocate(surfNum);
 
     auto &thisConstruct = state->dataConstruction->Construct(constrNum);
-    auto *thisMat = state->dataMaterial->Material(1);
-    auto *thisMatChild = dynamic_cast<Material::MaterialChild *>(thisMat);
+    auto *thisMat = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
     auto &thisEcoRoof = state->dataEcoRoofMgr;
 
     thisConstruct.LayerPoint.allocate(1);
@@ -249,8 +248,8 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofFirstTimeTest)
 
     state->dataSurface->Surface(surfNum).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
 
-    thisMatChild->LAI = 3.21;
-    thisMatChild->AbsorpSolar = 0.72;
+    thisMat->LAI = 3.21;
+    thisMat->AbsorpSolar = 0.72;
     thisEcoRoof->FirstEcoSurf = 0;
     thisEcoRoof->EcoRoofbeginFlag = true;
 
@@ -278,8 +277,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofTest)
     state->dataSurface->Surface.allocate(surfNum);
 
     auto &thisConstruct = state->dataConstruction->Construct(constrNum);
-    auto &thisMat = state->dataMaterial->Material(1);
-    auto *thisMatChild = dynamic_cast<Material::MaterialChild *>(thisMat);
+    auto *thisMat = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
     auto &thisEcoRoof = state->dataEcoRoofMgr;
 
     thisConstruct.LayerPoint.allocate(1);
@@ -289,8 +287,8 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofTest)
     state->dataGlobal->BeginEnvrnFlag = false;
     state->dataGlobal->WarmupFlag = true;
     thisEcoRoof->CalcEcoRoofMyEnvrnFlag = false;
-    thisMatChild->InitMoisture = 23.0;
-    thisMatChild->AbsorpSolar = 0.72;
+    thisMat->InitMoisture = 23.0;
+    thisMat->AbsorpSolar = 0.72;
     thisEcoRoof->Moisture = 0.0;
     thisEcoRoof->MeanRootMoisture = 0.0;
     thisEcoRoof->Alphag = 0.0;

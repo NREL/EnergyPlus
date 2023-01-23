@@ -88,15 +88,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
 
     Material::MaterialChild *mat = new Material::MaterialChild;
     state->dataMaterial->Material.push_back(mat);
-    auto *thisMaterial = state->dataMaterial->Material(1);
-    auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-    thisMaterialChild->Resistance = 1.25;
-    thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
-    thisMaterialChild->Group = Material::MaterialGroup::RegularMaterial;
-    thisMaterialChild->AbsorpSolar = 0.75;
-    thisMaterialChild->AbsorpThermal = 0.75;
-    thisMaterialChild->Trans = 0.25;
-    thisMaterialChild->ReflectSolBeamFront = 0.20;
+    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    thisMaterial->Resistance = 1.25;
+    thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
+    thisMaterial->Group = Material::MaterialGroup::RegularMaterial;
+    thisMaterial->AbsorpSolar = 0.75;
+    thisMaterial->AbsorpThermal = 0.75;
+    thisMaterial->Trans = 0.25;
+    thisMaterial->ReflectSolBeamFront = 0.20;
     state->dataHeatBal->Zone.allocate(1);
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->space.allocate(1);

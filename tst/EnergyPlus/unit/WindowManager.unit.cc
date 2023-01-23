@@ -3043,8 +3043,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     Real64 NominalConductanceSummer;
 
     MaterNum = state->dataConstruction->Construct(ConstrNum).LayerPoint(1);
-    auto *thisMaterial = state->dataMaterial->Material(MaterNum);
-    auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MaterNum));
     // summer, adj ratio should stay the same, only change for winter
     state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.5;
     CalcNominalWindowCond(*state, ConstrNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
@@ -3054,9 +3053,9 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     // for legal input U values, the adjusted NominalConductance should be close to input U
     std::array<Real64, 3> legalInputUs = {3.0, 5.0, 7.0};
     for (auto varyInputU : legalInputUs) {
-        thisMaterialChild->SimpleWindowUfactor = varyInputU;
+        thisMaterial->SimpleWindowUfactor = varyInputU;
         HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
-        state->dataWindowManager->scon[0] = thisMaterialChild->Conductivity / thisMaterialChild->Thickness;
+        state->dataWindowManager->scon[0] = thisMaterial->Conductivity / thisMaterial->Thickness;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.01);
     }
@@ -3066,7 +3065,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     std::array<Real64, 2> illegalInputUs = {0.0, -2.0};
     for (auto varyInputU : illegalInputUs) {
         state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.0;
-        thisMaterialChild->SimpleWindowUfactor = varyInputU;
+        thisMaterial->SimpleWindowUfactor = varyInputU;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         // expect adjustment ratio equal to 1
         EXPECT_EQ(state->dataHeatBal->CoeffAdjRatio(ConstrNum), 1.0);

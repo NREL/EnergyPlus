@@ -7473,11 +7473,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 } else if (ShadeFlagBack ==
                                            WinShadingType::ExtShade) { // Interior beam absorbed by EXTERIOR SHADE of back exterior window
                                     Real64 RGlFront = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffFront;
-                                    auto const *thisMaterial =
+                                    auto const *thisMaterialBase =
                                         state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1));
-                                    auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-                                    Real64 AbsSh = thisMaterialChild->AbsorpSolar;
-                                    Real64 RhoSh = 1.0 - AbsSh - thisMaterialChild->Trans;
+                                    auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+                                    Real64 AbsSh = thisMaterial->AbsorpSolar;
+                                    Real64 RhoSh = 1.0 - AbsSh - thisMaterial->Trans;
                                     Real64 AShBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef) * AbsSh /
                                                      (1.0 - RGlFront * RhoSh);
                                     BABSZone += BOverlap * AShBack;
@@ -7491,11 +7491,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     Real64 AShBack; // System shade absorptance for interior beam solar
                                     if (NBackGlass == 2) {
                                         Real64 t2k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).tBareSolCoef(2));
-                                        auto const *thisMaterial =
+                                        auto const *thisMaterialBase =
                                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(3));
-                                        auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-                                        Real64 TrSh = thisMaterialChild->Trans;              // Shade material solar transmittance
-                                        Real64 RhoSh = thisMaterialChild->ReflectShade;      // Shade material solar absorptance
+                                        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+                                        Real64 TrSh = thisMaterial->Trans;              // Shade material solar transmittance
+                                        Real64 RhoSh = thisMaterial->ReflectShade;      // Shade material solar absorptance
                                         Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh)); // Shade material solar absorptance
                                         AShBack = t2k * (1 + RhoSh * rfd2k + TrSh * rbd1k) * AbsSh;
                                     } else { // NBackGlass = 3
@@ -7504,11 +7504,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 rbd2k = state.dataConstruction->Construct(ConstrNumBack).rbBareSolDiff(2);
                                         Real64 rfd3k = state.dataConstruction->Construct(ConstrNumBack).rfBareSolDiff(3);
 
-                                        auto const *thisMaterial =
+                                        auto const *thisMaterialBase =
                                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(5));
-                                        auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-                                        Real64 TrSh = thisMaterialChild->Trans;
-                                        Real64 RhoSh = thisMaterialChild->ReflectShade;
+                                        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+                                        Real64 TrSh = thisMaterial->Trans;
+                                        Real64 RhoSh = thisMaterial->ReflectShade;
                                         Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh));
                                         AShBack = t3k * (1 + RhoSh * rfd3k + TrSh * (rbd2k + td2k * rbd1k * td2k)) * AbsSh;
                                     }
@@ -11630,9 +11630,9 @@ void ComputeWinShadeAbsorpFactors(EnergyPlusData &state)
                                 MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(5);
                             }
                         }
-                        auto const *thisMaterial = state.dataMaterial->Material(MatNumSh);
-                        auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-                        AbsorpEff = thisMaterialChild->AbsorpSolar / (thisMaterialChild->AbsorpSolar + thisMaterialChild->Trans + 0.0001);
+                        auto const *thisMaterialBase = state.dataMaterial->Material(MatNumSh);
+                        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+                        AbsorpEff = thisMaterial->AbsorpSolar / (thisMaterial->AbsorpSolar + thisMaterial->Trans + 0.0001);
                         AbsorpEff = std::clamp(AbsorpEff, 0.0001,
                                                0.999); // Constrain to avoid problems with following log eval
                         state.dataSurface->SurfWinShadeAbsFacFace1(SurfNum) = (1.0 - std::exp(0.5 * std::log(1.0 - AbsorpEff))) / AbsorpEff;

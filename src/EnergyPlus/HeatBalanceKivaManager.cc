@@ -901,9 +901,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                     // Push back construction's layers
                     for (int layer = 1; layer <= c.TotLayers; layer++) {
-                        auto const *mat = Materials(c.LayerPoint(layer));
-                        auto const *matChild = dynamic_cast<const Material::MaterialChild *>(mat);
-                        if (matChild->ROnly) {
+                        auto const *mat = dynamic_cast<const Material::MaterialChild *>(Materials(c.LayerPoint(layer)));
+                        if (mat->ROnly) {
                             ErrorsFound = true;
                             ShowSevereError(state, "Construction=\"" + c.Name + "\", constructions referenced by surfaces with a");
                             ShowContinueError(state, "\"Foundation\" Outside Boundary Condition must use only regular material objects");
@@ -913,8 +912,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                         Kiva::Layer tempLayer;
 
-                        tempLayer.material = Kiva::Material(matChild->Conductivity, matChild->Density, matChild->SpecHeat);
-                        tempLayer.thickness = matChild->Thickness;
+                        tempLayer.material = Kiva::Material(mat->Conductivity, mat->Density, mat->SpecHeat);
+                        tempLayer.thickness = mat->Thickness;
 
                         fnd.wall.layers.push_back(tempLayer);
                     }
@@ -926,9 +925,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                 // Set slab construction
                 for (int i = 0; i < Constructs(surface.Construction).TotLayers; ++i) {
-                    auto const *mat = Materials(Constructs(surface.Construction).LayerPoint[i]);
-                    auto const *matChild = dynamic_cast<const Material::MaterialChild *>(mat);
-                    if (matChild->ROnly) {
+                    auto const *mat = dynamic_cast<const Material::MaterialChild *>(Materials(Constructs(surface.Construction).LayerPoint[i]));
+                    if (mat->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(
                             state, "Construction=\"" + Constructs(surface.Construction).Name + "\", constructions referenced by surfaces with a");
@@ -939,8 +937,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                     Kiva::Layer tempLayer;
 
-                    tempLayer.material = Kiva::Material(matChild->Conductivity, matChild->Density, matChild->SpecHeat);
-                    tempLayer.thickness = matChild->Thickness;
+                    tempLayer.material = Kiva::Material(mat->Conductivity, mat->Density, mat->SpecHeat);
+                    tempLayer.thickness = mat->Thickness;
 
                     fnd.slab.layers.push_back(tempLayer);
                 }

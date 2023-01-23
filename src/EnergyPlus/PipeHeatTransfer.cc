@@ -658,15 +658,15 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             ShowContinueError(state, "Found in " + cCurrentModuleObject + '=' + state.dataPipeHT->PipeHT(Item).Name);
             ErrorsFound = true;
         } else {
-            auto const *thisMaterialChild =
+            auto const *thisMaterial =
                 dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum));
-            state.dataPipeHT->PipeHT(Item).SoilDensity = thisMaterialChild->Density;
-            state.dataPipeHT->PipeHT(Item).SoilDepth = thisMaterialChild->Thickness;
-            state.dataPipeHT->PipeHT(Item).SoilCp = thisMaterialChild->SpecHeat;
-            state.dataPipeHT->PipeHT(Item).SoilConductivity = thisMaterialChild->Conductivity;
-            state.dataPipeHT->PipeHT(Item).SoilThermAbs = thisMaterialChild->AbsorpThermal;
-            state.dataPipeHT->PipeHT(Item).SoilSolarAbs = thisMaterialChild->AbsorpSolar;
-            state.dataPipeHT->PipeHT(Item).SoilRoughness = thisMaterialChild->Roughness;
+            state.dataPipeHT->PipeHT(Item).SoilDensity = thisMaterial->Density;
+            state.dataPipeHT->PipeHT(Item).SoilDepth = thisMaterial->Thickness;
+            state.dataPipeHT->PipeHT(Item).SoilCp = thisMaterial->SpecHeat;
+            state.dataPipeHT->PipeHT(Item).SoilConductivity = thisMaterial->Conductivity;
+            state.dataPipeHT->PipeHT(Item).SoilThermAbs = thisMaterial->AbsorpThermal;
+            state.dataPipeHT->PipeHT(Item).SoilSolarAbs = thisMaterial->AbsorpSolar;
+            state.dataPipeHT->PipeHT(Item).SoilRoughness = thisMaterial->Roughness;
             state.dataPipeHT->PipeHT(Item).PipeDepth = state.dataPipeHT->PipeHT(Item).SoilDepth + state.dataPipeHT->PipeHT(Item).PipeID / 2.0;
             state.dataPipeHT->PipeHT(Item).DomainDepth = state.dataPipeHT->PipeHT(Item).PipeDepth * 2.0;
             state.dataPipeHT->PipeHT(Item).SoilDiffusivity = state.dataPipeHT->PipeHT(Item).SoilConductivity /
@@ -871,26 +871,26 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
     // get pipe properties
     if (TotalLayers == 1) { // no insulation layer
 
-        auto const *thisMaterialChild =
+        auto const *thisMaterial =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1)));
-        this->PipeConductivity = thisMaterialChild->Conductivity;
-        this->PipeDensity = thisMaterialChild->Density;
-        this->PipeCp = thisMaterialChild->SpecHeat;
-        this->PipeOD = this->PipeID + 2.0 * thisMaterialChild->Thickness;
+        this->PipeConductivity = thisMaterial->Conductivity;
+        this->PipeDensity = thisMaterial->Density;
+        this->PipeCp = thisMaterial->SpecHeat;
+        this->PipeOD = this->PipeID + 2.0 * thisMaterial->Thickness;
         this->InsulationOD = this->PipeOD;
-        this->SumTK = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
+        this->SumTK = thisMaterial->Thickness / thisMaterial->Conductivity;
 
     } else if (TotalLayers >= 2) { // first layers are insulation, last layer is pipe
 
         for (int LayerNum = 1; LayerNum <= TotalLayers - 1; ++LayerNum) {
-            auto const *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(
+            auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)));
-            Resistance += thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
-            Density = thisMaterialChild->Density * thisMaterialChild->Thickness;
-            TotThickness += thisMaterialChild->Thickness;
-            SpHeat = thisMaterialChild->SpecHeat * thisMaterialChild->Thickness;
-            this->InsulationThickness = thisMaterialChild->Thickness;
-            this->SumTK += thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
+            Resistance += thisMaterial->Thickness / thisMaterial->Conductivity;
+            Density = thisMaterial->Density * thisMaterial->Thickness;
+            TotThickness += thisMaterial->Thickness;
+            SpHeat = thisMaterial->SpecHeat * thisMaterial->Thickness;
+            this->InsulationThickness = thisMaterial->Thickness;
+            this->SumTK += thisMaterial->Thickness / thisMaterial->Conductivity;
         }
 
         this->InsulationResistance = Resistance;
@@ -899,13 +899,13 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
         this->InsulationCp = SpHeat / TotThickness;
         this->InsulationThickness = TotThickness;
 
-        auto const *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(
+        auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
             state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers)));
-        this->PipeConductivity = thisMaterialChild->Conductivity;
-        this->PipeDensity = thisMaterialChild->Density;
-        this->PipeCp = thisMaterialChild->SpecHeat;
+        this->PipeConductivity = thisMaterial->Conductivity;
+        this->PipeDensity = thisMaterial->Density;
+        this->PipeCp = thisMaterial->SpecHeat;
 
-        this->PipeOD = this->PipeID + 2.0 * thisMaterialChild->Thickness;
+        this->PipeOD = this->PipeID + 2.0 * thisMaterial->Thickness;
         this->InsulationOD = this->PipeOD + 2.0 * this->InsulationThickness;
 
     } else {

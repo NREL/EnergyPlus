@@ -214,49 +214,48 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         // Obtain thermal properties from the Material derived type
 
-        auto *thisMaterial = state.dataMaterial->Material(CurrentLayer);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
 
-        dl(Layer) = thisMaterialChild->Thickness;
-        rk(Layer) = thisMaterialChild->Conductivity;
-        rho(Layer) = thisMaterialChild->Density;
-        cp(Layer) = thisMaterialChild->SpecHeat; // Must convert
+        dl(Layer) = thisMaterial->Thickness;
+        rk(Layer) = thisMaterial->Conductivity;
+        rho(Layer) = thisMaterial->Density;
+        cp(Layer) = thisMaterial->SpecHeat; // Must convert
         // from kJ/kg-K to J/kg-k due to rk units
 
-        if (this->SourceSinkPresent && !thisMaterialChild->WarnedForHighDiffusivity) {
+        if (this->SourceSinkPresent && !thisMaterial->WarnedForHighDiffusivity) {
             // check for materials that are too conductive or thin
             if ((rho(Layer) * cp(Layer)) > 0.0) {
                 Real64 Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                 if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
                     DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                     Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
-                    if (thisMaterialChild->Thickness < ThicknessThreshold) {
+                    if (thisMaterial->Thickness < ThicknessThreshold) {
                         ShowSevereError(state,
                                         "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                         "material name = " +
-                                            thisMaterialChild->Name);
+                                            thisMaterial->Name);
                         ShowContinueError(state,
                                           format("High conductivity Material layers are not well supported for internal source constructions, "
                                                  "material conductivity = {:.3R} [W/m-K]",
-                                                 thisMaterialChild->Conductivity));
+                                                 thisMaterial->Conductivity));
                         ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
                         ShowContinueError(state,
                                           format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
-                        if (thisMaterialChild->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
+                        if (thisMaterial->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                             ShowContinueError(
-                                state, format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterialChild->Thickness));
+                                state, format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterial->Thickness));
                             ShowContinueError(state,
                                               format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                      DataHeatBalance::ThinMaterialLayerThreshold));
                         }
-                        thisMaterialChild->WarnedForHighDiffusivity = true;
+                        thisMaterial->WarnedForHighDiffusivity = true;
                     }
                 }
             }
         }
-        if (thisMaterialChild->Thickness > 3.0) {
+        if (thisMaterial->Thickness > 3.0) {
             ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation");
-            ShowContinueError(state, "material name = " + thisMaterialChild->Name);
+            ShowContinueError(state, "material name = " + thisMaterial->Name);
             ErrorsFound = true;
         }
 
@@ -273,12 +272,12 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         if (ResLayer(Layer)) {                         // Resistive layer-check for R-value, etc.
             ++NumResLayers;                            // Increment number of resistive layers
-            lr(Layer) = thisMaterialChild->Resistance; // User defined thermal resistivity
+            lr(Layer) = thisMaterial->Resistance; // User defined thermal resistivity
             if (lr(Layer) < RValueLowLimit) {          // User didn't define enough
                 // parameters to calculate CTFs for a building element
                 // containing this layer.
 
-                ShowSevereError(state, "InitConductionTransferFunctions: Material=" + thisMaterialChild->Name + "R Value below lowest allowed value");
+                ShowSevereError(state, "InitConductionTransferFunctions: Material=" + thisMaterial->Name + "R Value below lowest allowed value");
                 ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                 ErrorsFound = true;
 
@@ -1903,12 +1902,11 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint(I);
-        auto const thisMaterial = state.dataMaterial->Material(Layer);
-        auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-        switch (thisMaterialChild->Group) {
+        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(Layer));
+        switch (thisMaterial->Group) {
         case Material::MaterialGroup::Air: {
             static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
-            print(state.files.eio, Format_702, thisMaterialChild->Name, thisMaterialChild->Resistance);
+            print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
         } break;
         default: {
             static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");

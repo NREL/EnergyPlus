@@ -1761,8 +1761,7 @@ namespace HeatBalanceManager {
                 // count number of glass layers
                 if (thisConstruct.LayerPoint(Layer) > 0) {
                     auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
-                    auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-                    MaterialLayerGroup = thisMaterialChild->Group;
+                    MaterialLayerGroup = thisMaterial->Group;
                     if (MaterialLayerGroup == Material::MaterialGroup::WindowGlass) ++iMatGlass;
                     if ((MaterialLayerGroup == Material::MaterialGroup::GlassEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
@@ -1785,12 +1784,11 @@ namespace HeatBalanceManager {
 
                     if (thisConstruct.LayerPoint(Layer) > 0) {
                         auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
-                        auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
 
                         // reset layer pointer to the first glazing in the TC GlazingGroup
                         thisConstruct.LayerPoint(Layer) = state.dataHeatBal->TCGlazings(thisConstruct.LayerPoint(Layer)).LayerPoint(1);
                         thisConstruct.TCLayer = thisConstruct.LayerPoint(Layer);
-                        if (thisMaterialChild->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
+                        if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
                         thisConstruct.TCFlag = 1;
                         thisConstruct.TCMasterConst = ConstrNum;
                         thisConstruct.TCGlassID = iMatGlass; // the TC glass layer ID
@@ -1805,10 +1803,10 @@ namespace HeatBalanceManager {
                                         ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
-                    auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
-                    auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
+                    auto const *thisMaterial =
+                        dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)));
                     state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += state.dataHeatBal->NominalR(thisConstruct.LayerPoint(Layer));
-                    if (thisMaterialChild->Group == Material::MaterialGroup::RegularMaterial && !thisMaterialChild->ROnly) {
+                    if (thisMaterial->Group == Material::MaterialGroup::RegularMaterial && !thisMaterial->ROnly) {
                         state.dataHeatBal->NoRegularMaterialsUsed = false;
                     }
                 }
@@ -2445,14 +2443,13 @@ namespace HeatBalanceManager {
             auto const &Constr = state.dataConstruction->Construct(ConstrNum);
             int MaterNum = Constr.LayerPoint(Constr.TotLayers);
             auto const *Mat = state.dataMaterial->Material(MaterNum);
-            auto const *MatChild = dynamic_cast<const Material::MaterialChild *>(Mat);
             bool withNoncompatibleShades =
-                (MatChild->Group == Material::MaterialGroup::Shade || MatChild->Group == Material::MaterialGroup::WindowBlind ||
-                 MatChild->Group == Material::MaterialGroup::Screen || MatChild->Group == Material::MaterialGroup::GlassEquivalentLayer ||
-                 MatChild->Group == Material::MaterialGroup::GapEquivalentLayer || MatChild->Group == Material::MaterialGroup::ShadeEquivalentLayer ||
-                 MatChild->Group == Material::MaterialGroup::DrapeEquivalentLayer ||
-                 MatChild->Group == Material::MaterialGroup::ScreenEquivalentLayer ||
-                 MatChild->Group == Material::MaterialGroup::BlindEquivalentLayer || Surf.HasShadeControl);
+                (Mat->Group == Material::MaterialGroup::Shade || Mat->Group == Material::MaterialGroup::WindowBlind ||
+                 Mat->Group == Material::MaterialGroup::Screen || Mat->Group == Material::MaterialGroup::GlassEquivalentLayer ||
+                 Mat->Group == Material::MaterialGroup::GapEquivalentLayer || Mat->Group == Material::MaterialGroup::ShadeEquivalentLayer ||
+                 Mat->Group == Material::MaterialGroup::DrapeEquivalentLayer ||
+                 Mat->Group == Material::MaterialGroup::ScreenEquivalentLayer ||
+                 Mat->Group == Material::MaterialGroup::BlindEquivalentLayer || Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                 ErrorsFound = true;
@@ -4442,67 +4439,66 @@ namespace HeatBalanceManager {
             for (loop = TotMaterialsPrev + 1; loop <= state.dataMaterial->TotMaterials; ++loop) {
                 delete state.dataMaterial->Material(loop);
                 state.dataMaterial->Material(loop) = new Material::MaterialChild;
-                auto *thisMaterial = state.dataMaterial->Material(loop);
-                auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-                thisMaterialChild->Name = "";
-                thisMaterialChild->Group = Material::MaterialGroup::Invalid;
-                thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::Invalid;
-                thisMaterialChild->Conductivity = 0.0;
-                thisMaterialChild->Density = 0.0;
-                thisMaterialChild->IsoMoistCap = 0.0;
-                thisMaterialChild->Porosity = 0.0;
-                thisMaterialChild->Resistance = 0.0;
-                thisMaterialChild->SpecHeat = 0.0;
-                thisMaterialChild->ThermGradCoef = 0.0;
-                thisMaterialChild->Thickness = 0.0;
-                thisMaterialChild->VaporDiffus = 0.0;
-                thisMaterialChild->AbsorpSolar = 0.0;
-                thisMaterialChild->AbsorpThermal = 0.0;
-                thisMaterialChild->AbsorpVisible = 0.0;
-                thisMaterialChild->ReflectShade = 0.0;
-                thisMaterialChild->Trans = 0.0;
-                thisMaterialChild->ReflectShadeVis = 0.0;
-                thisMaterialChild->TransVis = 0.0;
-                thisMaterialChild->GlassTransDirtFactor = 1.0;
-                thisMaterialChild->SolarDiffusing = false;
-                thisMaterialChild->AbsorpThermalBack = 0.0;
-                thisMaterialChild->AbsorpThermalFront = 0.0;
-                thisMaterialChild->ReflectSolBeamBack = 0.0;
-                thisMaterialChild->ReflectSolBeamFront = 0.0;
-                thisMaterialChild->ReflectSolDiffBack = 0.0;
-                thisMaterialChild->ReflectSolDiffFront = 0.0;
-                thisMaterialChild->ReflectVisBeamBack = 0.0;
-                thisMaterialChild->ReflectVisBeamFront = 0.0;
-                thisMaterialChild->ReflectVisDiffBack = 0.0;
-                thisMaterialChild->ReflectVisDiffFront = 0.0;
-                thisMaterialChild->TransSolBeam = 0.0;
-                thisMaterialChild->TransThermal = 0.0;
-                thisMaterialChild->TransVisBeam = 0.0;
-                thisMaterialChild->GlassSpectralDataPtr = 0;
-                thisMaterialChild->NumberOfGasesInMixture = 0;
-                thisMaterialChild->GasCon = 0.0;
-                thisMaterialChild->GasVis = 0.0;
-                thisMaterialChild->GasCp = 0.0;
-                thisMaterialChild->gasTypes = Material::GasType::Custom;
-                thisMaterialChild->GasWght = 0.0;
-                thisMaterialChild->GasSpecHeatRatio = 0.0;
-                thisMaterialChild->GasFract = 0.0;
-                thisMaterialChild->WinShadeToGlassDist = 0.0;
-                thisMaterialChild->WinShadeTopOpeningMult = 0.0;
-                thisMaterialChild->WinShadeBottomOpeningMult = 0.0;
-                thisMaterialChild->WinShadeLeftOpeningMult = 0.0;
-                thisMaterialChild->WinShadeRightOpeningMult = 0.0;
-                thisMaterialChild->WinShadeAirFlowPermeability = 0.0;
-                thisMaterialChild->BlindDataPtr = 0;
-                thisMaterialChild->EMPDmu = 0.0;
-                thisMaterialChild->MoistACoeff = 0.0;
-                thisMaterialChild->MoistBCoeff = 0.0;
-                thisMaterialChild->MoistCCoeff = 0.0;
-                thisMaterialChild->MoistDCoeff = 0.0;
-                thisMaterialChild->EMPDSurfaceDepth = 0.0;
-                thisMaterialChild->EMPDDeepDepth = 0.0;
-                thisMaterialChild->EMPDmuCoating = 0.0;
-                thisMaterialChild->EMPDCoatingThickness = 0.0;
+                auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(loop));
+                thisMaterial->Name = "";
+                thisMaterial->Group = Material::MaterialGroup::Invalid;
+                thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Invalid;
+                thisMaterial->Conductivity = 0.0;
+                thisMaterial->Density = 0.0;
+                thisMaterial->IsoMoistCap = 0.0;
+                thisMaterial->Porosity = 0.0;
+                thisMaterial->Resistance = 0.0;
+                thisMaterial->SpecHeat = 0.0;
+                thisMaterial->ThermGradCoef = 0.0;
+                thisMaterial->Thickness = 0.0;
+                thisMaterial->VaporDiffus = 0.0;
+                thisMaterial->AbsorpSolar = 0.0;
+                thisMaterial->AbsorpThermal = 0.0;
+                thisMaterial->AbsorpVisible = 0.0;
+                thisMaterial->ReflectShade = 0.0;
+                thisMaterial->Trans = 0.0;
+                thisMaterial->ReflectShadeVis = 0.0;
+                thisMaterial->TransVis = 0.0;
+                thisMaterial->GlassTransDirtFactor = 1.0;
+                thisMaterial->SolarDiffusing = false;
+                thisMaterial->AbsorpThermalBack = 0.0;
+                thisMaterial->AbsorpThermalFront = 0.0;
+                thisMaterial->ReflectSolBeamBack = 0.0;
+                thisMaterial->ReflectSolBeamFront = 0.0;
+                thisMaterial->ReflectSolDiffBack = 0.0;
+                thisMaterial->ReflectSolDiffFront = 0.0;
+                thisMaterial->ReflectVisBeamBack = 0.0;
+                thisMaterial->ReflectVisBeamFront = 0.0;
+                thisMaterial->ReflectVisDiffBack = 0.0;
+                thisMaterial->ReflectVisDiffFront = 0.0;
+                thisMaterial->TransSolBeam = 0.0;
+                thisMaterial->TransThermal = 0.0;
+                thisMaterial->TransVisBeam = 0.0;
+                thisMaterial->GlassSpectralDataPtr = 0;
+                thisMaterial->NumberOfGasesInMixture = 0;
+                thisMaterial->GasCon = 0.0;
+                thisMaterial->GasVis = 0.0;
+                thisMaterial->GasCp = 0.0;
+                thisMaterial->gasTypes = Material::GasType::Custom;
+                thisMaterial->GasWght = 0.0;
+                thisMaterial->GasSpecHeatRatio = 0.0;
+                thisMaterial->GasFract = 0.0;
+                thisMaterial->WinShadeToGlassDist = 0.0;
+                thisMaterial->WinShadeTopOpeningMult = 0.0;
+                thisMaterial->WinShadeBottomOpeningMult = 0.0;
+                thisMaterial->WinShadeLeftOpeningMult = 0.0;
+                thisMaterial->WinShadeRightOpeningMult = 0.0;
+                thisMaterial->WinShadeAirFlowPermeability = 0.0;
+                thisMaterial->BlindDataPtr = 0;
+                thisMaterial->EMPDmu = 0.0;
+                thisMaterial->MoistACoeff = 0.0;
+                thisMaterial->MoistBCoeff = 0.0;
+                thisMaterial->MoistCCoeff = 0.0;
+                thisMaterial->MoistDCoeff = 0.0;
+                thisMaterial->EMPDSurfaceDepth = 0.0;
+                thisMaterial->EMPDDeepDepth = 0.0;
+                thisMaterial->EMPDmuCoating = 0.0;
+                thisMaterial->EMPDCoatingThickness = 0.0;
             }
 
             // Glass objects
@@ -4515,44 +4511,43 @@ namespace HeatBalanceManager {
                     ++MaterNum;
                     delete state.dataMaterial->Material(MaterNum);
                     state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-                    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-                    auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
-                    thisMaterialChild->Group = Material::MaterialGroup::WindowGlass;
+                    thisMaterial->Group = Material::MaterialGroup::WindowGlass;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
 
                     readList(NextLine.data.substr(25),
-                             thisMaterialChild->Thickness,
-                             thisMaterialChild->Conductivity,
-                             thisMaterialChild->Trans,
-                             thisMaterialChild->ReflectSolBeamFront,
-                             thisMaterialChild->ReflectSolBeamBack,
-                             thisMaterialChild->TransVis,
-                             thisMaterialChild->ReflectVisBeamFront,
-                             thisMaterialChild->ReflectVisBeamBack,
-                             thisMaterialChild->TransThermal,
-                             thisMaterialChild->AbsorpThermalFront,
-                             thisMaterialChild->AbsorpThermalBack,
+                             thisMaterial->Thickness,
+                             thisMaterial->Conductivity,
+                             thisMaterial->Trans,
+                             thisMaterial->ReflectSolBeamFront,
+                             thisMaterial->ReflectSolBeamBack,
+                             thisMaterial->TransVis,
+                             thisMaterial->ReflectVisBeamFront,
+                             thisMaterial->ReflectVisBeamBack,
+                             thisMaterial->TransThermal,
+                             thisMaterial->AbsorpThermalFront,
+                             thisMaterial->AbsorpThermalBack,
                              LayerName);
 
-                    thisMaterialChild->Thickness *= 0.001;
-                    if (thisMaterialChild->Thickness <= 0.0) {
+                    thisMaterial->Thickness *= 0.001;
+                    if (thisMaterial->Thickness <= 0.0) {
                     }
                     if (NGlSys == 1) {
-                        thisMaterialChild->Name = "W5:" + DesiredConstructionName + ":GLASS" + NumName(IGlass);
+                        thisMaterial->Name = "W5:" + DesiredConstructionName + ":GLASS" + NumName(IGlass);
                     } else {
-                        thisMaterialChild->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
+                        thisMaterial->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
                     }
-                    thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-                    thisMaterialChild->AbsorpThermal = thisMaterialChild->AbsorpThermalBack;
-                    if (thisMaterialChild->Thickness <= 0.0) {
+                    thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+                    thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
+                    if (thisMaterial->Thickness <= 0.0) {
                         ShowSevereError(state,
-                                        "SearchWindow5DataFile: Material=\"" + thisMaterialChild->Name +
+                                        "SearchWindow5DataFile: Material=\"" + thisMaterial->Name +
                                             "\" has thickness of 0.0.  Will be set to thickness = .001 but inaccuracies may result.");
                         ShowContinueError(state, "Line being read=" + NextLine.data);
                         ShowContinueError(state, "Thickness field starts at column 26=" + NextLine.data.substr(25));
-                        thisMaterialChild->Thickness = 0.001;
+                        thisMaterial->Thickness = 0.001;
                     }
                 }
             }
@@ -4566,19 +4561,18 @@ namespace HeatBalanceManager {
                     ++MaterNum;
                     delete state.dataMaterial->Material(MaterNum);
                     state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-                    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-                    auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    readList(NextLine.data.substr(23), thisMaterialChild->Thickness, NumGases(IGap, IGlSys));
+                    readList(NextLine.data.substr(23), thisMaterial->Thickness, NumGases(IGap, IGlSys));
                     if (NGlSys == 1) {
-                        thisMaterialChild->Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
+                        thisMaterial->Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
                     } else {
-                        thisMaterialChild->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
+                        thisMaterial->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
                     }
-                    thisMaterialChild->Thickness *= 0.001;
-                    thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
+                    thisMaterial->Thickness *= 0.001;
+                    thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
                 }
             }
 
@@ -4590,25 +4584,24 @@ namespace HeatBalanceManager {
                     MaterNum = MaterNumSysGap(IGap, IGlSys);
                     delete state.dataMaterial->Material(MaterNum);
                     state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-                    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-                    auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-                    thisMaterialChild->NumberOfGasesInMixture = NumGases(IGap, IGlSys);
-                    thisMaterialChild->Group = Material::MaterialGroup::WindowGas;
-                    if (NumGases(IGap, IGlSys) > 1) thisMaterialChild->Group = Material::MaterialGroup::WindowGasMixture;
+                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+                    thisMaterial->NumberOfGasesInMixture = NumGases(IGap, IGlSys);
+                    thisMaterial->Group = Material::MaterialGroup::WindowGas;
+                    if (NumGases(IGap, IGlSys) > 1) thisMaterial->Group = Material::MaterialGroup::WindowGasMixture;
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
                         readList(NextLine.data.substr(19),
                                  GasName(IGas),
-                                 thisMaterialChild->GasFract(IGas),
-                                 thisMaterialChild->GasWght(IGas),
-                                 thisMaterialChild->GasCon(_, IGas),
-                                 thisMaterialChild->GasVis(_, IGas),
-                                 thisMaterialChild->GasCp(_, IGas));
+                                 thisMaterial->GasFract(IGas),
+                                 thisMaterial->GasWght(IGas),
+                                 thisMaterial->GasCon(_, IGas),
+                                 thisMaterial->GasVis(_, IGas),
+                                 thisMaterial->GasCp(_, IGas));
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
                         state.dataHeatBal->NominalR(MaterNum) =
-                            thisMaterialChild->Thickness /
-                            (thisMaterialChild->GasCon(1, 1) + thisMaterialChild->GasCon(2, 1) * 300.0 + thisMaterialChild->GasCon(3, 1) * 90000.0);
+                            thisMaterial->Thickness /
+                            (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
                     }
                 }
             }
@@ -4862,17 +4855,16 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = 0.0;
                 for (loop = 1; loop <= NGlass(IGlSys) + NGaps(IGlSys); ++loop) {
                     MatNum = thisConstruct.LayerPoint(loop);
-                    auto const *thisMaterial = state.dataMaterial->Material(MatNum);
-                    auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-                    if (thisMaterialChild->Group == Material::MaterialGroup::WindowGlass) {
+                    auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
+                    if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
-                            thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
-                    } else if (thisMaterialChild->Group == Material::MaterialGroup::WindowGas ||
-                               thisMaterialChild->Group == Material::MaterialGroup::WindowGasMixture) {
+                            thisMaterial->Thickness / thisMaterial->Conductivity;
+                    } else if (thisMaterial->Group == Material::MaterialGroup::WindowGas ||
+                               thisMaterial->Group == Material::MaterialGroup::WindowGasMixture) {
                         // If mixture, use conductivity of first gas in mixture
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
-                            thisMaterialChild->Thickness /
-                            (thisMaterialChild->GasCon(1, 1) + thisMaterialChild->GasCon(2, 1) * 300.0 + thisMaterialChild->GasCon(3, 1) * 90000.0);
+                            thisMaterial->Thickness /
+                            (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
                     }
                 }
 
@@ -5844,103 +5836,102 @@ namespace HeatBalanceManager {
         Real64 RLowSide(0.0);
         Real64 RHiSide(0.0);
 
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
         // first fill out defaults
-        thisMaterialChild->GlassSpectralDataPtr = 0;
-        thisMaterialChild->SolarDiffusing = false;
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-        thisMaterialChild->TransThermal = 0.0;
-        thisMaterialChild->AbsorpThermalBack = 0.84;
-        thisMaterialChild->AbsorpThermalFront = 0.84;
-        thisMaterialChild->AbsorpThermal = thisMaterialChild->AbsorpThermalBack;
+        thisMaterial->GlassSpectralDataPtr = 0;
+        thisMaterial->SolarDiffusing = false;
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+        thisMaterial->TransThermal = 0.0;
+        thisMaterial->AbsorpThermalBack = 0.84;
+        thisMaterial->AbsorpThermalFront = 0.84;
+        thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
 
         // step 1. Determine U-factor without film coefficients
         // Simple window model has its own correlation for film coefficients (m2-K/W) under Winter conditions as function of U-factor
-        if (thisMaterialChild->SimpleWindowUfactor < 5.85) {
-            Riw = 1.0 / (0.359073 * std::log(thisMaterialChild->SimpleWindowUfactor) + 6.949915);
+        if (thisMaterial->SimpleWindowUfactor < 5.85) {
+            Riw = 1.0 / (0.359073 * std::log(thisMaterial->SimpleWindowUfactor) + 6.949915);
         } else {
-            Riw = 1.0 / (1.788041 * thisMaterialChild->SimpleWindowUfactor - 2.886625);
+            Riw = 1.0 / (1.788041 * thisMaterial->SimpleWindowUfactor - 2.886625);
         }
-        Row = 1.0 / (0.025342 * thisMaterialChild->SimpleWindowUfactor + 29.163853);
+        Row = 1.0 / (0.025342 * thisMaterial->SimpleWindowUfactor + 29.163853);
 
         // determine 1/U without film coefficients
-        Rlw = (1.0 / thisMaterialChild->SimpleWindowUfactor) - Riw - Row;
+        Rlw = (1.0 / thisMaterial->SimpleWindowUfactor) - Riw - Row;
         if (Rlw <= 0.0) { // U factor of film coefficients is better than user input.
             Rlw = max(Rlw, 0.001);
             ShowWarningError(state,
-                             "WindowMaterial:SimpleGlazingSystem: " + thisMaterialChild->Name +
+                             "WindowMaterial:SimpleGlazingSystem: " + thisMaterial->Name +
                                  " has U-factor higher than that provided by surface film resistances, Check value of U-factor");
         }
 
         // Step 2. determine layer thickness.
 
         if ((1.0 / Rlw) > 7.0) {
-            thisMaterialChild->Thickness = 0.002;
+            thisMaterial->Thickness = 0.002;
         } else {
-            thisMaterialChild->Thickness = 0.05914 - (0.00714 / Rlw);
+            thisMaterial->Thickness = 0.05914 - (0.00714 / Rlw);
         }
 
         // Step 3. determine effective conductivity
 
-        thisMaterialChild->Conductivity = thisMaterialChild->Thickness / Rlw;
-        if (thisMaterialChild->Conductivity > 0.0) {
+        thisMaterial->Conductivity = thisMaterial->Thickness / Rlw;
+        if (thisMaterial->Conductivity > 0.0) {
             state.dataHeatBal->NominalR(MaterNum) = Rlw;
-            thisMaterialChild->Resistance = Rlw;
+            thisMaterial->Resistance = Rlw;
         } else {
             ErrorsFound = true;
             ShowSevereError(state,
-                            "WindowMaterial:SimpleGlazingSystem: " + thisMaterialChild->Name +
+                            "WindowMaterial:SimpleGlazingSystem: " + thisMaterial->Name +
                                 " has Conductivity <= 0.0, must be >0.0, Check value of U-factor");
         }
 
         // step 4. determine solar transmission (revised to 10-1-2009 version from LBNL.)
 
-        if (thisMaterialChild->SimpleWindowUfactor > 4.5) {
+        if (thisMaterial->SimpleWindowUfactor > 4.5) {
 
-            if (thisMaterialChild->SimpleWindowSHGC < 0.7206) {
+            if (thisMaterial->SimpleWindowSHGC < 0.7206) {
 
-                thisMaterialChild->Trans = 0.939998 * pow_2(thisMaterialChild->SimpleWindowSHGC) + 0.20332 * thisMaterialChild->SimpleWindowSHGC;
+                thisMaterial->Trans = 0.939998 * pow_2(thisMaterial->SimpleWindowSHGC) + 0.20332 * thisMaterial->SimpleWindowSHGC;
             } else { // >= 0.7206
 
-                thisMaterialChild->Trans = 1.30415 * thisMaterialChild->SimpleWindowSHGC - 0.30515;
+                thisMaterial->Trans = 1.30415 * thisMaterial->SimpleWindowSHGC - 0.30515;
             }
 
-        } else if (thisMaterialChild->SimpleWindowUfactor < 3.4) {
+        } else if (thisMaterial->SimpleWindowUfactor < 3.4) {
 
-            if (thisMaterialChild->SimpleWindowSHGC <= 0.15) {
-                thisMaterialChild->Trans = 0.41040 * thisMaterialChild->SimpleWindowSHGC;
+            if (thisMaterial->SimpleWindowSHGC <= 0.15) {
+                thisMaterial->Trans = 0.41040 * thisMaterial->SimpleWindowSHGC;
             } else { // > 0.15
-                thisMaterialChild->Trans =
-                    0.085775 * pow_2(thisMaterialChild->SimpleWindowSHGC) + 0.963954 * thisMaterialChild->SimpleWindowSHGC - 0.084958;
+                thisMaterial->Trans =
+                    0.085775 * pow_2(thisMaterial->SimpleWindowSHGC) + 0.963954 * thisMaterial->SimpleWindowSHGC - 0.084958;
             }
         } else { // interpolate. 3.4 <= Ufactor <= 4.5
 
-            if (thisMaterialChild->SimpleWindowSHGC < 0.7206) {
-                TsolHiSide = 0.939998 * pow_2(thisMaterialChild->SimpleWindowSHGC) + 0.20332 * thisMaterialChild->SimpleWindowSHGC;
+            if (thisMaterial->SimpleWindowSHGC < 0.7206) {
+                TsolHiSide = 0.939998 * pow_2(thisMaterial->SimpleWindowSHGC) + 0.20332 * thisMaterial->SimpleWindowSHGC;
             } else { // >= 0.7206
-                TsolHiSide = 1.30415 * thisMaterialChild->SimpleWindowSHGC - 0.30515;
+                TsolHiSide = 1.30415 * thisMaterial->SimpleWindowSHGC - 0.30515;
             }
 
-            if (thisMaterialChild->SimpleWindowSHGC <= 0.15) {
-                TsolLowSide = 0.41040 * thisMaterialChild->SimpleWindowSHGC;
+            if (thisMaterial->SimpleWindowSHGC <= 0.15) {
+                TsolLowSide = 0.41040 * thisMaterial->SimpleWindowSHGC;
             } else { // > 0.15
-                TsolLowSide = 0.085775 * pow_2(thisMaterialChild->SimpleWindowSHGC) + 0.963954 * thisMaterialChild->SimpleWindowSHGC - 0.084958;
+                TsolLowSide = 0.085775 * pow_2(thisMaterial->SimpleWindowSHGC) + 0.963954 * thisMaterial->SimpleWindowSHGC - 0.084958;
             }
 
-            thisMaterialChild->Trans = ((thisMaterialChild->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (TsolHiSide - TsolLowSide) + TsolLowSide;
+            thisMaterial->Trans = ((thisMaterial->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (TsolHiSide - TsolLowSide) + TsolLowSide;
         }
-        if (thisMaterialChild->Trans < 0.0) thisMaterialChild->Trans = 0.0;
+        if (thisMaterial->Trans < 0.0) thisMaterial->Trans = 0.0;
 
         // step 5.  determine solar reflectances
 
-        DeltaSHGCandTsol = thisMaterialChild->SimpleWindowSHGC - thisMaterialChild->Trans;
+        DeltaSHGCandTsol = thisMaterial->SimpleWindowSHGC - thisMaterial->Trans;
 
-        if (thisMaterialChild->SimpleWindowUfactor > 4.5) {
+        if (thisMaterial->SimpleWindowUfactor > 4.5) {
 
             Ris = 1.0 / (29.436546 * pow_3(DeltaSHGCandTsol) - 21.943415 * pow_2(DeltaSHGCandTsol) + 9.945872 * DeltaSHGCandTsol + 7.426151);
             Ros = 1.0 / (2.225824 * DeltaSHGCandTsol + 20.577080);
-        } else if (thisMaterialChild->SimpleWindowUfactor < 3.4) {
+        } else if (thisMaterial->SimpleWindowUfactor < 3.4) {
 
             Ris = 1.0 / (199.8208128 * pow_3(DeltaSHGCandTsol) - 90.639733 * pow_2(DeltaSHGCandTsol) + 19.737055 * DeltaSHGCandTsol + 6.766575);
             Ros = 1.0 / (5.763355 * DeltaSHGCandTsol + 20.541528);
@@ -5948,37 +5939,37 @@ namespace HeatBalanceManager {
             // inside first
             RLowSide = 1.0 / (199.8208128 * pow_3(DeltaSHGCandTsol) - 90.639733 * pow_2(DeltaSHGCandTsol) + 19.737055 * DeltaSHGCandTsol + 6.766575);
             RHiSide = 1.0 / (29.436546 * pow_3(DeltaSHGCandTsol) - 21.943415 * pow_2(DeltaSHGCandTsol) + 9.945872 * DeltaSHGCandTsol + 7.426151);
-            Ris = ((thisMaterialChild->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
+            Ris = ((thisMaterial->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
             // then outside
             RLowSide = 1.0 / (5.763355 * DeltaSHGCandTsol + 20.541528);
             RHiSide = 1.0 / (2.225824 * DeltaSHGCandTsol + 20.577080);
-            Ros = ((thisMaterialChild->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
+            Ros = ((thisMaterial->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
         }
 
         InflowFraction = (Ros + 0.5 * Rlw) / (Ros + Rlw + Ris);
 
-        SolarAbsorb = (thisMaterialChild->SimpleWindowSHGC - thisMaterialChild->Trans) / InflowFraction;
-        thisMaterialChild->ReflectSolBeamBack = 1.0 - thisMaterialChild->Trans - SolarAbsorb;
-        thisMaterialChild->ReflectSolBeamFront = thisMaterialChild->ReflectSolBeamBack;
+        SolarAbsorb = (thisMaterial->SimpleWindowSHGC - thisMaterial->Trans) / InflowFraction;
+        thisMaterial->ReflectSolBeamBack = 1.0 - thisMaterial->Trans - SolarAbsorb;
+        thisMaterial->ReflectSolBeamFront = thisMaterial->ReflectSolBeamBack;
 
         // step 6. determine visible properties.
-        if (thisMaterialChild->SimpleWindowVTinputByUser) {
-            thisMaterialChild->TransVis = thisMaterialChild->SimpleWindowVisTran;
-            thisMaterialChild->ReflectVisBeamBack = -0.7409 * pow_3(thisMaterialChild->TransVis) + 1.6531 * pow_2(thisMaterialChild->TransVis) -
-                                                    1.2299 * thisMaterialChild->TransVis + 0.4545;
-            if (thisMaterialChild->TransVis + thisMaterialChild->ReflectVisBeamBack >= 1.0) {
-                thisMaterialChild->ReflectVisBeamBack = 0.999 - thisMaterialChild->TransVis;
+        if (thisMaterial->SimpleWindowVTinputByUser) {
+            thisMaterial->TransVis = thisMaterial->SimpleWindowVisTran;
+            thisMaterial->ReflectVisBeamBack = -0.7409 * pow_3(thisMaterial->TransVis) + 1.6531 * pow_2(thisMaterial->TransVis) -
+                                                    1.2299 * thisMaterial->TransVis + 0.4545;
+            if (thisMaterial->TransVis + thisMaterial->ReflectVisBeamBack >= 1.0) {
+                thisMaterial->ReflectVisBeamBack = 0.999 - thisMaterial->TransVis;
             }
 
-            thisMaterialChild->ReflectVisBeamFront = -0.0622 * pow_3(thisMaterialChild->TransVis) + 0.4277 * pow_2(thisMaterialChild->TransVis) -
-                                                     0.4169 * thisMaterialChild->TransVis + 0.2399;
-            if (thisMaterialChild->TransVis + thisMaterialChild->ReflectVisBeamFront >= 1.0) {
-                thisMaterialChild->ReflectVisBeamFront = 0.999 - thisMaterialChild->TransVis;
+            thisMaterial->ReflectVisBeamFront = -0.0622 * pow_3(thisMaterial->TransVis) + 0.4277 * pow_2(thisMaterial->TransVis) -
+                                                     0.4169 * thisMaterial->TransVis + 0.2399;
+            if (thisMaterial->TransVis + thisMaterial->ReflectVisBeamFront >= 1.0) {
+                thisMaterial->ReflectVisBeamFront = 0.999 - thisMaterial->TransVis;
             }
         } else {
-            thisMaterialChild->TransVis = thisMaterialChild->Trans;
-            thisMaterialChild->ReflectVisBeamBack = thisMaterialChild->ReflectSolBeamBack;
-            thisMaterialChild->ReflectVisBeamFront = thisMaterialChild->ReflectSolBeamFront;
+            thisMaterial->TransVis = thisMaterial->Trans;
+            thisMaterial->ReflectVisBeamBack = thisMaterial->ReflectSolBeamBack;
+            thisMaterial->ReflectVisBeamFront = thisMaterial->ReflectSolBeamFront;
         }
 
         // step 7. The dependence on incident angle is in subroutine TransAndReflAtPhi
@@ -6149,15 +6140,14 @@ namespace HeatBalanceManager {
             ++MaterNum;
             delete state.dataMaterial->Material(MaterNum);
             state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-            thisMaterialChild->Group = Material::MaterialGroup::ComplexWindowGap;
-            thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::Rough;
-            thisMaterialChild->ROnly = true;
+            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            thisMaterial->Group = Material::MaterialGroup::ComplexWindowGap;
+            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
+            thisMaterial->ROnly = true;
 
-            thisMaterialChild->Name = state.dataIPShortCut->cAlphaArgs(1);
+            thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
 
-            thisMaterialChild->Thickness = state.dataIPShortCut->rNumericArgs(1);
+            thisMaterial->Thickness = state.dataIPShortCut->rNumericArgs(1);
             if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
@@ -6168,7 +6158,7 @@ namespace HeatBalanceManager {
                     format("{} must be > 0, entered {:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
             }
 
-            thisMaterialChild->Pressure = state.dataIPShortCut->rNumericArgs(2);
+            thisMaterial->Pressure = state.dataIPShortCut->rNumericArgs(2);
             if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
@@ -6180,7 +6170,7 @@ namespace HeatBalanceManager {
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                thisMaterialChild->GasPointer = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
+                thisMaterial->GasPointer = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -6188,11 +6178,11 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, cCurrentModuleObject + " does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre.");
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                thisMaterialChild->DeflectionStatePtr =
+                thisMaterial->DeflectionStatePtr =
                     UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->DeflectionState);
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                thisMaterialChild->SupportPillarPtr =
+                thisMaterial->SupportPillarPtr =
                     UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->SupportPillar);
             }
         }
@@ -6229,16 +6219,15 @@ namespace HeatBalanceManager {
             ++MaterNum;
             delete state.dataMaterial->Material(MaterNum);
             state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-            thisMaterialChild->Group = Material::MaterialGroup::ComplexWindowShade;
-            thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::Rough;
-            thisMaterialChild->ROnly = true;
+            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            thisMaterial->Group = Material::MaterialGroup::ComplexWindowShade;
+            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
+            thisMaterial->ROnly = true;
 
             // Assign pointer to ComplexShade
-            thisMaterialChild->ComplexShadePtr = Loop;
+            thisMaterial->ComplexShadePtr = Loop;
 
-            thisMaterialChild->Name = state.dataIPShortCut->cAlphaArgs(1);
+            thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHeatBal->ComplexShade(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
             {
@@ -6268,9 +6257,9 @@ namespace HeatBalanceManager {
             }
 
             state.dataHeatBal->ComplexShade(Loop).Thickness = state.dataIPShortCut->rNumericArgs(1);
-            thisMaterialChild->Thickness = state.dataIPShortCut->rNumericArgs(1);
+            thisMaterial->Thickness = state.dataIPShortCut->rNumericArgs(1);
             state.dataHeatBal->ComplexShade(Loop).Conductivity = state.dataIPShortCut->rNumericArgs(2);
-            thisMaterialChild->Conductivity = state.dataIPShortCut->rNumericArgs(2);
+            thisMaterial->Conductivity = state.dataIPShortCut->rNumericArgs(2);
             state.dataHeatBal->ComplexShade(Loop).IRTransmittance = state.dataIPShortCut->rNumericArgs(3);
             state.dataHeatBal->ComplexShade(Loop).FrontEmissivity = state.dataIPShortCut->rNumericArgs(4);
             state.dataHeatBal->ComplexShade(Loop).BackEmissivity = state.dataIPShortCut->rNumericArgs(5);
@@ -6278,9 +6267,9 @@ namespace HeatBalanceManager {
             // Simon: in heat balance radiation exchange routines AbsorpThermal is used
             // and program will crash if value is not assigned.  Not sure if this is correct
             // or some additional calculation is necessary. Simon TODO
-            thisMaterialChild->AbsorpThermal = state.dataIPShortCut->rNumericArgs(5);
-            thisMaterialChild->AbsorpThermalFront = state.dataIPShortCut->rNumericArgs(4);
-            thisMaterialChild->AbsorpThermalBack = state.dataIPShortCut->rNumericArgs(5);
+            thisMaterial->AbsorpThermal = state.dataIPShortCut->rNumericArgs(5);
+            thisMaterial->AbsorpThermalFront = state.dataIPShortCut->rNumericArgs(4);
+            thisMaterial->AbsorpThermalBack = state.dataIPShortCut->rNumericArgs(5);
 
             state.dataHeatBal->ComplexShade(Loop).TopOpeningMultiplier = state.dataIPShortCut->rNumericArgs(6);
             state.dataHeatBal->ComplexShade(Loop).BottomOpeningMultiplier = state.dataIPShortCut->rNumericArgs(7);

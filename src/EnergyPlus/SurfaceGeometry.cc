@@ -2600,10 +2600,9 @@ namespace SurfaceGeometry {
                         // Use the new generic code (assuming only one blind) as follows
                         for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                             iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
-                            auto *thisMaterial = state.dataMaterial->Material(iTmp2);
-                            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-                            if (thisMaterialChild->Group == Material::MaterialGroup::WindowBlind) {
-                                BlNum = thisMaterialChild->BlindDataPtr;
+                            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iTmp2));
+                            if (thisMaterial->Group == Material::MaterialGroup::WindowBlind) {
+                                BlNum = thisMaterial->BlindDataPtr;
                                 state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
                                 // TH 2/18/2010. CR 8010
                                 // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
@@ -2613,7 +2612,7 @@ namespace SurfaceGeometry {
                                     errFlag = false;
                                     AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
                                     // point to the new blind
-                                    thisMaterialChild->BlindDataPtr = BlNumNew;
+                                    thisMaterial->BlindDataPtr = BlNumNew;
                                     // window surface points to new blind
                                     state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNumNew;
                                 }
@@ -5845,13 +5844,12 @@ namespace SurfaceGeometry {
                         MatGap1 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 2);
                         MatGap2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
                         MatSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
-                        auto const *thisMaterialGapChild = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap));
-                        auto const *thisMaterialGap1Child = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap1));
-                        auto const *thisMaterialGap2Child = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap2));
-                        auto const *thisMaterialShChild = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatSh));
+                        auto const *thisMaterialGap = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap));
+                        auto const *thisMaterialGap1 = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap1));
+                        auto const *thisMaterialGap2 = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap2));
+                        auto const *thisMaterialSh = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatSh));
                         if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::BGBlind) {
-                            MatGapCalc =
-                                std::abs(thisMaterialGapChild->Thickness - (thisMaterialGap1Child->Thickness + thisMaterialGap2Child->Thickness));
+                            MatGapCalc = std::abs(thisMaterialGap->Thickness - (thisMaterialGap1->Thickness + thisMaterialGap2->Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state,
                                                 std::string{cRoutineName} + ": The gap width(s) for the unshaded window construction " +
@@ -5862,22 +5860,20 @@ namespace SurfaceGeometry {
                                 ShowContinueError(state,
                                                   "for window " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                                       ", which has a between-glass blind.");
-                                ShowContinueError(
-                                    state, format("..Material={} thickness={:.3R} -", thisMaterialGapChild->Name, thisMaterialGapChild->Thickness));
-                                ShowContinueError(
-                                    state,
-                                    format("..( Material={} thickness={:.3R} +", thisMaterialGap1Child->Name, thisMaterialGap1Child->Thickness));
+                                ShowContinueError(state,
+                                                  format("..Material={} thickness={:.3R} -", thisMaterialGap->Name, thisMaterialGap->Thickness));
+                                ShowContinueError(state,
+                                                  format("..( Material={} thickness={:.3R} +", thisMaterialGap1->Name, thisMaterialGap1->Thickness));
                                 ShowContinueError(state,
                                                   format("..Material={} thickness={:.3R} )=[{:.3R}] >.001",
-                                                         thisMaterialGap2Child->Name,
-                                                         thisMaterialGap2Child->Thickness,
+                                                         thisMaterialGap2->Name,
+                                                         thisMaterialGap2->Thickness,
                                                          MatGapCalc));
                                 ErrorsFound = true;
                             }
                         } else { // Between-glass shade
-                            MatGapCalc =
-                                std::abs(thisMaterialGapChild->Thickness -
-                                         (thisMaterialGap1Child->Thickness + thisMaterialGap2Child->Thickness + thisMaterialShChild->Thickness));
+                            MatGapCalc = std::abs(thisMaterialGap->Thickness -
+                                                  (thisMaterialGap1->Thickness + thisMaterialGap2->Thickness + thisMaterialSh->Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state,
                                                 std::string{cRoutineName} + ": The gap width(s) for the unshaded window construction " +
@@ -5888,17 +5884,16 @@ namespace SurfaceGeometry {
                                 ShowContinueError(state,
                                                   "for window " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                                       ", which has a between-glass shade.");
-                                ShowContinueError(
-                                    state, format("..Material={} thickness={:.3R} -", thisMaterialGapChild->Name, thisMaterialGapChild->Thickness));
-                                ShowContinueError(
-                                    state,
-                                    format("...( Material={} thickness={:.3R} +", thisMaterialGap1Child->Name, thisMaterialGap1Child->Thickness));
-                                ShowContinueError(
-                                    state, format("..Material={} thickness={:.3R} +", thisMaterialGap2Child->Name, thisMaterialGap2Child->Thickness));
+                                ShowContinueError(state,
+                                                  format("..Material={} thickness={:.3R} -", thisMaterialGap->Name, thisMaterialGap->Thickness));
+                                ShowContinueError(state,
+                                                  format("...( Material={} thickness={:.3R} +", thisMaterialGap1->Name, thisMaterialGap1->Thickness));
+                                ShowContinueError(state,
+                                                  format("..Material={} thickness={:.3R} +", thisMaterialGap2->Name, thisMaterialGap2->Thickness));
                                 ShowContinueError(state,
                                                   format("..Material={} thickness={:.3R} )=[{:.3R}] >.001",
-                                                         thisMaterialShChild->Name,
-                                                         thisMaterialShChild->Thickness,
+                                                         thisMaterialSh->Name,
+                                                         thisMaterialSh->Thickness,
                                                          MatGapCalc));
                                 ErrorsFound = true;
                             }
@@ -6067,9 +6062,8 @@ namespace SurfaceGeometry {
             if (ConstrNum > 0) {
                 for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-                    auto const *thisMaterial = state.dataMaterial->Material(LayerPtr);
-                    auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-                    if (thisMaterialChild->Group == Material::MaterialGroup::WindowGlass && thisMaterialChild->GlassTransDirtFactor < 1.0) {
+                    auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayerPtr));
+                    if (thisMaterial->Group == Material::MaterialGroup::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state,
                                         std::string{cRoutineName} + ": Interior Window or GlassDoor " + SubSurfaceName + " has a glass layer with");
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
@@ -10870,9 +10864,8 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                    auto *m = state.dataMaterial->Material(index);
-                    auto const *mChild = dynamic_cast<const Material::MaterialChild *>(m);
-                    if (mChild->Group != Material::MaterialGroup::RegularMaterial || mChild->ROnly) {
+                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -10881,8 +10874,8 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     fndInput.intHIns.x = 0.0;
-                    fndInput.intHIns.material = Kiva::Material(mChild->Conductivity, mChild->Density, mChild->SpecHeat);
-                    fndInput.intHIns.depth = mChild->Thickness;
+                    fndInput.intHIns.material = Kiva::Material(m->Conductivity, m->Density, m->SpecHeat);
+                    fndInput.intHIns.depth = m->Thickness;
                 }
                 alpF++;
 
@@ -10931,9 +10924,8 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                    auto *m = state.dataMaterial->Material(index);
-                    auto const *mChild = dynamic_cast<const Material::MaterialChild *>(m);
-                    if (mChild->Group != Material::MaterialGroup::RegularMaterial || mChild->ROnly) {
+                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -10941,8 +10933,8 @@ namespace SurfaceGeometry {
                         ShowContinueError(state, "Must be of type \"Material\"");
                         continue;
                     }
-                    fndInput.intVIns.material = Kiva::Material(mChild->Conductivity, mChild->Density, mChild->SpecHeat);
-                    fndInput.intVIns.width = -mChild->Thickness;
+                    fndInput.intVIns.material = Kiva::Material(m->Conductivity, m->Density, m->SpecHeat);
+                    fndInput.intVIns.width = -m->Thickness;
                     fndInput.intVIns.x = 0.0;
                     fndInput.intVIns.z = 0.0;
                 }
@@ -10980,9 +10972,8 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                    auto *m = state.dataMaterial->Material(index);
-                    auto const *mChild = dynamic_cast<const Material::MaterialChild *>(m);
-                    if (mChild->Group != Material::MaterialGroup::RegularMaterial || mChild->ROnly) {
+                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -10991,8 +10982,8 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     fndInput.extHIns.x = 0.0;
-                    fndInput.extHIns.material = Kiva::Material(mChild->Conductivity, mChild->Density, mChild->SpecHeat);
-                    fndInput.extHIns.depth = mChild->Thickness;
+                    fndInput.extHIns.material = Kiva::Material(m->Conductivity, m->Density, m->SpecHeat);
+                    fndInput.extHIns.depth = m->Thickness;
                 }
                 alpF++;
 
@@ -11041,9 +11032,8 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                    auto *m = state.dataMaterial->Material(index);
-                    auto const *mChild = dynamic_cast<const Material::MaterialChild *>(m);
-                    if (mChild->Group != Material::MaterialGroup::RegularMaterial || mChild->ROnly) {
+                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -11051,8 +11041,8 @@ namespace SurfaceGeometry {
                         ShowContinueError(state, "Must be of type \"Material\"");
                         continue;
                     }
-                    fndInput.extVIns.material = Kiva::Material(mChild->Conductivity, mChild->Density, mChild->SpecHeat);
-                    fndInput.extVIns.width = mChild->Thickness;
+                    fndInput.extVIns.material = Kiva::Material(m->Conductivity, m->Density, m->SpecHeat);
+                    fndInput.extVIns.width = m->Thickness;
                     fndInput.extVIns.x = 0.0;
                     fndInput.extVIns.z = 0.0;
                 }
@@ -11127,9 +11117,8 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                    auto *m = state.dataMaterial->Material(index);
-                    auto const *mChild = dynamic_cast<const Material::MaterialChild *>(m);
-                    if (mChild->Group != Material::MaterialGroup::RegularMaterial || mChild->ROnly) {
+                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -11137,8 +11126,8 @@ namespace SurfaceGeometry {
                         ShowContinueError(state, "Must be of type \"Material\"");
                         continue;
                     }
-                    fndInput.footing.material = Kiva::Material(mChild->Conductivity, mChild->Density, mChild->SpecHeat);
-                    fndInput.footing.width = mChild->Thickness;
+                    fndInput.footing.material = Kiva::Material(m->Conductivity, m->Density, m->SpecHeat);
+                    fndInput.footing.width = m->Thickness;
                     fndInput.footing.x = 0.0;
                     fndInput.footing.z = 0.0;
                 }
@@ -11188,9 +11177,8 @@ namespace SurfaceGeometry {
                                                     ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                                 continue;
                             }
-                            auto *m = state.dataMaterial->Material(index);
-                            auto const *mChild = dynamic_cast<const Material::MaterialChild *>(m);
-                            if (mChild->Group != Material::MaterialGroup::RegularMaterial || mChild->ROnly) {
+                            auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                            if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                                 ErrorsFound = true;
                                 ShowSevereError(state,
                                                 cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " +
@@ -11198,8 +11186,8 @@ namespace SurfaceGeometry {
                                 ShowContinueError(state, "Must be of type \"Material\"");
                                 continue;
                             }
-                            block.material = Kiva::Material(mChild->Conductivity, mChild->Density, mChild->SpecHeat);
-                            block.width = mChild->Thickness;
+                            block.material = Kiva::Material(m->Conductivity, m->Density, m->SpecHeat);
+                            block.width = m->Thickness;
                         } else {
                             ErrorsFound = true;
                             ShowSevereError(state,
@@ -11712,8 +11700,7 @@ namespace SurfaceGeometry {
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             MaterNum = UtilityRoutines::FindItemInPtrList(
                 state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
-            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
+            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType =
                 static_cast<InsulationType>(getEnumerationValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
@@ -11765,7 +11752,7 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Screen:EquivalentLayer",
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
-                    Material::MaterialGroup const MaterialLayerGroup = thisMaterialChild->Group;
+                    Material::MaterialGroup const MaterialLayerGroup = thisMaterial->Group;
                     if ((MaterialLayerGroup == Material::MaterialGroup::WindowSimpleGlazing) ||
                         (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::DrapeEquivalentLayer) ||
@@ -11804,31 +11791,31 @@ namespace SurfaceGeometry {
                                 state.dataSurface->SurfMaterialMovInsulExt(SurfNum) = MaterNum;
                                 state.dataSurface->SurfSchedMovInsulExt(SurfNum) = SchNum;
                                 state.dataSurface->AnyMovableInsulation = true;
-                                if (thisMaterialChild->Resistance <= 0.0) {
-                                    if (thisMaterialChild->Conductivity <= 0.0 || thisMaterialChild->Thickness <= 0.0) {
+                                if (thisMaterial->Resistance <= 0.0) {
+                                    if (thisMaterial->Conductivity <= 0.0 || thisMaterial->Thickness <= 0.0) {
                                         ShowSevereError(state,
                                                         cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                             state.dataIPShortCut->cAlphaArgs(2) + "\", invalid material.");
                                         ShowContinueError(state, "\"Outside\", invalid material for movable insulation.");
                                         ShowContinueError(state,
                                                           format("Material=\"{}\",Resistance=[{:.3R}], must be > 0 for use in Movable Insulation.",
-                                                                 thisMaterialChild->Name,
-                                                                 thisMaterialChild->Resistance));
+                                                                 thisMaterial->Name,
+                                                                 thisMaterial->Resistance));
                                         ErrorsFound = true;
-                                    } else if (thisMaterialChild->Conductivity > 0.0) {
-                                        thisMaterialChild->Resistance = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
+                                    } else if (thisMaterial->Conductivity > 0.0) {
+                                        thisMaterial->Resistance = thisMaterial->Thickness / thisMaterial->Conductivity;
                                     }
                                 }
-                                if (thisMaterialChild->Conductivity <= 0.0) {
-                                    if (thisMaterialChild->Resistance <= 0.0) {
+                                if (thisMaterial->Conductivity <= 0.0) {
+                                    if (thisMaterial->Resistance <= 0.0) {
                                         ShowSevereError(state,
                                                         cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                             state.dataIPShortCut->cAlphaArgs(2) + "\", invalid material.");
                                         ShowContinueError(state, "\"Outside\", invalid material for movable insulation.");
                                         ShowContinueError(state,
                                                           format("Material=\"{}\",Conductivity=[{:.3R}], must be > 0 for use in Movable Insulation.",
-                                                                 thisMaterialChild->Name,
-                                                                 thisMaterialChild->Conductivity));
+                                                                 thisMaterial->Name,
+                                                                 thisMaterial->Conductivity));
                                         ErrorsFound = true;
                                     }
                                 }
@@ -11842,25 +11829,25 @@ namespace SurfaceGeometry {
                                                       "\"Inside\", was already assigned Material=\"" +
                                                           state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name +
                                                           "\".");
-                                    ShowContinueError(state, "attempting to assign Material=\"" + thisMaterialChild->Name + "\".");
+                                    ShowContinueError(state, "attempting to assign Material=\"" + thisMaterial->Name + "\".");
                                     ErrorsFound = true;
                                 }
                                 state.dataSurface->SurfMaterialMovInsulInt(SurfNum) = MaterNum;
                                 state.dataSurface->SurfSchedMovInsulInt(SurfNum) = SchNum;
                                 state.dataSurface->AnyMovableInsulation = true;
-                                if (thisMaterialChild->Resistance <= 0.0) {
-                                    if (thisMaterialChild->Conductivity <= 0.0 || thisMaterialChild->Thickness <= 0.0) {
+                                if (thisMaterial->Resistance <= 0.0) {
+                                    if (thisMaterial->Conductivity <= 0.0 || thisMaterial->Thickness <= 0.0) {
                                         ShowSevereError(state,
                                                         cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                             state.dataIPShortCut->cAlphaArgs(2) + "\", invalid material.");
                                         ShowContinueError(state, "\"Inside\", invalid material for movable insulation.");
                                         ShowContinueError(state,
                                                           format("Material=\"{}\",Resistance=[{:.3R}], must be > 0 for use in Movable Insulation.",
-                                                                 thisMaterialChild->Name,
-                                                                 thisMaterialChild->Resistance));
+                                                                 thisMaterial->Name,
+                                                                 thisMaterial->Resistance));
                                         ErrorsFound = true;
-                                    } else if (thisMaterialChild->Conductivity > 0.0) {
-                                        thisMaterialChild->Resistance = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
+                                    } else if (thisMaterial->Conductivity > 0.0) {
+                                        thisMaterial->Resistance = thisMaterial->Thickness / thisMaterial->Conductivity;
                                     }
                                 }
                                 break;
@@ -13456,22 +13443,22 @@ namespace SurfaceGeometry {
                 // Interior shading device
                 thisConstrNewSh.LayerPoint({1, TotLayersOld}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
                 thisConstrNewSh.LayerPoint(TotLayersNew) = ShDevNum;
-                auto const *thisMaterialLayerPt1Child =
+                auto const *thisMaterialLayerPt1 =
                     dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstrNewSh.LayerPoint(1)));
                 thisConstrNewSh.InsideAbsorpSolar =
                     dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShDevNum))->AbsorpSolar;
-                thisConstrNewSh.OutsideAbsorpSolar = thisMaterialLayerPt1Child->AbsorpSolar;
-                thisConstrNewSh.OutsideAbsorpThermal = thisMaterialLayerPt1Child->AbsorpThermalFront;
+                thisConstrNewSh.OutsideAbsorpSolar = thisMaterialLayerPt1->AbsorpSolar;
+                thisConstrNewSh.OutsideAbsorpThermal = thisMaterialLayerPt1->AbsorpThermalFront;
             } else {
                 // Exterior shading device
                 thisConstrNewSh.LayerPoint(1) = ShDevNum;
                 thisConstrNewSh.LayerPoint({2, TotLayersNew}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
-                auto const *thisMaterialShDevChild = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShDevNum));
+                auto const *thisMaterialShDev = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShDevNum));
                 thisConstrNewSh.InsideAbsorpSolar =
                     dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstrNewSh.LayerPoint(TotLayersNew)))
                         ->AbsorpSolar;
-                thisConstrNewSh.OutsideAbsorpSolar = thisMaterialShDevChild->AbsorpSolar;
-                thisConstrNewSh.OutsideAbsorpThermal = thisMaterialShDevChild->AbsorpThermalFront;
+                thisConstrNewSh.OutsideAbsorpSolar = thisMaterialShDev->AbsorpSolar;
+                thisConstrNewSh.OutsideAbsorpThermal = thisMaterialShDev->AbsorpThermalFront;
             }
             // The following InsideAbsorpThermal applies only to inside glass; it is corrected
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
@@ -13626,65 +13613,65 @@ namespace SurfaceGeometry {
             newAirMaterial = state.dataMaterial->TotMaterials;
             Material::MaterialChild *p = new Material::MaterialChild;
             state.dataMaterial->Material.push_back(p);
-            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataMaterial->TotMaterials));
+            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataMaterial->TotMaterials));
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
-            thisMaterialChild->Name = MatNameStAir;
-            thisMaterialChild->Group = Material::MaterialGroup::WindowGas;
-            thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-            thisMaterialChild->Conductivity = 0.0;
-            thisMaterialChild->Density = 0.0;
-            thisMaterialChild->IsoMoistCap = 0.0;
-            thisMaterialChild->Porosity = 0.0;
-            thisMaterialChild->Resistance = 0.0;
-            thisMaterialChild->SpecHeat = 0.0;
-            thisMaterialChild->ThermGradCoef = 0.0;
-            thisMaterialChild->Thickness = distance;
-            thisMaterialChild->VaporDiffus = 0.0;
-            thisMaterialChild->gasTypes = Material::GasType::Custom;
-            thisMaterialChild->GasCon = 0.0;
-            thisMaterialChild->GasVis = 0.0;
-            thisMaterialChild->GasCp = 0.0;
-            thisMaterialChild->GasWght = 0.0;
-            thisMaterialChild->GasFract = 0.0;
-            thisMaterialChild->gasTypes(1) = Material::GasType::Air;
-            thisMaterialChild->GlassSpectralDataPtr = 0;
-            thisMaterialChild->NumberOfGasesInMixture = 1;
-            thisMaterialChild->GasCon(1, 1) = 2.873e-3;
-            thisMaterialChild->GasCon(2, 1) = 7.760e-5;
-            thisMaterialChild->GasVis(1, 1) = 3.723e-6;
-            thisMaterialChild->GasVis(2, 1) = 4.940e-8;
-            thisMaterialChild->GasCp(1, 1) = 1002.737;
-            thisMaterialChild->GasCp(2, 1) = 1.2324e-2;
-            thisMaterialChild->GasWght(1) = 28.97;
-            thisMaterialChild->GasFract(1) = 1.0;
-            thisMaterialChild->AbsorpSolar = 0.0;
-            thisMaterialChild->AbsorpThermal = 0.0;
-            thisMaterialChild->AbsorpVisible = 0.0;
-            thisMaterialChild->Trans = 0.0;
-            thisMaterialChild->TransVis = 0.0;
-            thisMaterialChild->GlassTransDirtFactor = 0.0;
-            thisMaterialChild->ReflectShade = 0.0;
-            thisMaterialChild->ReflectShadeVis = 0.0;
-            thisMaterialChild->AbsorpThermalBack = 0.0;
-            thisMaterialChild->AbsorpThermalFront = 0.0;
-            thisMaterialChild->ReflectSolBeamBack = 0.0;
-            thisMaterialChild->ReflectSolBeamFront = 0.0;
-            thisMaterialChild->ReflectSolDiffBack = 0.0;
-            thisMaterialChild->ReflectSolDiffFront = 0.0;
-            thisMaterialChild->ReflectVisBeamBack = 0.0;
-            thisMaterialChild->ReflectVisBeamFront = 0.0;
-            thisMaterialChild->ReflectVisDiffBack = 0.0;
-            thisMaterialChild->ReflectVisDiffFront = 0.0;
-            thisMaterialChild->TransSolBeam = 0.0;
-            thisMaterialChild->TransThermal = 0.0;
-            thisMaterialChild->TransVisBeam = 0.0;
-            thisMaterialChild->BlindDataPtr = 0;
-            thisMaterialChild->WinShadeToGlassDist = 0.0;
-            thisMaterialChild->WinShadeTopOpeningMult = 0.0;
-            thisMaterialChild->WinShadeBottomOpeningMult = 0.0;
-            thisMaterialChild->WinShadeLeftOpeningMult = 0.0;
-            thisMaterialChild->WinShadeRightOpeningMult = 0.0;
-            thisMaterialChild->WinShadeAirFlowPermeability = 0.0;
+            thisMaterial->Name = MatNameStAir;
+            thisMaterial->Group = Material::MaterialGroup::WindowGas;
+            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+            thisMaterial->Conductivity = 0.0;
+            thisMaterial->Density = 0.0;
+            thisMaterial->IsoMoistCap = 0.0;
+            thisMaterial->Porosity = 0.0;
+            thisMaterial->Resistance = 0.0;
+            thisMaterial->SpecHeat = 0.0;
+            thisMaterial->ThermGradCoef = 0.0;
+            thisMaterial->Thickness = distance;
+            thisMaterial->VaporDiffus = 0.0;
+            thisMaterial->gasTypes = Material::GasType::Custom;
+            thisMaterial->GasCon = 0.0;
+            thisMaterial->GasVis = 0.0;
+            thisMaterial->GasCp = 0.0;
+            thisMaterial->GasWght = 0.0;
+            thisMaterial->GasFract = 0.0;
+            thisMaterial->gasTypes(1) = Material::GasType::Air;
+            thisMaterial->GlassSpectralDataPtr = 0;
+            thisMaterial->NumberOfGasesInMixture = 1;
+            thisMaterial->GasCon(1, 1) = 2.873e-3;
+            thisMaterial->GasCon(2, 1) = 7.760e-5;
+            thisMaterial->GasVis(1, 1) = 3.723e-6;
+            thisMaterial->GasVis(2, 1) = 4.940e-8;
+            thisMaterial->GasCp(1, 1) = 1002.737;
+            thisMaterial->GasCp(2, 1) = 1.2324e-2;
+            thisMaterial->GasWght(1) = 28.97;
+            thisMaterial->GasFract(1) = 1.0;
+            thisMaterial->AbsorpSolar = 0.0;
+            thisMaterial->AbsorpThermal = 0.0;
+            thisMaterial->AbsorpVisible = 0.0;
+            thisMaterial->Trans = 0.0;
+            thisMaterial->TransVis = 0.0;
+            thisMaterial->GlassTransDirtFactor = 0.0;
+            thisMaterial->ReflectShade = 0.0;
+            thisMaterial->ReflectShadeVis = 0.0;
+            thisMaterial->AbsorpThermalBack = 0.0;
+            thisMaterial->AbsorpThermalFront = 0.0;
+            thisMaterial->ReflectSolBeamBack = 0.0;
+            thisMaterial->ReflectSolBeamFront = 0.0;
+            thisMaterial->ReflectSolDiffBack = 0.0;
+            thisMaterial->ReflectSolDiffFront = 0.0;
+            thisMaterial->ReflectVisBeamBack = 0.0;
+            thisMaterial->ReflectVisBeamFront = 0.0;
+            thisMaterial->ReflectVisDiffBack = 0.0;
+            thisMaterial->ReflectVisDiffFront = 0.0;
+            thisMaterial->TransSolBeam = 0.0;
+            thisMaterial->TransThermal = 0.0;
+            thisMaterial->TransVisBeam = 0.0;
+            thisMaterial->BlindDataPtr = 0;
+            thisMaterial->WinShadeToGlassDist = 0.0;
+            thisMaterial->WinShadeTopOpeningMult = 0.0;
+            thisMaterial->WinShadeBottomOpeningMult = 0.0;
+            thisMaterial->WinShadeLeftOpeningMult = 0.0;
+            thisMaterial->WinShadeRightOpeningMult = 0.0;
+            thisMaterial->WinShadeAirFlowPermeability = 0.0;
         }
         return (newAirMaterial);
     }
@@ -13724,9 +13711,8 @@ namespace SurfaceGeometry {
             thisConstructTot.InsideAbsorpSolar = 0.0;
             thisConstructTot.OutsideAbsorpSolar = 0.0;
             thisConstructTot.InsideAbsorpThermal = state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
-            auto const *thisMaterial = state.dataMaterial->Material(stormMaterial);
-            auto const *thisMaterialChild = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
-            thisConstructTot.OutsideAbsorpThermal = thisMaterialChild->AbsorpThermalFront;
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(stormMaterial));
+            thisConstructTot.OutsideAbsorpThermal = thisMaterial->AbsorpThermalFront;
             thisConstructTot.OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
             thisConstructTot.DayltPropPtr = 0;
             thisConstructTot.CTFCross = 0.0;
@@ -15552,65 +15538,63 @@ namespace SurfaceGeometry {
         for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
             auto &thisConstLayer(state.dataConstruction->Construct(ConstrNum).LayerPoint(LayerNo));
             auto &revConstLayer(state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
-            auto *thisMatLay(state.dataMaterial->Material(thisConstLayer));
-            auto *thisMatLayChild = dynamic_cast<Material::MaterialChild *>(thisMatLay);
-            auto *revMatLay(state.dataMaterial->Material(revConstLayer));
-            auto *revMatLayChild = dynamic_cast<Material::MaterialChild *>(revMatLay);
+            auto *thisMatLay = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstLayer));
+            auto *revMatLay = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(revConstLayer));
             if ((thisConstLayer != revConstLayer) ||                                // Not pointing to the same layer
-                (thisMatLayChild->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
+                (thisMatLay->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
                 (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||       // to have certain properties flipped from front to back
-                (thisMatLayChild->Group == Material::MaterialGroup::GlassEquivalentLayer) ||
+                (thisMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer) ||
                 (revMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
                 Real64 constexpr SmallDiff = 0.0001;
-                if ((thisMatLayChild->Group == Material::MaterialGroup::WindowGlass) && (revMatLay->Group == Material::MaterialGroup::WindowGlass)) {
+                if ((thisMatLay->Group == Material::MaterialGroup::WindowGlass) && (revMatLay->Group == Material::MaterialGroup::WindowGlass)) {
                     // Both layers are window glass, so need to check to see if the properties are reversed
-                    if ((abs(thisMatLayChild->Thickness - revMatLayChild->Thickness) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflectSolBeamBack - revMatLayChild->ReflectSolBeamFront) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflectSolBeamFront - revMatLayChild->ReflectSolBeamBack) > SmallDiff) ||
-                        (abs(thisMatLayChild->TransVis - revMatLayChild->TransVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflectVisBeamBack - revMatLayChild->ReflectVisBeamFront) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflectVisBeamFront - revMatLayChild->ReflectVisBeamBack) > SmallDiff) ||
-                        (abs(thisMatLayChild->TransThermal - revMatLayChild->TransThermal) > SmallDiff) ||
-                        (abs(thisMatLayChild->AbsorpThermalBack - revMatLayChild->AbsorpThermalFront) > SmallDiff) ||
-                        (abs(thisMatLayChild->AbsorpThermalFront - revMatLayChild->AbsorpThermalBack) > SmallDiff) ||
-                        (abs(thisMatLayChild->Conductivity - revMatLayChild->Conductivity) > SmallDiff) ||
-                        (abs(thisMatLayChild->GlassTransDirtFactor - revMatLayChild->GlassTransDirtFactor) > SmallDiff) ||
-                        (thisMatLayChild->SolarDiffusing != revMatLayChild->SolarDiffusing) ||
-                        (abs(thisMatLayChild->YoungModulus - revMatLayChild->YoungModulus) > SmallDiff) ||
-                        (abs(thisMatLayChild->PoissonsRatio - revMatLayChild->PoissonsRatio) > SmallDiff)) {
+                    if ((abs(thisMatLay->Thickness - revMatLay->Thickness) > SmallDiff) ||
+                        (abs(thisMatLay->ReflectSolBeamBack - revMatLay->ReflectSolBeamFront) > SmallDiff) ||
+                        (abs(thisMatLay->ReflectSolBeamFront - revMatLay->ReflectSolBeamBack) > SmallDiff) ||
+                        (abs(thisMatLay->TransVis - revMatLay->TransVis) > SmallDiff) ||
+                        (abs(thisMatLay->ReflectVisBeamBack - revMatLay->ReflectVisBeamFront) > SmallDiff) ||
+                        (abs(thisMatLay->ReflectVisBeamFront - revMatLay->ReflectVisBeamBack) > SmallDiff) ||
+                        (abs(thisMatLay->TransThermal - revMatLay->TransThermal) > SmallDiff) ||
+                        (abs(thisMatLay->AbsorpThermalBack - revMatLay->AbsorpThermalFront) > SmallDiff) ||
+                        (abs(thisMatLay->AbsorpThermalFront - revMatLay->AbsorpThermalBack) > SmallDiff) ||
+                        (abs(thisMatLay->Conductivity - revMatLay->Conductivity) > SmallDiff) ||
+                        (abs(thisMatLay->GlassTransDirtFactor - revMatLay->GlassTransDirtFactor) > SmallDiff) ||
+                        (thisMatLay->SolarDiffusing != revMatLay->SolarDiffusing) ||
+                        (abs(thisMatLay->YoungModulus - revMatLay->YoungModulus) > SmallDiff) ||
+                        (abs(thisMatLay->PoissonsRatio - revMatLay->PoissonsRatio) > SmallDiff)) {
                         RevLayerDiffs = true;
                         break; // exit when diff
                     }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
-                } else if ((thisMatLayChild->Group == Material::MaterialGroup::GlassEquivalentLayer) &&
-                           (revMatLayChild->Group == Material::MaterialGroup::GlassEquivalentLayer)) {
-                    if ((abs(thisMatLayChild->TausBackBeamBeam - revMatLayChild->TausFrontBeamBeam) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausFrontBeamBeam - revMatLayChild->TausBackBeamBeam) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflBackBeamBeam - revMatLayChild->ReflFrontBeamBeam) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflFrontBeamBeam - revMatLayChild->ReflBackBeamBeam) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausBackBeamBeamVis - revMatLayChild->TausFrontBeamBeamVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausFrontBeamBeamVis - revMatLayChild->TausBackBeamBeamVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflBackBeamBeamVis - revMatLayChild->ReflFrontBeamBeamVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflFrontBeamBeamVis - revMatLayChild->ReflBackBeamBeamVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausBackBeamDiff - revMatLayChild->TausFrontBeamDiff) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausFrontBeamDiff - revMatLayChild->TausBackBeamDiff) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflBackBeamDiff - revMatLayChild->ReflFrontBeamDiff) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflFrontBeamDiff - revMatLayChild->ReflBackBeamDiff) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausBackBeamDiffVis - revMatLayChild->TausFrontBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausFrontBeamDiffVis - revMatLayChild->TausBackBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflBackBeamDiffVis - revMatLayChild->ReflFrontBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflFrontBeamDiffVis - revMatLayChild->ReflBackBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausDiffDiff - revMatLayChild->TausDiffDiff) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflBackDiffDiff - revMatLayChild->ReflFrontDiffDiff) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflFrontDiffDiff - revMatLayChild->ReflBackDiffDiff) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausDiffDiffVis - revMatLayChild->TausDiffDiffVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflBackDiffDiffVis - revMatLayChild->ReflFrontDiffDiffVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->ReflFrontDiffDiffVis - revMatLayChild->ReflBackDiffDiffVis) > SmallDiff) ||
-                        (abs(thisMatLayChild->TausThermal - revMatLayChild->TausThermal) > SmallDiff) ||
-                        (abs(thisMatLayChild->EmissThermalBack - revMatLayChild->EmissThermalFront) > SmallDiff) ||
-                        (abs(thisMatLayChild->EmissThermalFront - revMatLayChild->EmissThermalBack) > SmallDiff) ||
-                        (abs(thisMatLayChild->Resistance - revMatLayChild->Resistance) > SmallDiff)) {
+                } else if ((thisMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer) &&
+                           (revMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer)) {
+                    if ((abs(thisMatLay->TausBackBeamBeam - revMatLay->TausFrontBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay->TausFrontBeamBeam - revMatLay->TausBackBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay->ReflBackBeamBeam - revMatLay->ReflFrontBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay->ReflFrontBeamBeam - revMatLay->ReflBackBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay->TausBackBeamBeamVis - revMatLay->TausFrontBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay->TausFrontBeamBeamVis - revMatLay->TausBackBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay->ReflBackBeamBeamVis - revMatLay->ReflFrontBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay->ReflFrontBeamBeamVis - revMatLay->ReflBackBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay->TausBackBeamDiff - revMatLay->TausFrontBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay->TausFrontBeamDiff - revMatLay->TausBackBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay->ReflBackBeamDiff - revMatLay->ReflFrontBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay->ReflFrontBeamDiff - revMatLay->ReflBackBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay->TausBackBeamDiffVis - revMatLay->TausFrontBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay->TausFrontBeamDiffVis - revMatLay->TausBackBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay->ReflBackBeamDiffVis - revMatLay->ReflFrontBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay->ReflFrontBeamDiffVis - revMatLay->ReflBackBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay->TausDiffDiff - revMatLay->TausDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay->ReflBackDiffDiff - revMatLay->ReflFrontDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay->ReflFrontDiffDiff - revMatLay->ReflBackDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay->TausDiffDiffVis - revMatLay->TausDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay->ReflBackDiffDiffVis - revMatLay->ReflFrontDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay->ReflFrontDiffDiffVis - revMatLay->ReflBackDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay->TausThermal - revMatLay->TausThermal) > SmallDiff) ||
+                        (abs(thisMatLay->EmissThermalBack - revMatLay->EmissThermalFront) > SmallDiff) ||
+                        (abs(thisMatLay->EmissThermalFront - revMatLay->EmissThermalBack) > SmallDiff) ||
+                        (abs(thisMatLay->Resistance - revMatLay->Resistance) > SmallDiff)) {
                         RevLayerDiffs = true;
                         break; // exit when diff
                     }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)

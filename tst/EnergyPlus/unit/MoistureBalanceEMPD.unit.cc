@@ -184,10 +184,9 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
     MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput(*state);
 
-    auto const *material = state->dataMaterial->Material(1);
-    auto const *materialChild = dynamic_cast<const Material::MaterialChild *>(material);
-    ASSERT_NEAR(materialChild->EMPDSurfaceDepth, 0.014143, 0.000001);
-    ASSERT_NEAR(materialChild->EMPDDeepDepth, 0.064810, 0.000001);
+    auto const *material = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(1));
+    ASSERT_NEAR(material->EMPDSurfaceDepth, 0.014143, 0.000001);
+    ASSERT_NEAR(material->EMPDDeepDepth, 0.064810, 0.000001);
 }
 
 TEST_F(EnergyPlusFixture, EMPDRcoating)
@@ -347,8 +346,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 
     using Psychrometrics::PsyRhFnTdbRhov;
 
-    auto const *material(state->dataMaterial->Material(1));
-    auto const *materialChild = dynamic_cast<const Material::MaterialChild *>(material);
+    auto const *material = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(1));
 
     Real64 Tsat(0.0);
     state->dataHeatBalSurf->SurfTempIn.allocate(surfNum);
@@ -360,13 +358,13 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     Real64 RV_Deep_Old = state->dataMstBalEMPD->RVdeepOld(surfNum);
     Real64 RVaver = state->dataMstBalEMPD->RVSurfLayerOld(surfNum);
     Real64 RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
-    Real64 dU_dRH = materialChild->MoistACoeff * materialChild->MoistBCoeff * pow(RHaver, materialChild->MoistBCoeff - 1) +
-                    materialChild->MoistCCoeff * materialChild->MoistDCoeff * pow(RHaver, materialChild->MoistDCoeff - 1);
+    Real64 dU_dRH = material->MoistACoeff * material->MoistBCoeff * pow(RHaver, material->MoistBCoeff - 1) +
+                    material->MoistCCoeff * material->MoistDCoeff * pow(RHaver, material->MoistDCoeff - 1);
 
     // Convert stored vapor density to RH.
     Real64 RH_deep_layer_old = PsyRhFnTdbRhov(*state, Taver, RV_Deep_Old);
     Real64 RH_surf_layer_old = PsyRhFnTdbRhov(*state, Taver, RVaver);
-    Real64 mass_flux_surf_deep_max = materialChild->EMPDDeepDepth * materialChild->Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) /
+    Real64 mass_flux_surf_deep_max = material->EMPDDeepDepth * material->Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) /
                                      (state->dataGlobal->TimeStepZone * 3600.0);
 
     Real64 hm_deep_layer = 6.9551289450635225e-05;

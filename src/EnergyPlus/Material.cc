@@ -259,31 +259,30 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             // Load the material derived type from the input data.
             delete state.dataMaterial->Material(MaterNum);
             state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-            thisMaterialChild->Group = MaterialGroup::RegularMaterial;
-            thisMaterialChild->Name = materialName;
+            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            thisMaterial->Group = MaterialGroup::RegularMaterial;
+            thisMaterial->Name = materialName;
 
             std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
-            thisMaterialChild->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
+            thisMaterial->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
                 getEnumerationValue(DataSurfaces::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
 
-            thisMaterialChild->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
-            thisMaterialChild->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
-            thisMaterialChild->Density = ip->getRealFieldValue(objectFields, objectSchemaProps, "density");
-            thisMaterialChild->SpecHeat = ip->getRealFieldValue(objectFields, objectSchemaProps, "specific_heat");
-            thisMaterialChild->AbsorpThermal = ip->getRealFieldValue(objectFields, objectSchemaProps, "thermal_absorptance");
-            thisMaterialChild->AbsorpThermalInput = thisMaterialChild->AbsorpThermal;
-            thisMaterialChild->AbsorpSolar = ip->getRealFieldValue(objectFields, objectSchemaProps, "solar_absorptance");
-            thisMaterialChild->AbsorpSolarInput = thisMaterialChild->AbsorpSolar;
-            thisMaterialChild->AbsorpVisible = ip->getRealFieldValue(objectFields, objectSchemaProps, "visible_absorptance");
-            thisMaterialChild->AbsorpVisibleInput = thisMaterialChild->AbsorpVisible;
+            thisMaterial->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
+            thisMaterial->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
+            thisMaterial->Density = ip->getRealFieldValue(objectFields, objectSchemaProps, "density");
+            thisMaterial->SpecHeat = ip->getRealFieldValue(objectFields, objectSchemaProps, "specific_heat");
+            thisMaterial->AbsorpThermal = ip->getRealFieldValue(objectFields, objectSchemaProps, "thermal_absorptance");
+            thisMaterial->AbsorpThermalInput = thisMaterial->AbsorpThermal;
+            thisMaterial->AbsorpSolar = ip->getRealFieldValue(objectFields, objectSchemaProps, "solar_absorptance");
+            thisMaterial->AbsorpSolarInput = thisMaterial->AbsorpSolar;
+            thisMaterial->AbsorpVisible = ip->getRealFieldValue(objectFields, objectSchemaProps, "visible_absorptance");
+            thisMaterial->AbsorpVisibleInput = thisMaterial->AbsorpVisible;
 
-            if (thisMaterialChild->Conductivity > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
-                thisMaterialChild->Resistance = state.dataHeatBal->NominalR(MaterNum);
+            if (thisMaterial->Conductivity > 0.0) {
+                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
+                thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
             } else {
-                ShowSevereError(state, "Positive thermal conductivity required for material " + thisMaterialChild->Name);
+                ShowSevereError(state, "Positive thermal conductivity required for material " + thisMaterial->Name);
                 ErrorsFound = true;
             }
         }
@@ -294,20 +293,19 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::RegularMaterial;
-        thisMaterialChild->Name = "~FC_Concrete";
-        thisMaterialChild->Thickness = 0.15;    // m, 0.15m = 6 inches
-        thisMaterialChild->Conductivity = 1.95; // W/mK
-        thisMaterialChild->Density = 2240.0;    // kg/m3
-        thisMaterialChild->SpecHeat = 900.0;    // J/kgK
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-        thisMaterialChild->AbsorpSolar = 0.7;
-        thisMaterialChild->AbsorpThermal = 0.9;
-        thisMaterialChild->AbsorpVisible = 0.7;
-        state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
-        thisMaterialChild->Resistance = state.dataHeatBal->NominalR(MaterNum);
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::RegularMaterial;
+        thisMaterial->Name = "~FC_Concrete";
+        thisMaterial->Thickness = 0.15;    // m, 0.15m = 6 inches
+        thisMaterial->Conductivity = 1.95; // W/mK
+        thisMaterial->Density = 2240.0;    // kg/m3
+        thisMaterial->SpecHeat = 900.0;    // J/kgK
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->AbsorpSolar = 0.7;
+        thisMaterial->AbsorpThermal = 0.9;
+        thisMaterial->AbsorpVisible = 0.7;
+        state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
+        thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
 
         ++RegMat;
     }
@@ -342,39 +340,38 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::RegularMaterial;
-        thisMaterialChild->Name = MaterialNames(1);
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::RegularMaterial;
+        thisMaterial->Name = MaterialNames(1);
 
-        thisMaterialChild->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
+        thisMaterial->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
             getEnumerationValue(DataSurfaces::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
-        thisMaterialChild->Resistance = MaterialProps(1);
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Resistance = MaterialProps(1);
+        thisMaterial->ROnly = true;
         if (MaterialNumProp >= 2) {
-            thisMaterialChild->AbsorpThermal = MaterialProps(2);
-            thisMaterialChild->AbsorpThermalInput = MaterialProps(2);
+            thisMaterial->AbsorpThermal = MaterialProps(2);
+            thisMaterial->AbsorpThermalInput = MaterialProps(2);
         } else {
-            thisMaterialChild->AbsorpThermal = 0.9;
-            thisMaterialChild->AbsorpThermalInput = 0.9;
+            thisMaterial->AbsorpThermal = 0.9;
+            thisMaterial->AbsorpThermalInput = 0.9;
         }
         if (MaterialNumProp >= 3) {
-            thisMaterialChild->AbsorpSolar = MaterialProps(3);
-            thisMaterialChild->AbsorpSolarInput = MaterialProps(3);
+            thisMaterial->AbsorpSolar = MaterialProps(3);
+            thisMaterial->AbsorpSolarInput = MaterialProps(3);
         } else {
-            thisMaterialChild->AbsorpSolar = 0.7;
-            thisMaterialChild->AbsorpSolarInput = 0.7;
+            thisMaterial->AbsorpSolar = 0.7;
+            thisMaterial->AbsorpSolarInput = 0.7;
         }
         if (MaterialNumProp >= 4) {
-            thisMaterialChild->AbsorpVisible = MaterialProps(4);
-            thisMaterialChild->AbsorpVisibleInput = MaterialProps(4);
+            thisMaterial->AbsorpVisible = MaterialProps(4);
+            thisMaterial->AbsorpVisibleInput = MaterialProps(4);
         } else {
-            thisMaterialChild->AbsorpVisible = 0.7;
-            thisMaterialChild->AbsorpVisibleInput = 0.7;
+            thisMaterial->AbsorpVisible = 0.7;
+            thisMaterial->AbsorpVisibleInput = 0.7;
         }
 
-        state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Resistance;
+        state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Resistance;
     }
 
     // Add a fictitious insulation layer for each construction defined with F or C factor method
@@ -383,15 +380,14 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ++MaterNum;
             delete state.dataMaterial->Material(MaterNum);
             state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-            thisMaterialChild->Group = MaterialGroup::RegularMaterial;
-            thisMaterialChild->Name = format("~FC_Insulation_{}", Loop);
-            thisMaterialChild->ROnly = true;
-            thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-            thisMaterialChild->AbsorpSolar = 0.0;
-            thisMaterialChild->AbsorpThermal = 0.0;
-            thisMaterialChild->AbsorpVisible = 0.0;
+            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            thisMaterial->Group = MaterialGroup::RegularMaterial;
+            thisMaterial->Name = format("~FC_Insulation_{}", Loop);
+            thisMaterial->ROnly = true;
+            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+            thisMaterial->AbsorpSolar = 0.0;
+            thisMaterial->AbsorpThermal = 0.0;
+            thisMaterial->AbsorpVisible = 0.0;
         }
         RegRMat += TotFfactorConstructs + TotCfactorConstructs;
     }
@@ -427,17 +423,16 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::Air;
-        thisMaterialChild->Name = MaterialNames(1);
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::Air;
+        thisMaterial->Name = MaterialNames(1);
 
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
-        thisMaterialChild->Resistance = MaterialProps(1);
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Resistance = MaterialProps(1);
+        thisMaterial->ROnly = true;
 
-        state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Resistance;
+        state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Resistance;
     }
 
     state.dataHeatBalMgr->CurrentModuleObject = "Material:InfraredTransparent";
@@ -469,24 +464,23 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::IRTMaterial;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::IRTMaterial;
 
         // Load the material derived type from the input data.
-        thisMaterialChild->Name = MaterialNames(1);
+        thisMaterial->Name = MaterialNames(1);
 
         // Load data for other properties that need defaults
-        thisMaterialChild->ROnly = true;
-        thisMaterialChild->Resistance = 0.01;
-        thisMaterialChild->AbsorpThermal = 0.9999;
-        thisMaterialChild->AbsorpThermalInput = 0.9999;
-        thisMaterialChild->AbsorpSolar = 1.0;
-        thisMaterialChild->AbsorpSolarInput = 1.0;
-        thisMaterialChild->AbsorpVisible = 1.0;
-        thisMaterialChild->AbsorpVisibleInput = 1.0;
+        thisMaterial->ROnly = true;
+        thisMaterial->Resistance = 0.01;
+        thisMaterial->AbsorpThermal = 0.9999;
+        thisMaterial->AbsorpThermalInput = 0.9999;
+        thisMaterial->AbsorpSolar = 1.0;
+        thisMaterial->AbsorpSolarInput = 1.0;
+        thisMaterial->AbsorpVisible = 1.0;
+        thisMaterial->AbsorpVisibleInput = 1.0;
 
-        state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Resistance;
+        state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Resistance;
     }
 
     // Glass materials, regular input: transmittance and front/back reflectance
@@ -520,55 +514,54 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::WindowGlass;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::WindowGlass;
 
         // Load the material derived type from the input data.
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-        thisMaterialChild->ROnly = true;
-        thisMaterialChild->Thickness = MaterialProps(1);
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+        thisMaterial->ROnly = true;
+        thisMaterial->Thickness = MaterialProps(1);
         if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
-            thisMaterialChild->Trans = MaterialProps(2);
-            thisMaterialChild->ReflectSolBeamFront = MaterialProps(3);
-            thisMaterialChild->ReflectSolBeamBack = MaterialProps(4);
-            thisMaterialChild->TransVis = MaterialProps(5);
-            thisMaterialChild->ReflectVisBeamFront = MaterialProps(6);
-            thisMaterialChild->ReflectVisBeamBack = MaterialProps(7);
-            thisMaterialChild->TransThermal = MaterialProps(8);
+            thisMaterial->Trans = MaterialProps(2);
+            thisMaterial->ReflectSolBeamFront = MaterialProps(3);
+            thisMaterial->ReflectSolBeamBack = MaterialProps(4);
+            thisMaterial->TransVis = MaterialProps(5);
+            thisMaterial->ReflectVisBeamFront = MaterialProps(6);
+            thisMaterial->ReflectVisBeamBack = MaterialProps(7);
+            thisMaterial->TransThermal = MaterialProps(8);
         }
-        thisMaterialChild->AbsorpThermalFront = MaterialProps(9);
-        thisMaterialChild->AbsorpThermalBack = MaterialProps(10);
-        thisMaterialChild->Conductivity = MaterialProps(11);
-        thisMaterialChild->GlassTransDirtFactor = MaterialProps(12);
-        thisMaterialChild->YoungModulus = MaterialProps(13);
-        thisMaterialChild->PoissonsRatio = MaterialProps(14);
-        if (MaterialProps(12) == 0.0) thisMaterialChild->GlassTransDirtFactor = 1.0;
-        thisMaterialChild->AbsorpThermal = thisMaterialChild->AbsorpThermalBack;
+        thisMaterial->AbsorpThermalFront = MaterialProps(9);
+        thisMaterial->AbsorpThermalBack = MaterialProps(10);
+        thisMaterial->Conductivity = MaterialProps(11);
+        thisMaterial->GlassTransDirtFactor = MaterialProps(12);
+        thisMaterial->YoungModulus = MaterialProps(13);
+        thisMaterial->PoissonsRatio = MaterialProps(14);
+        if (MaterialProps(12) == 0.0) thisMaterial->GlassTransDirtFactor = 1.0;
+        thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
 
-        if (thisMaterialChild->Conductivity > 0.0) {
-            state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
-            thisMaterialChild->Resistance = state.dataHeatBal->NominalR(MaterNum);
+        if (thisMaterial->Conductivity > 0.0) {
+            state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
+            thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
         } else {
             ErrorsFound = true;
-            ShowSevereError(state, "Window glass material " + thisMaterialChild->Name + " has Conductivity = 0.0, must be >0.0, default = .9");
+            ShowSevereError(state, "Window glass material " + thisMaterial->Name + " has Conductivity = 0.0, must be >0.0, default = .9");
         }
 
-        thisMaterialChild->GlassSpectralDataPtr = 0;
+        thisMaterial->GlassSpectralDataPtr = 0;
         if (state.dataHeatBal->TotSpectralData > 0 && !state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            thisMaterialChild->GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), state.dataHeatBal->SpectralData);
+            thisMaterial->GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), state.dataHeatBal->SpectralData);
         }
-        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) thisMaterialChild->GlassSpectralDataPtr = 0;
+        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) thisMaterial->GlassSpectralDataPtr = 0;
         // No need for spectral data for BSDF either
-        if (UtilityRoutines::SameString(MaterialNames(2), "BSDF")) thisMaterialChild->GlassSpectralDataPtr = 0;
-        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) thisMaterialChild->GlassSpectralAndAngle = true;
+        if (UtilityRoutines::SameString(MaterialNames(2), "BSDF")) thisMaterial->GlassSpectralDataPtr = 0;
+        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) thisMaterial->GlassSpectralAndAngle = true;
 
-        if (thisMaterialChild->GlassSpectralDataPtr == 0 && UtilityRoutines::SameString(MaterialNames(2), "Spectral")) {
+        if (thisMaterial->GlassSpectralDataPtr == 0 && UtilityRoutines::SameString(MaterialNames(2), "Spectral")) {
             ErrorsFound = true;
             ShowSevereError(state,
-                            state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterialChild->Name + "\" has " +
+                            state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterial->Name + "\" has " +
                                 state.dataIPShortCut->cAlphaFieldNames(2) +
                                 " = Spectral but has no matching MaterialProperty:GlazingSpectralData set");
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
@@ -583,7 +576,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage") && !UtilityRoutines::SameString(MaterialNames(2), "Spectral") &&
             !UtilityRoutines::SameString(MaterialNames(2), "BSDF") && !UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
             ErrorsFound = true;
-            ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterialChild->Name + "\", invalid specification.");
+            ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterial->Name + "\", invalid specification.");
             ShowContinueError(state,
                               state.dataIPShortCut->cAlphaFieldNames(2) +
                                   " must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value=" + MaterialNames(2));
@@ -720,7 +713,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         if (MaterialNames(4) == "") {
-            thisMaterialChild->SolarDiffusing = false;
+            thisMaterial->SolarDiffusing = false;
         } else {
             BooleanSwitch answer = getYesNoValue(MaterialNames(4));
             if (answer == BooleanSwitch::Invalid) {
@@ -728,32 +721,32 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(4) + " must be Yes or No, entered value=" + MaterialNames(4));
             } else {
-                thisMaterialChild->SolarDiffusing = (answer == BooleanSwitch::Yes);
+                thisMaterial->SolarDiffusing = (answer == BooleanSwitch::Yes);
             }
         }
         // Get SpectralAndAngle table names
-        if (thisMaterialChild->GlassSpectralAndAngle) {
+        if (thisMaterial->GlassSpectralAndAngle) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                 ShowContinueError(state, " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
             } else {
-                thisMaterialChild->GlassSpecAngTransDataPtr = Curve::GetCurveIndex(state, MaterialNames(5));
-                if (thisMaterialChild->GlassSpecAngTransDataPtr == 0) {
+                thisMaterial->GlassSpecAngTransDataPtr = Curve::GetCurveIndex(state, MaterialNames(5));
+                if (thisMaterial->GlassSpecAngTransDataPtr == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                     ShowContinueError(
                         state, state.dataIPShortCut->cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                 } else {
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                         thisMaterialChild->GlassSpecAngTransDataPtr, // Curve index
-                                                         {2},                                         // Valid dimensions
-                                                         RoutineName,                                 // Routine name
-                                                         state.dataHeatBalMgr->CurrentModuleObject,   // Object Type
-                                                         thisMaterialChild->Name,                     // Object Name
-                                                         state.dataIPShortCut->cAlphaFieldNames(5));  // Field Name
+                                                         thisMaterial->GlassSpecAngTransDataPtr,     // Curve index
+                                                         {2},                                        // Valid dimensions
+                                                         RoutineName,                                // Routine name
+                                                         state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                         thisMaterial->Name,                         // Object Name
+                                                         state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
 
-                    GetCurveMinMaxValues(state, thisMaterialChild->GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                    GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                     if (minAngValue > 1.0e-6) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -805,22 +798,22 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                 ShowContinueError(state, " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
             } else {
-                thisMaterialChild->GlassSpecAngFRefleDataPtr = Curve::GetCurveIndex(state, MaterialNames(6));
-                if (thisMaterialChild->GlassSpecAngFRefleDataPtr == 0) {
+                thisMaterial->GlassSpecAngFRefleDataPtr = Curve::GetCurveIndex(state, MaterialNames(6));
+                if (thisMaterial->GlassSpecAngFRefleDataPtr == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                     ShowContinueError(
                         state, state.dataIPShortCut->cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                 } else {
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                         thisMaterialChild->GlassSpecAngFRefleDataPtr, // Curve index
-                                                         {2},                                          // Valid dimensions
-                                                         RoutineName,                                  // Routine name
-                                                         state.dataHeatBalMgr->CurrentModuleObject,    // Object Type
-                                                         thisMaterialChild->Name,                      // Object Name
-                                                         state.dataIPShortCut->cAlphaFieldNames(6));   // Field Name
+                                                         thisMaterial->GlassSpecAngFRefleDataPtr,    // Curve index
+                                                         {2},                                        // Valid dimensions
+                                                         RoutineName,                                // Routine name
+                                                         state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                         thisMaterial->Name,                         // Object Name
+                                                         state.dataIPShortCut->cAlphaFieldNames(6)); // Field Name
 
-                    GetCurveMinMaxValues(state, thisMaterialChild->GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                    GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                     if (minAngValue > 1.0e-6) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -872,22 +865,22 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                 ShowContinueError(state, " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
             } else {
-                thisMaterialChild->GlassSpecAngBRefleDataPtr = Curve::GetCurveIndex(state, MaterialNames(7));
-                if (thisMaterialChild->GlassSpecAngBRefleDataPtr == 0) {
+                thisMaterial->GlassSpecAngBRefleDataPtr = Curve::GetCurveIndex(state, MaterialNames(7));
+                if (thisMaterial->GlassSpecAngBRefleDataPtr == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                     ShowContinueError(
                         state, state.dataIPShortCut->cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                 } else {
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                         thisMaterialChild->GlassSpecAngBRefleDataPtr, // Curve index
-                                                         {2},                                          // Valid dimensions
-                                                         RoutineName,                                  // Routine name
-                                                         state.dataHeatBalMgr->CurrentModuleObject,    // Object Type
-                                                         thisMaterialChild->Name,                      // Object Name
-                                                         state.dataIPShortCut->cAlphaFieldNames(7));   // Field Name
+                                                         thisMaterial->GlassSpecAngBRefleDataPtr,    // Curve index
+                                                         {2},                                        // Valid dimensions
+                                                         RoutineName,                                // Routine name
+                                                         state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                         thisMaterial->Name,                         // Object Name
+                                                         state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
 
-                    GetCurveMinMaxValues(state, thisMaterialChild->GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                    GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                     if (minAngValue > 1.0e-6) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -968,16 +961,15 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::WindowGlass;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::WindowGlass;
 
         // Load the material derived type from the input data.
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-        thisMaterialChild->Thickness = MaterialProps(1);
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+        thisMaterial->Thickness = MaterialProps(1);
+        thisMaterial->ROnly = true;
 
         // Calculate solar and visible transmittance and reflectance at normal incidence from thickness,
         // index of refraction and extinction coefficient. With the alternative input the front and back
@@ -987,29 +979,29 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ReflectivityVis = pow_2((MaterialProps(4) - 1.0) / (MaterialProps(4) + 1.0));
         TransmittivitySol = std::exp(-MaterialProps(3) * MaterialProps(1));
         TransmittivityVis = std::exp(-MaterialProps(5) * MaterialProps(1));
-        thisMaterialChild->Trans = TransmittivitySol * pow_2(1.0 - ReflectivitySol) / (1.0 - pow_2(ReflectivitySol * TransmittivitySol));
-        thisMaterialChild->ReflectSolBeamFront =
+        thisMaterial->Trans = TransmittivitySol * pow_2(1.0 - ReflectivitySol) / (1.0 - pow_2(ReflectivitySol * TransmittivitySol));
+        thisMaterial->ReflectSolBeamFront =
             ReflectivitySol * (1.0 + pow_2(1.0 - ReflectivitySol) * pow_2(TransmittivitySol) / (1.0 - pow_2(ReflectivitySol * TransmittivitySol)));
-        thisMaterialChild->ReflectSolBeamBack = thisMaterialChild->ReflectSolBeamFront;
-        thisMaterialChild->TransVis = TransmittivityVis * pow_2(1.0 - ReflectivityVis) / (1.0 - pow_2(ReflectivityVis * TransmittivityVis));
+        thisMaterial->ReflectSolBeamBack = thisMaterial->ReflectSolBeamFront;
+        thisMaterial->TransVis = TransmittivityVis * pow_2(1.0 - ReflectivityVis) / (1.0 - pow_2(ReflectivityVis * TransmittivityVis));
 
-        thisMaterialChild->ReflectVisBeamFront =
+        thisMaterial->ReflectVisBeamFront =
             ReflectivityVis * (1.0 + pow_2(1.0 - ReflectivityVis) * pow_2(TransmittivityVis) / (1.0 - pow_2(ReflectivityVis * TransmittivityVis)));
-        thisMaterialChild->ReflectVisBeamBack = thisMaterialChild->ReflectSolBeamFront;
-        thisMaterialChild->TransThermal = MaterialProps(6);
-        thisMaterialChild->AbsorpThermalFront = MaterialProps(7);
-        thisMaterialChild->AbsorpThermalBack = MaterialProps(7);
-        thisMaterialChild->Conductivity = MaterialProps(8);
-        thisMaterialChild->GlassTransDirtFactor = MaterialProps(9);
-        if (MaterialProps(9) == 0.0) thisMaterialChild->GlassTransDirtFactor = 1.0;
-        thisMaterialChild->AbsorpThermal = thisMaterialChild->AbsorpThermalBack;
+        thisMaterial->ReflectVisBeamBack = thisMaterial->ReflectSolBeamFront;
+        thisMaterial->TransThermal = MaterialProps(6);
+        thisMaterial->AbsorpThermalFront = MaterialProps(7);
+        thisMaterial->AbsorpThermalBack = MaterialProps(7);
+        thisMaterial->Conductivity = MaterialProps(8);
+        thisMaterial->GlassTransDirtFactor = MaterialProps(9);
+        if (MaterialProps(9) == 0.0) thisMaterial->GlassTransDirtFactor = 1.0;
+        thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
 
-        if (thisMaterialChild->Conductivity > 0.0) {
-            state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
-            thisMaterialChild->Resistance = state.dataHeatBal->NominalR(MaterNum);
+        if (thisMaterial->Conductivity > 0.0) {
+            state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
+            thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
         }
 
-        thisMaterialChild->GlassSpectralDataPtr = 0;
+        thisMaterial->GlassSpectralDataPtr = 0;
 
         if (MaterialProps(6) + MaterialProps(7) >= 1.0) {
             ErrorsFound = true;
@@ -1019,11 +1011,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         if (MaterialNames(2) == "") {
-            thisMaterialChild->SolarDiffusing = false;
+            thisMaterial->SolarDiffusing = false;
         } else if (MaterialNames(2) == "YES") {
-            thisMaterialChild->SolarDiffusing = true;
+            thisMaterial->SolarDiffusing = true;
         } else if (MaterialNames(2) == "NO") {
-            thisMaterialChild->SolarDiffusing = false;
+            thisMaterial->SolarDiffusing = false;
         } else {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
@@ -1061,48 +1053,47 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::GlassEquivalentLayer;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::GlassEquivalentLayer;
 
         // Load the material derived type from the input data.
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+        thisMaterial->ROnly = true;
 
-        thisMaterialChild->TausFrontBeamBeam = MaterialProps(1);
-        thisMaterialChild->TausBackBeamBeam = MaterialProps(2);
-        thisMaterialChild->ReflFrontBeamBeam = MaterialProps(3);
-        thisMaterialChild->ReflBackBeamBeam = MaterialProps(4);
-        thisMaterialChild->TausFrontBeamBeamVis = MaterialProps(5);
-        thisMaterialChild->TausBackBeamBeamVis = MaterialProps(6);
-        thisMaterialChild->ReflFrontBeamBeamVis = MaterialProps(7);
-        thisMaterialChild->ReflBackBeamBeamVis = MaterialProps(8);
-        thisMaterialChild->TausFrontBeamDiff = MaterialProps(9);
-        thisMaterialChild->TausBackBeamDiff = MaterialProps(10);
-        thisMaterialChild->ReflFrontBeamDiff = MaterialProps(11);
-        thisMaterialChild->ReflBackBeamDiff = MaterialProps(12);
-        thisMaterialChild->TausFrontBeamDiffVis = MaterialProps(13);
-        thisMaterialChild->TausBackBeamDiffVis = MaterialProps(14);
-        thisMaterialChild->ReflFrontBeamDiffVis = MaterialProps(15);
-        thisMaterialChild->ReflBackBeamDiffVis = MaterialProps(16);
-        thisMaterialChild->TausDiffDiff = MaterialProps(17);
-        thisMaterialChild->ReflFrontDiffDiff = MaterialProps(18);
-        thisMaterialChild->ReflBackDiffDiff = MaterialProps(19);
-        thisMaterialChild->TausDiffDiffVis = MaterialProps(20);
-        thisMaterialChild->ReflFrontDiffDiffVis = MaterialProps(21);
-        thisMaterialChild->ReflBackDiffDiffVis = MaterialProps(22);
-        thisMaterialChild->TausThermal = MaterialProps(23);
-        thisMaterialChild->EmissThermalFront = MaterialProps(24);
-        thisMaterialChild->EmissThermalBack = MaterialProps(25);
-        thisMaterialChild->Resistance = MaterialProps(26);
-        if (thisMaterialChild->Resistance <= 0.0) thisMaterialChild->Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
+        thisMaterial->TausFrontBeamBeam = MaterialProps(1);
+        thisMaterial->TausBackBeamBeam = MaterialProps(2);
+        thisMaterial->ReflFrontBeamBeam = MaterialProps(3);
+        thisMaterial->ReflBackBeamBeam = MaterialProps(4);
+        thisMaterial->TausFrontBeamBeamVis = MaterialProps(5);
+        thisMaterial->TausBackBeamBeamVis = MaterialProps(6);
+        thisMaterial->ReflFrontBeamBeamVis = MaterialProps(7);
+        thisMaterial->ReflBackBeamBeamVis = MaterialProps(8);
+        thisMaterial->TausFrontBeamDiff = MaterialProps(9);
+        thisMaterial->TausBackBeamDiff = MaterialProps(10);
+        thisMaterial->ReflFrontBeamDiff = MaterialProps(11);
+        thisMaterial->ReflBackBeamDiff = MaterialProps(12);
+        thisMaterial->TausFrontBeamDiffVis = MaterialProps(13);
+        thisMaterial->TausBackBeamDiffVis = MaterialProps(14);
+        thisMaterial->ReflFrontBeamDiffVis = MaterialProps(15);
+        thisMaterial->ReflBackBeamDiffVis = MaterialProps(16);
+        thisMaterial->TausDiffDiff = MaterialProps(17);
+        thisMaterial->ReflFrontDiffDiff = MaterialProps(18);
+        thisMaterial->ReflBackDiffDiff = MaterialProps(19);
+        thisMaterial->TausDiffDiffVis = MaterialProps(20);
+        thisMaterial->ReflFrontDiffDiffVis = MaterialProps(21);
+        thisMaterial->ReflBackDiffDiffVis = MaterialProps(22);
+        thisMaterial->TausThermal = MaterialProps(23);
+        thisMaterial->EmissThermalFront = MaterialProps(24);
+        thisMaterial->EmissThermalBack = MaterialProps(25);
+        thisMaterial->Resistance = MaterialProps(26);
+        if (thisMaterial->Resistance <= 0.0) thisMaterial->Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
         // Assumes thermal emissivity is the same as thermal absorptance
-        thisMaterialChild->AbsorpThermalFront = thisMaterialChild->EmissThermalFront;
-        thisMaterialChild->AbsorpThermalBack = thisMaterialChild->EmissThermalBack;
-        thisMaterialChild->TransThermal = thisMaterialChild->TausThermal;
+        thisMaterial->AbsorpThermalFront = thisMaterial->EmissThermalFront;
+        thisMaterial->AbsorpThermalBack = thisMaterial->EmissThermalBack;
+        thisMaterial->TransThermal = thisMaterial->TausThermal;
 
-        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) thisMaterialChild->GlassSpectralDataPtr = 0;
+        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) thisMaterial->GlassSpectralDataPtr = 0;
 
         // IF(dataMaterial.Material(MaterNum)%GlassSpectralDataPtr == 0 .AND. UtilityRoutines::SameString(MaterialNames(2),'Spectral')) THEN
         //  ErrorsFound = .TRUE.
@@ -1118,7 +1109,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) {
             ErrorsFound = true;
-            ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterialChild->Name + "\", invalid specification.");
+            ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterial->Name + "\", invalid specification.");
             ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(2) + " must be SpectralAverage, value=" + MaterialNames(2));
         }
 
@@ -1155,32 +1146,31 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::WindowGas;
-        thisMaterialChild->gasTypes(1) = GasType::Invalid;
-        thisMaterialChild->NumberOfGasesInMixture = 1;
-        thisMaterialChild->GasFract(1) = 1.0;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::WindowGas;
+        thisMaterial->gasTypes(1) = GasType::Invalid;
+        thisMaterial->NumberOfGasesInMixture = 1;
+        thisMaterial->GasFract(1) = 1.0;
 
         // Load the material derived type from the input data.
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->NumberOfGasesInMixture = 1;
-        thisMaterialChild->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->NumberOfGasesInMixture = 1;
+        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
-        thisMaterialChild->Thickness = MaterialProps(1);
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Thickness = MaterialProps(1);
+        thisMaterial->ROnly = true;
 
-        gasType = thisMaterialChild->gasTypes(1);
+        gasType = thisMaterial->gasTypes(1);
         if (gasType != GasType::Custom) {
-            thisMaterialChild->GasWght(1) = GasWght[static_cast<int>(gasType)];
-            thisMaterialChild->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+            thisMaterial->GasWght(1) = GasWght[static_cast<int>(gasType)];
+            thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterialChild->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterialChild->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterialChild->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
             }
         }
 
@@ -1188,12 +1178,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         if (gasType == GasType::Custom) {
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterialChild->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
-                thisMaterialChild->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
-                thisMaterialChild->GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
+                thisMaterial->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
+                thisMaterial->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
+                thisMaterial->GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
             }
-            thisMaterialChild->GasWght(1) = MaterialProps(11);
-            thisMaterialChild->GasSpecHeatRatio(1) = MaterialProps(12);
+            thisMaterial->GasWght(1) = MaterialProps(11);
+            thisMaterial->GasSpecHeatRatio(1) = MaterialProps(12);
 
             // Check for errors in custom gas properties
             //      IF(dataMaterial.Material(MaterNum)%GasCon(1,1) <= 0.0) THEN
@@ -1202,17 +1192,17 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             //                 //TRIM(MaterialNames(1))//' should be > 0.')
             //      END IF
 
-            if (thisMaterialChild->GasVis(1, 1) <= 0.0) {
+            if (thisMaterial->GasVis(1, 1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(3 + ICoeff) + " not > 0.0");
             }
-            if (thisMaterialChild->GasCp(1, 1) <= 0.0) {
+            if (thisMaterial->GasCp(1, 1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(5 + ICoeff) + " not > 0.0");
             }
-            if (thisMaterialChild->GasWght(1) <= 0.0) {
+            if (thisMaterial->GasWght(1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(8) + " not > 0.0");
@@ -1221,9 +1211,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Nominal resistance of gap at room temperature
         if (!ErrorsFound) {
-            DenomRGas = (thisMaterialChild->GasCon(1, 1) + thisMaterialChild->GasCon(2, 1) * 300.0 + thisMaterialChild->GasCon(3, 1) * 90000.0);
+            DenomRGas = (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
             if (DenomRGas > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Thickness / DenomRGas;
+                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / DenomRGas;
             } else {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
@@ -1264,61 +1254,60 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::GapEquivalentLayer;
-        thisMaterialChild->gasTypes(1) = GasType::Invalid;
-        thisMaterialChild->NumberOfGasesInMixture = 1;
-        thisMaterialChild->GasFract(1) = 1.0;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::GapEquivalentLayer;
+        thisMaterial->gasTypes(1) = GasType::Invalid;
+        thisMaterial->NumberOfGasesInMixture = 1;
+        thisMaterial->GasFract(1) = 1.0;
 
         // Load the material derived type from the input data.
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->NumberOfGasesInMixture = 1;
-        thisMaterialChild->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->NumberOfGasesInMixture = 1;
+        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
-        thisMaterialChild->Thickness = MaterialProps(1);
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Thickness = MaterialProps(1);
+        thisMaterial->ROnly = true;
 
-        gasType = thisMaterialChild->gasTypes(1);
+        gasType = thisMaterial->gasTypes(1);
         if (gasType != GasType::Custom) {
-            thisMaterialChild->GasWght(1) = GasWght[static_cast<int>(gasType)];
-            thisMaterialChild->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+            thisMaterial->GasWght(1) = GasWght[static_cast<int>(gasType)];
+            thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterialChild->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterialChild->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterialChild->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
             }
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             // Get gap vent type
-            thisMaterialChild->gapVentType =
+            thisMaterial->gapVentType =
                 static_cast<GapVentType>(getEnumerationValue(GapVentTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
         }
 
         if (gasType == GasType::Custom) {
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterialChild->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
-                thisMaterialChild->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
-                thisMaterialChild->GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
+                thisMaterial->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
+                thisMaterial->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
+                thisMaterial->GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
             }
-            thisMaterialChild->GasWght(1) = MaterialProps(11);
-            thisMaterialChild->GasSpecHeatRatio(1) = MaterialProps(12);
+            thisMaterial->GasWght(1) = MaterialProps(11);
+            thisMaterial->GasSpecHeatRatio(1) = MaterialProps(12);
 
-            if (thisMaterialChild->GasVis(1, 1) <= 0.0) {
+            if (thisMaterial->GasVis(1, 1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(5) + " not > 0.0");
             }
-            if (thisMaterialChild->GasCp(1, 1) <= 0.0) {
+            if (thisMaterial->GasCp(1, 1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(8) + " not > 0.0");
             }
-            if (thisMaterialChild->GasWght(1) <= 0.0) {
+            if (thisMaterial->GasWght(1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(11) + " not > 0.0");
@@ -1327,9 +1316,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Nominal resistance of gap at room temperature
         if (!ErrorsFound) {
-            DenomRGas = (thisMaterialChild->GasCon(1, 1) + thisMaterialChild->GasCon(2, 1) * 300.0 + thisMaterialChild->GasCon(3, 1) * 90000.0);
+            DenomRGas = (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
             if (DenomRGas > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Thickness / DenomRGas;
+                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / DenomRGas;
             } else {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
@@ -1370,48 +1359,46 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::WindowGasMixture;
-        thisMaterialChild->gasTypes = GasType::Invalid;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::WindowGasMixture;
+        thisMaterial->gasTypes = GasType::Invalid;
 
         // Load the material derived type from the input data.
 
-        thisMaterialChild->Name = state.dataIPShortCut->cAlphaArgs(1);
+        thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
         NumGases = MaterialProps(2);
-        thisMaterialChild->NumberOfGasesInMixture = NumGases;
+        thisMaterial->NumberOfGasesInMixture = NumGases;
         for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
-            thisMaterialChild->gasTypes(NumGas) =
+            thisMaterial->gasTypes(NumGas) =
                 static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
         }
 
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
 
-        thisMaterialChild->Thickness = MaterialProps(1);
-        if (thisMaterialChild->Thickness <= 0.0) {
+        thisMaterial->Thickness = MaterialProps(1);
+        if (thisMaterial->Thickness <= 0.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", Illegal value.");
             ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be greater than 0.");
         }
-        thisMaterialChild->ROnly = true;
+        thisMaterial->ROnly = true;
 
         for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
-            gasType = thisMaterialChild->gasTypes(NumGas);
+            gasType = thisMaterial->gasTypes(NumGas);
             if (gasType != GasType::Custom) {
-                thisMaterialChild->GasWght(NumGas) = GasWght[static_cast<int>(gasType)];
-                thisMaterialChild->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[static_cast<int>(gasType)];
-                thisMaterialChild->GasFract(NumGas) = MaterialProps(2 + NumGas);
+                thisMaterial->GasWght(NumGas) = GasWght[static_cast<int>(gasType)];
+                thisMaterial->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+                thisMaterial->GasFract(NumGas) = MaterialProps(2 + NumGas);
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    thisMaterialChild->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                    thisMaterialChild->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                    thisMaterialChild->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                    thisMaterial->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
                 }
             }
         }
 
         // Nominal resistance of gap at room temperature (based on first gas in mixture)
         state.dataHeatBal->NominalR(MaterNum) =
-            thisMaterialChild->Thickness /
-            (thisMaterialChild->GasCon(1, 1) + thisMaterialChild->GasCon(2, 1) * 300.0 + thisMaterialChild->GasCon(3, 1) * 90000.0);
+            thisMaterial->Thickness / (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
     }
 
     // Window Shade Materials
@@ -1445,35 +1432,34 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::Shade;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::Shade;
 
         // Load the material derived type from the input data.
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-        thisMaterialChild->Trans = MaterialProps(1);
-        thisMaterialChild->ReflectShade = MaterialProps(2);
-        thisMaterialChild->TransVis = MaterialProps(3);
-        thisMaterialChild->ReflectShadeVis = MaterialProps(4);
-        thisMaterialChild->AbsorpThermal = MaterialProps(5);
-        thisMaterialChild->AbsorpThermalInput = MaterialProps(5);
-        thisMaterialChild->TransThermal = MaterialProps(6);
-        thisMaterialChild->Thickness = MaterialProps(7);
-        thisMaterialChild->Conductivity = MaterialProps(8);
-        thisMaterialChild->AbsorpSolar = max(0.0, 1.0 - thisMaterialChild->Trans - thisMaterialChild->ReflectShade);
-        thisMaterialChild->AbsorpSolarInput = thisMaterialChild->AbsorpSolar;
-        thisMaterialChild->WinShadeToGlassDist = MaterialProps(9);
-        thisMaterialChild->WinShadeTopOpeningMult = MaterialProps(10);
-        thisMaterialChild->WinShadeBottomOpeningMult = MaterialProps(11);
-        thisMaterialChild->WinShadeLeftOpeningMult = MaterialProps(12);
-        thisMaterialChild->WinShadeRightOpeningMult = MaterialProps(13);
-        thisMaterialChild->WinShadeAirFlowPermeability = MaterialProps(14);
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->Trans = MaterialProps(1);
+        thisMaterial->ReflectShade = MaterialProps(2);
+        thisMaterial->TransVis = MaterialProps(3);
+        thisMaterial->ReflectShadeVis = MaterialProps(4);
+        thisMaterial->AbsorpThermal = MaterialProps(5);
+        thisMaterial->AbsorpThermalInput = MaterialProps(5);
+        thisMaterial->TransThermal = MaterialProps(6);
+        thisMaterial->Thickness = MaterialProps(7);
+        thisMaterial->Conductivity = MaterialProps(8);
+        thisMaterial->AbsorpSolar = max(0.0, 1.0 - thisMaterial->Trans - thisMaterial->ReflectShade);
+        thisMaterial->AbsorpSolarInput = thisMaterial->AbsorpSolar;
+        thisMaterial->WinShadeToGlassDist = MaterialProps(9);
+        thisMaterial->WinShadeTopOpeningMult = MaterialProps(10);
+        thisMaterial->WinShadeBottomOpeningMult = MaterialProps(11);
+        thisMaterial->WinShadeLeftOpeningMult = MaterialProps(12);
+        thisMaterial->WinShadeRightOpeningMult = MaterialProps(13);
+        thisMaterial->WinShadeAirFlowPermeability = MaterialProps(14);
+        thisMaterial->ROnly = true;
 
-        if (thisMaterialChild->Conductivity > 0.0) {
-            state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
+        if (thisMaterial->Conductivity > 0.0) {
+            state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
         } else {
             state.dataHeatBal->NominalR(MaterNum) = 1.0;
         }
@@ -1533,31 +1519,30 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::ShadeEquivalentLayer;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::ShadeEquivalentLayer;
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->ROnly = true;
 
         //  Front side and back side have the same beam-Beam Transmittance
-        thisMaterialChild->TausFrontBeamBeam = MaterialProps(1);
-        thisMaterialChild->TausBackBeamBeam = MaterialProps(1);
-        thisMaterialChild->TausFrontBeamDiff = MaterialProps(2);
-        thisMaterialChild->TausBackBeamDiff = MaterialProps(3);
-        thisMaterialChild->ReflFrontBeamDiff = MaterialProps(4);
-        thisMaterialChild->ReflBackBeamDiff = MaterialProps(5);
-        thisMaterialChild->TausFrontBeamBeamVis = MaterialProps(6);
-        thisMaterialChild->TausFrontBeamDiffVis = MaterialProps(7);
-        thisMaterialChild->ReflFrontBeamDiffVis = MaterialProps(8);
-        thisMaterialChild->TausThermal = MaterialProps(9);
-        thisMaterialChild->EmissThermalFront = MaterialProps(10);
-        thisMaterialChild->EmissThermalBack = MaterialProps(11);
+        thisMaterial->TausFrontBeamBeam = MaterialProps(1);
+        thisMaterial->TausBackBeamBeam = MaterialProps(1);
+        thisMaterial->TausFrontBeamDiff = MaterialProps(2);
+        thisMaterial->TausBackBeamDiff = MaterialProps(3);
+        thisMaterial->ReflFrontBeamDiff = MaterialProps(4);
+        thisMaterial->ReflBackBeamDiff = MaterialProps(5);
+        thisMaterial->TausFrontBeamBeamVis = MaterialProps(6);
+        thisMaterial->TausFrontBeamDiffVis = MaterialProps(7);
+        thisMaterial->ReflFrontBeamDiffVis = MaterialProps(8);
+        thisMaterial->TausThermal = MaterialProps(9);
+        thisMaterial->EmissThermalFront = MaterialProps(10);
+        thisMaterial->EmissThermalBack = MaterialProps(11);
         // Assumes thermal emissivity is the same as thermal absorptance
-        thisMaterialChild->AbsorpThermalFront = thisMaterialChild->EmissThermalFront;
-        thisMaterialChild->AbsorpThermalBack = thisMaterialChild->EmissThermalBack;
-        thisMaterialChild->TransThermal = thisMaterialChild->TausThermal;
+        thisMaterial->AbsorpThermalFront = thisMaterial->EmissThermalFront;
+        thisMaterial->AbsorpThermalBack = thisMaterial->EmissThermalBack;
+        thisMaterial->TransThermal = thisMaterial->TausThermal;
 
         if (MaterialProps(1) + MaterialProps(2) + MaterialProps(4) >= 1.0) {
             ErrorsFound = true;
@@ -1628,42 +1613,41 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::DrapeEquivalentLayer;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::DrapeEquivalentLayer;
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->ROnly = true;
 
         //  Front side and back side have the same properties
-        thisMaterialChild->TausFrontBeamBeam = MaterialProps(1);
-        thisMaterialChild->TausBackBeamBeam = MaterialProps(1);
+        thisMaterial->TausFrontBeamBeam = MaterialProps(1);
+        thisMaterial->TausBackBeamBeam = MaterialProps(1);
 
-        thisMaterialChild->TausFrontBeamDiff = MaterialProps(2);
-        thisMaterialChild->TausBackBeamDiff = MaterialProps(3);
+        thisMaterial->TausFrontBeamDiff = MaterialProps(2);
+        thisMaterial->TausBackBeamDiff = MaterialProps(3);
 
-        thisMaterialChild->ReflFrontBeamDiff = MaterialProps(4);
-        thisMaterialChild->ReflBackBeamDiff = MaterialProps(5);
-        thisMaterialChild->TausFrontBeamBeamVis = MaterialProps(6);
-        thisMaterialChild->TausFrontBeamDiffVis = MaterialProps(7);
-        thisMaterialChild->ReflFrontBeamDiffVis = MaterialProps(8);
-        thisMaterialChild->TausThermal = MaterialProps(9);
-        thisMaterialChild->EmissThermalFront = MaterialProps(10);
-        thisMaterialChild->EmissThermalBack = MaterialProps(11);
+        thisMaterial->ReflFrontBeamDiff = MaterialProps(4);
+        thisMaterial->ReflBackBeamDiff = MaterialProps(5);
+        thisMaterial->TausFrontBeamBeamVis = MaterialProps(6);
+        thisMaterial->TausFrontBeamDiffVis = MaterialProps(7);
+        thisMaterial->ReflFrontBeamDiffVis = MaterialProps(8);
+        thisMaterial->TausThermal = MaterialProps(9);
+        thisMaterial->EmissThermalFront = MaterialProps(10);
+        thisMaterial->EmissThermalBack = MaterialProps(11);
         // Assumes thermal emissivity is the same as thermal absorptance
-        thisMaterialChild->AbsorpThermalFront = thisMaterialChild->EmissThermalFront;
-        thisMaterialChild->AbsorpThermalBack = thisMaterialChild->EmissThermalBack;
-        thisMaterialChild->TransThermal = thisMaterialChild->TausThermal;
+        thisMaterial->AbsorpThermalFront = thisMaterial->EmissThermalFront;
+        thisMaterial->AbsorpThermalBack = thisMaterial->EmissThermalBack;
+        thisMaterial->TransThermal = thisMaterial->TausThermal;
 
         if (!state.dataIPShortCut->lNumericFieldBlanks(12) && !state.dataIPShortCut->lNumericFieldBlanks(13)) {
             if (MaterialProps(12) != 0.0 && MaterialProps(13) != 0.0) {
-                thisMaterialChild->PleatedDrapeWidth = MaterialProps(12);
-                thisMaterialChild->PleatedDrapeLength = MaterialProps(13);
-                thisMaterialChild->ISPleatedDrape = true;
+                thisMaterial->PleatedDrapeWidth = MaterialProps(12);
+                thisMaterial->PleatedDrapeLength = MaterialProps(13);
+                thisMaterial->ISPleatedDrape = true;
             }
         } else {
-            thisMaterialChild->ISPleatedDrape = false;
+            thisMaterial->ISPleatedDrape = false;
         }
         if (MaterialProps(1) + MaterialProps(2) + MaterialProps(4) >= 1.0) {
             ErrorsFound = true;
@@ -1719,14 +1703,13 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::Screen;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::Screen;
 
         // Load the material derived type from the input data.
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->ReflectanceModeling = MaterialNames(2);
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->ReflectanceModeling = MaterialNames(2);
         if (!(UtilityRoutines::SameString(MaterialNames(2), "DoNotModel") || UtilityRoutines::SameString(MaterialNames(2), "ModelAsDirectBeam") ||
               UtilityRoutines::SameString(MaterialNames(2), "ModelAsDiffuse"))) {
             ErrorsFound = true;
@@ -1735,29 +1718,28 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                               state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + MaterialNames(2) +
                                   "\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.");
         }
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-        thisMaterialChild->ReflectShade = MaterialProps(1);
-        if (thisMaterialChild->ReflectShade < 0.0 || thisMaterialChild->ReflectShade > 1.0) {
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->ReflectShade = MaterialProps(1);
+        if (thisMaterial->ReflectShade < 0.0 || thisMaterial->ReflectShade > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be >= 0 and <= 1");
         }
-        thisMaterialChild->ReflectShadeVis = MaterialProps(2);
-        if (thisMaterialChild->ReflectShadeVis < 0.0 || thisMaterialChild->ReflectShadeVis > 1.0) {
+        thisMaterial->ReflectShadeVis = MaterialProps(2);
+        if (thisMaterial->ReflectShadeVis < 0.0 || thisMaterial->ReflectShadeVis > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state,
-                              state.dataIPShortCut->cNumericFieldNames(2) + " must be >= 0 and <= 1 for material " + thisMaterialChild->Name + '.');
+            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(2) + " must be >= 0 and <= 1 for material " + thisMaterial->Name + '.');
         }
-        thisMaterialChild->AbsorpThermal = MaterialProps(3);
-        thisMaterialChild->AbsorpThermalInput = MaterialProps(3);
-        if (thisMaterialChild->AbsorpThermal < 0.0 || thisMaterialChild->AbsorpThermal > 1.0) {
+        thisMaterial->AbsorpThermal = MaterialProps(3);
+        thisMaterial->AbsorpThermalInput = MaterialProps(3);
+        if (thisMaterial->AbsorpThermal < 0.0 || thisMaterial->AbsorpThermal > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(3) + " must be >= 0 and <= 1");
         }
-        thisMaterialChild->Conductivity = MaterialProps(4);
-        thisMaterialChild->Thickness = MaterialProps(6); // thickness = diameter
+        thisMaterial->Conductivity = MaterialProps(4);
+        thisMaterial->Thickness = MaterialProps(6); // thickness = diameter
 
         if (MaterialProps(5) > 0.0) {
             //      SurfaceScreens(ScNum)%ScreenDiameterToSpacingRatio = MaterialProps(6)/MaterialProps(5) or
@@ -1769,7 +1751,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                   state.dataIPShortCut->cNumericFieldNames(6) + " must be less than " + state.dataIPShortCut->cNumericFieldNames(5));
             } else {
                 //       Calculate direct normal transmittance (open area fraction)
-                thisMaterialChild->Trans = pow_2(1.0 - MaterialProps(6) / MaterialProps(5));
+                thisMaterial->Trans = pow_2(1.0 - MaterialProps(6) / MaterialProps(5));
             }
         } else {
             ErrorsFound = true;
@@ -1785,91 +1767,91 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         //   Modify reflectance to account for the open area in the screen assembly
-        thisMaterialChild->ReflectShade *= (1.0 - thisMaterialChild->Trans);
-        thisMaterialChild->ReflectShadeVis *= (1.0 - thisMaterialChild->Trans);
+        thisMaterial->ReflectShade *= (1.0 - thisMaterial->Trans);
+        thisMaterial->ReflectShadeVis *= (1.0 - thisMaterial->Trans);
 
-        thisMaterialChild->WinShadeToGlassDist = MaterialProps(7);
-        if (thisMaterialChild->WinShadeToGlassDist < 0.001 || thisMaterialChild->WinShadeToGlassDist > 1.0) {
+        thisMaterial->WinShadeToGlassDist = MaterialProps(7);
+        if (thisMaterial->WinShadeToGlassDist < 0.001 || thisMaterial->WinShadeToGlassDist > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(7) + " must be greater than or equal to 0.001 and less than or equal to 1.");
         }
 
-        thisMaterialChild->WinShadeTopOpeningMult = MaterialProps(8);
-        if (thisMaterialChild->WinShadeTopOpeningMult < 0.0 || thisMaterialChild->WinShadeTopOpeningMult > 1.0) {
+        thisMaterial->WinShadeTopOpeningMult = MaterialProps(8);
+        if (thisMaterial->WinShadeTopOpeningMult < 0.0 || thisMaterial->WinShadeTopOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(8) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
-        thisMaterialChild->WinShadeBottomOpeningMult = MaterialProps(9);
-        if (thisMaterialChild->WinShadeBottomOpeningMult < 0.0 || thisMaterialChild->WinShadeBottomOpeningMult > 1.0) {
+        thisMaterial->WinShadeBottomOpeningMult = MaterialProps(9);
+        if (thisMaterial->WinShadeBottomOpeningMult < 0.0 || thisMaterial->WinShadeBottomOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(9) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
-        thisMaterialChild->WinShadeLeftOpeningMult = MaterialProps(10);
-        if (thisMaterialChild->WinShadeLeftOpeningMult < 0.0 || thisMaterialChild->WinShadeLeftOpeningMult > 1.0) {
+        thisMaterial->WinShadeLeftOpeningMult = MaterialProps(10);
+        if (thisMaterial->WinShadeLeftOpeningMult < 0.0 || thisMaterial->WinShadeLeftOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
-        thisMaterialChild->WinShadeRightOpeningMult = MaterialProps(11);
-        if (thisMaterialChild->WinShadeRightOpeningMult < 0.0 || thisMaterialChild->WinShadeRightOpeningMult > 1.0) {
+        thisMaterial->WinShadeRightOpeningMult = MaterialProps(11);
+        if (thisMaterial->WinShadeRightOpeningMult < 0.0 || thisMaterial->WinShadeRightOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(11) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
-        thisMaterialChild->ScreenMapResolution = MaterialProps(12);
-        if (thisMaterialChild->ScreenMapResolution < 0 || thisMaterialChild->ScreenMapResolution > 5 || thisMaterialChild->ScreenMapResolution == 4) {
+        thisMaterial->ScreenMapResolution = MaterialProps(12);
+        if (thisMaterial->ScreenMapResolution < 0 || thisMaterial->ScreenMapResolution > 5 || thisMaterial->ScreenMapResolution == 4) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(12) + " must be 0, 1, 2, 3, or 5.");
             ErrorsFound = true;
         }
 
         //   Default air flow permeability to open area fraction
-        thisMaterialChild->WinShadeAirFlowPermeability = thisMaterialChild->Trans;
-        thisMaterialChild->TransThermal = thisMaterialChild->Trans;
-        thisMaterialChild->TransVis = thisMaterialChild->Trans;
+        thisMaterial->WinShadeAirFlowPermeability = thisMaterial->Trans;
+        thisMaterial->TransThermal = thisMaterial->Trans;
+        thisMaterial->TransVis = thisMaterial->Trans;
 
-        thisMaterialChild->ROnly = true;
+        thisMaterial->ROnly = true;
 
         //   Calculate absorptance accounting for the open area in the screen assembly (used only in CreateShadedWindowConstruction)
-        thisMaterialChild->AbsorpSolar = max(0.0, 1.0 - thisMaterialChild->Trans - thisMaterialChild->ReflectShade);
-        thisMaterialChild->AbsorpSolarInput = thisMaterialChild->AbsorpSolar;
-        thisMaterialChild->AbsorpVisible = max(0.0, 1.0 - thisMaterialChild->TransVis - thisMaterialChild->ReflectShadeVis);
-        thisMaterialChild->AbsorpVisibleInput = thisMaterialChild->AbsorpVisible;
-        thisMaterialChild->AbsorpThermal *= (1.0 - thisMaterialChild->Trans);
-        thisMaterialChild->AbsorpThermalInput = thisMaterialChild->AbsorpThermal;
+        thisMaterial->AbsorpSolar = max(0.0, 1.0 - thisMaterial->Trans - thisMaterial->ReflectShade);
+        thisMaterial->AbsorpSolarInput = thisMaterial->AbsorpSolar;
+        thisMaterial->AbsorpVisible = max(0.0, 1.0 - thisMaterial->TransVis - thisMaterial->ReflectShadeVis);
+        thisMaterial->AbsorpVisibleInput = thisMaterial->AbsorpVisible;
+        thisMaterial->AbsorpThermal *= (1.0 - thisMaterial->Trans);
+        thisMaterial->AbsorpThermalInput = thisMaterial->AbsorpThermal;
 
-        if (thisMaterialChild->Conductivity > 0.0) {
-            state.dataHeatBal->NominalR(MaterNum) = (1.0 - thisMaterialChild->Trans) * thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
+        if (thisMaterial->Conductivity > 0.0) {
+            state.dataHeatBal->NominalR(MaterNum) = (1.0 - thisMaterial->Trans) * thisMaterial->Thickness / thisMaterial->Conductivity;
         } else {
             state.dataHeatBal->NominalR(MaterNum) = 1.0;
             ShowWarningError(
                 state,
-                "Conductivity for material=\"" + thisMaterialChild->Name +
+                "Conductivity for material=\"" + thisMaterial->Name +
                     "\" must be greater than 0 for calculating Nominal R-value, Nominal R is defaulted to 1 and the simulation continues.");
         }
 
-        if (thisMaterialChild->Trans + thisMaterialChild->ReflectShade >= 1.0) {
+        if (thisMaterial->Trans + thisMaterial->ReflectShade >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated solar transmittance + solar reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for solar transmittance.");
         }
 
-        if (thisMaterialChild->TransVis + thisMaterialChild->ReflectShadeVis >= 1.0) {
+        if (thisMaterial->TransVis + thisMaterial->ReflectShadeVis >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated visible transmittance + visible reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for visible solar transmittance.");
         }
 
-        if (thisMaterialChild->TransThermal + thisMaterialChild->AbsorpThermal >= 1.0) {
+        if (thisMaterial->TransThermal + thisMaterial->AbsorpThermal >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowSevereError(state, "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
@@ -1907,32 +1889,31 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::ScreenEquivalentLayer;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::ScreenEquivalentLayer;
 
         // Load the material derived type from the input data.
         // WindowMaterial:Screen:EquivalentLayer,
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-        thisMaterialChild->ROnly = true;
-        thisMaterialChild->TausFrontBeamBeam = MaterialProps(1);
-        thisMaterialChild->TausBackBeamBeam = MaterialProps(1);
-        thisMaterialChild->TausFrontBeamDiff = MaterialProps(2);
-        thisMaterialChild->TausBackBeamDiff = MaterialProps(2);
-        thisMaterialChild->ReflFrontBeamDiff = MaterialProps(3);
-        thisMaterialChild->ReflBackBeamDiff = MaterialProps(3);
-        thisMaterialChild->TausFrontBeamBeamVis = MaterialProps(4);
-        thisMaterialChild->TausFrontBeamDiffVis = MaterialProps(5);
-        thisMaterialChild->ReflFrontDiffDiffVis = MaterialProps(6);
-        thisMaterialChild->TausThermal = MaterialProps(7);
-        thisMaterialChild->EmissThermalFront = MaterialProps(8);
-        thisMaterialChild->EmissThermalBack = MaterialProps(8);
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+        thisMaterial->ROnly = true;
+        thisMaterial->TausFrontBeamBeam = MaterialProps(1);
+        thisMaterial->TausBackBeamBeam = MaterialProps(1);
+        thisMaterial->TausFrontBeamDiff = MaterialProps(2);
+        thisMaterial->TausBackBeamDiff = MaterialProps(2);
+        thisMaterial->ReflFrontBeamDiff = MaterialProps(3);
+        thisMaterial->ReflBackBeamDiff = MaterialProps(3);
+        thisMaterial->TausFrontBeamBeamVis = MaterialProps(4);
+        thisMaterial->TausFrontBeamDiffVis = MaterialProps(5);
+        thisMaterial->ReflFrontDiffDiffVis = MaterialProps(6);
+        thisMaterial->TausThermal = MaterialProps(7);
+        thisMaterial->EmissThermalFront = MaterialProps(8);
+        thisMaterial->EmissThermalBack = MaterialProps(8);
 
         // Assumes thermal emissivity is the same as thermal absorptance
-        thisMaterialChild->AbsorpThermalFront = thisMaterialChild->EmissThermalFront;
-        thisMaterialChild->AbsorpThermalBack = thisMaterialChild->EmissThermalBack;
-        thisMaterialChild->TransThermal = thisMaterialChild->TausThermal;
+        thisMaterial->AbsorpThermalFront = thisMaterial->EmissThermalFront;
+        thisMaterial->AbsorpThermalBack = thisMaterial->EmissThermalBack;
+        thisMaterial->TransThermal = thisMaterial->TausThermal;
 
         if (MaterialProps(3) < 0.0 || MaterialProps(3) > 1.0) {
             ErrorsFound = true;
@@ -1943,71 +1924,69 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (MaterialProps(6) < 0.0 || MaterialProps(6) > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state,
-                              state.dataIPShortCut->cNumericFieldNames(6) + " must be >= 0 and <= 1 for material " + thisMaterialChild->Name + '.');
+            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(6) + " must be >= 0 and <= 1 for material " + thisMaterial->Name + '.');
         }
 
         if (!state.dataIPShortCut->lNumericFieldBlanks(9)) {
             if (MaterialProps(9) > 0.00001) {
-                thisMaterialChild->ScreenWireSpacing = MaterialProps(9); // screen wire spacing
+                thisMaterial->ScreenWireSpacing = MaterialProps(9); // screen wire spacing
             } else {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(9) + " must be > 0.");
                 ShowContinueError(state, "...Setting screen wire spacing to a default value of 0.025m and simulation continues.");
-                thisMaterialChild->ScreenWireSpacing = 0.025;
+                thisMaterial->ScreenWireSpacing = 0.025;
             }
         }
 
         if (!state.dataIPShortCut->lNumericFieldBlanks(10)) {
-            if (MaterialProps(10) > 0.00001 && MaterialProps(10) < thisMaterialChild->ScreenWireSpacing) {
-                thisMaterialChild->ScreenWireDiameter = MaterialProps(10); // screen wire spacing
+            if (MaterialProps(10) > 0.00001 && MaterialProps(10) < thisMaterial->ScreenWireSpacing) {
+                thisMaterial->ScreenWireDiameter = MaterialProps(10); // screen wire spacing
             } else {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(10) + " must be > 0.");
                 ShowContinueError(state, "...Setting screen wire diameter to a default value of 0.005m and simulation continues.");
-                thisMaterialChild->ScreenWireDiameter = 0.005;
+                thisMaterial->ScreenWireDiameter = 0.005;
             }
         }
 
-        if (thisMaterialChild->ScreenWireSpacing > 0.0) {
-            if (thisMaterialChild->ScreenWireDiameter / thisMaterialChild->ScreenWireSpacing >= 1.0) {
+        if (thisMaterial->ScreenWireSpacing > 0.0) {
+            if (thisMaterial->ScreenWireDiameter / thisMaterial->ScreenWireSpacing >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cNumericFieldNames(10) + " must be less than " + state.dataIPShortCut->cNumericFieldNames(9));
             } else {
                 //  Calculate direct normal transmittance (open area fraction)
-                Openness = pow_2(1.0 - thisMaterialChild->ScreenWireDiameter / thisMaterialChild->ScreenWireSpacing);
-                if ((thisMaterialChild->TausFrontBeamBeam - Openness) / Openness > 0.01) {
+                Openness = pow_2(1.0 - thisMaterial->ScreenWireDiameter / thisMaterial->ScreenWireSpacing);
+                if ((thisMaterial->TausFrontBeamBeam - Openness) / Openness > 0.01) {
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", screen openness specified.");
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " is > 1.0% of the value calculated from input fields:");
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(9) + " and " + (state.dataIPShortCut->cNumericFieldNames(10)));
                     ShowContinueError(state, " using the formula (1-diameter/spacing)**2");
                     ShowContinueError(state, " ...the screen diameter is recalculated from the material openness specified ");
                     ShowContinueError(state, " ...and wire spacing using the formula = wire spacing * (1.0 - SQRT(Opennes))");
-                    thisMaterialChild->ScreenWireDiameter =
-                        thisMaterialChild->ScreenWireSpacing * (1.0 - std::sqrt(thisMaterialChild->TausFrontBeamBeam));
+                    thisMaterial->ScreenWireDiameter = thisMaterial->ScreenWireSpacing * (1.0 - std::sqrt(thisMaterial->TausFrontBeamBeam));
                     ShowContinueError(
                         state,
-                        format(" ...Recalculated {}={:.4R} m", state.dataIPShortCut->cNumericFieldNames(10), thisMaterialChild->ScreenWireDiameter));
+                        format(" ...Recalculated {}={:.4R} m", state.dataIPShortCut->cNumericFieldNames(10), thisMaterial->ScreenWireDiameter));
                 }
             }
         }
 
-        if (thisMaterialChild->TausFrontBeamBeam + thisMaterialChild->ReflFrontBeamDiff >= 1.0) {
+        if (thisMaterial->TausFrontBeamBeam + thisMaterial->ReflFrontBeamDiff >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated solar transmittance + solar reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for solar transmittance.");
         }
 
-        if (thisMaterialChild->TausFrontBeamBeamVis + thisMaterialChild->ReflFrontDiffDiffVis >= 1.0) {
+        if (thisMaterial->TausFrontBeamBeamVis + thisMaterial->ReflFrontDiffDiffVis >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated visible transmittance + visible reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for visible solar transmittance.");
         }
-        if (thisMaterialChild->TransThermal + thisMaterialChild->AbsorpThermal >= 1.0) {
+        if (thisMaterial->TransThermal + thisMaterial->AbsorpThermal >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowSevereError(state, "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
@@ -2053,17 +2032,16 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::WindowBlind;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::WindowBlind;
 
         // Load the material derived type from the input data.
 
-        thisMaterialChild->Name = MaterialNames(1);
+        thisMaterial->Name = MaterialNames(1);
         state.dataHeatBal->Blind(Loop).Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::Rough;
-        thisMaterialChild->BlindDataPtr = Loop;
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
+        thisMaterial->BlindDataPtr = Loop;
+        thisMaterial->ROnly = true;
 
         state.dataHeatBal->Blind(Loop).MaterialNumber = MaterNum;
         if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
@@ -2348,113 +2326,111 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::BlindEquivalentLayer;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::BlindEquivalentLayer;
 
-        thisMaterialChild->Name = MaterialNames(1);
-        thisMaterialChild->Roughness = DataSurfaces::SurfaceRoughness::Rough;
-        thisMaterialChild->ROnly = true;
+        thisMaterial->Name = MaterialNames(1);
+        thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
+        thisMaterial->ROnly = true;
 
         if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
-            thisMaterialChild->SlatOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
+            thisMaterial->SlatOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
         } else if (UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
-            thisMaterialChild->SlatOrientation = DataWindowEquivalentLayer::Orientation::Vertical;
+            thisMaterial->SlatOrientation = DataWindowEquivalentLayer::Orientation::Vertical;
         }
-        thisMaterialChild->SlatWidth = MaterialProps(1);
-        thisMaterialChild->SlatSeparation = MaterialProps(2);
-        thisMaterialChild->SlatCrown = MaterialProps(3);
-        thisMaterialChild->SlatAngle = MaterialProps(4);
+        thisMaterial->SlatWidth = MaterialProps(1);
+        thisMaterial->SlatSeparation = MaterialProps(2);
+        thisMaterial->SlatCrown = MaterialProps(3);
+        thisMaterial->SlatAngle = MaterialProps(4);
 
-        thisMaterialChild->TausFrontBeamDiff = MaterialProps(5);
-        thisMaterialChild->TausBackBeamDiff = MaterialProps(6);
-        thisMaterialChild->ReflFrontBeamDiff = MaterialProps(7);
-        thisMaterialChild->ReflBackBeamDiff = MaterialProps(8);
+        thisMaterial->TausFrontBeamDiff = MaterialProps(5);
+        thisMaterial->TausBackBeamDiff = MaterialProps(6);
+        thisMaterial->ReflFrontBeamDiff = MaterialProps(7);
+        thisMaterial->ReflBackBeamDiff = MaterialProps(8);
 
         if (!state.dataIPShortCut->lNumericFieldBlanks(9) && !state.dataIPShortCut->lNumericFieldBlanks(10) &&
             !state.dataIPShortCut->lNumericFieldBlanks(11) && !state.dataIPShortCut->lNumericFieldBlanks(12)) {
-            thisMaterialChild->TausFrontBeamDiffVis = MaterialProps(9);
-            thisMaterialChild->TausBackBeamDiffVis = MaterialProps(10);
-            thisMaterialChild->ReflFrontBeamDiffVis = MaterialProps(11);
-            thisMaterialChild->ReflBackBeamDiffVis = MaterialProps(12);
+            thisMaterial->TausFrontBeamDiffVis = MaterialProps(9);
+            thisMaterial->TausBackBeamDiffVis = MaterialProps(10);
+            thisMaterial->ReflFrontBeamDiffVis = MaterialProps(11);
+            thisMaterial->ReflBackBeamDiffVis = MaterialProps(12);
         }
         if (!state.dataIPShortCut->lNumericFieldBlanks(13) && !state.dataIPShortCut->lNumericFieldBlanks(14) &&
             !state.dataIPShortCut->lNumericFieldBlanks(15)) {
-            thisMaterialChild->TausDiffDiff = MaterialProps(13);
-            thisMaterialChild->ReflFrontDiffDiff = MaterialProps(14);
-            thisMaterialChild->ReflBackDiffDiff = MaterialProps(15);
+            thisMaterial->TausDiffDiff = MaterialProps(13);
+            thisMaterial->ReflFrontDiffDiff = MaterialProps(14);
+            thisMaterial->ReflBackDiffDiff = MaterialProps(15);
         }
         if (!state.dataIPShortCut->lNumericFieldBlanks(16) && !state.dataIPShortCut->lNumericFieldBlanks(17) &&
             !state.dataIPShortCut->lNumericFieldBlanks(18)) {
-            thisMaterialChild->TausDiffDiffVis = MaterialProps(13);
-            thisMaterialChild->ReflFrontDiffDiffVis = MaterialProps(14);
-            thisMaterialChild->ReflBackDiffDiffVis = MaterialProps(15);
+            thisMaterial->TausDiffDiffVis = MaterialProps(13);
+            thisMaterial->ReflFrontDiffDiffVis = MaterialProps(14);
+            thisMaterial->ReflBackDiffDiffVis = MaterialProps(15);
         }
         if (!state.dataIPShortCut->lNumericFieldBlanks(19)) {
-            thisMaterialChild->TausThermal = MaterialProps(19);
+            thisMaterial->TausThermal = MaterialProps(19);
         }
         if (!state.dataIPShortCut->lNumericFieldBlanks(20)) {
-            thisMaterialChild->EmissThermalFront = MaterialProps(20);
+            thisMaterial->EmissThermalFront = MaterialProps(20);
         }
         if (!state.dataIPShortCut->lNumericFieldBlanks(21)) {
-            thisMaterialChild->EmissThermalBack = MaterialProps(21);
+            thisMaterial->EmissThermalBack = MaterialProps(21);
         }
         // Assumes thermal emissivity is the same as thermal absorptance
-        thisMaterialChild->AbsorpThermalFront = thisMaterialChild->EmissThermalFront;
-        thisMaterialChild->AbsorpThermalBack = thisMaterialChild->EmissThermalBack;
-        thisMaterialChild->TransThermal = thisMaterialChild->TausThermal;
+        thisMaterial->AbsorpThermalFront = thisMaterial->EmissThermalFront;
+        thisMaterial->AbsorpThermalBack = thisMaterial->EmissThermalBack;
+        thisMaterial->TransThermal = thisMaterial->TausThermal;
 
         // By default all blinds have fixed slat angle,
         //  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
-        thisMaterialChild->slatAngleType = SlatAngleType::FixedSlatAngle;
+        thisMaterial->slatAngleType = SlatAngleType::FixedSlatAngle;
         if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            thisMaterialChild->slatAngleType =
+            thisMaterial->slatAngleType =
                 static_cast<SlatAngleType>(getEnumerationValue(SlatAngleTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
         }
-        if (thisMaterialChild->SlatWidth < thisMaterialChild->SlatSeparation) {
+        if (thisMaterial->SlatWidth < thisMaterial->SlatSeparation) {
             ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Seperation/Width");
             ShowContinueError(state,
                               format("{} [{:.2R}] is less than {} [{:.2R}].",
                                      state.dataIPShortCut->cNumericFieldNames(1),
-                                     thisMaterialChild->SlatWidth,
+                                     thisMaterial->SlatWidth,
                                      state.dataIPShortCut->cNumericFieldNames(2),
-                                     thisMaterialChild->SlatSeparation));
+                                     thisMaterial->SlatSeparation));
             ShowContinueError(state, "This will allow direct beam to be transmitted when Slat angle = 0.");
         }
-        if (thisMaterialChild->SlatSeparation < 0.001) {
+        if (thisMaterial->SlatSeparation < 0.001) {
             ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Seperation");
             ShowContinueError(
-                state,
-                format("{} [{:.2R}]. Slate spacing must be > 0.0", state.dataIPShortCut->cNumericFieldNames(2), thisMaterialChild->SlatSeparation));
+                state, format("{} [{:.2R}]. Slate spacing must be > 0.0", state.dataIPShortCut->cNumericFieldNames(2), thisMaterial->SlatSeparation));
             ShowContinueError(state, "...Setting slate spacing to default value of 0.025 m and simulation continues.");
-            thisMaterialChild->SlatSeparation = 0.025;
+            thisMaterial->SlatSeparation = 0.025;
         }
-        if (thisMaterialChild->SlatWidth < 0.001 || thisMaterialChild->SlatWidth >= 2.0 * thisMaterialChild->SlatSeparation) {
+        if (thisMaterial->SlatWidth < 0.001 || thisMaterial->SlatWidth >= 2.0 * thisMaterial->SlatSeparation) {
             ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Width");
             ShowContinueError(state,
                               format("{} [{:.2R}]. Slat width range is 0 < Width <= 2*Spacing",
                                      state.dataIPShortCut->cNumericFieldNames(1),
-                                     thisMaterialChild->SlatWidth));
+                                     thisMaterial->SlatWidth));
             ShowContinueError(state, "...Setting slate width equal to slate spacing and simulation continues.");
-            thisMaterialChild->SlatWidth = thisMaterialChild->SlatSeparation;
+            thisMaterial->SlatWidth = thisMaterial->SlatSeparation;
         }
-        if (thisMaterialChild->SlatCrown < 0.0 || thisMaterialChild->SlatCrown >= 0.5 * thisMaterialChild->SlatWidth) {
+        if (thisMaterial->SlatCrown < 0.0 || thisMaterial->SlatCrown >= 0.5 * thisMaterial->SlatWidth) {
             ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Crown");
             ShowContinueError(state,
                               format("{} [{:.2R}]. Slat crwon range is 0 <= crown < 0.5*Width",
                                      state.dataIPShortCut->cNumericFieldNames(3),
-                                     thisMaterialChild->SlatCrown));
+                                     thisMaterial->SlatCrown));
             ShowContinueError(state, "...Setting slate crown to 0.0 and simulation continues.");
-            thisMaterialChild->SlatCrown = 0.0;
+            thisMaterial->SlatCrown = 0.0;
         }
-        if (thisMaterialChild->SlatAngle < -90.0 || thisMaterialChild->SlatAngle > 90.0) {
+        if (thisMaterial->SlatAngle < -90.0 || thisMaterial->SlatAngle > 90.0) {
             ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Angle");
             ShowContinueError(state,
                               format("{} [{:.2R}]. Slat angle range is -90.0 <= Angle < 90.0",
                                      state.dataIPShortCut->cNumericFieldNames(4),
-                                     thisMaterialChild->SlatAngle));
+                                     thisMaterial->SlatAngle));
             ShowContinueError(state, "...Setting slate angle to 0.0 and simulation continues.");
-            thisMaterialChild->SlatAngle = 0.0;
+            thisMaterial->SlatAngle = 0.0;
         }
 
         if (!UtilityRoutines::SameString(MaterialNames(2), "Horizontal") && !UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
@@ -2523,27 +2499,26 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::EcoRoof;
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::EcoRoof;
 
         // this part is new for Ecoroof properties,
         // especially for the Plant Layer of the ecoroof
-        thisMaterialChild->HeightOfPlants = MaterialProps(1);
-        thisMaterialChild->LAI = MaterialProps(2);
-        thisMaterialChild->Lreflectivity = MaterialProps(3); // Albedo
-        thisMaterialChild->LEmissitivity = MaterialProps(4);
-        thisMaterialChild->RStomata = MaterialProps(5);
+        thisMaterial->HeightOfPlants = MaterialProps(1);
+        thisMaterial->LAI = MaterialProps(2);
+        thisMaterial->Lreflectivity = MaterialProps(3); // Albedo
+        thisMaterial->LEmissitivity = MaterialProps(4);
+        thisMaterial->RStomata = MaterialProps(5);
 
-        thisMaterialChild->Name = MaterialNames(1);
+        thisMaterial->Name = MaterialNames(1);
         // need to treat the A2 with is just the name of the soil(it is
         // not important)
-        thisMaterialChild->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
+        thisMaterial->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
             getEnumerationValue(DataSurfaces::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
         if (UtilityRoutines::SameString(MaterialNames(4), "Simple")) {
-            thisMaterialChild->EcoRoofCalculationMethod = 1;
+            thisMaterial->EcoRoofCalculationMethod = 1;
         } else if (UtilityRoutines::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-            thisMaterialChild->EcoRoofCalculationMethod = 2;
+            thisMaterial->EcoRoofCalculationMethod = 2;
         } else {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value");
             ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + MaterialNames(4) + "\".");
@@ -2551,20 +2526,20 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ErrorsFound = true;
         }
 
-        thisMaterialChild->Thickness = MaterialProps(6);
-        thisMaterialChild->Conductivity = MaterialProps(7);
-        thisMaterialChild->Density = MaterialProps(8);
-        thisMaterialChild->SpecHeat = MaterialProps(9);
-        thisMaterialChild->AbsorpThermal = MaterialProps(10); // emissivity
-        thisMaterialChild->AbsorpSolar = MaterialProps(11);   // (1 - Albedo)
-        thisMaterialChild->AbsorpVisible = MaterialProps(12);
-        thisMaterialChild->Porosity = MaterialProps(13);
-        thisMaterialChild->MinMoisture = MaterialProps(14);
-        thisMaterialChild->InitMoisture = MaterialProps(15);
+        thisMaterial->Thickness = MaterialProps(6);
+        thisMaterial->Conductivity = MaterialProps(7);
+        thisMaterial->Density = MaterialProps(8);
+        thisMaterial->SpecHeat = MaterialProps(9);
+        thisMaterial->AbsorpThermal = MaterialProps(10); // emissivity
+        thisMaterial->AbsorpSolar = MaterialProps(11);   // (1 - Albedo)
+        thisMaterial->AbsorpVisible = MaterialProps(12);
+        thisMaterial->Porosity = MaterialProps(13);
+        thisMaterial->MinMoisture = MaterialProps(14);
+        thisMaterial->InitMoisture = MaterialProps(15);
 
-        if (thisMaterialChild->Conductivity > 0.0) {
-            state.dataHeatBal->NominalR(MaterNum) = thisMaterialChild->Thickness / thisMaterialChild->Conductivity;
-            thisMaterialChild->Resistance = state.dataHeatBal->NominalR(MaterNum);
+        if (thisMaterial->Conductivity > 0.0) {
+            state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
+            thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
         } else {
             ShowSevereError(state,
                             state.dataHeatBalMgr->CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" is not defined correctly.");
@@ -2572,19 +2547,19 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ErrorsFound = true;
         }
 
-        if (thisMaterialChild->InitMoisture > thisMaterialChild->Porosity) {
+        if (thisMaterial->InitMoisture > thisMaterial->Porosity) {
             ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(15) + " is greater than " + state.dataIPShortCut->cNumericFieldNames(13) +
                                   ". It must be less or equal.");
-            ShowContinueError(state, format("{} = {:.3T}.", state.dataIPShortCut->cNumericFieldNames(13), thisMaterialChild->Porosity));
-            ShowContinueError(state, format("{} = {:.3T}.", state.dataIPShortCut->cNumericFieldNames(15), thisMaterialChild->InitMoisture));
+            ShowContinueError(state, format("{} = {:.3T}.", state.dataIPShortCut->cNumericFieldNames(13), thisMaterial->Porosity));
+            ShowContinueError(state, format("{} = {:.3T}.", state.dataIPShortCut->cNumericFieldNames(15), thisMaterial->InitMoisture));
             ShowContinueError(state,
                               format("{} is reset to the maximum (saturation) value = {:.3T}.",
                                      state.dataIPShortCut->cNumericFieldNames(15),
-                                     thisMaterialChild->Porosity));
+                                     thisMaterial->Porosity));
             ShowContinueError(state, "Simulation continues.");
-            thisMaterialChild->InitMoisture = thisMaterialChild->Porosity;
+            thisMaterial->InitMoisture = thisMaterial->Porosity;
         }
     }
 
@@ -2646,13 +2621,13 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 iMat = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(1 + iTC), state.dataMaterial->Material);
                 if (iMat != 0) {
                     // TC glazing
-                    auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iMat));
-                    thisMaterialChild->SpecTemp = state.dataIPShortCut->rNumericArgs(iTC);
-                    thisMaterialChild->TCParent = Loop;
+                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iMat));
+                    thisMaterial->SpecTemp = state.dataIPShortCut->rNumericArgs(iTC);
+                    thisMaterial->TCParent = Loop;
                     state.dataHeatBal->TCGlazings(Loop).LayerPoint(iTC) = iMat;
 
                     // test that named material is of the right type
-                    if (thisMaterialChild->Group != MaterialGroup::WindowGlass) {
+                    if (thisMaterial->Group != MaterialGroup::WindowGlass) {
                         ShowSevereError(state,
                                         state.dataHeatBalMgr->CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             "\" is not defined correctly.");
@@ -2698,15 +2673,14 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         delete state.dataMaterial->Material(MaterNum);
         state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-        thisMaterialChild->Group = MaterialGroup::WindowSimpleGlazing;
-        thisMaterialChild->Name = state.dataIPShortCut->cAlphaArgs(1);
-        thisMaterialChild->SimpleWindowUfactor = state.dataIPShortCut->rNumericArgs(1);
-        thisMaterialChild->SimpleWindowSHGC = state.dataIPShortCut->rNumericArgs(2);
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        thisMaterial->Group = MaterialGroup::WindowSimpleGlazing;
+        thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
+        thisMaterial->SimpleWindowUfactor = state.dataIPShortCut->rNumericArgs(1);
+        thisMaterial->SimpleWindowSHGC = state.dataIPShortCut->rNumericArgs(2);
         if (!state.dataIPShortCut->lNumericFieldBlanks(3)) {
-            thisMaterialChild->SimpleWindowVisTran = state.dataIPShortCut->rNumericArgs(3);
-            thisMaterialChild->SimpleWindowVTinputByUser = true;
+            thisMaterial->SimpleWindowVisTran = state.dataIPShortCut->rNumericArgs(3);
+            thisMaterial->SimpleWindowVTinputByUser = true;
         }
 
         HeatBalanceManager::SetupSimpleWindowGlazingSystem(state, MaterNum);
@@ -2736,25 +2710,24 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
 
-            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-            switch (thisMaterialChild->Group) {
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            switch (thisMaterial->Group) {
             case MaterialGroup::Air: {
-                print(state.files.eio, Format_702, thisMaterialChild->Name, thisMaterialChild->Resistance);
+                print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
             } break;
             default: {
                 print(state.files.eio,
                       Format_701,
-                      thisMaterialChild->Name,
-                      thisMaterialChild->Resistance,
-                      DataHeatBalance::DisplayMaterialRoughness(thisMaterialChild->Roughness),
-                      thisMaterialChild->Thickness,
-                      thisMaterialChild->Conductivity,
-                      thisMaterialChild->Density,
-                      thisMaterialChild->SpecHeat,
-                      thisMaterialChild->AbsorpThermal,
-                      thisMaterialChild->AbsorpSolar,
-                      thisMaterialChild->AbsorpVisible);
+                      thisMaterial->Name,
+                      thisMaterial->Resistance,
+                      DataHeatBalance::DisplayMaterialRoughness(thisMaterial->Roughness),
+                      thisMaterial->Thickness,
+                      thisMaterial->Conductivity,
+                      thisMaterial->Density,
+                      thisMaterial->SpecHeat,
+                      thisMaterial->AbsorpThermal,
+                      thisMaterial->AbsorpSolar,
+                      thisMaterial->AbsorpVisible);
             } break;
             }
         }
@@ -2765,30 +2738,29 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
         for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
-            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-            auto *thisMaterialChild = dynamic_cast<Material::MaterialChild *>(thisMaterial);
-            if (thisMaterialChild->Group != MaterialGroup::RegularMaterial) continue;
+            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            if (thisMaterial->Group != MaterialGroup::RegularMaterial) continue;
             SetupEMSActuator(state,
                              "Material",
-                             thisMaterialChild->Name,
+                             thisMaterial->Name,
                              "Surface Property Solar Absorptance",
                              "[ ]",
-                             thisMaterialChild->AbsorpSolarEMSOverrideOn,
-                             thisMaterialChild->AbsorpSolarEMSOverride);
+                             thisMaterial->AbsorpSolarEMSOverrideOn,
+                             thisMaterial->AbsorpSolarEMSOverride);
             SetupEMSActuator(state,
                              "Material",
-                             thisMaterialChild->Name,
+                             thisMaterial->Name,
                              "Surface Property Thermal Absorptance",
                              "[ ]",
-                             thisMaterialChild->AbsorpThermalEMSOverrideOn,
-                             thisMaterialChild->AbsorpThermalEMSOverride);
+                             thisMaterial->AbsorpThermalEMSOverrideOn,
+                             thisMaterial->AbsorpThermalEMSOverride);
             SetupEMSActuator(state,
                              "Material",
-                             thisMaterialChild->Name,
+                             thisMaterial->Name,
                              "Surface Property Visible Absorptance",
                              "[ ]",
-                             thisMaterialChild->AbsorpVisibleEMSOverrideOn,
-                             thisMaterialChild->AbsorpVisibleEMSOverride);
+                             thisMaterial->AbsorpVisibleEMSOverrideOn,
+                             thisMaterial->AbsorpVisibleEMSOverride);
         }
     }
 
