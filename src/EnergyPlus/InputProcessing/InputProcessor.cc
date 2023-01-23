@@ -898,7 +898,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
     }
 }
 
-const json &InputProcessor::getObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName)
+const json &InputProcessor::getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName)
 {
     auto objectInfo = ObjectInfo();
     objectInfo.objectType = ObjType;

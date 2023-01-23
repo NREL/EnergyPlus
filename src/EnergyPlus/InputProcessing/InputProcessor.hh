@@ -137,7 +137,7 @@ public:
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
-    const json &getObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName);
+    const json &getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName);
 
     void getObjectItem(EnergyPlusData &state,
                        std::string_view Object,

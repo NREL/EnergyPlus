@@ -392,7 +392,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         } else {
             auto const &epListFields =
-                ip->getObjectItem(state, CurrentModuleObject, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName);
+                ip->getJSONObjectItem(state, CurrentModuleObject, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName);
 
             auto const &objectSchemaProps = ip->getObjectSchemaProps(state, CurrentModuleObject);
 
