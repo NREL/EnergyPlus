@@ -369,9 +369,9 @@ namespace HVACMultiSpeedHeatPump {
                           int const MSHeatPumpNum); // Number of the current electric MSHP being simulated
 
     void SetAverageAirFlow(EnergyPlusData &state,
-                           int const MSHeatPumpNum,              // Unit index
-                           Real64 const PartLoadRatio,           // unit part load ratio
-                           Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
+                           int const MSHeatPumpNum,                         // Unit index
+                           Real64 const PartLoadRatio,                      // unit part load ratio
+                           Real64 &OnOffAirFlowRatio,                       // ratio of compressor ON airflow to average airflow over timestep
                            ObjexxFCL::Optional_int_const SpeedNum = _,      // Speed number
                            ObjexxFCL::Optional<Real64 const> SpeedRatio = _ // Speed ratio
     );

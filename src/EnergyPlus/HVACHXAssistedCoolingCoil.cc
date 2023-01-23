@@ -105,9 +105,9 @@ namespace HVACHXAssistedCoolingCoil {
                                   CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,             // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
-                                  int const FanOpMode,                     // Allows the parent object to control fan operation
-                                  ObjexxFCL::Optional_bool_const HXUnitEnable,        // flag to enable heat exchanger heat recovery
-                                  ObjexxFCL::Optional<Real64 const> OnOffAFR,         // Ratio of compressor ON air mass flow rate to AVERAGE over time step
+                                  int const FanOpMode,                         // Allows the parent object to control fan operation
+                                  ObjexxFCL::Optional_bool_const HXUnitEnable, // flag to enable heat exchanger heat recovery
+                                  ObjexxFCL::Optional<Real64 const> OnOffAFR,  // Ratio of compressor ON air mass flow rate to AVERAGE over time step
                                   ObjexxFCL::Optional_bool_const EconomizerFlag,      // OA sys or air loop economizer status
                                   ObjexxFCL::Optional<Real64> QTotOut,                // the total cooling output of unit
                                   ObjexxFCL::Optional_int_const DehumidificationMode, // Optional dehumbidication mode
@@ -1032,8 +1032,8 @@ namespace HVACHXAssistedCoolingCoil {
                                    Real64 const PartLoadRatio,                     // Cooling coil part load ratio
                                    bool const HXUnitOn,                            // Flag to enable heat exchanger
                                    int const FanOpMode,                            // Allows parent object to control fan operation
-                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlow,            // Ratio of compressor ON air mass flow to AVERAGE over time step
-                                   ObjexxFCL::Optional_bool_const EconomizerFlag,             // OA (or airloop) econommizer status
+                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlow, // Ratio of compressor ON air mass flow to AVERAGE over time step
+                                   ObjexxFCL::Optional_bool_const EconomizerFlag,  // OA (or airloop) econommizer status
                                    ObjexxFCL::Optional_int_const DehumidificationMode,        // Optional dehumbidication mode
                                    [[maybe_unused]] ObjexxFCL::Optional<Real64 const> LoadSHR // Optional coil SHR pass over
     )
@@ -1445,9 +1445,9 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     int GetCoilGroupTypeNum(EnergyPlusData &state,
-                            std::string const &CoilType,     // must match coil types in this module
-                            std::string const &CoilName,     // must match coil names for the coil type
-                            bool &ErrorsFound,               // set to true if problem
+                            std::string const &CoilType,                // must match coil types in this module
+                            std::string const &CoilName,                // must match coil names for the coil type
+                            bool &ErrorsFound,                          // set to true if problem
                             ObjexxFCL::Optional_bool_const PrintWarning // prints warning message if true
     )
     {
@@ -1504,9 +1504,9 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     int GetCoilObjectTypeNum(EnergyPlusData &state,
-                             std::string const &CoilType,     // must match coil types in this module
-                             std::string const &CoilName,     // must match coil names for the coil type
-                             bool &ErrorsFound,               // set to true if problem
+                             std::string const &CoilType,                // must match coil types in this module
+                             std::string const &CoilName,                // must match coil names for the coil type
+                             bool &ErrorsFound,                          // set to true if problem
                              ObjexxFCL::Optional_bool_const PrintWarning // prints warning message if true
     )
     {

@@ -303,8 +303,8 @@ namespace AirflowNetwork {
         void mrxinv(int NORDER);
         void report();
         void update(ObjexxFCL::Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
-        void venting_control(int i,                              // AirflowNetwork surface number
-                             Real64 &OpenFactor                  // Window or door opening factor (used to calculate airflow)
+        void venting_control(int i,                                         // AirflowNetwork surface number
+                             Real64 &OpenFactor                             // Window or door opening factor (used to calculate airflow)
         );
         void assign_fan_airloop();
         void validate_distribution();

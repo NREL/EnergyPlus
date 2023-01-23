@@ -193,9 +193,9 @@ namespace BranchInputManager {
     );
 
     void GetConnectorList(EnergyPlusData &state,
-                          std::string const &ConnectorListName, // Requested Connector List
-                          ConnectorData &Connectoid,            // Returned Connector Data
-                          ObjexxFCL::Optional_int_const NumInList = _      // Number of the current connector in the list of connectors
+                          std::string const &ConnectorListName,       // Requested Connector List
+                          ConnectorData &Connectoid,                  // Returned Connector Data
+                          ObjexxFCL::Optional_int_const NumInList = _ // Number of the current connector in the list of connectors
     );
 
     void GetLoopMixer(EnergyPlusData &state,
@@ -291,7 +291,7 @@ namespace BranchInputManager {
     //==================================================================================
 
     void AuditBranches(EnergyPlusData &state,
-                       bool mustprint,                     // true if the warning should be printed.
+                       bool mustprint,                                // true if the warning should be printed.
                        ObjexxFCL::Optional_string_const CompType = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
                        ObjexxFCL::Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );

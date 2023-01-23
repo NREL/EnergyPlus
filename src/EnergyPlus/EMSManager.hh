@@ -111,8 +111,8 @@ namespace EMSManager {
     void CheckIfAnyEMS(EnergyPlusData &state);
 
     void ManageEMS(EnergyPlusData &state,
-                   EMSCallFrom iCalledFrom,                   // indicates where subroutine was called from, parameters in DataGlobals.
-                   bool &anyProgramRan,                       // true if any Erl programs ran for this call
+                   EMSCallFrom iCalledFrom,                              // indicates where subroutine was called from, parameters in DataGlobals.
+                   bool &anyProgramRan,                                  // true if any Erl programs ran for this call
                    ObjexxFCL::Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 

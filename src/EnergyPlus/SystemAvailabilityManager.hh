@@ -414,9 +414,9 @@ namespace SystemAvailabilityManager {
     );
 
     void CalcNCycSysAvailMgr(EnergyPlusData &state,
-                             int const SysAvailNum,                // number of the current scheduled system availability manager
-                             int const PriAirSysNum,               // number of the primary air system affected by this Avail. Manager
-                             int &AvailStatus,                     // System status indicator
+                             int const SysAvailNum,                           // number of the current scheduled system availability manager
+                             int const PriAirSysNum,                          // number of the primary air system affected by this Avail. Manager
+                             int &AvailStatus,                                // System status indicator
                              ObjexxFCL::Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
                              ObjexxFCL::Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
     );
@@ -434,17 +434,17 @@ namespace SystemAvailabilityManager {
     );
 
     void CalcOptStartSysAvailMgr(EnergyPlusData &state,
-                                 int const SysAvailNum,                // number of the current scheduled system availability manager
-                                 int const PriAirSysNum,               // number of the primary air system affected by this Avail. Manager
-                                 int &AvailStatus,                     // System status indicator
+                                 int const SysAvailNum,                           // number of the current scheduled system availability manager
+                                 int const PriAirSysNum,                          // number of the primary air system affected by this Avail. Manager
+                                 int &AvailStatus,                                // System status indicator
                                  ObjexxFCL::Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
                                  ObjexxFCL::Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
     );
 
     void CalcNVentSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum,               // number of the current scheduled system availability manager
-                              int const PriAirSysNum,              // number of the primary air system affected by this Avail. Manager
-                              int &AvailStatus,                    // System status indicator
+                              int const SysAvailNum,                          // number of the current scheduled system availability manager
+                              int const PriAirSysNum,                         // number of the primary air system affected by this Avail. Manager
+                              int &AvailStatus,                               // System status indicator
                               ObjexxFCL::Optional_int_const ZoneEquipType = _ // Type of zone equipment component
     );
 
@@ -481,7 +481,7 @@ namespace SystemAvailabilityManager {
     void InitHybridVentSysAvailMgr(EnergyPlusData &state);
 
     void CalcHybridVentSysAvailMgr(EnergyPlusData &state,
-                                   int const SysAvailNum,              // number of the current scheduled system availability manager
+                                   int const SysAvailNum,                         // number of the current scheduled system availability manager
                                    ObjexxFCL::Optional_int_const PriAirSysNum = _ // number of the primary air system affected by this Avail. Manager
     );
 

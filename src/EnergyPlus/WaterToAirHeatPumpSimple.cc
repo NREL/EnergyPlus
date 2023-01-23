@@ -3995,9 +3995,9 @@ namespace WaterToAirHeatPumpSimple {
     }
 
     void SetSimpleWSHPData(EnergyPlusData &state,
-                           int const SimpleWSHPNum,              // Number of OA Controller
-                           bool &ErrorsFound,                    // Set to true if certain errors found
-                           int const WaterCyclingMode,           // the coil water flow mode (cycling, constant or constantondemand)
+                           int const SimpleWSHPNum,                         // Number of OA Controller
+                           bool &ErrorsFound,                               // Set to true if certain errors found
+                           int const WaterCyclingMode,                      // the coil water flow mode (cycling, constant or constantondemand)
                            ObjexxFCL::Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
                            ObjexxFCL::Optional_int CompanionHeatingCoilNum  // Index to heating coil for cooling coil = SimpleWSHPNum
     )

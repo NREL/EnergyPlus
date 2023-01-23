@@ -215,8 +215,11 @@ namespace ScheduleManager {
 
     int GetDayScheduleIndex(EnergyPlusData &state, std::string &ScheduleName);
 
-    void GetScheduleValuesForDay(
-        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, ObjexxFCL::Optional_int_const JDay = _, ObjexxFCL::Optional_int_const CurDayofWeek = _);
+    void GetScheduleValuesForDay(EnergyPlusData &state,
+                                 int const ScheduleIndex,
+                                 Array2S<Real64> DayValues,
+                                 ObjexxFCL::Optional_int_const JDay = _,
+                                 ObjexxFCL::Optional_int_const CurDayofWeek = _);
 
     void GetSingleDayScheduleValues(EnergyPlusData &state,
                                     int const DayScheduleIndex, // Index of the DaySchedule for values

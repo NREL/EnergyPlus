@@ -239,9 +239,9 @@ namespace UnitVentilator {
     );
 
     void CalcUnitVentilatorComponents(EnergyPlusData &state,
-                                      int const UnitVentNum,                                       // Unit index in unit ventilator array
-                                      bool const FirstHVACIteration,                               // flag for 1st HVAV iteration in the time step
-                                      Real64 &LoadMet,                                             // load met by unit (watts)
+                                      int const UnitVentNum,         // Unit index in unit ventilator array
+                                      bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
+                                      Real64 &LoadMet,               // load met by unit (watts)
                                       ObjexxFCL::Optional_int_const OpMode = DataHVACGlobals::ContFanCycCoil, // Fan Type
                                       ObjexxFCL::Optional<Real64 const> PartLoadFrac = 1.0                    // Part Load Ratio of coil and fan
     );

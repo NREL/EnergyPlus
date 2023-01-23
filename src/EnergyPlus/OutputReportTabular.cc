@@ -605,14 +605,14 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     // the arrays prior to filling them and to size the arrays basically
     // the same steps must be gone through as with filling the arrays.
 
-    //#ifdef ITM_KEYCACHE
-    // Noel comment:  How about allocating these variables once for the whole routine?
-    //    Again, if a max value for key count can be agreed upon, we could use it here --
-    //    otherwise, will have to have re-allocate logic.
-    // maxKeyCount=1500 ! ?
-    // ALLOCATE(NamesOfKeys(maxKeyCount))
-    // ALLOCATE(IndexesForKeyVar(maxKeyCount))
-    //#endif
+    // #ifdef ITM_KEYCACHE
+    //  Noel comment:  How about allocating these variables once for the whole routine?
+    //     Again, if a max value for key count can be agreed upon, we could use it here --
+    //     otherwise, will have to have re-allocate logic.
+    //  maxKeyCount=1500 ! ?
+    //  ALLOCATE(NamesOfKeys(maxKeyCount))
+    //  ALLOCATE(IndexesForKeyVar(maxKeyCount))
+    // #endif
 
     ort->MonthlyColumnsCount = 0;
     ort->MonthlyTablesCount = 0;
@@ -624,9 +624,9 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         UniqueKeyCount = 0;
         for (colNum = 1; colNum <= NumColumns; ++colNum) {
 
-            //#ifdef ITM_KEYCACHE
-            // Noel comment:  First time in this TabNum/ColNum loop, let's save the results
-            //  of GetVariableKeyCountandType & GetVariableKeys.
+            // #ifdef ITM_KEYCACHE
+            //  Noel comment:  First time in this TabNum/ColNum loop, let's save the results
+            //   of GetVariableKeyCountandType & GetVariableKeys.
             curVariMeter = UtilityRoutines::MakeUPPERCase(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
             // call the key count function but only need count during this pass
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
@@ -662,14 +662,14 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             //      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey) = NamesOfKeys(iKey)  !noel
             //      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) = IndexesForKeyVar(iKey)  !noel
             //    ENDDO
-            //#else
+            // #else
             //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
             //    ! call the key count function but only need count during this pass
             //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
             //    ALLOCATE(NamesOfKeys(KeyCount))
             //    ALLOCATE(IndexesForKeyVar(KeyCount))
             //    CALL GetVariableKeys(state, curVariMeter,TypeVar,NamesOfKeys,IndexesForKeyVar)
-            //#endif
+            // #endif
 
             for (iKey = 1; iKey <= KeyCount; ++iKey) {
                 found = 0;
@@ -692,12 +692,12 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     UniqueKeyNames(UniqueKeyCount) = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey);
                 }
             }
-            //#ifdef ITM_KEYCACHE
-            //    ! Don't deallocate here, only allocating/deallocating once for the whole routine
-            //#else
-            //    DEALLOCATE(NamesOfKeys)
-            //    DEALLOCATE(IndexesForKeyVar)
-            //#endif
+            // #ifdef ITM_KEYCACHE
+            //     ! Don't deallocate here, only allocating/deallocating once for the whole routine
+            // #else
+            //     DEALLOCATE(NamesOfKeys)
+            //     DEALLOCATE(IndexesForKeyVar)
+            // #endif
         } // colNum
         // fix for CR8285 - when monthly report is only environmental variables
         if (environmentKeyFound && UniqueKeyCount == 0) {
@@ -743,8 +743,8 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         UniqueKeyCount = 0;
         environmentKeyFound = false;
         for (colNum = 1; colNum <= NumColumns; ++colNum) {
-            //#ifdef ITM_KEYCACHE
-            // Noel comment:  Here is where we could use the saved values
+            // #ifdef ITM_KEYCACHE
+            //  Noel comment:  Here is where we could use the saved values
             curVariMeter = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper;
             KeyCount = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount;
             TypeVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar;
@@ -755,14 +755,14 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             //       NamesOfKeys(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey)  !noel
             //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
             //    ENDDO
-            //#else
+            // #else
             //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
             //    ! call the key count function but only need count during this pass
             //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
             //    ALLOCATE(NamesOfKeys(KeyCount))
             //    ALLOCATE(IndexesForKeyVar(KeyCount))
             //    CALL GetVariableKeys(state, curVariMeter,TypeVar,NamesOfKeys,IndexesForKeyVar)
-            //#endif
+            // #endif
 
             if (KeyCount == 0) {
                 ++state.dataOutRptTab->ErrCount1;
@@ -801,12 +801,12 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     UniqueKeyNames(UniqueKeyCount) = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey);
                 }
             }
-            //#ifdef ITM_KEYCACHE
-            //    ! Don't deallocate here, only allocating/deallocating once for the whole routine
-            //#else
-            //    DEALLOCATE(NamesOfKeys)
-            //    DEALLOCATE(IndexesForKeyVar)
-            //#endif
+            // #ifdef ITM_KEYCACHE
+            //     ! Don't deallocate here, only allocating/deallocating once for the whole routine
+            // #else
+            //     DEALLOCATE(NamesOfKeys)
+            //     DEALLOCATE(IndexesForKeyVar)
+            // #endif
         }
         // fix for CR8285 - when monthly report is only environmental variables
         if (environmentKeyFound && UniqueKeyCount == 0) {
@@ -839,8 +839,8 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                 // a EP variable that corresponds to it.  In no variable is found
                 // then set it to 0 to be skipped during data gathering
 
-                //#ifdef ITM_KEYCACHE
-                // Noel comment:  Here is where we could use the saved values
+                // #ifdef ITM_KEYCACHE
+                //  Noel comment:  Here is where we could use the saved values
                 curVariMeter = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper;
                 KeyCount = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount;
                 TypeVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar;
@@ -851,14 +851,14 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                 //       NamesOfKeys(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey)  !noel
                 //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
                 //    ENDDO
-                //#else
+                // #else
                 //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
                 //    ! call the key count function but only need count during this pass
                 //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
                 //    ALLOCATE(NamesOfKeys(KeyCount))
                 //    ALLOCATE(IndexesForKeyVar(KeyCount))
                 //    CALL GetVariableKeys(state, curVariMeter,TypeVar,NamesOfKeys,IndexesForKeyVar)
-                //#endif
+                // #endif
 
                 if (KeyCount == 1) { // first test if KeyCount is one to avoid referencing a zero element array
                     if (UtilityRoutines::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(1), "ENVIRONMENT")) {
@@ -959,19 +959,19 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     ort->MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
                     ort->MonthlyColumns(mColumn).aggType = AggType::SumOrAvg;
                 }
-                //#ifdef ITM_KEYCACHE
-                //#else
-                //    DEALLOCATE(NamesOfKeys)
-                //    DEALLOCATE(IndexesForKeyVar)
-                //#endif
+                // #ifdef ITM_KEYCACHE
+                // #else
+                //     DEALLOCATE(NamesOfKeys)
+                //     DEALLOCATE(IndexesForKeyVar)
+                // #endif
             } // ColNum
         }     // kUniqueKey
     }         // TabNum the end of the loop through the inputs objects
 
-    //#ifdef ITM_KEYCACHE
-    // DEALLOCATE(NamesOfKeys)
-    // DEALLOCATE(IndexesForKeyVar)
-    //#endif
+    // #ifdef ITM_KEYCACHE
+    //  DEALLOCATE(NamesOfKeys)
+    //  DEALLOCATE(IndexesForKeyVar)
+    // #endif
 }
 
 bool isInvalidAggregationOrder(EnergyPlusData &state)

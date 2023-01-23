@@ -694,11 +694,11 @@ namespace OutputProcessor {
 
     void WriteTimeStampFormatData(EnergyPlusData &state,
                                   InputOutputFile &outputFile,
-                                  ReportingFrequency reportingInterval,   // Reporting frequency.
-                                  int reportID,                           // The ID of the time stamp
-                                  std::string const &reportIDString,      // The ID of the time stamp
-                                  std::string const &DayOfSimChr,         // the number of days simulated so far
-                                  bool writeToSQL,                        // write to SQLite
+                                  ReportingFrequency reportingInterval,              // Reporting frequency.
+                                  int reportID,                                      // The ID of the time stamp
+                                  std::string const &reportIDString,                 // The ID of the time stamp
+                                  std::string const &DayOfSimChr,                    // the number of days simulated so far
+                                  bool writeToSQL,                                   // write to SQLite
                                   ObjexxFCL::Optional_int_const Month = _,           // the month of the reporting interval
                                   ObjexxFCL::Optional_int_const DayOfMonth = _,      // The day of the reporting interval
                                   ObjexxFCL::Optional_int_const Hour = _,            // The hour of the reporting interval
@@ -844,23 +844,23 @@ namespace OutputProcessor {
 // *****************************************************************************
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string_view const VariableName,              // String Name of variable (with units)
-                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string_view const KeyedValue,                // Associated Key for this variable
-                         ObjexxFCL::Optional_string_const ReportFreq = _,             // Internal use -- causes reporting at this freqency
-                         ObjexxFCL::Optional_string_const ResourceTypeKey = _,        // Meter Resource Type (Electricity, Gas, etc)
-                         ObjexxFCL::Optional_string_const EndUseKey = _,              // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         ObjexxFCL::Optional_string_const EndUseSubKey = _,           // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         ObjexxFCL::Optional_string_const GroupKey = _,               // Meter Super Group Key (Building, System, Plant)
-                         ObjexxFCL::Optional_string_const ZoneKey = _,                // Meter Zone Key (zone name)
-                         ObjexxFCL::Optional_int_const ZoneMult = _,                  // Zone Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const ZoneListMult = _,              // Zone List Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const indexGroupKey = _,             // Group identifier for SQL output
-                         ObjexxFCL::Optional_string_const customUnitName = _,         // the custom name for the units from EMS definition of units
-                         ObjexxFCL::Optional_string_const SpaceType = _               // Space type (applicable for Building group only)
+                         std::string_view const VariableName,                  // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,                   // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                               // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey,     // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                    // Associated Key for this variable
+                         ObjexxFCL::Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
+                         ObjexxFCL::Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
+                         ObjexxFCL::Optional_string_const EndUseKey = _,       // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         ObjexxFCL::Optional_string_const EndUseSubKey = _,    // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         ObjexxFCL::Optional_string_const GroupKey = _,        // Meter Super Group Key (Building, System, Plant)
+                         ObjexxFCL::Optional_string_const ZoneKey = _,         // Meter Zone Key (zone name)
+                         ObjexxFCL::Optional_int_const ZoneMult = _,           // Zone Multiplier, defaults to 1
+                         ObjexxFCL::Optional_int_const ZoneListMult = _,       // Zone List Multiplier, defaults to 1
+                         ObjexxFCL::Optional_int_const indexGroupKey = _,      // Group identifier for SQL output
+                         ObjexxFCL::Optional_string_const customUnitName = _,  // the custom name for the units from EMS definition of units
+                         ObjexxFCL::Optional_string_const SpaceType = _        // Space type (applicable for Building group only)
 );
 
 void SetupOutputVariable(EnergyPlusData &state,
@@ -870,8 +870,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable
-                         ObjexxFCL::Optional_string_const ReportFreq = _,             // Internal use -- causes reporting at this freqency
-                         ObjexxFCL::Optional_int_const indexGroupKey = _              // Group identifier for SQL output
+                         ObjexxFCL::Optional_string_const ReportFreq = _,  // Internal use -- causes reporting at this freqency
+                         ObjexxFCL::Optional_int_const indexGroupKey = _   // Group identifier for SQL output
 );
 
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
