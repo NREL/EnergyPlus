@@ -1319,10 +1319,9 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
     // will not shut down the branch
     auto &sim_component(DataPlant::CompData::getPlantComponent(state, this->loadSidePlantLoc));
-    auto EquipFlowCtrl = sim_component.FlowCtrl;
     bool RunFlag = true;
     if ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad <= 0.0) || !RunFlag) {
-        if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive)
+        if (sim_component.FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive)
             this->loadSideMassFlowRate = state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate;
         this->resetReportingVariables();
         return;
@@ -1343,8 +1342,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         // Initialize the delta temperature to zero
         Real64 FFHPDeltaTemp = 0.0; // C - FFHP inlet to outlet temperature difference, set in all necessary code paths so no initialization required
 
-        if (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopSide(this->loadSidePlantLoc.loopSideNum).FlowLock ==
-            DataPlant::FlowLock::Unlocked) {
+        if (thisLoadPlantLoop.LoopSide(this->loadSidePlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             // Either set the flow to the Constant value or calculate the flow for the variable volume
             if ((this->flowMode == DataPlant::FlowMode::Constant) || (this->flowMode == DataPlant::FlowMode::NotModulated)) {
                 // Then find the flow rate and outlet temp
@@ -1364,8 +1362,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 // Calculate the Delta Temp from the inlet temp to the FFHP outlet setpoint
                 // Then find the flow rate and outlet temp
 
-                if (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopDemandCalcScheme ==
-                    DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+                if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     FFHPDeltaTemp =
                         state.dataLoopNodes->Node(this->loadSideNodes.inlet).TempSetPoint - state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
                 } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
@@ -1402,8 +1399,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
             }
         }
     } else if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-        if (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopSide(this->loadSidePlantLoc.loopSideNum).FlowLock ==
-            DataPlant::FlowLock::Unlocked) {
+        if (thisLoadPlantLoop.LoopSide(this->loadSidePlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             // this->PossibleSubcooling =
             //    !(state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
             //      DataPlant::OpScheme::CompSetPtBased);
@@ -1424,7 +1420,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 }
                 this->loadSideOutletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp - evapDeltaTemp;
             } else if (this->flowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-                switch (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopDemandCalcScheme) {
+                switch (thisLoadPlantLoop.LoopDemandCalcScheme) {
                 case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
                     // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                     evapDeltaTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp -
@@ -1447,7 +1443,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                     PlantUtilities::SetComponentFlowRate(
                         state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
                     // Should we recalculate this with the corrected setpoint?
-                    switch (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopDemandCalcScheme) {
+                    switch (thisLoadPlantLoop.LoopDemandCalcScheme) {
                     case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
                         this->loadSideOutletTemp = state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint;
                     } break;
