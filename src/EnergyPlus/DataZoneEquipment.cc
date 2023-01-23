@@ -396,7 +396,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             EquipList &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(ControlledZoneNum);
 
             thisZoneEquipList.Name = thisZoneEquipConfig.EquipListName;
-            UtilityRoutines::IsNameEmpty(state, thisZoneEquipList.Name, CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
 
             std::string loadDistName = ip->getAlphaFieldValue(epListFields, objectSchemaProps, "load_distribution_scheme");
             thisZoneEquipList.LoadDistScheme = static_cast<DataZoneEquipment::LoadDist>(
