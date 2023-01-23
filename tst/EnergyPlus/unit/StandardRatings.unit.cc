@@ -1097,9 +1097,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat,
                     IPLV,
-                    Optional<const Real64>(),
+                    ObjexxFCL::Optional<const Real64>(),
                     ObjexxFCL::Optional_int_const(),
-                    Optional<const Real64>());
+                    ObjexxFCL::Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
 }
@@ -1186,9 +1186,9 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat,
                     IPLV,
-                    Optional<const Real64>(),
+                    ObjexxFCL::Optional<const Real64>(),
                     ObjexxFCL::Optional_int_const(),
-                    Optional<const Real64>());
+                    ObjexxFCL::Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 5.44); // 18.56 IPLV
 }

@@ -112,7 +112,7 @@ void SimTESCoil(EnergyPlusData &state,
                 int &CompIndex,
                 int const FanOpMode, // allows parent object to control fan mode
                 PTSCOperatingMode &TESOpMode,
-                Optional<Real64 const> PartLoadRatio // part load ratio (for single speed cycling unit)
+                ObjexxFCL::Optional<Real64 const> PartLoadRatio // part load ratio (for single speed cycling unit)
 )
 {
 

@@ -55,6 +55,8 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include <ObjexxFCL/Optional.hh>
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -190,8 +192,8 @@ private:
                       std::vector<int> validDims,
                       std::string_view const routineName,
                       const std::string &fieldName,
-                      Real64 Var1,                      // required 1st independent variable
-                      Optional<Real64 const> Var2 = _); // 2nd independent variable
+                      Real64 Var1,                                 // required 1st independent variable
+                      ObjexxFCL::Optional<Real64 const> Var2 = _); // 2nd independent variable
 };
 } // namespace EnergyPlus
 

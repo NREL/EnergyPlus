@@ -309,8 +309,8 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
                                   std::string_view CompName,
                                   std::string_view VarDesc,
                                   Real64 const VarValue,
-                                  Optional_string_const UsrDesc,
-                                  Optional<Real64 const> UsrValue)
+                                  ObjexxFCL::Optional_string_const UsrDesc,
+                                  ObjexxFCL::Optional<Real64 const> UsrValue)
 {
 
     static constexpr std::string_view Format_990(
