@@ -10666,7 +10666,7 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
     }
 }
 
-void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, int tmpLoopNum)
+void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, const int loopNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -10692,7 +10692,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
     Real64 tmpUseDesignVolFlowRate = this->UseDesignVolFlowRate;
     Real64 tmpSourceDesignVolFlowRate = this->SourceDesignVolFlowRate;
 
-    if ((this->UseInletNode > 0) && (tmpLoopNum == this->UseSidePlantLoc.loopNum)) {
+    if ((this->UseInletNode > 0) && (loopNum == this->UseSidePlantLoc.loopNum)) {
         if (this->UseDesignVolFlowRateWasAutoSized) {
             int PltSizNum = this->UseSidePlantSizNum;
             if (PltSizNum > 0) { // we have a Plant Sizing Object
@@ -10755,7 +10755,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
         } // autosizing needed.
     }     // connected to plant
 
-    if ((this->SourceInletNode > 0) && (tmpLoopNum == this->SrcSidePlantLoc.loopNum)) {
+    if ((this->SourceInletNode > 0) && (loopNum == this->SrcSidePlantLoc.loopNum)) {
         if (this->SourceDesignVolFlowRateWasAutoSized) {
             int PltSizNum = this->SourceSidePlantSizNum;
             if (PltSizNum > 0) {
