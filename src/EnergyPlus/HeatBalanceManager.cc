@@ -4433,9 +4433,8 @@ namespace HeatBalanceManager {
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataMaterial->TotMaterials; ++loop) {
                 Material::MaterialChild *p = new Material::MaterialChild;
-                Material::MaterialBase *pBase = dynamic_cast<Material::MaterialBase *>(p);
-                state.dataMaterial->Material.push_back(pBase);
-                auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(loop));
+                state.dataMaterial->Material.push_back(p);
+                auto *thisMaterial = p;
                 assert(thisMaterial != nullptr);
                 thisMaterial->Name = "";
                 thisMaterial->Group = Material::MaterialGroup::Invalid;

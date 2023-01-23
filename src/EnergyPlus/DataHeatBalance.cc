@@ -441,8 +441,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         for (Layer = 1; Layer <= TotLayers; ++Layer) {
             MaterNum = thisConstruct.LayerPoint(Layer);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
-            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-            assert(thisMaterial != nullptr);
+            auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             WrongMaterialsMix =
                 !((thisMaterial->Group == Material::MaterialGroup::WindowGlass) || (thisMaterial->Group == Material::MaterialGroup::WindowGas) ||
                   (thisMaterial->Group == Material::MaterialGroup::WindowGasMixture) || (thisMaterial->Group == Material::MaterialGroup::Shade) ||
