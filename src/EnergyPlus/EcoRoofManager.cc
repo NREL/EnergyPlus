@@ -566,7 +566,7 @@ namespace EcoRoofManager {
         thisEcoRoof->MoistureMax = thisMat->Porosity;           // Max moisture content in soil
         thisEcoRoof->MoistureResidual = thisMat->MinMoisture;   // Min moisture content in soil
         thisEcoRoof->Moisture = thisMat->InitMoisture;          // Initial moisture content in soil
-        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture;       // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
+        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture;  // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
 
         thisEcoRoof->SoilThickness = thisMat->Thickness; // Total thickness of soil layer (m)
 
@@ -707,7 +707,8 @@ namespace EcoRoofManager {
         // Using/Aliasing
         using namespace DataEnvironment;
 
-        auto const *thisMat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+        auto const *thisMat =
+            dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
         assert(thisMat != nullptr);
         auto &thisEcoRoof = state.dataEcoRoofMgr;
         auto &thisSurf = state.dataSurface->Surface(SurfNum);
@@ -716,9 +717,9 @@ namespace EcoRoofManager {
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
         if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
-            thisEcoRoof->Moisture = thisMat->InitMoisture;    // Initial moisture content in soil
+            thisEcoRoof->Moisture = thisMat->InitMoisture;         // Initial moisture content in soil
             thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // Start the root zone moisture at the same value as the surface.
-            thisEcoRoof->Alphag = 1.0 - thisMat->AbsorpSolar; // albedo rather than absorptivity
+            thisEcoRoof->Alphag = 1.0 - thisMat->AbsorpSolar;      // albedo rather than absorptivity
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && thisEcoRoof->CalcEcoRoofMyEnvrnFlag) {

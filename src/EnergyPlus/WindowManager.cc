@@ -2377,7 +2377,7 @@ namespace WindowManager {
                         if (TotGlassLay == 3) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(5);
                     }
                     auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr));
-                        assert(thisMaterialShade != nullptr);
+                    assert(thisMaterialShade != nullptr);
                     if (ANY_SHADE_SCREEN(ShadeFlag)) {
                         // Shade or screen on
                         if (state.dataGlobal
@@ -4236,9 +4236,9 @@ namespace WindowManager {
             }
         }
         auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNumSh));
-                assert(thisMaterialShade != nullptr);
+        assert(thisMaterialShade != nullptr);
 
-                for (IGap = 1; IGap <= 2; ++IGap) {
+        for (IGap = 1; IGap <= 2; ++IGap) {
             TAve(IGap) = 0.5 * (TGlassFace(IGap) + TShadeFace(IGap));
             if (iter == 0) {
                 TGapOld(IGap) = TAve(IGap);

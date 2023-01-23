@@ -108,7 +108,7 @@ using namespace DataHeatBalance;
 using namespace DataMoistureBalanceEMPD;
 
 Real64 CalcDepthFromPeriod(EnergyPlusData &state,
-                           Real64 const period,              // in seconds
+                           Real64 const period,               // in seconds
                            Material::MaterialChild const *mat // material
 )
 {
@@ -225,8 +225,8 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
             //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
             //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
             ShowSevereError(state,
-                            cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
-                                material->Name + ", must have regular properties (L,Cp,K,D)");
+                            cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" + material->Name +
+                                ", must have regular properties (L,Cp,K,D)");
             ErrorsFound = true;
         }
 
@@ -609,8 +609,8 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     RSurfaceLayer = 1.0 / hm_surf_layer - 1.0 / h_mass_conv_in_fd;
 
     // Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
-    mass_flux_surf_deep_max = material->EMPDDeepDepth * material->Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) /
-                              (state.dataGlobal->TimeStepZone * 3600.0);
+    mass_flux_surf_deep_max =
+        material->EMPDDeepDepth * material->Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (state.dataGlobal->TimeStepZone * 3600.0);
     mass_flux_surf_deep = hm_deep_layer * (rv_surf_layer_old - rv_deep_old);
     if (std::abs(mass_flux_surf_deep_max) < std::abs(mass_flux_surf_deep)) {
         mass_flux_surf_deep = mass_flux_surf_deep_max;
@@ -632,8 +632,8 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     mass_flux_zone = hm_surf_layer * (rv_surf_layer_old - rho_vapor_air_in);
 
     // Calculate new surface layer RH using mass balance on surface layer
-    RH_surf_layer_tmp = RH_surf_layer_old + state.dataGlobal->TimeStepZone * 3600.0 *
-                                                (-mass_flux_surf_layer / (material->Density * material->EMPDSurfaceDepth * dU_dRH));
+    RH_surf_layer_tmp = RH_surf_layer_old +
+                        state.dataGlobal->TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material->Density * material->EMPDSurfaceDepth * dU_dRH));
 
     //    RH_surf_layer = RH_surf_layer_tmp;
 
@@ -681,8 +681,8 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     if (material->EMPDDeepDepth <= 0.0) {
         RH_deep_layer = RH_deep_layer_old;
     } else {
-        RH_deep_layer = RH_deep_layer_old + state.dataGlobal->TimeStepZone * 3600.0 * mass_flux_deep_layer /
-                                                (material->Density * material->EMPDDeepDepth * dU_dRH);
+        RH_deep_layer = RH_deep_layer_old +
+                        state.dataGlobal->TimeStepZone * 3600.0 * mass_flux_deep_layer / (material->Density * material->EMPDDeepDepth * dU_dRH);
     }
     // Convert calculated RH back to vapor density of surface and deep layers.
     rv_surf_layer = PsyRhovFnTdbRh(state, Taver, RH_surf_layer);
@@ -710,10 +710,10 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     rvd.w_deep_layer = 0.622 * PV_deep_layer / (state.dataEnvrn->OutBaroPress - PV_deep_layer);
     rvd.mass_flux_zone = mass_flux_zone;
     rvd.mass_flux_deep = mass_flux_deep_layer;
-    rvd.u_surface_layer = material->MoistACoeff * pow(RH_surf_layer, material->MoistBCoeff) +
-                          material->MoistCCoeff * pow(RH_surf_layer, material->MoistDCoeff);
-    rvd.u_deep_layer = material->MoistACoeff * pow(RH_deep_layer, material->MoistBCoeff) +
-                       material->MoistCCoeff * pow(RH_deep_layer, material->MoistDCoeff);
+    rvd.u_surface_layer =
+        material->MoistACoeff * pow(RH_surf_layer, material->MoistBCoeff) + material->MoistCCoeff * pow(RH_surf_layer, material->MoistDCoeff);
+    rvd.u_deep_layer =
+        material->MoistACoeff * pow(RH_deep_layer, material->MoistBCoeff) + material->MoistCCoeff * pow(RH_deep_layer, material->MoistDCoeff);
 }
 
 void UpdateMoistureBalanceEMPD(EnergyPlusData &state, int const SurfNum) // Surface number

@@ -7495,9 +7495,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         auto const *thisMaterialBase =
                                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(3));
                                         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
-                                    assert(thisMaterial != nullptr);
-                                        Real64 TrSh = thisMaterial->Trans;              // Shade material solar transmittance
-                                        Real64 RhoSh = thisMaterial->ReflectShade;      // Shade material solar absorptance
+                                        assert(thisMaterial != nullptr);
+                                        Real64 TrSh = thisMaterial->Trans;                   // Shade material solar transmittance
+                                        Real64 RhoSh = thisMaterial->ReflectShade;           // Shade material solar absorptance
                                         Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh)); // Shade material solar absorptance
                                         AShBack = t2k * (1 + RhoSh * rfd2k + TrSh * rbd1k) * AbsSh;
                                     } else { // NBackGlass = 3

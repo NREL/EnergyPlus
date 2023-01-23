@@ -726,9 +726,8 @@ namespace HeatBalanceHAMTManager {
                 if (thisMaterial->ntc < 0) {
                     if (thisMaterial->Conductivity > 0) {
                         ShowWarningError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
-                        ShowContinueError(state,
-                                          "Reference Material=\"" + thisMaterial->Name +
-                                              "\" does not have thermal conductivity data. Using fixed value.");
+                        ShowContinueError(
+                            state, "Reference Material=\"" + thisMaterial->Name + "\" does not have thermal conductivity data. Using fixed value.");
                         thisMaterial->ntc = 2;
                         thisMaterial->tcwater(1) = 0.0;
                         thisMaterial->tcdata(1) = thisMaterial->Conductivity;
@@ -860,10 +859,8 @@ namespace HeatBalanceHAMTManager {
                     // Make cells smaller near the surface
                     cells(cid).length(1) =
                         thisMaterial->Thickness *
-                        ((std::sin(DataGlobalConstants::Pi * (-double(did) / double(thisMaterial->divs)) - DataGlobalConstants::Pi / 2.0) /
-                          2.0) -
-                         (std::sin(DataGlobalConstants::Pi * (-double(did - 1) / double(thisMaterial->divs)) - DataGlobalConstants::Pi / 2.0) /
-                          2.0));
+                        ((std::sin(DataGlobalConstants::Pi * (-double(did) / double(thisMaterial->divs)) - DataGlobalConstants::Pi / 2.0) / 2.0) -
+                         (std::sin(DataGlobalConstants::Pi * (-double(did - 1) / double(thisMaterial->divs)) - DataGlobalConstants::Pi / 2.0) / 2.0));
 
                     cells(cid).origin(1) = runor + cells(cid).length(1) / 2.0;
                     runor += cells(cid).length(1);
@@ -1249,12 +1246,7 @@ namespace HeatBalanceHAMTManager {
                 if (matid > 0) {
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
                     assert(thisMaterial != nullptr);
-                    interp(thisMaterial->niso,
-                           thisMaterial->isorh,
-                           thisMaterial->isodata,
-                           cells(cid).rhp1,
-                           cells(cid).water,
-                           cells(cid).dwdphi);
+                    interp(thisMaterial->niso, thisMaterial->isorh, thisMaterial->isodata, cells(cid).rhp1, cells(cid).water, cells(cid).dwdphi);
                     if (state.dataEnvrn->IsRain && state.dataHeatBalHAMTMgr->rainswitch) {
                         interp(thisMaterial->nsuc, thisMaterial->sucwater, thisMaterial->sucdata, cells(cid).water, cells(cid).dw);
                     } else {
