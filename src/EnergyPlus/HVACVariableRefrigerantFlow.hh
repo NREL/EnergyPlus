@@ -136,7 +136,7 @@ namespace HVACVariableRefrigerantFlow {
         // Members
         std::string Name;                      // Name of the VRF Terminal Unit
         int VRFSystemTypeNum;                  // integer equivalent of system type
-        AlgorithmType VRFAlgorithmType;     // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
+        AlgorithmType VRFAlgorithmType;        // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
         DataPlant::PlantEquipmentType VRFType; // integer equivalent of index to DataPlant type
         PlantLocation SourcePlantLoc;          // plant data for water-cooled only
         Real64 WaterCondenserDesignMassFlow;   // plant data for water-cooled only

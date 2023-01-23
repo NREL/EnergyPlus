@@ -3575,8 +3575,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
                 // VRFTU Supply Air Fan Object Type must be Fan:OnOff or Fan:ConstantVolume if VRF Algorithm Type is AlgorithmTypeSysCurve
-                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType ==
-                        AlgorithmType::SysCurve &&
+                if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType == AlgorithmType::SysCurve &&
                     !(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ||
                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject)) {
