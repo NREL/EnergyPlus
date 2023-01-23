@@ -1573,8 +1573,12 @@ namespace HeatBalanceHAMTManager {
                                                        state.dataHeatBalHAMTMgr->cells(state.dataHeatBalHAMTMgr->Intcell(sid)).temp);
     }
 
-    void
-    interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad)
+    void interp(int const ndata,
+                const Array1D<Real64> &xx,
+                const Array1D<Real64> &yy,
+                Real64 const invalue,
+                Real64 &outvalue,
+                ObjexxFCL::Optional<Real64> outgrad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph

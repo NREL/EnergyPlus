@@ -1671,9 +1671,9 @@ namespace DualDuct {
         }
     }
 
-    void DualDuctAirTerminal::CalcOAOnlyMassFlow(EnergyPlusData &state,        // NOLINT(readability-make-member-function-const)
-                                                 Real64 &OAMassFlow,           // outside air flow from user input kg/s
-                                                 Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
+    void DualDuctAirTerminal::CalcOAOnlyMassFlow(EnergyPlusData &state,                   // NOLINT(readability-make-member-function-const)
+                                                 Real64 &OAMassFlow,                      // outside air flow from user input kg/s
+                                                 ObjexxFCL::Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
     )
     {
 

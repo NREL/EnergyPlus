@@ -1119,7 +1119,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &s
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Optional_bool_const InitOnly)
+void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(ObjexxFCL::Optional<int const> cell, ObjexxFCL::Optional_bool_const InitOnly)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Edwin Lee

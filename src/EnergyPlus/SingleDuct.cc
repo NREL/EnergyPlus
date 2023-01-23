@@ -5476,8 +5476,8 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
                                int &SDSIndex,
                                bool &ErrorsFound,
                                std::string_view const ThisObjectType,
-                               Optional_int DamperInletNode, // Damper inlet node number
-                               Optional_int DamperOutletNode // Damper outlet node number
+                               ObjexxFCL::Optional_int DamperInletNode, // Damper inlet node number
+                               ObjexxFCL::Optional_int DamperOutletNode // Damper outlet node number
 )
 {
 
@@ -6211,8 +6211,8 @@ void GetATMixer(EnergyPlusData &state,
 }
 
 void SetATMixerPriFlow(EnergyPlusData &state,
-                       int const ATMixerNum,                     // Air terminal mixer index
-                       Optional<Real64 const> PriAirMassFlowRate // Air terminal mixer primary air mass flow rate [kg/s]
+                       int const ATMixerNum,                                // Air terminal mixer index
+                       ObjexxFCL::Optional<Real64 const> PriAirMassFlowRate // Air terminal mixer primary air mass flow rate [kg/s]
 )
 {
 
