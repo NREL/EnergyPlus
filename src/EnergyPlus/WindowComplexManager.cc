@@ -2866,6 +2866,7 @@ namespace WindowComplexManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
             auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
+            assert(thisMaterial != nullptr);
 
             if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
                 (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
@@ -2927,6 +2928,7 @@ namespace WindowComplexManager {
                 GasPointer = thisMaterial->GasPointer;
 
                 auto const *thisMaterialGasPt = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(GasPointer));
+                assert(thisMaterialGasPt != nullptr);
                 nmix(IGap + 1) = thisMaterialGasPt->NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
                     frct(IMix, IGap + 1) = thisMaterialGasPt->GasFract(IMix);

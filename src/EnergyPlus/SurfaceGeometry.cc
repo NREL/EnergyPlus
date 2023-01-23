@@ -2601,6 +2601,7 @@ namespace SurfaceGeometry {
                         for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                             iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
                             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iTmp2));
+                            assert(thisMaterial != nullptr);
                             if (thisMaterial->Group == Material::MaterialGroup::WindowBlind) {
                                 BlNum = thisMaterial->BlindDataPtr;
                                 state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
@@ -5845,9 +5846,13 @@ namespace SurfaceGeometry {
                         MatGap2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
                         MatSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
                         auto const *thisMaterialGap = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap));
+                        assert(thisMaterialGap != nullptr);
                         auto const *thisMaterialGap1 = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap1));
+                        assert(thisMaterialGap1 != nullptr);
                         auto const *thisMaterialGap2 = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGap2));
+                        assert(thisMaterialGap2 != nullptr);
                         auto const *thisMaterialSh = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatSh));
+                        assert(thisMaterialSh != nullptr);
                         if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::BGBlind) {
                             MatGapCalc = std::abs(thisMaterialGap->Thickness - (thisMaterialGap1->Thickness + thisMaterialGap2->Thickness));
                             if (MatGapCalc > 0.001) {
@@ -6063,6 +6068,7 @@ namespace SurfaceGeometry {
                 for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                     auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayerPtr));
+                    assert(thisMaterial != nullptr);
                     if (thisMaterial->Group == Material::MaterialGroup::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state,
                                         std::string{cRoutineName} + ": Interior Window or GlassDoor " + SubSurfaceName + " has a glass layer with");
@@ -10864,7 +10870,7 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
                     if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -10924,7 +10930,7 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
                     if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -10972,7 +10978,7 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
                     if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -11032,7 +11038,7 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
                     if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -11117,7 +11123,7 @@ namespace SurfaceGeometry {
                                             ", missing material = " + state.dataIPShortCut->cAlphaArgs(alpF));
                         continue;
                     }
-                 auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
+                    auto const *m = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(index));
                     if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -11701,6 +11707,7 @@ namespace SurfaceGeometry {
             MaterNum = UtilityRoutines::FindItemInPtrList(
                 state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            assert(thisMaterial != nullptr);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType =
                 static_cast<InsulationType>(getEnumerationValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
@@ -13614,6 +13621,7 @@ namespace SurfaceGeometry {
             Material::MaterialChild *p = new Material::MaterialChild;
             state.dataMaterial->Material.push_back(p);
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataMaterial->TotMaterials));
+            assert(thisMaterial != nullptr);
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
             thisMaterial->Group = Material::MaterialGroup::WindowGas;
@@ -13712,6 +13720,7 @@ namespace SurfaceGeometry {
             thisConstructTot.OutsideAbsorpSolar = 0.0;
             thisConstructTot.InsideAbsorpThermal = state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
             auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(stormMaterial));
+            assert(thisMaterial != nullptr);
             thisConstructTot.OutsideAbsorpThermal = thisMaterial->AbsorpThermalFront;
             thisConstructTot.OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
             thisConstructTot.DayltPropPtr = 0;
@@ -15540,9 +15549,9 @@ namespace SurfaceGeometry {
             auto &revConstLayer(state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
             auto *thisMatLay = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstLayer));
             auto *revMatLay = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(revConstLayer));
-            if ((thisConstLayer != revConstLayer) ||                                // Not pointing to the same layer
+            if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
                 (thisMatLay->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
-                (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||       // to have certain properties flipped from front to back
+                (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||  // to have certain properties flipped from front to back
                 (thisMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer) ||
                 (revMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have

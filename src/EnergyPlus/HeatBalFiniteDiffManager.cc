@@ -631,6 +631,7 @@ namespace HeatBalFiniteDiffManager {
 
                 CurrentLayer = thisConstruct.LayerPoint(Layer);
                 auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
+                assert(thisMaterial != nullptr);
 
                 thisConstructFD.Name(Layer) = thisMaterial->Name;
                 thisConstructFD.Thickness(Layer) = thisMaterial->Thickness;
@@ -1601,6 +1602,7 @@ namespace HeatBalFiniteDiffManager {
                 int const ConstrNum(surface.Construction);
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
                 auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay));
+                assert(mat != nullptr);
                 auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
                 auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
                 auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
@@ -1773,6 +1775,7 @@ namespace HeatBalFiniteDiffManager {
 
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
         auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay));
+        assert(mat != nullptr);
         auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
         auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
         auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
@@ -1903,9 +1906,11 @@ namespace HeatBalFiniteDiffManager {
 
             int const MatLay(construct.LayerPoint(Lay));
             auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay));
+            assert(mat != nullptr);
 
             int const MatLay2(construct.LayerPoint(Lay + 1));
             auto const *mat2 = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay2));
+            assert(mat2 != nullptr);
 
             auto const &condActuator1(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
             auto const &condActuator2(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay + 1));
@@ -2311,6 +2316,7 @@ namespace HeatBalFiniteDiffManager {
         if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay));
+            assert(mat != nullptr);
             auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
             auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
             auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));

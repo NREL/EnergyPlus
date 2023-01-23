@@ -241,6 +241,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofFirstTimeTest)
 
     auto &thisConstruct = state->dataConstruction->Construct(constrNum);
     auto *thisMat = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    assert(thisMat != nullptr);
     auto &thisEcoRoof = state->dataEcoRoofMgr;
 
     thisConstruct.LayerPoint.allocate(1);
@@ -278,6 +279,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofTest)
 
     auto &thisConstruct = state->dataConstruction->Construct(constrNum);
     auto *thisMat = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    assert(thisMat != nullptr);
     auto &thisEcoRoof = state->dataEcoRoofMgr;
 
     thisConstruct.LayerPoint.allocate(1);

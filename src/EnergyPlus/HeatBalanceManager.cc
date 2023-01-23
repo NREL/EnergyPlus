@@ -4440,6 +4440,7 @@ namespace HeatBalanceManager {
                 delete state.dataMaterial->Material(loop);
                 state.dataMaterial->Material(loop) = new Material::MaterialChild;
                 auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(loop));
+                assert(thisMaterial != nullptr);
                 thisMaterial->Name = "";
                 thisMaterial->Group = Material::MaterialGroup::Invalid;
                 thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Invalid;
@@ -4512,6 +4513,7 @@ namespace HeatBalanceManager {
                     delete state.dataMaterial->Material(MaterNum);
                     state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+                    assert(thisMaterial != nullptr);
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
                     thisMaterial->Group = Material::MaterialGroup::WindowGlass;
                     NextLine = W5DataFile.readLine();
@@ -4562,6 +4564,7 @@ namespace HeatBalanceManager {
                     delete state.dataMaterial->Material(MaterNum);
                     state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+                    assert(thisMaterial != nullptr);
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
@@ -4585,6 +4588,7 @@ namespace HeatBalanceManager {
                     delete state.dataMaterial->Material(MaterNum);
                     state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+                    assert(thisMaterial != nullptr);
                     thisMaterial->NumberOfGasesInMixture = NumGases(IGap, IGlSys);
                     thisMaterial->Group = Material::MaterialGroup::WindowGas;
                     if (NumGases(IGap, IGlSys) > 1) thisMaterial->Group = Material::MaterialGroup::WindowGasMixture;
@@ -4856,6 +4860,7 @@ namespace HeatBalanceManager {
                 for (loop = 1; loop <= NGlass(IGlSys) + NGaps(IGlSys); ++loop) {
                     MatNum = thisConstruct.LayerPoint(loop);
                     auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
+                    assert(thisMaterial != nullptr);
                     if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
                             thisMaterial->Thickness / thisMaterial->Conductivity;
@@ -5837,6 +5842,7 @@ namespace HeatBalanceManager {
         Real64 RHiSide(0.0);
 
         auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        assert(thisMaterial != nullptr);
         // first fill out defaults
         thisMaterial->GlassSpectralDataPtr = 0;
         thisMaterial->SolarDiffusing = false;
@@ -6141,6 +6147,7 @@ namespace HeatBalanceManager {
             delete state.dataMaterial->Material(MaterNum);
             state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            assert(thisMaterial != nullptr);
             thisMaterial->Group = Material::MaterialGroup::ComplexWindowGap;
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
             thisMaterial->ROnly = true;
@@ -6220,6 +6227,7 @@ namespace HeatBalanceManager {
             delete state.dataMaterial->Material(MaterNum);
             state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            assert(thisMaterial != nullptr);
             thisMaterial->Group = Material::MaterialGroup::ComplexWindowShade;
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
             thisMaterial->ROnly = true;

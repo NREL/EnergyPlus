@@ -189,6 +189,7 @@ namespace WindowManager {
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
                     auto const *material = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
+                    assert(material != nullptr);
                     if (BITF_TEST_NONE(BITF(material->Group),
                                        BITF(Material::MaterialGroup::WindowGas) | BITF(Material::MaterialGroup::WindowGasMixture) |
                                            BITF(Material::MaterialGroup::ComplexWindowGap) | BITF(Material::MaterialGroup::ComplexWindowShade))) {
@@ -250,6 +251,7 @@ namespace WindowManager {
                     }
                     if (IntShade) {
                         auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr));
+                        assert(thisMaterialShade != nullptr);
                         Real64 TauShIR = thisMaterialShade->TransThermal;
                         Real64 EpsShIR = thisMaterialShade->AbsorpThermal;
                         Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);

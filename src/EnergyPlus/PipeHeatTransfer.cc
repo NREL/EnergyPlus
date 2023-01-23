@@ -885,6 +885,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
         for (int LayerNum = 1; LayerNum <= TotalLayers - 1; ++LayerNum) {
             auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)));
+            assert(thisMaterial != nullptr);
             Resistance += thisMaterial->Thickness / thisMaterial->Conductivity;
             Density = thisMaterial->Density * thisMaterial->Thickness;
             TotThickness += thisMaterial->Thickness;
@@ -901,6 +902,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
 
         auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
             state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers)));
+        assert(thisMaterial != nullptr);
         this->PipeConductivity = thisMaterial->Conductivity;
         this->PipeDensity = thisMaterial->Density;
         this->PipeCp = thisMaterial->SpecHeat;

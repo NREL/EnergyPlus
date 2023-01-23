@@ -7476,6 +7476,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     auto const *thisMaterialBase =
                                         state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1));
                                     auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+                                    assert(thisMaterial != nullptr);
                                     Real64 AbsSh = thisMaterial->AbsorpSolar;
                                     Real64 RhoSh = 1.0 - AbsSh - thisMaterial->Trans;
                                     Real64 AShBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef) * AbsSh /
@@ -7494,6 +7495,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         auto const *thisMaterialBase =
                                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(3));
                                         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+                                    assert(thisMaterial != nullptr);
                                         Real64 TrSh = thisMaterial->Trans;              // Shade material solar transmittance
                                         Real64 RhoSh = thisMaterial->ReflectShade;      // Shade material solar absorptance
                                         Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh)); // Shade material solar absorptance
@@ -7507,6 +7509,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         auto const *thisMaterialBase =
                                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(5));
                                         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+                                        assert(thisMaterial != nullptr);
                                         Real64 TrSh = thisMaterial->Trans;
                                         Real64 RhoSh = thisMaterial->ReflectShade;
                                         Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh));
@@ -11632,6 +11635,7 @@ void ComputeWinShadeAbsorpFactors(EnergyPlusData &state)
                         }
                         auto const *thisMaterialBase = state.dataMaterial->Material(MatNumSh);
                         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+                        assert(thisMaterial != nullptr);
                         AbsorpEff = thisMaterial->AbsorpSolar / (thisMaterial->AbsorpSolar + thisMaterial->Trans + 0.0001);
                         AbsorpEff = std::clamp(AbsorpEff, 0.0001,
                                                0.999); // Constrain to avoid problems with following log eval

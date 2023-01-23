@@ -118,6 +118,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Material::MaterialChild *p = new Material::MaterialChild;
     state->dataMaterial->Material.push_back(p);
     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MatNum));
+    assert(thisMaterial != nullptr);
     thisMaterial->AbsorpThermal = 0.8;
     // allocate exterior vented cavity variable data
     state->dataSurface->ExtVentedCavity.allocate(1);

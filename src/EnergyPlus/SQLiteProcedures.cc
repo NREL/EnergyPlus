@@ -173,6 +173,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
         for (int materialNum = 1; materialNum <= state.dataMaterial->TotMaterials; ++materialNum) {
             auto const *thisMaterialBase = state.dataMaterial->Material(materialNum);
             auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
+            assert(thisMaterial != nullptr);
             state.dataSQLiteProcedures->sqlite->addMaterialData(materialNum, thisMaterial);
         }
         for (int constructNum = 1; constructNum <= state.dataHeatBal->TotConstructs; ++constructNum) {

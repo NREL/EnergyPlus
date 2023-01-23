@@ -215,6 +215,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
         // Obtain thermal properties from the Material derived type
 
         auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
+        assert(thisMaterial != nullptr);
 
         dl(Layer) = thisMaterial->Thickness;
         rk(Layer) = thisMaterial->Conductivity;
@@ -1903,6 +1904,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint(I);
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(Layer));
+        assert(thisMaterial != nullptr);
         switch (thisMaterial->Group) {
         case Material::MaterialGroup::Air: {
             static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
