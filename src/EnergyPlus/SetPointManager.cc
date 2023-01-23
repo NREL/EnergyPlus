@@ -7710,7 +7710,7 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     // na
 
     // Using/Aliasing
-    using Curve::CurveValue;
+    using EnergyPlus::Curve::CurveValue;
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace DataPlant;
 

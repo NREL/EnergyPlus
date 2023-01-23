@@ -1570,7 +1570,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ExhaustFanCurveIndex = GetCurveIndex(state, Alphas(15));
 
             if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
-                ErrorsFoundGeneric |= Curve::CheckCurveDims(state,
+                ErrorsFoundGeneric |= EnergyPlus::Curve::CheckCurveDims(state,
                                                             DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
                                                             {1},                                            // Valid dimensions
                                                             RoutineName,                                    // Routine name

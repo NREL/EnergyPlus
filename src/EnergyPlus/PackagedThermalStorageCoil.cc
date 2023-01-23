@@ -470,7 +470,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlyCapFTempCurve, // Curve index
                                                      {2},                                                                          // Valid dimensions
                                                      RoutineName,                                                                  // Routine name
@@ -496,7 +496,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlyCapFFlowCurve, // Curve index
                                                      {1},                                                                          // Valid dimensions
                                                      RoutineName,                                                                  // Routine name
@@ -522,7 +523,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlyEIRFTempCurve, // Curve index
                                                      {2},                                                                          // Valid dimensions
                                                      RoutineName,                                                                  // Routine name
@@ -548,7 +550,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlyEIRFFlowCurve, // Curve index
                                                      {1},                                                                          // Valid dimensions
                                                      RoutineName,                                                                  // Routine name
@@ -574,7 +577,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlyPLFFPLRCurve, // Curve index
                                                      {1},                                                                         // Valid dimensions
                                                      RoutineName,                                                                 // Routine name
@@ -600,7 +604,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlySHRFTempCurve, // Curve index
                                                      {2},                                                                          // Valid dimensions
                                                      RoutineName,                                                                  // Routine name
@@ -626,7 +631,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlySHRFFlowCurve, // Curve index
                                                      {1},                                                                          // Valid dimensions
                                                      RoutineName,                                                                  // Routine name
@@ -687,8 +693,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeCoolingCapFTempCurve, // Curve index
                                           {3},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -715,8 +721,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve, // Curve index
                                           {1},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -742,8 +748,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve, // Curve index
                                           {3},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -770,8 +776,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve, // Curve index
                                           {1},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -798,8 +804,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve, // Curve index
                                           {1},                                                                                     // Valid dimensions
                                           RoutineName,                                                                             // Routine name
@@ -826,8 +832,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeChargingCapFTempCurve, // Curve index
                                           {3},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -854,8 +860,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve, // Curve index
                                           {1},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -882,8 +888,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeChargingEIRFTempCurve, // Curve index
                                           {3},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -910,8 +916,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve, // Curve index
                                           {1},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -938,8 +944,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve, // Curve index
                                           {1},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -966,7 +972,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeSHRFTempCurve, // Curve index
                                                      {2, 3},               // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,          // Routine name
@@ -993,7 +1000,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeSHRFFlowCurve, // Curve index
                                                      {1},                                                      // Valid dimensions
                                                      RoutineName,                                              // Routine name
@@ -1055,8 +1063,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve, // Curve index
                                           {3},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -1083,8 +1091,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve, // Curve index
                                           {1},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -1111,8 +1119,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve, // Curve index
                                           {3},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -1139,8 +1147,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve, // Curve index
                                           {1},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -1167,8 +1175,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve, // Curve index
                                           {1},                                                      // Valid dimensions
                                           RoutineName,                                              // Routine name
@@ -1195,7 +1203,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
                     state,
                     state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve, // Curve index
                     {3},                                                                                             // Valid dimensions
@@ -1223,7 +1231,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
                     state,
                     state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve, // Curve index
                     {1},                                                                                             // Valid dimensions
@@ -1251,7 +1259,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
                     state,
                     state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve, // Curve index
                     {1},                                                                                                // Valid dimensions
@@ -1279,7 +1287,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
                     state,
                     state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve, // Curve index
                     {3},                                                                                             // Valid dimensions
@@ -1307,7 +1315,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
                     state,
                     state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve, // Curve index
                     {1},                                                                                             // Valid dimensions
@@ -1335,7 +1343,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
                     state,
                     state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve, // Curve index
                     {1},                                                                                            // Valid dimensions
@@ -1363,8 +1371,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeSHRFTempCurve, // Curve index
                                           {2, 3},                                                   // Valid dimensions  // MULTIPLECURVEDIMS
                                           RoutineName,                                              // Routine name
@@ -1391,8 +1399,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeSHRFFlowCurve, // Curve index
                                           {1},                                                                                  // Valid dimensions
                                           RoutineName,                                                                          // Routine name
@@ -1446,8 +1454,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).ChargeOnlyChargingCapFTempCurve, // Curve index
                                           {2},                                                                                 // Valid dimensions
                                           RoutineName,                                                                         // Routine name
@@ -1474,8 +1482,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |=
-                    Curve::CheckCurveDims(state,
+                ErrorsFound |= EnergyPlus::Curve::CheckCurveDims(
+                    state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(item).ChargeOnlyChargingEIRFTempCurve, // Curve index
                                           {2},                                                                                 // Valid dimensions
                                           RoutineName,                                                                         // Routine name
@@ -1530,7 +1538,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlyCapFTempCurve, // Curve index
                                                      {2},                                                      // Valid dimensions
                                                      RoutineName,                                              // Routine name
@@ -1557,7 +1566,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlyCapFFlowCurve, // Curve index
                                                      {1},                                                      // Valid dimensions
                                                      RoutineName,                                              // Routine name
@@ -1584,7 +1594,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlyEIRFTempCurve, // Curve index
                                                      {2},                                                      // Valid dimensions
                                                      RoutineName,                                              // Routine name
@@ -1611,7 +1622,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlyEIRFFlowCurve, // Curve index
                                                      {1},                                                      // Valid dimensions
                                                      RoutineName,                                              // Routine name
@@ -1638,7 +1650,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlyPLFFPLRCurve, // Curve index
                                                      {1},                                                      // Valid dimensions
                                                      RoutineName,                                              // Routine name
@@ -1665,7 +1678,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlySHRFTempCurve, // Curve index
                                                      {2, 3},               // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,          // Routine name
@@ -1692,7 +1706,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, any curve with just x as single independent variable
-                ErrorsFound |= Curve::CheckCurveDims(state,
+                ErrorsFound |=
+                    EnergyPlus::Curve::CheckCurveDims(state,
                                                      state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlySHRFFLowCurve, // Curve index
                                                      {1},                                                      // Valid dimensions
                                                      RoutineName,                                              // Routine name
@@ -2489,7 +2504,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     // Using/Aliasing
     using namespace DataSizing;
     using namespace OutputReportPredefined;
-    using Curve::CurveValue;
+    using EnergyPlus::Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2921,7 +2936,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using Curve::CurveValue;
+    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -3246,7 +3261,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using Curve::CurveValue;
+    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -3758,7 +3773,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using Curve::CurveValue;
+    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -4211,7 +4226,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using Curve::CurveValue;
+    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -4413,7 +4428,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using Curve::CurveValue;
+    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
