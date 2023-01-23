@@ -1311,6 +1311,9 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         return;
     }
 
+    // get setpoint on the load side outlet
+    Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
+
     // Use a logic similar to that for a boilder: If the specified load is 0.0 or the boiler should not run
     // then we leave this subroutine. Before leaving
     // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
@@ -1325,79 +1328,176 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         return;
     }
 
-    // Set the current load equal to the boiler load
-    Real64 FFHPloadSideLoad = currentLoad; // this->loadSidePlantLoad = MyLoad;
-
-    // Initialize the delta temperature to zero
-    Real64 FFHPDeltaTemp = 0.0; // C - FFHP inlet to outlet temperature difference, set in all necessary code paths so no initialization required
-
-    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
+    DataPlant::PlantLoopData &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
     Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
                                                            thisLoadPlantLoop.FluidName,
                                                            state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
                                                            thisLoadPlantLoop.FluidIndex,
                                                            "PLFFHPEIR::simulate()");
 
-    if (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopSide(this->loadSidePlantLoc.loopSideNum).FlowLock ==
-        DataPlant::FlowLock::Unlocked) {
-        // Either set the flow to the Constant value or calculate the flow for the variable volume
-        if ((this->flowMode == DataPlant::FlowMode::Constant) || (this->flowMode == DataPlant::FlowMode::NotModulated)) {
-            // Then find the flow rate and outlet temp
-            this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
-            PlantUtilities::SetComponentFlowRate(
-                state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+    // Set the current load equal to the FFHP load
+    Real64 FFHPloadSideLoad = currentLoad; // this->loadSidePlantLoad = MyLoad;
 
-            if ((this->loadSideMassFlowRate != 0.0) &&
-                ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) {
-                FFHPDeltaTemp = currentLoad / this->loadSideMassFlowRate / CpLoad;
+    if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) {
+
+        // Initialize the delta temperature to zero
+        Real64 FFHPDeltaTemp = 0.0; // C - FFHP inlet to outlet temperature difference, set in all necessary code paths so no initialization required
+
+        if (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopSide(this->loadSidePlantLoc.loopSideNum).FlowLock ==
+            DataPlant::FlowLock::Unlocked) {
+            // Either set the flow to the Constant value or calculate the flow for the variable volume
+            if ((this->flowMode == DataPlant::FlowMode::Constant) || (this->flowMode == DataPlant::FlowMode::NotModulated)) {
+                // Then find the flow rate and outlet temp
+                this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+
+                if ((this->loadSideMassFlowRate != 0.0) &&
+                    ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) {
+                    FFHPDeltaTemp = currentLoad / this->loadSideMassFlowRate / CpLoad;
+                } else {
+                    FFHPDeltaTemp = 0.0;
+                }
+                this->loadSideOutletTemp = FFHPDeltaTemp + state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+
+            } else if (this->flowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
+                // Calculate the Delta Temp from the inlet temp to the FFHP outlet setpoint
+                // Then find the flow rate and outlet temp
+
+                if (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopDemandCalcScheme ==
+                    DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+                    FFHPDeltaTemp =
+                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).TempSetPoint - state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+                } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
+                    FFHPDeltaTemp = state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointLo -
+                                    state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+                }
+
+                this->loadSideOutletTemp = FFHPDeltaTemp + state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+
+                if ((FFHPDeltaTemp > 0.0) && ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) {
+                    this->loadSideMassFlowRate = currentLoad / CpLoad / FFHPDeltaTemp;
+                    this->loadSideMassFlowRate = min(this->loadSideDesignMassFlowRate, this->loadSideMassFlowRate);
+                } else {
+                    this->loadSideMassFlowRate = 0.0;
+                }
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+
+            }    // End of Constant/Variable Flow If Block
+        } else { // If FlowLock is True
+            // Set the boiler flow rate from inlet node and then check performance
+            this->loadSideMassFlowRate = state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate;
+
+            if ((this->loadSideMassFlowRate > 0.0) &&
+                ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) { // this FFHP has a heat load
+                // FFHPloadSideLoad = currentLoad;
+                if (FFHPloadSideLoad > this->referenceCapacity * this->maxPLR) FFHPloadSideLoad = this->referenceCapacity * this->maxPLR;
+                if (FFHPloadSideLoad < this->referenceCapacity * this->minPLR) FFHPloadSideLoad = this->referenceCapacity * this->minPLR;
+                this->loadSideOutletTemp =
+                    state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp + FFHPloadSideLoad / (this->loadSideMassFlowRate * CpLoad);
             } else {
-                FFHPDeltaTemp = 0.0;
+                FFHPloadSideLoad = 0.0;
+                this->loadSideOutletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
             }
-            this->loadSideOutletTemp = FFHPDeltaTemp + state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
-
-        } else if (this->flowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-            // Calculate the Delta Temp from the inlet temp to the FFHP outlet setpoint
-            // Then find the flow rate and outlet temp
-
-            if (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                FFHPDeltaTemp =
-                    state.dataLoopNodes->Node(this->loadSideNodes.inlet).TempSetPoint - state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
-            } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
-                FFHPDeltaTemp =
-                    state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointLo - state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
-            }
-
-            this->loadSideOutletTemp = FFHPDeltaTemp + state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
-
-            if ((FFHPDeltaTemp > 0.0) && ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) {
-                this->loadSideMassFlowRate = currentLoad / CpLoad / FFHPDeltaTemp;
-                this->loadSideMassFlowRate = min(this->loadSideDesignMassFlowRate, this->loadSideMassFlowRate);
-            } else {
-                this->loadSideMassFlowRate = 0.0;
-            }
-            PlantUtilities::SetComponentFlowRate(
-                state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
-
-        }    // End of Constant/Variable Flow If Block
-    } else { // If FlowLock is True
-        // Set the boiler flow rate from inlet node and then check performance
-        this->loadSideMassFlowRate = state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate;
-
-        if ((this->loadSideMassFlowRate > 0.0) &&
-            ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) { // this FFHP has a heat load
-            // FFHPloadSideLoad = currentLoad;
-            if (FFHPloadSideLoad > this->referenceCapacity * this->maxPLR) FFHPloadSideLoad = this->referenceCapacity * this->maxPLR;
-            if (FFHPloadSideLoad < this->referenceCapacity * this->minPLR) FFHPloadSideLoad = this->referenceCapacity * this->minPLR;
-            this->loadSideOutletTemp =
-                state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp + FFHPloadSideLoad / (this->loadSideMassFlowRate * CpLoad);
-        } else {
-            FFHPloadSideLoad = 0.0;
-            this->loadSideOutletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
         }
-    }
+    } else if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+        if (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopSide(this->loadSidePlantLoc.loopSideNum).FlowLock ==
+            DataPlant::FlowLock::Unlocked) {
+            // this->PossibleSubcooling =
+            //    !(state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
+            //      DataPlant::OpScheme::CompSetPtBased);
+            Real64 evapDeltaTemp = 0.0; // Evaporator temperature difference [C]
 
-    // get setpoint on the load side outlet
-    Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
+            // Either set the flow to the Constant value or calculate the flow for the variable volume case
+            if ((this->flowMode == DataPlant::FlowMode::Constant) || (this->flowMode == DataPlant::FlowMode::NotModulated)) {
+                // Set the evaporator mass flow rate to design
+                // Start by assuming max (design) flow
+                this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
+                // Use PlantUtilities::SetComponentFlowRate to decide actual flow
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+                if (this->loadSideMassFlowRate != 0.0) {
+                    evapDeltaTemp = std::abs(currentLoad) / this->loadSideMassFlowRate / CpLoad; // MyLoad = net evaporator capacity, QEvaporator
+                } else {
+                    evapDeltaTemp = 0.0;
+                }
+                this->loadSideOutletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp - evapDeltaTemp;
+            } else if (this->flowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
+                switch (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopDemandCalcScheme) {
+                case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+                    // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
+                    evapDeltaTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp -
+                                    state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint;
+                } break;
+                case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+                    evapDeltaTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp -
+                                    state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
+                } break;
+                default: {
+                    assert(false);
+                } break;
+                }
+
+                if (evapDeltaTemp != 0) {
+                    this->loadSideMassFlowRate = max(0.0, (std::abs(currentLoad) / CpLoad / evapDeltaTemp));
+                    // Check to see if the Maximum is exceeded, if so set to maximum
+                    this->loadSideMassFlowRate = min(this->loadSideDesignMassFlowRate, this->loadSideMassFlowRate);
+                    // Use PlantUtilities::SetComponentFlowRate to decide actual flow
+                    PlantUtilities::SetComponentFlowRate(
+                        state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+                    // Should we recalculate this with the corrected setpoint?
+                    switch (state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).LoopDemandCalcScheme) {
+                    case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+                        this->loadSideOutletTemp = state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint;
+                    } break;
+                    case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+                        this->loadSideOutletTemp = state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
+                    } break;
+                    default:
+                        break;
+                    }
+                } else {
+                    // Try to request zero flow
+                    this->loadSideMassFlowRate = 0.0;
+                    // Use PlantUtilities::SetComponentFlowRate to decide actual flow
+                    PlantUtilities::SetComponentFlowRate(
+                        state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+                    // No deltaT since component is not running
+                    this->loadSideOutletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+                    // this->QEvaporator = 0.0;
+                    // PartLoadRat = 0.0;
+                    // this->ChillerPartLoadRatio = 0.0;
+
+                    // if (this->DeltaTErrCount < 1 && !state.dataGlobal->WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
+                        // ++this->DeltaTErrCount;
+                        ShowWarningError(state, "Evaporator DeltaTemp = 0 in mass flow calculation (Tevapin = Tevapout setpoint temp).");
+                        ShowContinueErrorTimeStamp(state, "");
+                        // } else if (!state.dataGlobal->WarmupFlag) {
+                        // ++this->ChillerCapFTError;
+                        ShowWarningError( // RecurringWarningErrorAtEnd(
+                            state,
+                            format("{} \"{}\": Evaporator DeltaTemp = 0 in mass flow calculation warning continues...", this->EIRHPType, this->name));
+                        // this->DeltaTErrCountIndex,
+                        // evapDeltaTemp,
+                        // evapDeltaTemp);
+                    }
+                }
+            }
+        } else { // If FlowLock is True
+            this->loadSideMassFlowRate = state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate;
+            PlantUtilities::SetComponentFlowRate(
+                state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+            //       Some other component set the flow to 0. No reason to continue with calculations.
+            if (this->loadSideMassFlowRate == 0.0) {
+                FFHPloadSideLoad = 0.0;
+                // return;
+            }
+        } // This is the end of the FlowLock Block
+    } else {
+        //
+    }
 
     // Determine which air variable to use for GAHP:
     // Source (air) side variable to use
