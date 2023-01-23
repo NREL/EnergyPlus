@@ -4429,16 +4429,13 @@ namespace HeatBalanceManager {
 
             // reallocate Material type
 
-            for (int i = 1; i <= state.dataMaterial->TotMaterials; i++) {
-                Material::MaterialBase *p = new Material::MaterialBase;
-                state.dataMaterial->Material.push_back(p);
-            }
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials, 0.0);
 
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataMaterial->TotMaterials; ++loop) {
-                delete state.dataMaterial->Material(loop);
-                state.dataMaterial->Material(loop) = new Material::MaterialChild;
+                Material::MaterialChild *p = new Material::MaterialChild;
+                Material::MaterialBase *pBase = dynamic_cast<Material::MaterialBase *>(p);
+                state.dataMaterial->Material.push_back(pBase);
                 auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(loop));
                 assert(thisMaterial != nullptr);
                 thisMaterial->Name = "";
@@ -4510,8 +4507,6 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     ++MaterNum;
-                    delete state.dataMaterial->Material(MaterNum);
-                    state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
                     assert(thisMaterial != nullptr);
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
@@ -4561,8 +4556,6 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     ++MaterNum;
-                    delete state.dataMaterial->Material(MaterNum);
-                    state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
                     assert(thisMaterial != nullptr);
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
@@ -4585,8 +4578,6 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     MaterNum = MaterNumSysGap(IGap, IGlSys);
-                    delete state.dataMaterial->Material(MaterNum);
-                    state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
                     assert(thisMaterial != nullptr);
                     thisMaterial->NumberOfGasesInMixture = NumGases(IGap, IGlSys);
