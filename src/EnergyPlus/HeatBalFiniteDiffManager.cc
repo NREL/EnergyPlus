@@ -1913,7 +1913,7 @@ namespace HeatBalFiniteDiffManager {
 
             int const MatLay2(construct.LayerPoint(Lay + 1));
             auto const *mat2(state.dataMaterial->Material(MatLay2));
-            auto const *mat2Child = dynamic_cast<const Material::MaterialChild *>(mat);
+            auto const *mat2Child = dynamic_cast<const Material::MaterialChild *>(mat2);
 
             auto const &condActuator1(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
             auto const &condActuator2(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay + 1));
