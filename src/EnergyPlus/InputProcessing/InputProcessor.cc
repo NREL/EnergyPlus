@@ -900,9 +900,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
 
 const json &InputProcessor::getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName)
 {
-    auto objectInfo = ObjectInfo();
-    objectInfo.objectType = ObjType;
-    objectInfo.objectName = ObjName;
+    auto objectInfo = ObjectInfo(std::string{ObjType}, std::string{ObjName});
 
     auto obj_iter = epJSON.find(std::string(ObjType));
     if (obj_iter == epJSON.end() || obj_iter.value().find(objectInfo.objectName) == obj_iter.value().end()) {
