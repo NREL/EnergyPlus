@@ -9636,11 +9636,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
-    Real64 Qsens_sys(0.0); // UnitarySystem delivered sensible capacity wrt zone
-    Real64 ZoneTemp(0.0);  // control zone temperature
-    int InletNode(0);      // UnitarySystem inlet node number
-    int OutletNode(0);     // UnitarySystem outlet node number
-    int ControlZoneNum(0); // index to control zone
 
     std::string const idf_objects = delimited_string({
 
