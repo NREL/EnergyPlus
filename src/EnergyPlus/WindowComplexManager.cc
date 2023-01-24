@@ -1591,10 +1591,14 @@ namespace WindowComplexManager {
                         BSHit.HitDsq = HitDsq;
                     }
                 }
-            }                   // back surf loop
-            if (TotHits == 0) { // this should not happen--means a ray has gotten lost
-                //    CALL ShowWarningError(state, format("BSDF--Zone surfaces do not completely enclose zone--transmitted ray
-                //    lost{}{}{}{}{}{}{}{}{}{}{}", ), }, else, {, KBkSurf, =, BSHit.KBkSurf;, JSurf, =, BSHit.HitSurf;, Geom.NSurfInt(KBkSurf));
+            } // back surf loop
+            if (TotHits == 0) {
+                // this should not happen--means a ray has gotten lost
+                // ShowWarningError(state, "BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost");
+            } else {
+                KBkSurf = BSHit.KBkSurf;
+                JSurf = BSHit.HitSurf;
+                ++Geom.NSurfInt(KBkSurf);
                 TmpSurfInt(Geom.NSurfInt(KBkSurf), KBkSurf) = IRay;
                 VecNorm = state.dataSurface->Surface(JSurf).OutNormVec;
                 TmpSjdotN(Geom.NSurfInt(KBkSurf), KBkSurf) = dot(Geom.sTrn(IRay), VecNorm);
