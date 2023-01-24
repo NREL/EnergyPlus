@@ -239,17 +239,17 @@ namespace Curve {
                    this->coeff[5] * V1 * V2 + this->coeff[6] * V1 * V1 * V1 + this->coeff[7] * V2 * V2 * V2 + this->coeff[8] * V1 * V1 * V2 +
                    this->coeff[9] * V1 * V2 * V2 + this->coeff[10] * V1 * V1 * V2 * V2 + this->coeff[11] * V3 * V2 * V2 * V2;
         case CurveType::TriQuadratic: {
-            auto const &Tri2ndOrder(this->tri2ndOrder);
+            auto const &c(this->coeff);
             auto const V1s(V1 * V1);
             auto const V2s(V2 * V2);
             auto const V3s(V3 * V3);
-            return Tri2ndOrder[0] + Tri2ndOrder[1] * V1s + Tri2ndOrder[2] * V1 + Tri2ndOrder[3] * V2s + Tri2ndOrder[4] * V2 + Tri2ndOrder[5] * V3s +
-                   Tri2ndOrder[6] * V3 + Tri2ndOrder[7] * V1s * V2s + Tri2ndOrder[8] * V1 * V2 + Tri2ndOrder[9] * V1 * V2s +
-                   Tri2ndOrder[10] * V1s * V2 + Tri2ndOrder[11] * V1s * V3s + Tri2ndOrder[12] * V1 * V3 + Tri2ndOrder[13] * V1 * V3s +
-                   Tri2ndOrder[14] * V1s * V3 + Tri2ndOrder[15] * V2s * V3s + Tri2ndOrder[16] * V2 * V3 + Tri2ndOrder[17] * V2 * V3s +
-                   Tri2ndOrder[18] * V2s * V3 + Tri2ndOrder[19] * V1s * V2s * V3s + Tri2ndOrder[20] * V1s * V2s * V3 +
-                   Tri2ndOrder[21] * V1s * V2 * V3s + Tri2ndOrder[22] * V1 * V2s * V3s + Tri2ndOrder[23] * V1s * V2 * V3 +
-                   Tri2ndOrder[24] * V1 * V2s * V3 + Tri2ndOrder[25] * V1 * V2 * V3s + Tri2ndOrder[26] * V1 * V2 * V3;
+            return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s +
+                   c[6] * V3 + c[7] * V1s * V2s + c[8] * V1 * V2 + c[9] * V1 * V2s +
+                   c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s +
+                   c[14] * V1s * V3 + c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s +
+                   c[18] * V2s * V3 + c[19] * V1s * V2s * V3s + c[20] * V1s * V2s * V3 +
+                   c[21] * V1s * V2 * V3s + c[22] * V1 * V2s * V3s + c[23] * V1s * V2 * V3 +
+                   c[24] * V1 * V2s * V3 + c[25] * V1 * V2 * V3s + c[26] * V1 * V2 * V3;
         }
         default:
             return this->valueFallback(state, V1, V2, V3, 0.0, 0.0);
@@ -534,15 +534,15 @@ namespace Curve {
                    this->coeff[9] * V1 * V2 * V2 + this->coeff[10] * V1 * V1 * V2 * V2 + this->coeff[11] * V3 * V2 * V2 * V2;
         } break;
         case CurveType::TriQuadratic: {
-            auto const &tri(this->tri2ndOrder);
+            auto const &c(this->coeff);
             auto const V1s(V1 * V1);
             auto const V2s(V2 * V2);
             auto const V3s(V3 * V3);
-            return tri[0] + tri[1] * V1s + tri[2] * V1 + tri[3] * V2s + tri[4] * V2 + tri[5] * V3s + tri[6] * V3 + tri[7] * V1s * V2s +
-                   tri[8] * V1 * V2 + tri[9] * V1 * V2s + tri[10] * V1s * V2 + tri[11] * V1s * V3s + tri[12] * V1 * V3 + tri[13] * V1 * V3s +
-                   tri[14] * V1s * V3 + tri[15] * V2s * V3s + tri[16] * V2 * V3 + tri[17] * V2 * V3s + tri[18] * V2s * V3 +
-                   tri[19] * V1s * V2s * V3s + tri[20] * V1s * V2s * V3 + tri[21] * V1s * V2 * V3s + tri[22] * V1 * V2s * V3s +
-                   tri[23] * V1s * V2 * V3 + tri[24] * V1 * V2s * V3 + tri[25] * V1 * V2 * V3s + tri[26] * V1 * V2 * V3;
+            return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s + c[6] * V3 + c[7] * V1s * V2s +
+                   c[8] * V1 * V2 + c[9] * V1 * V2s + c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s +
+                   c[14] * V1s * V3 + c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s + c[18] * V2s * V3 +
+                   c[19] * V1s * V2s * V3s + c[20] * V1s * V2s * V3 + c[21] * V1s * V2 * V3s + c[22] * V1 * V2s * V3s +
+                   c[23] * V1s * V2 * V3 + c[24] * V1 * V2s * V3 + c[25] * V1 * V2 * V3s + c[26] * V1 * V2 * V3;
         } break;
         case CurveType::Exponent: {
             return this->coeff[0] + this->coeff[1] * std::pow(V1, this->coeff[2]);
@@ -1359,33 +1359,33 @@ namespace Curve {
             thisCurve->curveType = CurveType::TriQuadratic;
             thisCurve->numDims = 3;
             thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
-            thisCurve->tri2ndOrder[0] = Numbers(1);
-            thisCurve->tri2ndOrder[1] = Numbers(2);
-            thisCurve->tri2ndOrder[2] = Numbers(3);
-            thisCurve->tri2ndOrder[3] = Numbers(4);
-            thisCurve->tri2ndOrder[4] = Numbers(5);
-            thisCurve->tri2ndOrder[5] = Numbers(6);
-            thisCurve->tri2ndOrder[6] = Numbers(7);
-            thisCurve->tri2ndOrder[7] = Numbers(8);
-            thisCurve->tri2ndOrder[8] = Numbers(9);
-            thisCurve->tri2ndOrder[9] = Numbers(10);
-            thisCurve->tri2ndOrder[10] = Numbers(11);
-            thisCurve->tri2ndOrder[11] = Numbers(12);
-            thisCurve->tri2ndOrder[12] = Numbers(13);
-            thisCurve->tri2ndOrder[13] = Numbers(14);
-            thisCurve->tri2ndOrder[14] = Numbers(15);
-            thisCurve->tri2ndOrder[15] = Numbers(16);
-            thisCurve->tri2ndOrder[16] = Numbers(17);
-            thisCurve->tri2ndOrder[17] = Numbers(18);
-            thisCurve->tri2ndOrder[18] = Numbers(19);
-            thisCurve->tri2ndOrder[19] = Numbers(20);
-            thisCurve->tri2ndOrder[20] = Numbers(21);
-            thisCurve->tri2ndOrder[21] = Numbers(22);
-            thisCurve->tri2ndOrder[22] = Numbers(23);
-            thisCurve->tri2ndOrder[23] = Numbers(24);
-            thisCurve->tri2ndOrder[24] = Numbers(25);
-            thisCurve->tri2ndOrder[25] = Numbers(26);
-            thisCurve->tri2ndOrder[26] = Numbers(27);
+            thisCurve->coeff[0] = Numbers(1);
+            thisCurve->coeff[1] = Numbers(2);
+            thisCurve->coeff[2] = Numbers(3);
+            thisCurve->coeff[3] = Numbers(4);
+            thisCurve->coeff[4] = Numbers(5);
+            thisCurve->coeff[5] = Numbers(6);
+            thisCurve->coeff[6] = Numbers(7);
+            thisCurve->coeff[7] = Numbers(8);
+            thisCurve->coeff[8] = Numbers(9);
+            thisCurve->coeff[9] = Numbers(10);
+            thisCurve->coeff[10] = Numbers(11);
+            thisCurve->coeff[11] = Numbers(12);
+            thisCurve->coeff[12] = Numbers(13);
+            thisCurve->coeff[13] = Numbers(14);
+            thisCurve->coeff[14] = Numbers(15);
+            thisCurve->coeff[15] = Numbers(16);
+            thisCurve->coeff[16] = Numbers(17);
+            thisCurve->coeff[17] = Numbers(18);
+            thisCurve->coeff[18] = Numbers(19);
+            thisCurve->coeff[19] = Numbers(20);
+            thisCurve->coeff[20] = Numbers(21);
+            thisCurve->coeff[21] = Numbers(22);
+            thisCurve->coeff[22] = Numbers(23);
+            thisCurve->coeff[23] = Numbers(24);
+            thisCurve->coeff[24] = Numbers(25);
+            thisCurve->coeff[25] = Numbers(26);
+            thisCurve->coeff[26] = Numbers(27);
             thisCurve->inputLimits[0].min = Numbers(28);
             thisCurve->inputLimits[0].max = Numbers(29);
             thisCurve->inputLimits[1].min = Numbers(30);
@@ -2364,17 +2364,19 @@ namespace Curve {
                         // This could be an enum lookup, but they are accessing enums inside Btwxt that we don't control, and it's only two options
                         // for each
                         Btwxt::Method interpMethod = Btwxt::Method::CUBIC; // Assume cubic as the default
-                        if (indVarInstance.count("interpolation_method")) {
-                            if (indVarInstance.at("interpolation_method").get<std::string>() == "Linear") {
+                        auto interpIterator = indVarInstance.find("interpolation_method");
+                        if (interpIterator != indVarInstance.end()) {
+                            if (interpIterator->get<std::string>() == "Linear") {
                                 interpMethod = Btwxt::Method::LINEAR;
                             }
                         }
                         Btwxt::Method extrapMethod = Btwxt::Method::LINEAR; // Assume linear as the default
-                        if (indVarInstance.count("extrapolation_method")) {
-                            if (indVarInstance.at("extrapolation_method") == "Unavailable") {
+                        auto extrapIterator = indVarInstance.find("extrapolation_method");
+                        if (extrapIterator != indVarInstance.end()) {
+                            if (extrapIterator->get<std::string>() == "Unavailable") {
                                 ShowSevereError(state, format("{}: Extrapolation method \"Unavailable\" is not yet available.", contextString));
                                 ErrorsFound = true;
-                            } else if (indVarInstance.at("extrapolation_method") == "Constant") {
+                            } else if (extrapIterator->get<std::string>() == "Constant") {
                                 extrapMethod = Btwxt::Method::CONSTANT;
                             }
                         }
@@ -2382,27 +2384,14 @@ namespace Curve {
                         double min_grid_value = *std::min_element(axis.begin(), axis.end());
                         double max_grid_value = *std::max_element(axis.begin(), axis.end());
 
-                        double min_val, max_val;
-                        if (indVarInstance.count("minimum_value")) {
-                            min_val = indVarInstance.at("minimum_value").get<Real64>();
-                        } else {
-                            min_val = min_grid_value;
-                        }
-
-                        if (indVarInstance.count("maximum_value")) {
-                            max_val = indVarInstance.at("maximum_value").get<Real64>();
-                        } else {
-                            max_val = max_grid_value;
-                        }
-
+                        auto minValIterator = indVarInstance.find("minimum_value");
+                        Real64 min_val = (minValIterator != indVarInstance.end()) ? minValIterator->get<Real64>() : min_grid_value;
+                        auto maxValIterator = indVarInstance.find("maximum_value");
+                        Real64 max_val = (maxValIterator != indVarInstance.end()) ? maxValIterator->get<Real64>() : max_grid_value;
                         varListLimits[varListName].emplace_back(min_val, max_val);
 
-                        Real64 normalizationRefValue;
-                        if (indVarInstance.count("normalization_reference_value")) {
-                            normalizationRefValue = indVarInstance.at("normalization_reference_value").get<Real64>();
-                        } else {
-                            normalizationRefValue = std::numeric_limits<double>::quiet_NaN();
-                        }
+                        auto normValIterator = indVarInstance.find("normalization_reference_value");
+                        Real64 normalizationRefValue = (normValIterator != indVarInstance.end()) ? normValIterator->get<Real64>() : std::numeric_limits<double>::quiet_NaN();
 
                         varListNormalizeTargets[varListName].push_back(normalizationRefValue);
 

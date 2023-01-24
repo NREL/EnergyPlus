@@ -156,8 +156,7 @@ namespace Curve {
         int numDims = 0;        // Number of dimensions (AKA, independent variables)
         int GridValueIndex = 0; // Index of output within RGI for new Table:Lookup
         // input coefficients
-        std::array<Real64, 12> coeff = {0.0}; // curve coefficients
-        std::array<Real64, 27> tri2ndOrder;   // 27 coefficient full triquadratic (!)
+        std::array<Real64, 27> coeff = {0.0}; // curve coefficients
         // independent variables
         std::array<Real64, 6> inputs = {0.0}; // curve inputs
         std::array<Limits, 6> inputLimits;    // min/max of independent variables
