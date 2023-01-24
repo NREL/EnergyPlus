@@ -1281,6 +1281,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     // overwrite outdoor weather temp to variable speed coil rated water temp until this gets fixed
     state->dataSize->DesDayWeath(1).Temp(1) = 29.4;
@@ -1577,6 +1579,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -1815,6 +1819,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -2410,6 +2416,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Setp
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -2947,6 +2955,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SuppMultiStageElecHeatCoil_EMS_Set
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -3195,6 +3205,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -3411,6 +3423,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -3910,6 +3924,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -4313,6 +4329,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -4645,6 +4663,19 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
         "  Always 20C, !- Schedule Name",
         "  Water Cooling Coil Air Outlet Node;  !- Setpoint Node or NodeList Name",
 
+        "Schedule:Compact,",
+        "  Always Point004,              !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00, 0.004;      !- Field 3",
+
+        "SetpointManager:Scheduled,",
+        "  CW Coil Humidity Setpoint Manager, !- Name",
+        "  MaximumHumidityRatio, !- Control Variable",
+        "  Always 20C, !- Schedule Name",
+        "  Water Cooling Coil Air Outlet Node;  !- Setpoint Node or NodeList Name",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
@@ -4680,6 +4711,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -10007,6 +10040,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
     state->dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
+    state->dataHVACGlobal->DoSetPointTest = true; // Force setpoint check
 
     auto &inletNode = state->dataLoopNodes->Node(thisSys->AirInNode);
     auto &outletNode = state->dataLoopNodes->Node(thisSys->AirOutNode);
@@ -18631,8 +18665,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
         "  1.0,                            !- Gas Burner Efficiency",
         "  autosize,                       !- Nominal Capacity",
         "  Heating Coil Air Inlet Node,    !- Air Inlet Node Name",
-        "  Zone 2 Inlet Node,              !- Air Outlet Node Name",
-        "  Zone 2 Inlet Node;              !- Temperature Setpoint Node Name",
+        "  Zone 2 Inlet Node;              !- Air Outlet Node Name",
 
         "ScheduleTypeLimits,",
         "  Any Number;                     !- Name",
@@ -18685,6 +18718,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -18837,8 +18872,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
         "  1.0,                            !- Efficiency",
         "  autosize,                       !- Nominal Capacity",
         "  Heating Coil Air Inlet Node,    !- Air Inlet Node Name",
-        "  Zone 2 Inlet Node,              !- Air Outlet Node Name",
-        "  Zone 2 Inlet Node;              !- Temperature Setpoint Node Name",
+        "  Zone 2 Inlet Node;              !- Air Outlet Node Name",
 
         "ScheduleTypeLimits,",
         "  Any Number;                     !- Name",
@@ -18891,6 +18925,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -19035,7 +19071,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
         "  Zone 2 Inlet Node,              !- Coil Air Outlet Node Name",
         "  Refrigeration:CompressorRack,   !- Heating Source Type",
         "  SelfContainedDisplay,           !- Heating Source Name",
-        "  Zone 2 Inlet Node,              !- Coil Temperature Setpoint Node Name",
+        "  ,                               !- Coil Temperature Setpoint Node Name",
         "  0.1;                            !- Parasitic Electric Load {W}",
 
         "ScheduleTypeLimits,",
@@ -19199,6 +19235,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
