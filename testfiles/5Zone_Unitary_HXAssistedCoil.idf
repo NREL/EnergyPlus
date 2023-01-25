@@ -2715,8 +2715,7 @@
     0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
-    VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
-    VAV Sys 1 Outlet Node;   !- Temperature Setpoint Node Name
+    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name
 
   SetpointManager:Scheduled,
     Supply Air Hum Rate Manager 1,  !- Name

@@ -2730,7 +2730,7 @@
     VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
     Coil:Cooling:DX,  !- Heating Source Object Type
     Main Cooling Coil 1,     !- Heating Source Name
-    VAV Sys 1 Outlet Node,   !- Temperature Setpoint Node Name
+    ,                        !- Temperature Setpoint Node Name
     5.0;                     !- Parasitic Electric Load {W}
 
   SetpointManager:Scheduled,

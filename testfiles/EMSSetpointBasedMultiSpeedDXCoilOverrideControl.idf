@@ -2791,8 +2791,7 @@
     0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Rht Coil Air Inlet Node, !- Air Inlet Node Name
-    VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
-    VAV Sys 1 Outlet Node;   !- Temperature Setpoint Node Name
+    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name
 
   NodeList,
     HumRat SetPoint Nodes,   !- Name
