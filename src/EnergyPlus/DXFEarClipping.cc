@@ -259,8 +259,9 @@ namespace DXFEarClipping {
             generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
                 ShowWarningError(state,
-                                 "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
-                                     "\", check surface vertex order(entry)");
+                                 format("DXFOut: Could not triangulate surface=\"{}\", type=\"{}\", check surface vertex order(entry)",
+                                        surfname,
+                                        cSurfaceClass(surfclass)));
                 ++state.dataDXFEarClipping->errcount;
                 if (state.dataDXFEarClipping->errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
