@@ -162,17 +162,19 @@ namespace MatrixDataManager {
 
             // test
             if (NumElements < 1) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("GetMatrixInput: for {}: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  "Check " + state.dataIPShortCut->cNumericFieldNames(1) + " and " + state.dataIPShortCut->cNumericFieldNames(2) +
-                                      " total number of elements in matrix must be 1 or more");
+                                  format("Check {} and {} total number of elements in matrix must be 1 or more",
+                                         state.dataIPShortCut->cNumericFieldNames(1),
+                                         state.dataIPShortCut->cNumericFieldNames(2)));
                 ErrorsFound = true;
             }
             if ((NumNumbers - 2) < NumElements) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("GetMatrixInput: for {}: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  "Check input, total number of elements does not agree with " + state.dataIPShortCut->cNumericFieldNames(1) +
-                                      " and " + state.dataIPShortCut->cNumericFieldNames(2));
+                                  format("Check input, total number of elements does not agree with {} and {}",
+                                         state.dataIPShortCut->cNumericFieldNames(1),
+                                         state.dataIPShortCut->cNumericFieldNames(2)));
                 ErrorsFound = true;
             }
             state.dataMatrixDataManager->MatData(MatNum).MatrixType = TwoDimensional;

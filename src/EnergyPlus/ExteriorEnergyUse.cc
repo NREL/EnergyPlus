@@ -648,7 +648,7 @@ namespace ExteriorEnergyUse {
             FuelTypeString = "DistrictHeating";
         } else {
             ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, CurrentName));
-            ShowFatalError(state, "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha);
+            ShowFatalError(state, format("Heating source/fuel type not recognized. Check input field {}=\"{}", CurrentField, FuelTypeAlpha));
         }
     }
 
