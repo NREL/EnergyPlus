@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -143,7 +143,7 @@ namespace HVACCooledBeam {
         if (CompIndex == 0) {
             CBNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACCooledBeam->CoolBeam);
             if (CBNum == 0) {
-                ShowFatalError(state, "SimCoolBeam: Cool Beam Unit not found=" + std::string{CompName});
+                ShowFatalError(state, format("SimCoolBeam: Cool Beam Unit not found={}", CompName));
             }
             CompIndex = CBNum;
         } else {
@@ -167,7 +167,7 @@ namespace HVACCooledBeam {
             }
         }
         if (CBNum == 0) {
-            ShowFatalError(state, "Cool Beam Unit not found = " + std::string{CompName});
+            ShowFatalError(state, format("Cool Beam Unit not found = {}", CompName));
         }
 
         state.dataSize->CurTermUnitSizingNum =
@@ -279,8 +279,8 @@ namespace HVACCooledBeam {
             } else if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Active")) {
                 CoolBeam(CBNum).CBType = CooledBeamType::Active;
             } else {
-                ShowSevereError(state, "Illegal " + cAlphaFields(3) + " = " + CoolBeam(CBNum).CBTypeString + '.');
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + CoolBeam(CBNum).Name);
+                ShowSevereError(state, format("Illegal {} = {}.", cAlphaFields(3), CoolBeam(CBNum).CBTypeString));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CoolBeam(CBNum).Name));
                 ErrorsFound = true;
             }
             CoolBeam(CBNum).Sched = Alphas(2);
@@ -290,8 +290,13 @@ namespace HVACCooledBeam {
                 CoolBeam(CBNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (CoolBeam(CBNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
-                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
+                                    format("{}{}: invalid {} entered ={} for {}={}",
+                                           RoutineName,
+                                           CurrentModuleObject,
+                                           cAlphaFields(2),
+                                           Alphas(2),
+                                           cAlphaFields(1),
+                                           Alphas(1)));
                     ErrorsFound = true;
                 }
             }
@@ -444,10 +449,10 @@ namespace HVACCooledBeam {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (CoolBeam(CBNum).ADUNum == 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' +
-                                    CoolBeam(CBNum).Name + "].");
-                ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(CoolBeam(CBNum).AirOutNode));
+                ShowSevereError(
+                    state,
+                    format("{}No matching Air Distribution Unit, for Unit = [{},{}].", RoutineName, CurrentModuleObject, CoolBeam(CBNum).Name));
+                ShowContinueError(state, format("...should have outlet node={}", state.dataLoopNodes->NodeID(CoolBeam(CBNum).AirOutNode)));
                 ErrorsFound = true;
             } else {
 
@@ -471,8 +476,8 @@ namespace HVACCooledBeam {
                 }
             }
             if (!AirNodeFound) {
-                ShowSevereError(state, "The outlet air node from the " + CurrentModuleObject + " = " + CoolBeam(CBNum).Name);
-                ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas(5));
+                ShowSevereError(state, format("The outlet air node from the {} = {}", CurrentModuleObject, CoolBeam(CBNum).Name));
+                ShowContinueError(state, format("did not have a matching Zone Equipment Inlet Node, Node ={}", Alphas(5)));
                 ErrorsFound = true;
             }
         }
@@ -485,7 +490,7 @@ namespace HVACCooledBeam {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input. Preceding conditions cause termination.");
+            ShowFatalError(state, format("{}Errors found in getting input. Preceding conditions cause termination.", RoutineName));
         }
     }
 
@@ -559,9 +564,9 @@ namespace HVACCooledBeam {
                 if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(CoolBeam(Loop).ADUNum).Name))
                     continue;
                 ShowSevereError(state,
-                                "InitCoolBeam: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(CoolBeam(Loop).ADUNum).Name +
-                                    "] is not on any ZoneHVAC:EquipmentList.");
-                ShowContinueError(state, "...Unit=[" + CurrentModuleObject + ',' + CoolBeam(Loop).Name + "] will not be simulated.");
+                                format("InitCoolBeam: ADU=[Air Distribution Unit,{}] is not on any ZoneHVAC:EquipmentList.",
+                                       state.dataDefineEquipment->AirDistUnit(CoolBeam(Loop).ADUNum).Name));
+                ShowContinueError(state, format("...Unit=[{},{}] will not be simulated.", CurrentModuleObject, CoolBeam(Loop).Name));
             }
         }
 
@@ -783,7 +788,7 @@ namespace HVACCooledBeam {
                                                  CoolBeam(CBNum).MaxCoolWaterVolFlow);
                 } else {
                     ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
-                    ShowContinueError(state, "Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
+                    ShowContinueError(state, format("Occurs in{} Object={}", CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name));
                     ErrorsFound = true;
                 }
             }
@@ -866,7 +871,7 @@ namespace HVACCooledBeam {
                         state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Beam Length [m]", CoolBeam(CBNum).BeamLength);
                 } else {
                     ShowSevereError(state, "Autosizing of cooled beam length requires a cooling loop Sizing:Plant object");
-                    ShowContinueError(state, "Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
+                    ShowContinueError(state, format("Occurs in{} Object={}", CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name));
                     ErrorsFound = true;
                 }
             }
@@ -990,10 +995,10 @@ namespace HVACCooledBeam {
                     };
                     General::SolveRoot(state, ErrTolerance, 50, SolFlag, CWFlow, f, MinColdWaterFlow, MaxColdWaterFlow);
                     if (SolFlag == -1) {
-                        ShowWarningError(state, "Cold water control failed in cooled beam unit " + CoolBeam(CBNum).Name);
+                        ShowWarningError(state, format("Cold water control failed in cooled beam unit {}", CoolBeam(CBNum).Name));
                         ShowContinueError(state, "  Iteration limit exceeded in calculating cold water mass flow rate");
                     } else if (SolFlag == -2) {
-                        ShowWarningError(state, "Cold water control failed in cooled beam unit " + CoolBeam(CBNum).Name);
+                        ShowWarningError(state, format("Cold water control failed in cooled beam unit {}", CoolBeam(CBNum).Name));
                         ShowContinueError(state, "  Bad cold water flow limits");
                     }
                 } else {

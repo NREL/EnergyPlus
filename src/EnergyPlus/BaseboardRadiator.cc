@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,7 +126,7 @@ namespace BaseboardRadiator {
         if (CompIndex == 0) {
             int BaseboardNum = UtilityRoutines::FindItemInList(EquipName, state.dataBaseboardRadiator->baseboards, &BaseboardParams::EquipID);
             if (BaseboardNum == 0) {
-                ShowFatalError(state, "SimBaseboard: Unit not found=" + EquipName);
+                ShowFatalError(state, format("SimBaseboard: Unit not found={}", EquipName));
             }
             CompIndex = BaseboardNum;
         }
@@ -285,9 +285,13 @@ namespace BaseboardRadiator {
                     thisBaseboard.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                     if (thisBaseboard.SchedPtr == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                            " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                            '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                        format("{}{}: invalid {} entered ={} for {}={}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(2),
+                                               state.dataIPShortCut->cAlphaArgs(2),
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
                     }
                 }
@@ -325,7 +329,7 @@ namespace BaseboardRadiator {
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity < 0.0 && thisBaseboard.ScaledHeatingCapacity != AutoSize) {
-                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + thisBaseboard.EquipID);
+                            ShowSevereError(state, format("{} = {}", cCMO_BBRadiator_Water, thisBaseboard.EquipID));
                             ShowContinueError(state,
                                               format("Illegal {} = {:.7T}",
                                                      state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
@@ -333,12 +337,13 @@ namespace BaseboardRadiator {
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + thisBaseboard.EquipID);
+                        ShowSevereError(state, format("{} = {}", cCMO_BBRadiator_Water, thisBaseboard.EquipID));
                         ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
+                                          format("Input for {} = {}",
+                                                 state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                                 state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+                        ShowContinueError(
+                            state, format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
@@ -346,31 +351,36 @@ namespace BaseboardRadiator {
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity <= 0.0) {
-                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + thisBaseboard.EquipID);
+                            ShowSevereError(state, format("{} = {}", cCMO_BBRadiator_Water, thisBaseboard.EquipID));
                             ShowContinueError(state,
-                                              "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                                  state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                                              format("Input for {} = {}",
+                                                     state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                                     state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
                             ShowContinueError(state,
                                               format("Illegal {} = {:.7T}",
                                                      state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                      state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                             ErrorsFound = true;
                         } else if (thisBaseboard.ScaledHeatingCapacity == AutoSize) {
-                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + thisBaseboard.EquipID);
+                            ShowSevereError(state, format("{} = {}", cCMO_BBRadiator_Water, thisBaseboard.EquipID));
                             ShowContinueError(state,
-                                              "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                                  state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                                              format("Input for {} = {}",
+                                                     state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                                     state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
                             ShowContinueError(
-                                state, "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                                state,
+                                format("Illegal {} = Autosize", state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + thisBaseboard.EquipID);
+                        ShowSevereError(state, format("{} = {}", cCMO_BBRadiator_Water, thisBaseboard.EquipID));
                         ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                                          format("Input for {} = {}",
+                                                 state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                                 state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
                         ShowContinueError(
-                            state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                            state,
+                            format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
@@ -378,7 +388,7 @@ namespace BaseboardRadiator {
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity < 0.0) {
-                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + thisBaseboard.EquipID);
+                            ShowSevereError(state, format("{} = {}", cCMO_BBRadiator_Water, thisBaseboard.EquipID));
                             ShowContinueError(state,
                                               format("Illegal {} = {:.7T}",
                                                      state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
@@ -386,19 +396,22 @@ namespace BaseboardRadiator {
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + thisBaseboard.EquipID);
+                        ShowSevereError(state, format("{} = {}", cCMO_BBRadiator_Water, thisBaseboard.EquipID));
                         ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(
-                            state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                                          format("Input for {} = {}",
+                                                 state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                                 state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+                        ShowContinueError(state,
+                                          format("Blank field not allowed for {}",
+                                                 state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCMO_BBRadiator_Water + " = " + thisBaseboard.EquipID);
+                    ShowSevereError(state, format("{} = {}", cCMO_BBRadiator_Water, thisBaseboard.EquipID));
                     ShowContinueError(state,
-                                      "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                                      format("Illegal {} = {}",
+                                             state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                             state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
                     ErrorsFound = true;
                 }
 
@@ -415,7 +428,7 @@ namespace BaseboardRadiator {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.  Preceding condition(s) cause termination.");
+                ShowFatalError(state, format("{}Errors found in getting input.  Preceding condition(s) cause termination.", RoutineName));
             }
         }
 
@@ -738,9 +751,10 @@ namespace BaseboardRadiator {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowRateMaxDes - WaterVolFlowRateMaxUser) / WaterVolFlowRateMaxUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state,
-                                                "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" +
-                                                    this->EquipID + "\".");
+                                    ShowMessage(
+                                        state,
+                                        format("SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"{}\".",
+                                               this->EquipID));
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxUser));
                                     ShowContinueError(
@@ -852,8 +866,9 @@ namespace BaseboardRadiator {
                                 // if the numerical inversion failed, issue error messages.
                                 if (SolFla == -1) {
                                     ShowSevereError(state,
-                                                    "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" +
-                                                        this->EquipID + "\"");
+                                                    format("SizeBaseboard: Autosizing of HW baseboard UA failed for {}=\"{}\"",
+                                                           cCMO_BBRadiator_Water,
+                                                           this->EquipID));
                                     ShowContinueError(state, "Iteration limit exceeded in calculating coil UA");
                                     if (UAAutoSize) {
                                         ErrorsFound = true;
@@ -864,8 +879,9 @@ namespace BaseboardRadiator {
                                     }
                                 } else if (SolFla == -2) {
                                     ShowSevereError(state,
-                                                    "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" +
-                                                        this->EquipID + "\"");
+                                                    format("SizeBaseboard: Autosizing of HW baseboard UA failed for {}=\"{}\"",
+                                                           cCMO_BBRadiator_Water,
+                                                           this->EquipID));
                                     ShowContinueError(state, "Bad starting values for UA");
                                     if (UAAutoSize) {
                                         ErrorsFound = true;
@@ -880,10 +896,11 @@ namespace BaseboardRadiator {
                                 UADes = UA1;
                                 if (UAAutoSize) {
                                     ShowWarningError(state,
-                                                     "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" +
-                                                         this->EquipID + "\"");
+                                                     format("SizeBaseboard: Autosizing of HW baseboard UA failed for {}=\"{}\"",
+                                                            cCMO_BBRadiator_Water,
+                                                            this->EquipID));
                                     ShowContinueError(
-                                        state, "Design UA set equal to design coil load for " + cCMO_BBRadiator_Water + "=\"" + this->EquipID + "\"");
+                                        state, format("Design UA set equal to design coil load for {}=\"{}\"", cCMO_BBRadiator_Water, this->EquipID));
                                     ShowContinueError(state, format("Design coil load used during sizing = {:.5R} W.", DesCoilLoad));
                                     ShowContinueError(state, format("Inlet water temperature used during sizing = {:.5R} C.", this->WaterInletTemp));
                                 }
@@ -892,11 +909,12 @@ namespace BaseboardRadiator {
                             UADes = UA0;
                             if (UAAutoSize) {
                                 ShowWarningError(state,
-                                                 "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" +
-                                                     this->EquipID + "\"");
-                                ShowContinueError(state,
-                                                  "Design UA set equal to 0.001 * design coil load for " + cCMO_BBRadiator_Water + "=\"" +
-                                                      this->EquipID + "\"");
+                                                 format("SizeBaseboard: Autosizing of HW baseboard UA failed for {}=\"{}\"",
+                                                        cCMO_BBRadiator_Water,
+                                                        this->EquipID));
+                                ShowContinueError(
+                                    state,
+                                    format("Design UA set equal to 0.001 * design coil load for {}=\"{}\"", cCMO_BBRadiator_Water, this->EquipID));
                                 ShowContinueError(state, format("Design coil load used during sizing = {:.5R} W.", DesCoilLoad));
                                 ShowContinueError(state, format("Inlet water temperature used during sizing = {:.5R} C.", this->WaterInletTemp));
                             }
@@ -923,9 +941,10 @@ namespace BaseboardRadiator {
                             // Report difference between design size and hard-sized values
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(UADes - UAUser) / UAUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state,
-                                                "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" +
-                                                    this->EquipID + "\".");
+                                    ShowMessage(
+                                        state,
+                                        format("SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"{}\".",
+                                               this->EquipID));
                                     ShowContinueError(state, format("User-Specified U-Factor Times Area Value of {:.2R} [W/K]", UAUser));
                                     ShowContinueError(state, format("differs from Design Size U-Factor Times Area Value of {:.2R} [W/K]", UADes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -939,7 +958,7 @@ namespace BaseboardRadiator {
         } else {
             // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
             if (FlowAutoSize || UAAutoSize) {
-                ShowSevereError(state, "SizeBaseboard: " + cCMO_BBRadiator_Water + "=\"" + this->EquipID + "\"");
+                ShowSevereError(state, format("SizeBaseboard: {}=\"{}\"", cCMO_BBRadiator_Water, this->EquipID));
                 ShowContinueError(state, "...Autosizing of hot water baseboard requires a heating loop Sizing:Plant object");
                 ErrorsFound = true;
             }

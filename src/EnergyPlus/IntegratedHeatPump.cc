@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,8 +87,8 @@ void SimIHP(EnergyPlusData &state,
             Real64 const SensLoad,                                   // Sensible demand load [W]
             Real64 const LatentLoad,                                 // Latent demand load [W]
             bool const IsCallbyWH, // whether the call from the water heating loop or air loop, true = from water heating loop
-            [[maybe_unused]] bool const FirstHVACIteration, // TRUE if First iteration of simulation
-            Optional<Real64 const> OnOffAirFlowRat          // ratio of comp on to comp off air flow rate
+            [[maybe_unused]] bool const FirstHVACIteration,   // TRUE if First iteration of simulation
+            ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
 )
 {
 
@@ -1443,7 +1443,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirInletNodeNum != InNode) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirOutletNodeNum != OutNode)) {
-            ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + ihp.SCWHCoilName + "-wrong coil node names.");
+            ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCWHCoilName));
             ErrorsFound = true;
         }
         SetUpCompSets(state, CurrentModuleObject, ihp.Name + " Cooling Coil", ihp.SCWHCoilType, ihp.SCWHCoilName, InNodeName, OutNodeName);
@@ -1468,7 +1468,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).AirInletNodeNum != InNode) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).AirOutletNodeNum != OutNode)) {
-            ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + ihp.SCDWHCoolCoilName + "-wrong coil node names.");
+            ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCDWHCoolCoilName));
             ErrorsFound = true;
         }
         SetUpCompSets(state, CurrentModuleObject, ihp.Name + " Cooling Coil", ihp.SCDWHCoolCoilType, ihp.SCDWHCoolCoilName, InNodeName, OutNodeName);

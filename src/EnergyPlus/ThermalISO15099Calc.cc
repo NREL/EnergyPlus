@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2417,7 +2417,7 @@ void effectiveLayerCond(EnergyPlusData &state,
                         std::string &ErrorMessage                  // Error message
 )
 {
-    for (auto i = 1; i <= nlayer; ++i) {
+    for (int i = 1; i <= nlayer; ++i) {
         if (LayerType(i) != TARCOGLayerType::SPECULAR) {
             auto tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
             auto nmix1 = nmix(i);

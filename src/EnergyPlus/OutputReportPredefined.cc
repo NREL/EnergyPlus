@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1305,8 +1305,11 @@ namespace OutputReportPredefined {
         s->pdchIllumOccupiedHourBright = newPreDefColumn(state, s->pdstIllumOccupiedHours, "Bright (>500 lux) [hr]");
     }
 
-    void PreDefTableEntry(
-        EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
+    void PreDefTableEntry(EnergyPlusData &state,
+                          int const columnIndex,
+                          std::string_view objName,
+                          Real64 const tableEntryReal,
+                          ObjexxFCL::Optional_int_const numSigDigits)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

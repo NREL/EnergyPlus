@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -103,8 +103,8 @@ namespace ICEngineElectricGenerator {
         }
         // If we didn't find it, fatal
         ShowFatalError(state,
-                       "LocalICEngineGeneratorFactory: Error getting inputs for internal combustion engine generator named: " +
-                           objectName); // LCOV_EXCL_LINE
+                       format("LocalICEngineGeneratorFactory: Error getting inputs for internal combustion engine generator named: {}",
+                              objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -134,7 +134,7 @@ namespace ICEngineElectricGenerator {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataICEngElectGen->NumICEngineGenerators <= 0) {
-            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -162,7 +162,7 @@ namespace ICEngineElectricGenerator {
             state.dataICEngElectGen->ICEngineGenerator(genNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
                 ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
@@ -186,45 +186,46 @@ namespace ICEngineElectricGenerator {
             state.dataICEngElectGen->ICEngineGenerator(genNum).ElecOutputFuelCurve =
                 Curve::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
             if (state.dataICEngElectGen->ICEngineGenerator(genNum).ElecOutputFuelCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + AlphArray(3));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(3), AlphArray(3)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).RecJacHeattoFuelCurve =
                 Curve::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
             if (state.dataICEngElectGen->ICEngineGenerator(genNum).RecJacHeattoFuelCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + AlphArray(4));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).RecLubeHeattoFuelCurve =
                 Curve::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
             if (state.dataICEngElectGen->ICEngineGenerator(genNum).RecLubeHeattoFuelCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + AlphArray(5));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).TotExhausttoFuelCurve =
                 Curve::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             if (state.dataICEngElectGen->ICEngineGenerator(genNum).TotExhausttoFuelCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).ExhaustTempCurve =
                 Curve::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
             if (state.dataICEngElectGen->ICEngineGenerator(genNum).ExhaustTempCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             } else {
                 Real64 xValue = Curve::CurveValue(state, state.dataICEngElectGen->ICEngineGenerator(genNum).ExhaustTempCurve, 1.0);
                 if (xValue < ReferenceTemp) {
-                    ShowSevereError(state, "GetICEngineGeneratorInput: " + state.dataIPShortCut->cAlphaFieldNames(7) + " output has very low value.");
+                    ShowSevereError(state,
+                                    format("GetICEngineGeneratorInput: {} output has very low value.", state.dataIPShortCut->cAlphaFieldNames(7)));
                     ShowContinueError(state, format("...curve generates [{:.3R} C] at PLR=1.0", xValue));
                     ShowContinueError(state,
                                       format("...this is less than the Reference Temperature [{:.2R} C] and may cause errors.", ReferenceTemp));
@@ -251,8 +252,8 @@ namespace ICEngineElectricGenerator {
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
+                    ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
                 state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum =
@@ -266,8 +267,8 @@ namespace ICEngineElectricGenerator {
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), AlphArray(9)));
+                    ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
                 BranchNodeConnections::TestCompSet(
@@ -281,8 +282,9 @@ namespace ICEngineElectricGenerator {
                 state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum = 0;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(8) || !state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                     ShowWarningError(state,
-                                     "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + state.dataIPShortCut->cCurrentModuleObject +
-                                         '=' + AlphArray(1));
+                                     format("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for {}={}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            AlphArray(1)));
                     ShowContinueError(state, "However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
             }
@@ -291,8 +293,8 @@ namespace ICEngineElectricGenerator {
             bool FuelTypeError(false);
             UtilityRoutines::ValidateFuelType(state, AlphArray(10), state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
                 FuelTypeError = false;
             }
@@ -301,7 +303,7 @@ namespace ICEngineElectricGenerator {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
         }
     }
 
@@ -658,7 +660,7 @@ namespace ICEngineElectricGenerator {
             } else {
                 if (this->ErrExhaustTempIndex == 0) {
                     ShowWarningMessage(
-                        state, "CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name + "\" low Exhaust Temperature from Curve Value");
+                        state, format("CalcICEngineGeneratorModel: {}=\"{}\" low Exhaust Temperature from Curve Value", this->TypeOf, this->Name));
                     ShowContinueError(state, format("...curve generated temperature=[{:.3R} C], PLR=[{:.3R}].", exhaustTemp, PLR));
                     ShowContinueError(state, "...simulation will continue with exhaust heat reclaim set to 0.");
                 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,8 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+
+#include <ObjexxFCL/Optional.hh>
 
 namespace EnergyPlus {
 
@@ -190,8 +192,8 @@ private:
                       std::vector<int> validDims,
                       std::string_view const routineName,
                       const std::string &fieldName,
-                      Real64 Var1,                      // required 1st independent variable
-                      Optional<Real64 const> Var2 = _); // 2nd independent variable
+                      Real64 Var1,                                 // required 1st independent variable
+                      ObjexxFCL::Optional<Real64 const> Var2 = _); // 2nd independent variable
 };
 } // namespace EnergyPlus
 

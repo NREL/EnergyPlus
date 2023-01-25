@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,7 +155,7 @@ namespace BranchInputManager {
         //  Find this BranchList in the master BranchList Names
         Found = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
         if (Found == 0) {
-            ShowFatalError(state, "GetBranchList: BranchList Name not found=" + BranchListName);
+            ShowFatalError(state, format("GetBranchList: BranchList Name not found={}", BranchListName));
         }
 
         // Set data
@@ -165,9 +165,10 @@ namespace BranchInputManager {
         } else if (state.dataBranchInputManager->BranchList(Found).LoopName != LoopName) {
             ShowSevereError(state, "GetBranchList: BranchList Loop Name already assigned");
             ShowContinueError(state,
-                              "BranchList=" + state.dataBranchInputManager->BranchList(Found).Name +
-                                  ", already assigned to loop=" + state.dataBranchInputManager->BranchList(Found).LoopName);
-            ShowContinueError(state, "Now requesting assignment to Loop=" + LoopName);
+                              format("BranchList={}, already assigned to loop={}",
+                                     state.dataBranchInputManager->BranchList(Found).Name,
+                                     state.dataBranchInputManager->BranchList(Found).LoopName));
+            ShowContinueError(state, format("Now requesting assignment to Loop={}", LoopName));
             ErrFound = true;
         }
 
@@ -175,7 +176,7 @@ namespace BranchInputManager {
         NumBranchNames = state.dataBranchInputManager->BranchList(Found).NumOfBranchNames;
         if (isize(BranchNames) < NumBranchNames) {
             ShowSevereError(state, "GetBranchList: Branch Names array not big enough to hold Branch Names");
-            ShowContinueError(state, "Input BranchListName=" + BranchListName + ", in Loop=" + LoopName);
+            ShowContinueError(state, format("Input BranchListName={}, in Loop={}", BranchListName, LoopName));
             ShowContinueError(state, fmt::format("BranchName Array size={}, but input size={}", size(BranchNames), (NumBranchNames)));
             ErrFound = true;
         } else {
@@ -215,7 +216,7 @@ namespace BranchInputManager {
         //  Find this BranchList in the master BranchList Names
         Found = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
         if (Found == 0) {
-            ShowFatalError(state, "NumBranchesInBranchList: BranchList Name not found=" + BranchListName);
+            ShowFatalError(state, format("NumBranchesInBranchList: BranchList Name not found={}", BranchListName));
         }
 
         NumBranchesInBranchList = state.dataBranchInputManager->BranchList(Found).NumOfBranchNames;
@@ -266,7 +267,7 @@ namespace BranchInputManager {
             size(CompType), size(CompName), size(CompInletNodeNames), size(CompInletNodeNums), size(CompOutletNodeNames), size(CompOutletNodeNums));
         if (MinCompsAllowed < NumComps) {
             ShowSevereError(state, "GetBranchData: Component List arrays not big enough to hold Number of Components");
-            ShowContinueError(state, "Input BranchName=" + BranchName + ", in Loop=" + LoopName);
+            ShowContinueError(state, format("Input BranchName={}, in Loop={}", BranchName, LoopName));
             ShowContinueError(state, fmt::format("Max Component Array size={}, but input size={}", MinCompsAllowed, NumComps));
             ShowFatalError(state, "Program terminates due to preceding conditions.");
         }
@@ -308,7 +309,7 @@ namespace BranchInputManager {
 
         Found = UtilityRoutines::FindItemInList(BranchName, state.dataBranchInputManager->Branch);
         if (Found == 0) {
-            ShowSevereError(state, "NumCompsInBranch:  Branch not found=" + BranchName);
+            ShowSevereError(state, format("NumCompsInBranch:  Branch not found={}", BranchName));
             NumCompsInBranch = 0;
         } else {
             NumCompsInBranch = state.dataBranchInputManager->Branch(Found).NumOfComponents;
@@ -346,7 +347,7 @@ namespace BranchInputManager {
         NumBranches = size(state.dataBranchInputManager->Branch);
 
         if (NumBranches == 0) {
-            ShowSevereError(state, "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + std::string{CompName} + "\"");
+            ShowSevereError(state, format("GetAirBranchIndex:  Branch not found with component = {} \"{}\"", CompType, CompName));
         } else {
             for (BranchNum = 1; BranchNum <= NumBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= state.dataBranchInputManager->Branch(BranchNum).NumOfComponents; ++CompNum) {
@@ -453,7 +454,7 @@ namespace BranchInputManager {
 
         Found = UtilityRoutines::FindItemInList(BranchName, state.dataBranchInputManager->Branch);
         if (Found == 0) {
-            ShowSevereError(state, "GetInternalBranchData:  Branch not found=" + BranchName);
+            ShowSevereError(state, format("GetInternalBranchData:  Branch not found={}", BranchName));
             ErrorsFound = true;
             NumComps = 0;
         } else {
@@ -464,9 +465,9 @@ namespace BranchInputManager {
                 NumComps = state.dataBranchInputManager->Branch(Found).NumOfComponents;
                 BComponents({1, NumComps}) = state.dataBranchInputManager->Branch(Found).Component({1, NumComps});
             } else if (state.dataBranchInputManager->Branch(Found).AssignedLoopName != LoopName) {
-                ShowSevereError(state, "Attempt to assign branch to two different loops, Branch=" + BranchName);
-                ShowContinueError(state, "Branch already assigned to loop=" + state.dataBranchInputManager->Branch(Found).AssignedLoopName);
-                ShowContinueError(state, "New attempt to assign to loop=" + LoopName);
+                ShowSevereError(state, format("Attempt to assign branch to two different loops, Branch={}", BranchName));
+                ShowContinueError(state, format("Branch already assigned to loop={}", state.dataBranchInputManager->Branch(Found).AssignedLoopName));
+                ShowContinueError(state, format("New attempt to assign to loop={}", LoopName));
                 ErrorsFound = true;
                 NumComps = 0;
             } else {
@@ -513,15 +514,15 @@ namespace BranchInputManager {
             numSplitters = state.dataBranchInputManager->ConnectorLists(ConnNum).NumOfSplitters;
             numMixers = state.dataBranchInputManager->ConnectorLists(ConnNum).NumOfMixers;
         } else {
-            ShowSevereError(state, "Ref: Loop=" + LoopName + ", Connector List not found=" + ConnectorListName);
+            ShowSevereError(state, format("Ref: Loop={}, Connector List not found={}", LoopName, ConnectorListName));
             ErrorsFound = true;
         }
     }
 
     void GetConnectorList(EnergyPlusData &state,
-                          std::string const &ConnectorListName, // Requested Connector List
-                          ConnectorData &Connectoid,            // Returned Connector Data
-                          Optional_int_const NumInList          // Number of the current connector in the list of connectors
+                          std::string const &ConnectorListName,   // Requested Connector List
+                          ConnectorData &Connectoid,              // Returned Connector Data
+                          ObjexxFCL::Optional_int_const NumInList // Number of the current connector in the list of connectors
     )
     {
 
@@ -562,7 +563,7 @@ namespace BranchInputManager {
         if (not_blank(ConnectorListName)) {
             Count = UtilityRoutines::FindItemInList(ConnectorListName, state.dataBranchInputManager->ConnectorLists);
             if (Count == 0) {
-                ShowFatalError(state, "GetConnectorList: Connector List not found=" + ConnectorListName);
+                ShowFatalError(state, format("GetConnectorList: Connector List not found={}", ConnectorListName));
             }
             Connectoid = state.dataBranchInputManager->ConnectorLists(Count);
             if (present(NumInList)) {
@@ -592,8 +593,8 @@ namespace BranchInputManager {
                       Array1D_string &InletNodeNames,       // Inlet Node IDs
                       Array1D_int &InletNodeNums,           // Inlet Node Numbers
                       bool &ErrorsFound,
-                      Optional_int_const ConnectorNumber, // number of the current item in connector list
-                      Optional_int MixerNumber            // Mixer number for this specific splitter
+                      ObjexxFCL::Optional_int_const ConnectorNumber, // number of the current item in connector list
+                      ObjexxFCL::Optional_int MixerNumber            // Mixer number for this specific splitter
     )
     {
 
@@ -634,12 +635,12 @@ namespace BranchInputManager {
             Count = UtilityRoutines::FindItemInList(Connectoid.ConnectorName(1), state.dataBranchInputManager->Mixers);
             if (present(MixerNumber)) ++MixerNumber;
             if (Count == 0) {
-                ShowFatalError(state, "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName(1));
+                ShowFatalError(state, format("GetLoopMixer: No Mixer Found={}", Connectoid.ConnectorName(1)));
             }
         } else if (UtilityRoutines::SameString(Connectoid.ConnectorType(2), cMIXER)) {
             Count = UtilityRoutines::FindItemInList(Connectoid.ConnectorName(2), state.dataBranchInputManager->Mixers);
             if (Count == 0) {
-                ShowFatalError(state, "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName(2));
+                ShowFatalError(state, format("GetLoopMixer: No Mixer Found={}", Connectoid.ConnectorName(2)));
             }
         } else {
             Count = 0;
@@ -675,7 +676,7 @@ namespace BranchInputManager {
                                   BComponents,
                                   errFlag);
             if (errFlag) {
-                ShowContinueError(state, "..occurs for Connector:Mixer Name=" + state.dataBranchInputManager->Mixers(Count).Name);
+                ShowContinueError(state, format("..occurs for Connector:Mixer Name={}", state.dataBranchInputManager->Mixers(Count).Name));
                 ErrorsFound = true;
             }
             if (NumComps > 0) {
@@ -695,7 +696,7 @@ namespace BranchInputManager {
                                        errFlag);
 
                 if (NumInletNodes > isize(InletNodeNames) || NumInletNodes > isize(InletNodeNums)) {
-                    ShowSevereError(state, "GetLoopMixer: Connector:Mixer=" + MixerName + " contains too many inlets for size of Inlet Array.");
+                    ShowSevereError(state, format("GetLoopMixer: Connector:Mixer={} contains too many inlets for size of Inlet Array.", MixerName));
                     ShowContinueError(state, fmt::format("Max array size={}, Mixer statement inlets={}", size(InletNodeNames), NumInletNodes));
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
@@ -746,8 +747,8 @@ namespace BranchInputManager {
                          Array1D_string &OutletNodeNames,      // Outlet Node IDs
                          Array1D_int &OutletNodeNums,          // Outlet Node Numbers
                          bool &ErrorsFound,
-                         Optional_int_const ConnectorNumber, // number of the current item in connector list
-                         Optional_int SplitterNumber         // splitter number for this specific splitter
+                         ObjexxFCL::Optional_int_const ConnectorNumber, // number of the current item in connector list
+                         ObjexxFCL::Optional_int SplitterNumber         // splitter number for this specific splitter
     )
     {
 
@@ -784,7 +785,7 @@ namespace BranchInputManager {
         }
 
         if (ConnectorListName.empty()) {
-            ShowSevereError(state, "GetLoopSplitter: ConnectorListName is blank.  LoopName=" + LoopName);
+            ShowSevereError(state, format("GetLoopSplitter: ConnectorListName is blank.  LoopName={}", LoopName));
             ShowFatalError(state, "Program terminates due to previous condition.");
         }
         GetConnectorList(state, ConnectorListName, Connectoid, ConnectorNumber);
@@ -792,12 +793,12 @@ namespace BranchInputManager {
             Count = UtilityRoutines::FindItemInList(Connectoid.ConnectorName(1), state.dataBranchInputManager->Splitters);
             if (present(SplitterNumber)) ++SplitterNumber;
             if (Count == 0) {
-                ShowFatalError(state, "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName(1));
+                ShowFatalError(state, format("GetLoopSplitter: No Splitter Found={}", Connectoid.ConnectorName(1)));
             }
         } else if (UtilityRoutines::SameString(Connectoid.ConnectorType(2), cSPLITTER)) {
             Count = UtilityRoutines::FindItemInList(Connectoid.ConnectorName(2), state.dataBranchInputManager->Splitters);
             if (Count == 0) {
-                ShowFatalError(state, "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName(2));
+                ShowFatalError(state, format("GetLoopSplitter: No Splitter Found={}", Connectoid.ConnectorName(2)));
             }
         } else {
             Count = 0;
@@ -833,7 +834,7 @@ namespace BranchInputManager {
                                   BComponents,
                                   errFlag);
             if (errFlag) {
-                ShowContinueError(state, "..occurs for Splitter Name=" + state.dataBranchInputManager->Splitters(Count).Name);
+                ShowContinueError(state, format("..occurs for Splitter Name={}", state.dataBranchInputManager->Splitters(Count).Name));
                 ErrorsFound = true;
             }
             if (NumComps > 0) {
@@ -853,8 +854,8 @@ namespace BranchInputManager {
                                        errFlag);
 
                 if (NumOutletNodes > isize(OutletNodeNames) || NumOutletNodes > isize(OutletNodeNums)) {
-                    ShowSevereError(state,
-                                    "GetLoopSplitter: Connector:Splitter=" + SplitterName + " contains too many outlets for size of Outlet Array.");
+                    ShowSevereError(
+                        state, format("GetLoopSplitter: Connector:Splitter={} contains too many outlets for size of Outlet Array.", SplitterName));
                     ShowContinueError(state, fmt::format("Max array size={}, Splitter statement outlets={}", size(OutletNodeNames), NumOutletNodes));
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
@@ -921,15 +922,16 @@ namespace BranchInputManager {
 
         Found1 = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
         if (Found1 == 0) {
-            ShowSevereError(state, "GetFirstBranchInletNodeName: BranchList=\"" + BranchListName + "\", not a valid BranchList Name");
+            ShowSevereError(state, format("GetFirstBranchInletNodeName: BranchList=\"{}\", not a valid BranchList Name", BranchListName));
             InletNodeName = "Invalid Node Name";
         } else {
             Found2 = UtilityRoutines::FindItemInList(state.dataBranchInputManager->BranchList(Found1).BranchNames(1),
                                                      state.dataBranchInputManager->Branch);
             if (Found2 == 0) {
                 ShowSevereError(state,
-                                "GetFirstBranchInletNodeName: BranchList=\"" + BranchListName + "\", Branch=\"" +
-                                    state.dataBranchInputManager->BranchList(Found1).BranchNames(1) + "\" not a valid Branch Name");
+                                format("GetFirstBranchInletNodeName: BranchList=\"{}\", Branch=\"{}\" not a valid Branch Name",
+                                       BranchListName,
+                                       state.dataBranchInputManager->BranchList(Found1).BranchNames(1)));
                 InletNodeName = "Invalid Node Name";
             } else {
                 InletNodeName = state.dataBranchInputManager->Branch(Found2).Component(1).InletNodeName;
@@ -966,7 +968,7 @@ namespace BranchInputManager {
 
         Found1 = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
         if (Found1 == 0) {
-            ShowSevereError(state, "GetLastBranchOutletNodeName: BranchList=\"" + BranchListName + "\", not a valid BranchList Name");
+            ShowSevereError(state, format("GetLastBranchOutletNodeName: BranchList=\"{}\", not a valid BranchList Name", BranchListName));
             OutletNodeName = "Invalid Node Name";
         } else {
             Found2 = UtilityRoutines::FindItemInList(
@@ -974,10 +976,10 @@ namespace BranchInputManager {
                 state.dataBranchInputManager->Branch);
             if (Found2 == 0) {
                 ShowSevereError(state,
-                                "GetLastBranchOutletNodeName: BranchList=\"" + BranchListName + "\", Branch=\"" +
-                                    state.dataBranchInputManager->BranchList(Found1).BranchNames(
-                                        state.dataBranchInputManager->BranchList(Found1).NumOfBranchNames) +
-                                    "\" not a valid Branch Name");
+                                format("GetLastBranchOutletNodeName: BranchList=\"{}\", Branch=\"{}\" not a valid Branch Name",
+                                       BranchListName,
+                                       state.dataBranchInputManager->BranchList(Found1).BranchNames(
+                                           state.dataBranchInputManager->BranchList(Found1).NumOfBranchNames)));
                 OutletNodeName = "Invalid Node Name";
             } else {
                 OutletNodeName = state.dataBranchInputManager->Branch(Found2)
@@ -1092,9 +1094,9 @@ namespace BranchInputManager {
                 lAlphaBlanks.deallocate();
                 lNumericBlanks.deallocate();
                 if (ErrFound) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + " Invalid " + CurrentModuleObject +
-                                        " Input, preceding condition(s) will likely cause termination.");
+                    ShowSevereError(
+                        state,
+                        format("{} Invalid {} Input, preceding condition(s) will likely cause termination.", RoutineName, CurrentModuleObject));
                     state.dataBranchInputManager->InvalidBranchDefinitions = true;
                 }
                 TestInletOutletNodes(state);
@@ -1130,8 +1132,8 @@ namespace BranchInputManager {
         state.dataBranchInputManager->Branch(BCount).Name = Alphas(1);
         GetPressureCurveTypeAndIndex(state, Alphas(2), pressureCurveType, PressureCurveIndex);
         if (pressureCurveType == DataBranchAirLoopPlant::PressureCurveType::Invalid) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
-            ShowContinueError(state, "..Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
+            ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, Alphas(1)));
+            ShowContinueError(state, format("..Invalid {}=\"{}\".", cAlphaFields(2), Alphas(2)));
             ShowContinueError(state, "This curve could not be found in the input deck.  Ensure that this curve has been entered");
             ShowContinueError(state, " as either a Curve:Functional:PressureDrop or one of Curve:{Linear,Quadratic,Cubic,Exponent}");
             ShowContinueError(state, "This error could be caused by a misspelled curve name");
@@ -1147,22 +1149,22 @@ namespace BranchInputManager {
         Comp = 1;
         for (int Loop = 3; Loop <= NumAlphas; Loop += 4) {
             if (UtilityRoutines::SameString(Alphas(Loop), cSPLITTER) || UtilityRoutines::SameString(Alphas(Loop), cMIXER)) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
-                ShowContinueError(state, "Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject);
+                ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, Alphas(1)));
+                ShowContinueError(state, format("Connector:Splitter/Connector:Mixer not allowed in object {}", CurrentModuleObject));
                 ErrFound = true;
                 continue;
             }
             if (Comp > NumInComps) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, fmt::format("...Number of Arguments indicate [{}], but count of fields indicates [{}]", NumInComps, Comp));
-                ShowContinueError(state, "...examine " + CurrentModuleObject + " carefully.");
+                ShowContinueError(state, format("...examine {} carefully.", CurrentModuleObject));
                 continue;
             }
             state.dataBranchInputManager->Branch(BCount).Component(Comp).CType = Alphas(Loop);
             state.dataBranchInputManager->Branch(BCount).Component(Comp).Name = Alphas(Loop + 1);
             ValidateComponent(state, Alphas(Loop), Alphas(Loop + 1), IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
-                ShowContinueError(state, "Occurs on " + CurrentModuleObject + '=' + Alphas(1));
+                ShowContinueError(state, format("Occurs on {}={}", CurrentModuleObject, Alphas(1)));
                 ErrFound = true;
             }
             state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName = Alphas(Loop + 2);
@@ -1187,24 +1189,22 @@ namespace BranchInputManager {
                             false,
                             cAlphaFields(Loop + 2));
                 if (NumNodes > 1) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, Alphas(1)));
                     ShowContinueError(state,
-                                      "..invalid " + cAlphaFields(Loop + 2) + "=\"" +
-                                          state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName +
-                                          "\" must be a single node - appears to be a list.");
-                    ShowContinueError(state,
-                                      "Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
-                                          Alphas(Loop + 1) + "\".");
+                                      format("..invalid {}=\"{}\" must be a single node - appears to be a list.",
+                                             cAlphaFields(Loop + 2),
+                                             state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName));
+                    ShowContinueError(
+                        state, format("Occurs on {}=\"{}\", {}=\"{}\".", cAlphaFields(Loop), Alphas(Loop), cAlphaFields(Loop + 1), Alphas(Loop + 1)));
                     ErrFound = true;
                 } else {
                     state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNode = NodeNums(1);
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
-                ShowContinueError(state, "blank required field: " + cAlphaFields(Loop + 2));
-                ShowContinueError(state,
-                                  "Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
-                                      Alphas(Loop + 1) + "\".");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, Alphas(1)));
+                ShowContinueError(state, format("blank required field: {}", cAlphaFields(Loop + 2)));
+                ShowContinueError(
+                    state, format("Occurs on {}=\"{}\", {}=\"{}\".", cAlphaFields(Loop), Alphas(Loop), cAlphaFields(Loop + 1), Alphas(Loop + 1)));
                 ErrFound = true;
             }
             state.dataBranchInputManager->Branch(BCount).Component(Comp).OutletNodeName = Alphas(Loop + 3);
@@ -1229,24 +1229,22 @@ namespace BranchInputManager {
                             false,
                             cAlphaFields(Loop + 3));
                 if (NumNodes > 1) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, Alphas(1)));
                     ShowContinueError(state,
-                                      "..invalid " + cAlphaFields(Loop + 2) + "=\"" +
-                                          state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName +
-                                          "\" must be a single node - appears to be a list.");
-                    ShowContinueError(state,
-                                      "Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
-                                          Alphas(Loop + 1) + "\".");
+                                      format("..invalid {}=\"{}\" must be a single node - appears to be a list.",
+                                             cAlphaFields(Loop + 2),
+                                             state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName));
+                    ShowContinueError(
+                        state, format("Occurs on {}=\"{}\", {}=\"{}\".", cAlphaFields(Loop), Alphas(Loop), cAlphaFields(Loop + 1), Alphas(Loop + 1)));
                     ErrFound = true;
                 } else {
                     state.dataBranchInputManager->Branch(BCount).Component(Comp).OutletNode = NodeNums(1);
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
-                ShowContinueError(state, "blank required field: " + cAlphaFields(Loop + 3));
-                ShowContinueError(state,
-                                  "Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
-                                      Alphas(Loop + 1) + "\".");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, Alphas(1)));
+                ShowContinueError(state, format("blank required field: {}", cAlphaFields(Loop + 3)));
+                ShowContinueError(
+                    state, format("Occurs on {}=\"{}\", {}=\"{}\".", cAlphaFields(Loop), Alphas(Loop), cAlphaFields(Loop + 1), Alphas(Loop + 1)));
                 ErrFound = true;
             }
 
@@ -1331,8 +1329,9 @@ namespace BranchInputManager {
 
         if (NumNumbers > 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject +
-                                " Object definition contains numbers, cannot be decoded by GetBranchListInput routine.");
+                            format("{}{} Object definition contains numbers, cannot be decoded by GetBranchListInput routine.",
+                                   RoutineName,
+                                   CurrentModuleObject));
             ErrFound = true;
         }
         BCount = 0;
@@ -1358,8 +1357,10 @@ namespace BranchInputManager {
             state.dataBranchInputManager->BranchList(BCount).BranchNames.allocate(NumAlphas - 1);
             if (state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
-                                    "\", No branch names entered.");
+                                format("{}{}=\"{}\", No branch names entered.",
+                                       RoutineName,
+                                       CurrentModuleObject,
+                                       state.dataBranchInputManager->BranchList(BCount).Name));
                 ErrFound = true;
             } else {
                 state.dataBranchInputManager->BranchList(BCount).BranchNames({1, NumAlphas - 1}) = Alphas({2, NumAlphas});
@@ -1373,11 +1374,13 @@ namespace BranchInputManager {
                                                                 state.dataBranchInputManager->Branch);
                         if (Found == 0) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                                state.dataBranchInputManager->BranchList(BCount).Name + "\", invalid data.");
+                                            format("{}{}=\"{}\", invalid data.",
+                                                   RoutineName,
+                                                   CurrentModuleObject,
+                                                   state.dataBranchInputManager->BranchList(BCount).Name));
                             ShowContinueError(state,
-                                              "..invalid Branch Name not found=\"" +
-                                                  state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop) + "\".");
+                                              format("..invalid Branch Name not found=\"{}\".",
+                                                     state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop)));
                             ErrFound = true;
                         }
                     }
@@ -1391,18 +1394,18 @@ namespace BranchInputManager {
             TestName = state.dataBranchInputManager->BranchList(Count).BranchNames(1);
             for (Loop = 2; Loop <= state.dataBranchInputManager->BranchList(Count).NumOfBranchNames; ++Loop) {
                 if (TestName != state.dataBranchInputManager->BranchList(Count).BranchNames(Loop)) continue;
-                ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
-                                    "\", invalid data.");
+                ShowSevereError(
+                    state,
+                    format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, state.dataBranchInputManager->BranchList(BCount).Name));
                 ShowContinueError(state, "..invalid: duplicate branch name specified in the list.");
-                ShowContinueError(state, "..Branch Name=" + TestName);
+                ShowContinueError(state, format("..Branch Name={}", TestName));
                 ShowContinueError(state, fmt::format("..Branch Name #{} is duplicate.", Loop));
                 ErrFound = true;
             }
         }
 
         if (ErrFound) {
-            ShowSevereError(state, std::string{RoutineName} + " Invalid Input -- preceding condition(s) will likely cause termination.");
+            ShowSevereError(state, format("{} Invalid Input -- preceding condition(s) will likely cause termination.", RoutineName));
         }
         NumOfBranchLists = BCount;
         Alphas.deallocate();
@@ -1499,8 +1502,9 @@ namespace BranchInputManager {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         if (NumAlphas != 5 || NumNumbers != 0) {
             ShowWarningError(state,
-                             "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject +
-                                 " object. Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)");
+                             format("GetConnectorList: Illegal \"extension\" to {} object. Internal code does not support > 2 connectors "
+                                    "(Connector:Splitter and Connector:Mixer)",
+                                    CurrentModuleObject));
         }
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
@@ -1544,9 +1548,9 @@ namespace BranchInputManager {
                     state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(CCount) = Alphas(Arg).substr(0, 30);
                     ++state.dataBranchInputManager->ConnectorLists(Count).NumOfMixers;
                 } else {
-                    ShowWarningError(state,
-                                     "GetConnectorListInput: Invalid " + cAlphaFields(Arg) + '=' + Alphas(Arg) + " in " + CurrentModuleObject + '=' +
-                                         Alphas(1));
+                    ShowWarningError(
+                        state,
+                        format("GetConnectorListInput: Invalid {}={} in {}={}", cAlphaFields(Arg), Alphas(Arg), CurrentModuleObject, Alphas(1)));
                 }
                 state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(CCount) = Alphas(Arg + 1);
             }
@@ -1583,10 +1587,11 @@ namespace BranchInputManager {
                                                                state.dataBranchInputManager->Splitters);
                     // Following code sets up branch names to be matched from Splitter/Mixer data structure
                     if (SplitNum == 0) {
-                        ShowSevereError(
-                            state,
-                            "Invalid Connector:Splitter(none)=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
-                                ", referenced by " + CurrentModuleObject + '=' + state.dataBranchInputManager->ConnectorLists(Count).Name);
+                        ShowSevereError(state,
+                                        format("Invalid Connector:Splitter(none)={}, referenced by {}={}",
+                                               state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
+                                               CurrentModuleObject,
+                                               state.dataBranchInputManager->ConnectorLists(Count).Name));
                         ErrorsFound = true;
                         continue;
                     }
@@ -1599,9 +1604,10 @@ namespace BranchInputManager {
                                                                state.dataBranchInputManager->Mixers);
                     if (MixerNum == 0) {
                         ShowSevereError(state,
-                                        "Invalid Connector:Mixer(none)=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
-                                            ", referenced by " + CurrentModuleObject + '=' +
-                                            state.dataBranchInputManager->ConnectorLists(Count).Name);
+                                        format("Invalid Connector:Mixer(none)={}, referenced by {}={}",
+                                               state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
+                                               CurrentModuleObject,
+                                               state.dataBranchInputManager->ConnectorLists(Count).Name));
                         ErrorsFound = true;
                         continue;
                     }
@@ -1669,10 +1675,11 @@ namespace BranchInputManager {
             for (Loop = 1; Loop <= state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors; ++Loop) {
                 if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop) != 0) continue;
                 //  = 0, not matched.
-                ShowSevereError(state, "For " + CurrentModuleObject + '=' + state.dataBranchInputManager->ConnectorLists(Count).Name);
+                ShowSevereError(state, format("For {}={}", CurrentModuleObject, state.dataBranchInputManager->ConnectorLists(Count).Name));
                 ShowContinueError(state,
-                                  "...Item=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop) +
-                                      ", Type=" + state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop) + " was not matched.");
+                                  format("...Item={}, Type={} was not matched.",
+                                         state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
+                                         state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop)));
                 if (UtilityRoutines::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop), "Connector:Splitter")) {
                     ShowContinueError(
                         state, "The BranchList for this Connector:Splitter does not match the BranchList for its corresponding Connector:Mixer.");
@@ -1797,9 +1804,10 @@ namespace BranchInputManager {
                 UtilityRoutines::FindItemInList(state.dataBranchInputManager->Splitters(Count).InletBranchName, state.dataBranchInputManager->Branch);
             if (Found == 0) {
                 ShowSevereError(state,
-                                "GetSplitterInput: Invalid Branch=" + state.dataBranchInputManager->Splitters(Count).InletBranchName +
-                                    ", referenced as Inlet Branch to " + CurrentModuleObject + '=' +
-                                    state.dataBranchInputManager->Splitters(Count).Name);
+                                format("GetSplitterInput: Invalid Branch={}, referenced as Inlet Branch to {}={}",
+                                       state.dataBranchInputManager->Splitters(Count).InletBranchName,
+                                       CurrentModuleObject,
+                                       state.dataBranchInputManager->Splitters(Count).Name));
                 ErrorsFound = true;
             }
             for (Loop = 1; Loop <= state.dataBranchInputManager->Splitters(Count).NumOutletBranches; ++Loop) {
@@ -1823,9 +1831,10 @@ namespace BranchInputManager {
             for (Loop = 1; Loop <= state.dataBranchInputManager->Splitters(Count).NumOutletBranches; ++Loop) {
                 if (TestName != state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop)) continue;
                 ShowSevereError(state,
-                                CurrentModuleObject + '=' + state.dataBranchInputManager->Splitters(Count).Name +
-                                    " specifies an outlet node name the same as the inlet node.");
-                ShowContinueError(state, "..Inlet Node=" + TestName);
+                                format("{}={} specifies an outlet node name the same as the inlet node.",
+                                       CurrentModuleObject,
+                                       state.dataBranchInputManager->Splitters(Count).Name));
+                ShowContinueError(state, format("..Inlet Node={}", TestName));
                 ShowContinueError(state, fmt::format("..Outlet Node #{} is duplicate.", Loop));
                 ErrorsFound = true;
             }
@@ -1835,8 +1844,9 @@ namespace BranchInputManager {
                         state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop1))
                         continue;
                     ShowSevereError(state,
-                                    CurrentModuleObject + '=' + state.dataBranchInputManager->Splitters(Count).Name +
-                                        " specifies duplicate outlet nodes in its outlet node list.");
+                                    format("{}={} specifies duplicate outlet nodes in its outlet node list.",
+                                           CurrentModuleObject,
+                                           state.dataBranchInputManager->Splitters(Count).Name));
                     ShowContinueError(
                         state,
                         fmt::format("..Outlet Node #{} Name={}", Loop, state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop)));
@@ -1847,7 +1857,7 @@ namespace BranchInputManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "GetSplitterInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates.");
+            ShowFatalError(state, format("GetSplitterInput: Fatal Errors Found in {}, program terminates.", CurrentModuleObject));
         }
 
         //  Everything supposed to be good.  Now make sure all branches in Splitter on same side of loop.
@@ -1873,17 +1883,19 @@ namespace BranchInputManager {
                     SaveSupplyDemandAir = FoundSupplyDemandAir;
                     SaveLoop = FoundLoop;
                 } else {
-                    ShowSevereError(state,
-                                    "GetSplitterInput: Inlet Splitter Branch=\"" + TestName + "\" and BranchList=\"" + BranchListName +
-                                        "\" not matched to a Air/Plant/Condenser Loop");
+                    ShowSevereError(
+                        state,
+                        format("GetSplitterInput: Inlet Splitter Branch=\"{}\" and BranchList=\"{}\" not matched to a Air/Plant/Condenser Loop",
+                               TestName,
+                               BranchListName));
                     ShowContinueError(state, "...and therefore, not a valid Loop Splitter.");
-                    ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Splitters(Count).Name);
+                    ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Splitters(Count).Name));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, "GetSplitterInput: Inlet Splitter Branch=\"" + TestName + "\" not on BranchList");
+                ShowSevereError(state, format("GetSplitterInput: Inlet Splitter Branch=\"{}\" not on BranchList", TestName));
                 ShowContinueError(state, "...and therefore, not a valid Loop Splitter.");
-                ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Splitters(Count).Name);
+                ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Splitters(Count).Name));
                 ErrorsFound = true;
             }
             for (Loop = 1; Loop <= state.dataBranchInputManager->Splitters(Count).NumOutletBranches; ++Loop) {
@@ -1904,33 +1916,35 @@ namespace BranchInputManager {
                     FindAirPlantCondenserLoopFromBranchList(state, BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
                     if (MatchedLoop) {
                         if (SaveSupplyDemandAir != FoundSupplyDemandAir || SaveLoop != FoundLoop) {
-                            ShowSevereError(state,
-                                            "GetSplitterInput: Outlet Splitter Branch=\"" + TestName + "\" does not match types of Inlet Branch.");
-                            ShowContinueError(state, "...Inlet Branch is on \"" + SaveLoop + "\" on \"" + SaveSupplyDemandAir + "\" side.");
-                            ShowContinueError(state, "...Outlet Branch is on \"" + FoundLoop + "\" on \"" + FoundSupplyDemandAir + "\" side.");
+                            ShowSevereError(
+                                state, format("GetSplitterInput: Outlet Splitter Branch=\"{}\" does not match types of Inlet Branch.", TestName));
+                            ShowContinueError(state, format("...Inlet Branch is on \"{}\" on \"{}\" side.", SaveLoop, SaveSupplyDemandAir));
+                            ShowContinueError(state, format("...Outlet Branch is on \"{}\" on \"{}\" side.", FoundLoop, FoundSupplyDemandAir));
                             ShowContinueError(state, "...All branches in Loop Splitter must be on same kind of loop and supply/demand side.");
-                            ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Splitters(Count).Name);
+                            ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Splitters(Count).Name));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state,
-                                        "GetSplitterInput: Outlet Splitter Branch=\"" + TestName + "\" and BranchList=\"" + BranchListName +
-                                            "\" not matched to a Air/Plant/Condenser Loop");
+                        ShowSevereError(
+                            state,
+                            format("GetSplitterInput: Outlet Splitter Branch=\"{}\" and BranchList=\"{}\" not matched to a Air/Plant/Condenser Loop",
+                                   TestName,
+                                   BranchListName));
                         ShowContinueError(state, "...and therefore, not a valid Loop Splitter.");
-                        ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Splitters(Count).Name);
+                        ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Splitters(Count).Name));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, "GetSplitterInput: Outlet Splitter Branch=\"" + TestName + "\" not on BranchList");
+                    ShowSevereError(state, format("GetSplitterInput: Outlet Splitter Branch=\"{}\" not on BranchList", TestName));
                     ShowContinueError(state, "...and therefore, not a valid Loop Splitter");
-                    ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Splitters(Count).Name);
+                    ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Splitters(Count).Name));
                     ErrorsFound = true;
                 }
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "GetSplitterInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates.");
+            ShowFatalError(state, format("GetSplitterInput: Fatal Errors Found in {}, program terminates.", CurrentModuleObject));
         }
     }
 
@@ -2043,9 +2057,10 @@ namespace BranchInputManager {
                 UtilityRoutines::FindItemInList(state.dataBranchInputManager->Mixers(Count).OutletBranchName, state.dataBranchInputManager->Branch);
             if (Found == 0) {
                 ShowSevereError(state,
-                                "GetMixerInput: Invalid Branch=" + state.dataBranchInputManager->Mixers(Count).OutletBranchName +
-                                    ", referenced as Outlet Branch in " + CurrentModuleObject + '=' +
-                                    state.dataBranchInputManager->Mixers(Count).Name);
+                                format("GetMixerInput: Invalid Branch={}, referenced as Outlet Branch in {}={}",
+                                       state.dataBranchInputManager->Mixers(Count).OutletBranchName,
+                                       CurrentModuleObject,
+                                       state.dataBranchInputManager->Mixers(Count).Name));
                 ErrorsFound = true;
             }
             for (Loop = 1; Loop <= state.dataBranchInputManager->Mixers(Count).NumInletBranches; ++Loop) {
@@ -2069,9 +2084,10 @@ namespace BranchInputManager {
             for (Loop = 1; Loop <= state.dataBranchInputManager->Mixers(Count).NumInletBranches; ++Loop) {
                 if (TestName != state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop)) continue;
                 ShowSevereError(state,
-                                CurrentModuleObject + '=' + state.dataBranchInputManager->Mixers(Count).Name +
-                                    " specifies an inlet node name the same as the outlet node.");
-                ShowContinueError(state, "..Outlet Node=" + TestName);
+                                format("{}={} specifies an inlet node name the same as the outlet node.",
+                                       CurrentModuleObject,
+                                       state.dataBranchInputManager->Mixers(Count).Name));
+                ShowContinueError(state, format("..Outlet Node={}", TestName));
                 ShowContinueError(state, format("..Inlet Node #{} is duplicate.", Loop));
                 ErrorsFound = true;
             }
@@ -2081,8 +2097,9 @@ namespace BranchInputManager {
                         state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop1))
                         continue;
                     ShowSevereError(state,
-                                    CurrentModuleObject + '=' + state.dataBranchInputManager->Mixers(Count).Name +
-                                        " specifies duplicate inlet nodes in its inlet node list.");
+                                    format("{}={} specifies duplicate inlet nodes in its inlet node list.",
+                                           CurrentModuleObject,
+                                           state.dataBranchInputManager->Mixers(Count).Name));
                     ShowContinueError(
                         state, fmt::format("..Inlet Node #{} Name={}", Loop, state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop)));
                     ShowContinueError(state, fmt::format("..Inlet Node #{} is duplicate.", Loop));
@@ -2092,7 +2109,7 @@ namespace BranchInputManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "GetMixerInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates.");
+            ShowFatalError(state, format("GetMixerInput: Fatal Errors Found in {}, program terminates.", CurrentModuleObject));
         }
 
         //  Everything supposed to be good.  Now make sure all branches in Splitter on same side of loop.
@@ -2118,17 +2135,19 @@ namespace BranchInputManager {
                     SaveSupplyDemandAir = FoundSupplyDemandAir;
                     SaveLoop = FoundLoop;
                 } else {
-                    ShowSevereError(state,
-                                    "GetMixerInput: Outlet Mixer Branch=\"" + TestName + "\" and BranchList=\"" + BranchListName +
-                                        "\" not matched to a Air/Plant/Condenser Loop");
+                    ShowSevereError(
+                        state,
+                        format("GetMixerInput: Outlet Mixer Branch=\"{}\" and BranchList=\"{}\" not matched to a Air/Plant/Condenser Loop",
+                               TestName,
+                               BranchListName));
                     ShowContinueError(state, "...and therefore, not a valid Loop Mixer.");
-                    ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Mixers(Count).Name);
+                    ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Mixers(Count).Name));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, "GetMixerInput: Outlet Mixer Branch=\"" + TestName + "\" not on BranchList");
+                ShowSevereError(state, format("GetMixerInput: Outlet Mixer Branch=\"{}\" not on BranchList", TestName));
                 ShowContinueError(state, "...and therefore, not a valid Loop Mixer.");
-                ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Mixers(Count).Name);
+                ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Mixers(Count).Name));
                 ErrorsFound = true;
             }
             for (Loop = 1; Loop <= state.dataBranchInputManager->Mixers(Count).NumInletBranches; ++Loop) {
@@ -2149,32 +2168,35 @@ namespace BranchInputManager {
                     FindAirPlantCondenserLoopFromBranchList(state, BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
                     if (MatchedLoop) {
                         if (SaveSupplyDemandAir != FoundSupplyDemandAir || SaveLoop != FoundLoop) {
-                            ShowSevereError(state, "GetMixerInput: Outlet Mixer Branch=\"" + TestName + "\" does not match types of Inlet Branch.");
-                            ShowContinueError(state, "...Outlet Branch is on \"" + SaveLoop + "\" on \"" + SaveSupplyDemandAir + "\" side.");
-                            ShowContinueError(state, "...Inlet Branch is on \"" + FoundLoop + "\" on \"" + FoundSupplyDemandAir + "\" side.");
+                            ShowSevereError(state,
+                                            format("GetMixerInput: Outlet Mixer Branch=\"{}\" does not match types of Inlet Branch.", TestName));
+                            ShowContinueError(state, format("...Outlet Branch is on \"{}\" on \"{}\" side.", SaveLoop, SaveSupplyDemandAir));
+                            ShowContinueError(state, format("...Inlet Branch is on \"{}\" on \"{}\" side.", FoundLoop, FoundSupplyDemandAir));
                             ShowContinueError(state, "...All branches in Loop Mixer must be on same kind of loop and supply/demand side.");
-                            ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Mixers(Count).Name);
+                            ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Mixers(Count).Name));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state,
-                                        "GetMixerInput: Inlet Mixer Branch=\"" + TestName + "\" and BranchList=\"" + BranchListName +
-                                            "\" not matched to a Air/Plant/Condenser Loop");
+                        ShowSevereError(
+                            state,
+                            format("GetMixerInput: Inlet Mixer Branch=\"{}\" and BranchList=\"{}\" not matched to a Air/Plant/Condenser Loop",
+                                   TestName,
+                                   BranchListName));
                         ShowContinueError(state, "...and therefore, not a valid Loop Mixer.");
-                        ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Mixers(Count).Name);
+                        ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Mixers(Count).Name));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, "GetMixerInput: Inlet Mixer Branch=\"" + TestName + "\" not on BranchList");
+                    ShowSevereError(state, format("GetMixerInput: Inlet Mixer Branch=\"{}\" not on BranchList", TestName));
                     ShowContinueError(state, "...and therefore, not a valid Loop Mixer");
-                    ShowContinueError(state, "..." + CurrentModuleObject + '=' + state.dataBranchInputManager->Mixers(Count).Name);
+                    ShowContinueError(state, format("...{}={}", CurrentModuleObject, state.dataBranchInputManager->Mixers(Count).Name));
                     ErrorsFound = true;
                 }
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "GetMixerInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates.");
+            ShowFatalError(state, format("GetMixerInput: Fatal Errors Found in {}, program terminates.", CurrentModuleObject));
         }
     }
 
@@ -2424,9 +2446,9 @@ namespace BranchInputManager {
     //==================================================================================
 
     void AuditBranches(EnergyPlusData &state,
-                       bool const mustprint,           // true if the warning should be printed.
-                       Optional_string_const CompType, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
-                       Optional_string_const CompName  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
+                       bool const mustprint,                      // true if the warning should be printed.
+                       ObjexxFCL::Optional_string_const CompType, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
+                       ObjexxFCL::Optional_string_const CompName  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     )
     {
 
@@ -2474,19 +2496,19 @@ namespace BranchInputManager {
             if (state.dataGlobal->DisplayExtraWarnings || mustprint) {
                 if (mustprint) {
                     ShowContinueError(
-                        state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
+                        state, format("AuditBranches: Branch=\"{}\" not found on any BranchLists.", state.dataBranchInputManager->Branch(BrN).Name));
                     if (!FoundBranchName.empty()) {
-                        ShowContinueError(state, "Branch contains component, type=\"" + CompType + "\", name=\"" + std::string{CompName} + "\"");
+                        ShowContinueError(state, format("Branch contains component, type=\"{}\", name=\"{}\"", CompType, CompName));
                     }
                 } else {
                     ShowSevereMessage(
-                        state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
+                        state, format("AuditBranches: Branch=\"{}\" not found on any BranchLists.", state.dataBranchInputManager->Branch(BrN).Name));
                     ++state.dataErrTracking->TotalSevereErrors;
                 }
             }
         }
         if (mustprint && NeverFound) { // this may be caught during branch input, not sure
-            ShowContinueError(state, "Component, type=\"" + CompType + "\", name=\"" + std::string{CompName} + "\" was not found on any Branch.");
+            ShowContinueError(state, format("Component, type=\"{}\", name=\"{}\" was not found on any Branch.", CompType, CompName));
             ShowContinueError(state, "Look for mistyped branch or component names/types.");
         }
         if (!mustprint && NumDanglingCount > 0) {
@@ -2596,7 +2618,7 @@ namespace BranchInputManager {
                     FoundBranches(Count) = Found;
                     BranchPtrs(Count) = NumNodesOnBranchList;
                 } else {
-                    ShowSevereError(state, "Branch not found=" + state.dataBranchInputManager->BranchList(BCount).BranchNames(Count));
+                    ShowSevereError(state, format("Branch not found={}", state.dataBranchInputManager->BranchList(BCount).BranchNames(Count)));
                     ErrFound = true;
                 }
             }
@@ -2624,7 +2646,7 @@ namespace BranchInputManager {
                     MatchNodeName = state.dataBranchInputManager->Branch(Found).Component(1).InletNodeName;
                     BranchInletNodeName = state.dataBranchInputManager->Branch(Found).Component(1).InletNodeName;
                 } else {
-                    ShowWarningError(state, "Branch has no components=" + state.dataBranchInputManager->Branch(Found).Name);
+                    ShowWarningError(state, format("Branch has no components={}", state.dataBranchInputManager->Branch(Found).Name));
                 }
                 NumErr = 0;
                 for (Loop = 1; Loop <= state.dataBranchInputManager->Branch(Found).NumOfComponents; ++Loop) {
@@ -2669,10 +2691,10 @@ namespace BranchInputManager {
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode;
                     }
                     if (state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode != MatchNode) {
-                        ShowSevereError(state, "Error Detected in BranchList=" + state.dataBranchInputManager->BranchList(BCount).Name);
-                        ShowContinueError(state, "Actual Error occurs in Branch=" + state.dataBranchInputManager->Branch(Found).Name);
-                        ShowContinueError(state, "Branch Outlet does not match Inlet, Outlet=" + MatchNodeName);
-                        ShowContinueError(state, "Inlet Name=" + state.dataBranchInputManager->Branch(Found).Component(Loop).InletNodeName);
+                        ShowSevereError(state, format("Error Detected in BranchList={}", state.dataBranchInputManager->BranchList(BCount).Name));
+                        ShowContinueError(state, format("Actual Error occurs in Branch={}", state.dataBranchInputManager->Branch(Found).Name));
+                        ShowContinueError(state, format("Branch Outlet does not match Inlet, Outlet={}", MatchNodeName));
+                        ShowContinueError(state, format("Inlet Name={}", state.dataBranchInputManager->Branch(Found).Component(Loop).InletNodeName));
                         ErrFound = true;
                         ++NumErr;
                     } else {
@@ -2704,27 +2726,27 @@ namespace BranchInputManager {
             }
             if (MixedFluidTypesOnBranchList) {
                 ShowSevereError(state,
-                                "BranchList=" + state.dataBranchInputManager->BranchList(BCount).Name + " has mixed fluid types in its nodes.");
+                                format("BranchList={} has mixed fluid types in its nodes.", state.dataBranchInputManager->BranchList(BCount).Name));
                 ErrFound = true;
                 if (OriginalBranchFluidType.empty()) OriginalBranchFluidType = "**Unknown**";
-                ShowContinueError(state,
-                                  "Initial Node=" + state.dataLoopNodes->NodeID(InitialBranchFluidNode) + ", Fluid Type=" + OriginalBranchFluidType);
+                ShowContinueError(
+                    state, format("Initial Node={}, Fluid Type={}", state.dataLoopNodes->NodeID(InitialBranchFluidNode), OriginalBranchFluidType));
                 ShowContinueError(state, "BranchList Topology - Note nodes which do not match that fluid type:");
                 Ptr = 1;
                 EndPtr = BranchPtrs(1);
                 for (Loop = 1; Loop <= state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames; ++Loop) {
                     if (FoundBranches(Loop) != 0) {
-                        ShowContinueError(state, "..Branch=" + state.dataBranchInputManager->Branch(FoundBranches(Loop)).Name);
+                        ShowContinueError(state, format("..Branch={}", state.dataBranchInputManager->Branch(FoundBranches(Loop)).Name));
                     } else {
-                        ShowContinueError(state, "..Illegal Branch=" + state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop));
+                        ShowContinueError(state, format("..Illegal Branch={}", state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop)));
                         continue;
                     }
                     for (Loop2 = Ptr; Loop2 <= EndPtr; ++Loop2) {
                         cBranchFluidType =
                             DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(BranchFluidNodes(Loop2)).FluidType)];
                         if (cBranchFluidType.empty()) cBranchFluidType = "**Unknown**";
-                        ShowContinueError(state,
-                                          "....Node=" + state.dataLoopNodes->NodeID(BranchFluidNodes(Loop2)) + ", Fluid Type=" + cBranchFluidType);
+                        ShowContinueError(
+                            state, format("....Node={}, Fluid Type={}", state.dataLoopNodes->NodeID(BranchFluidNodes(Loop2)), cBranchFluidType));
                     }
                     Ptr = EndPtr + 1;
                     EndPtr = BranchPtrs(Loop + 1);
@@ -2762,9 +2784,9 @@ namespace BranchInputManager {
                     Found = UtilityRoutines::FindItemInList(
                         BranchNodes(Count).UniqueNodeNames(Loop2), BranchNodes(Loop).UniqueNodeNames, BranchNodes(Loop).NumNodes);
                     if (Found != 0) {
-                        ShowSevereError(state, "Non-unique node name found, name=" + BranchNodes(Count).UniqueNodeNames(Loop2));
-                        ShowContinueError(state, "..1st occurrence in Branch=" + state.dataBranchInputManager->Branch(Count).Name);
-                        ShowContinueError(state, "..duplicate occurrence in Branch=" + state.dataBranchInputManager->Branch(Loop).Name);
+                        ShowSevereError(state, format("Non-unique node name found, name={}", BranchNodes(Count).UniqueNodeNames(Loop2)));
+                        ShowContinueError(state, format("..1st occurrence in Branch={}", state.dataBranchInputManager->Branch(Count).Name));
+                        ShowContinueError(state, format("..duplicate occurrence in Branch={}", state.dataBranchInputManager->Branch(Loop).Name));
                         ErrFound = true;
                     }
                 }
@@ -2791,21 +2813,21 @@ namespace BranchInputManager {
             for (Count = 1; Count <= (int)state.dataBranchInputManager->Branch.size(); ++Count) {
                 if (BranchReported(Count)) continue;
                 ++BCount;
-                ShowWarningError(state, "Orphan Branch=\"" + state.dataBranchInputManager->Branch(Count).Name + "\".");
+                ShowWarningError(state, format("Orphan Branch=\"{}\".", state.dataBranchInputManager->Branch(Count).Name));
 
                 if (state.dataBranchInputManager->Branch(Count).NumOfComponents > 0) {
                     MatchNode = state.dataBranchInputManager->Branch(Count).Component(1).InletNode;
                     MatchNodeName = state.dataBranchInputManager->Branch(Count).Component(1).InletNodeName;
                     BranchInletNodeName = state.dataBranchInputManager->Branch(Count).Component(1).InletNodeName;
                 } else {
-                    ShowWarningError(state, "Branch has no components=" + state.dataBranchInputManager->Branch(Count).Name);
+                    ShowWarningError(state, format("Branch has no components={}", state.dataBranchInputManager->Branch(Count).Name));
                 }
                 NumErr = 0;
                 for (Loop = 1; Loop <= state.dataBranchInputManager->Branch(Count).NumOfComponents; ++Loop) {
                     if (state.dataBranchInputManager->Branch(Count).Component(Loop).InletNode != MatchNode) {
-                        ShowSevereError(state, "Error Detected in Branch=" + state.dataBranchInputManager->Branch(Count).Name);
-                        ShowContinueError(state, "Branch Outlet does not match Inlet, Outlet=" + MatchNodeName);
-                        ShowContinueError(state, "Inlet Name=" + state.dataBranchInputManager->Branch(Count).Component(Loop).InletNodeName);
+                        ShowSevereError(state, format("Error Detected in Branch={}", state.dataBranchInputManager->Branch(Count).Name));
+                        ShowContinueError(state, format("Branch Outlet does not match Inlet, Outlet={}", MatchNodeName));
+                        ShowContinueError(state, format("Inlet Name={}", state.dataBranchInputManager->Branch(Count).Component(Loop).InletNodeName));
                         ErrFound = true;
                         ++NumErr;
                     } else {

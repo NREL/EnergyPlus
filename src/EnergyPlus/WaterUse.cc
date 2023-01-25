@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -73,6 +72,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -158,7 +158,7 @@ namespace WaterUse {
                     if (!state.dataGlobal->WarmupFlag) {
                         if (waterConnection.MaxIterationsErrorIndex == 0) {
                             ShowWarningError(state,
-                                             "WaterUse:Connections = " + waterConnection.Name + ":  Heat recovery temperature did not converge");
+                                             format("WaterUse:Connections = {}:  Heat recovery temperature did not converge", waterConnection.Name));
                             ShowContinueErrorTimeStamp(state, "");
                         }
                         ShowRecurringWarningErrorAtEnd(state,
@@ -192,7 +192,7 @@ namespace WaterUse {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(state, "LocalWaterUseConnectionFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, format("LocalWaterUseConnectionFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -251,7 +251,7 @@ namespace WaterUse {
             } else if (NumIteration > MaxIterations) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (this->MaxIterationsErrorIndex == 0) {
-                        ShowWarningError(state, "WaterUse:Connections = " + this->Name + ":  Heat recovery temperature did not converge");
+                        ShowWarningError(state, format("WaterUse:Connections = {}:  Heat recovery temperature did not converge", this->Name));
                         ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(state,
@@ -386,7 +386,8 @@ namespace WaterUse {
                     thisWEq.LatentFracSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
 
                     if (thisWEq.LatentFracSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
+                        ShowSevereError(state,
+                                        format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
                         ShowContinueError(state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, thisWEq.Name));
                         ErrorsFound = true;
                     }
@@ -394,7 +395,7 @@ namespace WaterUse {
 
             } // WaterEquipNum
 
-            if (ErrorsFound) ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            if (ErrorsFound) ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
         }
 
         state.dataIPShortCut->cCurrentModuleObject = "WaterUse:Connections";
@@ -555,7 +556,7 @@ namespace WaterUse {
 
             } // WaterConnNum
 
-            if (ErrorsFound) ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            if (ErrorsFound) ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
 
             if (state.dataWaterUse->numWaterConnections > 0) {
                 state.dataWaterUse->CheckEquipName.allocate(state.dataWaterUse->numWaterConnections);
@@ -1237,14 +1238,14 @@ namespace WaterUse {
             this->DrainMassFlowRate = this->TotalMassFlowRate;
 
         } else {
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->Zone);
 
             if (this->SensibleFracSchedule == 0) {
                 this->SensibleRate = 0.0;
                 this->SensibleEnergy = 0.0;
             } else {
                 this->SensibleRate = ScheduleManager::GetCurrentScheduleValue(state, this->SensibleFracSchedule) * this->TotalMassFlowRate *
-                                     Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) *
-                                     (this->MixedTemp - state.dataHeatBalFanSys->MAT(this->Zone));
+                                     Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->MixedTemp - thisZoneHB.MAT);
                 this->SensibleEnergy = this->SensibleRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
@@ -1252,14 +1253,13 @@ namespace WaterUse {
                 this->LatentRate = 0.0;
                 this->LatentEnergy = 0.0;
             } else {
-                Real64 ZoneHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(this->Zone);
+                Real64 ZoneHumRat = thisZoneHB.ZoneAirHumRat;
                 Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state,
-                                                                     state.dataHeatBalFanSys->MAT(this->Zone),
+                                                                     thisZoneHB.MAT,
                                                                      1.0,
                                                                      state.dataEnvrn->OutBaroPress,
                                                                      RoutineName); // Humidratio at 100% relative humidity
-                Real64 RhoAirDry =
-                    Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(this->Zone), 0.0);
+                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, 0.0);
                 Real64 ZoneMassMax =
                     (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * state.dataHeatBal->Zone(this->Zone).Volume; // Max water that can be evaporated to zone
                 Real64 FlowMassMax =
@@ -1269,7 +1269,7 @@ namespace WaterUse {
                 this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(state, this->LatentFracSchedule) * MoistureMassMax;
                 this->MoistureRate = this->MoistureMass / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
-                this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, state.dataHeatBalFanSys->MAT(this->Zone));
+                this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, thisZoneHB.MAT);
                 this->LatentEnergy = this->LatentRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
             }
 

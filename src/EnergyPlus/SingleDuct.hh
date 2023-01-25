@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -338,8 +338,8 @@ namespace SingleDuct {
                                    int &SDSIndex,
                                    bool &ErrorsFound,
                                    std::string_view const ThisObjectType = {},
-                                   Optional_int DamperInletNode = _, // Damper inlet node number
-                                   Optional_int DamperOutletNode = _ // Damper outlet node number
+                                   ObjexxFCL::Optional_int DamperInletNode = _, // Damper inlet node number
+                                   ObjexxFCL::Optional_int DamperOutletNode = _ // Damper outlet node number
     );
 
     void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool FirstHVACIteration, int &SysIndex);
@@ -362,8 +362,8 @@ namespace SingleDuct {
     );
 
     void SetATMixerPriFlow(EnergyPlusData &state,
-                           int ATMixerNum,                               // Air terminal mixer index
-                           Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
+                           int ATMixerNum,                                          // Air terminal mixer index
+                           ObjexxFCL::Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
     );
 
     void setATMixerSizingProperties(EnergyPlusData &state,

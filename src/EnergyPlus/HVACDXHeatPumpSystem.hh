@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -112,13 +112,13 @@ namespace HVACDXHeatPumpSystem {
     };
 
     void SimDXHeatPumpSystem(EnergyPlusData &state,
-                             std::string_view DXHeatPumpSystemName,     // Name of DXSystem:Airloop object
-                             bool const FirstHVACIteration,             // True when first HVAC iteration
-                             int const AirLoopNum,                      // Primary air loop number
-                             int &CompIndex,                            // Index to CoilSystem:Heating:DX object
-                             Optional_int_const OAUnitNum = _,          // If the system is an equipment of OutdoorAirUnit
-                             Optional<Real64 const> OAUCoilOutTemp = _, // the coil inlet temperature of OutdoorAirUnit
-                             Optional<Real64> QTotOut = _               // the total cooling output of unit
+                             std::string_view DXHeatPumpSystemName,                // Name of DXSystem:Airloop object
+                             bool const FirstHVACIteration,                        // True when first HVAC iteration
+                             int const AirLoopNum,                                 // Primary air loop number
+                             int &CompIndex,                                       // Index to CoilSystem:Heating:DX object
+                             ObjexxFCL::Optional_int_const OAUnitNum = _,          // If the system is an equipment of OutdoorAirUnit
+                             ObjexxFCL::Optional<Real64 const> OAUCoilOutTemp = _, // the coil inlet temperature of OutdoorAirUnit
+                             ObjexxFCL::Optional<Real64> QTotOut = _               // the total cooling output of unit
     );
 
     // Get Input Section of the Module
@@ -133,10 +133,10 @@ namespace HVACDXHeatPumpSystem {
     // *****************************************************************************
 
     void InitDXHeatPumpSystem(EnergyPlusData &state,
-                              int const DXSystemNum,                    // number of the current DX Sys being simulated
-                              int const AirLoopNum,                     // number of the current air loop being simulated
-                              Optional_int_const OAUnitNum = _,         // number of the current outdoor air unit being simulated
-                              Optional<Real64 const> OAUCoilOutTemp = _ // the coil inlet temperature of OutdoorAirUnit
+                              int const DXSystemNum,                               // number of the current DX Sys being simulated
+                              int const AirLoopNum,                                // number of the current air loop being simulated
+                              ObjexxFCL::Optional_int_const OAUnitNum = _,         // number of the current outdoor air unit being simulated
+                              ObjexxFCL::Optional<Real64 const> OAUCoilOutTemp = _ // the coil inlet temperature of OutdoorAirUnit
     );
 
     // End of Initialization subroutines for the Module

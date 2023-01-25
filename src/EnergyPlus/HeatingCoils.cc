@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -112,14 +112,14 @@ namespace HeatingCoils {
     void SimulateHeatingCoilComponents(EnergyPlusData &state,
                                        std::string_view CompName,
                                        bool const FirstHVACIteration,
-                                       Optional<Real64 const> QCoilReq, // coil load to be met
-                                       Optional_int CompIndex,
-                                       Optional<Real64> QCoilActual,         // coil load actually delivered returned to calling component
-                                       Optional_bool_const SuppHeat,         // True if current heating coil is a supplemental heating coil
-                                       Optional_int_const FanOpMode,         // fan operating mode, CycFanCycCoil or ContFanCycCoil
-                                       Optional<Real64 const> PartLoadRatio, // part-load ratio of heating coil
-                                       Optional_int StageNum,
-                                       Optional<Real64 const> SpeedRatio // Speed ratio of MultiStage heating coil
+                                       ObjexxFCL::Optional<Real64 const> QCoilReq, // coil load to be met
+                                       ObjexxFCL::Optional_int CompIndex,
+                                       ObjexxFCL::Optional<Real64> QCoilActual,         // coil load actually delivered returned to calling component
+                                       ObjexxFCL::Optional_bool_const SuppHeat,         // True if current heating coil is a supplemental heating coil
+                                       ObjexxFCL::Optional_int_const FanOpMode,         // fan operating mode, CycFanCycCoil or ContFanCycCoil
+                                       ObjexxFCL::Optional<Real64 const> PartLoadRatio, // part-load ratio of heating coil
+                                       ObjexxFCL::Optional_int StageNum,
+                                       ObjexxFCL::Optional<Real64 const> SpeedRatio // Speed ratio of MultiStage heating coil
     )
     {
 
@@ -1325,10 +1325,12 @@ namespace HeatingCoils {
                 }
                 HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                    ShowSevereError(state,
-                                    cAllCoilTypes(heatingCoil.HCoilType_Num) + ", \"" + heatingCoil.Name +
-                                        "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                        heatingCoil.ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                    ShowSevereError(
+                        state,
+                        format("{}, \"{}\" sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                               cAllCoilTypes(heatingCoil.HCoilType_Num),
+                               heatingCoil.Name,
+                               heatingCoil.ReclaimHeatingCoilName));
                 }
                 state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
             } else {
@@ -1684,10 +1686,12 @@ namespace HeatingCoils {
                         num = 0.0;
                     HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                     if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                        ShowSevereError(state,
-                                        cAllCoilTypes(heatingCoil.HCoilType_Num) + ", \"" + heatingCoil.Name +
-                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            heatingCoil.ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                        ShowSevereError(
+                            state,
+                            format("{}, \"{}\" sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                                   cAllCoilTypes(heatingCoil.HCoilType_Num),
+                                   heatingCoil.Name,
+                                   heatingCoil.ReclaimHeatingCoilName));
                     }
                 }
                 state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
@@ -3702,10 +3706,10 @@ namespace HeatingCoils {
     }
 
     void SetHeatingCoilData(EnergyPlusData &state,
-                            int const CoilNum,                       // Number of electric or gas heating Coil
-                            bool &ErrorsFound,                       // Set to true if certain errors found
-                            Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-                            Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this coil is used
+                            int const CoilNum,                                  // Number of electric or gas heating Coil
+                            bool &ErrorsFound,                                  // Set to true if certain errors found
+                            ObjexxFCL::Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+                            ObjexxFCL::Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this coil is used
     )
     {
 

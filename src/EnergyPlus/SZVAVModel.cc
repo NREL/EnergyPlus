@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -514,8 +514,8 @@ namespace SZVAVModel {
                 if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
                     15.0) { // water coil can provide same output at varying water PLR (model discontinuity?)
                     if (SZVAVModel.MaxIterIndex == 0) {
-                        ShowWarningMessage(state,
-                                           MessagePrefix + "Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
+                        ShowWarningMessage(
+                            state, format("{}Coil control failed to converge for {}:{}", MessagePrefix, SZVAVModel.UnitType, SZVAVModel.Name));
                         ShowContinueError(state, "  Iteration limit exceeded in calculating system sensible part-load ratio.");
                         ShowContinueErrorTimeStamp(
                             state,
@@ -533,7 +533,7 @@ namespace SZVAVModel {
                 }
             } else if (SolFlag == -2) {
                 if (SZVAVModel.RegulaFalsiFailedIndex == 0) {
-                    ShowWarningMessage(state, MessagePrefix + "Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
+                    ShowWarningMessage(state, format("{}Coil control failed for {}:{}", MessagePrefix, SZVAVModel.UnitType, SZVAVModel.Name));
                     ShowContinueError(state, "  sensible part-load ratio determined to be outside the range of 0-1.");
                     ShowContinueErrorTimeStamp(state, format("Sensible load to be met = {:.2T} (watts), and the simulation continues.", ZoneLoad));
                 }
@@ -966,8 +966,8 @@ namespace SZVAVModel {
                 if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
                     15.0) { // water coil can provide same output at varying water PLR (model discontinuity?)
                     if (SZVAVModel.MaxIterIndex == 0) {
-                        ShowWarningMessage(state,
-                                           MessagePrefix + "Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
+                        ShowWarningMessage(
+                            state, format("{}Coil control failed to converge for {}:{}", MessagePrefix, SZVAVModel.UnitType, SZVAVModel.Name));
                         ShowContinueError(state, "  Iteration limit exceeded in calculating system sensible part-load ratio.");
                         ShowContinueErrorTimeStamp(
                             state,
@@ -985,7 +985,7 @@ namespace SZVAVModel {
                 }
             } else if (SolFlag == -2) {
                 if (SZVAVModel.RegulaFalsiFailedIndex == 0) {
-                    ShowWarningMessage(state, MessagePrefix + "Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
+                    ShowWarningMessage(state, format("{}Coil control failed for {}:{}", MessagePrefix, SZVAVModel.UnitType, SZVAVModel.Name));
                     ShowContinueError(state, "  sensible part-load ratio determined to be outside the range of 0-1.");
                     ShowContinueErrorTimeStamp(state, format("Sensible load to be met = {:.2T} (watts), and the simulation continues.", ZoneLoad));
                 }

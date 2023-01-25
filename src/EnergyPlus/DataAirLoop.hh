@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -183,6 +183,14 @@ namespace DataAirLoop {
         Real64 BypassMassFlow = 0.0;        // air loop bypass mass flow NOT entering splitter but included in mixer or plenum
     };
 
+    enum class ControllerKind
+    {
+        Invalid = -1,
+        WaterCoil,  // Controller:WaterCoil
+        OutdoorAir, // Controller:OutdoorAir
+        Num
+    };
+
     struct OutsideAirSysProps
     {
         // Members
@@ -203,11 +211,12 @@ namespace DataAirLoop {
         std::vector<HVACSystemData *> compPointer;
         Array1D_string ControllerName;
         Array1D_string ControllerType;
-        Array1D_int ControllerIndex;    // Which one in list -- updated by routines called from here
-        Array1D_int InletNodeNum;       // component inlet node number
-        Array1D_int OutletNodeNum;      // component outlet node number
-        bool HeatExchangerFlag = false; // True to have a heat exchanger in the equipment list
-        int AirLoopDOASNum = -1;        // AirLoopHVAC:DedicatedOutdoorAirSystem number
+        EPVector<ControllerKind> controllerTypeEnum; // Controller:OutdoorAir or Controller:WaterCoil
+        Array1D_int ControllerIndex;                 // Which one in list -- updated by routines called from here
+        Array1D_int InletNodeNum;                    // component inlet node number
+        Array1D_int OutletNodeNum;                   // component outlet node number
+        bool HeatExchangerFlag = false;              // True to have a heat exchanger in the equipment list
+        int AirLoopDOASNum = -1;                     // AirLoopHVAC:DedicatedOutdoorAirSystem number
     };
 
     struct AirLoopAFNData

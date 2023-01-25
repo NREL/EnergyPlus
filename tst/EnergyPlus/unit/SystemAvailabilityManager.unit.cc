@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -447,7 +447,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataHVACGlobal->HybridVentSysAvailVentCtrl.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
@@ -483,24 +483,24 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
 
     state->dataSystemAvailabilityManager->HybridVentData(1).ControlMode = 5; // 80% acceptance
     state->dataThermalComforts->runningAverageASH = 20.0;
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
     state->dataHeatBal->ZoneMRT(1) = 27.0;
 
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Vent open
 
-    state->dataHeatBalFanSys->MAT(1) = 26.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 26.0;
     state->dataHeatBal->ZoneMRT(1) = 30.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // System operation
 
     state->dataSystemAvailabilityManager->HybridVentData(1).ControlMode = 6; // 90% acceptance
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
     state->dataHeatBal->ZoneMRT(1) = 27.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Vent open
 
-    state->dataHeatBalFanSys->MAT(1) = 26.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 26.0;
     state->dataHeatBal->ZoneMRT(1) = 30.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // System operation
@@ -564,21 +564,6 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Can change
-
-    state->dataSystemAvailabilityManager->HybridVentData.deallocate();
-    state->dataHVACGlobal->HybridVentSysAvailVentCtrl.deallocate();
-    state->dataAirLoop->PriAirSysAvailMgr.deallocate();
-    state->dataHeatBal->Zone.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate();
-    state->dataHeatBal->ZoneMRT.deallocate();
-    state->dataContaminantBalance->ZoneAirCO2.deallocate();
-    state->dataContaminantBalance->ZoneCO2SetPoint.deallocate();
-    state->dataAirLoop->PriAirSysAvailMgr.deallocate();
-    state->dataSystemAvailabilityManager->SchedData.deallocate();
-    state->dataScheduleMgr->Schedule.deallocate();
-    state->dataHVACGlobal->ZoneComp.deallocate();
-    state->dataHeatBalFanSys->TempControlType.deallocate();
-    state->dataHeatBalFanSys->TempZoneThermostatSetPoint.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)

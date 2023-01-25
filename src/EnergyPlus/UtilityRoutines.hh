@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,12 +50,12 @@
 
 // C++ Headers
 #include <functional>
+#include <optional>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
-#include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 #include <GSL/span.h>
@@ -130,78 +130,91 @@ template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inli
 
 bool env_var_on(std::string const &env_var_str);
 
-using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
+using OptionalOutputFileRef = std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
-void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
-void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowSevereError(EnergyPlusData &state,
+                     std::string const &ErrorMessage,
+                     OptionalOutputFileRef OutUnit1 = {},
+                     OptionalOutputFileRef OutUnit2 = {});
 
 void ShowSevereMessage(EnergyPlusData &state,
                        std::string const &ErrorMessage,
-                       OptionalOutputFileRef OutUnit1 = _,
-                       OptionalOutputFileRef OutUnit2 = _);
+                       OptionalOutputFileRef OutUnit1 = {},
+                       OptionalOutputFileRef OutUnit2 = {});
 
-void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
 void ShowContinueErrorTimeStamp(EnergyPlusData &state,
                                 std::string const &Message,
-                                OptionalOutputFileRef OutUnit1 = _,
-                                OptionalOutputFileRef OutUnit2 = _);
+                                OptionalOutputFileRef OutUnit1 = {},
+                                OptionalOutputFileRef OutUnit2 = {});
 
-void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = {}, OptionalOutputFileRef OutUnit2 = {});
 
-void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowWarningError(EnergyPlusData &state,
+                      std::string const &ErrorMessage,
+                      OptionalOutputFileRef OutUnit1 = {},
+                      OptionalOutputFileRef OutUnit2 = {});
 
 void ShowWarningMessage(EnergyPlusData &state,
                         std::string const &ErrorMessage,
-                        OptionalOutputFileRef OutUnit1 = _,
-                        OptionalOutputFileRef OutUnit2 = _);
+                        OptionalOutputFileRef OutUnit1 = {},
+                        OptionalOutputFileRef OutUnit2 = {});
 
-void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
-                                   std::string const &Message,             // Message automatically written to "error file" at end of simulation
-                                   int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                   Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                   Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
-                                   Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
-                                   std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
-                                   std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
-                                   std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
+void ShowRecurringSevereErrorAtEnd(
+    EnergyPlusData &state,
+    std::string const &Message,                        // Message automatically written to "error file" at end of simulation
+    int &MsgIndex,                                     // Recurring message index, if zero, next available index is assigned
+    ObjexxFCL::Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
+    ObjexxFCL::Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
+    ObjexxFCL::Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+    std::string const &ReportMaxUnits = "",            // optional char string (<=15 length) of units for max value
+    std::string const &ReportMinUnits = "",            // optional char string (<=15 length) of units for min value
+    std::string const &ReportSumUnits = ""             // optional char string (<=15 length) of units for sum value
 );
 
-void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
-                                    std::string const &Message,             // Message automatically written to "error file" at end of simulation
-                                    int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                    Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                    Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
-                                    Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
-                                    std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
-                                    std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
-                                    std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
+void ShowRecurringWarningErrorAtEnd(
+    EnergyPlusData &state,
+    std::string const &Message,                        // Message automatically written to "error file" at end of simulation
+    int &MsgIndex,                                     // Recurring message index, if zero, next available index is assigned
+    ObjexxFCL::Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
+    ObjexxFCL::Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
+    ObjexxFCL::Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+    std::string const &ReportMaxUnits = "",            // optional char string (<=15 length) of units for max value
+    std::string const &ReportMinUnits = "",            // optional char string (<=15 length) of units for min value
+    std::string const &ReportSumUnits = ""             // optional char string (<=15 length) of units for sum value
 );
 
-void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
-                                     std::string const &Message,             // Message automatically written to "error file" at end of simulation
-                                     int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                     Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                     Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
-                                     Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
-                                     std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
-                                     std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
-                                     std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
+void ShowRecurringContinueErrorAtEnd(
+    EnergyPlusData &state,
+    std::string const &Message,                        // Message automatically written to "error file" at end of simulation
+    int &MsgIndex,                                     // Recurring message index, if zero, next available index is assigned
+    ObjexxFCL::Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
+    ObjexxFCL::Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
+    ObjexxFCL::Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+    std::string const &ReportMaxUnits = "",            // optional char string (<=15 length) of units for max value
+    std::string const &ReportMinUnits = "",            // optional char string (<=15 length) of units for min value
+    std::string const &ReportSumUnits = ""             // optional char string (<=15 length) of units for sum value
 );
 
-void StoreRecurringErrorMessage(EnergyPlusData &state,
-                                std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
-                                int &ErrorMsgIndex,                          // Recurring message index, if zero, next available index is assigned
-                                Optional<Real64 const> ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
-                                Optional<Real64 const> ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
-                                Optional<Real64 const> ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
-                                std::string const &ErrorReportMaxUnits = "", // Units for "max" reporting
-                                std::string const &ErrorReportMinUnits = "", // Units for "min" reporting
-                                std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
+void StoreRecurringErrorMessage(
+    EnergyPlusData &state,
+    std::string const &ErrorMessage,                        // Message automatically written to "error file" at end of simulation
+    int &ErrorMsgIndex,                                     // Recurring message index, if zero, next available index is assigned
+    ObjexxFCL::Optional<Real64 const> ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
+    ObjexxFCL::Optional<Real64 const> ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
+    ObjexxFCL::Optional<Real64 const> ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
+    std::string const &ErrorReportMaxUnits = "",            // Units for "max" reporting
+    std::string const &ErrorReportMinUnits = "",            // Units for "min" reporting
+    std::string const &ErrorReportSumUnits = ""             // Units for "sum" reporting
 );
 
-void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowErrorMessage(EnergyPlusData &state,
+                      std::string const &ErrorMessage,
+                      OptionalOutputFileRef OutUnit1 = {},
+                      OptionalOutputFileRef OutUnit2 = {});
 
 void SummarizeErrors(EnergyPlusData &state);
 
@@ -271,6 +284,23 @@ namespace UtilityRoutines {
             if (String == ListOfItems[i].Name) return int(i + 1); // 1-based return index
         }
         return 0; // Not found
+    }
+
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs and operator[i] and elements need Name
+    inline int FindItemInPtrList(std::string_view const String, Container const &ListOfItems, int const NumItems)
+    {
+        for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
+            if (String == ListOfItems[i]->Name) return int(i + 1); // 1-based return index
+        }
+        return 0; // Not found
+    }
+
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs and operator[i] and elements need Name
+    inline int FindItemInPtrList(std::string_view const String, Container const &ListOfItems)
+    {
+        return UtilityRoutines::FindItemInPtrList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>

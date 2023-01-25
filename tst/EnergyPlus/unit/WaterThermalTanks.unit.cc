@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,14 +50,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Optional.hh>
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Fans.hh>
@@ -73,6 +69,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
@@ -1037,8 +1034,8 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     ASSERT_FALSE(ErrorsFound);
     state->dataHVACGlobal->TimeStepSys = 1;
     SetPredefinedTables(*state);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
     EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
     EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));

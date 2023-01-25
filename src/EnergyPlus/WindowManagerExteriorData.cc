@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,7 +122,7 @@ namespace WindowManager {
         // Handles solar radiation spetrum from defalut location or IDF
         CSeries solarRadiation;
 
-        for (auto i = 1; i <= state.dataWindowManager->nume; ++i) {
+        for (int i = 1; i <= state.dataWindowManager->nume; ++i) {
             solarRadiation.addProperty(state.dataWindowManager->wle[i - 1], state.dataWindowManager->e[i - 1]);
         }
 
@@ -143,7 +143,7 @@ namespace WindowManager {
         // Handles solar radiation spetrum from defalut location or IDF
         CSeries visibleResponse;
 
-        for (auto i = 1; i <= state.dataWindowManager->numt3; ++i) {
+        for (int i = 1; i <= state.dataWindowManager->numt3; ++i) {
             visibleResponse.addProperty(state.dataWindowManager->wlt3[i - 1], state.dataWindowManager->y30[i - 1]);
         }
 
@@ -165,7 +165,7 @@ namespace WindowManager {
         std::shared_ptr<CSpectralSampleData> aSampleData = std::make_shared<CSpectralSampleData>();
         auto spectralData = state.dataHeatBal->SpectralData(t_SampleDataPtr);
         int numOfWl = spectralData.NumOfWavelengths;
-        for (auto i = 1; i <= numOfWl; ++i) {
+        for (int i = 1; i <= numOfWl; ++i) {
             Real64 wl = spectralData.WaveLength(i);
             Real64 T = spectralData.Trans(i);
             Real64 Rf = spectralData.ReflFront(i);
@@ -240,7 +240,7 @@ namespace WindowManager {
             // shared_ptr< vector< double > > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
             IGU_Layers iguLayers = getLayers(state, t_Range, t_ConstrNum);
             std::shared_ptr<CMultiLayerScattered> aEqLayer = std::make_shared<CMultiLayerScattered>(iguLayers[0]);
-            for (auto i = 1u; i < iguLayers.size(); ++i) {
+            for (size_t i = 1u; i < iguLayers.size(); ++i) {
                 aEqLayer->addLayer(iguLayers[i]);
             }
 

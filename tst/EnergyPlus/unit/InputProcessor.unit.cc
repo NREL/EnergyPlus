@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4650,7 +4650,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &objectFields = instance.value();
-            auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+            std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
             EXPECT_EQ(thisObjectName, "SPACE EQUIPMENT");
             // Fields before extensibles
             alphaFieldValue = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "load_distribution_scheme");

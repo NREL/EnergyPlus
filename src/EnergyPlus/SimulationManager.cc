@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -239,6 +239,7 @@ namespace SimulationManager {
             state.dataGlobal->DoOutputReporting = true;
         }
         state.dataGlobal->DoingSizing = false;
+        state.dataHeatBal->doSpaceHeatBalance = state.dataHeatBal->doSpaceHeatBalanceSimulation;
 
         if ((state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) &&
             !(state.dataGlobal->DoDesDaySim || (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput))) {
@@ -643,13 +644,13 @@ namespace SimulationManager {
                 Which = static_cast<int>(index(Alphas(1), MatchVersion));
             }
             if (Which != 0) {
-                ShowWarningError(state, CurrentModuleObject + ": in IDF=\"" + Alphas(1) + "\" not the same as expected=\"" + MatchVersion + "\"");
+                ShowWarningError(state, format("{}: in IDF=\"{}\" not the same as expected=\"{}\"", CurrentModuleObject, Alphas(1), MatchVersion));
             }
             VersionID = Alphas(1);
         } else if (Num == 0) {
-            ShowWarningError(state, CurrentModuleObject + ": missing in IDF, processing for EnergyPlus version=\"" + MatchVersion + "\"");
+            ShowWarningError(state, format("{}: missing in IDF, processing for EnergyPlus version=\"{}\"", CurrentModuleObject, MatchVersion));
         } else {
-            ShowSevereError(state, "Too many " + CurrentModuleObject + " Objects found.");
+            ShowSevereError(state, format("Too many {} Objects found.", CurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -769,7 +770,7 @@ namespace SimulationManager {
             state.dataGlobal->NumOfTimeStepInHour = Number(1);
             if (state.dataGlobal->NumOfTimeStepInHour <= 0 || state.dataGlobal->NumOfTimeStepInHour > 60) {
                 Alphas(1) = fmt::to_string(state.dataGlobal->NumOfTimeStepInHour);
-                ShowWarningError(state, CurrentModuleObject + ": Requested number (" + Alphas(1) + ") invalid, Defaulted to 4");
+                ShowWarningError(state, format("{}: Requested number ({}) invalid, Defaulted to 4", CurrentModuleObject, Alphas(1)));
                 state.dataGlobal->NumOfTimeStepInHour = 4;
             } else if (mod(60, state.dataGlobal->NumOfTimeStepInHour) != 0) {
                 MinInt = 9999;
@@ -790,7 +791,7 @@ namespace SimulationManager {
                                  format("{}: Requested number ({}) cannot be used when Conduction Finite Difference algorithm is selected.",
                                         CurrentModuleObject,
                                         state.dataGlobal->NumOfTimeStepInHour));
-                ShowContinueError(state, "..." + CurrentModuleObject + " is set to 20.");
+                ShowContinueError(state, format("...{} is set to 20.", CurrentModuleObject));
                 state.dataGlobal->NumOfTimeStepInHour = 20;
             }
             if (state.dataGlobal->NumOfTimeStepInHour < 4 && state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Zone") > 0) {
@@ -799,21 +800,21 @@ namespace SimulationManager {
                                         CurrentModuleObject,
                                         state.dataGlobal->NumOfTimeStepInHour));
                 ShowContinueError(state,
-                                  "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations.");
+                                  format("Please see entry for {} in Input/Output Reference for discussion of considerations.", CurrentModuleObject));
             }
         } else if (Num == 0 && state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Zone") > 0 && !CondFDAlgo) {
-            ShowWarningError(state, "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4.");
+            ShowWarningError(state, format("No {} object found.  Number of TimeSteps in Hour defaulted to 4.", CurrentModuleObject));
             state.dataGlobal->NumOfTimeStepInHour = 4;
         } else if (Num == 0 && !CondFDAlgo) {
             state.dataGlobal->NumOfTimeStepInHour = 4;
         } else if (Num == 0 && state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Zone") > 0 && CondFDAlgo) {
-            ShowWarningError(state, "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20.");
+            ShowWarningError(state, format("No {} object found.  Number of TimeSteps in Hour defaulted to 20.", CurrentModuleObject));
             ShowContinueError(state, "...Due to presence of Conduction Finite Difference Algorithm selection.");
             state.dataGlobal->NumOfTimeStepInHour = 20;
         } else if (Num == 0 && CondFDAlgo) {
             state.dataGlobal->NumOfTimeStepInHour = 20;
         } else {
-            ShowSevereError(state, "Too many " + CurrentModuleObject + " Objects found.");
+            ShowSevereError(state, format("Too many {} Objects found.", CurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -869,7 +870,7 @@ namespace SimulationManager {
             state.dataConvergeParams->MinPlantSubIterations = 2;
             state.dataConvergeParams->MaxPlantSubIterations = 8;
         } else {
-            ShowSevereError(state, "Too many " + CurrentModuleObject + " Objects found.");
+            ShowSevereError(state, format("Too many {} Objects found.", CurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -880,7 +881,7 @@ namespace SimulationManager {
         CurrentModuleObject = "Output:DebuggingData";
         NumDebugOut = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDebugOut > 1) {
-            ShowWarningError(state, CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+            ShowWarningError(state, format("{}: More than 1 occurrence of this object found, only first will be used.", CurrentModuleObject));
         }
         if (NumDebugOut > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
@@ -898,7 +899,7 @@ namespace SimulationManager {
             if (Num > 1) {
                 // Let it slide, but warn
                 // ErrorsFound = true;
-                ShowWarningError(state, CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+                ShowWarningError(state, format("{}: More than 1 occurrence of this object found, only first will be used.", CurrentModuleObject));
             }
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
 
@@ -906,7 +907,7 @@ namespace SimulationManager {
                 auto &instancesValue = instances.value();
                 for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                     auto const &fields = instance.value();
-                    auto const &thisObjectName = instance.key();
+                    std::string const &thisObjectName = instance.key();
                     state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
 
                     auto diagnosticsExtensibles = fields.find("diagnostics");
@@ -918,7 +919,8 @@ namespace SimulationManager {
                             // Which happens if you put an "empty" entry in the extensible portion
                             auto it = diagnosticsExtensible.find("key");
                             if (it == diagnosticsExtensible.end()) {
-                                ShowWarningError(state, CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
+                                ShowWarningError(state,
+                                                 format("{}: empty key found, consider removing it to avoid this warning.", CurrentModuleObject));
                                 continue;
                             }
                             std::string diagnosticName = it->get<std::string>();
@@ -972,8 +974,9 @@ namespace SimulationManager {
                                 //        CreateMinimalSurfaceVariables=.FALSE.
                             } else if (!diagnosticName.empty()) {
                                 ShowWarningError(state,
-                                                 "GetProjectData: " + CurrentModuleObject + "=\"" + diagnosticName +
-                                                     "\", Invalid value for field, entered value ignored.");
+                                                 format("GetProjectData: {}=\"{}\", Invalid value for field, entered value ignored.",
+                                                        CurrentModuleObject,
+                                                        diagnosticName));
                             }
                         }
                     }
@@ -1062,7 +1065,7 @@ namespace SimulationManager {
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 1) {
             ErrorsFound = true;
-            ShowFatalError(state, "GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
+            ShowFatalError(state, format("GetProjectData: Only one (\"1\") {} object per simulation is allowed.", CurrentModuleObject));
         }
         state.dataGlobal->createPerfLog = Num > 0;
         std::string overrideModeValue = "Normal";
@@ -1070,7 +1073,7 @@ namespace SimulationManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     state.dataGlobal->DoCoilDirectSolutions =
@@ -1175,7 +1178,8 @@ namespace SimulationManager {
                                 state, "PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
                         }
                     } else {
-                        ShowSevereError(state, "Invalid over ride mode specified in PerformancePrecisionTradeoffs object: " + overrideModeValue);
+                        ShowSevereError(state,
+                                        format("Invalid over ride mode specified in PerformancePrecisionTradeoffs object: {}", overrideModeValue));
                     }
 
                     if (overrideTimestep) {
@@ -1580,7 +1584,7 @@ namespace SimulationManager {
     {
         auto result = std::make_unique<std::ofstream>(filePath, mode);
         if (!result->good()) {
-            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
+            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath.string()));
         }
         return result;
     }
@@ -1599,7 +1603,7 @@ namespace SimulationManager {
             result = std::make_unique<fmt::ostream>(std::move(f));
         } catch (const std::system_error &error) {
             ShowSevereError(state, error.what());
-            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
+            ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath.string()));
         }
         return result;
     }
@@ -1952,7 +1956,7 @@ namespace SimulationManager {
             if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
             ++NumNonParents;
         }
-        const auto NumParents = state.dataBranchNodeConnections->NumOfNodeConnections - NumNonParents;
+        const int NumParents = state.dataBranchNodeConnections->NumOfNodeConnections - NumNonParents;
         state.dataBranchNodeConnections->ParentNodeList.allocate(NumParents);
 
         //  Do Parent Objects
@@ -2152,8 +2156,8 @@ namespace SimulationManager {
                     state,
                     format("Potential Node Connection Error for object {}, name={}", CType, state.dataBranchNodeConnections->CompSets(Count).CName));
                 ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
-                ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
-                ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InletNodeName));
+                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }

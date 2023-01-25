@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -797,13 +797,13 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         void CalcVRF_FluidTCtrl(EnergyPlusData &state,
-                                int VRFTUNum,                          // Index to VRF terminal unit
-                                bool FirstHVACIteration,               // flag for 1st HVAC iteration in the time step
-                                Real64 PartLoadRatio,                  // compressor part load fraction
-                                Real64 &LoadMet,                       // load met by unit (W)
-                                Real64 &OnOffAirFlowRatio,             // ratio of ON air flow to average air flow
-                                Real64 &SuppHeatCoilLoad,              // supplemental heating coil load (W)
-                                Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
+                                int VRFTUNum,                                     // Index to VRF terminal unit
+                                bool FirstHVACIteration,                          // flag for 1st HVAC iteration in the time step
+                                Real64 PartLoadRatio,                             // compressor part load fraction
+                                Real64 &LoadMet,                                  // load met by unit (W)
+                                Real64 &OnOffAirFlowRatio,                        // ratio of ON air flow to average air flow
+                                Real64 &SuppHeatCoilLoad,                         // supplemental heating coil load (W)
+                                ObjexxFCL::Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
         );
 
         Real64 CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &state,
@@ -833,13 +833,13 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         void CalcVRF(EnergyPlusData &state,
-                     int const VRFTUNum,                    // Unit index in VRF terminal unit array
-                     bool const FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
-                     Real64 const PartLoadRatio,            // compressor part load fraction
-                     Real64 &LoadMet,                       // load met by unit (W)
-                     Real64 &OnOffAirFlowRatio,             // ratio of ON air flow to average air flow
-                     Real64 &SuppHeatCoilLoad,              // supplemental heating coil load (W)
-                     Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
+                     int const VRFTUNum,                               // Unit index in VRF terminal unit array
+                     bool const FirstHVACIteration,                    // flag for 1st HVAC iteration in the time step
+                     Real64 const PartLoadRatio,                       // compressor part load fraction
+                     Real64 &LoadMet,                                  // load met by unit (W)
+                     Real64 &OnOffAirFlowRatio,                        // ratio of ON air flow to average air flow
+                     Real64 &SuppHeatCoilLoad,                         // supplemental heating coil load (W)
+                     ObjexxFCL::Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
         );
 
         // Methods for curve based and refrigerant flow control based models
@@ -898,7 +898,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void InitVRF(EnergyPlusData &state, int VRFTUNum, int ZoneNum, bool FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
 
-    void SetCompFlowRate(EnergyPlusData &state, int VRFTUNum, int VRFCond, Optional_bool_const UseCurrentMode = _);
+    void SetCompFlowRate(EnergyPlusData &state, int VRFTUNum, int VRFCond, ObjexxFCL::Optional_bool_const UseCurrentMode = _);
 
     void SizeVRF(EnergyPlusData &state, int const VRFTUNum);
 

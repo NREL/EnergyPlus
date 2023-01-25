@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -171,7 +171,7 @@ public:
 
     Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 
-    void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
+    void evaluateSoilRhoCp(ObjexxFCL::Optional<int const> cell = _, ObjexxFCL::Optional_bool_const InitOnly = _);
 
     Real64 interpolate(Real64 const x, Real64 const x_hi, Real64 const x_low, Real64 const y_hi, Real64 const y_low);
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -140,7 +140,7 @@ namespace ExteriorEnergyUse {
         state.dataExteriorEnergyUse->NumExteriorEqs = 0;
 
         // =================================  Get Exterior Lights
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        std::string_view cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Exterior:Lights";
         for (Item = 1; Item <= state.dataExteriorEnergyUse->NumExteriorLights; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -162,14 +162,21 @@ namespace ExteriorEnergyUse {
             if (state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr == 0) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " is required, missing for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                        state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: {} is required, missing for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " entered=" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: invalid {} entered={} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
@@ -178,18 +185,24 @@ namespace ExteriorEnergyUse {
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                            " minimum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        format("{}{}: invalid {} minimum, is < 0.0 for {}={}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(2),
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(2), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                            " maximum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        format("{}{}: invalid {} maximum, is < 0.0 for {}={}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(2),
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(2), SchMax));
                         ErrorsFound = true;
@@ -204,9 +217,13 @@ namespace ExteriorEnergyUse {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::AstroClockOverride;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' +
-                                    state.dataIPShortCut->cAlphaArgs(3) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                    state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}{}: invalid {} entered={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(3),
+                                       state.dataIPShortCut->cAlphaArgs(3),
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
             }
 
             if (NumAlphas > 3) {
@@ -312,14 +329,21 @@ namespace ExteriorEnergyUse {
                 ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " is required, missing for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                        state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: {} is required, missing for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " entered=" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: invalid {} entered={} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                 }
                 ErrorsFound = true;
             } else {
@@ -369,14 +393,21 @@ namespace ExteriorEnergyUse {
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr == 0) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        " is required, missing for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                        state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: {} is required, missing for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(3),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        " entered=" + state.dataIPShortCut->cAlphaArgs(3) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: invalid {} entered={} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(3),
+                                           state.dataIPShortCut->cAlphaArgs(3),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
@@ -387,18 +418,24 @@ namespace ExteriorEnergyUse {
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                            " minimum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        format("{}{}: invalid {} minimum, is < 0.0 for {}={}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(3),
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                            " maximum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        format("{}{}: invalid {} maximum, is < 0.0 for {}={}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(3),
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
@@ -442,14 +479,21 @@ namespace ExteriorEnergyUse {
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr == 0) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        " is required, missing for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                        state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: {} is required, missing for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(3),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        " entered=" + state.dataIPShortCut->cAlphaArgs(3) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: invalid {} entered={} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(3),
+                                           state.dataIPShortCut->cAlphaArgs(3),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
@@ -460,18 +504,24 @@ namespace ExteriorEnergyUse {
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                            " minimum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        format("{}{}: invalid {} minimum, is < 0.0 for {}={}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(3),
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                            " maximum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        format("{}{}: invalid {} maximum, is < 0.0 for {}={}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(3),
+                                               state.dataIPShortCut->cAlphaFieldNames(1),
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
@@ -529,7 +579,7 @@ namespace ExteriorEnergyUse {
                           ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber, // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,                     // Fuel Type String
                           std::string &FuelTypeString,                          // Standardized Fuel Type String (for variable naming)
-                          std::string const &CurrentModuleObject,               // object being parsed
+                          std::string_view CurrentModuleObject,                 // object being parsed
                           std::string const &CurrentField,                      // current field being parsed
                           std::string const &CurrentName                        // current object name being parsed
     )
@@ -597,8 +647,8 @@ namespace ExteriorEnergyUse {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatUse;
             FuelTypeString = "DistrictHeating";
         } else {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + CurrentName + "\".");
-            ShowFatalError(state, "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha);
+            ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, CurrentName));
+            ShowFatalError(state, format("Heating source/fuel type not recognized. Check input field {}=\"{}", CurrentField, FuelTypeAlpha));
         }
     }
 

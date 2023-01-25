@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -147,7 +147,7 @@ namespace SurfaceGroundHeatExchanger {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(state, "Surface Ground Heat Exchanger: Error getting inputs for pipe named: " + objectName);
+        ShowFatalError(state, format("Surface Ground Heat Exchanger: Error getting inputs for pipe named: {}", objectName));
         // Shut up the compiler
         return nullptr;
     }
@@ -233,15 +233,15 @@ namespace SurfaceGroundHeatExchanger {
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).ConstructionNum == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
             // Error checking for surfaces, zones, and construction information
             if (!state.dataConstruction->Construct(state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).ConstructionNum).SourceSinkPresent) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
                     state, "Construction must have internal source/sink and be referenced by a ConstructionProperty:InternalHeatSource object");
                 ErrorsFound = true;
@@ -260,8 +260,8 @@ namespace SurfaceGroundHeatExchanger {
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -278,8 +278,8 @@ namespace SurfaceGroundHeatExchanger {
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -298,14 +298,14 @@ namespace SurfaceGroundHeatExchanger {
             if (state.dataIPShortCut->rNumericArgs(2) == 0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (state.dataIPShortCut->rNumericArgs(3) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(3), state.dataIPShortCut->rNumericArgs(3)));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
@@ -316,14 +316,14 @@ namespace SurfaceGroundHeatExchanger {
             if (state.dataIPShortCut->rNumericArgs(4) <= 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(4), state.dataIPShortCut->rNumericArgs(4)));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (state.dataIPShortCut->rNumericArgs(5) <= 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(5), state.dataIPShortCut->rNumericArgs(5)));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
@@ -334,8 +334,8 @@ namespace SurfaceGroundHeatExchanger {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "EXPOSED")) {
                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).LowerSurfCond = SurfCond_Exposed;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Only \"Ground\" or \"Exposed\" is allowed.");
                 ErrorsFound = true;
             }
@@ -344,7 +344,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // final error check
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", cCurrentModuleObject));
         }
 
         // Set up the output variables
@@ -494,11 +494,11 @@ namespace SurfaceGroundHeatExchanger {
                     this->CTFTSourceQ = state.dataConstruction->Construct(Cons).CTFTSourceQ;     // w coefficents
                     this->ConstructionNum = Cons;
                     // surface properties
-                    this->BtmRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum)).Roughness;
-                    this->TopThermAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum)).AbsorpThermal;
-                    this->TopRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1)).Roughness;
-                    this->TopThermAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1)).AbsorpThermal;
-                    this->TopSolarAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1)).AbsorpSolar;
+                    this->BtmRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum))->Roughness;
+                    this->TopThermAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum))->AbsorpThermal;
+                    this->TopRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->Roughness;
+                    this->TopThermAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->AbsorpThermal;
+                    this->TopSolarAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->AbsorpSolar;
                 }
             }
             // set one-time flag

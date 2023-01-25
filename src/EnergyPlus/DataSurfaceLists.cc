@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -205,8 +205,9 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                 SurfList(Item).SurfFlowFrac(SurfNum) = Numbers(SurfNum);
                 if (SurfList(Item).SurfFlowFrac(SurfNum) < SurfListMinFlowFrac) {
                     ShowSevereError(state,
-                                    "The Flow Fraction for Surface " + SurfList(Item).SurfName(SurfNum) + " in Surface Group " + SurfList(Item).Name +
-                                        " is too low");
+                                    format("The Flow Fraction for Surface {} in Surface Group {} is too low",
+                                           SurfList(Item).SurfName(SurfNum),
+                                           SurfList(Item).Name));
                     ShowContinueError(state,
                                       format("Flow fraction of {:.6R} is less than minimum criteria = {:.6R}",
                                              SurfList(Item).SurfFlowFrac(SurfNum),
@@ -313,7 +314,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                         SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
                     if (NameConflict > 0) { // A slab list includes a surface on a surface list--not allowed
                         ShowSevereError(state, format("{}{}", CurrentModuleObject2, "=\"" + SlabList(Item).Name + "\", invalid surface specified."));
-                        ShowContinueError(state, "Surface=\"" + SlabList(Item).SurfName(SurfNum) + "\" is also on a Surface List.");
+                        ShowContinueError(state, format("Surface=\"{}\" is also on a Surface List.", SlabList(Item).SurfName(SurfNum)));
                         ShowContinueError(state, format("{}{}", CurrentModuleObject1, "=\"" + SurfList(SrfList).Name + "\" has this surface also."));
                         ShowContinueError(state, "A surface cannot be on both lists. The models cannot operate correctly.");
                         ErrorsFound = true;

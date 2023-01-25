@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -690,8 +690,9 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::IAQProcedure && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
-                            "DesignSpecification:OutdoorAir=\"" + this->Name +
-                                R"(" valid Outdoor Air Method =" IndoorAirQualityProcedure" requires CO2 simulation.)");
+                            format("DesignSpecification:OutdoorAir=\"{}{}",
+                                   this->Name,
+                                   R"(" valid Outdoor Air Method =" IndoorAirQualityProcedure" requires CO2 simulation.)"));
             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
             ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
         }
@@ -700,8 +701,9 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCOccSch && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
-                            "DesignSpecification:OutdoorAir=\"" + this->Name +
-                                R"(" valid Outdoor Air Method =" ProportionalControlBasedOnDesignOccupancy" requires CO2 simulation.)");
+                            format("DesignSpecification:OutdoorAir=\"{}{}",
+                                   this->Name,
+                                   R"(" valid Outdoor Air Method =" ProportionalControlBasedOnDesignOccupancy" requires CO2 simulation.)"));
             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
             ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
         }
@@ -710,8 +712,9 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
-                            "DesignSpecification:OutdoorAir=\"" + this->Name +
-                                R"(" valid Outdoor Air Method =" ProportionalControlBasedOnOccupancySchedule" requires CO2 simulation.)");
+                            format("DesignSpecification:OutdoorAir=\"{}{}",
+                                   this->Name,
+                                   R"(" valid Outdoor Air Method =" ProportionalControlBasedOnOccupancySchedule" requires CO2 simulation.)"));
             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
             ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
         }
@@ -850,8 +853,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                ZoneMaxCO2,
                                                ZoneMinCO2));
                                     ShowContinueError(state,
-                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
-                                                      "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
+                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
@@ -874,8 +877,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                ZoneMaxCO2,
                                                ZoneMinCO2));
                                     ShowContinueError(state,
-                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
-                                                      "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
+                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
@@ -919,8 +922,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                              "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
                                                              thisZone.Name));
                                     ShowContinueError(state,
-                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
-                                                      "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
+                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(state,
@@ -940,8 +943,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                              "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
                                                              thisZone.Name));
                                     ShowContinueError(state,
-                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
-                                                      "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
+                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(state,

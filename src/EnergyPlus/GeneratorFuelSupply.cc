@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -130,7 +130,7 @@ namespace GeneratorFuelSupply {
             int NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (NumGeneratorFuelSups <= 0) {
-                ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
+                ShowSevereError(state, format("No {} equipment specified in input file", cCurrentModuleObject));
                 ErrorsFound = true;
             }
 
@@ -158,8 +158,8 @@ namespace GeneratorFuelSupply {
                 } else if (UtilityRoutines::SameString("Scheduled", AlphArray(2))) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode = DataGenerators::FuelTemperatureMode::FuelInTempSchedule;
                 } else {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
+                    ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
 
@@ -177,16 +177,16 @@ namespace GeneratorFuelSupply {
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
                 if ((state.dataGenerator->FuelSupply(FuelSupNum).SchedNum == 0) &&
                     (state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode == DataGenerators::FuelTemperatureMode::FuelInTempSchedule)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
+                    ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, AlphArray(1)));
                     ShowContinueError(state, "Schedule named was not found");
                     ErrorsFound = true;
                 }
 
                 state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
                 if (state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + AlphArray(5));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
+                    ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, AlphArray(1)));
                     ShowContinueError(state, "Curve named was not found ");
                     ErrorsFound = true;
                 }
@@ -199,8 +199,8 @@ namespace GeneratorFuelSupply {
                 } else if (UtilityRoutines::SameString(AlphArray(6), "LiquidGeneric")) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::GenericLiquid;
                 } else {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
+                    ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
 
@@ -214,11 +214,11 @@ namespace GeneratorFuelSupply {
                     state.dataGenerator->FuelSupply(FuelSupNum).NumConstituents = NumFuelConstit;
 
                     if (NumFuelConstit > 12) {
-                        ShowSevereError(state, cCurrentModuleObject + " model not set up for more than 12 fuel constituents");
+                        ShowSevereError(state, format("{} model not set up for more than 12 fuel constituents", cCurrentModuleObject));
                         ErrorsFound = true;
                     }
                     if (NumFuelConstit < 1) {
-                        ShowSevereError(state, cCurrentModuleObject + " model needs at least one fuel constituent");
+                        ShowSevereError(state, format("{} model needs at least one fuel constituent", cCurrentModuleObject));
                         ErrorsFound = true;
                     }
 
@@ -229,9 +229,9 @@ namespace GeneratorFuelSupply {
 
                     // check for molar fractions summing to 1.0.
                     if (std::abs(sum(state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract) - 1.0) > 0.0001) {
-                        ShowSevereError(state, cCurrentModuleObject + " molar fractions do not sum to 1.0");
+                        ShowSevereError(state, format("{} molar fractions do not sum to 1.0", cCurrentModuleObject));
                         ShowContinueError(state, format("Sum was={:.5R}", sum(state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract)));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, AlphArray(1)));
                         ErrorsFound = true;
                     }
                 }
@@ -244,7 +244,7 @@ namespace GeneratorFuelSupply {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(state, "Problem found processing input for " + cCurrentModuleObject);
+                ShowFatalError(state, format("Problem found processing input for {}", cCurrentModuleObject));
             }
 
             state.dataGeneratorFuelSupply->MyOneTimeFlag = false;
@@ -616,7 +616,7 @@ namespace GeneratorFuelSupply {
                 state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
 
                 if (thisGasID == 0) {
-                    ShowSevereError(state, "Fuel constituent not found in thermochemistry data: " + thisName);
+                    ShowSevereError(state, format("Fuel constituent not found in thermochemistry data: {}", thisName));
                     ErrorsFound = true;
                 }
 

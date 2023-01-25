@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -365,9 +365,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -379,9 +379,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -392,18 +392,16 @@ namespace FaultsManager {
             // Evaporative cooler type
             state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerType = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Evaporative cooler name
             state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName = cAlphaArgs(5);
             if (lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -424,9 +422,9 @@ namespace FaultsManager {
                                                                 state.dataEvapCoolers->EvapCond,
                                                                 &EvaporativeCoolers::EvapConditions::Name);
                 if (EvapCoolerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the boiler with the fault model
@@ -464,9 +462,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -478,9 +476,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -491,18 +489,16 @@ namespace FaultsManager {
             // Chiller type
             state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerType = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Chiller name
             state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName = cAlphaArgs(5);
             if (lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -522,18 +518,21 @@ namespace FaultsManager {
                     }
                 }
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
 
                     if (state.dataPlantChillers->ElectricChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                         // The fault model is only applicable to the chillers with water based condensers
                         ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaArgs(5) +
-                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+                                         format("{} = \"{}\" invalid {} = \"{}\". The specified chiller is not water cooled. The chiller fouling "
+                                                "fault model will not be applied.",
+                                                cFaultCurrentObject,
+                                                cAlphaArgs(1),
+                                                cAlphaFieldNames(5),
+                                                cAlphaArgs(5)));
 
                     } else {
                         // Link the chiller with the fault model
@@ -553,18 +552,21 @@ namespace FaultsManager {
                 ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName,
                                                              state.dataChillerElectricEIR->ElectricEIRChiller);
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
 
                     if (state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                         // The fault model is only applicable to the chillers with water based condensers
                         ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaArgs(5) +
-                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+                                         format("{} = \"{}\" invalid {} = \"{}\". The specified chiller is not water cooled. The chiller fouling "
+                                                "fault model will not be applied.",
+                                                cFaultCurrentObject,
+                                                cAlphaArgs(1),
+                                                cAlphaFieldNames(5),
+                                                cAlphaArgs(5)));
 
                     } else {
                         // Link the chiller with the fault model
@@ -584,18 +586,21 @@ namespace FaultsManager {
                 ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName,
                                                              state.dataChillerReformulatedEIR->ElecReformEIRChiller);
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
 
                     if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                         // The fault model is only applicable to the chillers with water based condensers
                         ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaArgs(5) +
-                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+                                         format("{} = \"{}\" invalid {} = \"{}\". The specified chiller is not water cooled. The chiller fouling "
+                                                "fault model will not be applied.",
+                                                cFaultCurrentObject,
+                                                cAlphaArgs(1),
+                                                cAlphaFieldNames(5),
+                                                cAlphaArgs(5)));
 
                     } else {
                         // Link the chiller with the fault model
@@ -615,18 +620,21 @@ namespace FaultsManager {
                     }
                 }
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
 
                     if (state.dataPlantChillers->ConstCOPChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                         // The fault model is only applicable to the chillers with water based condensers
                         ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaArgs(5) +
-                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+                                         format("{} = \"{}\" invalid {} = \"{}\". The specified chiller is not water cooled. The chiller fouling "
+                                                "fault model will not be applied.",
+                                                cFaultCurrentObject,
+                                                cAlphaArgs(1),
+                                                cAlphaFieldNames(5),
+                                                cAlphaArgs(5)));
 
                     } else {
                         // Link the chiller with the fault model
@@ -646,18 +654,21 @@ namespace FaultsManager {
                     }
                 }
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
 
                     if (state.dataPlantChillers->EngineDrivenChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                         // The fault model is only applicable to the chillers with water based condensers
                         ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaArgs(5) +
-                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+                                         format("{} = \"{}\" invalid {} = \"{}\". The specified chiller is not water cooled. The chiller fouling "
+                                                "fault model will not be applied.",
+                                                cFaultCurrentObject,
+                                                cAlphaArgs(1),
+                                                cAlphaFieldNames(5),
+                                                cAlphaArgs(5)));
 
                     } else {
                         // Link the fault model with the water cooled chiller
@@ -677,17 +688,20 @@ namespace FaultsManager {
                     }
                 }
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     if (state.dataPlantChillers->GTChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                         // The fault model is only applicable to the chillers with water based condensers
                         ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaArgs(5) +
-                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+                                         format("{} = \"{}\" invalid {} = \"{}\". The specified chiller is not water cooled. The chiller fouling "
+                                                "fault model will not be applied.",
+                                                cFaultCurrentObject,
+                                                cAlphaArgs(1),
+                                                cAlphaFieldNames(5),
+                                                cAlphaArgs(5)));
 
                     } else {
                         // Link the fault model with the water cooled chiller
@@ -729,9 +743,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -743,9 +757,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -756,18 +770,16 @@ namespace FaultsManager {
             // Boiler type
             state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).BoilerType = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Boiler name
             state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).BoilerName = cAlphaArgs(5);
             if (lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -781,9 +793,9 @@ namespace FaultsManager {
                 int BoilerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).BoilerName,
                                                                 state.dataBoilers->Boiler);
                 if (BoilerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the boiler with the fault model
@@ -821,9 +833,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -835,9 +847,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -848,18 +860,16 @@ namespace FaultsManager {
             // Coil type
             state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilType = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Coil name
             state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName = cAlphaArgs(5);
             if (lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -879,9 +889,9 @@ namespace FaultsManager {
                 int CoilNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
                                                               state.dataHeatingCoils->HeatingCoil);
                 if (CoilNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the coil with the fault model
@@ -899,19 +909,21 @@ namespace FaultsManager {
                 int CoilNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
                                                               state.dataSteamCoils->SteamCoil);
                 if (CoilNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
 
                     if (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil != SteamCoils::CoilControlType::TemperatureSetPoint) {
                         // The fault model is only applicable to the coils controlled on leaving air temperature
                         ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaArgs(5) +
-                                             "\". The specified coil is not controlled on leaving air temperature. The coil SAT sensor fault model "
-                                             "will not be applied.");
+                                         format("{} = \"{}\" invalid {} = \"{}\". The specified coil is not controlled on leaving air temperature. "
+                                                "The coil SAT sensor fault model will not be applied.",
+                                                cFaultCurrentObject,
+                                                cAlphaArgs(1),
+                                                cAlphaFieldNames(5),
+                                                cAlphaArgs(5)));
                     } else {
                         // Link the fault model with the coil that is controlled on leaving air temperature
                         state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag = true;
@@ -931,18 +943,18 @@ namespace FaultsManager {
                 int CoilNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
                                                               state.dataWaterCoils->WaterCoil);
                 if (CoilNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
 
                 // Read in Water Coil Controller Name
                 state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).WaterCoilControllerName = cAlphaArgs(6);
                 if (lAlphaFieldBlanks(6)) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) +
-                                        "\" blank.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(6), cAlphaArgs(6)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
                 // Read in controller input if not done yet
@@ -955,9 +967,9 @@ namespace FaultsManager {
                                                                  state.dataHVACControllers->ControllerProps,
                                                                  &HVACControllers::ControllerPropsType::ControllerName);
                 if (ControlNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(6), cAlphaArgs(6)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the controller with the fault model
@@ -968,8 +980,13 @@ namespace FaultsManager {
                     if (state.dataHVACControllers->ControllerProps(ControlNum).SensedNode !=
                         state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum) {
                         ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" +
-                                            cAlphaArgs(6) + "\" does not match " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5));
+                                        format("{} = \"{}\" invalid {} = \"{}\" does not match {} = \"{}",
+                                               cFaultCurrentObject,
+                                               cAlphaArgs(1),
+                                               cAlphaFieldNames(6),
+                                               cAlphaArgs(6),
+                                               cAlphaFieldNames(5),
+                                               cAlphaArgs(5)));
                         state.dataFaultsMgr->ErrorsFound = true;
                     }
                 }
@@ -987,10 +1004,8 @@ namespace FaultsManager {
                 // int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
                 //                                                 state.dataHVACDXSys->DXCoolingSystem);
                 // if (CoilSysNum <= 0) {
-                //    ShowSevereError(state,
-                //                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                //                        cAlphaArgs(5) + "\" not found.");
-                //    state.dataFaultsMgr->ErrorsFound = true;
+                //    ShowSevereError(state, format("{}{} = \"{}\" invalid {} = \"{}{}\" not found.", //, cFaultCurrentObject, cAlphaArgs(1),
+                //    cAlphaFieldNames(5), //, cAlphaArgs(5))); state.dataFaultsMgr->ErrorsFound = true;
                 //} else {
                 //    // Link the coil system with the fault model
                 //    state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATFlag = true;
@@ -1008,9 +1023,9 @@ namespace FaultsManager {
                 int CoilSysNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName,
                                                                  state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
                 if (CoilSysNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the coil system with the fault model
@@ -1054,9 +1069,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1068,9 +1083,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1081,18 +1096,16 @@ namespace FaultsManager {
             // Cooling tower type
             state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerType = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Cooling tower name
             state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerName = cAlphaArgs(5);
             if (lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -1107,9 +1120,9 @@ namespace FaultsManager {
                 int TowerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerName,
                                                                state.dataCondenserLoopTowers->towers);
                 if (TowerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the tower with the fault model
@@ -1120,10 +1133,14 @@ namespace FaultsManager {
                     if (!UtilityRoutines::SameString(
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
                             state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerType)) {
-                        ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
-                                             cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) +
-                                             ". Tower type in the fault model is updated. ");
+                        ShowWarningError(
+                            state,
+                            format("{} = \"{}\" invalid {} = \"{}\" not match the type of {}. Tower type in the fault model is updated. ",
+                                   cFaultCurrentObject,
+                                   cAlphaArgs(1),
+                                   cAlphaFieldNames(4),
+                                   cAlphaArgs(4),
+                                   cAlphaFieldNames(5)));
                         state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerType =
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)];
                     }
@@ -1131,11 +1148,14 @@ namespace FaultsManager {
                     // Check the tower model
                     // Performance Input Method should be UFactorTimesAreaAndDesignWaterFlowRate to apply the fault model
                     if (state.dataCondenserLoopTowers->towers(TowerNum).PerformanceInputMethod_Num != CondenserLoopTowers::PIM::UFactor) {
-                        ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaFieldNames(5) +
-                                             ". Tower Performance Input Method is not UFactorTimesAreaAndDesignWaterFlowRate. " +
-                                             "The tower fouling fault model will not be applied to the tower. ");
+                        ShowWarningError(
+                            state,
+                            format("{} = \"{}\" invalid {} = \"{}. Tower Performance Input Method is not UFactorTimesAreaAndDesignWaterFlowRate. The "
+                                   "tower fouling fault model will not be applied to the tower. ",
+                                   cFaultCurrentObject,
+                                   cAlphaArgs(1),
+                                   cAlphaFieldNames(5),
+                                   cAlphaFieldNames(5)));
                         state.dataCondenserLoopTowers->towers(TowerNum).FaultyTowerFoulingFlag = false;
                     }
                 }
@@ -1170,9 +1190,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1184,9 +1204,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1197,18 +1217,16 @@ namespace FaultsManager {
             // Cooling tower type
             state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Cooling tower name
             state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerName = cAlphaArgs(5);
             if (lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -1223,9 +1241,9 @@ namespace FaultsManager {
                 int TowerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerName,
                                                                state.dataCondenserLoopTowers->towers);
                 if (TowerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the tower with the fault model
@@ -1237,8 +1255,12 @@ namespace FaultsManager {
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
                             state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType)) {
                         ShowWarningError(state,
-                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
-                                             cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) + ". Tower type is updated. ");
+                                         format("{} = \"{}\" invalid {} = \"{}\" not match the type of {}. Tower type is updated. ",
+                                                cFaultCurrentObject,
+                                                cAlphaArgs(1),
+                                                cAlphaFieldNames(4),
+                                                cAlphaArgs(4),
+                                                cAlphaFieldNames(5)));
                         state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType =
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)];
                     }
@@ -1274,9 +1296,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1288,9 +1310,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1301,18 +1323,16 @@ namespace FaultsManager {
             // Chiller type
             state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerType = cAlphaArgs(4);
             if (lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
             // Chiller name
             state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName = cAlphaArgs(5);
             if (lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\" blank.");
+                ShowSevereError(
+                    state, format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -1332,9 +1352,9 @@ namespace FaultsManager {
                     }
                 }
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the chiller with the fault model
@@ -1352,9 +1372,9 @@ namespace FaultsManager {
                 ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,
                                                              state.dataChillerElectricEIR->ElectricEIRChiller);
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the chiller with the fault model
@@ -1372,9 +1392,9 @@ namespace FaultsManager {
                 ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,
                                                              state.dataChillerReformulatedEIR->ElecReformEIRChiller);
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the chiller with the fault model
@@ -1393,9 +1413,9 @@ namespace FaultsManager {
                     }
                 }
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the chiller with the fault model
@@ -1413,9 +1433,9 @@ namespace FaultsManager {
                     }
                 }
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the chiller with the fault model
@@ -1433,9 +1453,9 @@ namespace FaultsManager {
                     }
                 }
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the chiller with the fault model
@@ -1453,9 +1473,9 @@ namespace FaultsManager {
                 ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,
                                                              state.dataChillerAbsorber->absorptionChillers);
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Link the chiller with the fault model
@@ -1473,9 +1493,9 @@ namespace FaultsManager {
                 ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,
                                                              state.dataChillerIndirectAbsorption->IndirectAbsorber);
                 if (ChillerNum <= 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     state.dataChillerIndirectAbsorption->IndirectAbsorber(ChillerNum).FaultyChillerSWTFlag = true;
@@ -1519,9 +1539,9 @@ namespace FaultsManager {
 
             // Check whether the specified fan exists in the fan list
             if (UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataFans->Fan, &Fans::FanEquipConditions::FanName) <= 0) {
-                ShowSevereError(state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                    "\" not found.");
+                ShowSevereError(
+                    state,
+                    format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -1541,9 +1561,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1556,9 +1576,9 @@ namespace FaultsManager {
                 state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterPressFracSchePtr =
                     GetScheduleIndex(state, cAlphaArgs(5));
                 if (state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterPressFracSchePtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1567,8 +1587,8 @@ namespace FaultsManager {
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve = cAlphaArgs(6);
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurvePtr = GetCurveIndex(state, cAlphaArgs(6));
             if (state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurvePtr == 0) {
-                ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"");
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" not found.");
+                ShowSevereError(state, format("{} = \"{}\"", cFaultCurrentObject, cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = \"{}\" not found.", cAlphaFieldNames(6), cAlphaArgs(6)));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -1608,8 +1628,10 @@ namespace FaultsManager {
                 // Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
                 if (lAlphaFieldBlanks(6)) {
                     ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\": " + cAlphaFieldNames(6) +
-                                        " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\".");
+                                    format("{} = \"{}\": {} cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\".",
+                                           cFaultCurrentObject,
+                                           cAlphaArgs(1),
+                                           cAlphaFieldNames(6)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).FaultyThermostatName = cAlphaArgs(6);
@@ -1626,8 +1648,11 @@ namespace FaultsManager {
                     state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                     if (state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).AvaiSchedPtr == 0) {
                         ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
-                                            cAlphaArgs(4) + "\" not found.");
+                                        format("{} = \"{}\" invalid {} = \"{}\" not found.",
+                                               cFaultCurrentObject,
+                                               cAlphaArgs(1),
+                                               cAlphaFieldNames(4),
+                                               cAlphaArgs(4)));
                         state.dataFaultsMgr->ErrorsFound = true;
                     }
                 }
@@ -1640,8 +1665,11 @@ namespace FaultsManager {
                     state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(5));
                     if (state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).SeveritySchedPtr == 0) {
                         ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
+                                        format("{} = \"{}\" invalid {} = \"{}\" not found.",
+                                               cFaultCurrentObject,
+                                               cAlphaArgs(1),
+                                               cAlphaFieldNames(5),
+                                               cAlphaArgs(5)));
                         state.dataFaultsMgr->ErrorsFound = true;
                     }
                 }
@@ -1649,8 +1677,10 @@ namespace FaultsManager {
                 // Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
                 if (lAlphaFieldBlanks(1)) {
                     ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\": " + cNumericFieldNames(1) +
-                                        " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\".");
+                                    format("{} = \"{}\": {} cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\".",
+                                           cFaultCurrentObject,
+                                           cAlphaArgs(1),
+                                           cNumericFieldNames(1)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).Offset = rNumericArgs(1);
@@ -1687,9 +1717,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1701,16 +1731,16 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
 
             // Reference offset value is required
             if (lAlphaFieldBlanks(1)) {
-                ShowSevereError(state, cFaultCurrentObject + " = \"" + cNumericFieldNames(1) + "\" cannot be blank.");
+                ShowSevereError(state, format("{} = \"{}\" cannot be blank.", cFaultCurrentObject, cNumericFieldNames(1)));
                 state.dataFaultsMgr->ErrorsFound = true;
             } else {
                 state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).Offset = rNumericArgs(1);
@@ -1746,9 +1776,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).AvaiSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1760,9 +1790,9 @@ namespace FaultsManager {
             } else {
                 state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).SeveritySchedPtr == 0) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
             }
@@ -1792,8 +1822,10 @@ namespace FaultsManager {
                                                               state.dataWaterCoils->WaterCoil);
                 if (CoilNum <= 0) {
                     ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\". Referenced Coil named \"" +
-                                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilName + "\" was not found.");
+                                    format("{} = \"{}\". Referenced Coil named \"{}\" was not found.",
+                                           cFaultCurrentObject,
+                                           cAlphaArgs(1),
+                                           state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilName));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Coil is found: check if the right type
@@ -1875,9 +1907,9 @@ namespace FaultsManager {
                                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
                         }
                     } else {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" +
-                                            cAlphaArgs(2) + "\".");
+                        ShowSevereError(
+                            state,
+                            format("{} = \"{}\" invalid {} = \"{}\".", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                         ShowContinueError(
                             state, R"(Coil was found but it is not one of the supported types ("Coil:Cooling:Water" or "Coil:Heating:Water").)");
                         state.dataFaultsMgr->ErrorsFound = true;
@@ -1918,8 +1950,11 @@ namespace FaultsManager {
                     state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedPtr == 0) {
                         ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" +
-                                            cAlphaArgs(2) + "\" not found.");
+                                        format("{} = \"{}\" invalid {} = \"{}\" not found.",
+                                               cFaultCurrentObject,
+                                               cAlphaArgs(1),
+                                               cAlphaFieldNames(2),
+                                               cAlphaArgs(2)));
                         state.dataFaultsMgr->ErrorsFound = true;
                     }
                 }
@@ -1932,8 +1967,11 @@ namespace FaultsManager {
                     state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr == 0) {
                         ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" +
-                                            cAlphaArgs(3) + "\" not found.");
+                                        format("{} = \"{}\" invalid {} = \"{}\" not found.",
+                                               cFaultCurrentObject,
+                                               cAlphaArgs(1),
+                                               cAlphaFieldNames(3),
+                                               cAlphaArgs(3)));
                         state.dataFaultsMgr->ErrorsFound = true;
                     }
                 }
@@ -1941,9 +1979,9 @@ namespace FaultsManager {
                 state.dataFaultsMgr->FaultsEconomizer(j).ControllerType = cAlphaArgs(4);
                 // check controller type
                 if (lAlphaFieldBlanks(4)) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
-                                        "\" blank.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == "CONTROLLER:OUTDOORAIR") {
@@ -1958,9 +1996,9 @@ namespace FaultsManager {
                 state.dataFaultsMgr->FaultsEconomizer(j).ControllerName = cAlphaArgs(5);
                 // check controller name
                 if (lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state,
-                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                        "\" blank.");
+                    ShowSevereError(
+                        state,
+                        format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,6 +72,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -4010,7 +4011,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -8318,7 +8319,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

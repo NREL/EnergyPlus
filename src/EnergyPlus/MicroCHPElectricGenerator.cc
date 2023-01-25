@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -78,6 +77,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::MicroCHPElectricGenerator {
 
@@ -117,7 +117,7 @@ PlantComponent *MicroCHPDataStruct::factory(EnergyPlusData &state, std::string c
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "LocalMicroCHPGenFactory: Error getting inputs for micro-CHP gen named: " + objectName); // LCOV_EXCL_LINE
+    ShowFatalError(state, format("LocalMicroCHPGenFactory: Error getting inputs for micro-CHP gen named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
     return nullptr; // LCOV_EXCL_LINE
 }
@@ -153,7 +153,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataCHPElectGen->NumMicroCHPParams <= 0) {
-            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -190,8 +190,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).PlantFlowControl = false;
             }
             if ((!(UtilityRoutines::SameString(AlphArray(4), "InternalControl"))) && (!(UtilityRoutines::SameString(AlphArray(4), "PlantControl")))) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
             if (state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).InternalFlowControl) { // get the curve
@@ -212,14 +212,14 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MCeng = NumArray(10);            // N10 Aggregated Thermal Mass of Generator MC_eng
             if (state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MCeng <= 0.0) {
                 ShowSevereError(state, format("Invalid, {} = {:.5R}", state.dataIPShortCut->cNumericFieldNames(10), NumArray(10)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ShowContinueError(state, "Thermal mass must be greater than zero");
                 ErrorsFound = true;
             }
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MCcw = NumArray(11); // Aggregated Thermal Mass of Heat Recovery MC_cw
             if (state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MCcw <= 0.0) {
                 ShowSevereError(state, format("Invalid, {} = {:.5R}", state.dataIPShortCut->cNumericFieldNames(11), NumArray(11)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ShowContinueError(state, "Thermal mass must be greater than zero");
                 ErrorsFound = true;
             }
@@ -231,8 +231,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             }
             if ((!(UtilityRoutines::SameString(AlphArray(7), "NominalEngineTemperature"))) &&
                 (!(UtilityRoutines::SameString(AlphArray(7), "TimeDelay")))) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).kf = NumArray(13);          // N13 Warmup Fuel Flow Rate Coefficient k_f
@@ -251,8 +251,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             }
             if ((!(UtilityRoutines::SameString(AlphArray(8), "MandatoryCoolDown"))) &&
                 (!(UtilityRoutines::SameString(AlphArray(8), "OptionalCoolDown")))) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
         }
@@ -263,7 +263,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
 
         if (state.dataCHPElectGen->NumMicroCHPs <= 0) {
             // shouldn't ever come here?
-            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -297,8 +297,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model =
                     state.dataCHPElectGen->MicroCHPParamInput(thisParamID); // entire structure of input data assigned here!
             } else {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
@@ -307,8 +307,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneID =
                     UtilityRoutines::FindItemInList(state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneName, state.dataHeatBal->Zone);
                 if (state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneID == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + AlphArray(3));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), AlphArray(3)));
+                    ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
             } else {
@@ -368,8 +368,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             state.dataCHPElectGen->MicroCHP(GeneratorNum).FuelSupplyID =
                 UtilityRoutines::FindItemInList(AlphArray(8), state.dataGenerator->FuelSupply); // Fuel Supply ID
             if (state.dataCHPElectGen->MicroCHP(GeneratorNum).FuelSupplyID == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
@@ -378,8 +378,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             } else {
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID = ScheduleManager::GetScheduleIndex(state, AlphArray(9));
                 if (state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + AlphArray(9));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), AlphArray(9)));
+                    ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
             }
@@ -388,7 +388,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
         }
 
         // setup report variables
@@ -880,7 +880,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
 
     Real64 thisAmbientTemp;
     if (this->ZoneID > 0) {
-        thisAmbientTemp = state.dataHeatBalFanSys->MAT(this->ZoneID);
+        thisAmbientTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ZoneID).MAT;
     } else { // outdoor location, no zone
         thisAmbientTemp = state.dataEnvrn->OutDryBulbTemp;
     }

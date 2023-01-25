@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -252,7 +252,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 // get the outside air fraction
                 if (this->curOASysNum > 0) {
                     OutAirFrac = 1.0;
-                } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::MinOA) {
+                } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::OAControl::MinOA) {
                     if (DesVolFlow > 0.0) {
                         OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / DesVolFlow;
                     } else {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,16 +57,17 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -1600,8 +1601,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                                // expect no errors
+    Material::GetMaterialData(*state, errors); // read material data
+    EXPECT_FALSE(errors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                                 // expect no errors
@@ -2324,8 +2325,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                                // expect no errors
+    Material::GetMaterialData(*state, errors); // read material data
+    EXPECT_FALSE(errors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                                 // expect no errors
@@ -2967,8 +2968,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                                // expect no errors
+    Material::GetMaterialData(*state, errors); // read material data
+    EXPECT_FALSE(errors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                                 // expect no errors
@@ -3676,8 +3677,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                                // expect no errors
+    Material::GetMaterialData(*state, errors); // read material data
+    EXPECT_FALSE(errors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                                 // expect no errors
@@ -4330,8 +4331,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                                // expect no errors
+    Material::GetMaterialData(*state, errors); // read material data
+    EXPECT_FALSE(errors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                                 // expect no errors
@@ -5542,8 +5543,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                                // expect no errors
+    Material::GetMaterialData(*state, errors); // read material data
+    EXPECT_FALSE(errors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                                 // expect no errors
@@ -5997,8 +5998,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
-    EXPECT_FALSE(errors);                                // expect no errors
+    Material::GetMaterialData(*state, errors); // read material data
+    EXPECT_FALSE(errors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                                 // expect no errors
@@ -6018,10 +6019,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     // #6912
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;

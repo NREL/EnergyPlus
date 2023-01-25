@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -116,7 +116,8 @@ char *listAllAPIDataCSV(EnergyPlusState state)
     // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
     // this function, and undefined behavior will occur.
     // instead make a deep copy, and the user must manage the new char * pointer
-    char *p = new char[std::strlen(output.c_str())];
+    // strcpy copies including the null-terminator, strlen doesn't include it
+    char *p = new char[std::strlen(output.c_str()) + 1];
     std::strcpy(p, output.c_str());
     return p;
 }
@@ -296,8 +297,7 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
             if (availActuator.handleCount > 0) {
                 // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
                 bool foundActuator = false;
-                for (int ActuatorLoopUsed = 1; ActuatorLoopUsed <= thisState->dataRuntimeLang->numActuatorsUsed; ++ActuatorLoopUsed) {
-                    auto const &usedActuator = thisState->dataRuntimeLang->EMSActuatorUsed(ActuatorLoopUsed);
+                for (auto const &usedActuator : thisState->dataRuntimeLang->EMSActuatorUsed) {
                     if (usedActuator.ActuatorVariableNum == handle) {
                         EnergyPlus::ShowWarningError(
                             *thisState,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -143,7 +143,7 @@ namespace Photovoltaics {
         if (GeneratorIndex == 0) {
             PVnum = UtilityRoutines::FindItemInList(GeneratorName, state.dataPhotovoltaic->PVarray);
             if (PVnum == 0) {
-                ShowFatalError(state, "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName);
+                ShowFatalError(state, format("SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators {}", GeneratorName));
             }
             GeneratorIndex = PVnum;
         } else {
@@ -183,7 +183,7 @@ namespace Photovoltaics {
             CalcSandiaPV(state, PVnum, RunFlag);
         } break;
         default: {
-            ShowFatalError(state, "Specified generator model type not found for PV generator = " + GeneratorName);
+            ShowFatalError(state, format("Specified generator model type not found for PV generator = {}", GeneratorName));
         } break;
         }
 
@@ -276,7 +276,7 @@ namespace Photovoltaics {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSandiaPerfObjectName);
 
         if (state.dataPhotovoltaic->NumPVs <= 0) {
-            ShowSevereError(state, "Did not find any " + state.dataPhotovoltaic->cPVGeneratorObjectName);
+            ShowSevereError(state, format("Did not find any {}", state.dataPhotovoltaic->cPVGeneratorObjectName));
             return;
         }
 
@@ -305,14 +305,14 @@ namespace Photovoltaics {
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
             // required-surface
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Surface name cannot be blank");
                 ErrorsFound = true;
             }
             if (state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             } else {
                 // Found one -- make sure has right parameters for PV
@@ -320,8 +320,9 @@ namespace Photovoltaics {
                 state.dataSurface->SurfIsPV(SurfNum) = true;
 
                 if (!state.dataSurface->Surface(SurfNum).ExtSolar) {
-                    ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowWarningError(state,
+                                     format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Surface is not exposed to solar, check surface bounday condition");
                 }
                 state.dataPhotovoltaic->PVarray(PVnum).Zone = GetPVZone(state, state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr);
@@ -329,9 +330,10 @@ namespace Photovoltaics {
                 // check surface orientation, warn if upside down
                 if ((state.dataSurface->Surface(SurfNum).Tilt < -95.0) || (state.dataSurface->Surface(SurfNum).Tilt > 95.0)) {
                     ShowWarningError(state,
-                                     "Suspected input problem with " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " +
-                                         state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                     format("Suspected input problem with {} = {}",
+                                            state.dataIPShortCut->cAlphaFieldNames(2),
+                                            state.dataIPShortCut->cAlphaArgs(2)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Surface used for solar collector faces down");
                     ShowContinueError(
                         state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", state.dataSurface->Surface(SurfNum).Tilt));
@@ -347,13 +349,13 @@ namespace Photovoltaics {
                 state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Sandia;
             } else { // throw error, did not find module performance type
                 if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Field cannot be blank");
                     ErrorsFound = true;
                 } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Did not recognize entry");
                     ErrorsFound = true;
                 }
@@ -375,13 +377,13 @@ namespace Photovoltaics {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::PVTSolarCollector;
             } else {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Field cannot be blank");
                     ErrorsFound = true;
                 } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Did not recognize entry");
                     ErrorsFound = true;
                 }
@@ -404,28 +406,31 @@ namespace Photovoltaics {
                 if (dupPtr != 0) dupPtr += PVnum; // to correct for shortened array in find item
                 if (dupPtr != 0) {
                     if (state.dataPhotovoltaic->PVarray(dupPtr).CellIntegrationMode == CellIntegration::SurfaceOutsideFace) {
-                        ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
+                        ShowSevereError(state, format("{}: problem detected with multiple PV arrays.", cCurrentModuleObject));
                         ShowContinueError(state, "When using IntegratedSurfaceOutsideFace heat transfer mode, only one PV array can be coupled");
                         ShowContinueError(state,
-                                          "Both " + state.dataPhotovoltaic->PVarray(PVnum).Name + " and " +
-                                              state.dataPhotovoltaic->PVarray(dupPtr).Name + " are using surface " +
-                                              state.dataPhotovoltaic->PVarray(PVnum).SurfaceName);
+                                          format("Both {} and {} are using surface {}",
+                                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
+                                                 state.dataPhotovoltaic->PVarray(dupPtr).Name,
+                                                 state.dataPhotovoltaic->PVarray(PVnum).SurfaceName));
                         ErrorsFound = true;
                     } else if (state.dataPhotovoltaic->PVarray(dupPtr).CellIntegrationMode == CellIntegration::TranspiredCollector) {
-                        ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
+                        ShowSevereError(state, format("{}: problem detected with multiple PV arrays.", cCurrentModuleObject));
                         ShowContinueError(state, "When using IntegratedTranspiredCollector heat transfer mode, only one PV array can be coupled");
                         ShowContinueError(state,
-                                          "Both " + state.dataPhotovoltaic->PVarray(PVnum).Name + " and " +
-                                              state.dataPhotovoltaic->PVarray(dupPtr).Name +
-                                              " are using UTSC surface = " + state.dataPhotovoltaic->PVarray(PVnum).SurfaceName);
+                                          format("Both {} and {} are using UTSC surface = {}",
+                                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
+                                                 state.dataPhotovoltaic->PVarray(dupPtr).Name,
+                                                 state.dataPhotovoltaic->PVarray(PVnum).SurfaceName));
                         ErrorsFound = true;
                     } else if (state.dataPhotovoltaic->PVarray(dupPtr).CellIntegrationMode == CellIntegration::ExteriorVentedCavity) {
-                        ShowSevereError(state, cCurrentModuleObject + ": problem detected with multiple PV arrays.");
+                        ShowSevereError(state, format("{}: problem detected with multiple PV arrays.", cCurrentModuleObject));
                         ShowContinueError(state, "When using IntegratedExteriorVentedCavity heat transfer mode, only one PV array can be coupled");
                         ShowContinueError(state,
-                                          "Both " + state.dataPhotovoltaic->PVarray(PVnum).Name + " and " +
-                                              state.dataPhotovoltaic->PVarray(dupPtr).Name +
-                                              " are using exterior vented surface = " + state.dataPhotovoltaic->PVarray(PVnum).SurfaceName);
+                                          format("Both {} and {} are using exterior vented surface = {}",
+                                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
+                                                 state.dataPhotovoltaic->PVarray(dupPtr).Name,
+                                                 state.dataPhotovoltaic->PVarray(PVnum).SurfaceName));
                         ErrorsFound = true;
                     }
                 }
@@ -463,13 +468,15 @@ namespace Photovoltaics {
                     tmpSimpleModuleParams(ModNum).EfficencyInputMode = Efficiency::Scheduled;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state,
+                                        format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state, "Field cannot be blank");
                         ErrorsFound = true;
                     } else {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state,
+                                        format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state, "Did not recognize entry");
                         ErrorsFound = true;
                     }
@@ -478,8 +485,8 @@ namespace Photovoltaics {
 
                 tmpSimpleModuleParams(ModNum).EffSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if ((tmpSimpleModuleParams(ModNum).EffSchedPtr == 0) && (tmpSimpleModuleParams(ModNum).EfficencyInputMode == Efficiency::Scheduled)) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Did not find schedule");
                     ErrorsFound = true;
                 }
@@ -512,13 +519,15 @@ namespace Photovoltaics {
                     tmpTNRSYSModuleParams(ModNum).CellType = SiPVCells::Amorphous;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state,
+                                        format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state, "Field cannot be blank");
                         ErrorsFound = true;
                     } else {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state,
+                                        format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state, "Did not recognize entry");
                         ErrorsFound = true;
                     }
@@ -623,9 +632,10 @@ namespace Photovoltaics {
                         state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).Area *
                         state.dataPhotovoltaic->PVarray(PVnum).SimplePVModule.ActiveFraction;
                 } else {
-                    ShowSevereError(state, "Invalid PV performance object name of " + state.dataPhotovoltaic->PVarray(PVnum).PerfObjName);
+                    ShowSevereError(state, format("Invalid PV performance object name of {}", state.dataPhotovoltaic->PVarray(PVnum).PerfObjName));
                     ShowContinueError(
-                        state, "Entered in " + state.dataPhotovoltaic->cPVGeneratorObjectName + " = " + state.dataPhotovoltaic->PVarray(PVnum).Name);
+                        state,
+                        format("Entered in {} = {}", state.dataPhotovoltaic->cPVGeneratorObjectName, state.dataPhotovoltaic->PVarray(PVnum).Name));
                     ErrorsFound = true;
                 }
             } break;
@@ -634,9 +644,10 @@ namespace Photovoltaics {
                 if (ThisParamObj > 0) {
                     state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule = tmpTNRSYSModuleParams(ThisParamObj); // entire structure assignment
                 } else {
-                    ShowSevereError(state, "Invalid PV performance object name of " + state.dataPhotovoltaic->PVarray(PVnum).PerfObjName);
+                    ShowSevereError(state, format("Invalid PV performance object name of {}", state.dataPhotovoltaic->PVarray(PVnum).PerfObjName));
                     ShowContinueError(
-                        state, "Entered in " + state.dataPhotovoltaic->cPVGeneratorObjectName + " = " + state.dataPhotovoltaic->PVarray(PVnum).Name);
+                        state,
+                        format("Entered in {} = {}", state.dataPhotovoltaic->cPVGeneratorObjectName, state.dataPhotovoltaic->PVarray(PVnum).Name));
                     ErrorsFound = true;
                 }
             } break;
@@ -646,9 +657,10 @@ namespace Photovoltaics {
                 if (ThisParamObj > 0) {
                     state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule = tmpSNLModuleParams(ThisParamObj); // entire structure assignment
                 } else {
-                    ShowSevereError(state, "Invalid PV performance object name of " + state.dataPhotovoltaic->PVarray(PVnum).PerfObjName);
+                    ShowSevereError(state, format("Invalid PV performance object name of {}", state.dataPhotovoltaic->PVarray(PVnum).PerfObjName));
                     ShowContinueError(
-                        state, "Entered in " + state.dataPhotovoltaic->cPVGeneratorObjectName + " = " + state.dataPhotovoltaic->PVarray(PVnum).Name);
+                        state,
+                        format("Entered in {} = {}", state.dataPhotovoltaic->cPVGeneratorObjectName, state.dataPhotovoltaic->PVarray(PVnum).Name));
                     ErrorsFound = true;
                 }
             } break;
@@ -715,15 +727,15 @@ namespace Photovoltaics {
                 // check that surface is HeatTransfer and a Construction with Internal Source was used
                 if (!state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).HeatTransSurf) {
                     ShowSevereError(state,
-                                    "Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " +
-                                        state.dataPhotovoltaic->PVarray(PVnum).Name);
+                                    format("Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in {}",
+                                           state.dataPhotovoltaic->PVarray(PVnum).Name));
                     ErrorsFound = true;
                 } else if (!state.dataConstruction
                                 ->Construct(state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).Construction)
                                 .SourceSinkPresent) {
                     ShowSevereError(state,
-                                    "Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " +
-                                        state.dataPhotovoltaic->PVarray(PVnum).Name);
+                                    format("Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in {}",
+                                           state.dataPhotovoltaic->PVarray(PVnum).Name));
                     ErrorsFound = true;
                 }
             }
@@ -998,7 +1010,8 @@ namespace Photovoltaics {
                 // add calls to PVT models here
             } break;
             default: {
-                ShowSevereError(state, "Sandia PV Simulation Temperature Modeling Mode Error in " + state.dataPhotovoltaic->PVarray(PVnum).Name);
+                ShowSevereError(state,
+                                format("Sandia PV Simulation Temperature Modeling Mode Error in {}", state.dataPhotovoltaic->PVarray(PVnum).Name));
             } break;
             }
 
@@ -1639,7 +1652,7 @@ namespace Photovoltaics {
         } else {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError(state, "Check input data in " + state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, format("Check input data in {}", state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName));
             ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
             ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FUN: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
@@ -1672,7 +1685,7 @@ namespace Photovoltaics {
         } else {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError(state, "Check input data in " + state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, format("Check input data in {}", state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName));
             ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
             ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
@@ -1705,7 +1718,7 @@ namespace Photovoltaics {
         } else {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
-            ShowContinueError(state, "Check input data in " + state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
+            ShowContinueError(state, format("Check input data in {}", state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName));
             ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
             ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
@@ -2272,8 +2285,8 @@ namespace Photovoltaics {
 
         if (!Found) {
             ShowFatalError(state,
-                           "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " +
-                               state.dataSurface->Surface(SurfacePtr).Name);
+                           format("Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = {}",
+                                  state.dataSurface->Surface(SurfacePtr).Name));
         } else {
 
             VentCavIndex = CavNum;

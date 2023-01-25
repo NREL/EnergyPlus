@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -235,11 +235,12 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofFirstTimeTest)
     Real64 allowableTolerance = 0.000001;
 
     state->dataConstruction->Construct.allocate(constrNum);
-    state->dataMaterial->Material.allocate(1);
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
+    state->dataMaterial->Material.push_back(mat);
     state->dataSurface->Surface.allocate(surfNum);
 
     auto &thisConstruct = state->dataConstruction->Construct(constrNum);
-    auto &thisMat = state->dataMaterial->Material(1);
+    auto thisMat = state->dataMaterial->Material(1);
     auto &thisEcoRoof = state->dataEcoRoofMgr;
 
     thisConstruct.LayerPoint.allocate(1);
@@ -247,8 +248,8 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofFirstTimeTest)
 
     state->dataSurface->Surface(surfNum).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
 
-    thisMat.LAI = 3.21;
-    thisMat.AbsorpSolar = 0.72;
+    thisMat->LAI = 3.21;
+    thisMat->AbsorpSolar = 0.72;
     thisEcoRoof->FirstEcoSurf = 0;
     thisEcoRoof->EcoRoofbeginFlag = true;
 
@@ -271,7 +272,8 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofTest)
     Real64 allowableTolerance = 0.000001;
 
     state->dataConstruction->Construct.allocate(constrNum);
-    state->dataMaterial->Material.allocate(1);
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
+    state->dataMaterial->Material.push_back(mat);
     state->dataSurface->Surface.allocate(surfNum);
 
     auto &thisConstruct = state->dataConstruction->Construct(constrNum);
@@ -285,8 +287,8 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofTest)
     state->dataGlobal->BeginEnvrnFlag = false;
     state->dataGlobal->WarmupFlag = true;
     thisEcoRoof->CalcEcoRoofMyEnvrnFlag = false;
-    thisMat.InitMoisture = 23.0;
-    thisMat.AbsorpSolar = 0.72;
+    thisMat->InitMoisture = 23.0;
+    thisMat->AbsorpSolar = 0.72;
     thisEcoRoof->Moisture = 0.0;
     thisEcoRoof->MeanRootMoisture = 0.0;
     thisEcoRoof->Alphag = 0.0;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,10 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 
 namespace EnergyPlus {
 
@@ -77,4 +79,55 @@ TEST_F(EnergyPlusFixture, TestPipesInput)
     EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Pipe, state->dataPipes->LocalPipe(1).Type));
     EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::PipeSteam, state->dataPipes->LocalPipe(2).Type));
 }
+
+TEST_F(EnergyPlusFixture, CalcPipeHeatTransCoef)
+{
+
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "Indoor Pipe";
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PipeInterior;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 0; // just skip the supply side search
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+
+    state->dataPipeHT->nsvNumOfPipeHT = 1;
+    state->dataPipeHT->PipeHT.allocate(state->dataPipeHT->nsvNumOfPipeHT);
+    state->dataPipeHT->PipeHTUniqueNames.reserve(static_cast<unsigned>(state->dataPipeHT->nsvNumOfPipeHT));
+    state->dataPipeHT->GetPipeInputFlag = false;
+    auto &pipe = state->dataPipeHT->PipeHT(1);
+    pipe.Name = "Indoor Pipe";
+    pipe.Type = DataPlant::PlantEquipmentType::PipeInterior;
+    pipe.Construction = "Pipe construction";
+    pipe.ConstructionNum = 1;
+    pipe.InletNodeNum = 1;
+    pipe.OutletNodeNum = 2;
+    int constexpr NumPipeSections(20);
+    pipe.FluidTemp.allocate({0, NumPipeSections});
+    pipe.FluidTemp = 7.0;
+
+    bool errFlag = false;
+    // test simple searching first
+    PlantUtilities::ScanPlantLoopsForObject(*state, pipe.Name, pipe.Type, pipe.plantLoc, errFlag);
+    ASSERT_FALSE(errFlag);
+    EXPECT_EQ(1, pipe.plantLoc.loopNum);
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, pipe.plantLoc.loopSideNum));
+    EXPECT_EQ(1, pipe.plantLoc.branchNum);
+    EXPECT_EQ(1, pipe.plantLoc.compNum);
+
+    constexpr Real64 massFlowRate = 0.5;
+    constexpr Real64 diameter = 0.05;
+    // Try a temperrature below the min
+    EXPECT_NO_THROW(pipe.CalcPipeHeatTransCoef(*state, 1.0, massFlowRate, diameter));
+    // Try a temperature above the max
+    EXPECT_NO_THROW(pipe.CalcPipeHeatTransCoef(*state, 65.0, massFlowRate, diameter));
+}
+
 } // namespace EnergyPlus

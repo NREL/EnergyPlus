@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -622,7 +622,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state->dataSize->PlantSizData(1).PlantLoopName = "ChilledWaterLoop";
     state->dataSize->PlantSizData(1).ExitTemp = 6.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
-    state->dataSize->PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Cooling;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -937,7 +937,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state->dataSize->PlantSizData(1).PlantLoopName = "SteamLoop";
     state->dataSize->PlantSizData(1).ExitTemp = 100.0;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
-    state->dataSize->PlantSizData(1).LoopType = DataSizing::SteamLoop;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Steam;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;

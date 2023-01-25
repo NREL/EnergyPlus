@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -154,7 +154,7 @@ void SimPIU(EnergyPlusData &state,
     if (CompIndex == 0) {
         PIUNum = UtilityRoutines::FindItemInList(CompName, state.dataPowerInductionUnits->PIU);
         if (PIUNum == 0) {
-            ShowFatalError(state, "SimPIU: PIU Unit not found=" + std::string{CompName});
+            ShowFatalError(state, format("SimPIU: PIU Unit not found={}", CompName));
         }
         CompIndex = PIUNum;
     } else {
@@ -199,8 +199,8 @@ void SimPIU(EnergyPlusData &state,
         break;
     }
     default:
-        ShowSevereError(state, "Illegal PI Unit Type used=" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType);
-        ShowContinueError(state, "Occurs in PI Unit=" + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+        ShowSevereError(state, format("Illegal PI Unit Type used={}", state.dataPowerInductionUnits->PIU(PIUNum).UnitType));
+        ShowContinueError(state, format("Occurs in PI Unit={}", state.dataPowerInductionUnits->PIU(PIUNum).Name));
         ShowFatalError(state, "Preceding condition causes termination.");
         break;
     }
@@ -303,9 +303,13 @@ void GetPIUs(EnergyPlusData &state)
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                    " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                    state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2),
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -329,7 +333,7 @@ void GetPIUs(EnergyPlusData &state)
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
-                ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
+                ShowSevereError(state, format("{}Steam Properties for {} not found.", RoutineName, state.dataIPShortCut->cAlphaArgs(1)));
                 if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                 ErrorsFound = true;
                 SteamMessageNeeded = false;
@@ -337,8 +341,8 @@ void GetPIUs(EnergyPlusData &state)
             break;
         }
         default: {
-            ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
-            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+            ShowSevereError(state, format("Illegal {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, state.dataPowerInductionUnits->PIU(PIUNum).Name));
             ErrorsFound = true;
         }
         }
@@ -418,7 +422,8 @@ void GetPIUs(EnergyPlusData &state)
             ValidateComponent(state, "FAN:CONSTANTVOLUME", state.dataPowerInductionUnits->PIU(PIUNum).FanName, isNotOkay, "GetPIUs");
             if (isNotOkay) {
                 ShowContinueError(
-                    state, "In " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                    state,
+                    format("In {} = {}", state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name));
                 ErrorsFound = true;
             }
             state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
@@ -434,7 +439,7 @@ void GetPIUs(EnergyPlusData &state)
                           IsNotOK,
                           cCurrentModuleObject + " - Heating Coil");
         if (IsNotOK) {
-            ShowContinueError(state, "In " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+            ShowContinueError(state, format("In {} = {}", cCurrentModuleObject, state.dataPowerInductionUnits->PIU(PIUNum).Name));
             ErrorsFound = true;
         }
         state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(4);
@@ -481,10 +486,12 @@ void GetPIUs(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" +
-                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
-            ShowContinueError(state,
-                              "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
+                            format("{}No matching Air Distribution Unit, for PIU = [{},{}].",
+                                   RoutineName,
+                                   state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                   state.dataPowerInductionUnits->PIU(PIUNum).Name));
+            ShowContinueError(
+                state, format("...should have outlet node = {}", state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode)));
             ErrorsFound = true;
         } else {
 
@@ -509,8 +516,9 @@ void GetPIUs(EnergyPlusData &state)
             }
             if (!AirNodeFound) {
                 ShowSevereError(
-                    state, "The outlet air node from the " + cCurrentModuleObject + " Unit = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node = " + state.dataIPShortCut->cAlphaArgs(5));
+                    state,
+                    format("The outlet air node from the {} Unit = {}", cCurrentModuleObject, state.dataPowerInductionUnits->PIU(PIUNum).Name));
+                ShowContinueError(state, format("did not have a matching Zone Equipment Inlet Node, Node = {}", state.dataIPShortCut->cAlphaArgs(5)));
                 ErrorsFound = true;
             }
         }
@@ -551,9 +559,13 @@ void GetPIUs(EnergyPlusData &state)
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                    " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                    state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2),
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -571,7 +583,7 @@ void GetPIUs(EnergyPlusData &state)
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
-                ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
+                ShowSevereError(state, format("{}Steam Properties for {} not found.", RoutineName, state.dataIPShortCut->cAlphaArgs(1)));
                 if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                 ErrorsFound = true;
                 SteamMessageNeeded = false;
@@ -579,8 +591,8 @@ void GetPIUs(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = HtgCoilType::Electric;
         } else {
-            ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
-            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+            ShowSevereError(state, format("Illegal {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, state.dataPowerInductionUnits->PIU(PIUNum).Name));
             ErrorsFound = true;
         }
 
@@ -656,7 +668,8 @@ void GetPIUs(EnergyPlusData &state)
             ValidateComponent(state, "FAN:CONSTANTVOLUME", state.dataPowerInductionUnits->PIU(PIUNum).FanName, isNotOkay, "GetPIUs");
             if (isNotOkay) {
                 ShowContinueError(
-                    state, "In " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                    state,
+                    format("In {} = {}", state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name));
                 ErrorsFound = true;
             }
             state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
@@ -671,7 +684,7 @@ void GetPIUs(EnergyPlusData &state)
                           IsNotOK,
                           cCurrentModuleObject + " - Heating Coil");
         if (IsNotOK) {
-            ShowContinueError(state, "In " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+            ShowContinueError(state, format("In {} = {}", cCurrentModuleObject, state.dataPowerInductionUnits->PIU(PIUNum).Name));
             ErrorsFound = true;
         }
         state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow = state.dataIPShortCut->rNumericArgs(5);
@@ -719,10 +732,12 @@ void GetPIUs(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" +
-                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
-            ShowContinueError(state,
-                              "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
+                            format("{}No matching Air Distribution Unit, for PIU = [{},{}].",
+                                   RoutineName,
+                                   state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                   state.dataPowerInductionUnits->PIU(PIUNum).Name));
+            ShowContinueError(
+                state, format("...should have outlet node = {}", state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode)));
             ErrorsFound = true;
         } else {
 
@@ -747,15 +762,16 @@ void GetPIUs(EnergyPlusData &state)
             }
             if (!AirNodeFound) {
                 ShowSevereError(
-                    state, "The outlet air node from the " + cCurrentModuleObject + " Unit = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node = " + state.dataIPShortCut->cAlphaArgs(5));
+                    state,
+                    format("The outlet air node from the {} Unit = {}", cCurrentModuleObject, state.dataPowerInductionUnits->PIU(PIUNum).Name));
+                ShowContinueError(state, format("did not have a matching Zone Equipment Inlet Node, Node = {}", state.dataIPShortCut->cAlphaArgs(5)));
                 ErrorsFound = true;
             }
         }
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.  Preceding conditions cause termination.");
+        ShowFatalError(state, format("{}Errors found in getting input.  Preceding conditions cause termination.", RoutineName));
     }
 
     for (PIUNum = 1; PIUNum <= state.dataPowerInductionUnits->NumPIUs; ++PIUNum) {
@@ -893,12 +909,12 @@ void InitPIU(EnergyPlusData &state,
                                        state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(Loop).ADUNum).Name))
                 continue;
             ShowSevereError(state,
-                            "InitPIU: ADU=[Air Distribution Unit," +
-                                state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(Loop).ADUNum).Name +
-                                "] is not on any ZoneHVAC:EquipmentList.");
+                            format("InitPIU: ADU=[Air Distribution Unit,{}] is not on any ZoneHVAC:EquipmentList.",
+                                   state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(Loop).ADUNum).Name));
             ShowContinueError(state,
-                              "...PIU=[" + state.dataPowerInductionUnits->PIU(Loop).UnitType + ',' + state.dataPowerInductionUnits->PIU(Loop).Name +
-                                  "] will not be simulated.");
+                              format("...PIU=[{},{}] will not be simulated.",
+                                     state.dataPowerInductionUnits->PIU(Loop).UnitType,
+                                     state.dataPowerInductionUnits->PIU(Loop).Name));
         }
     }
 
@@ -1171,8 +1187,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         if ((std::abs(MaxPriAirVolFlowDes - MaxPriAirVolFlowUser) / MaxPriAirVolFlowUser) >
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
-                                        "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                            ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                        format("SizePIU: Potential issue with equipment sizing for {} {}",
+                                               state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                               state.dataPowerInductionUnits->PIU(PIUNum).Name));
                             ShowContinueError(state, format("User-Specified Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowUser));
                             ShowContinueError(state, format("differs from Design Size Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1225,8 +1242,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) >
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
-                                        "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                            ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                        format("SizePIU: Potential issue with equipment sizing for {} {}",
+                                               state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                               state.dataPowerInductionUnits->PIU(PIUNum).Name));
                             ShowContinueError(state, format("User-Specified Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowUser));
                             ShowContinueError(state, format("differs from Design Size Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1296,8 +1314,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         if ((std::abs(MaxSecAirVolFlowDes - MaxSecAirVolFlowUser) / MaxSecAirVolFlowUser) >
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
-                                        "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                            ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                        format("SizePIU: Potential issue with equipment sizing for {} {}",
+                                               state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                               state.dataPowerInductionUnits->PIU(PIUNum).Name));
                             ShowContinueError(state, format("User-Specified Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowUser));
                             ShowContinueError(
                                 state, format("differs from Design Size Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowDes));
@@ -1345,14 +1364,13 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow *= MinPriAirFlowFracDes;
                             MinPriAirFlowFracDes = 1.0;
                             ShowWarningError(state,
-                                             "SingleDuctSystem:SizeSys: Autosized maximum air flow rate for " +
-                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name +
-                                                 " was increased to meet the zone primary air flow determined according to the ASHRAE Standard 62.1 "
-                                                 "Simplified Procedure.");
+                                             format("SingleDuctSystem:SizeSys: Autosized maximum air flow rate for {} was increased to meet the zone "
+                                                    "primary air flow determined according to the ASHRAE Standard 62.1 Simplified Procedure.",
+                                                    state.dataPowerInductionUnits->PIU(PIUNum).Name));
                         } else if (MinPriAirFlowFracDes > 1.0) {
                             ShowWarningError(state,
-                                             "SingleDuctSystem:SizeSys: Maximum primary air flow rate for " +
-                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name + " is potentially too low.");
+                                             format("SingleDuctSystem:SizeSys: Maximum primary air flow rate for {} is potentially too low.",
+                                                    state.dataPowerInductionUnits->PIU(PIUNum).Name));
                             ShowContinueError(state,
                                               "The flow is lower than the minimum primary air flow rate calculated following the ASHRAE Standard "
                                               "62.1 Simplified Procedure:");
@@ -1393,8 +1411,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         if ((std::abs(MinPriAirFlowFracDes - MinPriAirFlowFracUser) / MinPriAirFlowFracUser) >
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
-                                        "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                            ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                        format("SizePIU: Potential issue with equipment sizing for {} {}",
+                                               state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                               state.dataPowerInductionUnits->PIU(PIUNum).Name));
                             ShowContinueError(state, format("User-Specified Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracUser));
                             ShowContinueError(state,
                                               format("differs from Design Size Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracDes));
@@ -1454,8 +1473,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(FanOnFlowFracDes - FanOnFlowFracUser) / FanOnFlowFracUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
-                                        "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                            ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                        format("SizePIU: Potential issue with equipment sizing for {} {}",
+                                               state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                               state.dataPowerInductionUnits->PIU(PIUNum).Name));
                             ShowContinueError(state, format("User-Specified Fan On Flow Fraction of {:.1R}", FanOnFlowFracUser));
                             ShowContinueError(state, format("differs from Design Size Fan On Flow Fraction of {:.1R}", FanOnFlowFracDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1528,8 +1548,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     } else {
                         ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
                         ShowContinueError(state,
-                                          "Occurs in" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                              " Object=" + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                          format("Occurs in{} Object={}",
+                                                 state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name));
                         ErrorsFound = true;
                     }
                 }
@@ -1564,9 +1585,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state,
-                                            "SizePIU: Potential issue with equipment sizing for " +
-                                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' +
-                                                state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                            format("SizePIU: Potential issue with equipment sizing for {} {}",
+                                                   state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                                   state.dataPowerInductionUnits->PIU(PIUNum).Name));
                                 ShowContinueError(state,
                                                   format("User-Specified Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
                                 ShowContinueError(
@@ -1640,8 +1661,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     } else {
                         ShowSevereError(state, "Autosizing of Steam flow requires a heating loop Sizing:Plant object");
                         ShowContinueError(state,
-                                          "Occurs in" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                              " Object=" + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                          format("Occurs in{} Object={}",
+                                                 state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name));
                         ErrorsFound = true;
                     }
                 }
@@ -1666,9 +1688,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state,
-                                            "SizePIU: Potential issue with equipment sizing for " +
-                                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' +
-                                                state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                                            format("SizePIU: Potential issue with equipment sizing for {} {}",
+                                                   state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+                                                   state.dataPowerInductionUnits->PIU(PIUNum).Name));
                                 ShowContinueError(state, format("User-Specified Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
                                 ShowContinueError(
                                     state, format("differs from Design Size Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));

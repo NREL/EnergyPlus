@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,6 +74,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -81,6 +82,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -204,15 +206,13 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 100000;
 
-    state->dataHeatBalFanSys->ZTAV.allocate(1);
-    state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBal->ZoneMRT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
 
-    state->dataHeatBalFanSys->ZT(1) = 0.0;
-    state->dataHeatBalFanSys->ZTAV(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
     state->dataHeatBal->ZoneMRT(1) = 0.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);
 
@@ -246,9 +246,10 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataSurface->SurfOutDryBulbTemp(winNum) = T_out;
     state->dataHeatBal->SurfTempEffBulkAir(winNum) = T_in;
     state->dataSurface->SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.01);
-    state->dataHeatBalFanSys->ZoneAirHumRat.dimension(1, 0.01);
-    state->dataHeatBalFanSys->MAT.dimension(1, T_in);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = T_in;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.01;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.01;
 
     // initial guess temperatures
     int numTemps = 2 + 2 * state->dataConstruction->Construct(cNum).TotGlassLayers;
@@ -472,7 +473,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 
@@ -540,13 +541,11 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalSurf->SurfHConvInt(surfNum2) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(surfNum3) = 0.5;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.011;
 
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 25.0;
     state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQdotRadIntGainsInPerArea.allocate(3);
@@ -2531,7 +2530,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::GetWindowGlassSpectralData(*state, FoundError);
     EXPECT_FALSE(FoundError);
-    HeatBalanceManager::GetMaterialData(*state, FoundError);
+    Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
@@ -2731,7 +2730,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 
@@ -2807,16 +2806,15 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalSurf->SurfHConvInt(surfNum2) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(surfNum3) = 0.5;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.011;
 
     // initialize simple glazing adjustment ratio
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0024;
 
-    state->dataHeatBalFanSys->MAT.allocate(1);
-
-    state->dataHeatBalFanSys->MAT(1) = 25.0;
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
@@ -3029,7 +3027,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     bool ErrorsFound(false);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(34, 1.0);
@@ -3054,9 +3052,10 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     // for legal input U values, the adjusted NominalConductance should be close to input U
     std::array<Real64, 3> legalInputUs = {3.0, 5.0, 7.0};
     for (auto varyInputU : legalInputUs) {
-        state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
+        state->dataMaterial->Material(MaterNum)->SimpleWindowUfactor = varyInputU;
         HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
-        state->dataWindowManager->scon[0] = state->dataMaterial->Material(MaterNum).Conductivity / state->dataMaterial->Material(MaterNum).Thickness;
+        state->dataWindowManager->scon[0] =
+            state->dataMaterial->Material(MaterNum)->Conductivity / state->dataMaterial->Material(MaterNum)->Thickness;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.01);
     }
@@ -3066,7 +3065,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     std::array<Real64, 2> illegalInputUs = {0.0, -2.0};
     for (auto varyInputU : illegalInputUs) {
         state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.0;
-        state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
+        state->dataMaterial->Material(MaterNum)->SimpleWindowUfactor = varyInputU;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         // expect adjustment ratio equal to 1
         EXPECT_EQ(state->dataHeatBal->CoeffAdjRatio(ConstrNum), 1.0);
@@ -3098,7 +3097,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_found = false;
-    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    Material::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(state->dataHeatBal->ComplexShade(1).Name, "SHADE_14_LAYER");
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ));
@@ -3144,7 +3143,7 @@ TEST_F(EnergyPlusFixture, SetupComplexWindowStateGeometry_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_found = false;
-    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    Material::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
 
     state->dataWindowComplexManager->NumComplexWind = 1;
@@ -7675,15 +7674,13 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state->dataHeatBalFanSys->ZTAV.allocate(1);
-    state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBal->ZoneMRT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
 
-    state->dataHeatBalFanSys->ZT(1) = 0.0;
-    state->dataHeatBalFanSys->ZTAV(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
     state->dataHeatBal->ZoneMRT(1) = 0.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);
 
@@ -7705,9 +7702,10 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
                 DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
         }
     }
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.01);
-    state->dataHeatBalFanSys->ZoneAirHumRat.dimension(1, 0.01);
-    state->dataHeatBalFanSys->MAT.dimension(1, T_in);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.01;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.01;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = T_in;
 
     state->dataEnvrn->BeamSolarRad = I_s;
     if (I_s > 0.0) {

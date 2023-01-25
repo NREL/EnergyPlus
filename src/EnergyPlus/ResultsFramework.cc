@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1154,7 +1154,7 @@ namespace ResultsFramework {
             // nothing to do; meters are not reported at this frequency
             break;
         case OutputProcessor::ReportingFrequency::TimeStep: // at 'TimeStep'
-            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
+            for (int Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptTS || EnergyMeters(Loop).RptTSFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).TSRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptTSFO);
@@ -1173,7 +1173,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Hourly: // at 'Hourly'
-            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
+            for (int Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptHR || EnergyMeters(Loop).RptHRFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).HRRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptHRFO);
@@ -1192,7 +1192,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Daily: // at 'Daily'
-            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
+            for (int Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptDY || EnergyMeters(Loop).RptDYFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).DYRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptDYFO);
@@ -1211,7 +1211,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Monthly: // at 'Monthly'
-            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
+            for (int Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptMN || EnergyMeters(Loop).RptMNFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).MNRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptMNFO);
@@ -1230,7 +1230,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Simulation: // at 'RunPeriod'/'SM'
-            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
+            for (int Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptSM || EnergyMeters(Loop).RptSMFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).SMRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptSMFO);
@@ -1249,7 +1249,7 @@ namespace ResultsFramework {
             }
             break;
         case OutputProcessor::ReportingFrequency::Yearly: // at 'Yearly'
-            for (auto Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
+            for (int Loop = 1; Loop <= EnergyMeters.isize(); ++Loop) {
                 if (EnergyMeters(Loop).RptYR || EnergyMeters(Loop).RptYRFO) {
                     MeterVariable var(
                         EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).YRRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptYRFO);
