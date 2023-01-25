@@ -202,7 +202,7 @@ namespace AirLoopHVACDOAS {
             }
         }
 
-        ShowSevereError(state, "AirLoopMixer factory: Error getting inputs for system named: " + objectName);
+        ShowSevereError(state, format("AirLoopMixer factory: Error getting inputs for system named: {}", objectName));
         return nullptr;
     }
 
@@ -311,7 +311,7 @@ namespace AirLoopHVACDOAS {
                 return index;
             }
         }
-        ShowSevereError(state, "getAirLoopMixer: did not find AirLoopHVAC:Mixer name =" + objectName + ". Check inputs");
+        ShowSevereError(state, format("getAirLoopMixer: did not find AirLoopHVAC:Mixer name ={}. Check inputs", objectName));
         return index;
     }
 
@@ -330,7 +330,7 @@ namespace AirLoopHVACDOAS {
                 return &dSpec;
             }
         }
-        ShowSevereError(state, "AirLoopSplitter factory: Error getting inputs for system named: " + objectName);
+        ShowSevereError(state, format("AirLoopSplitter factory: Error getting inputs for system named: {}", objectName));
         return nullptr;
     }
 
@@ -359,7 +359,7 @@ namespace AirLoopHVACDOAS {
                 return index;
             }
         }
-        ShowSevereError(state, "getAirLoopSplitter: did not find AirLoopSplitter name =" + objectName + ". Check inputs");
+        ShowSevereError(state, format("getAirLoopSplitter: did not find AirLoopSplitter name ={}. Check inputs", objectName));
         return index;
     }
 
@@ -735,8 +735,8 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_AirLoopMixerIndex = getAirLoopMixerIndex(state, thisDOAS.AirLoopMixerName);
                 if (thisDOAS.m_AirLoopMixerIndex < 0) {
                     cFieldName = "AirLoopHVAC:Mixer Name";
-                    ShowSevereError(state,
-                                    cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.AirLoopMixerName);
+                    ShowSevereError(
+                        state, format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.AirLoopMixerName));
                     errorsFound = true;
                 }
                 AirLoopMixer thisAirLoopMixer;
@@ -746,7 +746,7 @@ namespace AirLoopHVACDOAS {
                 if (thisDOAS.m_AirLoopSplitterIndex < 0) {
                     cFieldName = "AirLoopHVAC:Splitter Name";
                     ShowSevereError(
-                        state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.AirLoopSplitterName);
+                        state, format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.AirLoopSplitterName));
                     errorsFound = true;
                 }
                 AirLoopSplitter thisAirLoopSplitter;
@@ -782,7 +782,7 @@ namespace AirLoopHVACDOAS {
                             thisDOAS.m_AirLoopNum.push_back(LoopNum);
                         } else {
                             cFieldName = "AirLoopHVAC Name";
-                            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + name);
+                            ShowSevereError(state, format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, name));
                             errorsFound = true;
                         }
                     }
@@ -797,8 +797,8 @@ namespace AirLoopHVACDOAS {
                 if (UtilityRoutines::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerListName, "")) {
                     if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
                         ShowSevereError(state,
-                                        "AirLoopHVAC:OutdoorAirSystem = \"" + state.dataAirLoop->OutsideAirSys(OASysNum).Name +
-                                            "\" invalid Controller List Name = \" not found.");
+                                        format("AirLoopHVAC:OutdoorAirSystem = \"{}\" invalid Controller List Name = \" not found.",
+                                               state.dataAirLoop->OutsideAirSys(OASysNum).Name));
                         errorsFound = true;
                     }
                 }
@@ -1015,7 +1015,7 @@ namespace AirLoopHVACDOAS {
             if (maxDiff > 1.0e-6) {
                 if (loop.ConveCount == 0) {
                     ++loop.ConveCount;
-                    ShowWarningError(state, "Convergence limit is above 1.0e-6 for unit=" + loop.Name);
+                    ShowWarningError(state, format("Convergence limit is above 1.0e-6 for unit={}", loop.Name));
                     ShowContinueErrorTimeStamp(
                         state, format("The max difference of node temperatures between AirLoopDOAS outlet and OA mixer inlet ={:.6R}", maxDiff));
                 } else {

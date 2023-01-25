@@ -1325,10 +1325,12 @@ namespace HeatingCoils {
                 }
                 HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                    ShowSevereError(state,
-                                    cAllCoilTypes(heatingCoil.HCoilType_Num) + ", \"" + heatingCoil.Name +
-                                        "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                        heatingCoil.ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                    ShowSevereError(
+                        state,
+                        format("{}, \"{}\" sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                               cAllCoilTypes(heatingCoil.HCoilType_Num),
+                               heatingCoil.Name,
+                               heatingCoil.ReclaimHeatingCoilName));
                 }
                 state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
             } else {
@@ -1684,10 +1686,12 @@ namespace HeatingCoils {
                         num = 0.0;
                     HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                     if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                        ShowSevereError(state,
-                                        cAllCoilTypes(heatingCoil.HCoilType_Num) + ", \"" + heatingCoil.Name +
-                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            heatingCoil.ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                        ShowSevereError(
+                            state,
+                            format("{}, \"{}\" sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                                   cAllCoilTypes(heatingCoil.HCoilType_Num),
+                                   heatingCoil.Name,
+                                   heatingCoil.ReclaimHeatingCoilName));
                     }
                 }
                 state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
