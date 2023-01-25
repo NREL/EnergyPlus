@@ -4515,10 +4515,8 @@ namespace HeatBalanceManager {
 
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataMaterial->TotMaterials; ++loop) {
-                Material::MaterialChild *p = new Material::MaterialChild;
-                state.dataMaterial->Material.push_back(p);
-                auto *thisMaterial = p;
-                assert(thisMaterial != nullptr);
+                Material::MaterialChild *thisMaterial = new Material::MaterialChild;
+                state.dataMaterial->Material.push_back(thisMaterial);
                 thisMaterial->Name = "";
                 thisMaterial->Group = Material::MaterialGroup::Invalid;
                 thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Invalid;
