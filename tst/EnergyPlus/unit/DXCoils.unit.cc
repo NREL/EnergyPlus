@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::Quadratic;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
     curve1->coeff[0] = 1;
@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     curve1->inputLimits[1].min = 0.0;
     curve1->inputLimits[1].max = 2.0;
 
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::Quadratic;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
     curve2->coeff[0] = 1;
@@ -195,7 +195,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     curve2->inputLimits[1].min = 0.7;
     curve2->inputLimits[1].max = 1.0;
 
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::BiQuadratic;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
     curve3->coeff[0] = 1;
@@ -319,7 +319,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::Quadratic;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
     curve1->coeff[0] = 1;
@@ -333,7 +333,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     curve1->inputLimits[1].min = 0.0;
     curve1->inputLimits[1].max = 2.0;
 
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::Quadratic;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
     curve2->coeff[0] = 1;
@@ -347,7 +347,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     curve2->inputLimits[1].min = 0.7;
     curve2->inputLimits[1].max = 1.0;
 
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::BiQuadratic;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
     curve3->coeff[0] = 1;
@@ -3885,7 +3885,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->Name = "HP_Cool-Cap-fT-SP1";
     curve1->curveType = CurveType::BiQuadratic;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -3900,7 +3900,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     curve1->inputLimits[1].min = 18.33;
     curve1->inputLimits[1].max = 51.66;
 
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->Name = "HP_Cool-Cap-fT-SP2";
     curve2->curveType = CurveType::BiQuadratic;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -3915,7 +3915,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     curve2->inputLimits[1].min = 18.33;
     curve2->inputLimits[1].max = 51.66;
 
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->Name = "HP_Heat-Cap-fT-SP1";
     curve3->curveType = CurveType::BiQuadratic;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -3930,7 +3930,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     curve3->inputLimits[1].min = -100.0;
     curve3->inputLimits[1].max = 100.0;
 
-    auto * curve4 = state->dataCurveManager->PerfCurve(4);
+    auto *curve4 = state->dataCurveManager->PerfCurve(4);
     curve4->Name = "HP_Heat-Cap-fT-SP2";
     curve4->curveType = CurveType::BiQuadratic;
     curve4->interpolationType = InterpType::EvaluateCurveToLimits;

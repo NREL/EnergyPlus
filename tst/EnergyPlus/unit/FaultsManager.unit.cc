@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataFaultsMgr->FaultsFouledAirFilters.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
-    auto * curve = state->dataCurveManager->PerfCurve(1);
+    auto *curve = state->dataCurveManager->PerfCurve(1);
     curve->curveType = CurveType::Cubic;
     curve->interpolationType = InterpType::EvaluateCurveToLimits;
     curve->coeff[0] = 1151.1;
@@ -349,7 +349,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     state->dataFans->Fan.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
-    auto * curve = state->dataCurveManager->PerfCurve(1);
+    auto *curve = state->dataCurveManager->PerfCurve(1);
     curve->curveType = CurveType::Cubic;
     curve->interpolationType = InterpType::EvaluateCurveToLimits;
     curve->coeff[0] = 1151.1;

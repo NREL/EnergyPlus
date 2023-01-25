@@ -118,7 +118,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::QuadLinear;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
     curve1->coeff[0] = -9.149069561;
@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     curve1->inputLimits[3].min = 0.0;
     curve1->inputLimits[3].max = 2.0;
 
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::QuintLinear;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
     curve2->coeff[0] = -5.462690012;
@@ -155,7 +155,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     curve2->inputLimits[4].min = 0.0;
     curve2->inputLimits[4].max = 1.0;
 
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::QuadLinear;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
     curve3->coeff[0] = -3.205409884;
@@ -1126,7 +1126,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::QuadLinear;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
     curve1->coeff[0] = -9.32564313298629;
@@ -1144,7 +1144,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     curve1->inputLimits[3].max = 2.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).TotalCoolCapCurveIndex = 1;
 
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::QuintLinear;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
     curve2->coeff[0] = -5.26562830117273;
@@ -1165,7 +1165,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     curve2->inputLimits[4].max = 1.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).SensCoolCapCurveIndex = 2;
 
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::QuadLinear;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
     curve3->coeff[0] = -3.25323327026219;
@@ -1199,7 +1199,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirWetbulbTemp = 19.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirDrybulbTemp = 27.0;
 
-    auto * curve4 = state->dataCurveManager->PerfCurve(4);
+    auto *curve4 = state->dataCurveManager->PerfCurve(4);
     curve4->curveType = CurveType::QuadLinear;
     curve4->interpolationType = InterpType::EvaluateCurveToLimits;
     curve4->coeff[0] = -0.68126221;
@@ -1217,7 +1217,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     curve4->inputLimits[3].max = 2.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).TotalCoolCapCurveIndex = 4;
 
-    auto * curve5 = state->dataCurveManager->PerfCurve(5);
+    auto *curve5 = state->dataCurveManager->PerfCurve(5);
     curve5->curveType = CurveType::QuintLinear;
     curve5->interpolationType = InterpType::EvaluateCurveToLimits;
     curve5->coeff[0] = 2.24209455;
@@ -1238,7 +1238,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     curve5->inputLimits[4].max = 1.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).SensCoolCapCurveIndex = 5;
 
-    auto * curve6 = state->dataCurveManager->PerfCurve(6);
+    auto *curve6 = state->dataCurveManager->PerfCurve(6);
     curve6->curveType = CurveType::QuadLinear;
     curve6->interpolationType = InterpType::EvaluateCurveToLimits;
     curve6->coeff[0] = -3.20456384;
@@ -1337,7 +1337,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::QuadLinear;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
     curve1->coeff[0] = -9.32564313298629;
@@ -1354,7 +1354,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     curve1->inputLimits[3].min = 0.0;
     curve1->inputLimits[3].max = 2.0;
 
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::QuintLinear;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
     curve2->coeff[0] = -5.26562830117273;
@@ -1374,7 +1374,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     curve2->inputLimits[4].min = 0.0;
     curve2->inputLimits[4].max = 1.0;
 
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::QuadLinear;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
     curve3->coeff[0] = -3.25323327026219;
@@ -1391,7 +1391,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     curve3->inputLimits[3].min = 0;
     curve3->inputLimits[3].max = 38;
 
-    auto * curve4 = state->dataCurveManager->PerfCurve(4);
+    auto *curve4 = state->dataCurveManager->PerfCurve(4);
     curve4->curveType = CurveType::QuadLinear;
     curve4->interpolationType = InterpType::EvaluateCurveToLimits;
     curve4->coeff[0] = -1.30782327125798;
@@ -1408,7 +1408,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     curve4->inputLimits[3].min = 0;
     curve4->inputLimits[3].max = 38;
 
-    auto * curve5 = state->dataCurveManager->PerfCurve(5);
+    auto *curve5 = state->dataCurveManager->PerfCurve(5);
     curve5->curveType = CurveType::QuadLinear;
     curve5->interpolationType = InterpType::EvaluateCurveToLimits;
     curve5->coeff[0] = -2.17352461285805;
@@ -1568,7 +1568,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::QuadLinear;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
     curve1->coeff[0] = -9.32564313298629;
@@ -1585,7 +1585,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     curve1->inputLimits[3].min = 0.0;
     curve1->inputLimits[3].max = 2.0;
 
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::QuintLinear;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
     curve2->coeff[0] = -5.26562830117273;
@@ -1605,7 +1605,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     curve2->inputLimits[4].min = 0.0;
     curve2->inputLimits[4].max = 1.0;
 
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::QuadLinear;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
     curve3->coeff[0] = -3.25323327026219;
@@ -1622,7 +1622,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     curve3->inputLimits[3].min = 0;
     curve3->inputLimits[3].max = 38;
 
-    auto * curve4 = state->dataCurveManager->PerfCurve(4);
+    auto *curve4 = state->dataCurveManager->PerfCurve(4);
     curve4->curveType = CurveType::QuadLinear;
     curve4->interpolationType = InterpType::EvaluateCurveToLimits;
     curve4->coeff[0] = -1.30782327125798;
@@ -1639,7 +1639,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     curve4->inputLimits[3].min = 0;
     curve4->inputLimits[3].max = 38;
 
-    auto * curve5 = state->dataCurveManager->PerfCurve(5);
+    auto *curve5 = state->dataCurveManager->PerfCurve(5);
     curve5->curveType = CurveType::QuadLinear;
     curve5->interpolationType = InterpType::EvaluateCurveToLimits;
     curve5->coeff[0] = -2.17352461285805;

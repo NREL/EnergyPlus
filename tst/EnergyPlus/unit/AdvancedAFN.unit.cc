@@ -118,7 +118,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     for (int curveIndex = 1; curveIndex <= 2; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::Quadratic;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
     curve1->coeff[0] = 21.2;
@@ -132,7 +132,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     curve1->inputLimits[1].min = 0.0;
     curve1->inputLimits[1].max = 2.0;
 
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::Quadratic;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
     curve2->coeff[0] = 18.8;

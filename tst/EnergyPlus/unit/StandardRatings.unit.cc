@@ -1039,7 +1039,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
     // Cap=f(T)
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::BiQuadratic;
     curve1->numDims = 2;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -1057,7 +1057,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::BiQuadratic;
     curve2->numDims = 2;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -1075,7 +1075,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::Cubic;
     curve3->numDims = 1;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -1126,7 +1126,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
     // Cap=f(T)
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::BiQuadratic;
     curve1->numDims = 2;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -1144,7 +1144,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::BiQuadratic;
     curve2->numDims = 2;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -1162,7 +1162,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::Cubic;
     curve3->numDims = 1;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -1213,7 +1213,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
     // Cap=f(T)
-    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::BiQuadratic;
     curve1->numDims = 2;
     curve1->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -1231,7 +1231,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
-    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
     curve2->curveType = CurveType::BiQuadratic;
     curve2->numDims = 2;
     curve2->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -1249,7 +1249,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
-    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
     curve3->curveType = CurveType::BiCubic;
     curve3->numDims = 2;
     curve3->interpolationType = InterpType::EvaluateCurveToLimits;

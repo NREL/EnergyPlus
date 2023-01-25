@@ -7904,27 +7904,27 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
         // design wet bulb temp and the minimum actual wet bulb temp.
         // Min_DesignWB = ACoef1 + ACoef2*OaWb + ACoef3*WPLR + ACoef4*TwrDsnWB + ACoef5*NF
         state.dataSetPointManager->DCESPMMin_DesignWB = EnergyPlus::Curve::CurveValue(state,
-                                                                   this->MinTwrWbCurve,
-                                                                   state.dataEnvrn->OutWetBulbTemp,
-                                                                   state.dataSetPointManager->DCESPMWeighted_Ratio,
-                                                                   Twr_DesignWB,
-                                                                   NormDsnCondFlow);
+                                                                                      this->MinTwrWbCurve,
+                                                                                      state.dataEnvrn->OutWetBulbTemp,
+                                                                                      state.dataSetPointManager->DCESPMWeighted_Ratio,
+                                                                                      Twr_DesignWB,
+                                                                                      NormDsnCondFlow);
 
         // Min_ActualWb = BCoef1 + BCoef2*MinDsnWB + BCoef3*WPLR + BCoef4*TwrDsnWB + BCoef5*NF
         state.dataSetPointManager->DCESPMMin_ActualWb = EnergyPlus::Curve::CurveValue(state,
-                                                                   this->MinOaWbCurve,
-                                                                   state.dataSetPointManager->DCESPMMin_DesignWB,
-                                                                   state.dataSetPointManager->DCESPMWeighted_Ratio,
-                                                                   Twr_DesignWB,
-                                                                   NormDsnCondFlow);
+                                                                                      this->MinOaWbCurve,
+                                                                                      state.dataSetPointManager->DCESPMMin_DesignWB,
+                                                                                      state.dataSetPointManager->DCESPMWeighted_Ratio,
+                                                                                      Twr_DesignWB,
+                                                                                      NormDsnCondFlow);
 
         // Opt_CondEntTemp = CCoef1 + CCoef2*OaWb + CCoef3*WPLR + CCoef4*TwrDsnWB + CCoef5*NF
         state.dataSetPointManager->DCESPMOpt_CondEntTemp = EnergyPlus::Curve::CurveValue(state,
-                                                                      this->OptCondEntCurve,
-                                                                      state.dataEnvrn->OutWetBulbTemp,
-                                                                      state.dataSetPointManager->DCESPMWeighted_Ratio,
-                                                                      Twr_DesignWB,
-                                                                      NormDsnCondFlow);
+                                                                                         this->OptCondEntCurve,
+                                                                                         state.dataEnvrn->OutWetBulbTemp,
+                                                                                         state.dataSetPointManager->DCESPMWeighted_Ratio,
+                                                                                         Twr_DesignWB,
+                                                                                         NormDsnCondFlow);
 
         // ***** Calculate (Cond ent - Evap lvg) Section *****
         // In this section we find the worst case of (Cond ent - Evap lvg) for the

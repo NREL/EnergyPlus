@@ -243,13 +243,11 @@ namespace Curve {
             Real64 const V1s(V1 * V1);
             Real64 const V2s(V2 * V2);
             Real64 const V3s(V3 * V3);
-            return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s +
-                   c[6] * V3 + c[7] * V1s * V2s + c[8] * V1 * V2 + c[9] * V1 * V2s +
-                   c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s +
-                   c[14] * V1s * V3 + c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s +
-                   c[18] * V2s * V3 + c[19] * V1s * V2s * V3s + c[20] * V1s * V2s * V3 +
-                   c[21] * V1s * V2 * V3s + c[22] * V1 * V2s * V3s + c[23] * V1s * V2 * V3 +
-                   c[24] * V1 * V2s * V3 + c[25] * V1 * V2 * V3s + c[26] * V1 * V2 * V3;
+            return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s + c[6] * V3 + c[7] * V1s * V2s + c[8] * V1 * V2 +
+                   c[9] * V1 * V2s + c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s + c[14] * V1s * V3 +
+                   c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s + c[18] * V2s * V3 + c[19] * V1s * V2s * V3s + c[20] * V1s * V2s * V3 +
+                   c[21] * V1s * V2 * V3s + c[22] * V1 * V2s * V3s + c[23] * V1s * V2 * V3 + c[24] * V1 * V2s * V3 + c[25] * V1 * V2 * V3s +
+                   c[26] * V1 * V2 * V3;
         }
         default:
             return this->valueFallback(state, V1, V2, V3, 0.0, 0.0);
@@ -516,11 +514,11 @@ namespace Curve {
             Real64 const V1s(V1 * V1);
             Real64 const V2s(V2 * V2);
             Real64 const V3s(V3 * V3);
-            return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s + c[6] * V3 + c[7] * V1s * V2s +
-                   c[8] * V1 * V2 + c[9] * V1 * V2s + c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s +
-                   c[14] * V1s * V3 + c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s + c[18] * V2s * V3 +
-                   c[19] * V1s * V2s * V3s + c[20] * V1s * V2s * V3 + c[21] * V1s * V2 * V3s + c[22] * V1 * V2s * V3s +
-                   c[23] * V1s * V2 * V3 + c[24] * V1 * V2s * V3 + c[25] * V1 * V2 * V3s + c[26] * V1 * V2 * V3;
+            return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s + c[6] * V3 + c[7] * V1s * V2s + c[8] * V1 * V2 +
+                   c[9] * V1 * V2s + c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s + c[14] * V1s * V3 +
+                   c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s + c[18] * V2s * V3 + c[19] * V1s * V2s * V3s + c[20] * V1s * V2s * V3 +
+                   c[21] * V1s * V2 * V3s + c[22] * V1 * V2s * V3s + c[23] * V1s * V2 * V3 + c[24] * V1 * V2s * V3 + c[25] * V1 * V2 * V3s +
+                   c[26] * V1 * V2 * V3;
         } break;
         case CurveType::Exponent: {
             return this->coeff[0] + this->coeff[1] * std::pow(V1, this->coeff[2]);
@@ -2370,7 +2368,8 @@ namespace Curve {
                         varListLimits[varListName].emplace_back(min_val, max_val);
 
                         auto normValIterator = indVarInstance.find("normalization_reference_value");
-                        Real64 normalizationRefValue = (normValIterator != indVarInstance.end()) ? normValIterator->get<Real64>() : std::numeric_limits<double>::quiet_NaN();
+                        Real64 normalizationRefValue =
+                            (normValIterator != indVarInstance.end()) ? normValIterator->get<Real64>() : std::numeric_limits<double>::quiet_NaN();
 
                         varListNormalizeTargets[varListName].push_back(normalizationRefValue);
 
