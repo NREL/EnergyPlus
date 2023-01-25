@@ -1448,6 +1448,9 @@ namespace PhotovoltaicThermalCollectors {
 
         dhyd = 4 * w * l / (2 * (w + l));
 
+        tmixed = tfin;
+        bfr = 0.0;
+        q = 0.0;
         while ((err_t1 > tol) || (err_tpv > tol) || (err_tpvg > tol) || (err_mdot_bipvt > tol)) {
             // Properties of air required for external convective heat transfer coefficient calculations - function of exterior film temperature
             t_film = (tamb + tpvg) * 0.5;
@@ -1604,8 +1607,15 @@ namespace PhotovoltaicThermalCollectors {
             t1_new = y[2];
             if (mdot > 0.0) {
                 tfout = (tfin + b / a) * std::exp(a * l) - b / a; // air outlet temperature (DegC)
-                if (((Mode == "Heating") && (q > 0.0) && (tmixed > tsp)) || ((Mode == "Cooling") && (q < 0.0) && (tmixed < tsp))) {
+                if (((Mode == "Heating") && (q > 0.0) && (tmixed > tsp) && (tfin < tsp)) ||
+                    ((Mode == "Cooling") && (q < 0.0) && (tmixed < tsp) && (tfin > tsp))) {
                     bfr = (tsp - tfout) / (tfin - tfout); // bypass fraction
+                    bfr = std::max(0.0, bfr);
+                    bfr = std::min(1.0, bfr);
+                } else if (((Mode == "Heating") && (q > 0.0) && (tmixed > tsp) && (tfin >= tsp)) ||
+                           ((Mode == "Cooling") && (q < 0.0) && (tmixed < tsp) && (tfin <= tsp))) {
+                    bfr = 1.0;
+                    tfout = tfin;
                 }
             } else {
                 tfout = tfin;
@@ -1630,7 +1640,9 @@ namespace PhotovoltaicThermalCollectors {
                 break;
             }
         }
-        if (q > 0.0) ThEff = q / (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) + small_num); // Thermal efficiency of BIPVT
+        ThEff = 0.0;
+        if ((q > small_num) && (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) > small_num))
+            ThEff = q / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + small_num); // Thermal efficiency of BIPVT
         this->BIPVT.Tcoll = t1;
         this->BIPVT.HrPlen = hrad12;
         this->BIPVT.Tplen = tfavg;
