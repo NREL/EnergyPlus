@@ -297,9 +297,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                 ShowSevereError(
                     state,
                     format("GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction={}", thisConstruct.Name));
-                ShowContinueError(
-                    state,
-                    format("..Outside layer material with EMPD properties = {}", thisMaterialLayerPt1->Name));
+                ShowContinueError(state, format("..Outside layer material with EMPD properties = {}", thisMaterialLayerPt1->Name));
                 ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
                 ErrorsFound = true;
             }
@@ -310,9 +308,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                     ShowSevereError(
                         state,
                         format("GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction={}", thisConstruct.Name));
-                    ShowContinueError(state,
-                                      format("..Middle layer material with EMPD properties = {}",
-                                             thisMaterialLayerPtLayer->Name));
+                    ShowContinueError(state, format("..Middle layer material with EMPD properties = {}", thisMaterialLayerPtLayer->Name));
                     ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
                     ErrorsFound = true;
                 }

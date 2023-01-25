@@ -6266,8 +6266,7 @@ namespace SurfaceGeometry {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                     auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayerPtr));
                     assert(thisMaterial != nullptr);
-                    if (thisMaterial->Group == Material::MaterialGroup::WindowGlass &&
-                        thisMaterial->GlassTransDirtFactor < 1.0) {
+                    if (thisMaterial->Group == Material::MaterialGroup::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, format("{}: Interior Window or GlassDoor {} has a glass layer with", cRoutineName, SubSurfaceName));
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError(state, "A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
