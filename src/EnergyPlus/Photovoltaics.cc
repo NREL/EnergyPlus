@@ -1022,8 +1022,7 @@ namespace Photovoltaics {
                                                                      thisPVarray.SNLPVModule.DT0);
             } break;
             default: {
-                ShowSevereError(state,
-                                format("Sandia PV Simulation Temperature Modeling Mode Error in {}", thisPVarray.Name));
+                ShowSevereError(state, format("Sandia PV Simulation Temperature Modeling Mode Error in {}", thisPVarray.Name));
             } break;
             }
 

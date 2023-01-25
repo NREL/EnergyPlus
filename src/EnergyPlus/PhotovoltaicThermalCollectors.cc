@@ -401,10 +401,11 @@ namespace PhotovoltaicThermalCollectors {
                         thisPVT.AreaCol = state.dataSurface->Surface(thisPVT.SurfNum).Area;
                         thisPVT.ModelType = PVTModelType::BIPVT;
                     } else {
-                        ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
-                        ShowContinueError(state,
-                                      format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                    ShowContinueError(state, format("{}, was not found.", state.dataIPShortCut->cAlphaFieldNames(3)));
+                        ShowSevereError(state,
+                                        format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+                        ShowContinueError(
+                            state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(state, format("{}, was not found.", state.dataIPShortCut->cAlphaFieldNames(3)));
                         ErrorsFound = true;
                     }
                 }
@@ -413,9 +414,10 @@ namespace PhotovoltaicThermalCollectors {
                     thisPVT.PVnum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataPhotovoltaic->PVarray);
                     // check PV
                     if (thisPVT.PVnum == 0) {
-                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
-                        ShowContinueError(state,
-                                      format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowSevereError(state,
+                                        format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
+                        ShowContinueError(
+                            state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
                     } else {
                         thisPVT.PVname = state.dataIPShortCut->cAlphaArgs(4);
@@ -432,14 +434,16 @@ namespace PhotovoltaicThermalCollectors {
                     thisPVT.WorkingFluidType = WorkingFluidEnum::AIR;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
-                        ShowContinueError(state,
-                                      format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                    ShowContinueError(state, format("{} field cannot be blank.", state.dataIPShortCut->cAlphaFieldNames(5)));
+                        ShowSevereError(state,
+                                        format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                        ShowContinueError(
+                            state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(state, format("{} field cannot be blank.", state.dataIPShortCut->cAlphaFieldNames(5)));
                     } else {
-                    ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
-                        ShowContinueError(state,
-                                      format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowSevereError(state,
+                                        format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                        ShowContinueError(
+                            state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     }
                     ErrorsFound = true;
                 }
