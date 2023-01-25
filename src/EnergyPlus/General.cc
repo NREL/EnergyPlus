@@ -390,7 +390,7 @@ void ProcessDateString(EnergyPlusData &state,
             PDay = 0;
             DateType = WeatherManager::DateType::MonthDay;
         } else if (FstNum < 0 || FstNum > 366) {
-            ShowSevereError(state, "Invalid Julian date Entered=" + String);
+            ShowSevereError(state, format("Invalid Julian date Entered={}", String));
             ErrorsFound = true;
         } else {
             InvOrdinalDay(FstNum, PMonth, PDay, 0);
@@ -490,7 +490,7 @@ void DetermineDateTokens(EnergyPlusData &state,
 
     strip(CurrentString);
     if (CurrentString == BlankString) {
-        ShowSevereError(state, "Invalid date field=" + String);
+        ShowSevereError(state, format("Invalid date field={}", String));
         ErrorsFound = true;
     } else {
         Loop = 0;
@@ -504,7 +504,7 @@ void DetermineDateTokens(EnergyPlusData &state,
             strip(CurrentString);
         }
         if (not_blank(CurrentString)) {
-            ShowSevereError(state, "Invalid date field=" + String);
+            ShowSevereError(state, format("Invalid date field={}", String));
             ErrorsFound = true;
         } else if (Loop == 2) {
             // Field must be Day Month or Month Day (if both numeric, mon / day)
@@ -514,7 +514,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                 // Month day, but first field is not numeric, 2nd must be
                 NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                 if (errFlag) {
-                    ShowSevereError(state, "Invalid date field=" + String);
+                    ShowSevereError(state, format("Invalid date field={}", String));
                     InternalError = true;
                 } else {
                     TokenDay = NumField2;
@@ -582,7 +582,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                             if (TokenMonth == 0) InternalError = true;
                         }
                     } else { // error....
-                        ShowSevereError(state, "First date field not numeric, field=" + String);
+                        ShowSevereError(state, format("First date field not numeric, field={}", String));
                     }
                 }
             } else { // mm/dd/yyyy or yyyy/mm/dd
@@ -607,7 +607,7 @@ void DetermineDateTokens(EnergyPlusData &state,
             }
         } else {
             // Not enough or too many fields
-            ShowSevereError(state, "Invalid date field=" + String);
+            ShowSevereError(state, format("Invalid date field={}", String));
             ErrorsFound = true;
         }
     }
@@ -647,7 +647,7 @@ void ValidateMonthDay(EnergyPlusData &state,
         if (Day < 1 || Day > EndMonthDay[Month - 1]) InternalError = true;
     }
     if (InternalError) {
-        ShowSevereError(state, "Invalid Month Day date format=" + String);
+        ShowSevereError(state, format("Invalid Month Day date format={}", String));
         ErrorsFound = true;
     } else {
         ErrorsFound = false;
@@ -1407,14 +1407,16 @@ void ScanForReports(EnergyPlusData &state,
                     state.dataGlobal->ShowDecayCurvesInEIO = true;
                     break;
                 default: // including empty
-                    ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
+                    ShowWarningError(state, format("{}: No {} supplied.", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1)));
                     ShowContinueError(state,
                                       R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
                 }
             } catch (int e) {
                 ShowWarningError(state,
-                                 cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                     state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
+                                 format("{}: Invalid {}=\"{}\" supplied.",
+                                        cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaFieldNames(1),
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
             }
@@ -1657,15 +1659,15 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     bool TooLong = false;
     if (ItemLength > DataGlobalConstants::MaxNameLength) {
         ShowWarningError(state, fmt::format("{}{} Combination of ZoneList and Object Name generate a name too long.", calledFrom, CurrentObject));
-        ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
-        ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
+        ShowContinueError(state, format("Object Name=\"{}\".", ItemName));
+        ShowContinueError(state, format("ZoneList/Zone Name=\"{}\".", ZoneName));
         ShowContinueError(
             state,
             format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.", ItemLength, DataGlobalConstants::MaxNameLength));
         ShowContinueError(state,
                           format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
                                  MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength));
-        ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
+        ShowContinueError(state, format("name that will be used (may be needed in reporting)=\"{}\".", ResultName));
         TooLong = true;
     }
 

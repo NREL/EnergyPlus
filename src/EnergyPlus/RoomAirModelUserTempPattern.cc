@@ -715,7 +715,8 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
         if (state.dataGlobal->DisplayExtraWarnings) {
             ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
             ShowContinueError(
-                state, "too low surface: " + state.dataSurface->Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
+                state,
+                format("too low surface: {} in zone: {}", state.dataSurface->Surface(thisHBsurf).Name, state.dataHeatBal->Zone(thisZone).Name));
             ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
             ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
         } else {
@@ -727,7 +728,8 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
         if (state.dataGlobal->DisplayExtraWarnings) {
             ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
             ShowContinueError(
-                state, " too high surface: " + state.dataSurface->Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
+                state,
+                format(" too high surface: {} in zone: {}", state.dataSurface->Surface(thisHBsurf).Name, state.dataHeatBal->Zone(thisZone).Name));
             ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
             ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
         } else {

@@ -255,7 +255,7 @@ namespace PVWatts {
         ModuleType moduleType;
         auto moduleTypeIt = moduleTypeMap.find(cAlphaArgs(AlphaFields::MODULE_TYPE));
         if (moduleTypeIt == moduleTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
+            ShowSevereError(state, format("PVWatts: Invalid Module Type: {}", cAlphaArgs(AlphaFields::MODULE_TYPE)));
             errorsFound = true;
         } else {
             moduleType = moduleTypeIt->second;
@@ -269,7 +269,7 @@ namespace PVWatts {
         ArrayType arrayType;
         auto arrayTypeIt = arrayTypeMap.find(cAlphaArgs(AlphaFields::ARRAY_TYPE));
         if (arrayTypeIt == arrayTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
+            ShowSevereError(state, format("PVWatts: Invalid Array Type: {}", cAlphaArgs(AlphaFields::ARRAY_TYPE)));
             errorsFound = true;
         } else {
             arrayType = arrayTypeIt->second;
@@ -280,7 +280,7 @@ namespace PVWatts {
         GeometryType geometryType;
         auto geometryTypeIt = geometryTypeMap.find(cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
         if (geometryTypeIt == geometryTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
+            ShowSevereError(state, format("PVWatts: Invalid Geometry Type: {}", cAlphaArgs(AlphaFields::GEOMETRY_TYPE)));
             errorsFound = true;
         } else {
             geometryType = geometryTypeIt->second;
