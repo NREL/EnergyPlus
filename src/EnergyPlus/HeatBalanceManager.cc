@@ -451,7 +451,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, "Each Unused construction is shown.");
                 for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
                     if (state.dataConstruction->Construct(Loop).IsUsed) continue;
-                    ShowMessage(state, "Construction=" + state.dataConstruction->Construct(Loop).Name);
+                    ShowMessage(state, format("Construction={}", state.dataConstruction->Construct(Loop).Name));
                 }
             }
         }
@@ -661,8 +661,11 @@ namespace HeatBalanceManager {
                 AlphaName(2) = "Urban";
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + ": " +
-                                    state.dataIPShortCut->cAlphaFieldNames(2) + " invalid=" + AlphaName(2));
+                                format("{}{}: {} invalid={}",
+                                       RoutineName,
+                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       AlphaName(2)));
                 state.dataEnvrn->SiteWindExp = 0.14;
                 state.dataEnvrn->SiteWindBLHeight = 270.0;
                 AlphaName(2) = AlphaName(2) + "-invalid";
@@ -713,8 +716,11 @@ namespace HeatBalanceManager {
                 state.dataSurface->CalcSolRefl = true;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + ": " +
-                                    state.dataIPShortCut->cAlphaFieldNames(3) + " invalid=" + AlphaName(3));
+                                format("{}{}: {} invalid={}",
+                                       RoutineName,
+                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(3),
+                                       AlphaName(3)));
                 ErrorsFound = true;
                 AlphaName(3) = AlphaName(3) + "-invalid";
             }
@@ -839,8 +845,9 @@ namespace HeatBalanceManager {
 
                 } else {
                     ShowWarningError(state,
-                                     "GetInsideConvectionAlgorithm: Invalid value for " + state.dataHeatBalMgr->CurrentModuleObject +
-                                         ", defaulting to TARP, invalid value=" + AlphaName(1));
+                                     format("GetInsideConvectionAlgorithm: Invalid value for {}, defaulting to TARP, invalid value={}",
+                                            state.dataHeatBalMgr->CurrentModuleObject,
+                                            AlphaName(1)));
                     state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAETARP;
                     AlphaName(1) = "TARP";
                 }
@@ -895,8 +902,9 @@ namespace HeatBalanceManager {
 
                 } else {
                     ShowWarningError(state,
-                                     "GetOutsideConvectionAlgorithm: Invalid value for " + state.dataHeatBalMgr->CurrentModuleObject +
-                                         ", defaulting to DOE-2, invalid value=" + AlphaName(1));
+                                     format("GetOutsideConvectionAlgorithm: Invalid value for {}, defaulting to DOE-2, invalid value={}",
+                                            state.dataHeatBalMgr->CurrentModuleObject,
+                                            AlphaName(1)));
                     state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_DOE2HcOutside;
                     AlphaName(1) = "DOE-2";
                 }
@@ -1060,8 +1068,10 @@ namespace HeatBalanceManager {
                         state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
                         ShowWarningError(state,
-                                         state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
-                                             state.dataIPShortCut->cAlphaFieldNames(1) + ". The default choice is assigned = " + AlphaName(1));
+                                         format("{}: Invalid input of {}. The default choice is assigned = {}",
+                                                state.dataHeatBalMgr->CurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaFieldNames(1),
+                                                AlphaName(1)));
                         ShowContinueError(state, "Valid choices are: ThirdOrderBackwardDifference, AnalyticalSolution, or EulerMethod.");
                     }
                 }
@@ -1120,24 +1130,28 @@ namespace HeatBalanceManager {
                         state.dataContaminantBalance->Contaminant.CO2Simulation = false;
                         AlphaName(1) = "NO";
                         ShowWarningError(state,
-                                         state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
-                                             state.dataIPShortCut->cAlphaFieldNames(1) + ". The default choice is assigned = NO");
+                                         format("{}: Invalid input of {}. The default choice is assigned = NO",
+                                                state.dataHeatBalMgr->CurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaFieldNames(1)));
                     }
                 }
             }
             if (NumAlpha == 1 && state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     ShowSevereError(state,
-                                    state.dataHeatBalMgr->CurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " is required and not given.");
+                                    format("{}, {} is required and not given.",
+                                           state.dataHeatBalMgr->CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2)));
                     ErrorsFound = true;
                 }
             } else if (NumAlpha > 1 && state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr = GetScheduleIndex(state, AlphaName(2));
                 if (state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr == 0) {
                     ShowSevereError(state,
-                                    state.dataHeatBalMgr->CurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " not found: " + AlphaName(2));
+                                    format("{}, {} not found: {}",
+                                           state.dataHeatBalMgr->CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           AlphaName(2)));
                     ErrorsFound = true;
                 }
             }
@@ -1154,23 +1168,27 @@ namespace HeatBalanceManager {
                         state.dataContaminantBalance->Contaminant.GenericContamSimulation = false;
                         AlphaName(3) = "NO";
                         ShowWarningError(state,
-                                         state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
-                                             state.dataIPShortCut->cAlphaFieldNames(3) + ". The default choice is assigned = NO");
+                                         format("{}: Invalid input of {}. The default choice is assigned = NO",
+                                                state.dataHeatBalMgr->CurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaFieldNames(3)));
                     }
                 }
                 if (NumAlpha == 3 && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         ShowSevereError(state,
-                                        state.dataHeatBalMgr->CurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                            " is required and not given.");
+                                        format("{}, {} is required and not given.",
+                                               state.dataHeatBalMgr->CurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(4)));
                         ErrorsFound = true;
                     }
                 } else if (NumAlpha > 3 && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr = GetScheduleIndex(state, AlphaName(4));
                     if (state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr == 0) {
                         ShowSevereError(state,
-                                        state.dataHeatBalMgr->CurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                            " not found: " + AlphaName(4));
+                                        format("{}, {} not found: {}",
+                                               state.dataHeatBalMgr->CurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(4),
+                                               AlphaName(4)));
                         ErrorsFound = true;
                     }
                 }
@@ -1237,8 +1255,9 @@ namespace HeatBalanceManager {
                         state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                         ShowWarningError(state,
-                                         state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
-                                             state.dataIPShortCut->cAlphaFieldNames(1) + ". The default choice is assigned = None");
+                                         format("{}: Invalid input of {}. The default choice is assigned = None",
+                                                state.dataHeatBalMgr->CurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaFieldNames(1)));
                     }
                 }
                 if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing)
@@ -1259,8 +1278,9 @@ namespace HeatBalanceManager {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
                         ShowWarningError(state,
-                                         state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
-                                             state.dataIPShortCut->cAlphaFieldNames(2) + ". The default choice is assigned = AddInfiltrationFlow");
+                                         format("{}: Invalid input of {}. The default choice is assigned = AddInfiltrationFlow",
+                                                state.dataHeatBalMgr->CurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaFieldNames(2)));
                     }
                 }
             } else {
@@ -1280,9 +1300,9 @@ namespace HeatBalanceManager {
                             state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                             ShowWarningError(state,
-                                             state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
-                                                 state.dataIPShortCut->cAlphaFieldNames(3) +
-                                                 ". The default choice is assigned = MixingSourceZonesOnly");
+                                             format("{}: Invalid input of {}. The default choice is assigned = MixingSourceZonesOnly",
+                                                    state.dataHeatBalMgr->CurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaFieldNames(3)));
                         }
                     }
                 } else {
@@ -1342,8 +1362,10 @@ namespace HeatBalanceManager {
                     } else {
                         HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
                         ShowWarningError(state,
-                                         state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
-                                             state.dataIPShortCut->cAlphaFieldNames(1) + ". The default choice is assigned = " + AlphaName(1));
+                                         format("{}: Invalid input of {}. The default choice is assigned = {}",
+                                                state.dataHeatBalMgr->CurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaFieldNames(1),
+                                                AlphaName(1)));
                         ShowContinueError(
                             state, "Valid choices are: RegulaFalsi, Bisection, BisectionThenRegulaFalsi, RegulaFalsiThenBisection, or Alternation.");
                     }
@@ -1412,7 +1434,7 @@ namespace HeatBalanceManager {
             if (NumNums > 2) state.dataEnvrn->SiteTempGradient = NumArray(3);
 
         } else if (NumObjects > 1) {
-            ShowSevereError(state, "Too many " + state.dataHeatBalMgr->CurrentModuleObject + " objects, only 1 allowed.");
+            ShowSevereError(state, format("Too many {} objects, only 1 allowed.", state.dataHeatBalMgr->CurrentModuleObject));
             ErrorsFound = true;
         } else { //  None entered
             // IDD defaults would have this:
@@ -1510,8 +1532,7 @@ namespace HeatBalanceManager {
             state.dataHeatBal->SpectralData(Loop).Name = SpecDataNames(1);
             TotLam = SpecDataNumProp / 4;
             if (mod(SpecDataNumProp, 4) != 0) {
-                ShowWarningError(state,
-                                 std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
+                ShowWarningError(state, format("{}{}=\"{}\" invalid set.", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
                 ShowContinueError(
                     state,
                     format("... set not even multiple of 4 items (Wavelength,Trans,ReflFront,ReflBack), number of items in dataset = {}",
@@ -1521,8 +1542,7 @@ namespace HeatBalanceManager {
             }
             if (TotLam > Construction::MaxSpectralDataElements) {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
+                ShowSevereError(state, format("{}{}=\"{}\" invalid set.", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
                 ShowContinueError(
                     state,
                     format("... More than max [{}] (Wavelength,Trans,ReflFront,ReflBack) entries in set.", Construction::MaxSpectralDataElements));
@@ -1555,8 +1575,7 @@ namespace HeatBalanceManager {
                     if (state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum + 1) <= Lam) {
                         ErrorsFound = true;
                         ShowSevereError(state,
-                                        std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + "=\"" + SpecDataNames(1) +
-                                            "\" invalid set.");
+                                        format("{}{}=\"{}\" invalid set.", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
                         ShowContinueError(state,
                                           format("... Wavelengths not in increasing order. at wavelength#={}, value=[{:.4T}], next is [{:.4T}].",
                                                  LamNum,
@@ -1567,8 +1586,8 @@ namespace HeatBalanceManager {
 
                 if (Lam < 0.1 || Lam > 4.0) {
                     ErrorsFound = true;
-                    ShowSevereError(
-                        state, std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\" invalid value.", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
                     ShowContinueError(
                         state, format("... A wavelength is not in the range 0.1 to 4.0 microns; at wavelength#={}, value=[{:.4T}].", LamNum, Lam));
                 }
@@ -1578,26 +1597,26 @@ namespace HeatBalanceManager {
                 //  Relax rules to allow directly use of spectral data from IGDB
                 if (Tau > 1.01) {
                     ErrorsFound = true;
-                    ShowSevereError(
-                        state, std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\" invalid value.", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
                     ShowContinueError(state, format("... A transmittance is > 1.0; at wavelength#={}, value=[{:.4T}].", LamNum, Tau));
                 }
 
                 if (RhoF < 0.0 || RhoF > 1.02 || RhoB < 0.0 || RhoB > 1.02) {
                     ErrorsFound = true;
-                    ShowSevereError(
-                        state, std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\" invalid value.", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
                     ShowContinueError(state, format("... A reflectance is < 0.0 or > 1.0; at wavelength#={}, RhoF value=[{:.4T}].", LamNum, RhoF));
                     ShowContinueError(state, format("... A reflectance is < 0.0 or > 1.0; at wavelength#={}, RhoB value=[{:.4T}].", LamNum, RhoB));
                 }
 
                 if ((Tau + RhoF) > 1.03 || (Tau + RhoB) > 1.03) {
                     ErrorsFound = true;
-                    ShowSevereError(
-                        state, std::string{RoutineName} + state.dataHeatBalMgr->CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\" invalid value.", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
                     ShowContinueError(state,
-                                      "... Transmittance + reflectance) > 1.0 for an entry; at wavelength#=" +
-                                          format("{}, value(Tau+RhoF)=[{:.4T}], value(Tau+RhoB)=[{:.4T}].", LamNum, (Tau + RhoF), (Tau + RhoB)));
+                                      format("... Transmittance + reflectance) > 1.0 for an entry; at wavelength#={}",
+                                             format("{}, value(Tau+RhoF)=[{:.4T}], value(Tau+RhoB)=[{:.4T}].", LamNum, (Tau + RhoF), (Tau + RhoB))));
                 }
             }
         }
@@ -1770,10 +1789,12 @@ namespace HeatBalanceManager {
                         (MaterialLayerGroup == Material::MaterialGroup::ScreenEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::GapEquivalentLayer)) {
                         ShowSevereError(
-                            state, "Invalid material layer type in window " + state.dataHeatBalMgr->CurrentModuleObject + " = " + thisConstruct.Name);
-                        ShowSevereError(state,
-                                        "Equivalent Layer material type = " + ConstructAlphas(Layer) +
-                                            " is allowed only in Construction:WindowEquivalentLayer window object.");
+                            state,
+                            format("Invalid material layer type in window {} = {}", state.dataHeatBalMgr->CurrentModuleObject, thisConstruct.Name));
+                        ShowSevereError(
+                            state,
+                            format("Equivalent Layer material type = {} is allowed only in Construction:WindowEquivalentLayer window object.",
+                                   ConstructAlphas(Layer)));
                         ErrorsFound = true;
                     }
                 }
@@ -1799,8 +1820,10 @@ namespace HeatBalanceManager {
 
                 if (thisConstruct.LayerPoint(Layer) == 0) {
                     ShowSevereError(state,
-                                    "Did not find matching material for " + state.dataHeatBalMgr->CurrentModuleObject + ' ' + thisConstruct.Name +
-                                        ", missing material = " + ConstructAlphas(Layer));
+                                    format("Did not find matching material for {} {}, missing material = {}",
+                                           state.dataHeatBalMgr->CurrentModuleObject,
+                                           thisConstruct.Name,
+                                           ConstructAlphas(Layer)));
                     ErrorsFound = true;
                 } else {
                     auto const *thisMaterial =
@@ -1859,7 +1882,7 @@ namespace HeatBalanceManager {
                 int ctf_dimensions{fields.at("dimensions_for_the_ctf_calculation")};
                 if ((ctf_dimensions < 1) || (ctf_dimensions > 2)) {
                     ShowWarningError(state, "ConstructionProperty:InternalHeatSource must be either 1- or 2-D.  Reset to 1-D solution.");
-                    ShowContinueError(state, "Construction=" + construction_name + " is affected.");
+                    ShowContinueError(state, format("Construction={} is affected.", construction_name));
                     ctf_dimensions = 1;
                 }
                 Real64 tube_spacing{fields.at("tube_spacing")};
@@ -1870,8 +1893,10 @@ namespace HeatBalanceManager {
 
                 if (construction_index == 0) {
                     ShowSevereError(state,
-                                    "Did not find matching construction for " + state.dataHeatBalMgr->CurrentModuleObject + ' ' + thisObjectName +
-                                        ", missing construction = " + construction_name);
+                                    format("Did not find matching construction for {} {}, missing construction = {}",
+                                           state.dataHeatBalMgr->CurrentModuleObject,
+                                           thisObjectName,
+                                           construction_name));
                     ErrorsFound = true;
                     continue;
                 }
@@ -1884,7 +1909,8 @@ namespace HeatBalanceManager {
                 if (thisConstruct.SourceSinkPresent) {
                     // Emulate old behavior by disallowing two sources in a single material
                     ShowSevereError(
-                        state, "Construction " + construction_name + " has more than one internal heat source referencing it, which is not allowed");
+                        state,
+                        format("Construction {} has more than one internal heat source referencing it, which is not allowed", construction_name));
                     ErrorsFound = true;
                     continue;
                 }
@@ -1899,12 +1925,13 @@ namespace HeatBalanceManager {
 
                 // Set the total number of layers for the construction
                 if ((thisConstruct.SourceAfterLayer >= thisConstruct.TotLayers) || (thisConstruct.SourceAfterLayer <= 0)) {
-                    ShowWarningError(state, "Construction " + thisConstruct.Name + " must have a source that is between two layers");
+                    ShowWarningError(state, format("Construction {} must have a source that is between two layers", thisConstruct.Name));
                     ShowContinueError(state, "The source after layer parameter has been set to one less than the number of layers.");
                     thisConstruct.SourceAfterLayer = thisConstruct.TotLayers - 1;
                 }
                 if ((thisConstruct.TempAfterLayer >= thisConstruct.TotLayers) || (thisConstruct.TempAfterLayer <= 0)) {
-                    ShowWarningError(state, "Construction " + thisConstruct.Name + " must have a temperature calculation that is between two layers");
+                    ShowWarningError(state,
+                                     format("Construction {} must have a temperature calculation that is between two layers", thisConstruct.Name));
                     ShowContinueError(state, "The temperature calculation after layer parameter has been set to one less than the number of layers.");
                     thisConstruct.TempAfterLayer = thisConstruct.TotLayers - 1;
                 }
@@ -1955,8 +1982,8 @@ namespace HeatBalanceManager {
             state.dataConstruction->Construct(TotRegConstructs + ConstrNum).TotLayers = ConstructNumAlpha - 1;
             if (state.dataConstruction->Construct(TotRegConstructs + ConstrNum).TotLayers < 1) {
                 ShowSevereError(state,
-                                "Construction " + state.dataConstruction->Construct(TotRegConstructs + ConstrNum).Name +
-                                    " must have at least a single layer");
+                                format("Construction {} must have at least a single layer",
+                                       state.dataConstruction->Construct(TotRegConstructs + ConstrNum).Name));
                 ErrorsFound = true;
             }
 
@@ -1970,8 +1997,10 @@ namespace HeatBalanceManager {
 
                 if (state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
                     ShowSevereError(state,
-                                    "Did not find matching material for " + state.dataHeatBalMgr->CurrentModuleObject + ' ' + thisConstruct.Name +
-                                        ", missing material = " + ConstructAlphas(Layer));
+                                    format("Did not find matching material for {} {}, missing material = {}",
+                                           state.dataHeatBalMgr->CurrentModuleObject,
+                                           thisConstruct.Name,
+                                           ConstructAlphas(Layer)));
                     ErrorsFound = true;
                 } else {
                     MaterialLayerGroup =
@@ -1983,11 +2012,12 @@ namespace HeatBalanceManager {
                           (MaterialLayerGroup == Material::MaterialGroup::ScreenEquivalentLayer) ||
                           (MaterialLayerGroup == Material::MaterialGroup::GapEquivalentLayer))) {
                         ShowSevereError(state,
-                                        "Invalid material layer type in window " + state.dataHeatBalMgr->CurrentModuleObject + " = " +
-                                            state.dataConstruction->Construct(TotRegConstructs + ConstrNum).Name);
+                                        format("Invalid material layer type in window {} = {}",
+                                               state.dataHeatBalMgr->CurrentModuleObject,
+                                               state.dataConstruction->Construct(TotRegConstructs + ConstrNum).Name));
                         ShowContinueError(state,
-                                          "...Window layer = " + ConstructAlphas(Layer) +
-                                              " is not allowed in Construction:WindowEquivalentLayer window object.");
+                                          format("...Window layer = {} is not allowed in Construction:WindowEquivalentLayer window object.",
+                                                 ConstructAlphas(Layer)));
                         ShowContinueError(state, "Only materials of type Material:*:EquivalentLayer are allowed");
                         ErrorsFound = true;
                     }
@@ -2035,7 +2065,7 @@ namespace HeatBalanceManager {
 
             // Obtain the data
             if (DummyNumProp != 0) {
-                ShowSevereError(state, "Construction From Window5 Data File: there should be no numerical inputs for " + ConstructAlphas(0));
+                ShowSevereError(state, format("Construction From Window5 Data File: there should be no numerical inputs for {}", ConstructAlphas(0)));
                 ErrorsFound = true;
                 continue;
             }
@@ -2062,8 +2092,8 @@ namespace HeatBalanceManager {
             if (EOFonW5File || !ConstructionFound) {
                 DisplayString(state, "--Construction not found");
                 ErrorsFound = true;
-                ShowSevereError(state, "No match on WINDOW5 data file for Construction=" + ConstructAlphas(0) + ", or error in data file.");
-                ShowContinueError(state, "...Looking on file=" + window5DataFilePath.string()); // TODO: call getAbsolutePath maybe?
+                ShowSevereError(state, format("No match on WINDOW5 data file for Construction={}, or error in data file.", ConstructAlphas(0)));
+                ShowContinueError(state, format("...Looking on file={}", window5DataFilePath.string())); // TODO: call getAbsolutePath maybe?
                 continue;
             }
 
@@ -2081,7 +2111,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->NominalU(ConstrNum) = 1.0 / state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum);
             } else {
                 if (!thisConstruct.WindowTypeEQL) {
-                    ShowSevereError(state, "Nominal U is zero, for construction=" + thisConstruct.Name);
+                    ShowSevereError(state, format("Nominal U is zero, for construction={}", thisConstruct.Name));
                     ErrorsFound = true;
                 }
             }
@@ -2249,9 +2279,10 @@ namespace HeatBalanceManager {
 
                 state.dataHeatBal->ZoneList(ListNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 if (UtilityRoutines::FindItemInList(state.dataHeatBal->ZoneList(ListNum).Name, state.dataHeatBal->Zone) > 0) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                         "\":  is a duplicate of a zone name.");
+                    ShowWarningError(
+                        state,
+                        format(
+                            "{}{}=\"{}\":  is a duplicate of a zone name.", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "This could be a problem in places where either a Zone Name or a Zone List can be used.");
                 }
 
@@ -2259,9 +2290,8 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->ZoneList(ListNum).NumOfZones = NumAlphas - 1;
 
                 if (state.dataHeatBal->ZoneList(ListNum).NumOfZones < 1) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        "\":  No zones specified.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\":  No zones specified.", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else {
                     state.dataHeatBal->ZoneList(ListNum).Zone.allocate(state.dataHeatBal->ZoneList(ListNum).NumOfZones);
@@ -2274,8 +2304,12 @@ namespace HeatBalanceManager {
                         state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) = UtilityRoutines::FindItemInList(ZoneName, state.dataHeatBal->Zone);
                         if (state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) == 0) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                                "\":  " + state.dataIPShortCut->cAlphaFieldNames(ZoneNum + 1) + ' ' + ZoneName + " not found.");
+                                            format("{}{}=\"{}\":  {} {} not found.",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(ZoneNum + 1),
+                                                   ZoneName));
                             ErrorsFound = true;
                         }
 
@@ -2283,9 +2317,12 @@ namespace HeatBalanceManager {
                         for (Loop = 1; Loop <= ZoneNum - 1; ++Loop) {
                             if (state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) == state.dataHeatBal->ZoneList(ListNum).Zone(Loop)) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                                    "\":  " + state.dataIPShortCut->cAlphaFieldNames(ZoneNum + 1) + ' ' + ZoneName +
-                                                    " appears more than once in list.");
+                                                format("{}{}=\"{}\":  {} {} appears more than once in list.",
+                                                       RoutineName,
+                                                       cCurrentModuleObject,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataIPShortCut->cAlphaFieldNames(ZoneNum + 1),
+                                                       ZoneName));
                                 ErrorsFound = true;
                             }
                         } // Loop
@@ -2328,17 +2365,25 @@ namespace HeatBalanceManager {
 
                 if (ListNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\":  " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + " named " + state.dataIPShortCut->cAlphaArgs(2) + " not found.");
+                                    format("{}{}=\"{}\":  {} named {} not found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
                     // Check to make sure list is not in use by another ZONE GROUP
                     for (Loop = 1; Loop <= GroupNum - 1; ++Loop) {
                         if (state.dataHeatBal->ZoneGroup(GroupNum).ZoneList == state.dataHeatBal->ZoneGroup(Loop).ZoneList) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                                "\":  " + state.dataIPShortCut->cAlphaFieldNames(2) + " already used by " + cCurrentModuleObject +
-                                                " named " + state.dataHeatBal->ZoneGroup(Loop).Name + '.');
+                                            format("{}{}=\"{}\":  {} already used by {} named {}.",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(2),
+                                                   cCurrentModuleObject,
+                                                   state.dataHeatBal->ZoneGroup(Loop).Name));
                             ErrorsFound = true;
                         }
                     } // Loop
@@ -2354,11 +2399,14 @@ namespace HeatBalanceManager {
                                 state.dataHeatBal->Zone(ZoneNum).ListGroup = ListNum;
                             } else {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                                    "\":  Zone " + state.dataHeatBal->Zone(ZoneNum).Name +
-                                                    " in ZoneList already exists in ZoneList of another ZoneGroup.");
+                                                format("{}{}=\"{}\":  Zone {} in ZoneList already exists in ZoneList of another ZoneGroup.",
+                                                       RoutineName,
+                                                       cCurrentModuleObject,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       state.dataHeatBal->Zone(ZoneNum).Name));
                                 ShowContinueError(
-                                    state, "Previous ZoneList=" + state.dataHeatBal->ZoneList(state.dataHeatBal->Zone(ZoneNum).ListGroup).Name);
+                                    state,
+                                    format("Previous ZoneList={}", state.dataHeatBal->ZoneList(state.dataHeatBal->Zone(ZoneNum).ListGroup).Name));
                                 ErrorsFound = true;
                             }
                         }
@@ -2420,11 +2468,16 @@ namespace HeatBalanceManager {
             int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
             if (SurfNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
-                ShowContinueError(state,
-                                  state.dataIPShortCut->cAlphaFieldNames(1) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                      "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(1)));
+                ShowContinueError(
+                    state,
+                    format("{} entered value = \"{}\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.",
+                           state.dataIPShortCut->cAlphaFieldNames(1),
+                           state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
                 continue;
             }
@@ -2535,11 +2588,15 @@ namespace HeatBalanceManager {
                 ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
                 if (ZoneNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(2) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2)));
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(2) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                          "\" no corresponding zone has been found in the input file.");
+                                      format("{} entered value = \"{}\" no corresponding zone has been found in the input file.",
+                                             state.dataIPShortCut->cAlphaFieldNames(2),
+                                             state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
                     state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr = ZoneNum;
@@ -2557,11 +2614,15 @@ namespace HeatBalanceManager {
                                             ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(3) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(3)));
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(3) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                          "\" no corresponding schedule has been found in the input file.");
+                                      format("{} entered value = \"{}\" no corresponding schedule has been found in the input file.",
+                                             state.dataIPShortCut->cAlphaFieldNames(3),
+                                             state.dataIPShortCut->cAlphaArgs(3)));
                     ErrorsFound = true;
                 } else {
                     state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr = NodeNum;
@@ -2643,8 +2704,8 @@ namespace HeatBalanceManager {
                     state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ConvectionConstants::HcInt_ASTMC1340;
 
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHeatBal->Zone(ZoneLoop).Name + "\".");
-                    ShowContinueError(state, "Invalid value for " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                    ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, cCurrentModuleObject, state.dataHeatBal->Zone(ZoneLoop).Name));
+                    ShowContinueError(state, format("Invalid value for {}=\"{}\".", cAlphaFieldNames(2), cAlphaArgs(2)));
                     ErrorsFound = true;
                 }
             }
@@ -2673,8 +2734,8 @@ namespace HeatBalanceManager {
                     state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm;
 
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHeatBal->Zone(ZoneLoop).Name + "\".");
-                    ShowContinueError(state, "Invalid value for " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                    ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, cCurrentModuleObject, state.dataHeatBal->Zone(ZoneLoop).Name));
+                    ShowContinueError(state, format("Invalid value for {}=\"{}\".", cAlphaFieldNames(3), cAlphaArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -2691,8 +2752,8 @@ namespace HeatBalanceManager {
             } else if (UtilityRoutines::SameString("Yes", cAlphaArgs(4)) || lAlphaFieldBlanks(4)) {
                 state.dataHeatBal->Zone(ZoneLoop).isPartOfTotalArea = true;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHeatBal->Zone(ZoneLoop).Name + "\".");
-                ShowContinueError(state, "Invalid value for " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+                ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, cCurrentModuleObject, state.dataHeatBal->Zone(ZoneLoop).Name));
+                ShowContinueError(state, format("Invalid value for {}=\"{}\".", cAlphaFieldNames(4), cAlphaArgs(4)));
                 ErrorsFound = true;
             }
         }
@@ -2760,8 +2821,8 @@ namespace HeatBalanceManager {
                     state.dataHeatBal->Zone(zoneNum).spaceIndexes.emplace_back(spaceNum);
                     ++state.dataHeatBal->Zone(zoneNum).numSpaces;
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpace.Name);
-                    ShowContinueError(state, "Zone Name =" + zoneName + "not found.");
+                    ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisSpace.Name));
+                    ShowContinueError(state, format("Zone Name ={}not found.", zoneName));
                     ErrorsFound = true;
                 }
                 thisSpace.spaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
@@ -2811,11 +2872,13 @@ namespace HeatBalanceManager {
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->Zone) > 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  is a duplicate of a zone name.");
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\":  is a duplicate of a zone name.", RoutineName, cCurrentModuleObject, thisSpaceList.Name));
                     ErrorsFound = true;
                 }
                 if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->space) > 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  is a duplicate of a space name.");
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\":  is a duplicate of a space name.", RoutineName, cCurrentModuleObject, thisSpaceList.Name));
                     ErrorsFound = true;
                 }
 
@@ -2832,8 +2895,8 @@ namespace HeatBalanceManager {
                             thisSpaceList.spaces.emplace_back(thisSpaceNum);
                             ++thisSpaceList.numListSpaces;
                         } else {
-                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpaceList.Name);
-                            ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
+                            ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisSpaceList.Name));
+                            ShowContinueError(state, format("Space Name={} not found.", thisSpaceName));
                             ErrorsFound = true;
                         }
                         thisSpaceList.maxSpaceNameLength = max(thisSpaceList.maxSpaceNameLength, len(thisSpaceName));
@@ -2841,8 +2904,11 @@ namespace HeatBalanceManager {
                         for (int loop = 1; loop <= int(thisSpaceList.spaces.size()) - 1; ++loop) {
                             if (thisSpaceNum == thisSpaceList.spaces(loop)) {
                                 ShowSevereError(state,
-                                                RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  Space Name " + thisSpaceName +
-                                                    " appears more than once in list.");
+                                                format("{}{}=\"{}\":  Space Name {} appears more than once in list.",
+                                                       RoutineName,
+                                                       cCurrentModuleObject,
+                                                       thisSpaceList.Name,
+                                                       thisSpaceName));
                                 ErrorsFound = true;
                             }
                         }
@@ -3502,9 +3568,9 @@ namespace HeatBalanceManager {
                             state.dataHeatBalMgr->SizingWarmupConvergenceWarning = true;
                         }
                         if (state.dataEnvrn->RunPeriodEnvironment) {
-                            ShowContinueError(state, "...Environment(RunPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
+                            ShowContinueError(state, format("...Environment(RunPeriod)=\"{}\"", state.dataEnvrn->EnvironmentName));
                         } else {
-                            ShowContinueError(state, "...Environment(SizingPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
+                            ShowContinueError(state, format("...Environment(SizingPeriod)=\"{}\"", state.dataEnvrn->EnvironmentName));
                         }
 
                         ShowContinueError(state,
@@ -3942,20 +4008,25 @@ namespace HeatBalanceManager {
 
             if (frameDivider.DividerWidth > 0.0 && (frameDivider.HorDividers == 0 && frameDivider.VertDividers == 0)) {
                 ShowWarningError(state,
-                                 state.dataHeatBalMgr->CurrentModuleObject + ": In FrameAndDivider " + frameDivider.Name + ' ' +
-                                     state.dataIPShortCut->cNumericFieldNames(9) + " > 0 ");
-                ShowContinueError(state,
-                                  "...but " + state.dataIPShortCut->cNumericFieldNames(10) + " = 0 and " +
-                                      state.dataIPShortCut->cNumericFieldNames(11) + " = 0.");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cNumericFieldNames(9) + " set to 0.");
+                                 format("{}: In FrameAndDivider {} {} > 0 ",
+                                        state.dataHeatBalMgr->CurrentModuleObject,
+                                        frameDivider.Name,
+                                        state.dataIPShortCut->cNumericFieldNames(9)));
+                ShowContinueError(
+                    state,
+                    format("...but {} = 0 and {} = 0.", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->cNumericFieldNames(11)));
+                ShowContinueError(state, format("...{} set to 0.", state.dataIPShortCut->cNumericFieldNames(9)));
                 frameDivider.DividerWidth = 0.0;
             }
             // Prevent InsideSillDepth < InsideReveal
             if (frameDivider.InsideSillDepth < state.dataSurface->FrameDivider(FrameDividerNum).InsideReveal) {
                 ShowWarningError(state,
-                                 state.dataHeatBalMgr->CurrentModuleObject + ": In FrameAndDivider " + frameDivider.Name + ' ' +
-                                     state.dataIPShortCut->cNumericFieldNames(20) + " is less than " + state.dataIPShortCut->cNumericFieldNames(22) +
-                                     "; it will be set to " + state.dataIPShortCut->cNumericFieldNames(22) + '.');
+                                 format("{}: In FrameAndDivider {} {} is less than {}; it will be set to {}.",
+                                        state.dataHeatBalMgr->CurrentModuleObject,
+                                        frameDivider.Name,
+                                        state.dataIPShortCut->cNumericFieldNames(20),
+                                        state.dataIPShortCut->cNumericFieldNames(22),
+                                        state.dataIPShortCut->cNumericFieldNames(22)));
                 frameDivider.InsideSillDepth = state.dataSurface->FrameDivider(FrameDividerNum).InsideReveal;
             }
 
@@ -4119,8 +4190,9 @@ namespace HeatBalanceManager {
         if (endcol > 0) {
             if (int(NextLine.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
                 ShowSevereError(state,
-                                "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFilePath.string() +
-                                    " fiile, appears to be a Unicode or binary file.");
+                                format("SearchWindow5DataFile: For \"{}\" in {} fiile, appears to be a Unicode or binary file.",
+                                       DesiredConstructionName,
+                                       DesiredFilePath.string()));
                 ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
@@ -4132,9 +4204,10 @@ namespace HeatBalanceManager {
         if (NextLine.eof) goto Label1000;
         ++FileLineCount;
         if (!has_prefixi(NextLine.data, "WINDOW5")) {
-            ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFilePath.string());
+            ShowSevereError(state, format("HeatBalanceManager: SearchWindow5DataFile: Error in Data File={}", DesiredFilePath.string()));
             ShowFatalError(
-                state, "Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
+                state,
+                format("Error reading Window5 Data File: first word of window entry is \"{}\", should be Window5.", NextLine.data.substr(0, 7)));
         }
 
     Label10:;
@@ -4297,8 +4370,9 @@ namespace HeatBalanceManager {
             if (FrameWidth > 0.0) {
                 if (FrameConductance <= 0.0) {
                     ShowSevereError(state,
-                                    "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                        " from the Window5 data file cannot be used: it has Frame Conductance <= 0.0");
+                                    format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used: it "
+                                           "has Frame Conductance <= 0.0",
+                                           DesiredConstructionName));
                     ErrorsFound = true;
                 }
                 // Relax this check for Window5 data: 1/28/2008.
@@ -4314,9 +4388,11 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 }
                 if (FrameEmis <= 0.0 || FrameEmis >= 1.0) {
-                    ShowSevereError(state,
-                                    "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                        " from the Window5 data file cannot be used: it has Frame Emissivity <= 0.0 or >= 1.0");
+                    ShowSevereError(
+                        state,
+                        format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used: it has "
+                               "Frame Emissivity <= 0.0 or >= 1.0",
+                               DesiredConstructionName));
                     ErrorsFound = true;
                 }
             }
@@ -4358,45 +4434,51 @@ namespace HeatBalanceManager {
                 uppercase(DividerType(IGlSys));
                 if (DividerWidth(IGlSys) > 0.0) {
                     if (HorDividers(IGlSys) == 0 && VertDividers(IGlSys) == 0) {
-                        ShowSevereError(state,
-                                        "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                            " from the Window5 data file cannot be used:");
+                        ShowSevereError(
+                            state,
+                            format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used:",
+                                   DesiredConstructionName));
                         ShowContinueError(
                             state, format("glazing system {} has a divider but number of horizontal and vertical divider elements = 0", IGlSys));
                         ErrorsFound = true;
                     }
                     if (DividerConductance(IGlSys) <= 0.0) {
-                        ShowSevereError(state,
-                                        "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                            " from the Window5 data file cannot be used:");
+                        ShowSevereError(
+                            state,
+                            format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used:",
+                                   DesiredConstructionName));
                         ShowContinueError(state, format("glazing system {} has Divider Conductance <= 0.0", IGlSys));
                         ErrorsFound = true;
                     }
                     if (DivEdgeToCenterGlCondRatio(IGlSys) < 1.0) {
-                        ShowSevereError(state,
-                                        "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                            " from the Window5 data file cannot be used:");
+                        ShowSevereError(
+                            state,
+                            format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used:",
+                                   DesiredConstructionName));
                         ShowContinueError(state, format("glazing system {} has Divider Edge-Of-Glass Conduction Ratio < 1.0", IGlSys));
                         ErrorsFound = true;
                     }
                     if (DividerSolAbsorp(IGlSys) < 0.0 || DividerSolAbsorp(IGlSys) > 1.0) {
-                        ShowSevereError(state,
-                                        "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                            " from the Window5 data file cannot be used:");
+                        ShowSevereError(
+                            state,
+                            format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used:",
+                                   DesiredConstructionName));
                         ShowContinueError(state, format("glazing system {} has Divider Solar Absorptance < 0.0 or > 1.0", IGlSys));
                         ErrorsFound = true;
                     }
                     if (DividerEmis(IGlSys) <= 0.0 || DividerEmis(IGlSys) >= 1.0) {
-                        ShowSevereError(state,
-                                        "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                            " from the Window5 data file cannot be used:");
+                        ShowSevereError(
+                            state,
+                            format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used:",
+                                   DesiredConstructionName));
                         ShowContinueError(state, format("glazing system {} has Divider Emissivity <= 0.0 or >= 1.0", IGlSys));
                         ErrorsFound = true;
                     }
                     if (DividerType(IGlSys) != "DIVIDEDLITE" && DividerType(IGlSys) != "SUSPENDED") {
-                        ShowSevereError(state,
-                                        "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                            " from the Window5 data file cannot be used:");
+                        ShowSevereError(
+                            state,
+                            format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used:",
+                                   DesiredConstructionName));
                         ShowContinueError(
                             state,
                             format("glazing system {} has Divider Type = {}; it should be DIVIDEDLITE or SUSPENDED.", IGlSys, DividerType(IGlSys)));
@@ -4415,8 +4497,9 @@ namespace HeatBalanceManager {
 
             if (ErrorsFound)
                 ShowFatalError(state,
-                               "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                   " from the Window5 data file cannot be used because of above errors");
+                               format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used because "
+                                      "of above errors",
+                                      DesiredConstructionName));
 
             TotMaterialsPrev = state.dataMaterial->TotMaterials;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
@@ -4538,10 +4621,11 @@ namespace HeatBalanceManager {
                     thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
                     if (thisMaterial->Thickness <= 0.0) {
                         ShowSevereError(state,
-                                        "SearchWindow5DataFile: Material=\"" + thisMaterial->Name +
-                                            "\" has thickness of 0.0.  Will be set to thickness = .001 but inaccuracies may result.");
-                        ShowContinueError(state, "Line being read=" + NextLine.data);
-                        ShowContinueError(state, "Thickness field starts at column 26=" + NextLine.data.substr(25));
+                                        format("SearchWindow5DataFile: Material=\"{}\" has thickness of 0.0.  Will be set to thickness = .001 but "
+                                               "inaccuracies may result.",
+                                               thisMaterial->Name));
+                        ShowContinueError(state, format("Line being read={}", NextLine.data));
+                        ShowContinueError(state, format("Thickness field starts at column 26={}", NextLine.data.substr(25)));
                         thisMaterial->Thickness = 0.001;
                     }
                 }
@@ -4813,9 +4897,11 @@ namespace HeatBalanceManager {
                 FileLineCount += 5;
 
                 if (ErrorsFound)
-                    ShowFatalError(state,
-                                   "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
-                                       " from the Window5 data file cannot be used because of above errors");
+                    ShowFatalError(
+                        state,
+                        format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used because "
+                               "of above errors",
+                               DesiredConstructionName));
 
                 // Hemis
                 thisConstruct.TransDiff = Tsol(11);
@@ -5117,24 +5203,30 @@ namespace HeatBalanceManager {
 
             if (Ffactor <= 0.0) {
                 ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + "=\"" + ConstructAlphas(1) + "\" has " +
-                                    state.dataIPShortCut->cNumericFieldNames(1) + " <= 0.0, must be > 0.0.");
+                                format("{}=\"{}\" has {} <= 0.0, must be > 0.0.",
+                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                       ConstructAlphas(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1)));
                 ShowContinueError(state, format("Entered value=[{:.2R}]", Ffactor));
                 ErrorsFound = true;
             }
 
             if (Area <= 0.0) {
                 ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + "=\"" + ConstructAlphas(1) + "\" has " +
-                                    state.dataIPShortCut->cNumericFieldNames(2) + " <= 0.0, must be > 0.0.");
+                                format("{}=\"{}\" has {} <= 0.0, must be > 0.0.",
+                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                       ConstructAlphas(1),
+                                       state.dataIPShortCut->cNumericFieldNames(2)));
                 ShowContinueError(state, format("Entered value=[{:.2R}]", Area));
                 ErrorsFound = true;
             }
 
             if (PerimeterExposed < 0.0) {
                 ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + "=\"" + ConstructAlphas(1) + "\" has " +
-                                    state.dataIPShortCut->cNumericFieldNames(3) + " <= 0.0, must be > 0.0.");
+                                format("{}=\"{}\" has {} <= 0.0, must be > 0.0.",
+                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                       ConstructAlphas(1),
+                                       state.dataIPShortCut->cNumericFieldNames(3)));
                 ShowContinueError(state, format("Entered value=[{:.2R}]", PerimeterExposed));
                 ErrorsFound = true;
             }
@@ -5159,9 +5251,9 @@ namespace HeatBalanceManager {
 
             Rfic = Reff - Rcon;
             if (Rfic <= 0.0) {
-                ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + "=\"" + ConstructAlphas(1) +
-                                    "\" has calculated R value <= 0.0, must be > 0.0.");
+                ShowSevereError(
+                    state,
+                    format("{}=\"{}\" has calculated R value <= 0.0, must be > 0.0.", state.dataHeatBalMgr->CurrentModuleObject, ConstructAlphas(1)));
                 ShowContinueError(state, format("Calculated value=[{:.2R}] Check definition.", Rfic));
                 ErrorsFound = true;
             }
@@ -5215,16 +5307,20 @@ namespace HeatBalanceManager {
 
             if (Cfactor <= 0.0) {
                 ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + ' ' + ConstructAlphas(1) + " has " +
-                                    state.dataIPShortCut->cNumericFieldNames(1) + " <= 0.0, must be > 0.0.");
+                                format("{} {} has {} <= 0.0, must be > 0.0.",
+                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                       ConstructAlphas(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1)));
                 ShowContinueError(state, format("Entered value=[{:.2R}]", Cfactor));
                 ErrorsFound = true;
             }
 
             if (Height <= 0.0) {
                 ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + ' ' + ConstructAlphas(1) + " has " +
-                                    state.dataIPShortCut->cNumericFieldNames(2) + " <= 0.0, must be > 0.0.");
+                                format("{} {} has {} <= 0.0, must be > 0.0.",
+                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                       ConstructAlphas(1),
+                                       state.dataIPShortCut->cNumericFieldNames(2)));
                 ShowContinueError(state, format("Entered value=[{:.2R}]", Height));
                 ErrorsFound = true;
             }
@@ -5254,9 +5350,9 @@ namespace HeatBalanceManager {
 
             Rfic = Reff - Rcon;
             if (Rfic <= 0) {
-                ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + "=\"" + ConstructAlphas(1) +
-                                    "\" has calculated R value <= 0.0, must be > 0.0.");
+                ShowSevereError(
+                    state,
+                    format("{}=\"{}\" has calculated R value <= 0.0, must be > 0.0.", state.dataHeatBalMgr->CurrentModuleObject, ConstructAlphas(1)));
                 ShowContinueError(state, format("Calculated value=[{:.2R}] Check definition.", Rfic));
                 ErrorsFound = true;
             }
@@ -5285,9 +5381,9 @@ namespace HeatBalanceManager {
                 // Cannot imagine how you would have numAirBoundaryConstructs > 0 and yet the instances is empty
                 // this would indicate a major problem in the input processor, not a problem here
                 // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
-                ShowSevereError(state,                                                                                  // LCOV_EXCL_LINE
-                                cCurrentModuleObject + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-                errorsFound = true;                                                                                     // LCOV_EXCL_LINE
+                ShowSevereError(state,
+                                format("{}: Somehow getNumObjectsFound was > 0 but epJSON.find found 0", cCurrentModuleObject)); // LCOV_EXCL_LINE
+                errorsFound = true;                                                                                              // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -5327,8 +5423,11 @@ namespace HeatBalanceManager {
                         thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(schedName));
                         if (thisConstruct.AirBoundaryMixingSched == 0) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisConstruct.Name +
-                                                "\", invalid (not found) " + "Simple Mixing Schedule Name" + "=\"" + schedName + "\".");
+                                            format("{}{}=\"{}\", invalid (not found) Simple Mixing Schedule Name=\"{}\".",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisConstruct.Name,
+                                                   schedName));
                             errorsFound = true;
                         }
                     } else {
@@ -5418,11 +5517,16 @@ namespace HeatBalanceManager {
                 SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(2) + " has been found.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(2) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                          "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2)));
+                    ShowContinueError(
+                        state,
+                        format("{} entered value = \"{}\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.",
+                               state.dataIPShortCut->cAlphaFieldNames(2),
+                               state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
@@ -5445,11 +5549,16 @@ namespace HeatBalanceManager {
                 ConstrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct);
                 if (ConstrNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(3) + " has been found.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(3) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                          "\" no corresponding construction (ref Construction) has been found in the input file.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(3)));
+                    ShowContinueError(
+                        state,
+                        format("{} entered value = \"{}\" no corresponding construction (ref Construction) has been found in the input file.",
+                               state.dataIPShortCut->cAlphaFieldNames(3),
+                               state.dataIPShortCut->cAlphaArgs(3)));
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).ConstrPtr = ConstrNum;
@@ -5459,11 +5568,15 @@ namespace HeatBalanceManager {
                 ScheduleNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                 if (ScheduleNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(4) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(4)));
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(4) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(4) +
-                                          "\" no corresponding schedule has been found in the input file.");
+                                      format("{} entered value = \"{}\" no corresponding schedule has been found in the input file.",
+                                             state.dataIPShortCut->cAlphaFieldNames(4),
+                                             state.dataIPShortCut->cAlphaArgs(4)));
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SchedPtr = ScheduleNum;
@@ -5508,11 +5621,16 @@ namespace HeatBalanceManager {
                 SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(2) + " has been found.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(2) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                          "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2)));
+                    ShowContinueError(
+                        state,
+                        format("{} entered value = \"{}\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.",
+                               state.dataIPShortCut->cAlphaFieldNames(2),
+                               state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->FenLayAbsSSG(Loop).SurfPtr = SurfNum;
@@ -5523,11 +5641,16 @@ namespace HeatBalanceManager {
                 auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
                 if (ConstrNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(3) + " has been found.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(3) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                          "\" no corresponding construction (ref Construction) has been found in the input file.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(3)));
+                    ShowContinueError(
+                        state,
+                        format("{} entered value = \"{}\" no corresponding construction (ref Construction) has been found in the input file.",
+                               state.dataIPShortCut->cAlphaFieldNames(3),
+                               state.dataIPShortCut->cAlphaArgs(3)));
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->FenLayAbsSSG(Loop).ConstrPtr = ConstrNum;
@@ -5539,10 +5662,13 @@ namespace HeatBalanceManager {
                     }
 
                     if (!NumOfLayersMatch) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ", object. Number of scheduled surface gains for each layer does not match number of layers in "
-                                            "referenced construction.");
+                        ShowSevereError(
+                            state,
+                            format("{}{}=\"{}, object. Number of scheduled surface gains for each layer does not match number of layers in "
+                                   "referenced construction.",
+                                   RoutineName,
+                                   cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{} have {} schedule layers and {} have {} layers.",
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -5562,13 +5688,15 @@ namespace HeatBalanceManager {
                         ScheduleNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(i + 3));
                         if (ScheduleNum == 0) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(NumOfScheduledLayers + 3) +
-                                                " has been found.");
+                                            format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(NumOfScheduledLayers + 3)));
                             ShowContinueError(state,
-                                              state.dataIPShortCut->cAlphaFieldNames(NumOfScheduledLayers + 3) + " entered value = \"" +
-                                                  state.dataIPShortCut->cAlphaArgs(NumOfScheduledLayers + 3) +
-                                                  "\" no corresponding schedule has been found in the input file.");
+                                              format("{} entered value = \"{}\" no corresponding schedule has been found in the input file.",
+                                                     state.dataIPShortCut->cAlphaFieldNames(NumOfScheduledLayers + 3),
+                                                     state.dataIPShortCut->cAlphaArgs(NumOfScheduledLayers + 3)));
                             ErrorsFound = true;
                         } else {
                             state.dataSurface->FenLayAbsSSG(Loop).SchedPtrs(i) = ScheduleNum;
@@ -5661,7 +5789,8 @@ namespace HeatBalanceManager {
         }
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
             // zone is nor scheduled nor unscheduled
-            ShowWarningError(state, "Zone " + state.dataHeatBal->Zone(ZoneNum).Name + " does not have all surfaces scheduled with surface gains.");
+            ShowWarningError(state,
+                             format("Zone {} does not have all surfaces scheduled with surface gains.", state.dataHeatBal->Zone(ZoneNum).Name));
             ShowContinueError(state,
                               "If at least one surface in the zone is scheduled with surface gains, then all other surfaces within the same zone "
                               "should be scheduled as well.");
@@ -5679,7 +5808,7 @@ namespace HeatBalanceManager {
                     }
 
                     if (SchedPtr == 0) {
-                        ShowContinueError(state, "Surface " + state.dataSurface->Surface(iSurf).Name + " does not have scheduled surface gains.");
+                        ShowContinueError(state, format("Surface {} does not have scheduled surface gains.", state.dataSurface->Surface(iSurf).Name));
                     }
                 }
             }
@@ -5854,8 +5983,9 @@ namespace HeatBalanceManager {
         if (Rlw <= 0.0) { // U factor of film coefficients is better than user input.
             Rlw = max(Rlw, 0.001);
             ShowWarningError(state,
-                             "WindowMaterial:SimpleGlazingSystem: " + thisMaterial->Name +
-                                 " has U-factor higher than that provided by surface film resistances, Check value of U-factor");
+                             format("WindowMaterial:SimpleGlazingSystem: {} has U-factor higher than that provided by surface film resistances, "
+                                    "Check value of U-factor",
+                                    thisMaterial->Name));
         }
 
         // Step 2. determine layer thickness.
@@ -5874,9 +6004,9 @@ namespace HeatBalanceManager {
             thisMaterial->Resistance = Rlw;
         } else {
             ErrorsFound = true;
-            ShowSevereError(state,
-                            "WindowMaterial:SimpleGlazingSystem: " + thisMaterial->Name +
-                                " has Conductivity <= 0.0, must be >0.0, Check value of U-factor");
+            ShowSevereError(
+                state,
+                format("WindowMaterial:SimpleGlazingSystem: {} has Conductivity <= 0.0, must be >0.0, Check value of U-factor", thisMaterial->Name));
         }
 
         // step 4. determine solar transmission (revised to 10-1-2009 version from LBNL.)
@@ -6030,8 +6160,11 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(1)));
                 ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
                 continue;
             }
@@ -6043,8 +6176,11 @@ namespace HeatBalanceManager {
             if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(1) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1)));
                 ShowContinueError(state,
                                   format("{} must be > 0, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(1),
@@ -6054,8 +6190,11 @@ namespace HeatBalanceManager {
             if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(2) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(2)));
                 ShowContinueError(state,
                                   format("{} must be > 0, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(2),
@@ -6082,8 +6221,11 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(1)));
                 ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
                 continue;
             }
@@ -6093,8 +6235,11 @@ namespace HeatBalanceManager {
             if (state.dataIPShortCut->rNumericArgs(1) < 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(1) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1)));
                 ShowContinueError(state,
                                   format("{} must be >= 0, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(1),
@@ -6145,8 +6290,11 @@ namespace HeatBalanceManager {
             if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(1) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1)));
                 ShowContinueError(
                     state,
                     format("{} must be > 0, entered {:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
@@ -6156,8 +6304,11 @@ namespace HeatBalanceManager {
             if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(2) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(2)));
                 ShowContinueError(
                     state,
                     format("{} must be > 0, entered {:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
@@ -6167,9 +6318,12 @@ namespace HeatBalanceManager {
                 thisMaterial->GasPointer = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
-                ShowContinueError(state, cCurrentModuleObject + " does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(1)));
+                ShowContinueError(state, format("{} does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre.", cCurrentModuleObject));
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 thisMaterial->DeflectionStatePtr =
@@ -6204,8 +6358,11 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(1)));
                 ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
                 continue;
             }
@@ -6243,11 +6400,15 @@ namespace HeatBalanceManager {
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(2) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2)));
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(2) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                          "\" should be OtherShadingType, Venetian, Woven, Perforated or BSDF.");
+                                      format("{} entered value = \"{}\" should be OtherShadingType, Venetian, Woven, Perforated or BSDF.",
+                                             state.dataIPShortCut->cAlphaFieldNames(2),
+                                             state.dataIPShortCut->cAlphaArgs(2)));
                 }
             }
 
@@ -6288,8 +6449,11 @@ namespace HeatBalanceManager {
             if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(1) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1)));
                 ShowContinueError(state,
                                   format("{} must be > 0, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(1),
@@ -6299,8 +6463,11 @@ namespace HeatBalanceManager {
             if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(2) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(2)));
                 ShowContinueError(state,
                                   format("{} must be > 0, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(2),
@@ -6310,8 +6477,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(3) < 0.0) || (state.dataIPShortCut->rNumericArgs(3) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(3) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(3)));
                 ShowContinueError(state,
                                   format("{} value must be >= 0 and <= 1, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(3),
@@ -6321,8 +6491,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(4) <= 0.0) || (state.dataIPShortCut->rNumericArgs(4) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(4) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(4)));
                 ShowContinueError(state,
                                   format("{} value must be >= 0 and <= 1, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(4),
@@ -6332,8 +6505,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(5) <= 0.0) || (state.dataIPShortCut->rNumericArgs(5) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(5) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(5)));
                 ShowContinueError(state,
                                   format("{} value must be >= 0 and <= 1, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -6343,8 +6519,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(6) < 0.0) || (state.dataIPShortCut->rNumericArgs(6) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(6) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(6)));
                 ShowContinueError(state,
                                   format("{} must be >= 0 or <= 1, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(6),
@@ -6354,8 +6533,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(7) < 0.0) || (state.dataIPShortCut->rNumericArgs(7) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(7) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(7)));
                 ShowContinueError(state,
                                   format("{} must be >=0 or <=1, entered {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(7),
@@ -6365,8 +6547,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(8) < 0.0) || (state.dataIPShortCut->rNumericArgs(8) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(8) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(8)));
                 ShowContinueError(state,
                                   format("{} must be >=0 or <=1, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(8),
@@ -6376,8 +6561,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(9) < 0.0) || (state.dataIPShortCut->rNumericArgs(9) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(9) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(9)));
                 ShowContinueError(state,
                                   format("{} must be >=0 or <=1, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(9),
@@ -6387,8 +6575,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(10) < 0.0) || (state.dataIPShortCut->rNumericArgs(10) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(10) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(10)));
                 ShowContinueError(state,
                                   format("{} must be >=0 or <=1, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(10),
@@ -6400,8 +6591,11 @@ namespace HeatBalanceManager {
                 if (state.dataIPShortCut->rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(11) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(11)));
                     ShowContinueError(state,
                                       format("{} must be >0, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(11),
@@ -6411,8 +6605,11 @@ namespace HeatBalanceManager {
                 if (state.dataIPShortCut->rNumericArgs(12) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(12) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(12)));
                     ShowContinueError(state,
                                       format("{} must be >0, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(12),
@@ -6422,8 +6619,11 @@ namespace HeatBalanceManager {
                 if (state.dataIPShortCut->rNumericArgs(13) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(13) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(13)));
                     ShowContinueError(state,
                                       format("{} must be >0, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(13),
@@ -6433,8 +6633,11 @@ namespace HeatBalanceManager {
                 if ((state.dataIPShortCut->rNumericArgs(14) < -90.0) || (state.dataIPShortCut->rNumericArgs(14) > 90.0)) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(14) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(14)));
                     ShowContinueError(state,
                                       format("{} must be >=-90 and <=90, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(14),
@@ -6444,8 +6647,11 @@ namespace HeatBalanceManager {
                 if (state.dataIPShortCut->rNumericArgs(15) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(15) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(15)));
                     ShowContinueError(state,
                                       format("{} must be >0, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(15),
@@ -6457,8 +6663,11 @@ namespace HeatBalanceManager {
                      (state.dataIPShortCut->rNumericArgs(16) < (state.dataIPShortCut->rNumericArgs(11) / 2)))) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(16) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(16)));
                     ShowContinueError(state,
                                       format("{} must be =0 or greater than SlatWidth/2, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(16),
@@ -6553,8 +6762,11 @@ namespace HeatBalanceManager {
             if ((state.dataIPShortCut->rNumericArgs(1) < 0.0) || (state.dataIPShortCut->rNumericArgs(1) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(1) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1)));
                 ShowContinueError(state,
                                   format("{} should be >= 0.0 and <= 1.0, entered value = {:.2R}",
                                          state.dataIPShortCut->cNumericFieldNames(1),
@@ -6572,11 +6784,15 @@ namespace HeatBalanceManager {
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(2) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2)));
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(2) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                          "\" should be ISO15099, EN673Declared or EN673Design.");
+                                      format("{} entered value = \"{}\" should be ISO15099, EN673Declared or EN673Design.",
+                                             state.dataIPShortCut->cAlphaFieldNames(2),
+                                             state.dataIPShortCut->cAlphaArgs(2)));
                 }
             }
 
@@ -6593,12 +6809,17 @@ namespace HeatBalanceManager {
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(3) + " has been found.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(3) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                          "\" should be ISO15099, ScaledCavityWidth, ConvectiveScalarModel_NoSDThickness or "
-                                          "ConvectiveScalarModel_WithSDThickness.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(3)));
+                    ShowContinueError(
+                        state,
+                        format("{} entered value = \"{}\" should be ISO15099, ScaledCavityWidth, ConvectiveScalarModel_NoSDThickness or "
+                               "ConvectiveScalarModel_WithSDThickness.",
+                               state.dataIPShortCut->cAlphaFieldNames(3),
+                               state.dataIPShortCut->cAlphaArgs(3)));
                 }
             }
 
@@ -6613,11 +6834,15 @@ namespace HeatBalanceManager {
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(4) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(4)));
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(4) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(4) +
-                                          "\" should be NoDeflection, TemperatureAndPressureInput or MeasuredDeflection.");
+                                      format("{} entered value = \"{}\" should be NoDeflection, TemperatureAndPressureInput or MeasuredDeflection.",
+                                             state.dataIPShortCut->cAlphaFieldNames(4),
+                                             state.dataIPShortCut->cAlphaArgs(4)));
                 }
             }
 
@@ -6626,8 +6851,11 @@ namespace HeatBalanceManager {
                 if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(2) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(2)));
                     ShowContinueError(state,
                                       format("{} must be > 0, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(2),
@@ -6638,8 +6866,11 @@ namespace HeatBalanceManager {
                 if (state.dataIPShortCut->rNumericArgs(3) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(3) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(3)));
                     ShowContinueError(state,
                                       format("{} must be > 0, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(3),
@@ -6650,8 +6881,11 @@ namespace HeatBalanceManager {
                 if (state.dataIPShortCut->rNumericArgs(4) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cNumericFieldNames(4) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cNumericFieldNames(4)));
                     ShowContinueError(state,
                                       format("{} must be > 0, entered value = {:.2R}",
                                              state.dataIPShortCut->cNumericFieldNames(4),
@@ -6723,10 +6957,13 @@ namespace HeatBalanceManager {
                     // throw error
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
-                                        locAlphaFieldNames(2) + " has been found.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           locAlphaArgs(1),
+                                           locAlphaFieldNames(2)));
                     ShowContinueError(state,
-                                      locAlphaFieldNames(2) + " entered value=\"" + locAlphaArgs(2) + "\" should be LBNLWindow or UserDefined.");
+                                      format("{} entered value=\"{}\" should be LBNLWindow or UserDefined.", locAlphaFieldNames(2), locAlphaArgs(2)));
                 }
             }
 
@@ -6740,9 +6977,13 @@ namespace HeatBalanceManager {
                     // throw error
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
-                                        locAlphaFieldNames(3) + " has been found.");
-                    ShowContinueError(state, locAlphaFieldNames(3) + " entered value = \"" + locAlphaArgs(3) + "\" should be Axisymmetric or None.");
+                                    format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           locAlphaArgs(1),
+                                           locAlphaFieldNames(3)));
+                    ShowContinueError(state,
+                                      format("{} entered value = \"{}\" should be Axisymmetric or None.", locAlphaFieldNames(3), locAlphaArgs(3)));
                 }
             }
 
@@ -6750,11 +6991,16 @@ namespace HeatBalanceManager {
             ThermalModelNum = UtilityRoutines::FindItemInList(locAlphaArgs(4), state.dataHeatBal->WindowThermalModel);
             if (ThermalModelNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
-                                    locAlphaFieldNames(4) + " has been found.");
-                ShowContinueError(state,
-                                  locAlphaFieldNames(4) + " entered value = \"" + locAlphaArgs(4) +
-                                      "\" no corresponding thermal model (WindowThermalModel:Params) found in the input file.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       locAlphaArgs(1),
+                                       locAlphaFieldNames(4)));
+                ShowContinueError(
+                    state,
+                    format("{} entered value = \"{}\" no corresponding thermal model (WindowThermalModel:Params) found in the input file.",
+                           locAlphaFieldNames(4),
+                           locAlphaArgs(4)));
             } else {
                 thisConstruct.BSDFInput.ThermalModel = ThermalModelNum;
             }
@@ -6770,11 +7016,15 @@ namespace HeatBalanceManager {
             if (NumCols != 2 && NumCols != 1) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
-                                    locAlphaFieldNames(5) + " has been found.");
+                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       locAlphaArgs(1),
+                                       locAlphaFieldNames(5)));
                 ShowContinueError(state,
-                                  locAlphaFieldNames(5) + " entered value=\"" + locAlphaArgs(5) +
-                                      "\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1.");
+                                  format("{} entered value=\"{}\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1.",
+                                         locAlphaFieldNames(5),
+                                         locAlphaArgs(5)));
             }
             thisConstruct.BSDFInput.BasisMat.allocate(NumCols, NumRows);
             Get2DMatrix(state, thisConstruct.BSDFInput.BasisMatIndex, thisConstruct.BSDFInput.BasisMat);
@@ -6794,9 +7044,9 @@ namespace HeatBalanceManager {
             if (mod((NumAlphas - 9), 3) != 0) {
                 // throw warning if incomplete field set
                 ErrorsFound = true;
-                ShowSevereError(
-                    state, std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Incomplete field set found.");
-                ShowContinueError(state, locAlphaArgs(1) + " is missing some of the layers or/and gaps.");
+                ShowSevereError(state,
+                                format("{}{}=\"{}, object. Incomplete field set found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
+                ShowContinueError(state, format("{} is missing some of the layers or/and gaps.", locAlphaArgs(1)));
             }
 
             if (thisConstruct.BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
@@ -6814,23 +7064,23 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Illegal matrix size has been found.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}, object. Illegal matrix size has been found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
                         state,
-                        "Solar front transmittance matrix \"" + locAlphaArgs(6) +
-                            "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
-                            locAlphaArgs(5) + "\".");
+                        format("Solar front transmittance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(6),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        "\", object. Invalid BSDF matrix dimensions.");
-                    ShowContinueError(state,
-                                      "Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", object. Invalid BSDF matrix dimensions.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
+                    ShowContinueError(
+                        state, format("Solar front transmittance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(6)));
                 }
 
                 if (thisConstruct.BSDFInput.BasisType == DataBSDFWindow::Basis::Custom) {
@@ -6842,10 +7092,12 @@ namespace HeatBalanceManager {
                 if (thisConstruct.BSDFInput.SolFrtTransIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Referenced Matrix:TwoDimension is missing from the input file.");
-                    ShowContinueError(state,
-                                      "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
+                                    format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                           RoutineName,
+                                           locCurrentModuleObject,
+                                           locAlphaArgs(1)));
+                    ShowContinueError(
+                        state, format("Solar front transmittance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(6)));
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.SolFrtTransIndex, thisConstruct.BSDFInput.SolFrtTrans);
                 }
@@ -6860,33 +7112,35 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Illegal matrix size has been found.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}, object. Illegal matrix size has been found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
                         state,
-                        "Solar back reflectance matrix \"" + locAlphaArgs(7) +
-                            "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
-                            locAlphaArgs(5) + "\".");
+                        format("Solar back reflectance matrix \"{}\" is not the same size as it is defined by basis definition. Basis size "
+                               "is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(7),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", object. Invalid BSDF matrix dimensions.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(state,
-                                      "Solar bakc reflectance matrix \"" + locAlphaArgs(7) + "\" must have the same number of rows and columns.");
+                                      format("Solar bakc reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(7)));
                 }
 
                 thisConstruct.BSDFInput.SolBkRefl.allocate(NumCols, NumRows);
                 if (thisConstruct.BSDFInput.SolBkReflIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Referenced Matrix:TwoDimension is missing from the input file.");
+                                    format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                           RoutineName,
+                                           locCurrentModuleObject,
+                                           locAlphaArgs(1)));
                     ShowContinueError(state,
-                                      "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
+                                      format("Solar back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(7)));
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.SolBkReflIndex, thisConstruct.BSDFInput.SolBkRefl);
                 }
@@ -6901,33 +7155,35 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Illegal matrix size has been found.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}, object. Illegal matrix size has been found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
                         state,
-                        "Visible front transmittance matrix \"" + locAlphaArgs(8) +
-                            "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
-                            locAlphaArgs(5) + "\".");
+                        format("Visible front transmittance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(8),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", object. Invalid BSDF matrix dimensions.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
-                        state, "Visible front transmittance matrix \"" + locAlphaArgs(8) + "\" must have the same number of rows and columns.");
+                        state, format("Visible front transmittance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(8)));
                 }
 
                 thisConstruct.BSDFInput.VisFrtTrans.allocate(NumCols, NumRows);
                 if (thisConstruct.BSDFInput.VisFrtTransIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Referenced Matrix:TwoDimension is missing from the input file.");
+                                    format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           locAlphaArgs(1)));
                     ShowContinueError(
-                        state, "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) + "\" is missing from the input file.");
+                        state, format("Visible front transmittance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(8)));
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.VisFrtTransIndex, thisConstruct.BSDFInput.VisFrtTrans);
                 }
@@ -6942,32 +7198,35 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Illegal matrix size has been found.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}, object. Illegal matrix size has been found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
                         state,
-                        "Visible back reflectance matrix \"" + locAlphaArgs(9) +
-                            "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
-                            locAlphaArgs(5) + "\".");
+                        format("Visible back reflectance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(9),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        "\", object. Invalid BSDF matrix dimensions.");
-                    ShowContinueError(state, "Visible back reflectance \"" + locAlphaArgs(9) + "\" must have the same number of rows and columns.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", object. Invalid BSDF matrix dimensions.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
+                    ShowContinueError(state,
+                                      format("Visible back reflectance \"{}\" must have the same number of rows and columns.", locAlphaArgs(9)));
                 }
 
                 thisConstruct.BSDFInput.VisBkRefl.allocate(NumCols, NumRows);
                 if (thisConstruct.BSDFInput.VisBkReflIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Referenced Matrix:TwoDimension is missing from the input file.");
-                    ShowContinueError(state,
-                                      "Visble back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
+                                    format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                           RoutineName,
+                                           locCurrentModuleObject,
+                                           locAlphaArgs(1)));
+                    ShowContinueError(
+                        state, format("Visble back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(9)));
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.VisBkReflIndex, thisConstruct.BSDFInput.VisBkRefl);
                 }
@@ -6992,9 +7251,9 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
-                                                "\", object. Incorrect matrix dimension.");
+                            ShowSevereError(
+                                state,
+                                format("{}{} = \"{}\", object. Incorrect matrix dimension.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
                                                      locAlphaArgs(AlphaIndex),
@@ -7003,9 +7262,9 @@ namespace HeatBalanceManager {
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
-                                                "\", object. Incorrect matrix dimension.");
+                            ShowSevereError(
+                                state,
+                                format("{}{} = \"{}\", object. Incorrect matrix dimension.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have same number of columns "
                                                      "as it is defined by basis matrix.",
@@ -7021,8 +7280,10 @@ namespace HeatBalanceManager {
                         if (thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
                             ErrorsFound = true;
                             ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                                ", object. Referenced Matrix:TwoDimension is missing from the input file.");
+                                            format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                                   RoutineName,
+                                                   locCurrentModuleObject,
+                                                   locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} is missing from the input file.",
                                                      locAlphaArgs(AlphaIndex),
@@ -7042,9 +7303,9 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
-                                                "\", object. Incorrect matrix dimension.");
+                            ShowSevereError(
+                                state,
+                                format("{}{} = \"{}\", object. Incorrect matrix dimension.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
                                                      locAlphaArgs(AlphaIndex),
@@ -7053,9 +7314,9 @@ namespace HeatBalanceManager {
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
-                                                "\", object. Incorrect matrix dimension.");
+                            ShowSevereError(
+                                state,
+                                format("{}{} = \"{}\", object. Incorrect matrix dimension.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have same number of columns as "
                                                      "it is defined by basis matrix.",
@@ -7070,8 +7331,10 @@ namespace HeatBalanceManager {
                         if (thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
                             ErrorsFound = true;
                             ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                                ", object. Referenced Matrix:TwoDimension is missing from the input file.");
+                                            format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                                   RoutineName,
+                                                   locCurrentModuleObject,
+                                                   locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} is missing from the input file.",
                                                      locAlphaArgs(AlphaIndex),
@@ -7098,33 +7361,35 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Illegal matrix size has been found.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}, object. Illegal matrix size has been found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
                         state,
-                        "Solar front transmittance matrix \"" + locAlphaArgs(6) +
-                            "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
-                            locAlphaArgs(5) + "\".");
+                        format("Solar front transmittance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(6),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        "\", object. Invalid BSDF matrix dimensions.");
-                    ShowContinueError(state,
-                                      "Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", object. Invalid BSDF matrix dimensions.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
+                    ShowContinueError(
+                        state, format("Solar front transmittance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(6)));
                 }
 
                 thisConstruct.BSDFInput.SolFrtTrans.allocate(NBasis, NBasis);
                 if (thisConstruct.BSDFInput.SolFrtTransIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Referenced Matrix:TwoDimension is missing from the input file.");
-                    ShowContinueError(state,
-                                      "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
+                                    format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                           RoutineName,
+                                           locCurrentModuleObject,
+                                           locAlphaArgs(1)));
+                    ShowContinueError(
+                        state, format("Solar front transmittance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(6)));
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.SolFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
 
@@ -7144,33 +7409,35 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Illegal matrix size has been found.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}, object. Illegal matrix size has been found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
                         state,
-                        "Solar back reflectance matrix \"" + locAlphaArgs(7) +
-                            "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
-                            locAlphaArgs(5) + "\".");
+                        format("Solar back reflectance matrix \"{}\" is not the same size as it is defined by basis definition. Basis size "
+                               "is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(7),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", object. Invalid BSDF matrix dimensions.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(state,
-                                      "Solar back reflectance matrix \"" + locAlphaArgs(7) + "\" must have the same number of rows and columns.");
+                                      format("Solar back reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(7)));
                 }
 
                 thisConstruct.BSDFInput.SolBkRefl.allocate(NBasis, NBasis);
                 if (thisConstruct.BSDFInput.SolBkReflIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Referenced Matrix:TwoDimension is missing from the input file.");
+                                    format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                           RoutineName,
+                                           locCurrentModuleObject,
+                                           locAlphaArgs(1)));
                     ShowContinueError(state,
-                                      "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
+                                      format("Solar back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(7)));
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.SolBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     thisConstruct.BSDFInput.SolBkRefl = 0.0;
@@ -7189,33 +7456,35 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Illegal matrix size has been found.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}, object. Illegal matrix size has been found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
                         state,
-                        "Visible front transmittance matrix \"" + locAlphaArgs(8) +
-                            "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
-                            locAlphaArgs(5) + "\".");
+                        format("Visible front transmittance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(8),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", object. Invalid BSDF matrix dimensions.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
-                        state, "Visible front transmittance matrix \"" + locAlphaArgs(8) + "\" must have the same number of rows and columns.");
+                        state, format("Visible front transmittance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(8)));
                 }
 
                 thisConstruct.BSDFInput.VisFrtTrans.allocate(NBasis, NBasis);
                 if (thisConstruct.BSDFInput.VisFrtTransIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Referenced Matrix:TwoDimension is missing from the input file.");
+                                    format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                           RoutineName,
+                                           locCurrentModuleObject,
+                                           locAlphaArgs(1)));
                     ShowContinueError(
-                        state, "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) + "\" is missing from the input file.");
+                        state, format("Visible front transmittance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(8)));
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.VisFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     thisConstruct.BSDFInput.VisFrtTrans = 0.0;
@@ -7234,33 +7503,35 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Illegal matrix size has been found.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}, object. Illegal matrix size has been found.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                     ShowContinueError(
                         state,
-                        "Visible back reflectance matrix \"" + locAlphaArgs(9) +
-                            "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
-                            locAlphaArgs(5) + "\".");
+                        format("Visible back reflectance matrix \"{}\" is not the same size as it is defined by basis definition. Basis "
+                               "size is defined by Matrix:TwoDimension = \"{}\".",
+                               locAlphaArgs(9),
+                               locAlphaArgs(5)));
                 }
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        "\", object. Invalid BSDF matrix dimensions.");
-                    ShowContinueError(state,
-                                      "Visible back reflectance matrix \"" + locAlphaArgs(9) + "\" must have the same number of rows and columns.");
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", object. Invalid BSDF matrix dimensions.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
+                    ShowContinueError(
+                        state, format("Visible back reflectance matrix \"{}\" must have the same number of rows and columns.", locAlphaArgs(9)));
                 }
 
                 thisConstruct.BSDFInput.VisBkRefl.allocate(NBasis, NBasis);
                 if (thisConstruct.BSDFInput.VisBkReflIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                        ", object. Referenced Matrix:TwoDimension is missing from the input file.");
-                    ShowContinueError(state,
-                                      "Visible back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
+                                    format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                           RoutineName,
+                                           locCurrentModuleObject,
+                                           locAlphaArgs(1)));
+                    ShowContinueError(
+                        state, format("Visible back reflectance Matrix:TwoDimension = \"{}\" is missing from the input file.", locAlphaArgs(9)));
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.VisBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     thisConstruct.BSDFInput.VisBkRefl = 0.0;
@@ -7281,10 +7552,6 @@ namespace HeatBalanceManager {
 
                 // ALLOCATE(Construct(ConstrNum)%BSDFInput%Layer(NumOfOpticalLayers))
                 for (Layer = 1; Layer <= thisConstruct.TotLayers; ++Layer) {
-                    AlphaIndex = 9 + (Layer * 3) - 2;
-                    currentOpticalLayer = int(Layer / 2) + 1;
-
-                    thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
 
                     if (mod(Layer, 2) != 0) {
                         thisConstruct.BSDFInput.Layer(currentOpticalLayer).MaterialIndex = thisConstruct.LayerPoint(Layer);
@@ -7298,9 +7565,9 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
-                                                "\", object. Incorrect matrix dimension.");
+                            ShowSevereError(
+                                state,
+                                format("{}{} = \"{}\", object. Incorrect matrix dimension.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
                                                      locAlphaArgs(AlphaIndex),
@@ -7309,9 +7576,9 @@ namespace HeatBalanceManager {
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
-                                                "\", object. Incorrect matrix dimension.");
+                            ShowSevereError(
+                                state,
+                                format("{}{} = \"{}\", object. Incorrect matrix dimension.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have same number of columns "
                                                      "as it is defined by basis matrix.",
@@ -7328,8 +7595,10 @@ namespace HeatBalanceManager {
                         if (thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
                             ErrorsFound = true;
                             ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                                ", object. Referenced Matrix:TwoDimension is missing from the input file.");
+                                            format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                                   RoutineName,
+                                                   locCurrentModuleObject,
+                                                   locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Front absorbtance Matrix:TwoDimension = \"{}\" for layer {} is missing from the input file.",
                                                      locAlphaArgs(AlphaIndex),
@@ -7349,9 +7618,9 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
-                                                "\", object. Incorrect matrix dimension.");
+                            ShowSevereError(
+                                state,
+                                format("{}{} = \"{}\", object. Incorrect matrix dimension.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have only one row.",
                                                      locAlphaArgs(AlphaIndex),
@@ -7360,9 +7629,9 @@ namespace HeatBalanceManager {
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
-                                                "\", object. Incorrect matrix dimension.");
+                            ShowSevereError(
+                                state,
+                                format("{}{} = \"{}\", object. Incorrect matrix dimension.", RoutineName, locCurrentModuleObject, locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} must have same number of columns as "
                                                      "it is defined by basis matrix.",
@@ -7378,8 +7647,10 @@ namespace HeatBalanceManager {
                         if (thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
                             ErrorsFound = true;
                             ShowSevereError(state,
-                                            std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
-                                                ", object. Referenced Matrix:TwoDimension is missing from the input file.");
+                                            format("{}{}=\"{}, object. Referenced Matrix:TwoDimension is missing from the input file.",
+                                                   RoutineName,
+                                                   locCurrentModuleObject,
+                                                   locAlphaArgs(1)));
                             ShowContinueError(state,
                                               format("Back absorbtance Matrix:TwoDimension = \"{}\" for layer {} is missing from the input file.",
                                                      locAlphaArgs(AlphaIndex),

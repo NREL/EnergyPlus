@@ -53,8 +53,6 @@
 #include <string>
 #include <vector>
 
-#include <ObjexxFCL/Optional.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirSystems.hh>

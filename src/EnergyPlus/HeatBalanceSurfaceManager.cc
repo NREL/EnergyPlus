@@ -4383,8 +4383,8 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
             // in the zone?
             if (thisSolEnclosure.solAbsFirstCalc) {
                 ShowWarningError(state,
-                                 "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " +
-                                     thisSolEnclosure.Name);
+                                 format("ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: {}",
+                                        thisSolEnclosure.Name));
                 thisSolEnclosure.solAbsFirstCalc = false;
             }
             thisSolEnclosure.solVMULT = 0.0;
@@ -4683,9 +4683,10 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                                 format("While construction named = {} has CTF timesteps = {}",
                                        state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name,
                                        state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).NumHistories));
-                            ShowContinueError(state,
-                                              "Transient heat transfer modeling may not be valid for surface name = " + Surface(SurfNum).Name +
-                                                  ", and the simulation continues");
+                            ShowContinueError(
+                                state,
+                                format("Transient heat transfer modeling may not be valid for surface name = {}, and the simulation continues",
+                                       Surface(SurfNum).Name));
                         }
                         if (state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms !=
                             state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).NumCTFTerms) {
@@ -4702,10 +4703,10 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                                 format("While construction named = {} has number of CTF terms = {}",
                                        state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name,
                                        state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).NumCTFTerms));
-                            ShowContinueError(
-                                state,
-                                "The actuator is allowed but the transient heat transfer modeling may not be valid for surface name = " +
-                                    Surface(SurfNum).Name + ", and the simulation continues");
+                            ShowContinueError(state,
+                                              format("The actuator is allowed but the transient heat transfer modeling may not be valid for surface "
+                                                     "name = {}, and the simulation continues",
+                                                     Surface(SurfNum).Name));
                         }
 
                         if (state.dataConstruction->Construct(Surface(SurfNum).Construction).SourceSinkPresent) {
@@ -4713,16 +4714,16 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                                 // thow warning, and do not allow
                                 ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
                                 ShowContinueError(state,
-                                                  "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
-                                                      " has internal source/sink");
+                                                  format("Construction named = {} has internal source/sink",
+                                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name));
                                 ShowContinueError(
                                     state,
-                                    "While construction named = " +
-                                        state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name +
-                                        " is not an internal source/sink construction");
-                                ShowContinueError(state,
-                                                  "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
-                                                      ", and the simulation continues without the override");
+                                    format("While construction named = {} is not an internal source/sink construction",
+                                           state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name));
+                                ShowContinueError(
+                                    state,
+                                    format("This actuator is not allowed for surface name = {}, and the simulation continues without the override",
+                                           Surface(SurfNum).Name));
 
                                 state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum),
                                                                                   SurfNum) = false;
@@ -4753,9 +4754,10 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                                        state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name,
                                        state.dataHeatBalFiniteDiffMgr->ConstructFD(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum))
                                            .TotNodes));
-                            ShowContinueError(state,
-                                              "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
-                                                  ", and the simulation continues without the override");
+                            ShowContinueError(
+                                state,
+                                format("This actuator is not allowed for surface name = {}, and the simulation continues without the override",
+                                       Surface(SurfNum).Name));
 
                             state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
                                 false;
@@ -4766,16 +4768,16 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                                 // thow warning, and do not allow
                                 ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
                                 ShowContinueError(state,
-                                                  "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
-                                                      " has internal source/sink");
+                                                  format("Construction named = {} has internal source/sink",
+                                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name));
                                 ShowContinueError(
                                     state,
-                                    "While construction named = " +
-                                        state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name +
-                                        " is not an internal source/sink construction");
-                                ShowContinueError(state,
-                                                  "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
-                                                      ", and the simulation continues without the override");
+                                    format("While construction named = {} is not an internal source/sink construction",
+                                           state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name));
+                                ShowContinueError(
+                                    state,
+                                    format("This actuator is not allowed for surface name = {}, and the simulation continues without the override",
+                                           Surface(SurfNum).Name));
 
                                 state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum),
                                                                                   SurfNum) = false;
@@ -4791,9 +4793,10 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                         ShowSevereError(state,
                                         "InitEMSControlledConstructions: EMS Construction State Actuator not available with Heat transfer "
                                         "algorithm CombinedHeatAndMoistureFiniteElement.");
-                        ShowContinueError(state,
-                                          "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
-                                              ", and the simulation continues without the override");
+                        ShowContinueError(
+                            state,
+                            format("This actuator is not allowed for surface name = {}, and the simulation continues without the override",
+                                   Surface(SurfNum).Name));
                         state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
                             true;
                         state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
@@ -4803,9 +4806,10 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                         ShowSevereError(state,
                                         "InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with "
                                         "Foundation Outside Boundary Condition.");
-                        ShowContinueError(state,
-                                          "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
-                                              ", and the simulation continues without the override");
+                        ShowContinueError(
+                            state,
+                            format("This actuator is not allowed for surface name = {}, and the simulation continues without the override",
+                                   Surface(SurfNum).Name));
                         state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
                             true;
                         state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
@@ -4832,7 +4836,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 // Beginning of Record Keeping subroutines for the HB Module
 // *****************************************************************************
 
-void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate)
+void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, ObjexxFCL::Optional_int_const ZoneToResimulate)
 {
     int firstZone = 1;
     int lastZone = state.dataGlobal->NumOfZones;
@@ -4905,7 +4909,7 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
     }
 }
 
-void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate)
+void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, ObjexxFCL::Optional_int_const ZoneToResimulate)
 {
     int firstZone = 1;
     int lastZone = state.dataGlobal->NumOfZones;
@@ -5471,7 +5475,7 @@ void UpdateThermalHistories(EnergyPlusData &state)
 }
 
 void CalculateZoneMRT(EnergyPlusData &state,
-                      Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+                      ObjexxFCL::Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
 {
 
     // SUBROUTINE INFORMATION:
@@ -5515,9 +5519,9 @@ void CalculateZoneMRT(EnergyPlusData &state,
                 state.dataHeatBal->ZoneMRT(ZoneNum) = SumAET / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
             } else {
                 if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
-                    ShowWarningError(state,
-                                     "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" +
-                                         state.dataHeatBal->Zone(ZoneNum).Name + "\"");
+                    ShowWarningError(
+                        state,
+                        format("Zone areas*inside surface emissivities are summing to zero, for Zone=\"{}\"", state.dataHeatBal->Zone(ZoneNum).Name));
                     ShowContinueError(state, "As a result, MRT will be set to MAT for that zone");
                 }
                 state.dataHeatBal->ZoneMRT(ZoneNum) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
@@ -6767,7 +6771,7 @@ void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state)
 // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) now moved into namespace
 
 void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
-                                Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+                                ObjexxFCL::Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
 {
 
     // SUBROUTINE INFORMATION:
@@ -7490,7 +7494,7 @@ Real64 GetQdotConvOutPerArea(EnergyPlusData &state, int const SurfNum)
 }
 
 void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
-                               Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+                               ObjexxFCL::Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
 {
     auto &Surface(state.dataSurface->Surface);
     if (state.dataHeatBalSurfMgr->calcHeatBalInsideSurfFirstTime) {
@@ -7571,7 +7575,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                 const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                 const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                 const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
-                                Optional_int_const ZoneToResimulate)
+                                ObjexxFCL::Optional_int_const ZoneToResimulate)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         George Walton
@@ -8016,11 +8020,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     if (construct.SourceSinkPresent) {
 
                         ShowSevereError(state, "Interior movable insulation is not valid with embedded sources/sinks");
-                        ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
+                        ShowContinueError(state, format("Construction {} contains an internal source or sink but also uses", construct.Name));
                         ShowContinueError(state,
-                                          "interior movable insulation " +
-                                              state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name +
-                                              " for a surface with that construction.");
+                                          format("interior movable insulation {} for a surface with that construction.",
+                                                 state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name));
                         ShowContinueError(state,
                                           "This is not currently allowed because the heat balance equations do not currently accommodate "
                                           "this combination.");
@@ -8397,7 +8400,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                        const int FirstZone,             // First zone to simulate
                                        const int LastZone,              // Last zone to simulate
                                        const std::vector<int> &IZSurfs, // Last zone to simulate
-                                       Optional_int_const ZoneToResimulate)
+                                       ObjexxFCL::Optional_int_const ZoneToResimulate)
 {
 
     // This function performs a heat balance on the inside face of each
@@ -9023,7 +9026,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                         state, format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surfName));
                     ShowContinueErrorTimeStamp(state, "");
                     if (!zone.TempOutOfBoundsReported) {
-                        ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
+                        ShowContinueError(state, format("Zone=\"{}\", Diagnostic Details:", zone.Name));
                         if (zone.FloorArea > 0.0) {
                             ShowContinueError(state, format("...Internal Heat Gain [{:.3R}] W/m2", zone.InternalHeatGains / zone.FloorArea));
                         } else {
@@ -9066,7 +9069,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                         state, format("Temperature (high) out of bounds ({:.2R}] for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surfName));
                     ShowContinueErrorTimeStamp(state, "");
                     if (!zone.TempOutOfBoundsReported) {
-                        ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
+                        ShowContinueError(state, format("Zone=\"{}\", Diagnostic Details:", zone.Name));
                         if (zone.FloorArea > 0.0) {
                             ShowContinueError(state, format("...Internal Heat Gain [{:.3R}] W/m2", zone.InternalHeatGains / zone.FloorArea));
                         } else {
@@ -9106,7 +9109,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
             }
             if (zone.EnforcedReciprocity) {
                 if (WarmupSurfTemp > 3) {
-                    ShowSevereError(state, "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity");
+                    ShowSevereError(state, format("CalcHeatBalanceInsideSurf: Zone=\"{}\" has view factor enforced reciprocity", zone.Name));
                     ShowContinueError(state, " and is having temperature out of bounds errors. Please correct zone geometry and rerun.");
                     ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                 }
@@ -9122,7 +9125,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                                 format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surfName));
                 ShowContinueErrorTimeStamp(state, "");
                 if (!zone.TempOutOfBoundsReported) {
-                    ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
+                    ShowContinueError(state, format("Zone=\"{}\", Diagnostic Details:", zone.Name));
                     if (zone.FloorArea > 0.0) {
                         ShowContinueError(state, format("...Internal Heat Gain [{:.3R}] W/m2", zone.InternalHeatGains / zone.FloorArea));
                     } else {
@@ -9147,7 +9150,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                                 format("Temperature (high) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surfName));
                 ShowContinueErrorTimeStamp(state, "");
                 if (!zone.TempOutOfBoundsReported) {
-                    ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
+                    ShowContinueError(state, format("Zone=\"{}\", Diagnostic Details:", zone.Name));
                     if (zone.FloorArea > 0.0) {
                         ShowContinueError(state, format("...Internal Heat Gain [{:.3R}] W/m2", zone.InternalHeatGains / zone.FloorArea));
                     } else {
@@ -9466,11 +9469,10 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         if (MovInsulPresent) {
             // Note: if movable insulation is ever added back in correctly, the heat balance equations above must be fixed
             ShowSevereError(state, "Exterior movable insulation is not valid with embedded sources/sinks");
-            ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
+            ShowContinueError(state, format("Construction {} contains an internal source or sink but also uses", construct.Name));
             ShowContinueError(state,
-                              "exterior movable insulation " +
-                                  state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum))->Name +
-                                  " for a surface with that construction.");
+                              format("exterior movable insulation {} for a surface with that construction.",
+                                     state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum))->Name));
             ShowContinueError(state,
                               "This is not currently allowed because the heat balance equations do not currently accommodate this combination.");
             ErrorFlag = true;
@@ -9699,7 +9701,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
 
             // Check if the sum of all defined view factors > 1.0
             if (SrdSurfsViewFactor > 1.0) {
-                ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface.Name + ".");
+                ShowSevereError(state, format("Illegal surrounding surfaces view factors for {}.", Surface.Name));
                 ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than or equal to 1.0.");
             }
             if (IsSkyViewFactorSet && IsGroundViewFactorSet) {

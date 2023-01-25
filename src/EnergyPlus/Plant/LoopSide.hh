@@ -56,6 +56,8 @@
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
 #include <EnergyPlus/Plant/SplitterData.hh>
 
+#include <ObjexxFCL/Optional.hh>
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -190,8 +192,8 @@ namespace DataPlant {
         void UpdateAnyLoopDemandAlterations(EnergyPlusData &state, int BranchNum, int CompNum);
 
         void SimulateAllLoopSidePumps(EnergyPlusData &state,
-                                      Optional<PlantLocation const> SpecificPumpLocation = _,
-                                      Optional<Real64 const> SpecificPumpFlowRate = _);
+                                      ObjexxFCL::Optional<PlantLocation const> SpecificPumpLocation = _,
+                                      ObjexxFCL::Optional<Real64 const> SpecificPumpFlowRate = _);
 
         void AdjustPumpFlowRequestByEMSControls(int BranchNum, int CompNum, Real64 &FlowToRequest);
 

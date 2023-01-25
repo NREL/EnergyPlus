@@ -2071,8 +2071,8 @@ namespace DataPlant {
     }
 
     void HalfLoopData::SimulateAllLoopSidePumps(EnergyPlusData &state,
-                                                Optional<PlantLocation const> SpecificPumpLocation,
-                                                Optional<Real64 const> SpecificPumpFlowRate)
+                                                ObjexxFCL::Optional<PlantLocation const> SpecificPumpLocation,
+                                                ObjexxFCL::Optional<Real64 const> SpecificPumpFlowRate)
     {
 
         // SUBROUTINE INFORMATION:

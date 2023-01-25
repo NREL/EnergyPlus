@@ -448,7 +448,7 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
         }
     }
     if (!CFSURated) {
-        ShowWarningMessage(state, std::string{RoutineName} + "Fenestration U-Value calculation failed for " + FS.Name);
+        ShowWarningMessage(state, format("{}Fenestration U-Value calculation failed for {}", RoutineName, FS.Name));
         ShowContinueError(state, format("...Calculated U-value = {:.4T}", U));
         ShowContinueError(state, "...Check consistency of inputs");
     }
@@ -560,7 +560,7 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
                                     true);
 
     if (!CFSSHGC) {
-        ShowWarningMessage(state, std::string{RoutineName} + "Solar heat gain coefficient calculation failed for " + FS.Name);
+        ShowWarningMessage(state, format("{}Solar heat gain coefficient calculation failed for {}", RoutineName, FS.Name));
         ShowContinueError(state, format("...Calculated SHGC = {:.4T}", SHGC));
         ShowContinueError(state, format("...Calculated U-Value = {:.4T}", UCG));
         ShowContinueError(state, "...Check consistency of inputs.");
@@ -899,7 +899,7 @@ Real64 P01(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("P01: ");
 
     if (P < -0.05 || P > 1.05) {
-        ShowWarningMessage(state, std::string{RoutineName} + "property value should have been between 0 and 1");
+        ShowWarningMessage(state, format("{}property value should have been between 0 and 1", RoutineName));
         ShowContinueError(state, format("{}=:  property value is ={:.4T}", WHAT, P));
         if (P < 0.0) {
             ShowContinueError(state, "property value is reset to 0.0");
@@ -1025,7 +1025,7 @@ void RB_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, std::string{RoutineName} + "Roller blind diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, format("{}Roller blind diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -1168,7 +1168,7 @@ void IS_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, std::string{RoutineName} + "Calculated insect screen diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, format("{}Calculated insect screen diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -1360,7 +1360,7 @@ void FM_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, std::string{RoutineName} + "Calculated drape fabric diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, format("{}Calculated drape fabric diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -4733,8 +4733,8 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
 
         if (FS.WEQLSolverErrorIndex < 1) {
             ++FS.WEQLSolverErrorIndex;
-            ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-            ShowContinueError(state, std::string{RoutineName} + "Net radiation analysis did not converge");
+            ShowSevereError(state, format("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"{}\"", FS.Name));
+            ShowContinueError(state, format("{}Net radiation analysis did not converge", RoutineName));
             ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
             ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
             ShowContinueErrorTimeStamp(state, "");
@@ -5208,8 +5208,8 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
 
     //    if (FS.WEQLSolverErrorIndex < 1) {
     //        ++FS.WEQLSolverErrorIndex;
-    //        ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-    //        ShowContinueError(state, std::string{RoutineName} + "Net radiation analysis did not converge");
+    //        ShowSevereError(state, format("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"{}\"", FS.Name));
+    //        ShowContinueError(state, format("{}Net radiation analysis did not converge", RoutineName));
     //        ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
     //        ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
     //        ShowContinueErrorTimeStamp(state, "");
@@ -6387,14 +6387,14 @@ bool CFSUFactor(EnergyPlusData &state,
     return CFSUFactor;
 }
 
-void ASHWAT_Solar(int const NL,                      // # of layers
-                  Array1S<CFSSWP> const LSWP_ON,     // layer SW (solar) properties (off-normal adjusted)
-                  CFSSWP const &SWP_ROOM,            // effective SW (solar) properties of room
-                  Real64 const IBEAM,                // incident beam insolation (W/m2 aperture)
-                  Real64 const IDIFF,                // incident diffuse insolation (W/m2 aperture)
-                  Real64 const ILIGHTS,              // incident diffuse insolation (W/m2 aperture)
-                  Array1S<Real64> SOURCE,            // returned: layer-by-layer flux of absorbed
-                  Optional<Array1S<Real64>> SourceBD // returned: layer-by-layer flux of absorbed
+void ASHWAT_Solar(int const NL,                                 // # of layers
+                  Array1S<CFSSWP> const LSWP_ON,                // layer SW (solar) properties (off-normal adjusted)
+                  CFSSWP const &SWP_ROOM,                       // effective SW (solar) properties of room
+                  Real64 const IBEAM,                           // incident beam insolation (W/m2 aperture)
+                  Real64 const IDIFF,                           // incident diffuse insolation (W/m2 aperture)
+                  Real64 const ILIGHTS,                         // incident diffuse insolation (W/m2 aperture)
+                  Array1S<Real64> SOURCE,                       // returned: layer-by-layer flux of absorbed
+                  ObjexxFCL::Optional<Array1S<Real64>> SourceBD // returned: layer-by-layer flux of absorbed
 )
 {
     // SUBROUTINE INFORMATION:
@@ -6947,12 +6947,12 @@ void Specular_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP) // short 
     Real64 RAT_TAU;
     Real64 RAT_1MR;
 
-    //#if 1
+    // #if 1
     Specular_RATDiff(state, RAT_1MR, RAT_TAU);
-    //#else
-    //    ! estimate diffuse properties as 60 deg angle of incidence
-    //    CALL Specular_RAT60( RAT_TAU, RAT_1MR)
-    //#endif
+    // #else
+    //     ! estimate diffuse properties as 60 deg angle of incidence
+    //     CALL Specular_RAT60( RAT_TAU, RAT_1MR)
+    // #endif
     SWP.TAUS_DD = RAT_TAU * SWP.TAUSFBB;
     SWP.RHOSFDD = 1.0 - RAT_1MR * (1.0 - SWP.RHOSFBB);
     SWP.RHOSBDD = 1.0 - RAT_1MR * (1.0 - SWP.RHOSBBB);
@@ -6992,9 +6992,9 @@ bool RB_LWP(CFSLAYER const &L, // RB layer
 }
 
 bool RB_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // RB layer
-            CFSSWP &LSWP,                // returned: equivalent layer properties set
-            Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
+            CFSLAYER const &L,                      // RB layer
+            CFSSWP &LSWP,                           // returned: equivalent layer properties set
+            ObjexxFCL::Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
 )
 {
     // FUNCTION INFORMATION:
@@ -7080,9 +7080,9 @@ bool IS_LWP(CFSLAYER const &L, // IS layer
 }
 
 bool IS_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // PD layer
-            CFSSWP &LSWP,                // returned: equivalent layer properties set
-            Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
+            CFSLAYER const &L,                      // PD layer
+            CFSSWP &LSWP,                           // returned: equivalent layer properties set
+            ObjexxFCL::Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
 )
 {
     // FUNCTION INFORMATION:
@@ -7200,10 +7200,10 @@ bool PD_LWP(EnergyPlusData &state,
 }
 
 bool PD_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,                // PD layer
-            CFSSWP &LSWP,                     // returned: equivalent layer properties set
-            Optional<Real64 const> OHM_V_RAD, // vertical VB profile angles, radians
-            Optional<Real64 const> OHM_H_RAD  // horizonatl VB profile angles, radians
+            CFSLAYER const &L,                           // PD layer
+            CFSSWP &LSWP,                                // returned: equivalent layer properties set
+            ObjexxFCL::Optional<Real64 const> OHM_V_RAD, // vertical VB profile angles, radians
+            ObjexxFCL::Optional<Real64 const> OHM_H_RAD  // horizonatl VB profile angles, radians
 )
 {
     // FUNCTION INFORMATION:
@@ -7325,9 +7325,9 @@ bool VB_LWP(EnergyPlusData &state,
 }
 
 bool VB_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // VB layer
-            CFSSWP &LSWP,                // returned: equivalent off-normal properties
-            Optional<Real64 const> OMEGA // incident profile angle (radians)
+            CFSLAYER const &L,                      // VB layer
+            CFSSWP &LSWP,                           // returned: equivalent off-normal properties
+            ObjexxFCL::Optional<Real64 const> OMEGA // incident profile angle (radians)
 )
 {
     // FUNCTION INFORMATION:
@@ -7676,11 +7676,11 @@ bool IsVBLayer(CFSLAYER const &L)
 }
 
 void BuildGap(EnergyPlusData &state,
-              CFSGAP &G,                    // returned
-              int const GType,              // gap type (gtyOPENin, gtyOPENout or gtySEALED)
-              Real64 &TAS,                  // gap thickness, m
-              Optional<Real64 const> xTMan, // re density calc -- temp (C) and pressure (Pa)
-              Optional<Real64 const> xPMan  // re density calc -- temp (C) and pressure (Pa)
+              CFSGAP &G,                               // returned
+              int const GType,                         // gap type (gtyOPENin, gtyOPENout or gtySEALED)
+              Real64 &TAS,                             // gap thickness, m
+              ObjexxFCL::Optional<Real64 const> xTMan, // re density calc -- temp (C) and pressure (Pa)
+              ObjexxFCL::Optional<Real64 const> xPMan  // re density calc -- temp (C) and pressure (Pa)
 )
 {
 
@@ -7706,7 +7706,7 @@ void BuildGap(EnergyPlusData &state,
     Real64 TMan;
 
     if (TAS < GapThickMin) {
-        ShowSevereError(state, std::string{RoutineName} + G.Name);
+        ShowSevereError(state, format("{}{}", RoutineName, G.Name));
         ShowContinueError(state, "...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m");
         TAS = GapThickMin;
     }
@@ -7892,7 +7892,7 @@ void FillDefaultsSWP(EnergyPlusData &state,
     } else if (L.LTYPE == LayerType::NONE || L.LTYPE == LayerType::ROOM) {
         // none or room: do nothing
     } else {
-        ShowSevereError(state, std::string{RoutineName} + L.Name + '.');
+        ShowSevereError(state, format("{}{}.", RoutineName, L.Name));
         ShowContinueError(state, "...invalid layer type specified.");
     }
 }
@@ -7926,7 +7926,7 @@ void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
         if (!IsVBLayer(FS.L(iL))) {
             LVBPREV = false;
         } else if (LVBPREV) {
-            ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name + "\", illegal.");
+            ShowSevereError(state, format("{}=\"{}\", illegal.", CurrentModuleObject, FS.Name));
             ShowContinueError(state, "...adjacent VB layers are specified.");
             ErrorsFound = true;
         } else {
@@ -7937,19 +7937,19 @@ void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
         if (iL < FS.NL) {
             gType = FS.G(iL).GTYPE;
             if (gType == state.dataWindowEquivalentLayer->gtyOPENout && iL != 1) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name);
-                ShowContinueError(state, "...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.');
+                ShowSevereError(state, format("{}=\"{}", CurrentModuleObject, FS.Name));
+                ShowContinueError(state, format("...invalid EquivalentLayer window gap type specified ={}.", FS.G(iL).Name));
                 ShowContinueError(state, "...VentedOutDoor gap is not outermost.");
             }
             if (gType == state.dataWindowEquivalentLayer->gtyOPENin && iL != FS.NL - 1) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name);
-                ShowContinueError(state, "...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.');
+                ShowSevereError(state, format("{}=\"{}", CurrentModuleObject, FS.Name));
+                ShowContinueError(state, format("...invalid EquivalentLayer window gap type specified ={}.", FS.G(iL).Name));
                 ShowContinueError(state, "...VentedIndoor gap is not innermost.");
             }
         }
     }
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Program terminates for preceding reason(s).");
+        ShowFatalError(state, format("{}Program terminates for preceding reason(s).", RoutineName));
     }
 }
 
@@ -8022,7 +8022,7 @@ Real64 EffectiveEPSLB(CFSTY const &FS) // Complex Fenestration
 bool FEQX(Real64 const a, // values to compare, fractional tolerance
           Real64 const b,
           Real64 const tolF,
-          Optional<Real64> tolAbs // absolute tolerance
+          ObjexxFCL::Optional<Real64> tolAbs // absolute tolerance
 )
 {
     // FUNCTION INFORMATION:

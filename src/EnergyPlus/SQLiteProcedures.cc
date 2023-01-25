@@ -1424,12 +1424,12 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
 
 void SQLite::createSQLiteReportDataRecord(int const recordIndex,
                                           Real64 const value,
-                                          Optional_int_const reportingInterval,
-                                          Optional<Real64 const> minValue,
-                                          Optional_int_const minValueDate,
-                                          Optional<Real64 const> maxValue,
-                                          Optional_int_const maxValueDate,
-                                          Optional_int_const minutesPerTimeStep)
+                                          ObjexxFCL::Optional_int_const reportingInterval,
+                                          ObjexxFCL::Optional<Real64 const> minValue,
+                                          ObjexxFCL::Optional_int_const minValueDate,
+                                          ObjexxFCL::Optional<Real64 const> maxValue,
+                                          ObjexxFCL::Optional_int_const maxValueDate,
+                                          ObjexxFCL::Optional_int_const minutesPerTimeStep)
 {
     if (m_writeOutputToSQLite) {
         ++m_dataIndex;
@@ -1541,13 +1541,13 @@ void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
                                          int const cumlativeSimulationDays,
                                          int const curEnvirNum,
                                          int const simulationYear,
-                                         Optional_int_const month,
-                                         Optional_int_const dayOfMonth,
-                                         Optional_int_const hour,
-                                         Optional<Real64 const> endMinute,
-                                         Optional<Real64 const> startMinute,
-                                         Optional_int_const dst,
-                                         Optional_string_const dayType,
+                                         ObjexxFCL::Optional_int_const month,
+                                         ObjexxFCL::Optional_int_const dayOfMonth,
+                                         ObjexxFCL::Optional_int_const hour,
+                                         ObjexxFCL::Optional<Real64 const> endMinute,
+                                         ObjexxFCL::Optional<Real64 const> startMinute,
+                                         ObjexxFCL::Optional_int_const dst,
+                                         ObjexxFCL::Optional_string_const dayType,
                                          bool const warmupFlag)
 {
     if (m_writeOutputToSQLite) {

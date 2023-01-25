@@ -123,7 +123,7 @@ namespace WaterToAirHeatPumpSimple {
                                DataHVACGlobals::CompressorOperation const CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
-                               Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
+                               ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
     )
     {
 
@@ -2429,8 +2429,8 @@ namespace WaterToAirHeatPumpSimple {
                                 ShowWarningError(state,
                                                  format("{} Coil:Heating:WaterToAirHeatPump:EquationFit={}", RoutineName, simpleWatertoAirHP.Name));
                                 ShowContinueError(state,
-                                                  "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
-                                                  "rated conditions.");
+                                                  "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) "
+                                                  "at rated conditions.");
                                 ShowContinueError(state, format("Curve output at rated conditions = {:.3T}", RatedHeatCapTempModFac));
                             }
                         }
@@ -2546,17 +2546,16 @@ namespace WaterToAirHeatPumpSimple {
                                 ShowWarningError(state,
                                                  format("{} Coil:Heating:WaterToAirHeatPump:EquationFit={}", RoutineName, simpleWatertoAirHP.Name));
                                 ShowContinueError(state,
-                                                  "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
-                                                  "rated conditions.");
+                                                  "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) "
+                                                  "at rated conditions.");
                                 ShowContinueError(state, format("Curve output at rated conditions = {:.3T}", RatedHeatCapTempModFac));
                             }
                             if (RatedHeatPowerTempModFac > 1.02 || RatedHeatPowerTempModFac < 0.98) {
                                 ShowWarningError(state,
                                                  format("{} Coil:Heating:WaterToAirHeatPump:EquationFit={}", RoutineName, simpleWatertoAirHP.Name));
-                                ShowContinueError(
-                                    state,
-                                    "Heating power consumption as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
-                                    "rated conditions.");
+                                ShowContinueError(state,
+                                                  "Heating power consumption as a function of temperature curve output is not equal to "
+                                                  "1.0 (+ or - 2%) at rated conditions.");
                                 ShowContinueError(state, format("Curve output at rated conditions = {:.3T}", RatedHeatPowerTempModFac));
                             }
                         }
@@ -3995,11 +3994,11 @@ namespace WaterToAirHeatPumpSimple {
     }
 
     void SetSimpleWSHPData(EnergyPlusData &state,
-                           int const SimpleWSHPNum,              // Number of OA Controller
-                           bool &ErrorsFound,                    // Set to true if certain errors found
-                           int const WaterCyclingMode,           // the coil water flow mode (cycling, constant or constantondemand)
-                           Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
-                           Optional_int CompanionHeatingCoilNum  // Index to heating coil for cooling coil = SimpleWSHPNum
+                           int const SimpleWSHPNum,                         // Number of OA Controller
+                           bool &ErrorsFound,                               // Set to true if certain errors found
+                           int const WaterCyclingMode,                      // the coil water flow mode (cycling, constant or constantondemand)
+                           ObjexxFCL::Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
+                           ObjexxFCL::Optional_int CompanionHeatingCoilNum  // Index to heating coil for cooling coil = SimpleWSHPNum
     )
     {
 
@@ -4068,8 +4067,8 @@ namespace WaterToAirHeatPumpSimple {
                                                 std::string{RoutineName},
                                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name));
                         ShowContinueError(state,
-                                          "Total cooling capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
-                                          "rated conditions.");
+                                          "Total cooling capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) "
+                                          "at rated conditions.");
                         ShowContinueError(state, format("Curve output at rated conditions = {:.3T}", RatedTotCapTempModFac));
                     }
                     if (RatedCoolPowerTempModFac > 1.02 || RatedCoolPowerTempModFac < 0.98) {
@@ -4078,8 +4077,8 @@ namespace WaterToAirHeatPumpSimple {
                                                 std::string{RoutineName},
                                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name));
                         ShowContinueError(state,
-                                          "Cooling power consumption as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
-                                          "rated conditions.");
+                                          "Cooling power consumption as a function of temperature curve output is not equal to 1.0 (+ or - 2%) "
+                                          "at rated conditions.");
                         ShowContinueError(state, format("Curve output at rated conditions = {:.3T}", RatedCoolPowerTempModFac));
                     }
                     if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).RatedEntAirDrybulbTemp != DataSizing::AutoSize) {
@@ -4093,10 +4092,9 @@ namespace WaterToAirHeatPumpSimple {
                                              format("{}: Coil:Cooling:WaterToAirHeatPump:EquationFit=\"{}\"",
                                                     std::string{RoutineName},
                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name));
-                            ShowContinueError(
-                                state,
-                                "Sensible cooling capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
-                                "rated conditions.");
+                            ShowContinueError(state,
+                                              "Sensible cooling capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) "
+                                              "at rated conditions.");
                             ShowContinueError(state, format("Curve output at rated conditions = {:.3T}", RatedSensCapTempModFac));
                         }
                     }
@@ -4118,9 +4116,8 @@ namespace WaterToAirHeatPumpSimple {
                                          format("{}: Coil:Heating:WaterToAirHeatPump:EquationFit=\"{}\"",
                                                 std::string{RoutineName},
                                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name));
-                        ShowContinueError(state,
-                                          "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
-                                          "rated conditions.");
+                        ShowContinueError(
+                            state, "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at rated conditions.");
                         ShowContinueError(state, format("Curve output at rated conditions = {:.3T}", RatedHeatCapTempModFac));
                     }
                     if (RatedHeatPowerTempModFac > 1.02 || RatedHeatPowerTempModFac < 0.98) {

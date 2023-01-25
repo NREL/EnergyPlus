@@ -156,8 +156,8 @@ namespace DualDuct {
         );
 
         void CalcOAOnlyMassFlow(EnergyPlusData &state,
-                                Real64 &OAMassFlow,               // outside air flow from user input kg/s
-                                Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
+                                Real64 &OAMassFlow,                          // outside air flow from user input kg/s
+                                ObjexxFCL::Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);

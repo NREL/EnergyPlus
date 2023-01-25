@@ -263,7 +263,7 @@ void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName,
     if (OASysNum == 0) {
         OASysNum = UtilityRoutines::FindItemInList(OASysName, state.dataAirLoop->OutsideAirSys);
         if (OASysNum == 0) {
-            ShowFatalError(state, "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName);
+            ShowFatalError(state, format("ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found={}", OASysName));
         }
     }
 
@@ -375,45 +375,45 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
                 OAMixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixedAir->OAMixer);
                 OAControllerNum = CurrentOASystem.OAControllerIndex;
                 if (state.dataMixedAir->OAController(OAControllerNum).MixNode != state.dataMixedAir->OAMixer(OAMixerNum).MixNode) {
-                    ShowSevereError(state,
-                                    "The mixed air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
+                    ShowSevereError(
+                        state, format("The mixed air node of Controller:OutdoorAir=\"{}\"", state.dataMixedAir->OAController(OAControllerNum).Name));
                     ShowContinueError(state,
-                                      "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" +
-                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
+                                      format("should be the same node as the mixed air node of OutdoorAir:Mixer=\"{}\".",
+                                             state.dataMixedAir->OAMixer(OAMixerNum).Name));
                     ShowContinueError(state,
-                                      "Controller:OutdoorAir mixed air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).MixNode) + "\".");
+                                      format("Controller:OutdoorAir mixed air node=\"{}\".",
+                                             state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).MixNode)));
                     ShowContinueError(state,
-                                      "OutdoorAir:Mixer mixed air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).MixNode) + "\".");
+                                      format("OutdoorAir:Mixer mixed air node=\"{}\".",
+                                             state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).MixNode)));
                     FatalErrorFlag = true;
                 }
                 if (state.dataMixedAir->OAController(OAControllerNum).RelNode != state.dataMixedAir->OAMixer(OAMixerNum).RelNode) {
                     ShowSevereError(
-                        state, "The relief air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
+                        state, format("The relief air node of Controller:OutdoorAir=\"{}\"", state.dataMixedAir->OAController(OAControllerNum).Name));
                     ShowContinueError(state,
-                                      "should be the same node as the relief air node of OutdoorAir:Mixer=\"" +
-                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
+                                      format("should be the same node as the relief air node of OutdoorAir:Mixer=\"{}\".",
+                                             state.dataMixedAir->OAMixer(OAMixerNum).Name));
                     ShowContinueError(state,
-                                      "Controller:OutdoorAir relief air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RelNode) + "\".");
+                                      format("Controller:OutdoorAir relief air node=\"{}\".",
+                                             state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RelNode)));
                     ShowContinueError(state,
-                                      "OutdoorAir:Mixer relief air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RelNode) + "\".");
+                                      format("OutdoorAir:Mixer relief air node=\"{}\".",
+                                             state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RelNode)));
                     FatalErrorFlag = true;
                 }
                 if (state.dataMixedAir->OAController(OAControllerNum).RetNode != state.dataMixedAir->OAMixer(OAMixerNum).RetNode) {
                     ShowSevereError(
-                        state, "The return air node of Controller:OutdoorAir=\"" + state.dataMixedAir->OAController(OAControllerNum).Name + "\"");
+                        state, format("The return air node of Controller:OutdoorAir=\"{}\"", state.dataMixedAir->OAController(OAControllerNum).Name));
                     ShowContinueError(state,
-                                      "should be the same node as the return air node of OutdoorAir:Mixer=\"" +
-                                          state.dataMixedAir->OAMixer(OAMixerNum).Name + "\".");
+                                      format("should be the same node as the return air node of OutdoorAir:Mixer=\"{}\".",
+                                             state.dataMixedAir->OAMixer(OAMixerNum).Name));
                     ShowContinueError(state,
-                                      "Controller:OutdoorAir return air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RetNode) + "\".");
+                                      format("Controller:OutdoorAir return air node=\"{}\".",
+                                             state.dataLoopNodes->NodeID(state.dataMixedAir->OAController(OAControllerNum).RetNode)));
                     ShowContinueError(state,
-                                      "OutdoorAir:Mixer return air node=\"" +
-                                          state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RetNode) + "\".");
+                                      format("OutdoorAir:Mixer return air node=\"{}\".",
+                                             state.dataLoopNodes->NodeID(state.dataMixedAir->OAMixer(OAMixerNum).RetNode)));
                     FatalErrorFlag = true;
                 }
             }
@@ -733,7 +733,7 @@ void SimOAComponent(EnergyPlusData &state,
         }
     } break;
     default:
-        ShowFatalError(state, "Invalid Outside Air Component=" + CompType);
+        ShowFatalError(state, format("Invalid Outside Air Component={}", CompType));
     }
 }
 
@@ -759,7 +759,7 @@ void SimOAMixer(EnergyPlusData &state, std::string const &CompName, int &CompInd
         OAMixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixedAir->OAMixer);
         CompIndex = OAMixerNum;
         if (OAMixerNum == 0) {
-            ShowFatalError(state, "SimOAMixer: OutdoorAir:Mixer not found=" + CompName);
+            ShowFatalError(state, format("SimOAMixer: OutdoorAir:Mixer not found={}", CompName));
         }
     } else {
         OAMixerNum = CompIndex;
@@ -799,7 +799,7 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
         }
         CtrlIndex = OAControllerNum;
         if (OAControllerNum == 0) {
-            ShowFatalError(state, "SimOAController: Outside Air Controller not found=" + CtrlName);
+            ShowFatalError(state, format("SimOAController: Outside Air Controller not found={}", CtrlName));
         }
     } else {
         OAControllerNum = CtrlIndex;
@@ -2294,8 +2294,9 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
             }
         } else {
             ShowSevereError(state,
-                            "Did not find Air Node (Zone with Humidistat), " + state.dataMixedAir->OAController(OutAirNum).ControllerType + " = \"" +
-                                state.dataMixedAir->OAController(OutAirNum).Name + "\"");
+                            format("Did not find Air Node (Zone with Humidistat), {} = \"{}\"",
+                                   state.dataMixedAir->OAController(OutAirNum).ControllerType,
+                                   state.dataMixedAir->OAController(OutAirNum).Name));
             ShowContinueError(state, format("Specified {} = {}", cAlphaFields(17), AlphArray(17)));
             ShowContinueError(state,
                               "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Humidistat object must be specified for this zone.");
@@ -2468,7 +2469,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 }
             }
             if (thisOASys == 0) {
-                ShowSevereError(state, "InitOAController: Did not find OAController=\"" + thisOAController.Name + "\".");
+                ShowSevereError(state, format("InitOAController: Did not find OAController=\"{}\".", thisOAController.Name));
                 ShowContinueError(state, "in list of valid OA Controllers.");
                 ErrorsFound = true;
             }
@@ -2492,8 +2493,9 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             }
 
             if (thisOAController.InletNode == 0) { // throw an error
-                ShowSevereError(state,
-                                "InitOAController: Failed to find proper inlet node for OutdoorAir:Mixer and Controller = " + thisOAController.Name);
+                ShowSevereError(
+                    state,
+                    format("InitOAController: Failed to find proper inlet node for OutdoorAir:Mixer and Controller = {}", thisOAController.Name));
                 ErrorsFound = true;
             }
         } break;
@@ -2503,7 +2505,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             thisOAController.InletNode = thisOAController.OANode;
         } break;
         default: {
-            ShowSevereError(state, "InitOAController: Failed to find ControllerType: " + thisOAController.ControllerType);
+            ShowSevereError(state, format("InitOAController: Failed to find ControllerType: {}", thisOAController.ControllerType));
             ErrorsFound = true;
         } break;
         }
@@ -2519,8 +2521,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             if (thisOAController.Econo > EconoOp::NoEconomizer && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan) {
                 if (state.dataLoopNodes->Node(MixedAirNode).TempSetPoint == SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
-                        ShowSevereError(state, "Node Referenced (by Controller)=" + state.dataLoopNodes->NodeID(MixedAirNode));
+                        ShowSevereError(state, format("MixedAir: Missing temperature setpoint for economizer controller {}", thisOAController.Name));
+                        ShowSevereError(state, format("Node Referenced (by Controller)={}", state.dataLoopNodes->NodeID(MixedAirNode)));
                         ShowContinueError(
                             state, "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node.");
                         state.dataHVACGlobal->SetPointErrorFlag = true;
@@ -2529,8 +2531,9 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                         CheckIfNodeSetPointManagedByEMS(
                             state, MixedAirNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
-                            ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
-                            ShowSevereError(state, "Node Referenced (by Controller)=" + state.dataLoopNodes->NodeID(MixedAirNode));
+                            ShowSevereError(state,
+                                            format("MixedAir: Missing temperature setpoint for economizer controller {}", thisOAController.Name));
+                            ShowSevereError(state, format("Node Referenced (by Controller)={}", state.dataLoopNodes->NodeID(MixedAirNode)));
                             ShowContinueError(state,
                                               "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the "
                                               "mixed air node.");
@@ -2564,7 +2567,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             }
         }
         if ((thisOAController.MaxOA - thisOAController.MinOA) < -SmallAirVolFlow) {
-            ShowSevereError(state, "For Controller:OutdoorAir: " + thisOAController.Name);
+            ShowSevereError(state, format("For Controller:OutdoorAir: {}", thisOAController.Name));
             ShowContinueError(state,
                               format("  maximum outdoor air flow rate ({:.4R}) < minimum outdoor air flow rate ({:.4R})",
                                      thisOAController.MaxOA,
@@ -2579,9 +2582,10 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             Real64 DesSupplyVolFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / state.dataEnvrn->StdRhoAir;
             if ((thisOAController.MinOA - DesSupplyVolFlowRate) > 0.0001) {
                 ShowWarningError(state,
-                                 "InitOAController: Minimum Outdoor Air Flow Rate for Controller:OutdoorAir=" + thisOAController.Name +
-                                     " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" +
-                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".");
+                                 format("InitOAController: Minimum Outdoor Air Flow Rate for Controller:OutdoorAir={} is greater than Design Supply "
+                                        "Air Flow Rate for AirLoopHVAC={}.",
+                                        thisOAController.Name,
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name));
                 ShowContinueError(state,
                                   format("...Minimum Outdoor Air Flow Rate={:.6R} will be reset to loop Design Supply Air Flow Rate={:.6R}",
                                          thisOAController.MinOA,
@@ -2593,9 +2597,10 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             }
             if ((thisOAController.MaxOA - DesSupplyVolFlowRate) > 0.0001) {
                 ShowWarningError(state,
-                                 "InitOAController: Maximum Outdoor Air Flow Rate for Controller:OutdoorAir=" + thisOAController.Name +
-                                     " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" +
-                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".");
+                                 format("InitOAController: Maximum Outdoor Air Flow Rate for Controller:OutdoorAir={} is greater than Design Supply "
+                                        "Air Flow Rate for AirLoopHVAC={}.",
+                                        thisOAController.Name,
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name));
                 ShowContinueError(state,
                                   format("...Maximum Outdoor Air Flow Rate={:.6R} will be reset to loop Design Supply Air Flow Rate={:.6R}",
                                          thisOAController.MaxOA,
@@ -2898,7 +2903,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 bool AirLoopFound = false;
                 if (thisOASys <= 0) {
                     // Check outside air system name
-                    ShowWarningError(state, "Cannot find the AirLoopHVAC:OutdoorAirSystem for the OA Controller: " + loopOAController.Name);
+                    ShowWarningError(state, format("Cannot find the AirLoopHVAC:OutdoorAirSystem for the OA Controller: {}", loopOAController.Name));
                 } else {
                     // Find the primary air loop that has the outside air system
                     for (int thisAirLoop = 1; thisAirLoop <= state.dataHVACGlobal->NumPrimaryAirSys; ++thisAirLoop) {
@@ -2926,7 +2931,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 if (AirLoopFound && airLoopNum > 0) {
                     airloopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name; // OutsideAirSys(OASysIndex)%Name
                 } else {
-                    ShowWarningError(state, "Cannot find the primary air loop for the OA Controller: " + loopOAController.Name);
+                    ShowWarningError(state, format("Cannot find the primary air loop for the OA Controller: {}", loopOAController.Name));
                     airloopName = "AirLoop not found";
                 }
 
@@ -4037,11 +4042,11 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlSchOcc) {
                                                 if (this->CO2GainErrorCount < 2) {
                                                     ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, this->Name));
-                                                    ShowContinueError(state,
-                                                                      "For System Outdoor Air Method = "
-                                                                      "ProportionalControlBasedOnOccupancySchedule, CO2 generation from people "
-                                                                      "is not greater than zero. Occurs in Zone =\"" +
-                                                                          curZone.Name + "\". ");
+                                                    ShowContinueError(
+                                                        state,
+                                                        format("For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, CO2 "
+                                                               "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
+                                                               curZone.Name));
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
                                                                       "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
@@ -4061,11 +4066,11 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOcc) {
                                                 if (this->CO2GainErrorCount < 2) {
                                                     ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, this->Name));
-                                                    ShowContinueError(state,
-                                                                      "For System Outdoor Air Method = "
-                                                                      "ProportionalControlBasedOnDesignOccupancy, CO2 generation from people is "
-                                                                      "not greater than zero. Occurs in Zone =\"" +
-                                                                          curZone.Name + "\". ");
+                                                    ShowContinueError(
+                                                        state,
+                                                        format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, CO2 "
+                                                               "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
+                                                               curZone.Name));
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
                                                                       "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
@@ -4945,7 +4950,7 @@ Array1D_int GetOAMixerNodeNumbers(EnergyPlusData &state,
     }
 
     if (WhichOAMixer == 0) {
-        ShowSevereError(state, "GetOAMixerNodeNumbers: Could not find OA Mixer = \"" + OAMixerName + "\"");
+        ShowSevereError(state, format("GetOAMixerNodeNumbers: Could not find OA Mixer = \"{}\"", OAMixerName));
         ErrorsFound = true;
         OANodeNumbers = 0;
     }
@@ -5238,7 +5243,7 @@ int GetOAMixerIndex(EnergyPlusData &state, std::string const &OAMixerName) // Wh
     int OAMixerIndex = UtilityRoutines::FindItem(OAMixerName, state.dataMixedAir->OAMixer);
 
     if (OAMixerIndex == 0) {
-        ShowSevereError(state, "GetOAMixerIndex: Could not find OutdoorAir:Mixer, Name=\"" + OAMixerName + "\"");
+        ShowSevereError(state, format("GetOAMixerIndex: Could not find OutdoorAir:Mixer, Name=\"{}\"", OAMixerName));
     }
 
     return OAMixerIndex;

@@ -817,10 +817,10 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
                                         int &NumAlphas,
                                         Array1D<Real64> &Numbers,
                                         int &NumNumbers,
-                                        Optional<Array1D_bool> NumBlank,
-                                        Optional<Array1D_bool> AlphaBlank,
-                                        Optional<Array1D_string> AlphaFieldNames,
-                                        Optional<Array1D_string> NumericFieldNames)
+                                        ObjexxFCL::Optional<Array1D_bool> NumBlank,
+                                        ObjexxFCL::Optional<Array1D_bool> AlphaBlank,
+                                        ObjexxFCL::Optional<Array1D_string> AlphaFieldNames,
+                                        ObjexxFCL::Optional<Array1D_string> NumericFieldNames)
 {
     auto const is_AlphaBlank = present(AlphaBlank);
     auto const is_AlphaFieldNames = present(AlphaFieldNames);
@@ -906,10 +906,10 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
                                    Array1D<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
-                                   Optional<Array1D_bool> NumBlank,
-                                   Optional<Array1D_bool> AlphaBlank,
-                                   Optional<Array1D_string> AlphaFieldNames,
-                                   Optional<Array1D_string> NumericFieldNames)
+                                   ObjexxFCL::Optional<Array1D_bool> NumBlank,
+                                   ObjexxFCL::Optional<Array1D_bool> AlphaBlank,
+                                   ObjexxFCL::Optional<Array1D_string> AlphaFieldNames,
+                                   ObjexxFCL::Optional<Array1D_string> NumericFieldNames)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie

@@ -124,24 +124,24 @@ struct ZoneEquipControllerProps
 };
 
 void ControlCompOutput(EnergyPlusData &state,
-                       std::string const &CompName,               // the component Name
-                       std::string const &CompType,               // Type of component
-                       int &CompNum,                              // Index of component in component array
-                       bool const FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
-                       Real64 const QZnReq,                       // zone load to be met
-                       int const ActuatedNode,                    // node that controls unit output
-                       Real64 const MaxFlow,                      // maximum water flow
-                       Real64 const MinFlow,                      // minimum water flow
-                       Real64 const ControlOffset,                // really the tolerance
-                       int &ControlCompTypeNum,                   // Internal type num for CompType
-                       int &CompErrIndex,                         // for Recurring error call
-                       Optional_int_const TempInNode = _,         // inlet node for output calculation
-                       Optional_int_const TempOutNode = _,        // outlet node for output calculation
-                       Optional<Real64 const> AirMassFlow = _,    // air mass flow rate
-                       Optional_int_const Action = _,             // 1=reverse; 2=normal
-                       Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
-                       PlantLocation const &plantLoc = {},        // for plant components, Location
-                       Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
+                       std::string const &CompName,                          // the component Name
+                       std::string const &CompType,                          // Type of component
+                       int &CompNum,                                         // Index of component in component array
+                       bool const FirstHVACIteration,                        // flag for 1st HVAV iteration in the time step
+                       Real64 const QZnReq,                                  // zone load to be met
+                       int const ActuatedNode,                               // node that controls unit output
+                       Real64 const MaxFlow,                                 // maximum water flow
+                       Real64 const MinFlow,                                 // minimum water flow
+                       Real64 const ControlOffset,                           // really the tolerance
+                       int &ControlCompTypeNum,                              // Internal type num for CompType
+                       int &CompErrIndex,                                    // for Recurring error call
+                       ObjexxFCL::Optional_int_const TempInNode = _,         // inlet node for output calculation
+                       ObjexxFCL::Optional_int_const TempOutNode = _,        // outlet node for output calculation
+                       ObjexxFCL::Optional<Real64 const> AirMassFlow = _,    // air mass flow rate
+                       ObjexxFCL::Optional_int_const Action = _,             // 1=reverse; 2=normal
+                       ObjexxFCL::Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
+                       PlantLocation const &plantLoc = {},                   // for plant components, Location
+                       ObjexxFCL::Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
 );
 
 bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const MinFlow);
@@ -192,12 +192,12 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
                                   Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
                                   Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
-                                  Optional<Real64> HcGapRpt = _,
-                                  Optional<Real64> HrGapRpt = _,
-                                  Optional<Real64> IscRpt = _,
-                                  Optional<Real64> MdotVentRpt = _,
-                                  Optional<Real64> VdotWindRpt = _,
-                                  Optional<Real64> VdotBuoyRpt = _);
+                                  ObjexxFCL::Optional<Real64> HcGapRpt = _,
+                                  ObjexxFCL::Optional<Real64> HrGapRpt = _,
+                                  ObjexxFCL::Optional<Real64> IscRpt = _,
+                                  ObjexxFCL::Optional<Real64> MdotVentRpt = _,
+                                  ObjexxFCL::Optional<Real64> VdotWindRpt = _,
+                                  ObjexxFCL::Optional<Real64> VdotBuoyRpt = _);
 
 //****************************************************************************
 

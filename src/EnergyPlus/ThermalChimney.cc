@@ -199,15 +199,16 @@ namespace ThermalChimney {
             state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid Zone");
+                ShowSevereError(state, format("{}=\"{} invalid Zone", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
-                    state, "invalid - not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                    state, format("invalid - not found {}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
             } else if (!state.dataHeatBal->Zone(state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr).HasWindow) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid Zone");
+                ShowSevereError(state, format("{}=\"{} invalid Zone", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  "...invalid - no window(s) in " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                                  format("...invalid - no window(s) in {}=\"{}\".",
+                                         state.dataIPShortCut->cAlphaFieldNames(2),
+                                         state.dataIPShortCut->cAlphaArgs(2)));
                 ShowContinueError(state, "...thermal chimney zones must have window(s).");
                 ErrorsFound = true;
             }
@@ -219,10 +220,10 @@ namespace ThermalChimney {
             } else {
                 state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state,
-                                      "Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                          "\".");
+                    ShowSevereError(state, format("{}=\"{} invalid data", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(
+                        state,
+                        format("Invalid-not found {}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -288,18 +289,24 @@ namespace ThermalChimney {
                 //!! Error trap for zones that do not exist or zones not in the zone the thermal chimney is in
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == 0) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(TCZoneNum + 3) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(TCZoneNum + 3) + "\" not found.");
+                                    format("{}=\"{} invalid {}=\"{}\" not found.",
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(TCZoneNum + 3),
+                                           state.dataIPShortCut->cAlphaArgs(TCZoneNum + 3)));
                     ErrorsFound = true;
                 } else if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) ==
                            state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid reference " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2));
+                                    format("{}=\"{} invalid reference {}=\"{}",
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2)));
                     ShowContinueError(state,
-                                      "...must not have same zone as reference= " + state.dataIPShortCut->cAlphaFieldNames(TCZoneNum + 3) + "=\"" +
-                                          state.dataIPShortCut->cAlphaArgs(TCZoneNum + 3) + "\".");
+                                      format("...must not have same zone as reference= {}=\"{}\".",
+                                             state.dataIPShortCut->cAlphaFieldNames(TCZoneNum + 3),
+                                             state.dataIPShortCut->cAlphaArgs(TCZoneNum + 3)));
                     ErrorsFound = true;
                 }
 
@@ -554,9 +561,9 @@ namespace ThermalChimney {
                             if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) ==
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum1)) {
                                 ShowSevereError(state,
-                                                "Only one ZoneThermalChimney object allowed per zone but zone " +
-                                                    state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
-                                                    " has two ZoneThermalChimney objects associated with it");
+                                                format("Only one ZoneThermalChimney object allowed per zone but zone {} has two ZoneThermalChimney "
+                                                       "objects associated with it",
+                                                       state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum)));
                                 ErrorsFound = true;
                             }
                         }
@@ -564,9 +571,9 @@ namespace ThermalChimney {
                             if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) ==
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum1)) {
                                 ShowSevereError(state,
-                                                "Only one ZoneThermalChimney object allowed per zone but zone " +
-                                                    state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
-                                                    " has two ZoneThermalChimney objects associated with it");
+                                                format("Only one ZoneThermalChimney object allowed per zone but zone {} has two ZoneThermalChimney "
+                                                       "objects associated with it",
+                                                       state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum)));
                                 ErrorsFound = true;
                             }
                         }
@@ -575,9 +582,9 @@ namespace ThermalChimney {
                             if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) ==
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum1)) {
                                 ShowSevereError(state,
-                                                "Only one ZoneThermalChimney object allowed per zone but zone " +
-                                                    state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
-                                                    " has two ZoneThermalChimney objects associated with it");
+                                                format("Only one ZoneThermalChimney object allowed per zone but zone {} has two ZoneThermalChimney "
+                                                       "objects associated with it",
+                                                       state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum)));
                                 ErrorsFound = true;
                             }
                         }
@@ -598,9 +605,9 @@ namespace ThermalChimney {
                                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) ==
                                     state.dataThermalChimneys->ThermalChimneySys(Loop1).ZonePtr(TCZoneNum1)) {
                                     ShowSevereError(state,
-                                                    "Only one ZoneThermalChimney object allowed per zone but zone " +
-                                                        state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
-                                                        " has two ZoneThermalChimney objects associated with it");
+                                                    format("Only one ZoneThermalChimney object allowed per zone but zone {} has two "
+                                                           "ZoneThermalChimney objects associated with it",
+                                                           state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -612,9 +619,9 @@ namespace ThermalChimney {
                                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) ==
                                     state.dataThermalChimneys->ThermalChimneySys(Loop1).ZonePtr(TCZoneNum1)) {
                                     ShowSevereError(state,
-                                                    "Only one ZoneThermalChimney object allowed per zone but zone " +
-                                                        state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
-                                                        " has two ZoneThermalChimney objects associated with it");
+                                                    format("Only one ZoneThermalChimney object allowed per zone but zone {} has two "
+                                                           "ZoneThermalChimney objects associated with it",
+                                                           state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -627,9 +634,9 @@ namespace ThermalChimney {
                                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) ==
                                     state.dataThermalChimneys->ThermalChimneySys(Loop1).ZonePtr(TCZoneNum1)) {
                                     ShowSevereError(state,
-                                                    "Only one ZoneThermalChimney object allowed per zone but zone " +
-                                                        state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
-                                                        " has two ZoneThermalChimney objects associated with it");
+                                                    format("Only one ZoneThermalChimney object allowed per zone but zone {} has two "
+                                                           "ZoneThermalChimney objects associated with it",
+                                                           state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -641,7 +648,7 @@ namespace ThermalChimney {
         }     // IF (TotThermalChimney > 1) THEN
 
         if (ErrorsFound) {
-            ShowFatalError(state, cCurrentModuleObject + " Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, format("{} Errors found in input.  Preceding condition(s) cause termination.", cCurrentModuleObject));
         }
     }
 

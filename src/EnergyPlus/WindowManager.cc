@@ -529,11 +529,14 @@ namespace WindowManager {
                     // If there is spectral data for between-glass shades or blinds, calc the average spectral properties for use.
                     if (state.dataWindowManager->BGFlag) {
                         // Add warning message for the glazing defined with full spectral data.
-                        ShowWarningError(state,
-                                         "Window glazing material \"" + thisMaterial->Name +
-                                             "\" was defined with full spectral data and has been converted to average spectral data");
+                        ShowWarningError(
+                            state,
+                            format(
+                                "Window glazing material \"{}\" was defined with full spectral data and has been converted to average spectral data",
+                                thisMaterial->Name));
                         ShowContinueError(
-                            state, "due to its use with between-glass shades or blinds of the window construction \"" + thisConstruct.Name + "\".");
+                            state,
+                            format("due to its use with between-glass shades or blinds of the window construction \"{}\".", thisConstruct.Name));
                         ShowContinueError(state, "All occurrences of this glazing material will be modeled as SpectralAverage.");
                         ShowContinueError(state,
                                           "If this material is also used in other window constructions  without between-glass shades or blinds,");
@@ -584,10 +587,12 @@ namespace WindowManager {
                     if (state.dataWindowManager->BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
                         ShowWarningError(state,
-                                         "Window glazing material \"" + thisMaterial->Name +
-                                             "\" was defined with full spectral and angular data and has been converted to average spectral data");
+                                         format("Window glazing material \"{}\" was defined with full spectral and angular data and has been "
+                                                "converted to average spectral data",
+                                                thisMaterial->Name));
                         ShowContinueError(
-                            state, "due to its use with between-glass shades or blinds of the window construction \"" + thisConstruct.Name + "\".");
+                            state,
+                            format("due to its use with between-glass shades or blinds of the window construction \"{}\".", thisConstruct.Name));
                         ShowContinueError(state, "All occurrences of this glazing material will be modeled as SpectralAverage.");
                         ShowContinueError(state,
                                           "If this material is also used in other window constructions  without between-glass shades or blinds,");
@@ -1709,10 +1714,10 @@ namespace WindowManager {
                             state.dataSurface->SurfWinSolarDiffusing(SurfNum) = false;
                             ++DifOverrideCount;
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowWarningError(
-                                    state,
-                                    "W5InitGlassParameters: Window=\"" + state.dataSurface->Surface(SurfNum).Name +
-                                        "\" has interior material with Solar Diffusing=Yes, but existing Window Shading Device sets Diffusing=No.");
+                                ShowWarningError(state,
+                                                 format("W5InitGlassParameters: Window=\"{}\" has interior material with Solar Diffusing=Yes, but "
+                                                        "existing Window Shading Device sets Diffusing=No.",
+                                                        state.dataSurface->Surface(SurfNum).Name));
                             }
                         }
                     }
@@ -2384,8 +2389,8 @@ namespace WindowManager {
                                 ->AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
                             if (thisMaterialShade->Group == Material::MaterialGroup::WindowBlind) {
                                 ShowSevereError(state,
-                                                "CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + thisMaterialShade->Name +
-                                                    "\" is being used.");
+                                                format("CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"{}\" is being used.",
+                                                       thisMaterialShade->Name));
                                 ShowContinueError(state, "This is most likely a fault of the EMS values for shading control.");
                                 ShowFatalError(state, "Preceding condition terminates program.");
                             }
@@ -2411,8 +2416,8 @@ namespace WindowManager {
                             if (thisMaterialShade->Group == Material::MaterialGroup::Shade ||
                                 thisMaterialShade->Group == Material::MaterialGroup::Screen) {
                                 ShowSevereError(state,
-                                                "CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + thisMaterialShade->Name +
-                                                    "\" is being used.");
+                                                format("CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"{}\" is being used.",
+                                                       thisMaterialShade->Name));
                                 ShowContinueError(state, "This is most likely a fault of the EMS values for shading control.");
                                 ShowFatalError(state, "Preceding condition terminates program.");
                             }
@@ -3916,7 +3921,7 @@ namespace WindowManager {
                 state.dataSurface->SurfWinConvCoeffWithShade(SurfNum) = hcv;
         } else {
             // No convergence after MaxIterations even with relaxed error tolerance
-            ShowSevereError(state, "Convergence error in SolveForWindowTemperatures for window " + state.dataSurface->Surface(SurfNum).Name);
+            ShowSevereError(state, format("Convergence error in SolveForWindowTemperatures for window {}", state.dataSurface->Surface(SurfNum).Name));
             ShowContinueErrorTimeStamp(state, "");
 
             if (state.dataGlobal->DisplayExtraWarnings) {
@@ -3931,8 +3936,8 @@ namespace WindowManager {
             }
 
             ShowFatalError(state,
-                           "Program halted because of convergence error in SolveForWindowTemperatures for window " +
-                               state.dataSurface->Surface(SurfNum).Name);
+                           format("Program halted because of convergence error in SolveForWindowTemperatures for window {}",
+                                  state.dataSurface->Surface(SurfNum).Name));
         }
     }
 
@@ -7104,8 +7109,9 @@ namespace WindowManager {
         // No convergence after MaxIterations; and/or error tolerance
         if (errtemp >= 10 * errtemptol) {
             // Fatal error: didn't converge
-            ShowFatalError(state,
-                           "Convergence error in WindowTempsForNominalCond for construction " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowFatalError(
+                state,
+                format("Convergence error in WindowTempsForNominalCond for construction {}", state.dataConstruction->Construct(ConstrNum).Name));
         }
     }
 
@@ -7372,9 +7378,9 @@ namespace WindowManager {
                         CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
 
                         if (errFlag == 1) {
-                            ShowWarningError(state,
-                                             "Window construction " + state.dataConstruction->Construct(ThisNum).Name +
-                                                 " has an interior or exterior blind");
+                            ShowWarningError(
+                                state,
+                                format("Window construction {} has an interior or exterior blind", state.dataConstruction->Construct(ThisNum).Name));
                             ShowContinueError(state, "but the corresponding construction without the blind cannot be found.");
                             ShowContinueError(state, "The ReportGlass entry for this construction will not be printed in eplusout.eio.");
                             continue;
@@ -7384,9 +7390,9 @@ namespace WindowManager {
                         // nominal conductance and SHGC.
 
                         if (errFlag == 2) {
-                            ShowWarningError(state,
-                                             "Window construction " + state.dataConstruction->Construct(ThisNum).Name +
-                                                 " has a between-glass shade or blind");
+                            ShowWarningError(
+                                state,
+                                format("Window construction {} has a between-glass shade or blind", state.dataConstruction->Construct(ThisNum).Name));
                             ShowContinueError(state, "The ReportGlass entry for this construction will not be printed in eplusout.eio.");
                             continue;
                         }
@@ -9151,7 +9157,7 @@ namespace WindowManager {
 
         // read custom spectrum data from Site:SolarAndVisibleSpectrum
         if (NumSiteSpectrum > 1) { // throw error
-            ShowSevereError(state, "Only one " + cCurrentModuleObject + " object is allowed");
+            ShowSevereError(state, format("Only one {} object is allowed", cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -9182,7 +9188,7 @@ namespace WindowManager {
             cCurrentModuleObject = "Site:SpectrumData";
             NumSiteSpectrum = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumSiteSpectrum == 0) { // throw error
-                ShowSevereError(state, "No " + cCurrentModuleObject + " object is found");
+                ShowSevereError(state, format("No {} object is found", cCurrentModuleObject));
                 ErrorsFound = true;
             }
 
@@ -9209,9 +9215,9 @@ namespace WindowManager {
                     iSolarSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->nume) {
-                        ShowSevereError(state,
-                                        "Solar spectrum data pair is more than 107 - " + cCurrentModuleObject + " - " +
-                                            state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(
+                            state,
+                            format("Solar spectrum data pair is more than 107 - {} - {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
                     } else {
                         // Step 3 - overwrite default solar spectrum data
@@ -9231,8 +9237,9 @@ namespace WindowManager {
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->numt3) {
                         ShowSevereError(state,
-                                        "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " +
-                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        format("Visible spectrum data pair is more than 81 - {} - {}",
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
                     } else {
                         // Step 3 - overwrite default visible spectrum data

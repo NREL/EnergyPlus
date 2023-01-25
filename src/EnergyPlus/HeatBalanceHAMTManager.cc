@@ -287,7 +287,7 @@ namespace HeatBalanceHAMTManager {
             matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
 
             if (matid == 0) {
-                ShowSevereError(state, cHAMTObject1 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowSevereError(state, format("{} {}=\"{}\" is invalid (undefined).", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
@@ -296,7 +296,7 @@ namespace HeatBalanceHAMTManager {
             assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
-                                 cHAMTObject1 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
+                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
                 continue;
             }
 
@@ -323,7 +323,7 @@ namespace HeatBalanceHAMTManager {
             matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
 
             if (matid == 0) {
-                ShowSevereError(state, cHAMTObject2 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowSevereError(state, format("{} {}=\"{}\" is invalid (undefined).", cHAMTObject2, cAlphaFieldNames(1), AlphaArray(1)));
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
@@ -332,7 +332,7 @@ namespace HeatBalanceHAMTManager {
             assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
-                                 cHAMTObject2 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
+                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject2, cAlphaFieldNames(1), AlphaArray(1)));
                 continue;
             }
 
@@ -393,7 +393,7 @@ namespace HeatBalanceHAMTManager {
                     if (avflag) break;
                 }
                 if (isoerrrise) {
-                    ShowWarningError(state, cHAMTObject2 + " data not rising - Check material " + thisMaterial->Name);
+                    ShowWarningError(state, format("{} data not rising - Check material {}", cHAMTObject2, thisMaterial->Name));
                     ShowContinueError(state, "Isotherm data has been fixed, and the simulation continues.");
                 }
             }
@@ -418,7 +418,7 @@ namespace HeatBalanceHAMTManager {
             matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
 
             if (matid == 0) {
-                ShowSevereError(state, cHAMTObject3 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowSevereError(state, format("{} {}=\"{}\" is invalid (undefined).", cHAMTObject3, cAlphaFieldNames(1), AlphaArray(1)));
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
@@ -427,7 +427,7 @@ namespace HeatBalanceHAMTManager {
             assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
-                                 cHAMTObject3 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
+                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject3, cAlphaFieldNames(1), AlphaArray(1)));
                 continue;
             }
 
@@ -464,7 +464,7 @@ namespace HeatBalanceHAMTManager {
 
             matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
-                ShowSevereError(state, cHAMTObject4 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowSevereError(state, format("{} {}=\"{}\" is invalid (undefined).", cHAMTObject4, cAlphaFieldNames(1), AlphaArray(1)));
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
@@ -473,7 +473,7 @@ namespace HeatBalanceHAMTManager {
             assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
-                                 cHAMTObject4 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
+                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject4, cAlphaFieldNames(1), AlphaArray(1)));
                 continue;
             }
             Numid = 1;
@@ -509,7 +509,7 @@ namespace HeatBalanceHAMTManager {
 
             matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
-                ShowSevereError(state, cHAMTObject5 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowSevereError(state, format("{} {}=\"{}\" is invalid (undefined).", cHAMTObject5, cAlphaFieldNames(1), AlphaArray(1)));
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
@@ -518,7 +518,7 @@ namespace HeatBalanceHAMTManager {
             assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
-                                 cHAMTObject5 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
+                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject5, cAlphaFieldNames(1), AlphaArray(1)));
                 continue;
             }
 
@@ -557,7 +557,7 @@ namespace HeatBalanceHAMTManager {
 
             matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
-                ShowSevereError(state, cHAMTObject6 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowSevereError(state, format("{} {}=\"{}\" is invalid (undefined).", cHAMTObject6, cAlphaFieldNames(1), AlphaArray(1)));
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
@@ -566,7 +566,7 @@ namespace HeatBalanceHAMTManager {
             assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
-                                 cHAMTObject6 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
+                                 format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject6, cAlphaFieldNames(1), AlphaArray(1)));
                 continue;
             }
             Numid = 1;
@@ -604,7 +604,7 @@ namespace HeatBalanceHAMTManager {
 
             vtcsid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataSurface->Surface);
             if (vtcsid == 0) {
-                ShowSevereError(state, cHAMTObject7 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowSevereError(state, format("{} {}=\"{}\" is invalid (undefined).", cHAMTObject7, cAlphaFieldNames(1), AlphaArray(1)));
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
@@ -689,54 +689,56 @@ namespace HeatBalanceHAMTManager {
                 assert(thisMaterial != nullptr);
                 if (thisMaterial->ROnly) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name +
-                                        " cannot contain R-only value materials.");
-                    ShowContinueError(state, "Reference Material=\"" + thisMaterial->Name + "\".");
+                                    format("{}Construction={} cannot contain R-only value materials.",
+                                           RoutineName,
+                                           state.dataConstruction->Construct(conid).Name));
+                    ShowContinueError(state, format("Reference Material=\"{}\".", thisMaterial->Name));
                     ++errorCount;
                     continue;
                 }
 
                 if (thisMaterial->nmu < 0) {
-                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
                     ShowContinueError(state,
-                                      "Reference Material=\"" + thisMaterial->Name +
-                                          "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.");
+                                      format("Reference Material=\"{}\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.",
+                                             thisMaterial->Name));
                     ++errorCount;
                 }
 
                 if (thisMaterial->niso < 0) {
-                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
-                    ShowContinueError(state, "Reference Material=\"" + thisMaterial->Name + "\" does not have required isotherm data.");
+                    ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
+                    ShowContinueError(state, format("Reference Material=\"{}\" does not have required isotherm data.", thisMaterial->Name));
                     ++errorCount;
                 }
                 if (thisMaterial->nsuc < 0) {
-                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
-                    ShowContinueError(state,
-                                      "Reference Material=\"" + thisMaterial->Name +
-                                          "\" does not have required liquid transport coefficient (suction) data.");
+                    ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
+                    ShowContinueError(
+                        state,
+                        format("Reference Material=\"{}\" does not have required liquid transport coefficient (suction) data.", thisMaterial->Name));
                     ++errorCount;
                 }
                 if (thisMaterial->nred < 0) {
-                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
                     ShowContinueError(state,
-                                      "Reference Material=\"" + thisMaterial->Name +
-                                          "\" does not have required liquid transport coefficient (redistribution) data.");
+                                      format("Reference Material=\"{}\" does not have required liquid transport coefficient (redistribution) data.",
+                                             thisMaterial->Name));
                     ++errorCount;
                 }
                 if (thisMaterial->ntc < 0) {
                     if (thisMaterial->Conductivity > 0) {
-                        ShowWarningError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                        ShowWarningError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
                         ShowContinueError(
-                            state, "Reference Material=\"" + thisMaterial->Name + "\" does not have thermal conductivity data. Using fixed value.");
+                            state,
+                            format("Reference Material=\"{}\" does not have thermal conductivity data. Using fixed value.", thisMaterial->Name));
                         thisMaterial->ntc = 2;
                         thisMaterial->tcwater(1) = 0.0;
                         thisMaterial->tcdata(1) = thisMaterial->Conductivity;
                         thisMaterial->tcwater(2) = thisMaterial->isodata(thisMaterial->niso);
                         thisMaterial->tcdata(2) = thisMaterial->Conductivity;
                     } else {
-                        ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                        ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
                         ShowContinueError(state,
-                                          "Reference Material=\"" + thisMaterial->Name + "\" does not have required thermal conductivity data.");
+                                          format("Reference Material=\"{}\" does not have required thermal conductivity data.", thisMaterial->Name));
                         ++errorCount;
                     }
                 }
@@ -759,8 +761,8 @@ namespace HeatBalanceHAMTManager {
                     if (testlen > adjdist) break;
                     --thisMaterial->divs;
                     if (thisMaterial->divs < 1) {
-                        ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
-                        ShowContinueError(state, "Reference Material=\"" + thisMaterial->Name + "\" is too thin.");
+                        ShowSevereError(state, format("{}Construction={}", RoutineName, state.dataConstruction->Construct(conid).Name));
+                        ShowContinueError(state, format("Reference Material=\"{}\" is too thin.", thisMaterial->Name));
                         ++errorCount;
                         break;
                     }
@@ -1322,7 +1324,8 @@ namespace HeatBalanceHAMTManager {
                     if (!state.dataGlobal->WarmupFlag) {
                         ++qvpErrCount;
                         if (qvpErrCount < 16) {
-                            ShowWarningError(state, "HeatAndMoistureTransfer: Large Latent Heat for Surface " + state.dataSurface->Surface(sid).Name);
+                            ShowWarningError(
+                                state, format("HeatAndMoistureTransfer: Large Latent Heat for Surface {}", state.dataSurface->Surface(sid).Name));
                         } else {
                             ShowRecurringWarningErrorAtEnd(state, "HeatAndMoistureTransfer: Large Latent Heat Errors ", qvpErrReport);
                         }
@@ -1462,7 +1465,7 @@ namespace HeatBalanceHAMTManager {
                     cells(cid).rhp1 = (phiorsum + vporsum + (wcap * cells(cid).rh) / state.dataHeatBalHAMTMgr->deltat) / denominator;
                 } else {
                     ShowSevereError(state, "CalcHeatBalHAMT: demoninator in calculating RH is zero.  Check material properties for accuracy.");
-                    ShowContinueError(state, "...Problem occurs in Material=\"" + state.dataMaterial->Material(cells(cid).matid)->Name + "\".");
+                    ShowContinueError(state, format("...Problem occurs in Material=\"{}\".", state.dataMaterial->Material(cells(cid).matid)->Name));
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
 
@@ -1547,8 +1550,12 @@ namespace HeatBalanceHAMTManager {
                                                        state.dataHeatBalHAMTMgr->cells(state.dataHeatBalHAMTMgr->Intcell(sid)).temp);
     }
 
-    void
-    interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad)
+    void interp(int const ndata,
+                const Array1D<Real64> &xx,
+                const Array1D<Real64> &yy,
+                Real64 const invalue,
+                Real64 &outvalue,
+                ObjexxFCL::Optional<Real64> outgrad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph

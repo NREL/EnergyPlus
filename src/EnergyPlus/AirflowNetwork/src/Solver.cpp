@@ -161,9 +161,9 @@ namespace AirflowNetwork {
 
     int constexpr NumOfVentCtrTypes(6); // Number of zone level venting control types
 
-    void Solver::manage_balance(Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
-                                Optional_int_const Iter,                // Iteration number
-                                Optional_bool ResimulateAirZone         // True when solution technique on third iteration
+    void Solver::manage_balance(ObjexxFCL::Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
+                                ObjexxFCL::Optional_int_const Iter,                // Iteration number
+                                ObjexxFCL::Optional_bool ResimulateAirZone         // True when solution technique on third iteration
     )
     {
 
@@ -9323,7 +9323,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::update(Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
+    void Solver::update(ObjexxFCL::Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
     {
 
         // SUBROUTINE INFORMATION:
