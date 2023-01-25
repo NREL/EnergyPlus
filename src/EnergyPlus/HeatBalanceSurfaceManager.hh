@@ -126,16 +126,16 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+    void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, ObjexxFCL::Optional_int_const ZoneToResimulate = _);
 
-    void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+    void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, ObjexxFCL::Optional_int_const ZoneToResimulate = _);
 
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
     void UpdateThermalHistories(EnergyPlusData &state);
 
     void CalculateZoneMRT(EnergyPlusData &state,
-                          Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+                          ObjexxFCL::Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     // End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
@@ -161,28 +161,30 @@ namespace HeatBalanceSurfaceManager {
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
-    void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
-                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+    void
+    CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
+                               ObjexxFCL::Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     Real64 GetSurfQdotRadHVACInPerArea(EnergyPlusData &state, int SurfNum);
 
     Real64 GetQdotConvOutPerArea(EnergyPlusData &state, const int SurfNum);
 
-    void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
-                                   Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+    void
+    CalcHeatBalanceInsideSurf(EnergyPlusData &state,
+                              ObjexxFCL::Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
-                                    Optional_int_const ZoneToResimulate = _);
+                                    ObjexxFCL::Optional_int_const ZoneToResimulate = _);
 
     void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                            const int FirstZone,             // First zone to simulate
                                            const int LastZone,              // Last zone to simulate
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
-                                           Optional_int_const ZoneToResimulate = _);
+                                           ObjexxFCL::Optional_int_const ZoneToResimulate = _);
 
     void
     TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, int const SurfNum, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);

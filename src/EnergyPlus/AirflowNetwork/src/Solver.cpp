@@ -161,9 +161,9 @@ namespace AirflowNetwork {
 
     int constexpr NumOfVentCtrTypes(6); // Number of zone level venting control types
 
-    void Solver::manage_balance(Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
-                                Optional_int_const Iter,                // Iteration number
-                                Optional_bool ResimulateAirZone         // True when solution technique on third iteration
+    void Solver::manage_balance(ObjexxFCL::Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
+                                ObjexxFCL::Optional_int_const Iter,                // Iteration number
+                                ObjexxFCL::Optional_bool ResimulateAirZone         // True when solution technique on third iteration
     )
     {
 
@@ -9323,7 +9323,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::update(Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
+    void Solver::update(ObjexxFCL::Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
     {
 
         // SUBROUTINE INFORMATION:
@@ -11110,13 +11110,12 @@ namespace AirflowNetwork {
 
         // Check number of fans specified in an AirLoop #6748
         int BranchNum;
-        int CompNum;
         int NumOfFans;
         std::string FanNames;
         for (BranchNum = 1; BranchNum <= m_state.dataAirSystemsData->PrimaryAirSystems(1).NumBranches; ++BranchNum) {
             NumOfFans = 0;
             FanNames = "";
-            for (CompNum = 1; CompNum <= m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).TotalComponents; ++CompNum) {
+            for (int CompNum = 1; CompNum <= m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).TotalComponents; ++CompNum) {
                 if (UtilityRoutines::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                 "Fan:ConstantVolume") ||
                     UtilityRoutines::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf,

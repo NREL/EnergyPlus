@@ -240,8 +240,9 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
         // ZoneEquipConfigNum = ZoneNum;
         // check whether this zone is a controlled zone or not
         if (!state.dataHeatBal->Zone(Zone).IsControlled) {
-            ShowFatalError(
-                state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + state.dataHeatBal->Zone(Zone).Name);
+            ShowFatalError(state,
+                           format("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone {}",
+                                  state.dataHeatBal->Zone(Zone).Name));
             // return;
         }
         // determine supply air conditions
@@ -502,7 +503,7 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     if (totalWidth == 0.0) {
         // This should never happen, but if it does, print a somewhat meaningful fatal error
         // (instead of allowing a divide by zero).
-        ShowFatalError(state, "Calculated projected surface width is zero for surface=\"" + Name + "\"");
+        ShowFatalError(state, format("Calculated projected surface width is zero for surface=\"{}\"", Name));
     }
 
     Real64 averageHeight = 0.0;
@@ -531,7 +532,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.EnclIndex = SolarEnclIndex;
     calcHashKey.TAirRef = state.dataSurface->SurfTAirRef(SurfNum);
 
-    auto extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+    int extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
     if (extBoundCond > 0) {
         calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
         calcHashKey.ExtEnclIndex = state.dataSurface->Surface(extBoundCond).SolarEnclIndex;
