@@ -240,9 +240,9 @@ namespace Curve {
                    this->coeff[9] * V1 * V2 * V2 + this->coeff[10] * V1 * V1 * V2 * V2 + this->coeff[11] * V3 * V2 * V2 * V2;
         case CurveType::TriQuadratic: {
             auto const &c(this->coeff);
-            auto const V1s(V1 * V1);
-            auto const V2s(V2 * V2);
-            auto const V3s(V3 * V3);
+            Real64 const V1s(V1 * V1);
+            Real64 const V2s(V2 * V2);
+            Real64 const V3s(V3 * V3);
             return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s +
                    c[6] * V3 + c[7] * V1s * V2s + c[8] * V1 * V2 + c[9] * V1 * V2s +
                    c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s +
@@ -535,9 +535,9 @@ namespace Curve {
         } break;
         case CurveType::TriQuadratic: {
             auto const &c(this->coeff);
-            auto const V1s(V1 * V1);
-            auto const V2s(V2 * V2);
-            auto const V3s(V3 * V3);
+            Real64 const V1s(V1 * V1);
+            Real64 const V2s(V2 * V2);
+            Real64 const V3s(V3 * V3);
             return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s + c[6] * V3 + c[7] * V1s * V2s +
                    c[8] * V1 * V2 + c[9] * V1 * V2s + c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s +
                    c[14] * V1s * V3 + c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s + c[18] * V2s * V3 +
