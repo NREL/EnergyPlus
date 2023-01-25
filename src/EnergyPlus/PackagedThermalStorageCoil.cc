@@ -2504,7 +2504,6 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     // Using/Aliasing
     using namespace DataSizing;
     using namespace OutputReportPredefined;
-    using EnergyPlus::Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2618,7 +2617,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
                 MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                 SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                 TotCapTempModFac =
-                    CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
+                    EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                 CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
                 if (TotCapTempModFac > 0.0) {
                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = CoolCapAtPeak / TotCapTempModFac;
@@ -2659,7 +2658,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
                 MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                 SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                 TotCapTempModFac =
-                    CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
+                    EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                 CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
                 if (TotCapTempModFac > 0.0) {
                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = CoolCapAtPeak / TotCapTempModFac;
@@ -2936,7 +2935,6 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -3040,9 +3038,9 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
 
         AirMassFlowRatio = EvapAirMassFlow / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
         TotCapTempModFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, EvapInletWetBulb, CondInletTemp);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, EvapInletWetBulb, CondInletTemp);
         TotCapTempModFac = max(0.0, TotCapTempModFac); // could warn if negative, DXcoil does
-        TotCapFlowModFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
+        TotCapFlowModFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
         TotCapFlowModFac = max(0.0, TotCapFlowModFac); // could warn if negative, DXcoil does
         TotCap = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TotCapTempModFac * TotCapFlowModFac;
         // now see if coil might be running dry
@@ -3056,13 +3054,13 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
             Counter = 0;
             Converged = false;
             while (!Converged) {
-                TotCapTempModFac = CurveValue(state,
+                TotCapTempModFac = EnergyPlus::Curve::CurveValue(state,
                                               state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve,
                                               DryCoilTestEvapInletWetBulb,
                                               CondInletTemp);
                 TotCapTempModFac = max(0.0, TotCapTempModFac); // could warn if negative, DXcoil does
                 TotCapFlowModFac =
-                    CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
+                    EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
                 TotCapFlowModFac = max(0.0, TotCapFlowModFac); // could warn if negative, DXcoil does
                 TotCap = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TotCapTempModFac * TotCapFlowModFac;
 
@@ -3098,8 +3096,8 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
         }
 
         SHRTempFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-        SHRFlowFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlySHRFFlowCurve, AirMassFlowRatio);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+        SHRFlowFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlySHRFFlowCurve, AirMassFlowRatio);
         SHR = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedSHR * SHRTempFac * SHRFlowFac;
         SHR = min(SHR, 1.0); // warn maybe
         SHR = max(SHR, 0.0); // warn maybe
@@ -3110,7 +3108,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
                 SHR = SHRadp;
             }
         }
-        PLF = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyPLFFPLRCurve, PartLoadRatio);
+        PLF = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyPLFFPLRCurve, PartLoadRatio);
         if (PLF >= PartLoadRatio && PLF > 0.0) {
             RuntimeFraction = PartLoadRatio / PLF;
         } else {
@@ -3139,9 +3137,9 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
         }
         // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
         EIRTempModFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyEIRFTempCurve, EvapInletWetBulb, CondInletTemp);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyEIRFTempCurve, EvapInletWetBulb, CondInletTemp);
         EIRTempModFac = max(EIRTempModFac, 0.0);
-        EIRFlowModFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyEIRFFlowCurve, AirMassFlowRatio);
+        EIRFlowModFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyEIRFFlowCurve, AirMassFlowRatio);
         EIRFlowModFac = max(EIRFlowModFac, 0.0);
         EIR = EIRTempModFac * EIRFlowModFac / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedCOP;
 
@@ -3261,7 +3259,6 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -3421,14 +3418,14 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
         AirMassFlowRatio = EvapAirMassFlow / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-        EvapTotCapTempModFac = CurveValue(state,
+        EvapTotCapTempModFac = EnergyPlus::Curve::CurveValue(state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve,
                                           EvapInletWetBulb,
                                           CondInletTemp,
                                           sTES);
         EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
         EvapTotCapFlowModFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
         EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
         EvapTotCap =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
@@ -3443,13 +3440,13 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
             Counter = 0;
             Converged = false;
             while (!Converged) {
-                EvapTotCapTempModFac = CurveValue(state,
+                EvapTotCapTempModFac = EnergyPlus::Curve::CurveValue(state,
                                                   state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve,
                                                   DryCoilTestEvapInletWetBulb,
                                                   CondInletTemp,
                                                   sTES);
                 EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-                EvapTotCapFlowModFac = CurveValue(
+                EvapTotCapFlowModFac = EnergyPlus::Curve::CurveValue(
                     state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
                 EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
                 EvapTotCap = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap * EvapTotCapTempModFac *
@@ -3487,19 +3484,19 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
         {
             if (state.dataCurveManager->PerfCurve(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve)->numDims ==
                 2) {
-                SHRTempFac = CurveValue(state,
+                SHRTempFac = EnergyPlus::Curve::CurveValue(state,
                                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve,
                                         EvapInletWetBulb,
                                         EvapInletDryBulb);
             } else {
-                SHRTempFac = CurveValue(state,
+                SHRTempFac = EnergyPlus::Curve::CurveValue(state,
                                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve,
                                         EvapInletWetBulb,
                                         EvapInletDryBulb,
                                         sTES);
             }
         }
-        SHRFlowFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeSHRFFlowCurve, AirMassFlowRatio);
+        SHRFlowFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeSHRFFlowCurve, AirMassFlowRatio);
         SHR = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedSHR * SHRTempFac * SHRFlowFac;
         SHR = min(SHR, 1.0); // warn maybe
         SHR = max(SHR, 0.0); // warn maybe
@@ -3510,7 +3507,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
                 SHR = SHRadp;
             }
         }
-        PLF = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingPLFFPLRCurve, PartLoadRatio);
+        PLF = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingPLFFPLRCurve, PartLoadRatio);
         if (PLF >= PartLoadRatio && PLF > 0.0) {
             EvapRuntimeFraction = PartLoadRatio / PLF;
         } else {
@@ -3518,21 +3515,21 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
         }
 
         // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-        EIRTempModFac = CurveValue(state,
+        EIRTempModFac = EnergyPlus::Curve::CurveValue(state,
                                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFTempCurve,
                                    EvapInletWetBulb,
                                    CondInletTemp,
                                    sTES);
         EIRTempModFac = max(EIRTempModFac, 0.0);
         EIRFlowModFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFFlowCurve, AirMassFlowRatio);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFFlowCurve, AirMassFlowRatio);
         EIRFlowModFac = max(EIRFlowModFac, 0.0);
         EIR = EIRTempModFac * EIRFlowModFac / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeCoolingRatedCOP;
 
         EvapElecCoolingPower = EvapTotCap * EIR * EvapRuntimeFraction;
 
         if (TESCanBeCharged) {
-            ChargeCapModFac = CurveValue(state,
+            ChargeCapModFac = EnergyPlus::Curve::CurveValue(state,
                                          state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve,
                                          EvapInletWetBulb,
                                          CondInletTemp,
@@ -3540,7 +3537,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
             ChargeCapModFac = max(0.0, ChargeCapModFac);
 
             ChargeCapPLRModFac =
-                CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
+                EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
             ChargeCapPLRModFac = max(0.0, ChargeCapPLRModFac);
 
             TotChargeCap =
@@ -3551,14 +3548,14 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
             } else {
                 ChargeRuntimeFraction = 1.0;
             }
-            ChargeEIRTempModFac = CurveValue(state,
+            ChargeEIRTempModFac = EnergyPlus::Curve::CurveValue(state,
                                              state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve,
                                              EvapInletWetBulb,
                                              CondInletTemp,
                                              sTES);
             ChargeEIRTempModFac = max(0.0, ChargeEIRTempModFac);
             ChargeEIRFlowModFac =
-                CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
+                EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
             ChargeEIRFlowModFac = max(0.0, ChargeEIRFlowModFac);
             ChargeEIR = (ChargeEIRTempModFac * ChargeEIRFlowModFac) /
                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingRatedCOP;
@@ -3650,7 +3647,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     } else {                   // Evap off, but may still charge
         if (TESCanBeCharged) { // coil is running to charge but not to cool at evaporator
             AirMassFlowRatio = EvapAirMassFlow / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-            ChargeCapModFac = CurveValue(state,
+            ChargeCapModFac = EnergyPlus::Curve::CurveValue(state,
                                          state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve,
                                          EvapInletWetBulb,
                                          CondInletTemp,
@@ -3658,7 +3655,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
             ChargeCapModFac = max(0.0, ChargeCapModFac);
 
             ChargeCapPLRModFac =
-                CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
+                EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
             ChargeCapPLRModFac = max(0.0, ChargeCapPLRModFac);
 
             TotChargeCap =
@@ -3669,14 +3666,14 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
             } else {
                 ChargeRuntimeFraction = 1.0;
             }
-            ChargeEIRTempModFac = CurveValue(state,
+            ChargeEIRTempModFac = EnergyPlus::Curve::CurveValue(state,
                                              state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve,
                                              EvapInletWetBulb,
                                              CondInletTemp,
                                              sTES);
             ChargeEIRTempModFac = max(0.0, ChargeEIRTempModFac);
             ChargeEIRFlowModFac =
-                CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
+                EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
             ChargeEIRFlowModFac = max(0.0, ChargeEIRFlowModFac);
             ChargeEIR = (ChargeEIRTempModFac * ChargeEIRFlowModFac) /
                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeChargingRatedCOP;
@@ -3773,7 +3770,6 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -3933,14 +3929,14 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
     if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
         AirMassFlowRatio = EvapAirMassFlow / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-        EvapTotCapTempModFac = CurveValue(state,
+        EvapTotCapTempModFac = EnergyPlus::Curve::CurveValue(state,
                                           state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve,
                                           EvapInletWetBulb,
                                           CondInletTemp,
                                           sTES);
         EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
         EvapTotCapFlowModFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
         EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
         EvapTotCap =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
@@ -3955,13 +3951,13 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
             Counter = 0;
             Converged = false;
             while (!Converged) {
-                EvapTotCapTempModFac = CurveValue(state,
+                EvapTotCapTempModFac = EnergyPlus::Curve::CurveValue(state,
                                                   state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve,
                                                   DryCoilTestEvapInletWetBulb,
                                                   CondInletTemp,
                                                   sTES);
                 EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-                EvapTotCapFlowModFac = CurveValue(
+                EvapTotCapFlowModFac = EnergyPlus::Curve::CurveValue(
                     state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
                 EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
                 EvapTotCap = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap * EvapTotCapTempModFac *
@@ -3999,19 +3995,19 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
         {
             if (state.dataCurveManager->PerfCurve(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve)
                     ->numDims == 2) {
-                SHRTempFac = CurveValue(state,
+                SHRTempFac = EnergyPlus::Curve::CurveValue(state,
                                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve,
                                         EvapInletWetBulb,
                                         EvapInletDryBulb);
             } else {
-                SHRTempFac = CurveValue(state,
+                SHRTempFac = EnergyPlus::Curve::CurveValue(state,
                                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve,
                                         EvapInletWetBulb,
                                         EvapInletDryBulb,
                                         sTES);
             }
         }
-        SHRFlowFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeSHRFFlowCurve, AirMassFlowRatio);
+        SHRFlowFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeSHRFFlowCurve, AirMassFlowRatio);
         SHR = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedSHR * SHRTempFac * SHRFlowFac;
         SHR = min(SHR, 1.0); // warn maybe
         SHR = max(SHR, 0.0); // warn maybe
@@ -4022,38 +4018,38 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
                 SHR = SHRadp;
             }
         }
-        PLF = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingPLFFPLRCurve, PartLoadRatio);
+        PLF = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingPLFFPLRCurve, PartLoadRatio);
         if (PLF >= PartLoadRatio && PLF > 0.0) {
             EvapRuntimeFraction = PartLoadRatio / PLF;
         } else {
             EvapRuntimeFraction = 1.0; // warn maybe
         }
         // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-        EIRTempModFac = CurveValue(state,
+        EIRTempModFac = EnergyPlus::Curve::CurveValue(state,
                                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFTempCurve,
                                    EvapInletWetBulb,
                                    CondInletTemp,
                                    sTES);
         EIRTempModFac = max(EIRTempModFac, 0.0);
         EIRFlowModFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFFlowCurve, AirMassFlowRatio);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFFlowCurve, AirMassFlowRatio);
         EIRFlowModFac = max(EIRFlowModFac, 0.0);
         EIR = EIRTempModFac * EIRFlowModFac / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeCoolingRatedCOP;
 
         EvapElecCoolingPower = EvapTotCap * EIR * EvapRuntimeFraction;
 
         if (TESHasSomeCharge) {
-            DischargeCapTempModFac = CurveValue(state,
+            DischargeCapTempModFac = EnergyPlus::Curve::CurveValue(state,
                                                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFTempCurve,
                                                 EvapInletWetBulb,
                                                 CondInletTemp,
                                                 sTES);
             DischargeCapTempModFac = max(0.0, DischargeCapTempModFac);
-            DischargeCapFlowModFac = CurveValue(
+            DischargeCapFlowModFac = EnergyPlus::Curve::CurveValue(
                 state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFFlowCurve, AirMassFlowRatio);
             DischargeCapFlowModFac = max(0.0, DischargeCapFlowModFac);
 
-            DischargePLF = CurveValue(
+            DischargePLF = EnergyPlus::Curve::CurveValue(
                 state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFEvapPLRCurve, PartLoadRatio);
             if (DischargePLF >= PartLoadRatio && DischargePLF > 0.0) {
                 DischargeRuntimeFraction = PartLoadRatio / DischargePLF;
@@ -4066,13 +4062,13 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
             if (TotDischargeCap > QdotDischargeLimit) {
                 TotDischargeCap = min(TotDischargeCap, QdotDischargeLimit);
             }
-            DischargeEIRTempModFac = CurveValue(state,
+            DischargeEIRTempModFac = EnergyPlus::Curve::CurveValue(state,
                                                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFTempCurve,
                                                 EvapInletWetBulb,
                                                 CondInletTemp,
                                                 sTES);
             DischargeEIRTempModFac = max(0.0, DischargeEIRTempModFac);
-            DischargeEIRFlowModFac = CurveValue(
+            DischargeEIRFlowModFac = EnergyPlus::Curve::CurveValue(
                 state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFFLowCurve, AirMassFlowRatio);
             DischargeEIRFlowModFac = max(0.0, DischargeEIRFlowModFac);
 
@@ -4226,7 +4222,6 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -4347,7 +4342,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
     }
 
     if (TESCanBeCharged) { // coil is running
-        CapModFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyChargingCapFTempCurve, CondInletTemp, sTES);
+        CapModFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyChargingCapFTempCurve, CondInletTemp, sTES);
         CapModFac = max(0.0, CapModFac);
         TotCap = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyRatedCapacity * CapModFac;
         if (TotCap > QdotChargeLimit) {
@@ -4356,7 +4351,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RuntimeFraction = 1.0;
         }
-        EIRModFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyChargingEIRFTempCurve, CondInletTemp, sTES);
+        EIRModFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyChargingEIRFTempCurve, CondInletTemp, sTES);
         EIRModFac = max(0.0, EIRModFac);
         EIR = EIRModFac / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyRatedCOP;
         ElecCoolingPower = TotCap * EIR;
@@ -4428,7 +4423,6 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using EnergyPlus::Curve::CurveValue;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -4543,13 +4537,13 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
         AirMassFlowRatio = EvapAirMassFlow / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
 
         TotCapTempModFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, EvapInletWetBulb, sTES);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, EvapInletWetBulb, sTES);
         TotCapTempModFac = max(0.0, TotCapTempModFac);
-        TotCapFlowModFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
+        TotCapFlowModFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
         TotCapFlowModFac = max(0.0, TotCapFlowModFac);
         TotCap = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TotCapTempModFac * TotCapFlowModFac;
 
-        PLF = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyPLFFPLRCurve, PLR);
+        PLF = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyPLFFPLRCurve, PLR);
         if (PLF >= PLR && PLF > 0.0) {
             RuntimeFraction = PLR / PLF;
         } else {
@@ -4557,9 +4551,9 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
         }
         // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
         EIRTempModFac =
-            CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyEIRFTempCurve, EvapInletWetBulb, sTES);
+            EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyEIRFTempCurve, EvapInletWetBulb, sTES);
         EIRTempModFac = max(EIRTempModFac, 0.0);
-        EIRFlowModFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyEIRFFlowCurve, AirMassFlowRatio);
+        EIRFlowModFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyEIRFFlowCurve, AirMassFlowRatio);
         EIRFlowModFac = max(EIRFlowModFac, 0.0);
         EIR = EIRTempModFac * EIRFlowModFac / state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedCOP;
 
@@ -4583,11 +4577,11 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
             Counter = 0;
             Converged = false;
             while (!Converged) {
-                TotCapTempModFac = CurveValue(
+                TotCapTempModFac = EnergyPlus::Curve::CurveValue(
                     state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, sTES);
                 TotCapTempModFac = max(0.0, TotCapTempModFac);
                 TotCapFlowModFac =
-                    CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
+                    EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
                 TotCapFlowModFac = max(0.0, TotCapFlowModFac);
                 TotCap =
                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TotCapTempModFac * TotCapFlowModFac;
@@ -4624,10 +4618,10 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
         {
             if (state.dataCurveManager->PerfCurve(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve)->numDims ==
                 2) {
-                SHRTempFac = CurveValue(
+                SHRTempFac = EnergyPlus::Curve::CurveValue(
                     state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
             } else {
-                SHRTempFac = CurveValue(state,
+                SHRTempFac = EnergyPlus::Curve::CurveValue(state,
                                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve,
                                         EvapInletWetBulb,
                                         EvapInletDryBulb,
@@ -4635,7 +4629,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
             }
         }
 
-        SHRFlowFac = CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlySHRFFLowCurve, AirMassFlowRatio);
+        SHRFlowFac = EnergyPlus::Curve::CurveValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlySHRFFLowCurve, AirMassFlowRatio);
         SHR = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedSHR * SHRTempFac * SHRFlowFac;
         SHR = min(SHR, 1.0); // warn maybe
         SHR = max(SHR, 0.0); // warn maybe
