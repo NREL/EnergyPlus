@@ -373,7 +373,7 @@ struct CurveManagerData : BaseGlobalStruct
         for (Curve::Curve *p : PerfCurve) {
             delete p;
         }
-        *this = CurveManagerData();
+        new (this) CurveManagerData();
     }
 };
 
