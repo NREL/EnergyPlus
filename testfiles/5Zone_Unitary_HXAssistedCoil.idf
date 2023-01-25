@@ -3035,12 +3035,6 @@
 
   Output:Variable,*,Unitary System Heating Ancillary Electricity Energy,hourly;
 
-  Output:Variable,*,Unitary System DX Coil Cycling Ratio,hourly;
-
-  Output:Variable,*,Unitary System DX Coil Speed Ratio,hourly;
-
-  Output:Variable,*,Unitary System DX Coil Speed Level,hourly;
-
   Output:Variable,*,Zone Operative Temperature,hourly;
 
   Output:Variable,*,Zone Mean Air Dewpoint Temperature,hourly;
