@@ -1205,14 +1205,13 @@ namespace PhotovoltaicThermalCollectors {
         Real64 PotentialHeatGain(0.0);
         Real64 Eff(0.0);
         Real64 Tcollector(Tinlet);
-        std::string Mode("Heating");
+        this->PVTMode = PVTMode::Heating;
 
         if (this->HeatingUseful && this->BypassDamperOff && (GetCurrentScheduleValue(state, this->BIPVT.SchedPtr) > 0.0)) {
 
             if ((state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint - Tinlet) > 0.1) {
                 calculateBIPVTMaxHeatGain(state,
                                           state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint,
-                                          Mode,
                                           BypassFraction,
                                           PotentialHeatGain,
                                           PotentialOutletTemp,
@@ -1238,11 +1237,10 @@ namespace PhotovoltaicThermalCollectors {
 
         } else if (this->CoolingUseful && this->BypassDamperOff && (GetCurrentScheduleValue(state, this->BIPVT.SchedPtr) > 0.0)) {
 
-            Mode = "Cooling";
+            this->PVTMode = PVTMode::Cooling;
             if ((Tinlet - state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint) > 0.1) {
                 calculateBIPVTMaxHeatGain(state,
                                           state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint,
-                                          Mode,
                                           BypassFraction,
                                           PotentialHeatGain,
                                           PotentialOutletTemp,
@@ -1263,8 +1261,7 @@ namespace PhotovoltaicThermalCollectors {
                     // trap for air not being cooled below its dewpoint.
                     if ((PotentialOutletTemp < DewPointInlet) && ((Tinlet - DewPointInlet) > 0.1)) {
                         //  water removal would be needed.. not going to allow that for now.  limit cooling to dew point and model bypass
-                        calculateBIPVTMaxHeatGain(
-                            state, DewPointInlet, Mode, BypassFraction, PotentialHeatGain, PotentialOutletTemp, Eff, Tcollector);
+                        calculateBIPVTMaxHeatGain(state, DewPointInlet, BypassFraction, PotentialHeatGain, PotentialOutletTemp, Eff, Tcollector);
                         PotentialOutletTemp = DewPointInlet;
                     }
                 }
@@ -1297,7 +1294,7 @@ namespace PhotovoltaicThermalCollectors {
     } // namespace PhotovoltaicThermalCollectors
 
     void PVTCollectorStruct::calculateBIPVTMaxHeatGain(
-        EnergyPlusData &state, Real64 tsp, const std::string &Mode, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv)
+        EnergyPlusData &state, Real64 tsp, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the maximum heat transfer from the BIPVT system to the air stream in the channel behind the PV module
@@ -1607,13 +1604,13 @@ namespace PhotovoltaicThermalCollectors {
             t1_new = y[2];
             if (mdot > 0.0) {
                 tfout = (tfin + b / a) * std::exp(a * l) - b / a; // air outlet temperature (DegC)
-                if (((Mode == "Heating") && (q > 0.0) && (tmixed > tsp) && (tfin < tsp)) ||
-                    ((Mode == "Cooling") && (q < 0.0) && (tmixed < tsp) && (tfin > tsp))) {
+                if (((this->PVTMode == PVTMode::Heating) && (q > 0.0) && (tmixed > tsp) && (tfin < tsp)) ||
+                    ((this->PVTMode == PVTMode::Cooling) && (q < 0.0) && (tmixed < tsp) && (tfin > tsp))) {
                     bfr = (tsp - tfout) / (tfin - tfout); // bypass fraction
                     bfr = std::max(0.0, bfr);
                     bfr = std::min(1.0, bfr);
-                } else if (((Mode == "Heating") && (q > 0.0) && (tmixed > tsp) && (tfin >= tsp)) ||
-                           ((Mode == "Cooling") && (q < 0.0) && (tmixed < tsp) && (tfin <= tsp))) {
+                } else if (((this->PVTMode == PVTMode::Heating) && (q > 0.0) && (tmixed > tsp) && (tfin >= tsp)) ||
+                           ((this->PVTMode == PVTMode::Cooling) && (q < 0.0) && (tmixed < tsp) && (tfin <= tsp))) {
                     bfr = 1.0;
                     tfout = tfin;
                 }

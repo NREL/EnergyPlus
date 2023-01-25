@@ -65,6 +65,14 @@ struct EnergyPlusData;
 
 namespace PhotovoltaicThermalCollectors {
 
+    enum class PVTMode
+    {
+        Invalid = -1,
+        Heating = 1,
+        Cooling = 2,
+        Num
+    };
+
     enum struct WorkingFluidEnum
     {
         LIQUID,
@@ -179,6 +187,7 @@ namespace PhotovoltaicThermalCollectors {
         bool SizingInit;                                // manage when sizing is complete
         std::string PVTModelName;                       // Name of PVT performance object
         PVTModelType ModelType = PVTModelType::Invalid; // model type indicator
+        PVTMode PVTMode = PVTMode::Invalid;             // PVT mode
         int SurfNum;                                    // surface index
         std::string PVname;                             // named Generator:Photovoltaic object
         int PVnum;                                      // PV index
@@ -238,8 +247,7 @@ namespace PhotovoltaicThermalCollectors {
 
         void calculateBIPVT(EnergyPlusData &state);
 
-        void calculateBIPVTMaxHeatGain(
-            EnergyPlusData &state, Real64 tsp, const std::string &Mode, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv);
+        void calculateBIPVTMaxHeatGain(EnergyPlusData &state, Real64 tsp, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv);
 
         void solveLinSysBackSub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
