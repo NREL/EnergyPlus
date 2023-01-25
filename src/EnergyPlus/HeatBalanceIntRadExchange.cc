@@ -1136,7 +1136,7 @@ namespace HeatBalanceIntRadExchange {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             if (NumNums < 3 * pow_2(N)) {
-                ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
+                ShowSevereError(state, format("GetInputViewFactors: {}=\"{}\", not enough values.", cCurrentModuleObject, ZoneName));
                 ShowContinueError(state, format("...Number of input values [{}] is less than the required number=[{}].", NumNums, 3 * pow_2(N)));
                 ErrorsFound = true;
                 NumNums = 0;
@@ -1267,22 +1267,26 @@ namespace HeatBalanceIntRadExchange {
             }
             if (!enclMatchFound) {
                 if (spaceListNum > 0) {
-                    ShowSevereError(
-                        state,
-                        "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisSpaceOrSpaceListName +
-                            "\" found a matching SpaceList, but did not find a matching radiant or solar enclosure with the same spaces.");
+                    ShowSevereError(state,
+                                    format("AlignInputViewFactors: {}=\"{}\" found a matching SpaceList, but did not find a matching radiant or "
+                                           "solar enclosure with the same spaces.",
+                                           cCurrentModuleObject,
+                                           thisSpaceOrSpaceListName));
                     ErrorsFound = true;
 
                 } else if (zoneListNum > 0) {
                     ShowSevereError(state,
-                                    "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisSpaceOrSpaceListName +
-                                        "\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same spaces.");
+                                    format("AlignInputViewFactors: {}=\"{}\" found a matching ZoneList, but did not find a matching radiant or solar "
+                                           "enclosure with the same spaces.",
+                                           cCurrentModuleObject,
+                                           thisSpaceOrSpaceListName));
                     ErrorsFound = true;
 
                 } else {
                     ShowSevereError(state,
-                                    "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisSpaceOrSpaceListName +
-                                        "\" did not find a matching radiant or solar enclosure name.");
+                                    format("AlignInputViewFactors: {}=\"{}\" did not find a matching radiant or solar enclosure name.",
+                                           cCurrentModuleObject,
+                                           thisSpaceOrSpaceListName));
                     ErrorsFound = true;
                 }
             }
@@ -1351,7 +1355,7 @@ namespace HeatBalanceIntRadExchange {
             F = 0.0;
             numinx1 = 0;
             if (NumNums < pow_2(N)) {
-                ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
+                ShowWarningError(state, format("GetInputViewFactors: {}=\"{}\", not enough values.", cCurrentModuleObject, EnclosureName));
                 ShowContinueError(state,
                                   format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a "
                                          "zero view factor.",
@@ -1363,14 +1367,15 @@ namespace HeatBalanceIntRadExchange {
                 inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
                 inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                 if (inx1 == 0) {
-                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                    ShowSevereError(state, format("GetInputViewFactors: {}=\"{}\", invalid surface name.", cCurrentModuleObject, EnclosureName));
+                    ShowContinueError(state,
+                                      format("...Surface name=\"{}\", not in this zone or enclosure.", state.dataIPShortCut->cAlphaArgs(index)));
                     ErrorsFound = true;
                 }
                 if (inx2 == 0) {
-                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowSevereError(state, format("GetInputViewFactors: {}=\"{}\", invalid surface name.", cCurrentModuleObject, EnclosureName));
                     ShowContinueError(state,
-                                      "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
+                                      format("...Surface name=\"{}\", not in this zone or enclosure.", state.dataIPShortCut->cAlphaArgs(index + 2)));
                     ErrorsFound = true;
                 }
                 ++numinx1;
@@ -1468,8 +1473,9 @@ namespace HeatBalanceIntRadExchange {
             if (ZoneArea(i) <= 0.0) {
                 ShowWarningError(state, "CalcApproximateViewFactors: Zero area for all other zone surfaces.");
                 ShowContinueError(state,
-                                  "Happens for Surface=\"" + state.dataSurface->Surface(SPtr(i)).Name +
-                                      "\" in Zone=" + state.dataHeatBal->Zone(state.dataSurface->Surface(SPtr(i)).Zone).Name);
+                                  format("Happens for Surface=\"{}\" in Zone={}",
+                                         state.dataSurface->Surface(SPtr(i)).Name,
+                                         state.dataHeatBal->Zone(state.dataSurface->Surface(SPtr(i)).Zone).Name));
             }
         }
 
@@ -1640,7 +1646,7 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
 
-            ShowWarningError(state, "Surfaces in Zone/Enclosure=\"" + enclName + "\" do not define an enclosure.");
+            ShowWarningError(state, format("Surfaces in Zone/Enclosure=\"{}\" do not define an enclosure.", enclName));
             ShowContinueError(state, "Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
             ShowContinueError(state, "Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.");
             ShowContinueError(state,
@@ -1738,16 +1744,15 @@ namespace HeatBalanceIntRadExchange {
                 RowSum = sum_FixedF;
                 if (CheckConvergeTolerance > 0.005) {
                     if (CheckConvergeTolerance > 0.1) {
-                        ShowSevereError(state,
-                                        "FixViewFactors: View factors convergence has failed "
-                                        "and will lead to heat balance errors in zone=\"" +
-                                            enclName + "\".");
+                        ShowSevereError(
+                            state,
+                            format("FixViewFactors: View factors convergence has failed and will lead to heat balance errors in zone=\"{}\".",
+                                   enclName));
                         severeErrorPresent = true;
                     }
-                    ShowWarningError(state,
-                                     "FixViewFactors: View factors not complete. Check "
-                                     "for bad surface descriptions or unenclosed zone=\"" +
-                                         enclName + "\".");
+                    ShowWarningError(
+                        state,
+                        format("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"{}\".", enclName));
                     ShowContinueError(state,
                                       format("Enforced reciprocity has tolerance (ideal is "
                                              "0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
@@ -1788,7 +1793,8 @@ namespace HeatBalanceIntRadExchange {
                 FinalCheckValue = FixedCheckValue;
             } else {
                 ShowWarningError(
-                    state, "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + enclName + "\".");
+                    state,
+                    format("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"{}\".", enclName));
             }
         }
         if (severeErrorPresent) {
@@ -2099,14 +2105,14 @@ namespace HeatBalanceIntRadExchange {
 
         // Trap for surfaces that do not exist
         if (surfNum == 0) {
-            ShowSevereError(state, std::string{routineName} + "Invalid Surface name = " + SurfaceName);
-            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state, format("{}Invalid Surface name = {}", routineName, SurfaceName));
+            ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, RadSysName));
             ErrorsFound = true;
             return surfNum;
         }
 
         if (RadSysZoneNum == 0) {
-            ShowSevereError(state, std::string{routineName} + "Invalid Zone number passed by " + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state, format("{}Invalid Zone number passed by {} = {}", routineName, cCurrentModuleObject, RadSysName));
             ErrorsFound = true;
             return surfNum;
         }
@@ -2115,20 +2121,23 @@ namespace HeatBalanceIntRadExchange {
         int const surfZoneNum = state.dataSurface->Surface(surfNum).Zone;
         if (RadSysZoneNum == 0) {
             // This should never happen - but it does in some simple unit tests that are designed to throw errors
-            ShowSevereError(
-                state, std::string{routineName} + "Somehow the radiant system zone number is zero for" + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state,
+                            format("{}Somehow the radiant system zone number is zero for{} = {}", routineName, cCurrentModuleObject, RadSysName));
             ErrorsFound = true;
         } else if (surfZoneNum == 0) {
             // This should never happen
             ShowSevereError(state,
-                            std::string{routineName} + "Somehow  the surface zone number is zero for" + cCurrentModuleObject + " = " + RadSysName +
-                                " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
-            ErrorsFound = true;                                   // LCOV_EXCL_LINE
+                            format("{}Somehow  the surface zone number is zero for{} = {} and Surface = {}",
+                                   routineName,
+                                   cCurrentModuleObject,
+                                   RadSysName,
+                                   SurfaceName)); // LCOV_EXCL_LINE
+            ErrorsFound = true;                   // LCOV_EXCL_LINE
         } else if (surfZoneNum != RadSysZoneNum) {
-            ShowSevereError(state, std::string(routineName) + "Surface = " + SurfaceName + " is not in the same zone  as the radiant equipment.");
-            ShowContinueError(state, "Surface zone or enclosure = " + state.dataHeatBal->Zone(surfZoneNum).Name);
-            ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataHeatBal->Zone(RadSysZoneNum).Name);
-            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state, format("{}Surface = {} is not in the same zone  as the radiant equipment.", routineName, SurfaceName));
+            ShowContinueError(state, format("Surface zone or enclosure = {}", state.dataHeatBal->Zone(surfZoneNum).Name));
+            ShowContinueError(state, format("Radiant equipment zone or enclosure = {}", state.dataHeatBal->Zone(RadSysZoneNum).Name));
+            ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, RadSysName));
             ErrorsFound = true;
         }
         return surfNum;

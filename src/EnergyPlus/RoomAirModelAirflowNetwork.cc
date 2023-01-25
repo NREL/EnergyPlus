@@ -145,8 +145,8 @@ namespace RoomAirModelAirflowNetwork {
 
         if (RAFNNum == 0) {
             ShowFatalError(state,
-                           "SimRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" +
-                               state.dataHeatBal->Zone(ZoneNum).Name);
+                           format("SimRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model ={}",
+                                  state.dataHeatBal->Zone(ZoneNum).Name));
         }
 
         auto &thisRAFN(state.dataRoomAirflowNetModel->RAFN(RAFNNum));
@@ -207,8 +207,8 @@ namespace RoomAirModelAirflowNetwork {
 
         if (RAFNNum == 0) {
             ShowFatalError(state,
-                           "LoadPredictionRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" +
-                               state.dataHeatBal->Zone(ZoneNum).Name);
+                           format("LoadPredictionRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model ={}",
+                                  state.dataHeatBal->Zone(ZoneNum).Name));
         }
         auto &thisRAFN(state.dataRoomAirflowNetModel->RAFN(RAFNNum));
         thisRAFN.ZoneNum = ZoneNum;
@@ -494,14 +494,16 @@ namespace RoomAirModelAirflowNetwork {
                             ShowSevereError(
                                 state, "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects");
                             ShowContinueError(
-                                state, "is greater than the number of zone configuration inlet nodes in " + state.dataHeatBal->Zone(LoopZone).Name);
+                                state,
+                                format("is greater than the number of zone configuration inlet nodes in {}", state.dataHeatBal->Zone(LoopZone).Name));
                             ShowContinueError(state, "Please check inputs of both objects.");
                             ErrorsFound = true;
                         } else {
                             ShowSevereError(
                                 state, "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects");
                             ShowContinueError(
-                                state, "is less than the number of zone configuration inlet nodes in " + state.dataHeatBal->Zone(LoopZone).Name);
+                                state,
+                                format("is less than the number of zone configuration inlet nodes in {}", state.dataHeatBal->Zone(LoopZone).Name));
                             ShowContinueError(state, "Please check inputs of both objects.");
                             ErrorsFound = true;
                         }
@@ -513,8 +515,8 @@ namespace RoomAirModelAirflowNetwork {
                             ShowSevereError(state,
                                             "GetRoomAirflowNetworkData: The equipment listed in ZoneEquipList is not found in the lsit of "
                                             "RoomAir:Node:AirflowNetwork:HVACEquipment objects =");
-                            ShowContinueError(state,
-                                              state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) + ". Please check inputs of both objects.");
+                            ShowContinueError(
+                                state, format("{}. Please check inputs of both objects.", state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I)));
                             ErrorsFound = true;
                         }
                     }
@@ -524,8 +526,8 @@ namespace RoomAirModelAirflowNetwork {
                         if (std::abs(SupplyFrac(I) - 1.0) > 0.001) {
                             ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone supply fractions do not sum to 1.0");
                             ShowContinueError(state,
-                                              "Entered in " + state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) +
-                                                  " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
+                                              format("Entered in {} defined in RoomAir:Node:AirflowNetwork:HVACEquipment",
+                                                     state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I)));
                             ShowContinueError(state,
                                               "The Fraction of supply fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
                             ShowContinueError(state, format("The sum of fractions entered = {:.3R}", SupplyFrac(I)));
@@ -534,8 +536,8 @@ namespace RoomAirModelAirflowNetwork {
                         if (std::abs(ReturnFrac(I) - 1.0) > 0.001) {
                             ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone return fractions do not sum to 1.0");
                             ShowContinueError(state,
-                                              "Entered in " + state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) +
-                                                  " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
+                                              format("Entered in {} defined in RoomAir:Node:AirflowNetwork:HVACEquipment",
+                                                     state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I)));
                             ShowContinueError(state,
                                               "The Fraction of return fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
                             ShowContinueError(state, format("The sum of fractions entered = {:.3R}", ReturnFrac(I)));
@@ -1124,8 +1126,8 @@ namespace RoomAirModelAirflowNetwork {
                     // check whether this zone is a controlled zone or not
                     if (!ControlledZoneAirFlag) {
                         ShowFatalError(state,
-                                       "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                           state.dataHeatBal->Zone(ZoneNum).Name);
+                                       format("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone {}",
+                                              state.dataHeatBal->Zone(ZoneNum).Name));
                         return;
                     }
                     // determine supply air temperature as a weighted average of the inlet temperatures.
