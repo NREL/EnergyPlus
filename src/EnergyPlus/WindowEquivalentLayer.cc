@@ -7752,9 +7752,6 @@ void BuildGap(EnergyPlusData &state,
     constexpr Real64 GapThickMin(0.0001); // Minimum gap thickness allowed, m
     static constexpr std::string_view RoutineName("BuildGap: ");
 
-    Real64 PMan;
-    Real64 TMan;
-
     if (TAS < GapThickMin) {
         ShowSevereError(state, std::string{RoutineName} + G.Name);
         ShowContinueError(state, "...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m");
