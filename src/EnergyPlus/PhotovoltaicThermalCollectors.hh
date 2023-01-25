@@ -68,15 +68,17 @@ namespace PhotovoltaicThermalCollectors {
     enum class PVTMode
     {
         Invalid = -1,
-        Heating = 1,
-        Cooling = 2,
+        Heating,
+        Cooling,
         Num
     };
 
     enum struct WorkingFluidEnum
     {
+        Invalid = -1,
         LIQUID,
-        AIR
+        AIR,
+        Num
     };
 
     enum struct ThermEfficEnum
@@ -194,7 +196,7 @@ namespace PhotovoltaicThermalCollectors {
         bool PVfound;                                   // init, need to delay get input until PV gotten
         SimplePVTModelStruct Simple;                    // Simple performance data structure.
         BIPVTModelStruct BIPVT;                         // BIPVT performance data structure.
-        WorkingFluidEnum WorkingFluidType;
+        WorkingFluidEnum WorkingFluidType = WorkingFluidEnum::LIQUID;
         int PlantInletNodeNum;
         int PlantOutletNodeNum;
         int HVACInletNodeNum;
@@ -216,10 +218,9 @@ namespace PhotovoltaicThermalCollectors {
         // Default Constructor
         PVTCollectorStruct()
             : Type(DataPlant::PlantEquipmentType::Invalid), WPlantLoc{}, EnvrnInit(true), SizingInit(true), SurfNum(0), PVnum(0), PVfound(false),
-              WorkingFluidType(WorkingFluidEnum::LIQUID), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0), HVACOutletNodeNum(0),
-              DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0), AreaCol(0.0),
-              BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true), MyOneTimeFlag(true),
-              SetLoopIndexFlag(true), QdotSource(0.0)
+              PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0), HVACOutletNodeNum(0), DesignVolFlowRate(0.0),
+              DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0), AreaCol(0.0), BypassDamperOff(true),
+              CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true), MyOneTimeFlag(true), SetLoopIndexFlag(true), QdotSource(0.0)
         {
         }
 
