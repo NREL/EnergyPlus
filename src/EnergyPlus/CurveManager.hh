@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
@@ -364,7 +365,7 @@ struct CurveManagerData : BaseGlobalStruct
     bool CurveValueMyBeginTimeStepFlag = false;
     bool FrictionFactorErrorHasOccurred = false;
     bool showFallbackMessage = true;
-    Array1D<Curve::Curve *> PerfCurve;
+    EPVector<Curve::Curve *> PerfCurve;
     Curve::BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
 
