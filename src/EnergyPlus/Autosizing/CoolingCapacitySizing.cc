@@ -194,10 +194,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                     TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb);
                                     break;
                                 case 2:
+                                default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
                                     TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                                     break;
-                                default:
-                                    TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                                 }
                             } else if (this->dataTotCapCurveValue > 0) {
                                 TotCapTempModFac = this->dataTotCapCurveValue;
@@ -444,10 +443,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                 TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb);
                                 break;
                             case 2:
+                            default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
                                 TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                                 break;
-                            default: // this block will allow the simulation to continue but issue the message to the user requesting a report
-                                TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                             }
                         } else {
                             TotCapTempModFac = 1.0;

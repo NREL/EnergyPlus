@@ -10880,10 +10880,9 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
             TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC);
             break;
         case 2:
+        default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
             TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
             break;
-        default:
-            TotCapTempModFac = Curve::CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
         }
 
         //  Warn user if curve output goes negative

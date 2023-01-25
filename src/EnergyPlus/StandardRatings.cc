@@ -571,10 +571,9 @@ namespace StandardRatings {
                         ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR);
                         break;
                     case 3:
+                    default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
                         ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR, 0.0);
                         break;
-                    default:
-                        ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR, 0.0);
                     }
 
                     Power = (AvailChillerCap / RefCOP) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
@@ -629,10 +628,9 @@ namespace StandardRatings {
                         ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
                         break;
                     case 3:
+                    default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
                         ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio, 0.0);
                         break;
-                    default:
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio, 0.0);
                     }
                 } else {
                     switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex)->numDims) {
@@ -643,10 +641,9 @@ namespace StandardRatings {
                         ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
                         break;
                     case 3:
+                    default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
                         ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat, 0.0);
                         break;
-                    default:
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat, 0.0);
                     }
                     PartLoadRatio = MinUnloadRat;
                 }
@@ -3499,12 +3496,10 @@ namespace StandardRatings {
                 curveVal = Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated);
                 break;
             case 2:
+            default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
                 curveVal =
                     Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2);
                 break;
-            default:
-                curveVal =
-                    Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2);
             }
             Q_A_Full(spnum) =
                 RatedTotalCapacity(spnum) * curveVal * TotCapFlowModFac(spnum) - FanPowerPerEvapAirFlowRate_2023(spnum) * RatedAirVolFlowRate(spnum);
