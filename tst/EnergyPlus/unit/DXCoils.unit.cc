@@ -92,7 +92,6 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     using Psychrometrics::PsyTsatFnHPb;
     using Psychrometrics::PsyWFnTdbH;
     int DXCoilNum;
-    int CurveNum;
 
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -168,47 +167,47 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 2.0;
+    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::Quadratic;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = 1;
+    curve1->coeff[1] = 0.0;
+    curve1->coeff[2] = 0.0;
+    curve1->coeff[3] = 0.0;
+    curve1->coeff[4] = 0.0;
+    curve1->coeff[5] = 0.0;
+    curve1->inputLimits[0].min = 0.0;
+    curve1->inputLimits[0].max = 2.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 2.0;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = 0.7;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 1.0;
+    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::Quadratic;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = 1;
+    curve2->coeff[1] = 0.0;
+    curve2->coeff[2] = 0.0;
+    curve2->coeff[3] = 0.0;
+    curve2->coeff[4] = 0.0;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 0.0;
+    curve2->inputLimits[0].max = 1.0;
+    curve2->inputLimits[1].min = 0.7;
+    curve2->inputLimits[1].max = 1.0;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 100.0;
+    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::BiQuadratic;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = 1;
+    curve3->coeff[1] = 0.0;
+    curve3->coeff[2] = 0.0;
+    curve3->coeff[3] = 0.0;
+    curve3->coeff[4] = 0.0;
+    curve3->coeff[5] = 0.0;
+    curve3->inputLimits[0].min = -100.0;
+    curve3->inputLimits[0].max = 100.0;
+    curve3->inputLimits[1].min = -100.0;
+    curve3->inputLimits[1].max = 100.0;
 
     SetPredefinedTables(*state);
     SizeDXCoil(*state, 2);
@@ -283,7 +282,6 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 TEST_F(EnergyPlusFixture, DXCoils_Test2)
 {
     int DXCoilNum;
-    int CurveNum;
 
     state->dataGlobal->DisplayExtraWarnings = true;
     state->dataSize->SysSizingRunDone = true;
@@ -321,47 +319,47 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 2.0;
+    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::Quadratic;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = 1;
+    curve1->coeff[1] = 0.0;
+    curve1->coeff[2] = 0.0;
+    curve1->coeff[3] = 0.0;
+    curve1->coeff[4] = 0.0;
+    curve1->coeff[5] = 0.0;
+    curve1->inputLimits[0].min = 0.0;
+    curve1->inputLimits[0].max = 2.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 2.0;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = 0.7;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 1.0;
+    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::Quadratic;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = 1;
+    curve2->coeff[1] = 0.0;
+    curve2->coeff[2] = 0.0;
+    curve2->coeff[3] = 0.0;
+    curve2->coeff[4] = 0.0;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 0.0;
+    curve2->inputLimits[0].max = 1.0;
+    curve2->inputLimits[1].min = 0.7;
+    curve2->inputLimits[1].max = 1.0;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 100.0;
+    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::BiQuadratic;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = 1;
+    curve3->coeff[1] = 0.0;
+    curve3->coeff[2] = 0.0;
+    curve3->coeff[3] = 0.0;
+    curve3->coeff[4] = 0.0;
+    curve3->coeff[5] = 0.0;
+    curve3->inputLimits[0].min = -100.0;
+    curve3->inputLimits[0].max = 100.0;
+    curve3->inputLimits[1].min = -100.0;
+    curve3->inputLimits[1].max = 100.0;
 
     SetPredefinedTables(*state);
     SizeDXCoil(*state, 2);
@@ -3869,7 +3867,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
 {
     int DXCoilNum;
-    int CurveNum;
 
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -3888,65 +3885,65 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
         state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum)->Name = "HP_Cool-Cap-fT-SP1";
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1.658788451;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = -0.0834530076;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.00342409032;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0024332436;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = -4.5036e-005;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = -0.00053367984;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 13.88;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 23.88;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = 18.33;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 51.66;
+    auto * curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->Name = "HP_Cool-Cap-fT-SP1";
+    curve1->curveType = CurveType::BiQuadratic;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = 1.658788451;
+    curve1->coeff[1] = -0.0834530076;
+    curve1->coeff[2] = 0.00342409032;
+    curve1->coeff[3] = 0.0024332436;
+    curve1->coeff[4] = -4.5036e-005;
+    curve1->coeff[5] = -0.00053367984;
+    curve1->inputLimits[0].min = 13.88;
+    curve1->inputLimits[0].max = 23.88;
+    curve1->inputLimits[1].min = 18.33;
+    curve1->inputLimits[1].max = 51.66;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum)->Name = "HP_Cool-Cap-fT-SP2";
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 1.472738138;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = -0.0672218352;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = 0.0029199042;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 5.16005999999982e-005;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = -2.97756e-005;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = -0.00035908596;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 13.88;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 23.88;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = 18.33;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 51.66;
+    auto * curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->Name = "HP_Cool-Cap-fT-SP2";
+    curve2->curveType = CurveType::BiQuadratic;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = 1.472738138;
+    curve2->coeff[1] = -0.0672218352;
+    curve2->coeff[2] = 0.0029199042;
+    curve2->coeff[3] = 5.16005999999982e-005;
+    curve2->coeff[4] = -2.97756e-005;
+    curve2->coeff[5] = -0.00035908596;
+    curve2->inputLimits[0].min = 13.88;
+    curve2->inputLimits[0].max = 23.88;
+    curve2->inputLimits[1].min = 18.33;
+    curve2->inputLimits[1].max = 51.66;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum)->Name = "HP_Heat-Cap-fT-SP1";
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 0.84077409;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = -0.0014336586;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = -0.000150336;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.029628603;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.000161676;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = -2.349e-005;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 100.0;
+    auto * curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->Name = "HP_Heat-Cap-fT-SP1";
+    curve3->curveType = CurveType::BiQuadratic;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = 0.84077409;
+    curve3->coeff[1] = -0.0014336586;
+    curve3->coeff[2] = -0.000150336;
+    curve3->coeff[3] = 0.029628603;
+    curve3->coeff[4] = 0.000161676;
+    curve3->coeff[5] = -2.349e-005;
+    curve3->inputLimits[0].min = -100.0;
+    curve3->inputLimits[0].max = 100.0;
+    curve3->inputLimits[1].min = -100.0;
+    curve3->inputLimits[1].max = 100.0;
 
-    CurveNum = 4;
-    state->dataCurveManager->PerfCurve(CurveNum)->Name = "HP_Heat-Cap-fT-SP2";
-    state->dataCurveManager->PerfCurve(CurveNum)->curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum)->interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[0] = 0.831506971;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[1] = 0.0018392166;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[2] = -0.000187596;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[3] = 0.0266002056;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[4] = 0.000191484;
-    state->dataCurveManager->PerfCurve(CurveNum)->coeff[5] = -6.5772e-005;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum)->inputLimits[1].max = 100.0;
+    auto * curve4 = state->dataCurveManager->PerfCurve(4);
+    curve4->Name = "HP_Heat-Cap-fT-SP2";
+    curve4->curveType = CurveType::BiQuadratic;
+    curve4->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve4->coeff[0] = 0.831506971;
+    curve4->coeff[1] = 0.0018392166;
+    curve4->coeff[2] = -0.000187596;
+    curve4->coeff[3] = 0.0266002056;
+    curve4->coeff[4] = 0.000191484;
+    curve4->coeff[5] = -6.5772e-005;
+    curve4->inputLimits[0].min = -100.0;
+    curve4->inputLimits[0].max = 100.0;
+    curve4->inputLimits[1].min = -100.0;
+    curve4->inputLimits[1].max = 100.0;
 
     state->dataDXCoils->DXCoil(1).MSCCapFTemp(1) = 1;
     state->dataDXCoils->DXCoil(1).MSCCapFTemp(2) = 2;
@@ -4098,7 +4095,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(17580.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling only
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
-    ;
+
     // check against local calculation
     Real64 results_totaloutput = Coil.InletAirMassFlowRate * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                               Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4126,7 +4123,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(4475.4221929927808, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat);                       // input check
     EXPECT_NEAR(0.0082418676694790537, AirOutletNode.HumRat, 0.00001);   // cooling and dehumidification
-    ;
+
     // check against hand calculation
     results_totaloutput = Coil.InletAirMassFlowRate * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                        Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4290,7 +4287,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate at high speed
     EXPECT_DOUBLE_EQ(0.0075, AirInletNode.HumRat);               // input check
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
-    ;
+
     // check against hand calculation
     results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateHigh * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                          Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4318,7 +4315,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(2779.6587940815953, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate at low speed
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat);                       // input check
     EXPECT_NEAR(0.0081800569931542392, AirOutletNode.HumRat, 0.00001);   // cooling and dehumidification
-    ;
+
     // check against hand calculation at low speed
     results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                         Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4337,7 +4334,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(4632.7646568026576, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate at high speed
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat);                       // input check
     EXPECT_NEAR(0.0081800569931542392, AirOutletNode.HumRat, 0.00001);   // cooling and dehumidification
-    ;
+
     // check against hand calculation
     results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateHigh * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                          Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
