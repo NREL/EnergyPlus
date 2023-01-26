@@ -9461,7 +9461,8 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
         auto &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
-        if ((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
+        if (((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
+             (((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad) && QZnReq <= 0.0)) ||
             (this->isSetPointControlled && this->suppTempSetPoint > thisSuppHeatCoilAirInletNode.Temp)) {
             Real64 ZoneLoad = 0.0;
             Real64 LoadToHeatingSP = 0.0;
@@ -9488,7 +9489,11 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                             SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
                         }
                     } else {
-                        SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                        if (QZnReq > 0.0 && (NoCompOutput - QZnReq) >= DataHVACGlobals::SmallLoad) {
+                            SuppHeatCoilLoad = 0.0;
+                        } else {
+                            SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                        }
                     }
                     this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
                     if (this->DesignSuppHeatingCapacity > 0.0) {
@@ -12775,7 +12780,11 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
                             SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
                         }
                     } else {
-                        SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                        if (QZnReq > 0.0 && (NoCompOutput - QZnReq) >= DataHVACGlobals::SmallLoad) {
+                            SuppHeatCoilLoad = 0.0;
+                        } else {
+                            SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                        }
                     }
                     this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
                     if (this->DesignSuppHeatingCapacity > 0.0) {
