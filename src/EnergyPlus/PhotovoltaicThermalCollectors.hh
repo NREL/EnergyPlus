@@ -189,7 +189,7 @@ namespace PhotovoltaicThermalCollectors {
         bool SizingInit;                                // manage when sizing is complete
         std::string PVTModelName;                       // Name of PVT performance object
         PVTModelType ModelType = PVTModelType::Invalid; // model type indicator
-        PVTMode PVTMode = PVTMode::Invalid;             // PVT mode
+        PVTMode OperatingMode = PVTMode::Invalid;       // PVT operating mode (heating or cooling)
         int SurfNum;                                    // surface index
         std::string PVname;                             // named Generator:Photovoltaic object
         int PVnum;                                      // PV index

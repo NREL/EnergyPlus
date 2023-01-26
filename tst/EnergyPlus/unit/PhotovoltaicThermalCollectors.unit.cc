@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     auto thisBIPVT = state->dataPhotovoltaicThermalCollector->PVT(1);
 
     Real64 tempSetPoint = 24.0;
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Heating; // this should be converted to an enum?
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating; // this should be converted to an enum?
     Real64 bypassFraction = 0.0;
     Real64 potentialHeatGain = 0.0;
     Real64 potentialOutletTemp = 0.0;
@@ -268,7 +268,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     state->dataHeatBal->SurfCosIncidenceAngle(thisBIPVT.SurfNum) = 0.5;           // Cosine of beam solar incidence angle
 
     // case 1: heating mode bypass fraction = 0.0
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
     tempSetPoint = 24.0;
     state->dataLoopNodes->Node(InletNode).Temp = 10.0;                              // inlet fluid temperature (DegC)
     state->dataEnvrn->OutDryBulbTemp = 10.0;                                        // ambient temperature (DegC)
@@ -286,7 +286,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(tCollector, 21.57, 0.01);
 
     // case 2: double the channel depth vs case 1
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
     tempSetPoint = 24.0;
     state->dataLoopNodes->Node(InletNode).Temp = 10.0;
     state->dataEnvrn->OutDryBulbTemp = 10.0;
@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(tCollector, 21.64, 0.01);
 
     // case 3: higher mass flow rate vs case 1
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
     tempSetPoint = 24.0;
     state->dataLoopNodes->Node(InletNode).Temp = 10.0;
     state->dataEnvrn->OutDryBulbTemp = 10.0;
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(tCollector, 20.93, 0.01);
 
     // case 4: heating mode and bypass fraction > 0.0
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
     tempSetPoint = 24.0;
     state->dataLoopNodes->Node(InletNode).Temp = 23.0;
     state->dataEnvrn->OutDryBulbTemp = 23.0;
@@ -342,7 +342,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(tCollector, 31.32, 0.01);
 
     // case 5: heating mode and bypass fraction = 1.0
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
     tempSetPoint = 24.0;
     state->dataLoopNodes->Node(InletNode).Temp = 25.0;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
@@ -360,7 +360,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(tCollector, 32.73, 0.01);
 
     // case 6: cooling mode and bypass fraction = 0.0
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Cooling;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Cooling;
     tempSetPoint = 13.0;
     state->dataLoopNodes->Node(InletNode).Temp = 30.0;
     state->dataEnvrn->OutDryBulbTemp = 30.0;
@@ -378,7 +378,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(tCollector, 34.95, 0.01);
 
     // case 7: cooling mode and bypass fraction > 0.0
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Cooling;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Cooling;
     tempSetPoint = 22.0;
     state->dataLoopNodes->Node(InletNode).Temp = 25.0;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
@@ -396,7 +396,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(tCollector, 19.33, 0.01);
 
     // case 8: higher mass flow rate vs case 6
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Cooling;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Cooling;
     tempSetPoint = 22.0;
     state->dataLoopNodes->Node(InletNode).Temp = 25.0;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
@@ -414,7 +414,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(tCollector, 20.38, 0.01);
 
     // case 9: cooling mode and bypass fraction = 1.0
-    thisBIPVT.PVTMode = PhotovoltaicThermalCollectors::PVTMode::Cooling;
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Cooling;
     tempSetPoint = 22.0;
     state->dataLoopNodes->Node(InletNode).Temp = 20.0;
     state->dataEnvrn->OutDryBulbTemp = 20.0;

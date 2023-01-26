@@ -1211,7 +1211,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 PotentialHeatGain(0.0);
         Real64 Eff(0.0);
         Real64 Tcollector(Tinlet);
-        this->PVTMode = PVTMode::Heating;
+        this->OperatingMode = PVTMode::Heating;
 
         if (this->HeatingUseful && this->BypassDamperOff && (GetCurrentScheduleValue(state, this->BIPVT.SchedPtr) > 0.0)) {
 
@@ -1243,7 +1243,7 @@ namespace PhotovoltaicThermalCollectors {
 
         } else if (this->CoolingUseful && this->BypassDamperOff && (GetCurrentScheduleValue(state, this->BIPVT.SchedPtr) > 0.0)) {
 
-            this->PVTMode = PVTMode::Cooling;
+            this->OperatingMode = PVTMode::Cooling;
             if ((Tinlet - state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint) > 0.1) {
                 calculateBIPVTMaxHeatGain(state,
                                           state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint,
@@ -1610,13 +1610,13 @@ namespace PhotovoltaicThermalCollectors {
             t1_new = y[2];
             if (mdot > 0.0) {
                 tfout = (tfin + b / a) * std::exp(a * l) - b / a; // air outlet temperature (DegC)
-                if (((this->PVTMode == PVTMode::Heating) && (q > 0.0) && (tmixed > tsp) && (tfin < tsp)) ||
-                    ((this->PVTMode == PVTMode::Cooling) && (q < 0.0) && (tmixed < tsp) && (tfin > tsp))) {
+                if (((this->OperatingMode == PVTMode::Heating) && (q > 0.0) && (tmixed > tsp) && (tfin < tsp)) ||
+                    ((this->OperatingMode == PVTMode::Cooling) && (q < 0.0) && (tmixed < tsp) && (tfin > tsp))) {
                     bfr = (tsp - tfout) / (tfin - tfout); // bypass fraction
                     bfr = std::max(0.0, bfr);
                     bfr = std::min(1.0, bfr);
-                } else if (((this->PVTMode == PVTMode::Heating) && (q > 0.0) && (tmixed > tsp) && (tfin >= tsp)) ||
-                           ((this->PVTMode == PVTMode::Cooling) && (q < 0.0) && (tmixed < tsp) && (tfin <= tsp))) {
+                } else if (((this->OperatingMode == PVTMode::Heating) && (q > 0.0) && (tmixed > tsp) && (tfin >= tsp)) ||
+                           ((this->OperatingMode == PVTMode::Cooling) && (q < 0.0) && (tmixed < tsp) && (tfin <= tsp))) {
                     bfr = 1.0;
                     tfout = tfin;
                 }
