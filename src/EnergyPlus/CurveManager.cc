@@ -291,7 +291,8 @@ namespace Curve {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
+        //        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
+        Real64 const V1(max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min));
         CurveValue = thisCurve->value(state, V1);
         if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
         if (thisCurve->outputLimits.maxPresent) CurveValue = min(CurveValue, thisCurve->outputLimits.max);
@@ -310,8 +311,10 @@ namespace Curve {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
-        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
+        //        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
+        //        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
+        Real64 const V1(max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min));
+        Real64 const V2(max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min));
         CurveValue = thisCurve->value(state, V1, V2);
 
         if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
@@ -336,9 +339,12 @@ namespace Curve {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
-        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
-        Real64 const V3 = std::clamp(Var3, thisCurve->inputLimits[2].min, thisCurve->inputLimits[2].max);
+        //        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
+        //        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
+        //        Real64 const V3 = std::clamp(Var3, thisCurve->inputLimits[2].min, thisCurve->inputLimits[2].max);
+        Real64 const V1(max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min));
+        Real64 const V2(max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min));
+        Real64 const V3(max(min(Var3, thisCurve->inputLimits[2].max), thisCurve->inputLimits[2].min));
         CurveValue = thisCurve->value(state, V1, V2, V3);
 
         if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
@@ -365,10 +371,14 @@ namespace Curve {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
-        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
-        Real64 const V3 = std::clamp(Var3, thisCurve->inputLimits[2].min, thisCurve->inputLimits[2].max);
-        Real64 const V4 = std::clamp(Var4, thisCurve->inputLimits[3].min, thisCurve->inputLimits[3].max);
+        //        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
+        //        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
+        //        Real64 const V3 = std::clamp(Var3, thisCurve->inputLimits[2].min, thisCurve->inputLimits[2].max);
+        //        Real64 const V4 = std::clamp(Var4, thisCurve->inputLimits[3].min, thisCurve->inputLimits[3].max);
+        Real64 const V1(max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min));
+        Real64 const V2(max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min));
+        Real64 const V3(max(min(Var3, thisCurve->inputLimits[2].max), thisCurve->inputLimits[2].min));
+        Real64 const V4(max(min(Var4, thisCurve->inputLimits[3].max), thisCurve->inputLimits[3].min));
         CurveValue = thisCurve->value(state, V1, V2, V3, V4);
 
         if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
@@ -397,11 +407,16 @@ namespace Curve {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
-        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
-        Real64 const V3 = std::clamp(Var3, thisCurve->inputLimits[2].min, thisCurve->inputLimits[2].max);
-        Real64 const V4 = std::clamp(Var4, thisCurve->inputLimits[3].min, thisCurve->inputLimits[3].max);
-        Real64 const V5 = std::clamp(Var5, thisCurve->inputLimits[4].min, thisCurve->inputLimits[4].max);
+        //        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
+        //        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
+        //        Real64 const V3 = std::clamp(Var3, thisCurve->inputLimits[2].min, thisCurve->inputLimits[2].max);
+        //        Real64 const V4 = std::clamp(Var4, thisCurve->inputLimits[3].min, thisCurve->inputLimits[3].max);
+        //        Real64 const V5 = std::clamp(Var5, thisCurve->inputLimits[4].min, thisCurve->inputLimits[4].max);
+        Real64 const V1(max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min));
+        Real64 const V2(max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min));
+        Real64 const V3(max(min(Var3, thisCurve->inputLimits[2].max), thisCurve->inputLimits[2].min));
+        Real64 const V4(max(min(Var4, thisCurve->inputLimits[3].max), thisCurve->inputLimits[3].min));
+        Real64 const V5(max(min(Var5, thisCurve->inputLimits[4].max), thisCurve->inputLimits[4].min));
         CurveValue = thisCurve->value(state, V1, V2, V3, V4, V5);
 
         if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
@@ -433,12 +448,18 @@ namespace Curve {
         commonEnvironInit(state);
         Real64 CurveValue(0.0);
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
-        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
-        Real64 const V3 = std::clamp(Var3, thisCurve->inputLimits[2].min, thisCurve->inputLimits[2].max);
-        Real64 const V4 = std::clamp(Var4, thisCurve->inputLimits[3].min, thisCurve->inputLimits[3].max);
-        Real64 const V5 = std::clamp(Var5, thisCurve->inputLimits[4].min, thisCurve->inputLimits[4].max);
-        Real64 const V6 = std::clamp(Var6, thisCurve->inputLimits[5].min, thisCurve->inputLimits[5].max);
+        //        Real64 const V1 = std::clamp(Var1, thisCurve->inputLimits[0].min, thisCurve->inputLimits[0].max);
+        //        Real64 const V2 = std::clamp(Var2, thisCurve->inputLimits[1].min, thisCurve->inputLimits[1].max);
+        //        Real64 const V3 = std::clamp(Var3, thisCurve->inputLimits[2].min, thisCurve->inputLimits[2].max);
+        //        Real64 const V4 = std::clamp(Var4, thisCurve->inputLimits[3].min, thisCurve->inputLimits[3].max);
+        //        Real64 const V5 = std::clamp(Var5, thisCurve->inputLimits[4].min, thisCurve->inputLimits[4].max);
+        //        Real64 const V6 = std::clamp(Var6, thisCurve->inputLimits[5].min, thisCurve->inputLimits[5].max);
+        Real64 const V1(max(min(Var1, thisCurve->inputLimits[0].max), thisCurve->inputLimits[0].min));
+        Real64 const V2(max(min(Var2, thisCurve->inputLimits[1].max), thisCurve->inputLimits[1].min));
+        Real64 const V3(max(min(Var3, thisCurve->inputLimits[2].max), thisCurve->inputLimits[2].min));
+        Real64 const V4(max(min(Var4, thisCurve->inputLimits[3].max), thisCurve->inputLimits[3].min));
+        Real64 const V5(max(min(Var5, thisCurve->inputLimits[4].max), thisCurve->inputLimits[4].min));
+        Real64 const V6(max(min(Var6, thisCurve->inputLimits[5].max), thisCurve->inputLimits[5].min));
         CurveValue = thisCurve->value(state, V1, V2, V3, V4, V5, V6);
 
         if (thisCurve->outputLimits.minPresent) CurveValue = max(CurveValue, thisCurve->outputLimits.min);
