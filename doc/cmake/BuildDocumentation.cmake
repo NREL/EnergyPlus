@@ -11,11 +11,11 @@ else()
   set(THIS_TEX_INTERACTION "${TEX_INTERACTION}")
 endif()
 
+set(COMMAND_ECHO_MODE NONE)
 if(DOCS_TESTING)
 
   # TODO: You can change this to ON for active debugging if you find a problem
   set(_DEBUG_DOCS OFF)
-  set(COMMAND_ECHO_MODE NONE)
   if(_DEBUG_DOCS)
     set(COMMAND_ECHO_MODE STDOUT)
     set(CMAKE_VERBOSE_MAKEFILE ON)
