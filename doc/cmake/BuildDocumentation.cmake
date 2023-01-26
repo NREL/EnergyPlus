@@ -12,6 +12,10 @@ else()
 endif()
 
 set(COMMAND_ECHO_MODE NONE)
+if (XELATEX_MEM_FLAGS)
+  set(XELATEX_MEM_FLAGS "--extra-mem-top=2000000" "--extra-mem-bot=4000000")
+endif()
+
 if(DOCS_TESTING)
 
   # TODO: You can change this to ON for active debugging if you find a problem
@@ -22,7 +26,6 @@ if(DOCS_TESTING)
   endif()
 
   if (XELATEX_MEM_FLAGS)
-    set(XELATEX_MEM_FLAGS "--extra-mem-top=2000000" "--extra-mem-bot=4000000")
     message("XELATEX_MEM_FLAGS=${XELATEX_MEM_FLAGS}")
   endif()
 
