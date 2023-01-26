@@ -1006,8 +1006,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         }
         if (!IsValid) {
             ShowSevereError(state,
-                            "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                "\", ZoneInlet node did not find an outlet node.");
+                            format("Node Connection Error, Node=\"{}\", ZoneInlet node did not find an outlet node.",
+                                   state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
             ShowContinueError(state,
                               format("Reference Object={}, Name={}",
@@ -1031,8 +1031,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         }
         if (!IsValid) {
             ShowSevereError(state,
-                            "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                "\", ZoneExhaust node did not find a matching inlet node.");
+                            format("Node Connection Error, Node=\"{}\", ZoneExhaust node did not find a matching inlet node.",
+                                   state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
             ShowContinueError(state,
                               format("Reference Object={}, Name={}",
@@ -1056,8 +1056,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         }
         if (!IsValid) {
             ShowSevereError(state,
-                            "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                "\", Return plenum induced air outlet node did not find a matching inlet node.");
+                            format("Node Connection Error, Node=\"{}\", Return plenum induced air outlet node did not find a matching inlet node.",
+                                   state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
             ShowContinueError(state,
                               format("Reference Object={}, Name={}",
@@ -1133,8 +1133,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber ==
                 state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber) {
                 ShowSevereError(state,
-                                "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                    "\", The same node appears as a non-parent Inlet node more than once.");
+                                format("Node Connection Error, Node=\"{}\", The same node appears as a non-parent Inlet node more than once.",
+                                       state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
                 ShowContinueError(
                     state,
@@ -1167,8 +1167,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber) {
                 // Skip if one of the
                 ShowSevereError(state,
-                                "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                    "\", The same node appears as a non-parent Outlet node more than once.");
+                                format("Node Connection Error, Node=\"{}\", The same node appears as a non-parent Outlet node more than once.",
+                                       state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
                 ShowContinueError(
                     state,
@@ -1314,8 +1314,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 ShowSevereError(state,
-                                "Node Connection Error, Node Name=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                    "\", The same zone node appears more than once.");
+                                format("Node Connection Error, Node Name=\"{}\", The same zone node appears more than once.",
+                                       state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
                 ShowContinueError(
                     state,
@@ -1948,7 +1948,7 @@ void SetUpCompSets(EnergyPlusData &state,
                         std::string_view const CType =
                             ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)];
                         if ((!has_prefixi(CType, "AirTerminal:DualDuct:")) && (!has_prefixi(CompTypeUC, "AirTerminal:DualDuct:"))) {
-                            ShowWarningError(state, "Node used as an outlet more than once: " + std::string{OutletNode});
+                            ShowWarningError(state, format("Node used as an outlet more than once: {}", OutletNode));
                             ShowContinueError(
                                 state,
                                 format("  Used by: {}, name={}",
@@ -2020,7 +2020,8 @@ void TestInletOutletNodes(EnergyPlusData &state)
                 state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Other).CName ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Other).OutletNodeName) {
                 AlreadyNoted(Other) = true;
-                ShowWarningError(state, "Node used as an inlet more than once: " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
+                ShowWarningError(state,
+                                 format("Node used as an inlet more than once: {}", state.dataBranchNodeConnections->CompSets(Count).InletNodeName));
                 ShowContinueError(
                     state,
                     format("  Used by: {}, name={}",
@@ -2058,7 +2059,8 @@ void TestInletOutletNodes(EnergyPlusData &state)
                 state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Other).CName ||
                 state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Other).InletNodeName) {
                 AlreadyNoted(Other) = true;
-                ShowWarningError(state, "Node used as an outlet more than once: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                ShowWarningError(
+                    state, format("Node used as an outlet more than once: {}", state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
                 ShowContinueError(
                     state,
                     format("  Used by: {}, name={}",
@@ -2205,14 +2207,17 @@ void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound)
                        ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)],
                        state.dataBranchNodeConnections->CompSets(Count).CName));
             ShowContinueError(state,
-                              "   Nodes, inlet: " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName +
-                                  ", outlet: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                              format("   Nodes, inlet: {}, outlet: {}",
+                                     state.dataBranchNodeConnections->CompSets(Count).InletNodeName,
+                                     state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
             ShowContinueError(state,
-                              " & Nodes, inlet: " + state.dataBranchNodeConnections->CompSets(Other).InletNodeName +
-                                  ", outlet: " + state.dataBranchNodeConnections->CompSets(Other).OutletNodeName);
+                              format(" & Nodes, inlet: {}, outlet: {}",
+                                     state.dataBranchNodeConnections->CompSets(Other).InletNodeName,
+                                     state.dataBranchNodeConnections->CompSets(Other).OutletNodeName));
             ShowContinueError(state,
-                              "   Node Types:   " + state.dataBranchNodeConnections->CompSets(Count).Description + " & " +
-                                  state.dataBranchNodeConnections->CompSets(Other).Description);
+                              format("   Node Types:   {} & {}",
+                                     state.dataBranchNodeConnections->CompSets(Count).Description,
+                                     state.dataBranchNodeConnections->CompSets(Other).Description));
             ErrorsFound = true;
         }
     }
@@ -2251,7 +2256,7 @@ void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, EPVector
         }
     } else {
         if (NodeNumber > 0) {
-            ShowWarningError(state, "Node not found = " + state.dataLoopNodes->NodeID(NodeNumber) + '.');
+            ShowWarningError(state, format("Node not found = {}.", state.dataLoopNodes->NodeID(NodeNumber)));
         } else {
             ShowWarningError(state, "Invalid node number passed = 0.");
         }

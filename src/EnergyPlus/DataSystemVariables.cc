@@ -203,10 +203,10 @@ namespace DataSystemVariables {
         }
 
         // If we get here, we didn't find the file
-        ShowSevereError(state, contextString + "\"" + originalInputFilePath.string() + "\" not found.");
+        ShowSevereError(state, format("{}\"{}\" not found.", contextString, originalInputFilePath.string()));
         ShowContinueError(state, "  Paths searched:");
         for (auto &path : pathsChecked) {
-            ShowContinueError(state, "    " + path.second + ": \"" + path.first.string() + "\"");
+            ShowContinueError(state, format("    {}: \"{}\"", path.second, path.first.string()));
         }
 
         return foundFilePath;

@@ -201,14 +201,16 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
         if (IType == SurfaceClass::Window && state.dataSurface->Surface(ISurf).Multiplier > 1.0) {
             if (thisEnclosure.TotalEnclosureDaylRefPoints > 0) {
                 ShowSevereError(state,
-                                "DayltgAveInteriorReflectance: Multiplier > 1.0 for window " + state.dataSurface->Surface(ISurf).Name +
-                                    " in Zone=" + state.dataSurface->Surface(ISurf).ZoneName);
+                                format("DayltgAveInteriorReflectance: Multiplier > 1.0 for window {} in Zone={}",
+                                       state.dataSurface->Surface(ISurf).Name,
+                                       state.dataSurface->Surface(ISurf).ZoneName));
                 ShowContinueError(state, "...not allowed since it is in a zone or enclosure with daylighting.");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             } else {
                 ShowSevereError(state,
-                                "DayltgAveInteriorReflectance: Multiplier > 1.0 for window " + state.dataSurface->Surface(ISurf).Name +
-                                    " in Zone=" + state.dataSurface->Surface(ISurf).ZoneName);
+                                format("DayltgAveInteriorReflectance: Multiplier > 1.0 for window {} in Zone={}",
+                                       state.dataSurface->Surface(ISurf).Name,
+                                       state.dataSurface->Surface(ISurf).ZoneName));
                 ShowContinueError(state, "...an adjacent Zone has daylighting. Simulation cannot proceed.");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }
@@ -241,7 +243,7 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
 
     // Average inside surface reflectance of enclosure
     if (AInsTot <= 0.0) {
-        ShowSevereError(state, "DayltgAveInteriorReflectance: Total opaque surface area is <=0.0 in solar enclosure=" + thisEnclosure.Name);
+        ShowSevereError(state, format("DayltgAveInteriorReflectance: Total opaque surface area is <=0.0 in solar enclosure={}", thisEnclosure.Name));
         ShowFatalError(state, "Program terminates due to preceding conditions.");
     }
     state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect = ARHTOT / AInsTot;
@@ -468,8 +470,8 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                 for (int daylightCtrlNum : thisEnclDaylight.daylightControlIndexes) {
                     if (state.dataDaylightingData->daylightControl(daylightCtrlNum).TotalDaylRefPoints > 0) {
                         ShowWarningError(state,
-                                         "Detailed daylighting will not be done for Daylighting:Controls=" +
-                                             state.dataDaylightingData->daylightControl(daylightCtrlNum).Name);
+                                         format("Detailed daylighting will not be done for Daylighting:Controls={}",
+                                                state.dataDaylightingData->daylightControl(daylightCtrlNum).Name));
                         ShowContinueError(state, "because it has no associated exterior windows.");
                     }
                 }
@@ -767,8 +769,8 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
                 int PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
                 if (PipeNum == 0) {
                     ShowSevereError(state,
-                                    "GetTDDInput: Surface=" + state.dataSurface->Surface(IWin).Name +
-                                        ", TDD:Dome object does not reference a valid Diffuser object.");
+                                    format("GetTDDInput: Surface={}, TDD:Dome object does not reference a valid Diffuser object.",
+                                           state.dataSurface->Surface(IWin).Name));
                     ShowContinueError(state, "...needs DaylightingDevice:Tubular of same name as Surface.");
                     ErrorsFound = true;
                 }
@@ -1739,11 +1741,11 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
         } else if (ALF < 0.1524 && ExtWinType == DataDaylighting::ExtWinType::AdjZoneExtWin) {
             if (state.dataDaylightingManager->RefErrIndex(iRefPoint, IWin) == 0) { // only show error message once
                 ShowWarningError(state,
-                                 "CalcDaylightCoeffRefPoints: For Daylghting:Controls=\"" +
-                                     state.dataDaylightingData->daylightControl(daylightCtrlNum).Name + "\" External Window=\"" +
-                                     state.dataSurface->Surface(IWin).Name + "\"in Zone=\"" +
-                                     state.dataHeatBal->Zone(state.dataSurface->Surface(IWin).Zone).Name +
-                                     "\" reference point is less than 0.15m (6\") from window plane ");
+                                 format("CalcDaylightCoeffRefPoints: For Daylghting:Controls=\"{}\" External Window=\"{}\"in Zone=\"{}\" reference "
+                                        "point is less than 0.15m (6\") from window plane ",
+                                        state.dataDaylightingData->daylightControl(daylightCtrlNum).Name,
+                                        state.dataSurface->Surface(IWin).Name,
+                                        state.dataHeatBal->Zone(state.dataSurface->Surface(IWin).Zone).Name));
                 ShowContinueError(state,
                                   format("Distance=[{:.1R} m] to ref point=[{:.1R},{:.1R},{:.1R}], Inaccuracy in Daylighting Calcs may result.",
                                          ALF,
@@ -1757,10 +1759,11 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
         if (ALF < 0.1524 && ExtWinType == DataDaylighting::ExtWinType::AdjZoneExtWin) {
             if (state.dataDaylightingManager->MapErrIndex(iRefPoint, IWin) == 0) { // only show error message once
                 ShowWarningError(state,
-                                 "CalcDaylightCoeffMapPoints: For Zone=\"" + state.dataHeatBal->Zone(zoneNum).Name + "\" External Window=\"" +
-                                     state.dataSurface->Surface(IWin).Name + "\"in Zone=\"" +
-                                     state.dataHeatBal->Zone(state.dataSurface->Surface(IWin).Zone).Name +
-                                     "\" map point is less than 0.15m (6\") from window plane ");
+                                 format("CalcDaylightCoeffMapPoints: For Zone=\"{}\" External Window=\"{}\"in Zone=\"{}\" map point is less than "
+                                        "0.15m (6\") from window plane ",
+                                        state.dataHeatBal->Zone(zoneNum).Name,
+                                        state.dataSurface->Surface(IWin).Name,
+                                        state.dataHeatBal->Zone(state.dataSurface->Surface(IWin).Zone).Name));
                 ShowContinueError(
                     state,
                     format(
@@ -4120,11 +4123,11 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                 if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).GlareControlIsActive) {
                     // Error if GlareControlIsActive but window is not in a Daylighting:Detailed zone
                     if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
-                        ShowSevereError(state, "Window=" + state.dataSurface->Surface(SurfNum).Name + " has Window Shading Control with");
+                        ShowSevereError(state, format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
                         ShowContinueError(state, "GlareControlIsActive = Yes but it is not in a Daylighting zone or enclosure.");
                         ShowContinueError(state,
-                                          "Zone or enclosure indicated=" +
-                                              state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex).Name);
+                                          format("Zone or enclosure indicated={}",
+                                                 state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex).Name));
                         ErrorsFound = true;
                     }
                     // Error if GlareControlIsActive and window is in a Daylighting:Detailed zone/enclosure with
@@ -4135,10 +4138,11 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                             if (state.dataSurface->Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
                                 auto &adjSurfEnclosure(state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
                                 if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
-                                    ShowSevereError(state, "Window=" + state.dataSurface->Surface(SurfNum).Name + " has Window Shading Control with");
+                                    ShowSevereError(state,
+                                                    format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
                                     ShowContinueError(state, "GlareControlIsActive = Yes and is in a Daylighting zone or enclosure");
                                     ShowContinueError(state, "that shares an interior window with another Daylighting zone or enclosure");
-                                    ShowContinueError(state, "Adjacent Zone or Enclosure indicated=" + adjSurfEnclosure.Name);
+                                    ShowContinueError(state, format("Adjacent Zone or Enclosure indicated={}", adjSurfEnclosure.Name));
                                     ErrorsFound = true;
                                 }
                             }
@@ -4151,9 +4155,9 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                     // Error if window has shadingControlType = MeetDaylightingIlluminanceSetpoint &
                     // but is not in a Daylighting:Detailed zone
                     if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
-                        ShowSevereError(state, "Window=" + state.dataSurface->Surface(SurfNum).Name + " has Window Shading Control with");
+                        ShowSevereError(state, format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
                         ShowContinueError(state, "MeetDaylightingIlluminanceSetpoint but it is not in a Daylighting zone or enclosure.");
-                        ShowContinueError(state, "Zone or enclosure indicated=" + thisSurfEnclosure.Name);
+                        ShowContinueError(state, format("Zone or enclosure indicated={}", thisSurfEnclosure.Name));
                         ErrorsFound = true;
                     }
                     // Error if window has shadingControlType = MeetDaylightIlluminanceSetpoint and is in a &
@@ -4164,10 +4168,11 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                             if (state.dataSurface->Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
                                 auto &adjSurfEnclosure(state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
                                 if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
-                                    ShowSevereError(state, "Window=" + state.dataSurface->Surface(SurfNum).Name + " has Window Shading Control with");
+                                    ShowSevereError(state,
+                                                    format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
                                     ShowContinueError(state, "MeetDaylightIlluminanceSetpoint and is in a Daylighting zone or enclosure");
                                     ShowContinueError(state, "that shares an interior window with another Daylighting zone or enclosure");
-                                    ShowContinueError(state, "Adjacent Zone or enclosure indicated=" + adjSurfEnclosure.Name);
+                                    ShowContinueError(state, format("Adjacent Zone or enclosure indicated={}", adjSurfEnclosure.Name));
                                     ErrorsFound = true;
                                 }
                             }
@@ -4407,8 +4412,11 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 
             if (state.dataDaylightingData->IllumMap(MapNum).zoneIndex == 0) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                                format("{}=\"{}\", invalid {}=\"{}\".",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
             } else {
                 // set enclosure index for first space in zone
@@ -4420,8 +4428,9 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                     int spaceNum = state.dataHeatBal->Zone(zoneNum).spaceIndexes(spaceCounter);
                     if (enclNum != state.dataHeatBal->space(spaceNum).solarEnclosureNum) {
                         ShowSevereError(state,
-                                        cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\" All spaces in the zone must be in the same enclosure for daylighting illuminance maps.");
+                                        format("{}=\"{}\" All spaces in the zone must be in the same enclosure for daylighting illuminance maps.",
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
                         break;
                     }
@@ -4435,7 +4444,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             state.dataDaylightingData->IllumMap(MapNum).Xmin = state.dataIPShortCut->rNumericArgs(2);
             state.dataDaylightingData->IllumMap(MapNum).Xmax = state.dataIPShortCut->rNumericArgs(3);
             if (state.dataIPShortCut->rNumericArgs(2) > state.dataIPShortCut->rNumericArgs(3)) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, format("{}=\"{}\", invalid entry.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("...{} {:.2R} must be <= {} {:.2R}.",
                                          state.dataIPShortCut->cNumericFieldNames(2),
@@ -4456,7 +4465,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             state.dataDaylightingData->IllumMap(MapNum).Ymin = state.dataIPShortCut->rNumericArgs(5);
             state.dataDaylightingData->IllumMap(MapNum).Ymax = state.dataIPShortCut->rNumericArgs(6);
             if (state.dataIPShortCut->rNumericArgs(5) > state.dataIPShortCut->rNumericArgs(6)) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, format("{}=\"{}\", invalid entry.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("...{} {:.2R} must be <= {} {:.2R}.",
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -4475,7 +4484,8 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             }
             if (state.dataDaylightingData->IllumMap(MapNum).Xnum * state.dataDaylightingData->IllumMap(MapNum).Ynum >
                 DataDaylighting::MaxMapRefPoints) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", too many map points specified.");
+                ShowSevereError(state,
+                                format("{}=\"{}\", too many map points specified.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("...{}[{}] * {}[{}].= [{}] must be <= [{}].",
                                          state.dataIPShortCut->cNumericFieldNames(4),
@@ -4515,8 +4525,10 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             } else {
                 state.dataDaylightingData->MapColSep = CharComma; // comma
                 ShowWarningError(state,
-                                 cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                     state.dataIPShortCut->cAlphaArgs(1) + "\", Commas will be used to separate fields.");
+                                 format("{}: invalid {}=\"{}\", Commas will be used to separate fields.",
+                                        cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaFieldNames(1),
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 state.dataIPShortCut->cAlphaArgs(1) = "COMMA";
             }
         }
@@ -4549,7 +4561,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 
                 if (AddMapPoints > DataDaylighting::MaxMapRefPoints) {
                     ShowSevereError(state, "GetDaylighting Parameters: Total Map Reference points entered is greater than maximum allowed.");
-                    ShowContinueError(state, "Occurs in Zone=" + zone.Name);
+                    ShowContinueError(state, format("Occurs in Zone={}", zone.Name));
                     ShowContinueError(state,
                                       format("Maximum reference points allowed={}, entered amount ( when error first occurred )={}",
                                              DataDaylighting::MaxMapRefPoints,
@@ -4749,8 +4761,8 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         if (!state.dataDaylightingData->enclDaylight(enclNum).hasSplitFluxDaylighting &&
             !ZoneMsgDone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex)) {
             ShowSevereError(state,
-                            "Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" +
-                                Zone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex).Name);
+                            format("Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls={}",
+                                   Zone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex).Name));
             ErrorsFound = true;
         }
     }
@@ -4833,8 +4845,11 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             // Check if this is a duplicate
             if (spaceHasDaylightingControl(spaceNum)) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + daylightControl.Name + "\" Space=" + "=\"" + state.dataHeatBal->space(spaceNum).Name +
-                                    "\" already has a " + cCurrentModuleObject + " object assigned to it. Only one per Space is allowed.");
+                                format("{}=\"{}\" Space==\"{}\" already has a {} object assigned to it. Only one per Space is allowed.",
+                                       cCurrentModuleObject,
+                                       daylightControl.Name,
+                                       state.dataHeatBal->space(spaceNum).Name,
+                                       cCurrentModuleObject));
                 ErrorsFound = true;
                 continue;
             }
@@ -4842,8 +4857,10 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             int const zoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (zoneNum == 0) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                                format("{}: invalid {}=\"{}\".",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
                 continue;
             } else {
@@ -4857,18 +4874,21 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                     int zoneSpaceNum = state.dataHeatBal->Zone(zoneNum).spaceIndexes(spaceCounter);
                     if (daylightControl.enclIndex != state.dataHeatBal->space(zoneSpaceNum).solarEnclosureNum) {
                         ShowSevereError(state,
-                                        cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(2) +
-                                            "\" All spaces in the zone must be in the same enclosure for daylighting.");
+                                        format("{}: invalid {}=\"{}\" All spaces in the zone must be in the same enclosure for daylighting.",
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaFieldNames(2),
+                                               state.dataIPShortCut->cAlphaArgs(2)));
                         ErrorsFound = true;
                         break;
                     }
                     // Check if this is a duplicate
                     if (spaceHasDaylightingControl(zoneSpaceNum)) {
                         ShowSevereError(state,
-                                        cCurrentModuleObject + "=\"" + daylightControl.Name + "\" Space=" + "=\"" +
-                                            state.dataHeatBal->space(zoneSpaceNum).Name + "\" already has a " + cCurrentModuleObject +
-                                            " object assigned to it. Only one per Space is allowed.");
+                                        format("{}=\"{}\" Space==\"{}\" already has a {} object assigned to it. Only one per Space is allowed.",
+                                               cCurrentModuleObject,
+                                               daylightControl.Name,
+                                               state.dataHeatBal->space(zoneSpaceNum).Name,
+                                               cCurrentModuleObject));
                         ErrorsFound = true;
                         continue;
                     }
@@ -4889,8 +4909,12 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             state.dataDaylightingData->enclDaylight(daylightControl.enclIndex).hasSplitFluxDaylighting = true;
         } else {
             ShowWarningError(state,
-                             "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3) + ", occurs in " +
-                                 cCurrentModuleObject + "object for " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1));
+                             format("Invalid {} = {}, occurs in {}object for {}=\"{}",
+                                    state.dataIPShortCut->cAlphaFieldNames(3),
+                                    state.dataIPShortCut->cAlphaArgs(3),
+                                    cCurrentModuleObject,
+                                    cCurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "SplitFlux assumed, and the simulation continues.");
         }
 
@@ -4898,9 +4922,12 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.AvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (daylightControl.AvailSchedNum == 0) {
                 ShowWarningError(state,
-                                 "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4) +
-                                     ", occurs in " + cCurrentModuleObject + "object for " + cCurrentModuleObject + "=\"" +
-                                     state.dataIPShortCut->cAlphaArgs(1));
+                                 format("Invalid {} = {}, occurs in {}object for {}=\"{}",
+                                        state.dataIPShortCut->cAlphaFieldNames(4),
+                                        state.dataIPShortCut->cAlphaArgs(4),
+                                        cCurrentModuleObject,
+                                        cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found so controls will always be available, and the simulation continues.");
                 daylightControl.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
             }
@@ -4912,8 +4939,12 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         daylightControl.LightControlType = static_cast<DataDaylighting::LtgCtrlType>(typeNum);
         if (daylightControl.LightControlType == DataDaylighting::LtgCtrlType::Invalid) {
             ShowWarningError(state,
-                             "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5) + ", occurs in " +
-                                 cCurrentModuleObject + "object for " + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1));
+                             format("Invalid {} = {}, occurs in {}object for {}=\"{}",
+                                    state.dataIPShortCut->cAlphaFieldNames(5),
+                                    state.dataIPShortCut->cAlphaArgs(5),
+                                    cCurrentModuleObject,
+                                    cCurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "Continuous assumed, and the simulation continues.");
         }
 
@@ -4932,14 +4963,17 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                                                 &DataDaylighting::RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
             if (daylightControl.glareRefPtNumber == 0) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(6) + "\" for object named: " + state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: invalid {}=\"{}\" for object named: {}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(6),
+                                       state.dataIPShortCut->cAlphaArgs(6),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
                 continue;
             }
         } else if (daylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
             ShowWarningError(
-                state, "No " + state.dataIPShortCut->cAlphaFieldNames(6) + " provided for object named: " + state.dataIPShortCut->cAlphaArgs(1));
+                state, format("No {} provided for object named: {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "No glare calculation performed, and the simulation continues.");
         }
 
@@ -4960,12 +4994,13 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         state.dataDaylightingData->maxRefPointsPerControl = max(state.dataDaylightingData->maxRefPointsPerControl, curTotalDaylRefPts);
         if ((NumNumber - 7) / 2 != daylightControl.TotalDaylRefPoints) {
             ShowSevereError(state,
-                            cCurrentModuleObject + "The number of extensible numeric fields and alpha fields is inconsistent for: " +
-                                state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(
-                state,
-                "For each field: " + state.dataIPShortCut->cAlphaFieldNames(NumAlpha) +
-                    " there needs to be the following fields: Fraction Controlled by Reference Point and Illuminance Setpoint at Reference Point");
+                            format("{}The number of extensible numeric fields and alpha fields is inconsistent for: {}",
+                                   cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state,
+                              format("For each field: {} there needs to be the following fields: Fraction Controlled by Reference Point and "
+                                     "Illuminance Setpoint at Reference Point",
+                                     state.dataIPShortCut->cAlphaFieldNames(NumAlpha)));
             ErrorsFound = true;
         }
         daylightControl.DaylRefPtNum.allocate(curTotalDaylRefPts);
@@ -5004,8 +5039,11 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                                                 &DataDaylighting::RefPointData::Name); // Field: Daylighting Reference Point Name
             if (daylightControl.DaylRefPtNum(refPtNum) == 0) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(6 + refPtNum) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(6 + refPtNum) + "\" for object named: " + state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: invalid {}=\"{}\" for object named: {}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(6 + refPtNum),
+                                       state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
                 continue;
             } else {
@@ -5049,7 +5087,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         }
         // Register Error if 0 DElight RefPts have been input for valid DElight object
         if (countRefPts < 1) {
-            ShowSevereError(state, "No Reference Points input for " + cCurrentModuleObject + " zone =" + daylightControl.ZoneName);
+            ShowSevereError(state, format("No Reference Points input for {} zone ={}", cCurrentModuleObject, daylightControl.ZoneName));
             ErrorsFound = true;
         }
 
@@ -5075,7 +5113,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         if (daylightControl.LightControlType == DataDaylighting::LtgCtrlType::Stepped && daylightControl.LightControlSteps <= 0) {
             ShowWarningError(state, "GetDaylightingControls: For Stepped Control, the number of steps must be > 0");
             ShowContinueError(
-                state, "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\", will use 1");
+                state, format("..discovered in \"{}\" for Zone=\"{}\", will use 1", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(2)));
             daylightControl.LightControlSteps = 1;
         }
         SetupOutputVariable(state,
@@ -5198,7 +5236,8 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
 
             if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(1, refPtNum) > zone.MaximumX) {
                 daylCntrl.DaylRefPtInBounds(refPtNum) = false;
-                ShowWarningError(state, "GeometryTransformForDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name);
+                ShowWarningError(state,
+                                 format("GeometryTransformForDaylighting: Reference point X Value outside Zone Min/Max X, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
                                          daylCntrl.DaylRefPtAbsCoord(1, refPtNum),
@@ -5216,7 +5255,8 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
             }
             if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord(2, refPtNum) > zone.MaximumY) {
                 daylCntrl.DaylRefPtInBounds(refPtNum) = false;
-                ShowWarningError(state, "GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name);
+                ShowWarningError(state,
+                                 format("GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
                                          daylCntrl.DaylRefPtAbsCoord(2, refPtNum),
@@ -5234,7 +5274,8 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
             }
             if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord(3, refPtNum) > zone.MaximumZ) {
                 daylCntrl.DaylRefPtInBounds(refPtNum) = false;
-                ShowWarningError(state, "GeometryTransformForDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name);
+                ShowWarningError(state,
+                                 format("GeometryTransformForDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
                                          daylCntrl.DaylRefPtAbsCoord(3, refPtNum),
@@ -5286,8 +5327,11 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
             int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
             if (spaceNum == 0) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                                format("{}=\"{}\", invalid {}=\"{}\".",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
             } else {
                 pt.ZoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
@@ -5341,15 +5385,16 @@ void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state)
             int const pipeEnclNum = state.dataSurface->Surface(SurfNum).SolarEnclIndex;
             if (state.dataViewFactor->EnclSolInfo(pipeEnclNum).TotalEnclosureDaylRefPoints == 0) {
                 ShowWarningError(state,
-                                 "DaylightingDevice:Tubular = " + state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name +
-                                     ":  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the "
-                                     "daylighting device.");
+                                 format("DaylightingDevice:Tubular = {}:  is not connected to a Zone that has Daylighting, no visible transmittance "
+                                        "will be modeled through the daylighting device.",
+                                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name));
             }
 
         } else { // SurfNum == 0
             // should not come here (would have already been caught in TDD get input), but is an error
             ShowSevereError(
-                state, "DaylightingDevice:Tubular = " + state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name + ":  Diffuser surface not found ");
+                state,
+                format("DaylightingDevice:Tubular = {}:  Diffuser surface not found ", state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name));
             ErrorsFound = true;
         }
     } // PipeNum
@@ -5358,7 +5403,8 @@ void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state)
         SurfNum = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;
         if (SurfNum == 0) {
             // should not come here (would have already been caught in shelf get input), but is an error
-            ShowSevereError(state, "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name + ":  window not found ");
+            ShowSevereError(state,
+                            format("DaylightingDevice:Shelf = {}:  window not found ", state.dataDaylightingDevicesData->Shelf(ShelfNum).Name));
             ErrorsFound = true;
         }
     } // ShelfNum
@@ -5383,9 +5429,9 @@ void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state)
         } else {
             ShowWarningError(state, "AssociateWindowShadingControlWithDaylighting: Daylighting object name used in WindowShadingControl not found.");
             ShowContinueError(state,
-                              "..The WindowShadingControl object=\"" + state.dataSurface->WindowShadingControl(iShadeCtrl).Name +
-                                  "\" and referenes an object named: \"" +
-                                  state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName + "\"");
+                              format("..The WindowShadingControl object=\"{}\" and referenes an object named: \"{}\"",
+                                     state.dataSurface->WindowShadingControl(iShadeCtrl).Name,
+                                     state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName));
         }
     }
 }
@@ -5449,8 +5495,10 @@ void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors fou
         SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
         if (SurfNum == 0) {
             ShowSevereError(state,
-                            cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                state.dataIPShortCut->cAlphaArgs(1) + "\" not found.");
+                            format("{}: invalid {}=\"{}\" not found.",
+                                   cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaFieldNames(1),
+                                   state.dataIPShortCut->cAlphaArgs(1)));
         }
 
         // Check that associated surface is an exterior window
@@ -5461,8 +5509,10 @@ void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors fou
                 WrongSurfaceType = true;
             if (WrongSurfaceType) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(1) + "\" - not an exterior window.");
+                                format("{}: invalid {}=\"{}\" - not an exterior window.",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -5480,8 +5530,10 @@ void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors fou
             // Warning if light well area is less than window area
             if (AreaWell < (state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum) - 0.1)) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(1) + "\" - Areas.");
+                                format("{}: invalid {}=\"{}\" - Areas.",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("has Area of Bottom of Well={:.1R} that is less than window area={:.1R}",
                                          state.dataSurface->Surface(SurfNum).Area,
@@ -9937,7 +9989,7 @@ void CloseReportIllumMaps(EnergyPlusData &state)
 
             const auto mapLines = state.dataDaylightingData->IllumMap(MapNum).mapFile->getLines();
             if (mapLines.empty()) {
-                ShowSevereError(state, "CloseReportIllumMaps: IllumMap=\"" + state.dataDaylightingData->IllumMap(MapNum).Name + "\" is empty.");
+                ShowSevereError(state, format("CloseReportIllumMaps: IllumMap=\"{}\" is empty.", state.dataDaylightingData->IllumMap(MapNum).Name));
                 break;
             }
             for (const auto &mapLine : mapLines) {
@@ -10436,13 +10488,13 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
                         if (count > thisEnclDaylight.NumOfDayltgExtWins) {
                             if (showOnce) {
                                 ShowWarningError(state,
-                                                 "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in enclosure " +
-                                                     thisSolEnclosureName);
+                                                 format("MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in enclosure {}",
+                                                        thisSolEnclosureName));
                                 ShowContinueError(
                                     state, "Check the Zone Name in the WindowShadingControl that references the following fenestration surfaces:");
                                 showOnce = false;
                             }
-                            ShowContinueError(state, "  -  " + state.dataSurface->Surface(IWinShdOrd).Name);
+                            ShowContinueError(state, format("  -  {}", state.dataSurface->Surface(IWinShdOrd).Name));
                         }
                         bool found = false;
                         for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
@@ -10704,7 +10756,7 @@ void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64
         transformPlane = cAlphas(1);
         if (transformPlane != "XY") {
             ShowWarningError(state,
-                             CurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + cAlphas(1) + "...ignored.");
+                             format("{}: invalid {}=\"{}...ignored.", CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), cAlphas(1)));
         }
         doTransform = true;
         state.dataSurface->AspectTransform = true;

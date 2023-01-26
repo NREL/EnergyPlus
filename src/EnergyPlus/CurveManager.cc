@@ -1753,9 +1753,10 @@ namespace Curve {
             int numOfCPArray = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             if (numOfCPArray != 1) {
-                ShowSevereError(state,
-                                "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
-                                    " object per simulation is required when using the AirflowNetwork model.");
+                ShowSevereError(
+                    state,
+                    format("GetCurveInput: Currently exactly one (\"1\") {} object per simulation is required when using the AirflowNetwork model.",
+                           CurrentModuleObject));
                 ErrorsFound = true;
             } else if (numOfCPArray == 1) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1836,7 +1837,7 @@ namespace Curve {
                                                state.dataIPShortCut->cAlphaFieldNames(2),
                                                Alphas(2),
                                                CurrentModuleObject));
-                        ShowContinueError(state, "The valid name is " + wpcName);
+                        ShowContinueError(state, format("The valid name is {}", wpcName));
                         ErrorsFound = true;
                     }
 
@@ -2982,7 +2983,7 @@ namespace Curve {
                     PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {
-                    ShowSevereError(state, "Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
+                    ShowSevereError(state, format("Plant Pressure Simulation: Found error for curve: {}", PressureCurveName));
                     ShowContinueError(state, format("Curve type detected: {}", Curve::objectNames[static_cast<int>(GenericCurveType)]));
                     ShowContinueError(state, "Generic curves should be single independent variable such that DeltaP = f(mdot)");
                     ShowContinueError(state, " Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
