@@ -47,7 +47,15 @@
 
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 
+#ifdef DEBUG_ARITHM_GCC
+#include <cfenv>
+#endif
+
 int main(int argc, const char *argv[])
 {
+#ifdef DEBUG_ARITHM_GCC
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+
     return EnergyPlusPgm(argc, argv);
 }

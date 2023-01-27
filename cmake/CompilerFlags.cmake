@@ -95,6 +95,8 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
     target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ffloat-store>) # Improve debug run solution stability
     target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fsignaling-nans>) # Disable optimizations that may have concealed NaN behavior
     target_compile_definitions(project_options INTERFACE $<$<CONFIG:Debug>:_GLIBCXX_DEBUG>) # Standard container debug mode (bounds checking, ...>)
+    target_compile_definitions(project_fp_options INTERFACE $<$<CONFIG:Debug>:DEBUG_ARITHM_GCC>) # in main.cc for E+ and gtest: feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW)
+
     # ADD_CXX_RELEASE_DEFINITIONS("-finline-limit=2000") # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
   endif()
 
