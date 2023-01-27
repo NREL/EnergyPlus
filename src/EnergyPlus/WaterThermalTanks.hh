@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.fwd.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -788,7 +787,7 @@ namespace WaterThermalTanks {
 
         void MinePlantStructForInfo(EnergyPlusData &state);
 
-        void SizeSupplySidePlantConnections(EnergyPlusData &state, ObjexxFCL::Optional_int_const LoopNum = _);
+        void SizeSupplySidePlantConnections(EnergyPlusData &state, const int loopNum);
 
         void CalcWaterThermalTank(EnergyPlusData &state);
 

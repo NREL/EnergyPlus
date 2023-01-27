@@ -6814,20 +6814,20 @@ namespace AirflowNetwork {
         Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
 
         int CurveNum = static_cast<int>(state.dataCurveManager->PerfCurve.size()) + 1;
-        state.dataCurveManager->PerfCurve.push_back(Curve::PerformanceCurveData());
+        state.dataCurveManager->PerfCurve.push_back(new Curve::Curve());
 
-        state.dataCurveManager->PerfCurve(CurveNum).Name = name;
-        state.dataCurveManager->PerfCurve(CurveNum).numDims = 1;
+        state.dataCurveManager->PerfCurve(CurveNum)->Name = name;
+        state.dataCurveManager->PerfCurve(CurveNum)->numDims = 1;
 
-        state.dataCurveManager->PerfCurve(CurveNum).interpolationType = Curve::InterpType::BtwxtMethod;
+        state.dataCurveManager->PerfCurve(CurveNum)->interpolationType = Curve::InterpType::BtwxtMethod;
 
-        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].minPresent = true;
-        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 360.0;
-        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].maxPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].minPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 360.0;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].maxPresent = true;
 
-        state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
-        state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
+        state.dataCurveManager->PerfCurve(CurveNum)->TableIndex = gridIndex;
+        state.dataCurveManager->PerfCurve(CurveNum)->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
 
         state.dataCurveManager->NumCurves += 1;
         return CurveNum;

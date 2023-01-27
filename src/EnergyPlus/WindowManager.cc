@@ -7445,9 +7445,9 @@ namespace WindowManager {
                             }
                             if (thisMaterial->GlassSpectralAndAngle) {
                                 OpticalDataType = "SpectralAndAngle";
-                                SpectralDataName = state.dataCurveManager->PerfCurve(thisMaterial->GlassSpecAngTransDataPtr).Name + ", " +
-                                                   state.dataCurveManager->PerfCurve(thisMaterial->GlassSpecAngFRefleDataPtr).Name + ", " +
-                                                   state.dataCurveManager->PerfCurve(thisMaterial->GlassSpecAngBRefleDataPtr).Name;
+                                SpectralDataName = state.dataCurveManager->PerfCurve(thisMaterial->GlassSpecAngTransDataPtr)->Name + ", " +
+                                                   state.dataCurveManager->PerfCurve(thisMaterial->GlassSpecAngFRefleDataPtr)->Name + ", " +
+                                                   state.dataCurveManager->PerfCurve(thisMaterial->GlassSpecAngBRefleDataPtr)->Name;
                             }
                             static constexpr std::string_view Format_707(
                                 " WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"

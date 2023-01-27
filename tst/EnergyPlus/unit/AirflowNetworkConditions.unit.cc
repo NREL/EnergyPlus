@@ -513,7 +513,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
     Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
-    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1).numDims);
+    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1)->numDims);
     EXPECT_EQ("EFACADE_WPCCURVE", Curve::GetCurveName(*state, 1));
     EXPECT_EQ(1, Curve::GetCurveIndex(*state, "EFACADE_WPCCURVE"));
     //    EXPECT_EQ("Table:Lookup", state->dataCurveManager->PerfCurve(1).objectType);
@@ -596,7 +596,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
     Curve::GetCurveInput(*state);
     state->dataCurveManager->GetCurvesInputFlag = false;
     ASSERT_EQ(1, state->dataCurveManager->NumCurves);
-    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1).numDims);
+    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1)->numDims);
     EXPECT_EQ("NFACADE_WPCVALUE", Curve::GetCurveName(*state, 1));
     EXPECT_EQ(1, Curve::GetCurveIndex(*state, "NFACADE_WPCVALUE"));
     //    EXPECT_EQ("AirflowNetwork:MultiZone:WindPressureCoefficientValues", state->dataCurveManager->PerfCurve(1).objectType);
