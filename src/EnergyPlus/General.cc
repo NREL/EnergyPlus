@@ -1053,86 +1053,6 @@ void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, h
     Item = ((Month * 100 + Day) * 100 + Hour) * 100 + Minute;
 }
 
-Real64 GetCurrentHVACTime(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This routine returns the time in seconds at the end of the current HVAC step.
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    // Return value
-    Real64 GetCurrentHVACTime;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 CurrentHVACTime;
-
-    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
-    // erronously truncate all sub-minute system time steps down to the closest full minute.
-    // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
-    // as real.
-    CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed + TimeStepSys;
-    GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour;
-
-    return GetCurrentHVACTime;
-}
-
-Real64 GetPreviousHVACTime(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This routine returns the time in seconds at the beginning of the current HVAC step.
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-
-    // Return value
-    Real64 GetPreviousHVACTime;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 PreviousHVACTime;
-
-    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
-    // erronously truncate all sub-minute system time steps down to the closest full minute.
-    PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed;
-    GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour;
-
-    return GetPreviousHVACTime;
-}
-
-std::string CreateHVACTimeIntervalString(EnergyPlusData &state)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function creates the time stamp with the current time interval for the HVAC
-    // time step.
-
-    // Return value
-    std::string OutputString;
-
-    OutputString = CreateTimeIntervalString(GetPreviousHVACTime(state), GetCurrentHVACTime(state));
-
-    return OutputString;
-}
-
 std::string CreateTimeString(Real64 const Time) // Time in seconds
 {
 
@@ -1159,32 +1079,6 @@ std::string CreateTimeString(Real64 const Time) // Time in seconds
     // TimeStamp written with formatting
     // "hh:mm:ss.s"
     return fmt::format("{:02d}:{:02d}:{:04.1f}", Hours, Minutes, Seconds);
-}
-
-std::string CreateTimeIntervalString(Real64 const StartTime, // Start of current interval in seconds
-                                     Real64 const EndTime    // End of current interval in seconds
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function creates the time stamp with the current time interval from start and end
-    // time values specified in seconds.
-    // Inspired by similar function CreateSysTimeIntervalString() in General.cc
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    std::string TimeStmpS; // Character representation of start of interval
-    std::string TimeStmpE; // Character representation of end of interval
-
-    TimeStmpS = CreateTimeString(StartTime);
-    TimeStmpE = CreateTimeString(EndTime);
-
-    return TimeStmpS + " - " + TimeStmpE;
 }
 
 void ParseTime(Real64 const Time, // Time value in seconds

@@ -2530,6 +2530,43 @@ void TraceIndividualController(EnergyPlusData &state,
     TraceFile.flush();
 }
 
+
+Real64 GetCurrentHVACTime(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dimitri Curtil
+    //       DATE WRITTEN   November 2004
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This routine returns the time in seconds at the end of the current HVAC step.
+
+    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
+    // erronously truncate all sub-minute system time steps down to the closest full minute.
+    // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
+    // as real.
+    Real64 const CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + state.dataHVACGlobal->SysTimeElapsed + state.dataHVACGlobal->TimeStepSys;
+    return CurrentHVACTime * DataGlobalConstants::SecInHour;
+}
+
+Real64 GetPreviousHVACTime(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dimitri Curtil
+    //       DATE WRITTEN   November 2004
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This routine returns the time in seconds at the beginning of the current HVAC step.
+
+    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
+    // erronously truncate all sub-minute system time steps down to the closest full minute.
+    Real64 const PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + state.dataHVACGlobal->SysTimeElapsed;
+    return PreviousHVACTime * DataGlobalConstants::SecInHour;
+}
+
 std::string CreateHVACTimeString(EnergyPlusData &state)
 {
 
@@ -2541,7 +2578,7 @@ std::string CreateHVACTimeString(EnergyPlusData &state)
     // This function creates a string describing the current time stamp of the system
     // time step.
 
-    std::string Buffer = General::CreateTimeString(General::GetCurrentHVACTime(state));
+    std::string Buffer = General::CreateTimeString(GetCurrentHVACTime(state));
     return state.dataEnvrn->CurMnDy + ' ' + stripped(Buffer);
 }
 
@@ -2572,7 +2609,7 @@ std::string MakeHVACTimeIntervalString(EnergyPlusData &state)
     // This function creates a string describing the current time interval of the system
     // time step.
 
-    return stripped(General::CreateHVACTimeIntervalString(state));
+    return format("{} - {}", General::CreateTimeString(GetPreviousHVACTime(state)), General::CreateTimeString(GetCurrentHVACTime(state)));
 }
 
 void CheckControllerListOrder(EnergyPlusData &state)

@@ -197,17 +197,7 @@ namespace General {
                            int Minute // minute in integer format (0:59)
     );
 
-    Real64 GetCurrentHVACTime(EnergyPlusData &state);
-
-    Real64 GetPreviousHVACTime(EnergyPlusData &state);
-
-    std::string CreateHVACTimeIntervalString(EnergyPlusData &state);
-
     std::string CreateTimeString(Real64 Time); // Time in seconds
-
-    std::string CreateTimeIntervalString(Real64 StartTime, // Start of current interval in seconds
-                                         Real64 EndTime    // End of current interval in seconds
-    );
 
     void ParseTime(Real64 Time,    // Time value in seconds
                    int &Hours,     // Number of hours
