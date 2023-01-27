@@ -369,6 +369,13 @@ struct CurveManagerData : BaseGlobalStruct
     Curve::BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
 
+    void allocateCurveVector(int const count)
+    {
+        this->NumCurves = count;
+        for (int curveIndex = 1; curveIndex <= count; curveIndex++)
+            this->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    }
+
     void clear_state() override
     {
         for (Curve::Curve *p : PerfCurve) {

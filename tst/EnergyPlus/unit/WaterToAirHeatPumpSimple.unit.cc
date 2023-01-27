@@ -114,9 +114,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.0045;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
 
-    state->dataCurveManager->NumCurves = 3;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(3);
 
     auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::QuadLinear;
@@ -1122,9 +1120,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirWetbulbTemp = 19.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirDrybulbTemp = 27.0;
 
-    state->dataCurveManager->NumCurves = 6;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(6);
 
     auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::QuadLinear;
@@ -1333,9 +1329,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0045;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
 
-    state->dataCurveManager->NumCurves = 5;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(5);
 
     auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::QuadLinear;
@@ -1564,9 +1558,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0045;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
 
-    state->dataCurveManager->NumCurves = 5;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(5);
 
     auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::QuadLinear;

@@ -90,9 +90,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     bool TestResult;
 
     // Allocate
-    state->dataCurveManager->NumCurves = 1;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(1);
 
     state->dataFans->NumFans = 2;
     state->dataFans->Fan.allocate(state->dataFans->NumFans);
@@ -341,9 +339,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     double FanFaultyDeltaPressInc = 0.10; // Increase by 10%
 
     // Allocate
-    state->dataCurveManager->NumCurves = 1;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(1);
 
     state->dataFans->NumFans = 1;
     state->dataFans->Fan.allocate(state->dataFans->NumFans);

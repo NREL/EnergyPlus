@@ -120,9 +120,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.RegionNum = 4;
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
-    state->dataCurveManager->NumCurves = 5;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(5);
     Curve::Curve *pCurve;
 
     int constexpr nCapfT = 1;
@@ -317,9 +315,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.RegionNum = 4;
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
-    state->dataCurveManager->NumCurves = 5;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(5);
     Curve::Curve *pCurve;
 
     int constexpr nCapfT = 1;
@@ -505,9 +501,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.RegionNum = 4; //
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
-    state->dataCurveManager->NumCurves = 5;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(5);
     Curve::Curve *pCurve;
 
     int constexpr nCapfT = 1;
@@ -1034,9 +1028,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AirCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
-    state->dataCurveManager->NumCurves = 3;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(3);
 
     // Cap=f(T)
     auto *curve1 = state->dataCurveManager->PerfCurve(1);
@@ -1121,9 +1113,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.10;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MaxPartLoadRat = 1.15;
 
-    state->dataCurveManager->NumCurves = 3;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(3);
 
     // Cap=f(T)
     auto *curve1 = state->dataCurveManager->PerfCurve(1);
@@ -1208,9 +1198,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).MaxPartLoadRat = 1.08;
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).CondVolFlowRate = 0.01924;
 
-    state->dataCurveManager->NumCurves = 3;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(3);
 
     // Cap=f(T)
     auto *curve1 = state->dataCurveManager->PerfCurve(1);

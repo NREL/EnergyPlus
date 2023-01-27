@@ -135,9 +135,7 @@ TEST_F(EnergyPlusFixture, ExerciseHVACDXHeatPumpSystem)
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
 
     // manually add a curve
-    state->dataCurveManager->NumCurves = 1;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(1);
     state->dataCurveManager->PerfCurve(1)->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
 
     // setup some outputs

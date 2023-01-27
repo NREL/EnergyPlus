@@ -19977,9 +19977,7 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut =
         state->dataVariableSpeedCoils->VarSpeedCoil(CoilNum1).WaterOutletNodeNum;
     // use psuedo real CapFT curve, use unity curves for all others
-    state->dataCurveManager->NumCurves = 2;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(2);
     state->dataCurveManager->PerfCurve(1)->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(1)->coeff[0] = 1.5;
     state->dataCurveManager->PerfCurve(1)->coeff[3] = -0.017; // yields roughly 1.0 at water rating point of 29.4444

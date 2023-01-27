@@ -114,9 +114,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->afn->OccupantVentilationControl(1).ComfortLowTempCurveNum = 1;
     state->afn->OccupantVentilationControl(1).ComfortHighTempCurveNum = 2;
 
-    state->dataCurveManager->NumCurves = 2;
-    for (int curveIndex = 1; curveIndex <= 2; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(2);
 
     auto *curve1 = state->dataCurveManager->PerfCurve(1);
     curve1->curveType = CurveType::Quadratic;

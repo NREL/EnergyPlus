@@ -193,9 +193,7 @@ protected:
         state->dataSize->NumSysSizInput = 1;
         state->dataSize->SysSizInput.allocate(1);
         state->dataSize->SysSizInput(1).AirLoopNum = 1;
-        state->dataCurveManager->NumCurves = 10;
-        for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-            state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+        state->dataCurveManager->allocateCurveVector(10);
         state->dataCurveManager->PerfCurve(1)->interpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(1)->curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(1)->numDims = 1;
@@ -2851,9 +2849,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     double CondHeat = 1864.44;
 
     // Allocate
-    state->dataCurveManager->NumCurves = 1; // CurveManager::NumCurves
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(1);
 
     // Inputs: parameters
     auto thisCurve = state->dataCurveManager->PerfCurve(CurveNum);

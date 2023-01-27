@@ -431,9 +431,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     Real64 FlowRatio(1.0);
 
     EvapCond(EvapCoolNum).FanPowerModifierCurveIndex = 1;
-    state->dataCurveManager->NumCurves = 1;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(1);
     auto *curve = state->dataCurveManager->PerfCurve(1);
     curve->curveType = CurveType::Quadratic;
     curve->interpolationType = InterpType::EvaluateCurveToLimits;
@@ -729,9 +727,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     auto &thisEvapCooler = EvapCond(EvapCoolNum);
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state->dataCurveManager->NumCurves = 1;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(1);
     auto *curve = state->dataCurveManager->PerfCurve(1);
     curve->curveType = CurveType::Quadratic;
     curve->interpolationType = InterpType::EvaluateCurveToLimits;

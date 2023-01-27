@@ -73,9 +73,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     Real64 Tolerance = 0.001;
 
     state->dataIceThermalStorage->DetailedIceStorage.allocate(TotDetailedIce);
-    state->dataCurveManager->NumCurves = TotCurves;
-    for (int curveIndex = 1; curveIndex <= state->dataCurveManager->NumCurves; curveIndex++)
-        state->dataCurveManager->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    state->dataCurveManager->allocateCurveVector(TotCurves);
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // Test 1: CurveVarsFracChargedLMTD Curve is QuadraticLinear
