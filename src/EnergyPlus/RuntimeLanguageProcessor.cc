@@ -2436,38 +2436,75 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                                                                                 // Value, 3rd independent | 4th
                                                                                                                 // independent | 5th independent
                 } else if (Operand(4).Type == Value::Null && Operand(5).Type == Value::Null && Operand(6).Type == Value::Null) {
-                    ReturnValue = SetErlValueNumber(CurveValue(state,
-                                                               std::floor(Operand(1).Number),
-                                                               Operand(2).Number,
-                                                               Operand(3).Number)); // curve index | X value | Y value, 2nd independent | Z
-                                                                                    // Value, 3rd independent | 4th independent | 5th
-                                                                                    // independent
+                    Real64 curveVal = 0.0;
+                    switch (state.dataCurveManager->PerfCurve(std::floor(Operand(1).Number))->numDims) {
+                    case 1:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number);
+                        break;
+                    case 2:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number);
+                        break;
+                    }
+                    ReturnValue = SetErlValueNumber(curveVal);
                 } else if (Operand(5).Type == Value::Null && Operand(6).Type == Value::Null) {
-                    ReturnValue = SetErlValueNumber(CurveValue(state,
-                                                               std::floor(Operand(1).Number),
-                                                               Operand(2).Number,
-                                                               Operand(3).Number,
-                                                               Operand(4).Number)); // curve index | X value | Y value, 2nd independent | Z
-                                                                                    // Value, 3rd independent | 4th independent | 5th
-                                                                                    // independent
+                    Real64 curveVal = 0.0;
+                    switch (state.dataCurveManager->PerfCurve(std::floor(Operand(1).Number))->numDims) {
+                    case 1:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number);
+                        break;
+                    case 2:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number);
+                        break;
+                    case 3:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number);
+                        break;
+                    }
+                    ReturnValue = SetErlValueNumber(curveVal);
                 } else if (Operand(6).Type == Value::Null) {
-                    ReturnValue = SetErlValueNumber(CurveValue(state,
-                                                               std::floor(Operand(1).Number),
-                                                               Operand(2).Number,
-                                                               Operand(3).Number,
-                                                               Operand(4).Number,
-                                                               Operand(5).Number)); // curve index | X value | Y value, 2nd independent | Z Value,
-                                                                                    // 3rd independent | 4th independent | 5th independent
+                    Real64 curveVal = 0.0;
+                    switch (state.dataCurveManager->PerfCurve(std::floor(Operand(1).Number))->numDims) {
+                    case 1:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number);
+                        break;
+                    case 2:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number);
+                        break;
+                    case 3:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number);
+                        break;
+                    case 4:
+                        curveVal = CurveValue(
+                            state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number, Operand(5).Number);
+                        break;
+                    }
+                    ReturnValue = SetErlValueNumber(curveVal);
                 } else {
-                    ReturnValue = SetErlValueNumber(CurveValue(state,
-                                                               std::floor(Operand(1).Number),
-                                                               Operand(2).Number,
-                                                               Operand(3).Number,
-                                                               Operand(4).Number,
-                                                               Operand(5).Number,
-                                                               Operand(6).Number)); // curve index | X value | Y value, 2nd
-                                                                                    // independent | Z Value, 3rd independent | 4th
-                                                                                    // independent | 5th independent
+                    Real64 curveVal = 0.0;
+                    switch (state.dataCurveManager->PerfCurve(std::floor(Operand(1).Number))->numDims) {
+                    case 1:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number);
+                        break;
+                    case 2:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number);
+                        break;
+                    case 3:
+                        curveVal = CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number);
+                        break;
+                    case 4:
+                        curveVal = CurveValue(
+                            state, std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number, Operand(5).Number);
+                        break;
+                    case 5:
+                        curveVal = CurveValue(state,
+                                              std::floor(Operand(1).Number),
+                                              Operand(2).Number,
+                                              Operand(3).Number,
+                                              Operand(4).Number,
+                                              Operand(5).Number,
+                                              Operand(6).Number);
+                        break;
+                    }
+                    ReturnValue = SetErlValueNumber(curveVal);
                 }
                 break;
 

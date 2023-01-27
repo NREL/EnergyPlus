@@ -193,16 +193,17 @@ protected:
         state->dataSize->NumSysSizInput = 1;
         state->dataSize->SysSizInput.allocate(1);
         state->dataSize->SysSizInput(1).AirLoopNum = 1;
-        state->dataCurveManager->NumCurves = 10;
-        state->dataCurveManager->PerfCurve.allocate(10);
-        state->dataCurveManager->PerfCurve(1).interpolationType = InterpType::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(1).curveType = CurveType::Linear;
-        state->dataCurveManager->PerfCurve(1).coeff[0] = 1.0;
-        state->dataCurveManager->PerfCurve(1).outputLimits.max = 1.0;
-        state->dataCurveManager->PerfCurve(2).interpolationType = InterpType::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(2).curveType = CurveType::Linear;
-        state->dataCurveManager->PerfCurve(2).coeff[0] = 1.0;
-        state->dataCurveManager->PerfCurve(2).outputLimits.max = 1.0;
+        state->dataCurveManager->allocateCurveVector(10);
+        state->dataCurveManager->PerfCurve(1)->interpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(1)->curveType = CurveType::Linear;
+        state->dataCurveManager->PerfCurve(1)->numDims = 1;
+        state->dataCurveManager->PerfCurve(1)->coeff[0] = 1.0;
+        state->dataCurveManager->PerfCurve(1)->outputLimits.max = 1.0;
+        state->dataCurveManager->PerfCurve(2)->interpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(2)->curveType = CurveType::Linear;
+        state->dataCurveManager->PerfCurve(2)->numDims = 1;
+        state->dataCurveManager->PerfCurve(2)->coeff[0] = 1.0;
+        state->dataCurveManager->PerfCurve(2)->outputLimits.max = 1.0;
 
         int NumAirLoops = state->dataHVACGlobal->NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
         state->dataAirSystemsData->PrimaryAirSystems.allocate(NumAirLoops);
@@ -2848,23 +2849,22 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     double CondHeat = 1864.44;
 
     // Allocate
-    state->dataCurveManager->NumCurves = 1; // CurveManager::NumCurves
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(1);
 
     // Inputs: parameters
-    auto &thisCurve = state->dataCurveManager->PerfCurve(CurveNum);
-    thisCurve.curveType = CurveType::BiQuadratic;
-    thisCurve.interpolationType = InterpType::EvaluateCurveToLimits;
-    thisCurve.coeff[0] = 724.71125;     // Coefficient1 Constant
-    thisCurve.coeff[1] = -21.867868;    // Coefficient2 x
-    thisCurve.coeff[2] = 0.52480042;    // Coefficient3 x**2
-    thisCurve.coeff[3] = -17.043566;    // Coefficient4 y
-    thisCurve.coeff[4] = -.40346383;    // Coefficient5 y**2
-    thisCurve.coeff[5] = 0.29573589;    // Coefficient6 x*y
-    thisCurve.inputLimits[0].min = 15;  // Minimum Value of x
-    thisCurve.inputLimits[0].max = 65;  // Maximum Value of x
-    thisCurve.inputLimits[1].min = -30; // Minimum Value of y
-    thisCurve.inputLimits[1].max = 15;  // Maximum Value of y
+    auto thisCurve = state->dataCurveManager->PerfCurve(CurveNum);
+    thisCurve->curveType = CurveType::BiQuadratic;
+    thisCurve->interpolationType = InterpType::EvaluateCurveToLimits;
+    thisCurve->coeff[0] = 724.71125;     // Coefficient1 Constant
+    thisCurve->coeff[1] = -21.867868;    // Coefficient2 x
+    thisCurve->coeff[2] = 0.52480042;    // Coefficient3 x**2
+    thisCurve->coeff[3] = -17.043566;    // Coefficient4 y
+    thisCurve->coeff[4] = -.40346383;    // Coefficient5 y**2
+    thisCurve->coeff[5] = 0.29573589;    // Coefficient6 x*y
+    thisCurve->inputLimits[0].min = 15;  // Minimum Value of x
+    thisCurve->inputLimits[0].max = 65;  // Maximum Value of x
+    thisCurve->inputLimits[1].min = -30; // Minimum Value of y
+    thisCurve->inputLimits[1].max = 15;  // Maximum Value of y
 
     // Run and Check
     double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(*state, Tdis, CondHeat, CurveNum, Te);
@@ -14485,19 +14485,19 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(0.15, thisVRF.MinPLR);
     // EIRFPLR curve minimum PLR value specified
     Curve::GetCurveMinMaxValues(*state, thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
-    EXPECT_EQ(0.25, thisCoolEIRFPLR.inputLimits[0].min);
+    EXPECT_EQ(0.25, thisCoolEIRFPLR->inputLimits[0].min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
-    EXPECT_EQ(1.00, thisCoolEIRFPLR.inputLimits[0].max);
-    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                          // getinput checks this
-    EXPECT_GT(thisCoolEIRFPLR.inputLimits[0].min, thisVRF.MinPLR); // expect warning message
+    EXPECT_EQ(1.00, thisCoolEIRFPLR->inputLimits[0].max);
+    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                           // getinput checks this
+    EXPECT_GT(thisCoolEIRFPLR->inputLimits[0].min, thisVRF.MinPLR); // expect warning message
     minEIRfLowPLRXInput = 0.0;
     maxEIRfLowPLRXInput = 0.0;
     Curve::GetCurveMinMaxValues(*state, thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
-    EXPECT_EQ(0.25, thisHeatEIRFPLR.inputLimits[0].min);
+    EXPECT_EQ(0.25, thisHeatEIRFPLR->inputLimits[0].min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
-    EXPECT_EQ(1.00, thisHeatEIRFPLR.inputLimits[0].max);
-    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                          // getinput checks this
-    EXPECT_GT(thisHeatEIRFPLR.inputLimits[0].min, thisVRF.MinPLR); // expect warning message
+    EXPECT_EQ(1.00, thisHeatEIRFPLR->inputLimits[0].max);
+    EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                           // getinput checks this
+    EXPECT_GT(thisHeatEIRFPLR->inputLimits[0].min, thisVRF.MinPLR); // expect warning message
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
     EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum,
                               DataGlobalConstants::ResourceType::Electricity)); // Check fuel type input that uses

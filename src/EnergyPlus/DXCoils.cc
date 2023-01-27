@@ -2042,14 +2042,14 @@ void GetDXCoils(EnergyPlusData &state)
             // only legal types are Quadratic, BiQuadratic and Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                 {1, 2},                                            // Valid dimensions
+                                                 {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                       // Routine name
                                                  CurrentModuleObject,                               // Object Type
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
                                                  cAlphaFields(5));                                  // Field Name
 
             if (!ErrorsFound) {
-                if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1)).numDims == 1) {
+                if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1))->numDims == 1) {
                     checkCurveIsNormalizedToOne(state,
                                                 std::string{RoutineName} + CurrentModuleObject,
                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -2115,14 +2115,14 @@ void GetDXCoils(EnergyPlusData &state)
             // only legal types are Quadratic, BiQuadratic and Cubic
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
-                                                 {1, 2},                                           // Valid dimensions
+                                                 {1, 2},                                           // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                      // Routine name
                                                  CurrentModuleObject,                              // Object Type
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,        // Object Name
                                                  cAlphaFields(7));                                 // Field Name
 
             if (!ErrorsFound) {
-                if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1)).numDims == 1) {
+                if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1))->numDims == 1) {
                     checkCurveIsNormalizedToOne(state,
                                                 std::string{RoutineName} + CurrentModuleObject,
                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -3280,14 +3280,14 @@ void GetDXCoils(EnergyPlusData &state)
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp, // Curve index
-                                                     {1, 2},                                         // Valid dimensions
+                                                     {1, 2},                                         // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                    // Routine name
                                                      CurrentModuleObject,                            // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
                                                      cAlphaFields(10));                              // Field Name
 
                 if (!ErrorsFound) {
-                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp).numDims == 1) {
+                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp)->numDims == 1) {
                         checkCurveIsNormalizedToOne(state,
                                                     std::string{RoutineName} + CurrentModuleObject,
                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -3375,14 +3375,14 @@ void GetDXCoils(EnergyPlusData &state)
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp, // Curve index
-                                                     {1, 2},                                         // Valid dimensions
+                                                     {1, 2},                                         // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                    // Routine name
                                                      CurrentModuleObject,                            // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
                                                      cAlphaFields(13));                              // Field Name
 
                 if (!ErrorsFound) {
-                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp).numDims == 1) {
+                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp)->numDims == 1) {
                         checkCurveIsNormalizedToOne(state,
                                                     std::string{RoutineName} + CurrentModuleObject,
                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -3723,14 +3723,14 @@ void GetDXCoils(EnergyPlusData &state)
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp, // Curve index
-                                                     {1, 2},                                         // Valid dimensions
+                                                     {1, 2},                                         // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                    // Routine name
                                                      CurrentModuleObject,                            // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
                                                      cAlphaFields(6));                               // Field Name
 
                 if (!ErrorsFound) {
-                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp).numDims == 1) {
+                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCapFTemp)->numDims == 1) {
                         checkCurveIsNormalizedToOne(state,
                                                     std::string{RoutineName} + CurrentModuleObject,
                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -3790,14 +3790,14 @@ void GetDXCoils(EnergyPlusData &state)
                 // Verify Curve Object, only legal types are BiQuadratic or Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp, // Curve index
-                                                     {1, 2},                                         // Valid dimensions
+                                                     {1, 2},                                         // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                    // Routine name
                                                      CurrentModuleObject,                            // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,      // Object Name
                                                      cAlphaFields(8));                               // Field Name
 
                 if (!ErrorsFound) {
-                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp).numDims == 1) {
+                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).HCOPFTemp)->numDims == 1) {
                         checkCurveIsNormalizedToOne(state,
                                                     std::string{RoutineName} + CurrentModuleObject,
                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -4725,14 +4725,14 @@ void GetDXCoils(EnergyPlusData &state)
                 // only legal types are Quadratic, BiQuadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
-                                                     {1, 2},                                              // Valid dimensions
+                                                     {1, 2},                                              // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                         // Routine name
                                                      CurrentModuleObject,                                 // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,           // Object Name
                                                      cAlphaFields(10 + (I - 1) * 6));                     // Field Name
 
                 if (!ErrorsFound) {
-                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I)).numDims == 1) {
+                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(I))->numDims == 1) {
                         checkCurveIsNormalizedToOne(state,
                                                     std::string{RoutineName} + CurrentModuleObject,
                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -4802,14 +4802,14 @@ void GetDXCoils(EnergyPlusData &state)
                 // only legal types are Quadratic, BiQuadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
-                                                     {1, 2},                                             // Valid dimensions
+                                                     {1, 2},                                             // Valid dimensions  // MULTIPLECURVEDIMS
                                                      RoutineName,                                        // Routine name
                                                      CurrentModuleObject,                                // Object Type
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,          // Object Name
                                                      cAlphaFields(12 + (I - 1) * 6));                    // Field Name
 
                 if (!ErrorsFound) {
-                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I)).numDims == 1) {
+                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(I))->numDims == 1) {
                         checkCurveIsNormalizedToOne(state,
                                                     std::string{RoutineName} + CurrentModuleObject,
                                                     state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -5049,14 +5049,14 @@ void GetDXCoils(EnergyPlusData &state)
         // Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
         ErrorsFound |= Curve::CheckCurveDims(state,
                                              state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                             {1, 2},                                            // Valid dimensions
+                                             {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                              RoutineName,                                       // Routine name
                                              CurrentModuleObject,                               // Object Type
                                              state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
                                              cAlphaFields(3));                                  // Field Name
 
         if (!ErrorsFound) {
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1))->numDims == 1) {
                 checkCurveIsNormalizedToOne(state,
                                             std::string{RoutineName} + CurrentModuleObject,
                                             state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -5228,14 +5228,14 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
-                                                 {1, 2},                                            // Valid dimensions
+                                                 {1, 2},                                            // Valid dimensions  // MULTIPLECURVEDIMS
                                                  RoutineName,                                       // Routine name
                                                  CurrentModuleObject,                               // Object Type
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,         // Object Name
                                                  cAlphaFields(5));                                  // Field Name
 
             if (!ErrorsFound) {
-                if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1)).numDims == 1) {
+                if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1))->numDims == 1) {
                     checkCurveIsNormalizedToOne(state,
                                                 std::string{RoutineName} + CurrentModuleObject,
                                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,
@@ -5370,10 +5370,10 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             {
-                if (state.dataCurveManager->PerfCurve(indexSHCurve).curveType == Curve::CurveType::Quadratic) {
-                    state.dataDXCoils->DXCoil(DXCoilNum).C1Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[0];
-                    state.dataDXCoils->DXCoil(DXCoilNum).C2Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[1];
-                    state.dataDXCoils->DXCoil(DXCoilNum).C3Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[2];
+                if (state.dataCurveManager->PerfCurve(indexSHCurve)->curveType == Curve::CurveType::Quadratic) {
+                    state.dataDXCoils->DXCoil(DXCoilNum).C1Te = state.dataCurveManager->PerfCurve(indexSHCurve)->coeff[0];
+                    state.dataDXCoils->DXCoil(DXCoilNum).C2Te = state.dataCurveManager->PerfCurve(indexSHCurve)->coeff[1];
+                    state.dataDXCoils->DXCoil(DXCoilNum).C3Te = state.dataCurveManager->PerfCurve(indexSHCurve)->coeff[2];
 
                 } else {
                     ShowSevereError(state,
@@ -5381,7 +5381,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...illegal {} type for this object = {}",
                                              cAlphaFields(5),
-                                             Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(indexSHCurve).curveType)]));
+                                             Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(indexSHCurve)->curveType)]));
                     ShowContinueError(state, "... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -5489,10 +5489,10 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             {
-                if (state.dataCurveManager->PerfCurve(indexSCCurve).curveType == Curve::CurveType::Quadratic) {
-                    state.dataDXCoils->DXCoil(DXCoilNum).C1Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[0];
-                    state.dataDXCoils->DXCoil(DXCoilNum).C2Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[1];
-                    state.dataDXCoils->DXCoil(DXCoilNum).C3Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[2];
+                if (state.dataCurveManager->PerfCurve(indexSCCurve)->curveType == Curve::CurveType::Quadratic) {
+                    state.dataDXCoils->DXCoil(DXCoilNum).C1Tc = state.dataCurveManager->PerfCurve(indexSCCurve)->coeff[0];
+                    state.dataDXCoils->DXCoil(DXCoilNum).C2Tc = state.dataCurveManager->PerfCurve(indexSCCurve)->coeff[1];
+                    state.dataDXCoils->DXCoil(DXCoilNum).C3Tc = state.dataCurveManager->PerfCurve(indexSCCurve)->coeff[2];
 
                 } else {
                     ShowSevereError(state,
@@ -5500,7 +5500,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...illegal {} type for this object = {}",
                                              cAlphaFields(5),
-                                             Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(indexSCCurve).curveType)]));
+                                             Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(indexSCCurve)->curveType)]));
                     ShowContinueError(state, "... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -9096,7 +9096,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
 
     // get output of Heating Capacity and Heating COP curves (curves default to 1 if user has not specified curve name)
     if (Coil.HCapFTemp > 0) {
-        if (state.dataCurveManager->PerfCurve(Coil.HCapFTemp).numDims == 1) {
+        if (state.dataCurveManager->PerfCurve(Coil.HCapFTemp)->numDims == 1) {
             HeatCapFTemp = CurveValue(state, Coil.HCapFTemp, InletAirTemp);
         } else {
             HeatCapFTemp = CurveValue(state, Coil.HCapFTemp, InletAirTemp, InletWaterTemp);
@@ -9107,7 +9107,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
                 ShowWarningMessage(state, format("{} \"{}\":", Coil.DXCoilType, Coil.Name));
                 ShowContinueError(
                     state, format(" HPWH Heating Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", HeatCapFTemp));
-                if (state.dataCurveManager->PerfCurve(Coil.HCapFTemp).numDims == 2) {
+                if (state.dataCurveManager->PerfCurve(Coil.HCapFTemp)->numDims == 2) {
                     ShowContinueError(
                         state,
                         format(" Negative value occurs using an inlet air temperature of {:.1T} and an inlet water temperature of {:.1T}.",
@@ -9135,7 +9135,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
     }
 
     if (Coil.HCOPFTemp > 0) {
-        if (state.dataCurveManager->PerfCurve(Coil.HCOPFTemp).numDims == 1) {
+        if (state.dataCurveManager->PerfCurve(Coil.HCOPFTemp)->numDims == 1) {
             HeatCOPFTemp = CurveValue(state, Coil.HCOPFTemp, InletAirTemp);
         } else {
             HeatCOPFTemp = CurveValue(state, Coil.HCOPFTemp, InletAirTemp, InletWaterTemp);
@@ -9146,7 +9146,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
                 ShowWarningMessage(state, format("{} \"{}\":", Coil.DXCoilType, Coil.Name));
                 ShowContinueError(state,
                                   format(" HPWH Heating COP Modifier curve (function of temperature) output is negative ({:.3T}).", HeatCOPFTemp));
-                if (state.dataCurveManager->PerfCurve(Coil.HCOPFTemp).numDims == 2) {
+                if (state.dataCurveManager->PerfCurve(Coil.HCOPFTemp)->numDims == 2) {
                     ShowContinueError(
                         state,
                         format(" Negative value occurs using an inlet air temperature of {:.1T} and an inlet water temperature of {:.1T}.",
@@ -9842,7 +9842,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
                 TotCapTempModFac = 1.0;
                 TotCapFlowModFac = 1.0;
             } else {
-                if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode)).numDims == 2) {
+                if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode))->numDims == 2) {
                     TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
                 } else {
                     TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), CondInletTemp);
@@ -9859,7 +9859,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
                         ShowContinueError(state,
                                           format(" Total Cooling Capacity Modifier curve (function of temperature) output is negative ({:.3T}).",
                                                  TotCapTempModFac));
-                        if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode)).numDims == 2) {
+                        if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode))->numDims == 2) {
                             ShowContinueError(state,
                                               format(" Negative value occurs using a condenser inlet air temperature of {:.1T} and an inlet air "
                                                      "wet-bulb temperature of {:.1T}.",
@@ -10282,7 +10282,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
                             "{}{}=\"{}\":", RoutineName, state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType, state.dataDXCoils->DXCoil(DXCoilNum).Name));
                     ShowContinueError(
                         state, format(" Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).", EIRTempModFac));
-                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode)).numDims == 2) {
+                    if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode))->numDims == 2) {
                         ShowContinueError(state,
                                           format(" Negative value occurs using a condenser inlet air temperature of {:.1T} and an inlet air "
                                                  "wet-bulb temperature of {:.1T}.",
@@ -10873,10 +10873,17 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
         //  Get total capacity modifying factor (function of temperature) for off-rated conditions
         //  InletAirHumRat may be modified in this ADP/BF loop, use temporary varible for calculations
         InletAirHumRatTemp = InletAirHumRat;
-        // No need to differentiate between curve types, single-independent curve will just use first variable
-        // (as long as the first independent variable is the same for both curve types)
+
     Label50:;
-        TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+        switch (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode))->numDims) {
+        case 1:
+            TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC);
+            break;
+        case 2:
+        default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
+            TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+            break;
+        }
 
         //  Warn user if curve output goes negative
         if (TotCapTempModFac < 0.0) {
@@ -11391,7 +11398,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
         // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
         // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
         // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-        if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode)).numDims == 2) {
+        if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode))->numDims == 2) {
             switch (state.dataDXCoils->DXCoil(DXCoilNum).HeatingPerformanceOATType) {
             case DryBulbIndicator: {
                 TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -11542,7 +11549,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
         // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
         if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating &&
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode))->numDims == 1) {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
             } else {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -14091,7 +14098,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
             // Low speed
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS))->numDims == 1) {
                 TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), OutdoorDryBulb);
             } else {
                 TotCapTempModFac =
@@ -14102,7 +14109,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Calculate total heating capacity for off-rated conditions
             TotCapLS = state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumLS) * TotCapFlowModFac * TotCapTempModFac;
             // High speed
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS))->numDims == 1) {
                 TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), OutdoorDryBulb);
             } else {
                 TotCapTempModFac =
@@ -14117,7 +14124,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
             // Low Speed
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS))->numDims == 1) {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), OutdoorDryBulb);
             } else {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -14125,7 +14132,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             EIRFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumLS), AirMassFlowRatioLS);
             EIRLS = 1.0 / state.dataDXCoils->DXCoil(DXCoilNum).MSRatedCOP(SpeedNumLS) * EIRTempModFac * EIRFlowModFac;
             // High Speed
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS))->numDims == 1) {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), OutdoorDryBulb);
             } else {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -14352,7 +14359,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum))->numDims == 1) {
                 TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), OutdoorDryBulb);
             } else {
                 TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -14435,7 +14442,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Model was extended to accept bi-quadratic curves. This allows sensitivity of the EIR
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(1)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(1))->numDims == 1) {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(1), OutdoorDryBulb);
             } else {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp(1), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -17713,7 +17720,7 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
         // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
         if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating &&
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode)).numDims == 1) {
+            if (state.dataCurveManager->PerfCurve(state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode))->numDims == 1) {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
             } else {
                 EIRTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
