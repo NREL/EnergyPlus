@@ -65,6 +65,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -134,6 +135,49 @@ namespace OutputProcessor {
     inline void ReallocateIVar(EnergyPlusData &state)
     {
         state.dataOutputProcessor->IVariableTypes.redimension(state.dataOutputProcessor->MaxIVariable += IVarAllocInc);
+    }
+
+    int DetermineMinuteForReporting(EnergyPlusData &state, TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   January 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // When reporting peaks, minutes are used but not necessarily easily calculated.
+
+        // METHODOLOGY EMPLOYED:
+        // Could use the access to the minute as OP (OutputProcessor) does but uses
+        // external calculation.
+
+        // Using/Aliasing
+        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
+        // Return value
+        int ActualTimeMin; // calculated Minute for reporting
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        Real64 constexpr FracToMin(60.0);
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 ActualTimeS; // Start of current interval (HVAC time step)
+        Real64 ActualTimeE; // End of current interval (HVAC time step)
+        int ActualTimeHrS;
+
+        if (t_timeStepType == OutputProcessor::TimeStepType::System) {
+            ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
+            ActualTimeE = ActualTimeS + TimeStepSys;
+            ActualTimeHrS = int(ActualTimeS);
+            ActualTimeMin = nint((ActualTimeE - ActualTimeHrS) * FracToMin);
+        } else {
+            ActualTimeMin = (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)) * FracToMin;
+        }
+
+        return ActualTimeMin;
     }
 
     void InitializeOutput(EnergyPlusData &state)

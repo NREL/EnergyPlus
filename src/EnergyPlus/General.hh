@@ -64,11 +64,6 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-// Forward declaration
-namespace OutputProcessor {
-    enum class TimeStepType;
-}
-
 namespace WeatherManager {
     enum class DateType;
     struct ReportPeriodData;
@@ -194,10 +189,6 @@ namespace General {
                            int &Hour,  // hour in integer format (1-24)
                            int &Minute // minute in integer format (0:59)
     );
-
-    // TODO: this probably shouldn't be here
-    int DetermineMinuteForReporting(EnergyPlusData &state,
-                                    OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
 
     void EncodeMonDayHrMin(int &Item, // word containing encoded month, day, hour, minute
                            int Month, // month in integer format (1:12)
