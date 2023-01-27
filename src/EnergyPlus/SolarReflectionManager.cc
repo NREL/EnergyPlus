@@ -248,7 +248,8 @@ namespace SolarReflectionManager {
                 for (loop = 1; loop <= state.dataSurface->Surface(SurfNum).Sides; ++loop) {
                     if (state.dataSurface->Surface(SurfNum).Vertex(loop).z < state.dataSurface->GroundLevelZ) {
                         ShowWarningError(
-                            state, "Calculation of reflected solar onto surface=" + state.dataSurface->Surface(SurfNum).Name + " may be inaccurate");
+                            state,
+                            format("Calculation of reflected solar onto surface={} may be inaccurate", state.dataSurface->Surface(SurfNum).Name));
                         ShowContinueError(state, "because it has one or more vertices below ground level.");
                         break;
                     }

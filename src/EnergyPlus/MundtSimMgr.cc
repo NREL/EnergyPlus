@@ -287,7 +287,7 @@ namespace MundtSimMgr {
 
                         // error check for debugging
                         if (!AirNodeFoundFlag) {
-                            ShowSevereError(state, "InitMundtModel: Air Node in Zone=\"" + thisZone.Name + "\" is not found.");
+                            ShowSevereError(state, format("InitMundtModel: Air Node in Zone=\"{}\" is not found.", thisZone.Name));
                             ErrorsFound = true;
                             continue;
                         }
@@ -355,7 +355,7 @@ namespace MundtSimMgr {
         ZoneEquipConfigNum = ZoneNum;
         // check whether this zone is a controlled zone or not
         if (!Zone(ZoneNum).IsControlled) {
-            ShowFatalError(state, "Zones must be controlled for Mundt air model. No system serves zone " + Zone(ZoneNum).Name);
+            ShowFatalError(state, format("Zones must be controlled for Mundt air model. No system serves zone {}", Zone(ZoneNum).Name));
             return;
         }
 
@@ -522,7 +522,7 @@ namespace MundtSimMgr {
                     state.dataMundtSimMgr->MundtAirSurf(state.dataMundtSimMgr->FloorSurfSetIDs(SurfNum), state.dataMundtSimMgr->MundtZoneNum).Area;
             }
         } else {
-            ShowSevereError(state, "SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
+            ShowSevereError(state, format("SetupMundtModel: Mundt model has no FloorAirNode, Zone={}", state.dataHeatBal->Zone(ZoneNum).Name));
             ErrorsFound = true;
         }
     }

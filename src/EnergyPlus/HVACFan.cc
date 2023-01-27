@@ -91,12 +91,12 @@ namespace HVACFan {
                     // TODO throw warning?
                     index = -1;
                     ShowSevereError(state,
-                                    "getFanObjectVectorIndex: Found duplicate Fan:SystemModel inputs of name =" + objectName + ". Check inputs");
+                                    format("getFanObjectVectorIndex: Found duplicate Fan:SystemModel inputs of name ={}. Check inputs", objectName));
                 }
             }
         }
         if (!found && ErrorCheck) {
-            ShowSevereError(state, "getFanObjectVectorIndex: did not find Fan:SystemModel name =" + objectName + ". Check inputs");
+            ShowSevereError(state, format("getFanObjectVectorIndex: did not find Fan:SystemModel name ={}. Check inputs", objectName));
         }
         return index;
     }
@@ -431,8 +431,8 @@ namespace HVACFan {
         } else {
             availSchedIndex = ScheduleManager::GetScheduleIndex(state, alphaArgs(2));
             if (availSchedIndex == 0) {
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + alphaFieldNames(2) + " = " + alphaArgs(2));
+                ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", alphaFieldNames(2), alphaArgs(2)));
                 errorsFound = true;
             }
         }
@@ -469,15 +469,15 @@ namespace HVACFan {
         } else if (UtilityRoutines::SameString(alphaArgs(5), "Discrete")) {
             speedControl = SpeedControlMethod::Discrete;
         } else {
-            ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + alphaFieldNames(5) + " = " + alphaArgs(5));
+            ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
+            ShowContinueError(state, format("Invalid {} = {}", alphaFieldNames(5), alphaArgs(5)));
             errorsFound = true;
         }
 
         m_minPowerFlowFrac = numericArgs(2);
         deltaPress = numericArgs(3);
         if (deltaPress <= 0.0) {
-            ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + " zero or negative, invalid entry in " + numericFieldNames(3));
+            ShowSevereError(state, format("{}{} zero or negative, invalid entry in {}", routineName, locCurrentModuleObject, numericFieldNames(3)));
             errorsFound = true;
         }
         m_motorEff = numericArgs(4);
@@ -496,8 +496,8 @@ namespace HVACFan {
             } else if (UtilityRoutines::SameString(alphaArgs(6), "TotalEfficiencyAndPressure")) {
                 m_powerSizingMethod = PowerSizingMethod::TotalEfficiencyAndPressure;
             } else {
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + alphaFieldNames(6) + " = " + alphaArgs(6));
+                ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", alphaFieldNames(6), alphaArgs(6)));
                 errorsFound = true;
             }
             m_elecPowerPerFlowRate = numericArgs(7);
@@ -507,8 +507,8 @@ namespace HVACFan {
         if (!isAlphaFieldBlank(7)) {
             powerModFuncFlowFractionCurveIndex = Curve::GetCurveIndex(state, alphaArgs(7));
             if (powerModFuncFlowFractionCurveIndex == 0) {
-                ShowWarningError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + alphaFieldNames(7) + " = " + alphaArgs(7));
+                ShowWarningError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", alphaFieldNames(7), alphaArgs(7)));
                 ShowContinueError(state, "Curve not found.");
                 if (speedControl == SpeedControlMethod::Continuous) {
                     errorsFound = true;
@@ -516,8 +516,8 @@ namespace HVACFan {
             }
         } else { // blank
             if (speedControl == SpeedControlMethod::Continuous) {
-                ShowWarningError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Continuous speed control requires a fan power curve in " + alphaFieldNames(7) + " = " + alphaArgs(7));
+                ShowWarningError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
+                ShowContinueError(state, format("Continuous speed control requires a fan power curve in {} = {}", alphaFieldNames(7), alphaArgs(7)));
                 errorsFound = true;
             }
         }
@@ -530,8 +530,8 @@ namespace HVACFan {
                 m_heatLossesDestination = ThermalLossDestination::LostToOutside;
             } else {
                 m_heatLossesDestination = ThermalLossDestination::LostToOutside;
-                ShowWarningError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + alphaFieldNames(8) + " = " + alphaArgs(8));
+                ShowWarningError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", alphaFieldNames(8), alphaArgs(8)));
                 ShowContinueError(state, "Zone name not found. Fan motor heat losses will not be added to a zone");
                 // continue with simulation but motor losses not sent to a zone.
             }
@@ -566,7 +566,7 @@ namespace HVACFan {
                 }
             } else {
                 // field set input does not match number of speeds, throw warning
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
                 ShowContinueError(state, "Fan with Discrete speed control does not have input for speed data that matches the number of speeds.");
                 errorsFound = true;
             }
@@ -578,7 +578,7 @@ namespace HVACFan {
                 }
             }
             if (increasingOrderError) {
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
                 ShowContinueError(state,
                                   "Fan with Discrete speed control and multiple speed levels does not have input with flow fractions arranged in "
                                   "increasing order.");
@@ -596,7 +596,7 @@ namespace HVACFan {
             }
             if (foundMissingPowerFraction) {
                 // field set input does not match number of speeds, throw warning
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
                 ShowContinueError(
                     state,
                     "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
@@ -605,7 +605,7 @@ namespace HVACFan {
         }
 
         if (errorsFound) {
-            ShowFatalError(state, std::string{routineName} + "Errors found in input for fan name = " + name + ".  Program terminates.");
+            ShowFatalError(state, format("{}Errors found in input for fan name = {}.  Program terminates.", routineName, name));
         }
 
         SetupOutputVariable(state,
