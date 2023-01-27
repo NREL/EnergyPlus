@@ -1053,30 +1053,6 @@ void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, h
     Item = ((Month * 100 + Day) * 100 + Hour) * 100 + Minute;
 }
 
-int LogicalToInteger(bool const Flag)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This subroutine uses an input logical and makes
-    // an integer (true=1, false=0)
-
-    // Return value
-    int LogicalToInteger;
-
-    if (Flag) {
-        LogicalToInteger = 1;
-    } else {
-        LogicalToInteger = 0;
-    }
-
-    return LogicalToInteger;
-}
-
 Real64 GetCurrentHVACTime(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:

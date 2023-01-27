@@ -197,8 +197,6 @@ namespace General {
                            int Minute // minute in integer format (0:59)
     );
 
-    int LogicalToInteger(bool Flag);
-
     Real64 GetCurrentHVACTime(EnergyPlusData &state);
 
     Real64 GetPreviousHVACTime(EnergyPlusData &state);

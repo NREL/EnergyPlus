@@ -2309,18 +2309,18 @@ void TraceIterationStamp(EnergyPlusData &state,
     // Note that we do not go to the next line
     print(TraceFile,
           "{},{},{},{},{},{},{},{},{},{},{},{},",
-          General::LogicalToInteger(state.dataGlobal->ZoneSizingCalc),
-          General::LogicalToInteger(state.dataGlobal->SysSizingCalc),
+          state.dataGlobal->ZoneSizingCalc ? 1 : 0,
+          state.dataGlobal->SysSizingCalc ? 1 : 0,
           state.dataEnvrn->CurEnvirNum,
-          General::LogicalToInteger(state.dataGlobal->WarmupFlag),
+          state.dataGlobal->WarmupFlag ? 1 : 0,
           CreateHVACTimeString(state),
           MakeHVACTimeIntervalString(state),
-          General::LogicalToInteger(state.dataGlobal->BeginTimeStepFlag),
-          General::LogicalToInteger(state.dataHVACGlobal->FirstTimeStepSysFlag),
-          General::LogicalToInteger(FirstHVACIteration),
+          state.dataGlobal->BeginTimeStepFlag ? 1 : 0,
+          state.dataHVACGlobal->FirstTimeStepSysFlag ? 1 : 0,
+          FirstHVACIteration ? 1 : 0,
           AirLoopPass,
           AirLoopNumCalls,
-          General::LogicalToInteger(AirLoopConverged));
+          AirLoopConverged ? 1 : 0);
 }
 
 void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum)
@@ -2431,11 +2431,11 @@ void TraceIndividualController(EnergyPlusData &state,
     print(TraceFile,
           "{},{},{},{},{},{},{},{},",
           state.dataEnvrn->CurEnvirNum,
-          General::LogicalToInteger(state.dataGlobal->WarmupFlag),
+          state.dataGlobal->WarmupFlag ? 1 : 0,
           CreateHVACTimeString(state),
           MakeHVACTimeIntervalString(state),
           AirLoopPass,
-          General::LogicalToInteger(FirstHVACIteration),
+          FirstHVACIteration ? 1 : 0,
           Operation,
           ControllerProps.NumCalcCalls);
 
@@ -2454,7 +2454,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ' ',
               ' ',
               ControllerProps.Mode,
-              General::LogicalToInteger(IsConvergedFlag),
+              IsConvergedFlag ? 1 : 0,
               ControllerProps.NextActuatedValue);
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
@@ -2479,7 +2479,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ControllerProps.DeltaSensed,
               ControllerProps.Offset,
               ControllerProps.Mode,
-              General::LogicalToInteger(IsConvergedFlag),
+              IsConvergedFlag ? 1 : 0,
               ControllerProps.NextActuatedValue);
 
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
@@ -2505,7 +2505,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ControllerProps.DeltaSensed,
               ControllerProps.Offset,
               ControllerProps.Mode,
-              General::LogicalToInteger(IsConvergedFlag),
+              IsConvergedFlag ? 1 : 0,
               ControllerProps.NextActuatedValue);
 
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
