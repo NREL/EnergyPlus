@@ -3073,7 +3073,7 @@ Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
         FanCalDeltaPresstemp = CurveValue(state, FanCurvePtr, FanFaultyAirFlowRate);
 
         if ((FanCalDeltaPresstemp <= FanCalDeltaPress) ||
-            (FanFaultyAirFlowRate <= state.dataCurveManager->PerfCurve(FanCurvePtr).inputLimits[0].min)) {
+            (FanFaultyAirFlowRate <= state.dataCurveManager->PerfCurve(FanCurvePtr)->inputLimits[0].min)) {
             // The new operational point of the fan go beyond the fan selection range
             ShowWarningError(state, format("The operational point of the fan {} may go beyond the fan selection ", FanName));
             ShowContinueError(state, "range in the faulty fouling air filter cases");
