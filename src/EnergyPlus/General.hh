@@ -222,14 +222,6 @@ namespace General {
                         ObjexxFCL::Optional_string Option1 = _,
                         ObjexxFCL::Optional_string Option2 = _);
 
-    inline void ReallocateRealArray(Array1D<Real64> &Array,
-                                    int &ArrayMax,     // Current and resultant dimension for Array
-                                    int const ArrayInc // increment for redimension
-    )
-    {
-        Array.redimension(ArrayMax += ArrayInc, 0.0);
-    }
-
     void CheckCreatedZoneItemName(EnergyPlusData &state,
                                   std::string_view calledFrom,              // routine called from
                                   std::string const &CurrentObject,         // object being parsed
