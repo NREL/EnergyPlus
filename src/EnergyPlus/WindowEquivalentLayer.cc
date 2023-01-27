@@ -6991,59 +6991,76 @@ bool RB_LWP(CFSLAYER const &L, // RB layer
 }
 
 bool RB_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,                      // RB layer
-            CFSSWP &LSWP,                           // returned: equivalent layer properties set
-            ObjexxFCL::Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
+            CFSLAYER const &L, // RB layer
+            CFSSWP &LSWP,      // returned: equivalent layer properties set
+            const Real64 THETA // incident angle, 0 <= theta <= PI/2
 )
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
+    //       MODIFIED       Jason W. DeGraw 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     //  Modifies roller blind shortwave properties. If not roller blind layer
     //  returns False.
 
-    // Return value
-    bool RB_SWP;
+    // FUNCTION ARGUMENT DEFINITIONS:
+    //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
+    //  if missing, derive diffuse properties
+
+    if (L.LTYPE != LayerType::ROLLB) return false;
+
+    // normal beam-total properties of fabric
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+
+    Real64 TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
+    Real64 TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
+
+    RB_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
+
+    RB_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
+
+    return true;
+}
+
+bool RB_SWP(EnergyPlusData &state,
+            CFSLAYER const &L, // RB layer
+            CFSSWP &LSWP       // returned: equivalent layer properties set
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       Jason W. DeGraw 2023
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    //  Modifies roller blind shortwave properties. If not roller blind layer
+    //  returns False.
 
     // FUNCTION ARGUMENT DEFINITIONS:
     //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
     //  if missing, derive diffuse properties
 
-    bool DODIFFUSE;
-    Real64 RHOBF_BT0;
-    Real64 RHOFF_BT0;
-    Real64 TAUBF_BT0;
-    Real64 TAUFF_BT0;
-    Real64 TAUX;
-
-    RB_SWP = false;
-    if (L.LTYPE != LayerType::ROLLB) return RB_SWP;
-
-    DODIFFUSE = !present(THETA);
+    if (L.LTYPE != LayerType::ROLLB) return false;
 
     // normal beam-total properties of fabric
-    RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
-    RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
 
-    TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
-    TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
+    Real64 TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
+    Real64 TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
 
-    if (DODIFFUSE) {
-        // front
-        RB_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
-        // back
-        RB_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
-    } else {
-        RB_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
+    // front
+    RB_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
+    // back
+    Real64 TAUX; // This gets used as output of RB_DIFF and is then discarded
+    RB_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
 
-        RB_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
-    }
-    RB_SWP = true;
-    return RB_SWP;
+    return true;
 }
 
 bool IS_LWP(CFSLAYER const &L, // IS layer
@@ -7079,62 +7096,78 @@ bool IS_LWP(CFSLAYER const &L, // IS layer
 }
 
 bool IS_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,                      // PD layer
-            CFSSWP &LSWP,                           // returned: equivalent layer properties set
-            ObjexxFCL::Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
+            CFSLAYER const &L, // PD layer
+            CFSSWP &LSWP,      // returned: equivalent layer properties set
+            const Real64 THETA // incident angle, 0 <= theta <= PI/2
 )
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
+    //       MODIFIED       Jason W. DeGraw 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Modifies Insect Screen shortwave properties. If not Insect Screen layer
     // returns False.
 
-    // Return value
-    bool IS_SWP;
+    // FUNCTION ARGUMENT DEFINITIONS:
+    //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
+    //  if missing, derive diffuse properties
+
+    if (L.LTYPE != LayerType::INSCRN) return false;
+
+    // normal beam-total properties
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+
+    Real64 TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
+    Real64 TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
+
+    // front
+    IS_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
+
+    // back -- call with reverse material properies
+    IS_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
+
+    return true;
+}
+
+bool IS_SWP(EnergyPlusData &state,
+            CFSLAYER const &L, // PD layer
+            CFSSWP &LSWP       // returned: equivalent layer properties set
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       Jason W. DeGraw 2023
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Modifies Insect Screen shortwave properties. If not Insect Screen layer
+    // returns False.
 
     // FUNCTION ARGUMENT DEFINITIONS:
     //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
     //  if missing, derive diffuse properties
 
-    bool DODIFFUSE;
-    Real64 RHOBF_BT0;
-    Real64 RHOFF_BT0;
-    Real64 TAUBF_BT0;
-    Real64 TAUFF_BT0;
-    Real64 TAUX;
-
-    IS_SWP = false;
-    if (L.LTYPE != LayerType::INSCRN) return IS_SWP;
-
-    DODIFFUSE = !present(THETA);
+    if (L.LTYPE != LayerType::INSCRN) return false;
 
     // normal beam-total properties
-    RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
-    RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
 
-    TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
-    TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
+    Real64 TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
+    Real64 TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
 
-    if (DODIFFUSE) {
+    // front
+    IS_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
+    // back
+    Real64 TAUX; // This gets used as output of IS_DIFF and is then discarded
+    IS_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
 
-        // front
-        IS_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
-        // back
-        IS_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
-    } else {
-        // front
-        IS_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
-
-        // back -- call with reverse material properies
-        IS_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
-    }
-    IS_SWP = true;
-    return IS_SWP;
+    return true;
 }
 
 void Fabric_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP) // fabric short wave properties
@@ -7199,86 +7232,95 @@ bool PD_LWP(EnergyPlusData &state,
 }
 
 bool PD_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,                           // PD layer
-            CFSSWP &LSWP,                                // returned: equivalent layer properties set
-            ObjexxFCL::Optional<Real64 const> OHM_V_RAD, // vertical VB profile angles, radians
-            ObjexxFCL::Optional<Real64 const> OHM_H_RAD  // horizonatl VB profile angles, radians
+            CFSLAYER const &L,      // PD layer
+            CFSSWP &LSWP,           // returned: equivalent layer properties set
+            const Real64 OHM_V_RAD, // vertical VB profile angles, radians
+            const Real64 OHM_H_RAD  // horizonatl VB profile angles, radians
 )
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
+    //       MODIFIED       Jason W. DeGraw 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Modifies drape fabric shortwave properties for openness. If not drape Fabric layer
     // returns false. If profile angles not specified diffuse properties are returned.
 
-    // Return value
-    bool PD_SWP;
+    if (!(L.LTYPE == LayerType::DRAPE)) return false;
 
-    bool DODIFFUSE;
-    Real64 RHOBF_BT0;
-    Real64 RHOFF_BT0;
-    Real64 TAUX;
+    // normal beam-total properties of fabric
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
 
-    PD_SWP = false;
-    if (!(L.LTYPE == LayerType::DRAPE)) return PD_SWP;
+    // drape front properties
+    PD_BEAM(state,
+            L.S,
+            L.W,
+            OHM_V_RAD,
+            OHM_H_RAD,
+            RHOFF_BT0,
+            L.SWP_MAT.TAUSFBB,
+            L.SWP_MAT.TAUSFBD,
+            L.SWP_MAT.RHOSFDD,
+            L.SWP_MAT.TAUS_DD,
+            RHOBF_BT0,
+            L.SWP_MAT.TAUSBBB,
+            L.SWP_MAT.TAUSBBD,
+            L.SWP_MAT.RHOSBDD,
+            L.SWP_MAT.TAUS_DD,
+            LSWP.RHOSFBD,
+            LSWP.TAUSFBB,
+            LSWP.TAUSFBD);
 
-    DODIFFUSE = !(present(OHM_V_RAD) && present(OHM_H_RAD));
+    // drape back properties: call with reversed fabric properies
+    PD_BEAM(state,
+            L.S,
+            L.W,
+            OHM_V_RAD,
+            OHM_H_RAD,
+            RHOBF_BT0,
+            L.SWP_MAT.TAUSBBB,
+            L.SWP_MAT.TAUSBBD,
+            L.SWP_MAT.RHOSBDD,
+            L.SWP_MAT.TAUS_DD,
+            RHOFF_BT0,
+            L.SWP_MAT.TAUSFBB,
+            L.SWP_MAT.TAUSFBD,
+            L.SWP_MAT.RHOSFDD,
+            L.SWP_MAT.TAUS_DD,
+            LSWP.RHOSBBD,
+            LSWP.TAUSBBB,
+            LSWP.TAUSBBD);
 
-    if (DODIFFUSE) {
-        PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSFDD, L.SWP_MAT.RHOSBDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
+    return true;
+}
 
-        PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
-    } else {
-        // normal beam-total properties of fabric
-        RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
-        RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+bool PD_SWP(EnergyPlusData &state,
+            CFSLAYER const &L, // PD layer
+            CFSSWP &LSWP       // returned: equivalent layer properties set
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       Jason W. DeGraw
+    //       RE-ENGINEERED  na
 
-        // drape front properties
-        PD_BEAM(state,
-                L.S,
-                L.W,
-                OHM_V_RAD,
-                OHM_H_RAD,
-                RHOFF_BT0,
-                L.SWP_MAT.TAUSFBB,
-                L.SWP_MAT.TAUSFBD,
-                L.SWP_MAT.RHOSFDD,
-                L.SWP_MAT.TAUS_DD,
-                RHOBF_BT0,
-                L.SWP_MAT.TAUSBBB,
-                L.SWP_MAT.TAUSBBD,
-                L.SWP_MAT.RHOSBDD,
-                L.SWP_MAT.TAUS_DD,
-                LSWP.RHOSFBD,
-                LSWP.TAUSFBB,
-                LSWP.TAUSFBD);
+    // PURPOSE OF THIS FUNCTION:
+    // Modifies drape fabric shortwave properties for openness. If not drape Fabric layer
+    // returns false. If profile angles not specified diffuse properties are returned.
 
-        // drape back properties: call with reversed fabric properies
-        PD_BEAM(state,
-                L.S,
-                L.W,
-                OHM_V_RAD,
-                OHM_H_RAD,
-                RHOBF_BT0,
-                L.SWP_MAT.TAUSBBB,
-                L.SWP_MAT.TAUSBBD,
-                L.SWP_MAT.RHOSBDD,
-                L.SWP_MAT.TAUS_DD,
-                RHOFF_BT0,
-                L.SWP_MAT.TAUSFBB,
-                L.SWP_MAT.TAUSFBD,
-                L.SWP_MAT.RHOSFDD,
-                L.SWP_MAT.TAUS_DD,
-                LSWP.RHOSBBD,
-                LSWP.TAUSBBB,
-                LSWP.TAUSBBD);
-    }
-    PD_SWP = true;
-    return PD_SWP;
+    Real64 TAUX; // This gets used as output of PD_DIFF and is then discarded
+
+    if (!(L.LTYPE == LayerType::DRAPE)) return false;
+
+    PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSFDD, L.SWP_MAT.RHOSBDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
+
+    PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
+
+    return true;
 }
 
 bool VB_LWP(EnergyPlusData &state,
@@ -7324,88 +7366,97 @@ bool VB_LWP(EnergyPlusData &state,
 }
 
 bool VB_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,                      // VB layer
-            CFSSWP &LSWP,                           // returned: equivalent off-normal properties
-            ObjexxFCL::Optional<Real64 const> OMEGA // incident profile angle (radians)
+            CFSLAYER const &L, // VB layer
+            CFSSWP &LSWP,      // returned: equivalent off-normal properties
+            const Real64 OMEGA // incident profile angle (radians)
 )
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
+    //       MODIFIED       Jason W. DeGraw
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Returns venetian blind off-normal short wave properties. If not VB layer
     // returns False.
-    // Return value
-    bool VB_SWP;
+
+    // FUNCTION ARGUMENT DEFINITIONS:
+    //   sets: RHOSFBD, TAUSFBB, TAUSFBD
+
+    if (!IsVBLayer(L)) return false;
+
+    Real64 SL_WR = VB_SLAT_RADIUS_RATIO(L.W, L.C);
+
+    // modify angle-dependent values for actual profile angle
+    VB_SOL46_CURVE(state,
+                   L.S,
+                   L.W,
+                   SL_WR,
+                   DataGlobalConstants::DegToRadians * L.PHI_DEG,
+                   OMEGA,
+                   L.SWP_MAT.RHOSBDD,
+                   L.SWP_MAT.RHOSFDD,
+                   L.SWP_MAT.TAUS_DD,
+                   LSWP.RHOSFBD,
+                   LSWP.TAUSFBB,
+                   LSWP.TAUSFBD);
+
+    VB_SOL46_CURVE(state,
+                   L.S,
+                   L.W,
+                   SL_WR,
+                   -DataGlobalConstants::DegToRadians * L.PHI_DEG,
+                   OMEGA,
+                   L.SWP_MAT.RHOSBDD,
+                   L.SWP_MAT.RHOSFDD,
+                   L.SWP_MAT.TAUS_DD,
+                   LSWP.RHOSBBD,
+                   LSWP.TAUSBBB,
+                   LSWP.TAUSBBD);
+
+    return true;
+}
+
+bool VB_SWP(EnergyPlusData &state,
+            CFSLAYER const &L, // VB layer
+            CFSSWP &LSWP       // returned: equivalent off-normal properties
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       Jason W. DeGraw
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Returns venetian blind off-normal short wave properties. If not VB layer
+    // returns False.
 
     // FUNCTION ARGUMENT DEFINITIONS:
     //   sets: RHOSFBD, TAUSFBB, TAUSFBD
 
     Real64 SL_WR;
-    Real64 TAUX;
-    bool DODIFFUSE;
+    Real64 TAUX; // This gets used as output of VB_DIFF and is then discarded
 
-    VB_SWP = false;
-    if (!IsVBLayer(L)) return VB_SWP;
+    if (!IsVBLayer(L)) return false;
 
     SL_WR = VB_SLAT_RADIUS_RATIO(L.W, L.C);
 
-    DODIFFUSE = !present(OMEGA);
+    VB_DIFF(state,
+            L.S,
+            L.W,
+            DataGlobalConstants::DegToRadians * L.PHI_DEG,
+            L.SWP_MAT.RHOSBDD,
+            L.SWP_MAT.RHOSFDD,
+            L.SWP_MAT.TAUS_DD,
+            LSWP.RHOSFDD,
+            LSWP.TAUS_DD);
 
-    if (DODIFFUSE) {
+    VB_DIFF(
+        state, L.S, L.W, -DataGlobalConstants::DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
 
-        VB_DIFF(state,
-                L.S,
-                L.W,
-                DataGlobalConstants::DegToRadians * L.PHI_DEG,
-                L.SWP_MAT.RHOSBDD,
-                L.SWP_MAT.RHOSFDD,
-                L.SWP_MAT.TAUS_DD,
-                LSWP.RHOSFDD,
-                LSWP.TAUS_DD);
-
-        VB_DIFF(state,
-                L.S,
-                L.W,
-                -DataGlobalConstants::DegToRadians * L.PHI_DEG,
-                L.SWP_MAT.RHOSBDD,
-                L.SWP_MAT.RHOSFDD,
-                L.SWP_MAT.TAUS_DD,
-                LSWP.RHOSBDD,
-                TAUX);
-    } else {
-        // modify angle-dependent values for actual profile angle
-        VB_SOL46_CURVE(state,
-                       L.S,
-                       L.W,
-                       SL_WR,
-                       DataGlobalConstants::DegToRadians * L.PHI_DEG,
-                       OMEGA,
-                       L.SWP_MAT.RHOSBDD,
-                       L.SWP_MAT.RHOSFDD,
-                       L.SWP_MAT.TAUS_DD,
-                       LSWP.RHOSFBD,
-                       LSWP.TAUSFBB,
-                       LSWP.TAUSFBD);
-
-        VB_SOL46_CURVE(state,
-                       L.S,
-                       L.W,
-                       SL_WR,
-                       -DataGlobalConstants::DegToRadians * L.PHI_DEG,
-                       OMEGA,
-                       L.SWP_MAT.RHOSBDD,
-                       L.SWP_MAT.RHOSFDD,
-                       L.SWP_MAT.TAUS_DD,
-                       LSWP.RHOSBBD,
-                       LSWP.TAUSBBB,
-                       LSWP.TAUSBBD);
-    }
-    VB_SWP = true;
-    return VB_SWP;
+    return true;
 }
 
 bool VB_ShadeControl(EnergyPlusData &state,
@@ -7675,18 +7726,16 @@ bool IsVBLayer(CFSLAYER const &L)
 }
 
 void BuildGap(EnergyPlusData &state,
-              CFSGAP &G,                               // returned
-              int const GType,                         // gap type (gtyOPENin, gtyOPENout or gtySEALED)
-              Real64 &TAS,                             // gap thickness, m
-              ObjexxFCL::Optional<Real64 const> xTMan, // re density calc -- temp (C) and pressure (Pa)
-              ObjexxFCL::Optional<Real64 const> xPMan  // re density calc -- temp (C) and pressure (Pa)
+              CFSGAP &G,       // returned
+              int const GType, // gap type (gtyOPENin, gtyOPENout or gtySEALED)
+              Real64 &TAS      // gap thickness, m
 )
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       Bereket Nigusse, June 2013
+    //       MODIFIED       Bereket Nigusse, June 2013, Jason W. DeGraw 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -7701,9 +7750,6 @@ void BuildGap(EnergyPlusData &state,
     constexpr Real64 GapThickMin(0.0001); // Minimum gap thickness allowed, m
     static constexpr std::string_view RoutineName("BuildGap: ");
 
-    Real64 PMan;
-    Real64 TMan;
-
     if (TAS < GapThickMin) {
         ShowSevereError(state, format("{}{}", RoutineName, G.Name));
         ShowContinueError(state, "...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m");
@@ -7715,12 +7761,7 @@ void BuildGap(EnergyPlusData &state,
     // venetian blind, see AdjustVBGap() routine
 
     G.GTYPE = GType;
-    TMan = 21.0;
-    if (present(xTMan)) TMan = xTMan;
-    PMan = state.dataWindowEquivalentLayer->PAtmSeaLevel;
-    if (present(xPMan)) PMan = xPMan;
-
-    G.RHOGAS = DensityCFSFillGas(G.FG, PMan, TMan + DataGlobalConstants::KelvinConv);
+    G.RHOGAS = DensityCFSFillGas(G.FG, state.dataWindowEquivalentLayer->PAtmSeaLevel, 294.15);
 }
 
 void AdjustVBGap(CFSGAP &G,        // gap, returned updated
@@ -8021,7 +8062,7 @@ Real64 EffectiveEPSLB(CFSTY const &FS) // Complex Fenestration
 bool FEQX(Real64 const a, // values to compare, fractional tolerance
           Real64 const b,
           Real64 const tolF,
-          ObjexxFCL::Optional<Real64> tolAbs // absolute tolerance
+          const Real64 tolAbs // absolute tolerance
 )
 {
     // FUNCTION INFORMATION:
@@ -8039,11 +8080,8 @@ bool FEQX(Real64 const a, // values to compare, fractional tolerance
     Real64 d;
     Real64 tolAbsX;
 
-    if (present(tolAbs)) {
-        tolAbsX = max(tolAbs, 1.e-10);
-    } else {
-        tolAbsX = 1.e-10;
-    }
+    tolAbsX = max(tolAbs, 1.e-10);
+
     d = std::abs(a - b);
     if (d < tolAbsX) {
         FEQX = true;
