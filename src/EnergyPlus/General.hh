@@ -253,8 +253,6 @@ namespace General {
         CheckCreatedZoneItemName(state, calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag);
     }
 
-    std::vector<std::string> splitString(const std::string &string, char delimiter);
-
     bool isReportPeriodBeginning(EnergyPlusData &state, int periodIdx);
 
     void findReportPeriodIdx(EnergyPlusData &state,

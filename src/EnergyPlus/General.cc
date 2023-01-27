@@ -1615,23 +1615,6 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     }
 }
 
-// This is from OpenStudio
-std::vector<std::string> splitString(const std::string &string, char delimiter)
-{
-    std::vector<std::string> results;
-    if (!string.empty()) { // Only do work if there is work to do
-        std::stringstream stream(string);
-        std::string substring;
-        while (std::getline(stream, substring, delimiter)) { // Loop and fill the results vector
-            results.push_back(substring);
-        }
-        if (*(string.end() - 1) == ',') { // Add an empty string if the last char is the delimiter
-            results.emplace_back();
-        }
-    }
-    return results;
-}
-
 bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx)
 {
     int currentDate;
