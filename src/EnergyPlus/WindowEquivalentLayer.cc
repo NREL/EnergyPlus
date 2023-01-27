@@ -7057,12 +7057,11 @@ bool RB_SWP(EnergyPlusData &state,
     // front
     RB_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
     // back
-    Real64 TAUX; // This gets used as output of RB_DIFF and is then discarded 
+    Real64 TAUX; // This gets used as output of RB_DIFF and is then discarded
     RB_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
 
     return true;
 }
-
 
 bool IS_LWP(CFSLAYER const &L, // IS layer
             CFSLWP &LLWP       // returned: equivalent layer long wave properties
@@ -7152,7 +7151,6 @@ bool IS_SWP(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
     //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
     //  if missing, derive diffuse properties
-    
 
     if (L.LTYPE != LayerType::INSCRN) return false;
 
@@ -7166,7 +7164,7 @@ bool IS_SWP(EnergyPlusData &state,
     // front
     IS_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
     // back
-    Real64 TAUX; // This gets used as output of IS_DIFF and is then discarded 
+    Real64 TAUX; // This gets used as output of IS_DIFF and is then discarded
     IS_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
 
     return true;
@@ -7314,14 +7312,14 @@ bool PD_SWP(EnergyPlusData &state,
     // Modifies drape fabric shortwave properties for openness. If not drape Fabric layer
     // returns false. If profile angles not specified diffuse properties are returned.
 
-    Real64 TAUX; // This gets used as output of PD_DIFF and is then discarded 
+    Real64 TAUX; // This gets used as output of PD_DIFF and is then discarded
 
     if (!(L.LTYPE == LayerType::DRAPE)) return false;
 
     PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSFDD, L.SWP_MAT.RHOSBDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
 
     PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
-    
+
     return true;
 }
 
@@ -7385,7 +7383,7 @@ bool VB_SWP(EnergyPlusData &state,
 
     // FUNCTION ARGUMENT DEFINITIONS:
     //   sets: RHOSFBD, TAUSFBB, TAUSFBD
- 
+
     if (!IsVBLayer(L)) return false;
 
     Real64 SL_WR = VB_SLAT_RADIUS_RATIO(L.W, L.C);
@@ -7439,7 +7437,7 @@ bool VB_SWP(EnergyPlusData &state,
     //   sets: RHOSFBD, TAUSFBB, TAUSFBD
 
     Real64 SL_WR;
-    Real64 TAUX; // This gets used as output of VB_DIFF and is then discarded 
+    Real64 TAUX; // This gets used as output of VB_DIFF and is then discarded
 
     if (!IsVBLayer(L)) return false;
 
