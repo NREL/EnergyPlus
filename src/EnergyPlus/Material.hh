@@ -132,6 +132,19 @@ namespace Material {
     constexpr std::array<std::string_view, static_cast<int>(SlatAngleType::Num)> SlatAngleTypeUC = {
         "FIXEDSLATANGLE", "MAXIMIZESOLAR", "BLOCKBEAMSOLAR"};
 
+    enum class VariableAbsCtrlSignal
+    {
+        Invalid = -1,
+        SurfaceTemperature,
+        SurfaceReceivedSolarRadiation,
+        SpaceHeatingCoolingMode,
+        Scheduled,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(VariableAbsCtrlSignal::Num)> VariableAbsCtrlSignalUC = {
+        "SURFACETEMPERATURE", "SURFACERECEIVEDSOLARRADIATION", "SPACEHEATINGCOOLINGMODE", "SCHEDULED"};
+
     struct MaterialProperties
     {
         // Members
@@ -167,18 +180,24 @@ namespace Material {
         Array1D<Real64> GasSpecHeatRatio; // Gas specific heat ratio (used for low pressure calculations)
         Array1D<Real64> GasFract;         // Gas fractions for up to 5 gases in a mixture
         // Radiation parameters
-        Real64 AbsorpSolar;              // Layer solar absorptance
-        Real64 AbsorpSolarInput;         // Layer solar absorptance input by user
-        bool AbsorpSolarEMSOverrideOn;   // if true, then EMS calling to override value for solar absorptance
-        Real64 AbsorpSolarEMSOverride;   // value to use when EMS calling to override value for solar absorptance
-        Real64 AbsorpThermal;            // Layer thermal absorptance
-        Real64 AbsorpThermalInput;       // Layer thermal absorptance input by user
-        bool AbsorpThermalEMSOverrideOn; // if true, then EMS calling to override value for thermal absorptance
-        Real64 AbsorpThermalEMSOverride; // value to use when EMS calling to override value for thermal absorptance
-        Real64 AbsorpVisible;            // Layer Visible Absorptance
-        Real64 AbsorpVisibleInput;       // Layer Visible Absorptance input by user
-        bool AbsorpVisibleEMSOverrideOn; // if true, then EMS calling to override value for visible absorptance
-        Real64 AbsorpVisibleEMSOverride; // value to use when EMS calling to override value for visible absorptance
+        Real64 AbsorpSolar;                      // Layer solar absorptance
+        Real64 AbsorpSolarInput;                 // Layer solar absorptance input by user
+        bool AbsorpSolarEMSOverrideOn;           // if true, then EMS calling to override value for solar absorptance
+        Real64 AbsorpSolarEMSOverride;           // value to use when EMS calling to override value for solar absorptance
+        Real64 AbsorpThermal;                    // Layer thermal absorptance
+        Real64 AbsorpThermalInput;               // Layer thermal absorptance input by user
+        bool AbsorpThermalEMSOverrideOn = false; // if true, then EMS calling to override value for thermal absorptance
+        Real64 AbsorpThermalEMSOverride = 0.0;   // value to use when EMS calling to override value for thermal absorptance
+        bool AbsorpThermalMatAddOnOverrideOn;    // if true, then use MaterialProperty:VariableThermalAbsorptance to override value for thermal
+                                                 // absorptance
+        Real64
+            AbsorpThermalMatAddOnOverride; // value to use to override value for thermal absorptance with MaterialProperty:VariableThermalAbsorptance
+        Real64 AbsorpVisible;              // Layer Visible Absorptance
+        Real64 AbsorpVisibleInput;         // Layer Visible Absorptance input by user
+        bool AbsorpVisibleEMSOverrideOn = false; // if true, then EMS calling to override value for visible absorptance
+        Real64 AbsorpVisibleEMSOverride = 0.0;   // value to use when EMS calling to override value for visible absorptance
+        bool AbsorpSolarMatAddOnOverrideOn; // if true, then use MaterialProperty:VariableSolarAbsorptance to override value for Solar absorptance
+        Real64 AbsorpSolarMatAddOnOverride; // value to use to override value for Solar absorptance with MaterialProperty:VariableSolarAbsorptance
         // Window-related radiation parameters
         Real64 Trans;                    // Transmittance of layer (glass, shade)
         Real64 TransVis;                 // Visible transmittance (at normal incidence)
@@ -357,7 +376,28 @@ namespace Material {
         }
     };
 
-    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
+    struct VariableAbsAddOn
+    {
+        std::string Name = "";
+        std::string MaterialName = "";
+        int MaterialIdx = -1;
+        VariableAbsCtrlSignal ControlSignal = VariableAbsCtrlSignal::Invalid;
+        std::string FunctionName = "";
+        int FunctionIdx = -1;
+        int SurfIdx = -1;
+        int ZoneIdx = -1;
+        std::string ScheduleName = "";
+        int ScheduleIdx = -1;
+    };
+
+    void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
+    void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_view addOnType, bool &errorsFound);
+    void GetVariableThermalAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
+    void GetVariableSolarAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
+    void GetMaterialAddOnData(EnergyPlusData &state, bool &errorsFound);
+    Real64 GetMaterialOverrideValue(EnergyPlusData &state, const VariableAbsAddOn &thisAbsAddOn);
+    void MaterialAddOnOverride(EnergyPlusData &state);
+    int GetSurfNumFromMaterial(EnergyPlusData &state, std::string_view materialName);
 
 } // namespace Material
 
@@ -365,6 +405,10 @@ struct MaterialData : BaseGlobalStruct
 {
     EPVector<Material::MaterialProperties *> Material;
     int TotMaterials = 0; // Total number of unique materials (layers) in this simulation
+    EPVector<Material::VariableAbsAddOn> variableThermalAbsAddOns;
+    int TotVariableThermalAbsAddOns = 0;
+    EPVector<Material::VariableAbsAddOn> variableSolarAbsAddOns;
+    int TotVariableSolarAbsAddOns = 0;
 
     void clear_state() override
     {

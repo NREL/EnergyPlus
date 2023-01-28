@@ -214,6 +214,71 @@
     0.7500000;               !- Visible Absorptance
 
   Material:NoMass,
+    R13LAYER_vary,           !- Name
+    Rough,                   !- Roughness
+    2.290965,                !- Thermal Resistance {m2-K/W}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  MaterialProperty:VariableThermalAbsorptance,
+    variableThermalR13LAYER, !- Name
+    R13LAYER_vary,           !- Reference Material Name
+    SurfaceTemperature,      !- Control Signal
+    ThermalAbsorptanceTemperatureTable,   !- Trigger Solar Absorptance Function Name
+    ;                        !- Thermal Absorptance Schedule Name
+    
+  MaterialProperty:VariableSolarAbsorptance,
+    variableSolarR13LAYER,   !- Name
+    R13LAYER_vary,           !- Reference Material Name
+    SurfaceTemperature,      !- Control Signal
+    SolarAbsorptanceTemperatureCurve,   !- Trigger Solar Absorptance Function Name
+    ;                        !- Solar Absorptance Schedule Name
+
+  Table:IndependentVariable,
+    ThermalAbsorptanceTemperatureTable_IndependentVariable1,  !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    -40.0,                   !- Minimum Value
+    60.0,                    !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Temperature,             !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.0,                     !- Value 1
+    20.0,                    !- Value 2
+    28.00000,                !- <none>
+    40.00000;                !- <none>
+
+  Table:IndependentVariableList,
+    ThermalAbsorptanceTemperatureTable_IndependentVariableList,  !- Name
+    ThermalAbsorptanceTemperatureTable_IndependentVariable1;     !- Independent Variable 1 Name
+
+  Table:Lookup,
+    ThermalAbsorptanceTemperatureTable,  !- Name
+    ThermalAbsorptanceTemperatureTable_IndependentVariableList,  !- Independent Variable List Name
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
+    0.2,                     !- Minimum Output
+    ,                        !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.20,                    !- Output Value 1
+    0.20,                    !- Output Value 2
+    0.90,                    !- <none>
+    0.90;                    !- <none>
+
+  Curve:Linear,
+    SolarAbsorptanceTemperatureCurve,    !- Name
+    0.6,                     !- Coefficient1 Constant
+    -0.01,                   !- Coefficient2 x
+    -40.0,                   !- Minimum Value of x
+    60.0;                    !- Maximum Value of x
+
+  Material:NoMass,
     R31LAYER,                !- Name
     Rough,                   !- Roughness
     5.456,                   !- Thermal Resistance {m2-K/W}
@@ -235,6 +300,10 @@
   Construction,
     R13WALL,                 !- Name
     R13LAYER;                !- Outside Layer
+
+  Construction,
+    R13WALL_vary,            !- Name
+    R13LAYER_vary;           !- Outside Layer
 
   Construction,
     FLOOR,                   !- Name
@@ -269,7 +338,7 @@
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
     Wall,                    !- Surface Type
-    R13WALL,                 !- Construction Name
+    R13WALL_vary,            !- Construction Name
     ZONE ONE,                !- Zone Name
     ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition

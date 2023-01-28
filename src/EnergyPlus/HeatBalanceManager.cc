@@ -229,6 +229,9 @@ namespace HeatBalanceManager {
 
         // These Inits will still have to be looked at as the routines are re-engineered further
 
+        // yujie: overwrite thermal solar absorptance here
+        Material::MaterialAddOnOverride(state);
+
         InitHeatBalance(state); // Initialize all heat balance related parameters
         ManageEMS(
             state, EMSManager::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
@@ -327,6 +330,9 @@ namespace HeatBalanceManager {
         GetConstructData(state, ErrorsFound); // Read constructs from input file/transfer from legacy data structure
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
+
+        // need surface data to be set up before these add-on can be constructed
+        Material::GetMaterialAddOnData(state, ErrorsFound); // Read variable thermal and solar absorptance addon data
 
         GetIncidentSolarMultiplier(state, ErrorsFound);
 
