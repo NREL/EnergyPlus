@@ -837,7 +837,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     // Annex42 = Direct
     EXPECT_TRUE(compare_enums(DataGenerators::CurveMode::Direct, fCPM.EffMode));
     ASSERT_GT(fCPM.EffCurveID, 0);
-    EXPECT_EQ("POWER MODULE EFFICIENCY CURVE", state->dataCurveManager->PerfCurve(fCPM.EffCurveID).Name);
+    EXPECT_EQ("POWER MODULE EFFICIENCY CURVE", state->dataCurveManager->PerfCurve(fCPM.EffCurveID)->Name);
     EXPECT_EQ(1.0, fCPM.NomEff);
     EXPECT_EQ(3400.0, fCPM.NomPel);
     // At beggining of simulation, 10. Then it's ALWAYS ON (baseload), so it doesn't cycle, so still should be 10
@@ -885,7 +885,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ(airSup.Name, thisFC->NameFCAirSup);
     EXPECT_EQ("GENERATOR FUEL CELL AIR SUPPLY 1 OA NODE", airSup.NodeName);
     ASSERT_GT(airSup.BlowerPowerCurveID, 0);
-    EXPECT_EQ("BLOWER POWER CURVE", state->dataCurveManager->PerfCurve(airSup.BlowerPowerCurveID).Name);
+    EXPECT_EQ("BLOWER POWER CURVE", state->dataCurveManager->PerfCurve(airSup.BlowerPowerCurveID)->Name);
     EXPECT_EQ(1.0, airSup.BlowerHeatLossFactor);
     EXPECT_TRUE(compare_enums(DataGenerators::AirSupRateMode::ConstantStoicsAirRat, airSup.AirSupRateMode));
 
@@ -893,7 +893,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ(2.0, airSup.Stoics);
 
     ASSERT_GT(airSup.AirFuncPelCurveID, 0);
-    EXPECT_EQ("AIR RATE FUNCTION OF ELECTRIC POWER CURVE", state->dataCurveManager->PerfCurve(airSup.AirFuncPelCurveID).Name);
+    EXPECT_EQ("AIR RATE FUNCTION OF ELECTRIC POWER CURVE", state->dataCurveManager->PerfCurve(airSup.AirFuncPelCurveID)->Name);
     EXPECT_EQ(0.00283, airSup.AirTempCoeff);
     EXPECT_EQ(0, airSup.AirFuncNdotCurveID);
 
@@ -912,10 +912,10 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ(waterSup.Name, thisFC->NameFCWaterSup);
 
     ASSERT_GT(waterSup.WaterSupRateCurveID, 0);
-    EXPECT_EQ("REFORMER WATER FLOWRATE FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.WaterSupRateCurveID).Name);
+    EXPECT_EQ("REFORMER WATER FLOWRATE FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.WaterSupRateCurveID)->Name);
 
     ASSERT_GT(waterSup.PmpPowerCurveID, 0);
-    EXPECT_EQ("REFORMER WATER PUMP POWER FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.PmpPowerCurveID).Name);
+    EXPECT_EQ("REFORMER WATER PUMP POWER FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.PmpPowerCurveID)->Name);
 
     EXPECT_EQ(0.0, waterSup.PmpPowerLossFactor);
 
@@ -999,7 +999,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_TRUE(compare_enums(DataGenerators::InverterEfficiencyMode::Constant, inverter.EffMode));
     EXPECT_EQ(1.0, inverter.ConstEff);
     ASSERT_GT(inverter.EffQuadraticCurveID, 0);
-    EXPECT_EQ("EFFICIENCY FUNCTION OF DC POWER CURVE", state->dataCurveManager->PerfCurve(inverter.EffQuadraticCurveID).Name);
+    EXPECT_EQ("EFFICIENCY FUNCTION OF DC POWER CURVE", state->dataCurveManager->PerfCurve(inverter.EffQuadraticCurveID)->Name);
 
     // StackCooler: not included
 
@@ -1784,7 +1784,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     // Annex42 = Direct
     EXPECT_TRUE(compare_enums(DataGenerators::CurveMode::Direct, fCPM.EffMode));
     ASSERT_GT(fCPM.EffCurveID, 0);
-    EXPECT_EQ("POWER MODULE EFFICIENCY CURVE", state->dataCurveManager->PerfCurve(fCPM.EffCurveID).Name);
+    EXPECT_EQ("POWER MODULE EFFICIENCY CURVE", state->dataCurveManager->PerfCurve(fCPM.EffCurveID)->Name);
     EXPECT_EQ(1.0, fCPM.NomEff);
     EXPECT_EQ(3400.0, fCPM.NomPel);
     // At beggining of simulation, 10. Then it's ALWAYS ON (baseload), so it doesn't cycle, so still should be 10
@@ -1832,7 +1832,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ(airSup.Name, thisFC->NameFCAirSup);
     EXPECT_EQ("GENERATOR FUEL CELL AIR SUPPLY 1 OA NODE", airSup.NodeName);
     ASSERT_GT(airSup.BlowerPowerCurveID, 0);
-    EXPECT_EQ("BLOWER POWER CURVE", state->dataCurveManager->PerfCurve(airSup.BlowerPowerCurveID).Name);
+    EXPECT_EQ("BLOWER POWER CURVE", state->dataCurveManager->PerfCurve(airSup.BlowerPowerCurveID)->Name);
     EXPECT_EQ(1.0, airSup.BlowerHeatLossFactor);
     EXPECT_TRUE(compare_enums(DataGenerators::AirSupRateMode::QuadraticFuncofPel, airSup.AirSupRateMode));
 
@@ -1840,7 +1840,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ(2.0, airSup.Stoics);
 
     ASSERT_GT(airSup.AirFuncPelCurveID, 0);
-    EXPECT_EQ("AIR RATE FUNCTION OF ELECTRIC POWER CURVE", state->dataCurveManager->PerfCurve(airSup.AirFuncPelCurveID).Name);
+    EXPECT_EQ("AIR RATE FUNCTION OF ELECTRIC POWER CURVE", state->dataCurveManager->PerfCurve(airSup.AirFuncPelCurveID)->Name);
     EXPECT_EQ(0.00283, airSup.AirTempCoeff);
     EXPECT_EQ(0, airSup.AirFuncNdotCurveID);
 
@@ -1859,10 +1859,10 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ(waterSup.Name, thisFC->NameFCWaterSup);
 
     ASSERT_GT(waterSup.WaterSupRateCurveID, 0);
-    EXPECT_EQ("REFORMER WATER FLOWRATE FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.WaterSupRateCurveID).Name);
+    EXPECT_EQ("REFORMER WATER FLOWRATE FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.WaterSupRateCurveID)->Name);
 
     ASSERT_GT(waterSup.PmpPowerCurveID, 0);
-    EXPECT_EQ("REFORMER WATER PUMP POWER FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.PmpPowerCurveID).Name);
+    EXPECT_EQ("REFORMER WATER PUMP POWER FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.PmpPowerCurveID)->Name);
 
     EXPECT_EQ(0.0, waterSup.PmpPowerLossFactor);
 
@@ -1946,7 +1946,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_TRUE(compare_enums(DataGenerators::InverterEfficiencyMode::Constant, inverter.EffMode));
     EXPECT_EQ(1.0, inverter.ConstEff);
     ASSERT_GT(inverter.EffQuadraticCurveID, 0);
-    EXPECT_EQ("EFFICIENCY FUNCTION OF DC POWER CURVE", state->dataCurveManager->PerfCurve(inverter.EffQuadraticCurveID).Name);
+    EXPECT_EQ("EFFICIENCY FUNCTION OF DC POWER CURVE", state->dataCurveManager->PerfCurve(inverter.EffQuadraticCurveID)->Name);
 
     // StackCooler: not included
 

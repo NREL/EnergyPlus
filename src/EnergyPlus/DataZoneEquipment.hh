@@ -480,7 +480,7 @@ namespace DataZoneEquipment {
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
                                 std::string_view ComponentName, // Name of component
-                                Optional_int CtrlZoneNum = _);
+                                ObjexxFCL::Optional_int CtrlZoneNum = _);
 
     int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 

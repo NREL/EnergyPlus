@@ -1305,8 +1305,11 @@ namespace OutputReportPredefined {
         s->pdchIllumOccupiedHourBright = newPreDefColumn(state, s->pdstIllumOccupiedHours, "Bright (>500 lux) [hr]");
     }
 
-    void PreDefTableEntry(
-        EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
+    void PreDefTableEntry(EnergyPlusData &state,
+                          int const columnIndex,
+                          std::string_view objName,
+                          Real64 const tableEntryReal,
+                          ObjexxFCL::Optional_int_const numSigDigits)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

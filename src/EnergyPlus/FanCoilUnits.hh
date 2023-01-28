@@ -319,12 +319,12 @@ namespace FanCoilUnits {
     );
 
     void Calc4PipeFanCoil(EnergyPlusData &state,
-                          int FanCoilNum,              // Unit index in fan coil array
-                          int ControlledZoneNum,       // ZoneEquipConfig index
-                          bool FirstHVACIteration,     // flag for 1st HVAV iteration in the time step
-                          Real64 &LoadMet,             // load met by unit (watts)
-                          Optional<Real64> PLR = _,    // Part Load Ratio, fraction of time step fancoil is on
-                          Real64 ElecHeatCoilPLR = 1.0 // electric heating coil PLR used with MultiSpeedFan capacity control
+                          int FanCoilNum,                      // Unit index in fan coil array
+                          int ControlledZoneNum,               // ZoneEquipConfig index
+                          bool FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
+                          Real64 &LoadMet,                     // load met by unit (watts)
+                          ObjexxFCL::Optional<Real64> PLR = _, // Part Load Ratio, fraction of time step fancoil is on
+                          Real64 ElecHeatCoilPLR = 1.0         // electric heating coil PLR used with MultiSpeedFan capacity control
     );
 
     void SimMultiStage4PipeFanCoil(EnergyPlusData &state,

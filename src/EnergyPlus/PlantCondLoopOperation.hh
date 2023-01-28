@@ -48,9 +48,6 @@
 #ifndef PlantCondLoopOperation_hh_INCLUDED
 #define PlantCondLoopOperation_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Optional.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>

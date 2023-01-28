@@ -986,7 +986,7 @@ void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state)
 bool CheckZoneEquipmentList(EnergyPlusData &state,
                             std::string_view const ComponentType, // Type of component
                             std::string_view const ComponentName, // Name of component
-                            Optional_int CtrlZoneNum)
+                            ObjexxFCL::Optional_int CtrlZoneNum)
 {
 
     // FUNCTION INFORMATION:

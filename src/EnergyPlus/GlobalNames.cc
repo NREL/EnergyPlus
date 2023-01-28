@@ -96,7 +96,7 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
                                  bool &ErrorsFound)
 {
     if (object_name.empty()) {
-        ShowSevereError(state, "E+ object type " + object_name + " cannot have blank " + std::string{field_name} + " field");
+        ShowSevereError(state, format("E+ object type {} cannot have blank {} field", object_name, field_name));
         ErrorsFound = true;
         object_name = "xxxxx";
         return true;
@@ -106,8 +106,7 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
         names.emplace(object_name, object_type);
     } else {
         ErrorsFound = true;
-        ShowSevereError(state,
-                        object_name + " with object type " + std::string{object_type} + " duplicates a name in object type " + names_iter->second);
+        ShowSevereError(state, format("{} with object type {} duplicates a name in object type {}", object_name, object_type, names_iter->second));
         return true;
     }
     return false;
@@ -120,7 +119,7 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
                                  bool &ErrorsFound)
 {
     if (object_name.empty()) {
-        ShowSevereError(state, "E+ object type " + object_name + " has a blank field");
+        ShowSevereError(state, format("E+ object type {} has a blank field", object_name));
         ErrorsFound = true;
         object_name = "xxxxx";
         return true;
@@ -130,7 +129,7 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
         names.emplace(object_name, object_type);
     } else {
         ErrorsFound = true;
-        ShowSevereError(state, object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
+        ShowSevereError(state, format("{} with object type {} duplicates a name in object type {}", object_name, object_type, names_iter->second));
         return true;
     }
     return false;
@@ -152,8 +151,8 @@ void VerifyUniqueChillerName(
 
     auto const iter = state.dataGlobalNames->ChillerNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->ChillerNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, format("{}, duplicate name={}, Chiller Type=\"{}\".", StringToDisplay, NameToVerify, iter->second));
+        ShowContinueError(state, format("...Current entry is Chiller Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->ChillerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -180,7 +179,7 @@ void VerifyUniqueBaseboardName(EnergyPlusData &state,
 
     auto const iter = state.dataGlobalNames->BaseboardNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->BaseboardNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
+        ShowSevereError(state, format("{}, duplicate name={}, Baseboard Type=\"{}\".", StringToDisplay, NameToVerify, iter->second));
         ShowContinueError(state, format("...Current entry is Baseboard Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
@@ -205,8 +204,8 @@ void VerifyUniqueBoilerName(
 
     auto const iter = state.dataGlobalNames->BoilerNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->BoilerNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, format("{}, duplicate name={}, Boiler Type=\"{}\".", StringToDisplay, NameToVerify, iter->second));
+        ShowContinueError(state, format("...Current entry is Boiler Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->BoilerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -229,7 +228,7 @@ void VerifyUniqueCoilName(
     // Coils.  If not found in the list, it is added before returning.
 
     if (NameToVerify.empty()) {
-        ShowSevereError(state, "\"" + TypeToVerify + "\" cannot have a blank field");
+        ShowSevereError(state, format("\"{}\" cannot have a blank field", TypeToVerify));
         ErrorsFound = true;
         NameToVerify = "xxxxx";
         return;
@@ -237,8 +236,8 @@ void VerifyUniqueCoilName(
 
     auto const iter = state.dataGlobalNames->CoilNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->CoilNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Coil Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, format("{}, duplicate name={}, Coil Type=\"{}\".", StringToDisplay, NameToVerify, iter->second));
+        ShowContinueError(state, format("...Current entry is Coil Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->CoilNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -251,8 +250,8 @@ void VerifyUniqueADUName(
 {
     auto const iter = state.dataGlobalNames->aDUNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->aDUNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, format("{}, duplicate name={}, ADU Type=\"{}\".", StringToDisplay, NameToVerify, iter->second));
+        ShowContinueError(state, format("...Current entry is Air Distribution Unit Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->aDUNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
