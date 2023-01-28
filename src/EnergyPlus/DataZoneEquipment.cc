@@ -126,6 +126,9 @@ constexpr std::array<std::string_view, static_cast<int>(ZoneEquip::Num)> ZoneEqu
                                                                                                  "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
                                                                                                  "AIRLOOPHVAC:UNITARYSYSTEM"};
 
+static constexpr std::array<std::string_view, static_cast<int>(LoadDist::Num)> LoadDistNamesUC = {
+    "SEQUENTIALLOAD", "UNIFORMLOAD", "UNIFORMPLR", "SEQUENTIALUNIFORMPLR"};
+
 void GetZoneEquipmentData(EnergyPlusData &state)
 {
 
