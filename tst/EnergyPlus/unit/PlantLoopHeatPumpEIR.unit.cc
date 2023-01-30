@@ -4175,7 +4175,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
-        EXPECT_NEAR(20000.0, thisHeatingPLHP->fuelUsage, 0.001);
+        EXPECT_NEAR(20000.0, thisHeatingPLHP->fuelRate, 0.001);
         EXPECT_NEAR(18000000.0, thisHeatingPLHP->fuelEnergy, 0.001);
         // expect it to meet setpoint and have some pre-evaluated conditions
         // EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingPLHP->loadSideOutletTemp, 0.001);
@@ -4196,7 +4196,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
         state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
-        EXPECT_NEAR(30000.0, thisHeatingPLHP->fuelUsage, 0.001);
+        EXPECT_NEAR(30000.0, thisHeatingPLHP->fuelRate, 0.001);
         EXPECT_NEAR(27000000.0, thisHeatingPLHP->fuelEnergy, 0.001);
         // expect it to miss setpoint and be at max capacity
         // EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);

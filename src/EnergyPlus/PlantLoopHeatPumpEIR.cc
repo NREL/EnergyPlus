@@ -801,7 +801,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     }
 }
 
-PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name)
+PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type, const std::string &hp_name)
 {
     if (state.dataEIRPlantLoopHeatPump->getInputsPLHP) {
         EIRPlantLoopHeatPump::processInputForEIRPLHP(state);
@@ -810,7 +810,7 @@ PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, DataPlant::
     }
 
     for (auto &plhp : state.dataEIRPlantLoopHeatPump->heatPumps) {
-        if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.EIRHPType == hp_type_of_num) {
+        if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.EIRHPType == hp_type) {
             return &plhp;
         }
     }
@@ -1108,7 +1108,7 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
 void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 {
     // This function does all the one-time initialization
-    std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
+    std::string static const routineName = std::string("EIRPlantLoopHeatPump : oneTimeInit"); // + __FUNCTION__;
 
     if (this->oneTimeInitFlag) {
         bool errFlag = false;
@@ -1704,10 +1704,10 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
 
     if (partLoadRatio < this->minPLR) {
-        this->fuelUsage = 0.0;
+        this->fuelRate = 0.0;
         this->powerUsage = 0.0;
     } else {
-        this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
+        this->fuelRate = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
 
         this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR;
         if (this->defrostType == DefrostType::Timed) {
@@ -1716,12 +1716,12 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
     this->powerUsage += this->standbyElecPower;
 
-    this->fuelEnergy = this->fuelUsage * reportingInterval;
+    this->fuelEnergy = this->fuelRate * reportingInterval;
     this->powerEnergy = this->powerEnergy * reportingInterval;
 
     // energy balance on heat pump
     // this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
-    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->fuelUsage + this->powerUsage - this->standbyElecPower);
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->fuelRate + this->powerUsage - this->standbyElecPower);
     this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
     // calculate source side outlet conditions
@@ -1810,14 +1810,14 @@ void EIRFuelFiredHeatPump::resetReportingVariables()
     this->loadSideOutletTemp = this->loadSideInletTemp;
     this->powerUsage = 0.0;
     this->powerEnergy = 0.0;
-    this->fuelUsage = 0.0;
+    this->fuelRate = 0.0;
     this->fuelEnergy = 0.0;
     this->sourceSideHeatTransfer = 0.0;
     this->sourceSideOutletTemp = this->sourceSideInletTemp;
     this->sourceSideEnergy = 0.0;
 }
 
-PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name)
+PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type, const std::string &hp_name)
 {
     if (state.dataEIRFuelFiredHeatPump->getInputsFFHP) {
         EIRFuelFiredHeatPump::processInputForEIRPLHP(state);
@@ -1826,12 +1826,12 @@ PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::
     }
 
     for (auto &plhp : state.dataEIRFuelFiredHeatPump->heatPumps) {
-        if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.EIRHPType == hp_type_of_num) {
+        if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.EIRHPType == hp_type) {
             return &plhp;
         }
     }
 
-    ShowFatalError(state, "EIR Fuel-Fired Heat Pump factory: Error getting inputs for PLFFHP named: " + hp_name);
+    ShowFatalError(state, format("EIR Fuel-Fired Heat Pump factory: Error getting inputs for PLFFHP named: {}", hp_name));
     return nullptr; // LCOV_EXCL_LINE
 }
 
@@ -1839,12 +1839,12 @@ void EIRFuelFiredHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
 {
     for (auto &thisHP : state.dataEIRFuelFiredHeatPump->heatPumps) {
         if (!thisHP.companionCoilName.empty()) {
-            auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
-            auto &thisCoilType = thisHP.EIRHPType;
-            auto targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
+            std::string thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
+            DataPlant::PlantEquipmentType thisCoilType = thisHP.EIRHPType;
+            std::string targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
             for (auto &potentialCompanionCoil : state.dataEIRFuelFiredHeatPump->heatPumps) {
-                auto &potentialCompanionType = potentialCompanionCoil.EIRHPType;
-                auto potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
+                DataPlant::PlantEquipmentType potentialCompanionType = potentialCompanionCoil.EIRHPType;
+                std::string potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
                 if (potentialCompanionName == thisCoilName) {
                     // skip the current coil
                     continue;
@@ -1862,8 +1862,8 @@ void EIRFuelFiredHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
             }
             if (!thisHP.companionHeatPumpCoil) {
                 ShowSevereError(state, "Could not find matching companion heat pump coil.");
-                ShowContinueError(state, "Base coil: " + thisCoilName);
-                ShowContinueError(state, "Looking for companion coil named: " + targetCompanionName);
+                ShowContinueError(state, format("Base coil: {}", thisCoilName));
+                ShowContinueError(state, format("Looking for companion coil named: {}", targetCompanionName));
                 ShowFatalError(state, "Simulation aborts due to previous severe error");
             }
         }
@@ -1904,12 +1904,12 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     };
 
     bool errorsFound = false;
-    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+    std::string &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     for (auto &classToInput : classesToInput) {
         cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
 
-        auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                               UtilityRoutines::MakeUPPERCase(cCurrentModuleObject));
+        DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                                                                               UtilityRoutines::MakeUPPERCase(cCurrentModuleObject)));
         int numPLHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numPLHP > 0) {
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -1962,15 +1962,14 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // Locals
                 static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
                 bool FuelTypeError(false);
-                UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
-                    tempRsrStr, thisPLHP.GAHPFuelTypeForOutputVariable, thisPLHP.fuelType, FuelTypeError);
+                UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(tempRsrStr, tempRsrStr, thisPLHP.fuelType, FuelTypeError);
                 if (FuelTypeError) {
                     ShowSevereError(state, fmt::format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
                     // ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
                     ShowContinueError(state, "Invalid Fuel Type = " + tempRsrStr);
                     // Set to Electric to avoid errors when setting up output variables
-                    thisPLHP.GAHPFuelTypeForOutputVariable = "NaturalGas";
-                    thisPLHP.fuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
+                    tempRsrStr = "NaturalGas";
+                    thisPLHP.fuelType = DataGlobalConstants::ResourceType::Natural_Gas;
                     errorsFound = true;
                     FuelTypeError = false;
                 }
@@ -2050,16 +2049,12 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A8 flow mode
-                std::string flowMode = UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>());
-                if (flowMode == "NOTMODULATED") {
-                    thisPLHP.flowMode = DataPlant::FlowMode::NotModulated;
-                } else if (flowMode == "CONSTANTFLOW") {
-                    thisPLHP.flowMode = DataPlant::FlowMode::Constant;
-                } else if (flowMode == "LEAVINGSETPOINTMODULATED") {
-                    thisPLHP.flowMode = DataPlant::FlowMode::LeavingSetpointModulated;
-                } else {
-                    ShowSevereError(state, fmt::format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, thisPLHP.name));
-                    ShowContinueError(state, "Invalid Flow Mode =" + flowMode);
+                thisPLHP.flowMode = static_cast<DataPlant::FlowMode>(
+                    getEnumerationValue(DataPlant::FlowModeNamesUC, UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>())));
+
+                if (thisPLHP.flowMode == DataPlant::FlowMode::Invalid) {
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, thisPLHP.name));
+                    ShowContinueError(state, format("Invalid Flow Mode ={}", DataPlant::FlowModeNamesUC[static_cast<int>(thisPLHP.flowMode)]));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                     // assume variable flow if not specified
@@ -2443,7 +2438,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
 {
     // This function does all the one-time initialization
-    std::string static const routineName = std::string("EIRFuelFiredHeatPump :") + __FUNCTION__;
+    std::string static const routineName = std::string("EIRFuelFiredHeatPump : oneTimeInit"); // + __FUNCTION__;
 
     if (this->oneTimeInitFlag) {
         bool errFlag = false;
@@ -2513,7 +2508,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Fuel Rate",
                             OutputProcessor::Unit::W,
-                            this->fuelUsage,
+                            this->fuelRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);

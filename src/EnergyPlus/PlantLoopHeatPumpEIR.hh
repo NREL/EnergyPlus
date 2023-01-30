@@ -176,7 +176,7 @@ namespace EIRPlantLoopHeatPumps {
 
         virtual void resetReportingVariables();
 
-        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type, const std::string &hp_name);
 
         static void pairUpCompanionCoils(EnergyPlusData &state);
 
@@ -263,10 +263,9 @@ namespace EIRPlantLoopHeatPumps {
         Real64 standbyElecPower = 0.0;
 
         // new output variables for derived class only
-        std::string GAHPFuelTypeForOutputVariable = "";
         Real64 loadSideVolumeFlowRate = 0.0;
-        Real64 fuelUsage = 0.0;
-        Real64 fuelEnergy = 0.0;
+        Real64 fuelRate = 0.0;   // Unit in W
+        Real64 fuelEnergy = 0.0; // Unit in J
         int capModFTErrorIndex = 0;
         int eirModFTErrorIndex = 0;
         int eirModFPLRErrorIndex = 0;
@@ -278,7 +277,7 @@ namespace EIRPlantLoopHeatPumps {
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
         void sizeSrcSideASHP(EnergyPlusData &state); // 2022-05-18: may not need this one
         void resetReportingVariables();
-        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type, const std::string &hp_name);
         static void pairUpCompanionCoils(EnergyPlusData &state);
         static void processInputForEIRPLHP(EnergyPlusData &state);
         void oneTimeInit(EnergyPlusData &state);
