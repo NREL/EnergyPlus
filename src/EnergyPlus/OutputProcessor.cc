@@ -4598,27 +4598,6 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::strip_trailing_zeros;
-
-        // Locals
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string NumberOut; // Character for producing "number out"
         std::string MaxOut;    // Character for Max out string
@@ -4634,8 +4613,7 @@ namespace OutputProcessor {
         if (repValue == 0.0) {
             NumberOut = "0.0";
         } else {
-            NumberOut = format("{:N}", repVal);
-            strip_trailing_zeros(strip(NumberOut));
+            NumberOut = format("{:f}", repVal);
         }
 
         // Append the min and max strings with date information

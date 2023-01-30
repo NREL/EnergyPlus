@@ -293,47 +293,6 @@ void SolveRoot(EnergyPlusData &state,
     XRes = XTemp;
 }
 
-std::string &strip_trailing_zeros(std::string &InputString)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Stuart Mentzer (in-place version of RemoveTrailingZeros by Linda Lawrie)
-    //       DATE WRITTEN   July 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Remove trailing fractional zeros from floating point representation strings in place.
-
-    static constexpr std::string_view ED("ED");
-    static constexpr std::string_view zero_string("0.");
-
-    assert(!has_any_of(InputString, "ed"));       // Pre Not using lowercase exponent letter
-    assert(InputString == stripped(InputString)); // Pre Already stripped surrounding spaces
-
-    if (has(InputString, '.') && (!has_any_of(InputString, ED))) { // Has decimal point and no exponent part
-        std::string::size_type const pos(InputString.find_last_not_of('0'));
-        if (pos + 1 < InputString.length()) {
-            switch (pos) { // Handle [+/-].000... format
-            case 0u:       // .0*
-                InputString = zero_string;
-                break;
-            case 1u:
-                if (InputString[1] == '.') {
-                    char const c0(InputString[0]);
-                    if ((c0 == '+') || (c0 == '-')) {
-                        InputString = zero_string;
-                        break;
-                    }
-                }
-                // fallthrough
-            default:
-                InputString.erase(pos + 1);
-            }
-        }
-    }
-    return InputString; // Allows chaining
-}
-
 void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
     if (NumItemsInAvg <= 1) return; // no need to average/smooth
@@ -1150,16 +1109,6 @@ void ScanForReports(EnergyPlusData &state,
     int NumNames;
     int NumNumbers;
     int IOStat;
-    auto &DXFOption1 = state.dataGeneral->DXFOption1;
-    auto &DXFOption2 = state.dataGeneral->DXFOption2;
-    auto &DXFWFOption1 = state.dataGeneral->DXFWFOption1;
-    auto &DXFWFOption2 = state.dataGeneral->DXFWFOption2;
-    auto &VRMLOption1 = state.dataGeneral->VRMLOption1;
-    auto &VRMLOption2 = state.dataGeneral->VRMLOption2;
-    auto &ViewRptOption1 = state.dataGeneral->ViewRptOption1;
-    auto &LineRptOption1 = state.dataGeneral->LineRptOption1;
-    auto &VarDictOption1 = state.dataGeneral->VarDictOption1;
-    auto &VarDictOption2 = state.dataGeneral->VarDictOption2;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     if (state.dataGeneral->GetReportInput) {
@@ -1210,7 +1159,7 @@ void ScanForReports(EnergyPlusData &state,
                 switch (value) {
                 case LINES:
                     state.dataGeneral->LineRpt = true;
-                    LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                    state.dataGeneral->LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
                     break;
                 case VERTICES:
                     state.dataGeneral->SurfVert = true;
@@ -1227,7 +1176,7 @@ void ScanForReports(EnergyPlusData &state,
                     break;
                 case VIEWFACTORINFO: // actual reporting is in HeatBalanceIntRadExchange
                     state.dataGeneral->ViewFactorInfo = true;
-                    ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                    state.dataGeneral->ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
                     break;
                 case DECAYCURVESFROMCOMPONENTLOADSSUMMARY: // Should the Radiant to Convective Decay Curves from the
                                                            // load component report appear in the EIO file
@@ -1272,18 +1221,18 @@ void ScanForReports(EnergyPlusData &state,
             switch (checkReportType) {
             case ReportType::DXF: {
                 state.dataGeneral->DXFReport = true;
-                DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
+                state.dataGeneral->DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
             } break;
             case ReportType::DXFWireFrame: {
                 state.dataGeneral->DXFWFReport = true;
-                DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
+                state.dataGeneral->DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
             } break;
             case ReportType::VRML: {
                 state.dataGeneral->VRMLReport = true;
-                VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
+                state.dataGeneral->VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
             } break;
             default:
                 break;
@@ -1293,8 +1242,8 @@ void ScanForReports(EnergyPlusData &state,
         RepNum = state.dataInputProcessing->inputProcessor->getNumSectionsFound("Report Variable Dictionary");
         if (RepNum > 0) {
             state.dataGeneral->VarDict = true;
-            VarDictOption1 = "REGULAR";
-            VarDictOption2 = "";
+            state.dataGeneral->VarDictOption1 = "REGULAR";
+            state.dataGeneral->VarDictOption2 = "";
         }
 
         cCurrentModuleObject = "Output:VariableDictionary";
@@ -1314,8 +1263,8 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataGeneral->VarDict = true;
-            VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
-            VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataGeneral->VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataGeneral->VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
         }
 
         cCurrentModuleObject = "Output:Constructions";
@@ -1399,12 +1348,12 @@ void ScanForReports(EnergyPlusData &state,
     } break;
     case ReportName::Viewfactorinfo: {
         DoReport = state.dataGeneral->ViewFactorInfo;
-        if (present(Option1)) Option1 = ViewRptOption1;
+        if (present(Option1)) Option1 = state.dataGeneral->ViewRptOption1;
     } break;
     case ReportName::Variabledictionary: {
         DoReport = state.dataGeneral->VarDict;
-        if (present(Option1)) Option1 = VarDictOption1;
-        if (present(Option2)) Option2 = VarDictOption2;
+        if (present(Option1)) Option1 = state.dataGeneral->VarDictOption1;
+        if (present(Option2)) Option2 = state.dataGeneral->VarDictOption2;
         //    CASE ('SCHEDULES')
         //     DoReport=SchRpt
         //      IF (PRESENT(Option1)) Option1=SchRptOption
@@ -1417,18 +1366,18 @@ void ScanForReports(EnergyPlusData &state,
         } break;
         case RptKey::DXF: {
             DoReport = state.dataGeneral->DXFReport;
-            if (present(Option1)) Option1 = DXFOption1;
-            if (present(Option2)) Option2 = DXFOption2;
+            if (present(Option1)) Option1 = state.dataGeneral->DXFOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->DXFOption2;
         } break;
         case RptKey::DXFwireframe: {
             DoReport = state.dataGeneral->DXFWFReport;
-            if (present(Option1)) Option1 = DXFWFOption1;
-            if (present(Option2)) Option2 = DXFWFOption2;
+            if (present(Option1)) Option1 = state.dataGeneral->DXFWFOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->DXFWFOption2;
         } break;
         case RptKey::VRML: {
             DoReport = state.dataGeneral->VRMLReport;
-            if (present(Option1)) Option1 = VRMLOption1;
-            if (present(Option2)) Option2 = VRMLOption2;
+            if (present(Option1)) Option1 = state.dataGeneral->VRMLOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->VRMLOption2;
         } break;
         case RptKey::Vertices: {
             DoReport = state.dataGeneral->SurfVert;
@@ -1441,7 +1390,7 @@ void ScanForReports(EnergyPlusData &state,
         } break;
         case RptKey::Lines: {
             DoReport = state.dataGeneral->LineRpt;
-            if (present(Option1)) Option1 = LineRptOption1;
+            if (present(Option1)) Option1 = state.dataGeneral->LineRptOption1;
         } break;
         default:
             break;

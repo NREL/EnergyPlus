@@ -97,8 +97,6 @@ namespace General {
         }
     }
 
-    std::string &strip_trailing_zeros(std::string &InputString);
-
     void MovingAvg(Array1D<Real64> &DataIn, int NumItemsInAvg);
 
     void ProcessDateString(EnergyPlusData &state,
@@ -291,31 +289,7 @@ struct GeneralData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->GetReportInput = true;
-        this->SurfVert = false;
-        this->SurfDet = false;
-        this->SurfDetWVert = false;
-        this->DXFReport = false;
-        this->DXFWFReport = false;
-        this->VRMLReport = false;
-        this->CostInfo = false;
-        this->ViewFactorInfo = false;
-        this->Constructions = false;
-        this->Materials = false;
-        this->LineRpt = false;
-        this->VarDict = false;
-        this->EMSoutput = false;
-        this->XNext = 0.0;
-        this->DXFOption1.clear();
-        this->DXFOption2.clear();
-        this->DXFWFOption1.clear();
-        this->DXFWFOption2.clear();
-        this->VRMLOption1.clear();
-        this->VRMLOption2.clear();
-        this->ViewRptOption1.clear();
-        this->LineRptOption1.clear();
-        this->VarDictOption1.clear();
-        this->VarDictOption2.clear();
+        new (this) GeneralData();
     }
 };
 

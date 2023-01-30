@@ -2530,7 +2530,6 @@ void TraceIndividualController(EnergyPlusData &state,
     TraceFile.flush();
 }
 
-
 Real64 GetCurrentHVACTime(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -2546,7 +2545,8 @@ Real64 GetCurrentHVACTime(EnergyPlusData &state)
     // erronously truncate all sub-minute system time steps down to the closest full minute.
     // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
     // as real.
-    Real64 const CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + state.dataHVACGlobal->SysTimeElapsed + state.dataHVACGlobal->TimeStepSys;
+    Real64 const CurrentHVACTime =
+        (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + state.dataHVACGlobal->SysTimeElapsed + state.dataHVACGlobal->TimeStepSys;
     return CurrentHVACTime * DataGlobalConstants::SecInHour;
 }
 
