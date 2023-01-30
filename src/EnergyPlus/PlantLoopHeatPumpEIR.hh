@@ -213,33 +213,31 @@ namespace EIRPlantLoopHeatPumps {
         enum class OATempCurveVar
         {
             Invalid = -1,
-            DryBulb, // = 0,
-            WetBulb, // = 1,
+            DryBulb,
+            WetBulb,
             Num
         };
 
         enum class WaterTempCurveVar
         {
             Invalid = -1,
-            EnteringCondenser, // = 0,
-            LeavingCondenser,  // = 1,
-            EnteringVaporator, // = 2,
-            LeavingEvaporator, // = 3,
+            EnteringCondenser,
+            LeavingCondenser,
+            EnteringVaporator,
+            LeavingEvaporator,
             Num
         };
 
         enum class DefrostType
         {
             Invalid = -1,
-            Timed,    // = 0,
-            OnDemand, // = 1,
+            Timed,
+            OnDemand,
             Num
         };
 
         // New additions for GAHP only
-        std::string fuelTypeStr = "";
         DataGlobalConstants::ResourceType fuelType = DataGlobalConstants::ResourceType::None; // resource type assignment
-        std::string endUseSubcat = "";                                                        // identifier use for the end use subcategory
         DataPlant::FlowMode flowMode = DataPlant::FlowMode::Invalid;
         Real64 desSupplyTemp = 60.0;
         Real64 desTempLift = 11.1;
@@ -290,25 +288,23 @@ namespace EIRPlantLoopHeatPumps {
     };
 } // namespace EIRPlantLoopHeatPumps
 
-struct EIRPlantLoopHeatPumpsData
+struct EIRPlantLoopHeatPumpsData : BaseGlobalStruct
 {
     std::vector<EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump> heatPumps;
     bool getInputsPLHP = true;
-    void clear_state()
+    void clear_state() override
     {
-        getInputsPLHP = true;
-        heatPumps.clear();
+        new (this) EIRPlantLoopHeatPumpsData();
     }
 };
 
-struct EIRFuelFiredHeatPumpsData
+struct EIRFuelFiredHeatPumpsData : BaseGlobalStruct
 {
     std::vector<EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump> heatPumps;
     bool getInputsFFHP = true;
-    void clear_state()
+    void clear_state() override
     {
-        getInputsFFHP = true;
-        heatPumps.clear();
+        new (this) EIRFuelFiredHeatPumpsData();
     }
 };
 
