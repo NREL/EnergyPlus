@@ -153,10 +153,6 @@ namespace OutputProcessor {
         // Could use the access to the minute as OP (OutputProcessor) does but uses
         // external calculation.
 
-        // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
         // Return value
         int ActualTimeMin; // calculated Minute for reporting
 
@@ -169,8 +165,8 @@ namespace OutputProcessor {
         int ActualTimeHrS;
 
         if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-            ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
-            ActualTimeE = ActualTimeS + TimeStepSys;
+            ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
+            ActualTimeE = ActualTimeS + state.dataHVACGlobal->TimeStepSys;
             ActualTimeHrS = int(ActualTimeS);
             ActualTimeMin = nint((ActualTimeE - ActualTimeHrS) * FracToMin);
         } else {
