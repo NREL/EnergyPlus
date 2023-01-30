@@ -608,7 +608,7 @@ namespace DXCoils {
                               int const DXCoilNum,     // the number of the DX heating coil to be simulated
                               Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                               Real64 const CycRatio,   // cycling part load ratio
-                              ObjexxFCL::Optional_bool_const ForceOn = _);
+                              const bool ForceOn = false);
 
     void CalcBasinHeaterPowerForMultiModeDXCoil(EnergyPlusData &state,
                                                 int const DXCoilNum,  // Index of coil being simulated
@@ -723,10 +723,10 @@ namespace DXCoils {
     );
 
     int GetCoilTypeNum(EnergyPlusData &state,
-                       std::string const &CoilType,                    // must match coil types in this module
-                       std::string const &CoilName,                    // must match coil names for the coil type
-                       bool &ErrorsFound,                              // set to true if problem
-                       ObjexxFCL::Optional_bool_const PrintWarning = _ // prints warning when true
+                       std::string const &CoilType,   // must match coil types in this module
+                       std::string const &CoilName,   // must match coil names for the coil type
+                       bool &ErrorsFound,             // set to true if problem
+                       const bool PrintWarning = true // prints warning when true
     );
 
     Real64 GetMinOATCompressor(EnergyPlusData &state,

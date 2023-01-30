@@ -11707,7 +11707,7 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
                           int const DXCoilNum,     // the number of the DX heating coil to be simulated
                           Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                           Real64 const CycRatio,   // cycling part load ratio
-                          ObjexxFCL::Optional_bool_const ForceOn)
+                          const bool ForceOn)
 {
 
     // SUBROUTINE INFORMATION:
@@ -11793,15 +11793,8 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
     Real64 OutdoorWetBulb;        // Outdoor wet-bulb temperature at condenser (C)
     Real64 OutdoorHumRat;         // Outdoor humidity ratio at condenser (kg/kg)
     Real64 OutdoorPressure;       // Outdoor barometric pressure at condenser (Pa)
-    bool LocalForceOn;
     Real64 AirMassFlowRatio2; // Ratio of low speed air mass flow to rated air mass flow
     Real64 CompAmbTemp(0.0);  // Ambient temperature at compressor
-
-    if (present(ForceOn)) {
-        LocalForceOn = true;
-    } else {
-        LocalForceOn = false;
-    }
 
     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
         OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
@@ -11860,7 +11853,7 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
     }
 
     if ((AirMassFlow > 0.0 && CompAmbTemp >= state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor) &&
-        ((GetCurrentScheduleValue(state, state.dataDXCoils->DXCoil(DXCoilNum).SchedPtr) > 0.0) || (LocalForceOn)) &&
+        ((GetCurrentScheduleValue(state, state.dataDXCoils->DXCoil(DXCoilNum).SchedPtr) > 0.0) || (ForceOn)) &&
         (SpeedRatio > 0.0 || CycRatio > 0.0)) {
 
         RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
@@ -15760,10 +15753,10 @@ Real64 GetCoilCapacityByIndexType(EnergyPlusData &state,
 }
 
 int GetCoilTypeNum(EnergyPlusData &state,
-                   std::string const &CoilType,                // must match coil types in this module
-                   std::string const &CoilName,                // must match coil names for the coil type
-                   bool &ErrorsFound,                          // set to true if problem
-                   ObjexxFCL::Optional_bool_const PrintWarning // prints warning when true
+                   std::string const &CoilType, // must match coil types in this module
+                   std::string const &CoilName, // must match coil names for the coil type
+                   bool &ErrorsFound,           // set to true if problem
+                   const bool PrintWarning      // prints warning when true
 )
 {
 
@@ -15781,7 +15774,6 @@ int GetCoilTypeNum(EnergyPlusData &state,
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int WhichCoil;
-    bool PrintMessage;
 
     // Obtains and Allocates DXCoils
     if (state.dataDXCoils->GetCoilsInputFlag) {
@@ -15789,17 +15781,11 @@ int GetCoilTypeNum(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    if (present(PrintWarning)) {
-        PrintMessage = PrintWarning;
-    } else {
-        PrintMessage = true;
-    }
-
     WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         TypeNum = state.dataDXCoils->DXCoil(WhichCoil).DXCoilType_Num;
     } else {
-        if (PrintMessage) {
+        if (PrintWarning) {
             ShowSevereError(state, format("GetCoilTypeNum: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
         }
         ErrorsFound = true;

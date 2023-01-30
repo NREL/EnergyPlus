@@ -1908,12 +1908,12 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
 }
 
 int MyPlantSizingIndex(EnergyPlusData &state,
-                       std::string const &CompType,                 // component description
-                       std::string_view CompName,                   // user name of component
-                       int const NodeNumIn,                         // component water inlet node
-                       [[maybe_unused]] int const NodeNumOut,       // component water outlet node
-                       bool &ErrorsFound,                           // set to true if there's an error, unchanged otherwise
-                       ObjexxFCL::Optional_bool_const SupressErrors // used for WSHP's where condenser loop may not be on a plant loop
+                       std::string const &CompType,           // component description
+                       std::string_view CompName,             // user name of component
+                       int const NodeNumIn,                   // component water inlet node
+                       [[maybe_unused]] int const NodeNumOut, // component water outlet node
+                       bool &ErrorsFound,                     // set to true if there's an error, unchanged otherwise
+                       const bool PrintErrors                 // used for WSHP's where condenser loop may not be on a plant loop
 )
 {
 
@@ -1940,14 +1940,8 @@ int MyPlantSizingIndex(EnergyPlusData &state,
 
     int MyPltLoopNum{};
     PlantLocation DummyPlantLoc{};
-    bool PrintErrorFlag;
 
     MyPltSizNum = 0;
-    if (present(SupressErrors)) {
-        PrintErrorFlag = SupressErrors;
-    } else {
-        PrintErrorFlag = true;
-    }
 
     ScanPlantLoopsForNodeNum(state, "MyPlantSizingIndex", NodeNumIn, DummyPlantLoc);
 
@@ -1963,7 +1957,7 @@ int MyPlantSizingIndex(EnergyPlusData &state,
                 state.dataPlnt->PlantLoop(MyPltLoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
         }
         if (MyPltSizNum == 0) {
-            if (PrintErrorFlag) {
+            if (PrintErrors) {
                 ShowSevereError(
                     state, format("MyPlantSizingIndex: Could not find {} in Sizing:Plant objects.", state.dataPlnt->PlantLoop(MyPltLoopNum).Name));
                 ShowContinueError(state, format("...reference Component Type=\"{}\", Name=\"{}\".", CompType, CompName));
@@ -1971,7 +1965,7 @@ int MyPlantSizingIndex(EnergyPlusData &state,
             ErrorsFound = true;
         }
     } else {
-        if (PrintErrorFlag) {
+        if (PrintErrors) {
             ShowWarningError(state, format("MyPlantSizingIndex: Could not find {} with name {} on any plant loop", CompType, CompName));
         }
         ErrorsFound = true;
