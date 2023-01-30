@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run clang-format style check for C/C++ programs.
-        uses: jidicula/clang-format-action@v3.5.2
+        uses: jidicula/clang-format-action@v4.10.1
         with:
           clang-format-version: '10'
           check-path: ${{ matrix.path }}
