@@ -2309,18 +2309,18 @@ void TraceIterationStamp(EnergyPlusData &state,
     // Note that we do not go to the next line
     print(TraceFile,
           "{},{},{},{},{},{},{},{},{},{},{},{},",
-          state.dataGlobal->ZoneSizingCalc ? 1 : 0,
-          state.dataGlobal->SysSizingCalc ? 1 : 0,
+          static_cast<int>(state.dataGlobal->ZoneSizingCalc),
+          static_cast<int>(state.dataGlobal->SysSizingCalc),
           state.dataEnvrn->CurEnvirNum,
-          state.dataGlobal->WarmupFlag ? 1 : 0,
+          static_cast<int>(state.dataGlobal->WarmupFlag),
           CreateHVACTimeString(state),
           MakeHVACTimeIntervalString(state),
-          state.dataGlobal->BeginTimeStepFlag ? 1 : 0,
-          state.dataHVACGlobal->FirstTimeStepSysFlag ? 1 : 0,
-          FirstHVACIteration ? 1 : 0,
+          static_cast<int>(state.dataGlobal->BeginTimeStepFlag),
+          static_cast<int>(state.dataHVACGlobal->FirstTimeStepSysFlag),
+          static_cast<int>(FirstHVACIteration),
           AirLoopPass,
           AirLoopNumCalls,
-          AirLoopConverged ? 1 : 0);
+          static_cast<int>(AirLoopConverged));
 }
 
 void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum)
@@ -2431,11 +2431,11 @@ void TraceIndividualController(EnergyPlusData &state,
     print(TraceFile,
           "{},{},{},{},{},{},{},{},",
           state.dataEnvrn->CurEnvirNum,
-          state.dataGlobal->WarmupFlag ? 1 : 0,
+          static_cast<int>(state.dataGlobal->WarmupFlag),
           CreateHVACTimeString(state),
           MakeHVACTimeIntervalString(state),
           AirLoopPass,
-          FirstHVACIteration ? 1 : 0,
+          static_cast<int>(FirstHVACIteration),
           Operation,
           ControllerProps.NumCalcCalls);
 
@@ -2454,7 +2454,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ' ',
               ' ',
               ControllerProps.Mode,
-              IsConvergedFlag ? 1 : 0,
+              static_cast<int>(IsConvergedFlag),
               ControllerProps.NextActuatedValue);
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
@@ -2479,7 +2479,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ControllerProps.DeltaSensed,
               ControllerProps.Offset,
               ControllerProps.Mode,
-              IsConvergedFlag ? 1 : 0,
+              static_cast<int>(IsConvergedFlag),
               ControllerProps.NextActuatedValue);
 
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
@@ -2505,7 +2505,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ControllerProps.DeltaSensed,
               ControllerProps.Offset,
               ControllerProps.Mode,
-              IsConvergedFlag ? 1 : 0,
+              static_cast<int>(IsConvergedFlag),
               ControllerProps.NextActuatedValue);
 
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
