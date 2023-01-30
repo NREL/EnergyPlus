@@ -8262,7 +8262,7 @@ void DefineReturnWaterChWSetPointManager::calculate(EnergyPlusData &state, DataL
     }
 
     // now correct it to bring it into range
-    T_supply_setpoint = std::clamp(T_supply_setpoint, this->minimumChilledWaterSetpoint, this->maximumChilledWaterSetpoint);
+    T_supply_setpoint = min(max(T_supply_setpoint, this->minimumChilledWaterSetpoint), this->maximumChilledWaterSetpoint);
 
     // now save it for use in the update routine
     this->currentSupplySetPt = T_supply_setpoint;

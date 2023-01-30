@@ -210,9 +210,9 @@ namespace HVACFan {
 
         m_massFlowRateMaxAvail =
             min(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMax, state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
-        m_massFlowRateMinAvail = std::clamp(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMin,
-                                            state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMinAvail,
-                                            state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
+        m_massFlowRateMinAvail =
+            min(max(state.dataLoopNodes->Node(outletNodeNum).MassFlowRateMin, state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMinAvail),
+                state.dataLoopNodes->Node(inletNodeNum).MassFlowRateMaxAvail);
 
         // Load the node data in this section for the component simulation
         // First need to make sure that the MassFlowRate is between the max and min avail.

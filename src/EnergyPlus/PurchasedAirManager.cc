@@ -2262,7 +2262,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                             if (((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                                  (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity)) &&
                                 (PurchAir(PurchAirNum).MaxCoolMassFlowRate > 0.0)) {
-                                SupplyMassFlowRate = std::clamp(SupplyMassFlowRate, 0.0, PurchAir(PurchAirNum).MaxCoolMassFlowRate);
+                                SupplyMassFlowRate = min(max(SupplyMassFlowRate, 0.0), PurchAir(PurchAirNum).MaxCoolMassFlowRate);
                             }
                             if (SupplyMassFlowRate > OAMassFlowRate) {
                                 EconoOn = true;
