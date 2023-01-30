@@ -1179,21 +1179,13 @@ void GetPlantInput(EnergyPlusData &state)
                     case PlantEquipmentType::HeatPumpFuelFiredHeating: {
                         this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
                             state, PlantEquipmentType::HeatPumpFuelFiredHeating, CompNames(CompNum));
-                        if (LoopSideNum == LoopSideLocation::Demand) {
-                            this_comp.CurOpSchemeType = OpScheme::Demand;
-                        } else if (LoopSideNum == LoopSideLocation::Supply) {
-                            this_comp.CurOpSchemeType = OpScheme::Invalid;
-                        }
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
                         break;
                     }
                     case PlantEquipmentType::HeatPumpFuelFiredCooling: {
                         this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
                             state, PlantEquipmentType::HeatPumpFuelFiredCooling, CompNames(CompNum));
-                        if (LoopSideNum == LoopSideLocation::Demand) {
-                            this_comp.CurOpSchemeType = OpScheme::Demand;
-                        } else if (LoopSideNum == LoopSideLocation::Supply) {
-                            this_comp.CurOpSchemeType = OpScheme::Invalid;
-                        }
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
                         break;
                     }
                     case PlantEquipmentType::HeatPumpVRF: {
