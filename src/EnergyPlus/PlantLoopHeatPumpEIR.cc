@@ -1302,8 +1302,6 @@ static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatP
     "ENTERINGCONDENSER", "LEAVINGCONDENSER", "ENTERINGEVAPORATOR", "LEAVINGEVAPORATOR"};
 static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatPump::DefrostType::Num)> DefrostTypeNamesUC = {"TIMED", "ONDEMAND"};
 
-std::string endUseSubcat = "";
-
 void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
     Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -1978,10 +1976,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A7 End use category
-                endUseSubcat = UtilityRoutines::MakeUPPERCase(fields.at("end_use_subcategory").get<std::string>());
+                thisPLHP.endUseSubcat = UtilityRoutines::MakeUPPERCase(fields.at("end_use_subcategory").get<std::string>());
                 // 2022-05-13: default: empty?
-                if (endUseSubcat == "") {
-                    endUseSubcat = "Heat Pump Fuel Fired"; // or "General"?
+                if (thisPLHP.endUseSubcat == "") {
+                    thisPLHP.endUseSubcat = "Heat Pump Fuel Fired"; // or "General"?
                 }
 
                 // N1 Nominal heating capacity
@@ -2537,7 +2535,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 _,
                                 DataGlobalConstants::GetResourceTypeChar(this->fuelType),
                                 "Cooling",
-                                endUseSubcat, //"Heat Pump",
+                                this->endUseSubcat, //"Heat Pump",
                                 "Plant");
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Electricity Energy",
@@ -2549,7 +2547,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 _,
                                 "Electricity",
                                 "Cooling",
-                                endUseSubcat, // "Heat Pump",
+                                this->endUseSubcat, // "Heat Pump",
                                 "Plant");
         } else if (this->EIRHPType ==
                    DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) { // energy from HeatPump:AirToWater:FuelFired:Heating object
@@ -2563,7 +2561,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 _,
                                 DataGlobalConstants::GetResourceTypeChar(this->fuelType),
                                 "Heating",
-                                endUseSubcat, // "Heat Pump",
+                                this->endUseSubcat, // "Heat Pump",
                                 "Plant");
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Electricity Energy",
@@ -2575,7 +2573,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 _,
                                 "Electricity",
                                 "Heating",
-                                endUseSubcat, // "Heat Pump",
+                                this->endUseSubcat, // "Heat Pump",
                                 "Plant");
         }
         SetupOutputVariable(state,
