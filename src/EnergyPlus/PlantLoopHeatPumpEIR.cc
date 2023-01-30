@@ -889,8 +889,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     for (auto &classToInput : classesToInput) {
         cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
-        auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                               UtilityRoutines::MakeUPPERCase(cCurrentModuleObject));
+        DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
+            getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(cCurrentModuleObject)));
         int numPLHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numPLHP > 0) {
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -1852,7 +1852,7 @@ void EIRFuelFiredHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
                 if (potentialCompanionName == targetCompanionName) {
                     if (thisCoilType == potentialCompanionType) {
                         ShowSevereError(state,
-                                        "Invalid companion specification for EIR Plant Loop Fuel-Fired Heat Pump named \"" + thisCoilName + "\"");
+                                        format("Invalid companion specification for EIR Plant Loop Fuel-Fired Heat Pump named \"{}\"", thisCoilName));
                         ShowContinueError(state, "For heating objects, the companion must be a cooling object, and vice-versa");
                         ShowFatalError(state, "Invalid companion object causes program termination");
                     }
@@ -1908,8 +1908,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     for (auto &classToInput : classesToInput) {
         cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
 
-        DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                               UtilityRoutines::MakeUPPERCase(cCurrentModuleObject)));
+        DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
+            getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(cCurrentModuleObject)));
         int numPLHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numPLHP > 0) {
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -1964,9 +1964,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 bool FuelTypeError(false);
                 UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(tempRsrStr, tempRsrStr, thisPLHP.fuelType, FuelTypeError);
                 if (FuelTypeError) {
-                    ShowSevereError(state, fmt::format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
+                    ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
                     // ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Invalid Fuel Type = " + tempRsrStr);
+                    ShowContinueError(state, format("Invalid Fuel Type = {}", tempRsrStr));
                     // Set to Electric to avoid errors when setting up output variables
                     tempRsrStr = "NaturalGas";
                     thisPLHP.fuelType = DataGlobalConstants::ResourceType::Natural_Gas;
@@ -2101,10 +2101,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
                 thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(state,
-                                    fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
-                                                thisPLHP.name,
-                                                capFtName.get<std::string>()));
+                    ShowSevereError(
+                        state,
+                        format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, capFtName.get<std::string>()));
                     errorsFound = true;
                 }
 
@@ -2112,20 +2111,18 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 auto &eirFtName = fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name");
                 thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(state,
-                                    fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
-                                                thisPLHP.name,
-                                                eirFtName.get<std::string>()));
+                    ShowSevereError(
+                        state,
+                        format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFtName.get<std::string>()));
                     errorsFound = true;
                 }
                 // A13 fuel_energy_input_ratio_function_of_plr_curve_name
                 auto &eirFplrName = fields.at("fuel_energy_input_ratio_function_of_plr_curve_name");
                 thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(state,
-                                    fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
-                                                thisPLHP.name,
-                                                eirFplrName.get<std::string>()));
+                    ShowSevereError(
+                        state,
+                        format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName.get<std::string>()));
                     errorsFound = true;
                 }
 
@@ -2176,9 +2173,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                             Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
                         if (thisPLHP.defrostEIRCurveIndex == 0) {
                             ShowSevereError(state,
-                                            fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
-                                                        thisPLHP.name,
-                                                        eirDefrostName.get<std::string>()));
+                                            format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
+                                                   thisPLHP.name,
+                                                   eirDefrostName.get<std::string>()));
                             errorsFound = true;
                         }
                     } else {
@@ -2271,9 +2268,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
                     if (thisPLHP.cycRatioCurveIndex == 0) {
                         ShowSevereError(state,
-                                        fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
-                                                    thisPLHP.name,
-                                                    cycRatioCurveName.get<std::string>()));
+                                        format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
+                                               thisPLHP.name,
+                                               cycRatioCurveName.get<std::string>()));
                         errorsFound = true;
                     }
                 } else {
@@ -2306,9 +2303,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
                     if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
                         ShowSevereError(state,
-                                        fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
-                                                    thisPLHP.name,
-                                                    auxEIRFTName.get<std::string>()));
+                                        format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
+                                               thisPLHP.name,
+                                               auxEIRFTName.get<std::string>()));
                         errorsFound = true;
                     }
                 } else {
@@ -2322,9 +2319,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
                     if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
                         ShowSevereError(state,
-                                        fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
-                                                    thisPLHP.name,
-                                                    auxEIRFPLRName.get<std::string>()));
+                                        format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
+                                               thisPLHP.name,
+                                               auxEIRFPLRName.get<std::string>()));
                         errorsFound = true;
                     }
                 } else {
@@ -2384,10 +2381,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else {
                     // Again, this should be protected by the input processor
                     ShowErrorMessage(state,
-                                     fmt::format("Invalid heat pump condenser type (name={}; entered type: {}).",
-                                                 thisPLHP.name,   // LCOV_EXCL_LINE
-                                                 condenserType)); // LCOV_EXCL_LINE
-                    errorsFound = true;                           // LCOV_EXCL_LINE
+                                     format("Invalid heat pump condenser type (name={}; entered type: {}).",
+                                            thisPLHP.name,   // LCOV_EXCL_LINE
+                                            condenserType)); // LCOV_EXCL_LINE
+                    errorsFound = true;                      // LCOV_EXCL_LINE
                 }
                 thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                      sourceSideInletNodeName,
@@ -2650,7 +2647,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         }
 
         if (errFlag) {
-            ShowFatalError(state, fmt::format("{}: Program terminated due to previous condition(s).", routineName));
+            ShowFatalError(state, format("{}: Program terminated due to previous condition(s).", routineName));
         }
         this->oneTimeInitFlag = false;
     }
