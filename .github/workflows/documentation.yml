@@ -8,10 +8,10 @@ jobs:
 
     steps:
     - name: Checkout EnergyPlus
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python 3.7
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.7
 
@@ -33,85 +33,85 @@ jobs:
       run: cmake --build . -j 2
 
     - name: Upload Acknowledgments
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Acknowledgments
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/Acknowledgments.pdf
 
     - name: Upload AuxiliaryPrograms
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: AuxiliaryPrograms
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/AuxiliaryPrograms.pdf
 
     - name: Upload EMSApplicationGuide
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: EMSApplicationGuide
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EMSApplicationGuide.pdf
 
     - name: Upload EnergyPlusEssentials
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: EnergyPlusEssentials
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EnergyPlusEssentials.pdf
 
     - name: Upload EngineeringReference
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: EngineeringReference
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EngineeringReference.pdf
 
     - name: Upload ExternalInterfacesApplicationGuide
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ExternalInterfacesApplicationGuide
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ExternalInterfacesApplicationGuide.pdf
 
     - name: Upload GettingStarted
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: GettingStarted
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/GettingStarted.pdf
 
     - name: Upload InputOutputReference
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: InputOutputReference
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/InputOutputReference.pdf
 
     - name: Upload InterfaceDeveloper
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: InterfaceDeveloper
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/InterfaceDeveloper.pdf
 
     - name: Upload ModuleDeveloper
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ModuleDeveloper
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ModuleDeveloper.pdf
 
     - name: Upload OutputDetailsAndExamples
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: OutputDetailsAndExamples
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/OutputDetailsAndExamples.pdf
 
     - name: Upload PlantApplicationGuide
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: PlantApplicationGuide
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/PlantApplicationGuide.pdf
 
     - name: Upload TipsAndTricksUsingEnergyPlus
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: TipsAndTricksUsingEnergyPlus
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/TipsAndTricksUsingEnergyPlus.pdf
 
     - name: Upload UsingEnergyPlusForCompliance
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: UsingEnergyPlusForCompliance
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/UsingEnergyPlusForCompliance.pdf

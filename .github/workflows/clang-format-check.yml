@@ -20,7 +20,7 @@ jobs:
           - 'src/EnergyPlus'
           - 'tst/EnergyPlus/unit'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run clang-format style check for C/C++ programs.
         uses: jidicula/clang-format-action@v3.5.2
         with:
