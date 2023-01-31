@@ -3292,10 +3292,9 @@ void CalcASHRAEDetailedIntConvCoeff(EnergyPlusData &state,
 }
 
 void CalcDetailedHcInForDVModel(EnergyPlusData &state,
-                                int const SurfNum,                             // surface number for which coefficients are being calculated
-                                const Array1D<Real64> &SurfaceTemperatures,    // Temperature of surfaces for evaluation of HcIn
-                                Array1D<Real64> &HcIn,                         // Interior Convection Coeff Array
-                                ObjexxFCL::Optional<Array1S<Real64> const> Vhc // Velocity array for forced convection coeff calculation
+                                int const SurfNum,                          // surface number for which coefficients are being calculated
+                                const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+                                Array1D<Real64> &HcIn                       // Interior Convection Coeff Array
 )
 {
 
@@ -3303,28 +3302,89 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   August 2000
     //       MODIFIED       Used for DV model; Feb 2004, LKL
+    //                      Removed Optional; Jan 2023, JWD
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This subroutine calculates the interior convection coefficient for a surface.
+    // Based on how the function is used, it's pretty likely that the calling point
+    // knows what the AirModelType is, so the check below may be redundant or at least
+    // needs some modification.
 
     // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 TAirConv;
-    Real64 Hf;
+    auto &Surface(state.dataSurface->Surface);
+
+    if (Surface(SurfNum).HeatTransSurf) { // Only treat heat transfer surfaces
+
+        assert(state.dataRoomAirMod->AirModel.allocated());
+        assert(state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType != DataRoomAirModel::RoomAirModel::UCSDCV);
+        if (state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
+            state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+            state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+
+            // Set HConvIn using the proper correlation based on DeltaTemp and CosTiltSurf
+            if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+
+                HcIn(SurfNum) = SetIntConvectionCoeff(state, SurfNum);
+
+            } else {
+                // UCSD
+                if (state.dataSurface->SurfTAirRef(SurfNum) == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
+                    TAirConv = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+                } else {
+                    // currently set to mean air temp but should add error warning here
+                    TAirConv = state.dataZoneTempPredictorCorrector->zoneHeatBalance(Surface(SurfNum).Zone).MAT;
+                }
+                HcIn(SurfNum) = CalcASHRAETARPNatural(SurfaceTemperatures(SurfNum),
+                                                      TAirConv,
+                                                      -Surface(SurfNum).CosTilt); // negative CosTilt because CosTilt is relative to exterior
+            }
+
+        }
+    }
+
+    // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
+    if (HcIn(SurfNum) < state.dataHeatBal->LowHConvLimit) HcIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+}
+
+void CalcDetailedHcInForDVModel(EnergyPlusData &state,
+                                int const SurfNum,                          // surface number for which coefficients are being calculated
+                                const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+                                Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
+                                const Array1S<Real64> &Vhc                  // Velocity array for forced convection coeff calculation
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Rick Strand
+    //       DATE WRITTEN   August 2000
+    //       MODIFIED       Used for DV model; Feb 2004, LKL
+    //                      Removed Optional; Jan 2023, JWD
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This subroutine calculates the interior convection coefficient for a surface.
+    // Based on how the function is used, it's pretty likely that the calling point
+    // knows what the AirModelType is, so the checks below may be redundant or at least
+    // needs some modification.
+
+    // Using/Aliasing
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 TAirConv;
     auto &Surface(state.dataSurface->Surface);
 
     if (Surface(SurfNum).HeatTransSurf) { // Only treat heat transfer surfaces
 
         // UCSD
-        {
-            if (state.dataSurface->SurfTAirRef(SurfNum) == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
-                TAirConv = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-            } else {
-                // currently set to mean air temp but should add error warning here
-                TAirConv = state.dataZoneTempPredictorCorrector->zoneHeatBalance(Surface(SurfNum).Zone).MAT;
-            }
+        if (state.dataSurface->SurfTAirRef(SurfNum) == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
+            TAirConv = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+        } else {
+            // currently set to mean air temp but should add error warning here
+            TAirConv = state.dataZoneTempPredictorCorrector->zoneHeatBalance(Surface(SurfNum).Zone).MAT;
         }
 
         assert(state.dataRoomAirMod->AirModel.allocated());
@@ -3345,7 +3405,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
 
         } else if (state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDCV) {
 
-            Hf = 4.3 * Vhc()(Surface(SurfNum).Zone);
+            Real64 Hf = 4.3 * Vhc(Surface(SurfNum).Zone);
 
             // Set HConvIn using the proper correlation based on DeltaTemp and CosTiltSurf
             if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
@@ -3364,6 +3424,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
     if (HcIn(SurfNum) < state.dataHeatBal->LowHConvLimit) HcIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
 }
+
 
 Real64 CalcZoneSystemACH(EnergyPlusData &state, int const ZoneNum)
 {

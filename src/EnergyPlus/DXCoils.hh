@@ -781,10 +781,10 @@ namespace DXCoils {
     );
 
     int GetDXCoilAvailSchPtr(EnergyPlusData &state,
-                             std::string const &CoilType,                // must match coil types in this module
-                             std::string const &CoilName,                // must match coil names for the coil type
-                             bool &ErrorsFound,                          // set to true if problem
-                             ObjexxFCL::Optional_int_const CoilIndex = _ // Coil index number
+                             std::string const &CoilType, // must match coil types in this module
+                             std::string const &CoilName, // must match coil names for the coil type
+                             bool &ErrorsFound,           // set to true if problem
+                             const int CoilIndex = -1     // Coil index number
     );
 
     Real64 GetDXCoilAirFlow(EnergyPlusData &state,

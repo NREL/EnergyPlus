@@ -16200,10 +16200,10 @@ int GetDXCoilNumberOfSpeeds(EnergyPlusData &state,
 }
 
 int GetDXCoilAvailSchPtr(EnergyPlusData &state,
-                         std::string const &CoilType,            // must match coil types in this module
-                         std::string const &CoilName,            // must match coil names for the coil type
-                         bool &ErrorsFound,                      // set to true if problem
-                         ObjexxFCL::Optional_int_const CoilIndex // Coil index number
+                         std::string const &CoilType, // must match coil types in this module
+                         std::string const &CoilName, // must match coil names for the coil type
+                         bool &ErrorsFound,           // set to true if problem
+                         const int CoilIndex          // Coil index number
 )
 {
 
@@ -16216,11 +16216,8 @@ int GetDXCoilAvailSchPtr(EnergyPlusData &state,
     // incorrect coil type or name is given, ErrorsFound is returned as true and schedule index is returned
     // as -1.
 
-    // Return value
-    int SchPtr; // returned availabiltiy schedule of matched coil
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
+    int WhichCoil{0};
 
     // Obtains and Allocates DXCoils
     if (state.dataDXCoils->GetCoilsInputFlag) {
@@ -16228,33 +16225,28 @@ int GetDXCoilAvailSchPtr(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    if (present(CoilIndex)) {
-        if (CoilIndex == 0) {
-            ShowSevereError(state, "GetDXCoilAvailSchPtr: Invalid index passed = 0");
-            ShowContinueError(state, "... returning DXCoilAvailSchPtr as -1.");
-            ErrorsFound = true;
-            SchPtr = -1;
-            return SchPtr;
-        } else {
-            WhichCoil = CoilIndex;
-        }
-    } else {
+    if (CoilIndex < 0) {
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
-    }
-    if (WhichCoil != 0) {
-        SchPtr = state.dataDXCoils->DXCoil(WhichCoil).SchedPtr;
-    } else {
-        if (!present(CoilIndex)) {
+        if (WhichCoil == 0) {
             ShowSevereError(state,
                             format("GetDXCoilAvailSch: Could not find Coil, Type=\"{}\" Name=\"{}\" when accessing coil availability schedule index.",
                                    CoilType,
                                    CoilName));
+            ErrorsFound = true;
+            return -1;
         }
-        ErrorsFound = true;
-        SchPtr = -1;
+    } else {
+        if (CoilIndex == 0) {
+            ShowSevereError(state, "GetDXCoilAvailSchPtr: Invalid index passed = 0");
+            ShowContinueError(state, "... returning DXCoilAvailSchPtr as -1.");
+            ErrorsFound = true;
+            return -1;
+        } else {
+            WhichCoil = CoilIndex;
+        }
     }
 
-    return SchPtr;
+    return state.dataDXCoils->DXCoil(WhichCoil).SchedPtr;
 }
 
 Real64 GetDXCoilAirFlow(EnergyPlusData &state,

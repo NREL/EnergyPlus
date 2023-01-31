@@ -193,9 +193,9 @@ namespace BranchInputManager {
     );
 
     void GetConnectorList(EnergyPlusData &state,
-                          std::string const &ConnectorListName,       // Requested Connector List
-                          ConnectorData &Connectoid,                  // Returned Connector Data
-                          ObjexxFCL::Optional_int_const NumInList = _ // Number of the current connector in the list of connectors
+                          std::string const &ConnectorListName,  // Requested Connector List
+                          ConnectorData &Connectoid,             // Returned Connector Data
+                          const int NumInList                    // Number of the current connector in the list of connectors
     );
 
     void GetLoopMixer(EnergyPlusData &state,

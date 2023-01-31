@@ -520,9 +520,9 @@ namespace BranchInputManager {
     }
 
     void GetConnectorList(EnergyPlusData &state,
-                          std::string const &ConnectorListName,   // Requested Connector List
-                          ConnectorData &Connectoid,              // Returned Connector Data
-                          ObjexxFCL::Optional_int_const NumInList // Number of the current connector in the list of connectors
+                          std::string const &ConnectorListName, // Requested Connector List
+                          ConnectorData &Connectoid,            // Returned Connector Data
+                          const int NumInList                   // Number of the current connector in the list of connectors
     )
     {
 
@@ -566,12 +566,11 @@ namespace BranchInputManager {
                 ShowFatalError(state, format("GetConnectorList: Connector List not found={}", ConnectorListName));
             }
             Connectoid = state.dataBranchInputManager->ConnectorLists(Count);
-            if (present(NumInList)) {
-                Connectoid.ConnectorType(1) = state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(NumInList);
-                Connectoid.ConnectorName(1) = state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(NumInList);
-                Connectoid.ConnectorType(2) = "";
-                Connectoid.ConnectorName(2) = "";
-            }
+            
+            Connectoid.ConnectorType(1) = state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(NumInList);
+            Connectoid.ConnectorName(1) = state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(NumInList);
+            Connectoid.ConnectorType(2) = "";
+            Connectoid.ConnectorName(2) = "";
         } else {
             Connectoid.Name = "";
             Connectoid.NumOfConnectors = 0;
