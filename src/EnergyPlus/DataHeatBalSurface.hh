@@ -236,11 +236,11 @@ struct HeatBalSurfData : BaseGlobalStruct
 
     Array1D<Real64> SurfMovInsulHExt;                         // Resistance or "h" value of exterior movable insulation
     Array1D<Real64> SurfMovInsulHInt;                         // Resistance or "h" value of interior movable insulation
-    Array1D<Real64> SurfAbsSolarExt;                          // Solar Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsThermalExt;                        // Thermal Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsSolarInt;                          // Solar absorptivity of surface outside face or exterior movable insulation if present
-    Array1D<DataSurfaces::SurfaceRoughness> SurfRoughnessExt; // Roughness of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsThermalInt; // Thermal absorptivity of surface outside face or exterior movable insulation if present
+    Array1D<Real64> SurfAbsSolarExt;                          // Solar Absorptivity of surface outside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalExt;                        // Thermal Absorptivity of surface outside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsSolarInt;                          // Solar absorptivity of surface inside face or exterior movable insulation if present
+    Array1D<DataSurfaces::SurfaceRoughness> SurfRoughnessExt; // Roughness of surface inside face or exterior movable insulation if present
+    Array1D<Real64> SurfAbsThermalInt; // Thermal absorptivity of surface inside face or exterior movable insulation if present
     std::vector<int> SurfMovInsulIndexList;
     std::vector<int> SurfMovSlatsIndexList;
     void clear_state() override
