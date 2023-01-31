@@ -61,6 +61,7 @@
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -79,6 +80,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -251,7 +253,7 @@ void MaterialAddOnOverrideByType(EnergyPlusData &state, EPVector<Material::Varia
 {
     for (auto &thisAbsAddOn : addOnVec) {
         Real64 overrideValue;
-        if (thisAbsAddOn.ControlSignal == VariableAbsCtrlSignal::Scheduled) {
+        if (thisAbsAddOn.ControlSignal == Material::VariableAbsCtrlSignal::Scheduled) {
             overrideValue = ScheduleManager::GetCurrentScheduleValue(state, thisAbsAddOn.ScheduleIdx);
             overrideValue = max(min(overrideValue, 0.9999), 0.0001);
             for (int surfNum : thisAbsAddOn.SurfList) {
@@ -259,14 +261,14 @@ void MaterialAddOnOverrideByType(EnergyPlusData &state, EPVector<Material::Varia
             }
         } else {
             Real64 triggerValue;
-            if (thisAbsAddOn.ControlSignal == VariableAbsCtrlSignal::SurfaceTemperature) {
+            if (thisAbsAddOn.ControlSignal == Material::VariableAbsCtrlSignal::SurfaceTemperature) {
                 for (int surfNum : thisAbsAddOn.SurfList) {
                     triggerValue = state.dataHeatBalSurf->SurfTempOut(surfNum);
                     overrideValue = Curve::CurveValue(state, thisAbsAddOn.FunctionIdx, triggerValue);
                     overrideValue = max(min(overrideValue, 0.9999), 0.0001);
                     arrayToBeOverride(surfNum) = max(min(overrideValue, 0.9999), 0.0001);
                 }
-            } else if (thisAbsAddOn.ControlSignal == VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation) {
+            } else if (thisAbsAddOn.ControlSignal == Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation) {
                 for (int surfNum : thisAbsAddOn.SurfList) {
                     triggerValue = state.dataHeatBal->SurfQRadSWOutIncident(surfNum);
                     overrideValue = Curve::CurveValue(state, thisAbsAddOn.FunctionIdx, triggerValue);
@@ -403,7 +405,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     }
 
     // yujie: variable thermal solar absorptance overrides
-    Material::MaterialAddOnOverride(state);
+    MaterialAddOnOverride(state);
 
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag) {
