@@ -56,7 +56,6 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 #include <nlohmann/json.hpp>
 
@@ -175,12 +174,37 @@ namespace Curve {
         Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5, Real64 V6);
         Real64 valueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5);
         Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                       Real64 Var1,                                // 1st independent variable
-                                       ObjexxFCL::Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                       ObjexxFCL::Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                       ObjexxFCL::Optional<Real64 const> Var4 = _, // 4th independent variable
-                                       ObjexxFCL::Optional<Real64 const> Var5 = _, // 5th independent variable
-                                       ObjexxFCL::Optional<Real64 const> Var6 = _);
+                                       const Real64 Var1 // 1st independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2  // 2nd independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2, // 2nd independent variable
+                                       const Real64 Var3  // 3rd independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2, // 2nd independent variable
+                                       const Real64 Var3, // 3rd independent variable
+                                       const Real64 Var4  // 4th independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2, // 2nd independent variable
+                                       const Real64 Var3, // 3rd independent variable
+                                       const Real64 Var4, // 4th independent variable
+                                       const Real64 Var5 // 5th independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2, // 2nd independent variable
+                                       const Real64 Var3, // 3rd independent variable
+                                       const Real64 Var4, // 4th independent variable
+                                       const Real64 Var5, // 5th independent variable
+                                       const Real64 Var6);
     };
 
     // Table file objects
@@ -306,26 +330,81 @@ namespace Curve {
     );
 
     void GetCurveMinMaxValues(EnergyPlusData &state,
-                              int CurveIndex,                          // index of curve in curve array
-                              Real64 &Var1Min,                         // Minimum values of 1st independent variable
-                              Real64 &Var1Max,                         // Maximum values of 1st independent variable
-                              ObjexxFCL::Optional<Real64> Var2Min = _, // Minimum values of 2nd independent variable
-                              ObjexxFCL::Optional<Real64> Var2Max = _, // Maximum values of 2nd independent variable
-                              ObjexxFCL::Optional<Real64> Var3Min = _, // Minimum values of 3rd independent variable
-                              ObjexxFCL::Optional<Real64> Var3Max = _, // Maximum values of 3rd independent variable
-                              ObjexxFCL::Optional<Real64> Var4Min = _, // Minimum values of 4th independent variable
-                              ObjexxFCL::Optional<Real64> Var4Max = _, // Maximum values of 4th independent variable
-                              ObjexxFCL::Optional<Real64> Var5Min = _, // Minimum values of 5th independent variable
-                              ObjexxFCL::Optional<Real64> Var5Max = _, // Maximum values of 5th independent variable
-                              ObjexxFCL::Optional<Real64> Var6Min = _, // Minimum values of 6th independent variable
-                              ObjexxFCL::Optional<Real64> Var6Max = _  // Maximum values of 6th independent variable
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max       // Maximum values of 1st independent variable
     );
 
-    void SetCurveOutputMinMaxValues(EnergyPlusData &state,
-                                    int CurveIndex,                                 // index of curve in curve array
-                                    bool &ErrorsFound,                              // TRUE when errors occur
-                                    ObjexxFCL::Optional<Real64 const> CurveMin = _, // Minimum value of curve output
-                                    ObjexxFCL::Optional<Real64 const> CurveMax = _  // Maximum values of curve output
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max       // Maximum values of 2nd independent variable
+    );
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max       // Maximum values of 3rd independent variable
+    );
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max       // Maximum values of 4th independent variable
+    );
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max,      // Maximum values of 4th independent variable
+                              Real64 &Var5Min,      // Minimum values of 5th independent variable
+                              Real64 &Var5Max       // Maximum values of 5th independent variable
+    );
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max,      // Maximum values of 4th independent variable
+                              Real64 &Var5Min,      // Minimum values of 5th independent variable
+                              Real64 &Var5Max,      // Maximum values of 5th independent variable
+                              Real64 &Var6Min,      // Minimum values of 6th independent variable
+                              Real64 &Var6Max       // Maximum values of 6th independent variable
+    );
+
+    void SetCurveOutputMinValue(EnergyPlusData &state,
+                                int CurveIndex,       // index of curve in curve array
+                                bool &ErrorsFound,    // TRUE when errors occur
+                                const Real64 CurveMin // Minimum value of curve output
+    );
+
+    void SetCurveOutputMaxValue(EnergyPlusData &state,
+                                int CurveIndex,       // index of curve in curve array
+                                bool &ErrorsFound,    // TRUE when errors occur
+                                const Real64 CurveMax // Maximum values of curve output
     );
 
     void GetPressureSystemInput(EnergyPlusData &state);

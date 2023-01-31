@@ -2797,43 +2797,131 @@ namespace Curve {
     }
 
     Real64 Curve::BtwxtTableInterpolation(EnergyPlusData &state,
-                                          Real64 const Var1,                      // 1st independent variable
-                                          ObjexxFCL::Optional<Real64 const> Var2, // 2nd independent variable
-                                          ObjexxFCL::Optional<Real64 const> Var3, // 3rd independent variable
-                                          ObjexxFCL::Optional<Real64 const> Var4, // 4th independent variable
-                                          ObjexxFCL::Optional<Real64 const> Var5, // 5th independent variable
-                                          ObjexxFCL::Optional<Real64 const> Var6  // 6th independent variable
+                                          const Real64 Var1 // 1st independent variable
     )
     {
         // TODO: Generalize for N-dims
-        Real64 var = Var1;
-        var = max(min(var, this->inputLimits[0].max), this->inputLimits[0].min);
-        std::vector<double> target{var};
-        if (present(Var2)) {
-            var = Var2;
-            var = max(min(var, this->inputLimits[1].max), this->inputLimits[1].min);
-            target.push_back(var);
-        }
-        if (present(Var3)) {
-            var = Var3;
-            var = max(min(var, this->inputLimits[2].max), this->inputLimits[2].min);
-            target.push_back(var);
-        }
-        if (present(Var4)) {
-            var = Var4;
-            var = max(min(var, this->inputLimits[3].max), this->inputLimits[3].min);
-            target.push_back(var);
-        }
-        if (present(Var5)) {
-            var = Var5;
-            var = max(min(var, this->inputLimits[4].max), this->inputLimits[4].min);
-            target.push_back(var);
-        }
-        if (present(Var6)) {
-            var = Var6;
-            var = max(min(var, this->inputLimits[5].max), this->inputLimits[5].min);
-            target.push_back(var);
-        }
+        std::vector<double> target{max(min(Var1, this->inputLimits[0].max), this->inputLimits[0].min)};
+
+        std::string contextString = format("Table:Lookup \"{}\"", this->Name);
+        std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
+        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
+
+        if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
+        if (this->outputLimits.maxPresent) TableValue = min(TableValue, this->outputLimits.max);
+
+        return TableValue;
+    }
+
+    Real64 Curve::BtwxtTableInterpolation(EnergyPlusData &state,
+                                          const Real64 Var1, // 1st independent variable
+                                          const Real64 Var2  // 2nd independent variable
+    )
+    {
+        // TODO: Generalize for N-dims
+        std::vector<double> target{max(min(Var1, this->inputLimits[0].max), this->inputLimits[0].min),
+                                   max(min(Var2, this->inputLimits[1].max), this->inputLimits[1].min)};
+
+        std::string contextString = format("Table:Lookup \"{}\"", this->Name);
+        std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
+        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
+
+        if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
+        if (this->outputLimits.maxPresent) TableValue = min(TableValue, this->outputLimits.max);
+
+        return TableValue;
+    }
+
+    Real64 Curve::BtwxtTableInterpolation(EnergyPlusData &state,
+                                          const Real64 Var1, // 1st independent variable
+                                          const Real64 Var2, // 2nd independent variable
+                                          const Real64 Var3  // 3rd independent variable
+    )
+    {
+        // TODO: Generalize for N-dims
+        std::vector<double> target{max(min(Var1, this->inputLimits[0].max), this->inputLimits[0].min),
+                                   max(min(Var2, this->inputLimits[1].max), this->inputLimits[1].min),
+                                   max(min(Var3, this->inputLimits[2].max), this->inputLimits[2].min)};
+
+        std::string contextString = format("Table:Lookup \"{}\"", this->Name);
+        std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
+        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
+
+        if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
+        if (this->outputLimits.maxPresent) TableValue = min(TableValue, this->outputLimits.max);
+
+        return TableValue;
+    }
+
+    Real64 Curve::BtwxtTableInterpolation(EnergyPlusData &state,
+                                          const Real64 Var1, // 1st independent variable
+                                          const Real64 Var2, // 2nd independent variable
+                                          const Real64 Var3, // 3rd independent variable
+                                          const Real64 Var4  // 4th independent variable
+    )
+    {
+        // TODO: Generalize for N-dims
+        std::vector<double> target{max(min(Var1, this->inputLimits[0].max), this->inputLimits[0].min),
+                                   max(min(Var2, this->inputLimits[1].max), this->inputLimits[1].min),
+                                   max(min(Var3, this->inputLimits[2].max), this->inputLimits[2].min),
+                                   max(min(Var4, this->inputLimits[3].max), this->inputLimits[3].min)};
+
+        std::string contextString = format("Table:Lookup \"{}\"", this->Name);
+        std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
+        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
+
+        if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
+        if (this->outputLimits.maxPresent) TableValue = min(TableValue, this->outputLimits.max);
+
+        return TableValue;
+    }
+
+    Real64 Curve::BtwxtTableInterpolation(EnergyPlusData &state,
+                                          const Real64 Var1, // 1st independent variable
+                                          const Real64 Var2, // 2nd independent variable
+                                          const Real64 Var3, // 3rd independent variable
+                                          const Real64 Var4, // 4th independent variable
+                                          const Real64 Var5  // 5th independent variable
+    )
+    {
+        // TODO: Generalize for N-dims
+        std::vector<double> target{max(min(Var1, this->inputLimits[0].max), this->inputLimits[0].min),
+                                   max(min(Var2, this->inputLimits[1].max), this->inputLimits[1].min),
+                                   max(min(Var3, this->inputLimits[2].max), this->inputLimits[2].min),
+                                   max(min(Var4, this->inputLimits[3].max), this->inputLimits[3].min),
+                                   max(min(Var5, this->inputLimits[4].max), this->inputLimits[4].min)};
+
+        std::string contextString = format("Table:Lookup \"{}\"", this->Name);
+        std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
+        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
+
+        if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
+        if (this->outputLimits.maxPresent) TableValue = min(TableValue, this->outputLimits.max);
+
+        return TableValue;
+    }
+
+    Real64 Curve::BtwxtTableInterpolation(EnergyPlusData &state,
+                                          const Real64 Var1, // 1st independent variable
+                                          const Real64 Var2, // 2nd independent variable
+                                          const Real64 Var3, // 3rd independent variable
+                                          const Real64 Var4, // 4th independent variable
+                                          const Real64 Var5, // 5th independent variable
+                                          const Real64 Var6  // 6th independent variable
+    )
+    {
+        // TODO: Generalize for N-dims
+        std::vector<double> target{max(min(Var1, this->inputLimits[0].max), this->inputLimits[0].min),
+                                   max(min(Var2, this->inputLimits[1].max), this->inputLimits[1].min),
+                                   max(min(Var3, this->inputLimits[2].max), this->inputLimits[2].min),
+                                   max(min(Var4, this->inputLimits[3].max), this->inputLimits[3].min),
+                                   max(min(Var5, this->inputLimits[4].max), this->inputLimits[4].min),
+                                   max(min(Var6, this->inputLimits[5].max), this->inputLimits[5].min)};
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -3019,19 +3107,9 @@ namespace Curve {
     }
 
     void GetCurveMinMaxValues(EnergyPlusData &state,
-                              int const CurveIndex,                // index of curve in curve array
-                              Real64 &Var1Min,                     // Minimum values of 1st independent variable
-                              Real64 &Var1Max,                     // Maximum values of 1st independent variable
-                              ObjexxFCL::Optional<Real64> Var2Min, // Minimum values of 2nd independent variable
-                              ObjexxFCL::Optional<Real64> Var2Max, // Maximum values of 2nd independent variable
-                              ObjexxFCL::Optional<Real64> Var3Min, // Minimum values of 3rd independent variable
-                              ObjexxFCL::Optional<Real64> Var3Max, // Maximum values of 3rd independent variable
-                              ObjexxFCL::Optional<Real64> Var4Min, // Minimum values of 4th independent variable
-                              ObjexxFCL::Optional<Real64> Var4Max, // Maximum values of 4th independent variable
-                              ObjexxFCL::Optional<Real64> Var5Min, // Minimum values of 5th independent variable
-                              ObjexxFCL::Optional<Real64> Var5Max, // Maximum values of 5th independent variable
-                              ObjexxFCL::Optional<Real64> Var6Min, // Minimum values of 6th independent variable
-                              ObjexxFCL::Optional<Real64> Var6Max  // Maximum values of 6th independent variable
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max       // Maximum values of 1st independent variable
     )
     {
 
@@ -3048,23 +3126,183 @@ namespace Curve {
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
         Var1Min = thisCurve->inputLimits[0].min;
         Var1Max = thisCurve->inputLimits[0].max;
-        if (present(Var2Min)) Var2Min = thisCurve->inputLimits[1].min;
-        if (present(Var2Max)) Var2Max = thisCurve->inputLimits[1].max;
-        if (present(Var3Min)) Var3Min = thisCurve->inputLimits[2].min;
-        if (present(Var3Max)) Var3Max = thisCurve->inputLimits[2].max;
-        if (present(Var4Min)) Var4Min = thisCurve->inputLimits[3].min;
-        if (present(Var4Max)) Var4Max = thisCurve->inputLimits[3].max;
-        if (present(Var5Min)) Var5Min = thisCurve->inputLimits[4].min;
-        if (present(Var5Max)) Var5Max = thisCurve->inputLimits[4].max;
-        if (present(Var6Min)) Var6Min = thisCurve->inputLimits[5].min;
-        if (present(Var6Max)) Var6Max = thisCurve->inputLimits[5].max;
     }
 
-    void SetCurveOutputMinMaxValues(EnergyPlusData &state,
-                                    int const CurveIndex,                       // index of curve in curve array
-                                    bool &ErrorsFound,                          // TRUE when errors occur
-                                    ObjexxFCL::Optional<Real64 const> CurveMin, // Minimum value of curve output
-                                    ObjexxFCL::Optional<Real64 const> CurveMax  // Maximum values of curve output
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max       // Maximum values of 2nd independent variable
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   July 2006
+        //       MODIFIED       B. Griffith Aug 2006 add third independent variable
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Given the curve index, returns the minimum and maximum values specified in the input
+        // for the independent variables of the performance curve.
+
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Var1Min = thisCurve->inputLimits[0].min;
+        Var1Max = thisCurve->inputLimits[0].max;
+        Var2Min = thisCurve->inputLimits[1].min;
+        Var2Max = thisCurve->inputLimits[1].max;
+    }
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max       // Maximum values of 3rd independent variable
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   July 2006
+        //       MODIFIED       B. Griffith Aug 2006 add third independent variable
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Given the curve index, returns the minimum and maximum values specified in the input
+        // for the independent variables of the performance curve.
+
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Var1Min = thisCurve->inputLimits[0].min;
+        Var1Max = thisCurve->inputLimits[0].max;
+        Var2Min = thisCurve->inputLimits[1].min;
+        Var2Max = thisCurve->inputLimits[1].max;
+        Var3Min = thisCurve->inputLimits[2].min;
+        Var3Max = thisCurve->inputLimits[2].max;
+    }
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max       // Maximum values of 4th independent variable
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   July 2006
+        //       MODIFIED       B. Griffith Aug 2006 add third independent variable
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Given the curve index, returns the minimum and maximum values specified in the input
+        // for the independent variables of the performance curve.
+
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Var1Min = thisCurve->inputLimits[0].min;
+        Var1Max = thisCurve->inputLimits[0].max;
+        Var2Min = thisCurve->inputLimits[1].min;
+        Var2Max = thisCurve->inputLimits[1].max;
+        Var3Min = thisCurve->inputLimits[2].min;
+        Var3Max = thisCurve->inputLimits[2].max;
+        Var4Min = thisCurve->inputLimits[3].min;
+        Var4Max = thisCurve->inputLimits[3].max;
+    }
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max,      // Maximum values of 4th independent variable
+                              Real64 &Var5Min,      // Minimum values of 5th independent variable
+                              Real64 &Var5Max       // Maximum values of 5th independent variable
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   July 2006
+        //       MODIFIED       B. Griffith Aug 2006 add third independent variable
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Given the curve index, returns the minimum and maximum values specified in the input
+        // for the independent variables of the performance curve.
+
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Var1Min = thisCurve->inputLimits[0].min;
+        Var1Max = thisCurve->inputLimits[0].max;
+        Var2Min = thisCurve->inputLimits[1].min;
+        Var2Max = thisCurve->inputLimits[1].max;
+        Var3Min = thisCurve->inputLimits[2].min;
+        Var3Max = thisCurve->inputLimits[2].max;
+        Var4Min = thisCurve->inputLimits[3].min;
+        Var4Max = thisCurve->inputLimits[3].max;
+        Var5Min = thisCurve->inputLimits[4].min;
+        Var5Max = thisCurve->inputLimits[4].max;
+    }
+
+    
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max,      // Maximum values of 4th independent variable
+                              Real64 &Var5Min,      // Minimum values of 5th independent variable
+                              Real64 &Var5Max,      // Maximum values of 5th independent variable
+                              Real64 &Var6Min,      // Minimum values of 6th independent variable
+                              Real64 &Var6Max       // Maximum values of 6th independent variable
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   July 2006
+        //       MODIFIED       B. Griffith Aug 2006 add third independent variable
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Given the curve index, returns the minimum and maximum values specified in the input
+        // for the independent variables of the performance curve.
+
+        Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+        Var1Min = thisCurve->inputLimits[0].min;
+        Var1Max = thisCurve->inputLimits[0].max;
+        Var2Min = thisCurve->inputLimits[1].min;
+        Var2Max = thisCurve->inputLimits[1].max;
+        Var3Min = thisCurve->inputLimits[2].min;
+        Var3Max = thisCurve->inputLimits[2].max;
+        Var4Min = thisCurve->inputLimits[3].min;
+        Var4Max = thisCurve->inputLimits[3].max;
+        Var5Min = thisCurve->inputLimits[4].min;
+        Var5Max = thisCurve->inputLimits[4].max;
+        Var6Min = thisCurve->inputLimits[5].min;
+        Var6Max = thisCurve->inputLimits[5].max;
+    }
+
+    void SetCurveOutputMinValue(EnergyPlusData &state,
+                                int const CurveIndex, // index of curve in curve array
+                                bool &ErrorsFound,    // TRUE when errors occur
+                                const Real64 CurveMin // Minimum value of curve output
     )
     {
 
@@ -3080,14 +3318,37 @@ namespace Curve {
 
         if (CurveIndex > 0 && CurveIndex <= state.dataCurveManager->NumCurves) {
             Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
-            if (present(CurveMin)) {
-                thisCurve->outputLimits.min = CurveMin;
-                thisCurve->outputLimits.minPresent = true;
-            }
-            if (present(CurveMax)) {
-                thisCurve->outputLimits.max = CurveMax;
-                thisCurve->outputLimits.maxPresent = true;
-            }
+            thisCurve->outputLimits.min = CurveMin;
+            thisCurve->outputLimits.minPresent = true;
+        } else {
+            ShowSevereError(
+                state,
+                format("SetCurveOutputMinValue: CurveIndex=[{}] not in range of curves=[1:{}].", CurveIndex, state.dataCurveManager->NumCurves));
+            ErrorsFound = true;
+        }
+    }
+
+    void SetCurveOutputMaxValue(EnergyPlusData &state,
+                               int const CurveIndex, // index of curve in curve array
+                               bool &ErrorsFound,    // TRUE when errors occur
+                               const Real64 CurveMax // Maximum values of curve output
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Richard Raustad
+        //       DATE WRITTEN   Feb 2009
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Given the curve index, sets the minimum and maximum possible value for this curve.
+        // Certain curve types have set limits (e.g., PLF curve should not be greater than 1 or less than 0.7).
+
+        if (CurveIndex > 0 && CurveIndex <= state.dataCurveManager->NumCurves) {
+            Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
+            thisCurve->outputLimits.max = CurveMax;
+            thisCurve->outputLimits.maxPresent = true;
         } else {
             ShowSevereError(
                 state,
