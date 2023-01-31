@@ -535,9 +535,8 @@ void CheckEarthTubesInZones(EnergyPlusData &state,
     for (int Loop = 1; Loop <= numEarthTubes - 1; ++Loop) {
         for (int Loop1 = Loop + 1; Loop1 <= numEarthTubes; ++Loop1) {
             if (state.dataEarthTube->EarthTubeSys(Loop).ZonePtr == state.dataEarthTube->EarthTubeSys(Loop1).ZonePtr) {
-                ShowSevereError(state, ZoneName + " has more than one " + std::string{FieldName} + " associated with it.");
-                ShowContinueError(state,
-                                  "Only one " + std::string{FieldName} + " is allowed per zone.  Check the definitions of " + std::string{FieldName});
+                ShowSevereError(state, format("{} has more than one {} associated with it.", ZoneName, FieldName));
+                ShowContinueError(state, format("Only one {} is allowed per zone.  Check the definitions of {}", FieldName, FieldName));
                 ShowContinueError(state, "in your input file and make sure that there is only one defined for each zone.");
                 ErrorsFound = true;
             }

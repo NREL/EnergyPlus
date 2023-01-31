@@ -120,12 +120,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.RegionNum = 4;
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
-    state->dataCurveManager->NumCurves = 5;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
-    PerformanceCurveData *pCurve;
+    state->dataCurveManager->allocateCurveVector(5);
+    Curve::Curve *pCurve;
 
     int constexpr nCapfT = 1;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfT);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfT);
     pCurve->curveType = CurveType::Cubic;
     pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT";
@@ -139,7 +138,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.CCapFTemp(1) = nCapfT;
 
     int constexpr nCapfFF = 2;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfFF);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfFF);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatCapfFF";
@@ -153,7 +152,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.CCapFFlow(1) = nCapfFF;
 
     int constexpr nEIRfT = 3;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfT);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfT);
     pCurve->curveType = CurveType::Cubic;
     pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT";
@@ -166,7 +165,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.EIRFTemp(1) = nEIRfT;
 
     int constexpr nEIRfFF = 4;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfFF);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatEIRfFF";
@@ -180,7 +179,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.EIRFFlow(1) = nEIRfFF;
 
     int constexpr nPLFfPLR = 5;
-    pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR);
+    pCurve = state->dataCurveManager->PerfCurve(nPLFfPLR);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatPLFfPLR";
@@ -194,8 +193,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.PLFFPLR(1) = nPLFfPLR;
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
-        PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
-        rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+        Curve::Curve *rCurve = state->dataCurveManager->PerfCurve(CurveNum);
+        rCurve->interpolationType = InterpType::EvaluateCurveToLimits;
     }
     Real64 NetHeatingCapRatedHighTemp;
     Real64 NetHeatingCapRatedLowTemp;
@@ -316,12 +315,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.RegionNum = 4;
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
-    state->dataCurveManager->NumCurves = 5;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
-    PerformanceCurveData *pCurve;
+    state->dataCurveManager->allocateCurveVector(5);
+    Curve::Curve *pCurve;
 
     int constexpr nCapfT = 1;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfT);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfT);
     pCurve->curveType = CurveType::Cubic;
     pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT";
@@ -335,7 +333,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.CCapFTemp(1) = nCapfT;
 
     int constexpr nCapfFF = 2;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfFF);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfFF);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatCapfFF";
@@ -349,7 +347,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.CCapFFlow(1) = nCapfFF;
 
     int constexpr nEIRfT = 3;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfT);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfT);
     pCurve->curveType = CurveType::Cubic;
     pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT";
@@ -362,7 +360,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.EIRFTemp(1) = nEIRfT;
 
     int constexpr nEIRfFF = 4;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfFF);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatEIRfFF";
@@ -376,7 +374,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.EIRFFlow(1) = nEIRfFF;
 
     int constexpr nPLFfPLR = 5;
-    pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR);
+    pCurve = state->dataCurveManager->PerfCurve(nPLFfPLR);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatPLFfPLR";
@@ -390,8 +388,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.PLFFPLR(1) = nPLFfPLR;
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
-        PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
-        rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+        Curve::Curve *rCurve = state->dataCurveManager->PerfCurve(CurveNum);
+        rCurve->interpolationType = InterpType::EvaluateCurveToLimits;
     }
     Real64 NetHeatingCapRatedHighTemp;
     Real64 NetHeatingCapRatedLowTemp;
@@ -503,12 +501,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.RegionNum = 4; //
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
-    state->dataCurveManager->NumCurves = 5;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
-    PerformanceCurveData *pCurve;
+    state->dataCurveManager->allocateCurveVector(5);
+    Curve::Curve *pCurve;
 
     int constexpr nCapfT = 1;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfT);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfT);
     pCurve->curveType = CurveType::Cubic;
     pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT"; // Simpl_HPACHeatCapFT_Cubic
@@ -522,7 +519,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.CCapFTemp(1) = nCapfT;
 
     int constexpr nCapfFF = 2;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfFF);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfFF);
     pCurve->curveType = CurveType::Cubic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatCapfFF"; // Simpl_HPACHeatCapFFF_Cubic
@@ -535,7 +532,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.CCapFFlow(1) = nCapfFF;
 
     int constexpr nEIRfT = 3;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfT);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfT);
     pCurve->curveType = CurveType::BiQuadratic;
     pCurve->numDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT"; // Simpl_HPACEIRFT_Biquadratic
@@ -552,7 +549,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.EIRFTemp(1) = nEIRfT;
 
     int constexpr nEIRfFF = 4;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfFF);
     pCurve->curveType = CurveType::Cubic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatEIRfFF"; // Simpl_HPACHeatEIRFT_Cubic
@@ -567,7 +564,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.EIRFFlow(1) = nEIRfFF;
 
     int constexpr nPLFfPLR = 5;
-    pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR);
+    pCurve = state->dataCurveManager->PerfCurve(nPLFfPLR);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->numDims = 1;
     pCurve->Name = "HPHeatPLFfPLR"; // Simpl_HPACCOOLPLFFPLR_Quadratic
@@ -581,8 +578,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.PLFFPLR(1) = nPLFfPLR;
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
-        PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
-        rCurve.interpolationType = InterpType::EvaluateCurveToLimits;
+        Curve::Curve *rCurve = state->dataCurveManager->PerfCurve(CurveNum);
+        rCurve->interpolationType = InterpType::EvaluateCurveToLimits;
     }
     Real64 NetHeatingCapRatedHighTemp;
     Real64 NetHeatingCapRatedLowTemp;
@@ -1031,58 +1028,56 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AirCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
-    int CurveNum;
-    state->dataCurveManager->NumCurves = 3;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(3);
 
     // Cap=f(T)
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpCapfT";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.98898813;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.036832851;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.000174006;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.000275634;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -0.000143667;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = -0.000246286;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 4.44;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 10;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 23.89;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 46.11;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::BiQuadratic;
+    curve1->numDims = 2;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->Name = "AirCooledChillerScrewCmpCapfT";
+    curve1->coeff[0] = 0.98898813;
+    curve1->coeff[1] = 0.036832851;
+    curve1->coeff[2] = 0.000174006;
+    curve1->coeff[3] = -0.000275634;
+    curve1->coeff[4] = -0.000143667;
+    curve1->coeff[5] = -0.000246286;
+    curve1->inputLimits[0].min = 4.44;
+    curve1->inputLimits[0].max = 10;
+    curve1->inputLimits[1].min = 23.89;
+    curve1->inputLimits[1].max = 46.11;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfT";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.814058418;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.002335553;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.000817786;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.017129784;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.000773288;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = -0.000922024;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 4.44;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 10;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 10;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 46.11;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::BiQuadratic;
+    curve2->numDims = 2;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->Name = "AirCooledChillerScrewCmpEIRfT";
+    curve2->coeff[0] = 0.814058418;
+    curve2->coeff[1] = 0.002335553;
+    curve2->coeff[2] = 0.000817786;
+    curve2->coeff[3] = -0.017129784;
+    curve2->coeff[4] = 0.000773288;
+    curve2->coeff[5] = -0.000922024;
+    curve2->inputLimits[0].min = 4.44;
+    curve2->inputLimits[0].max = 10;
+    curve2->inputLimits[1].min = 10;
+    curve2->inputLimits[1].max = 46.11;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfPLR";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -0.08117804;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.433532026;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.762289434;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.412199944;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 1;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::Cubic;
+    curve3->numDims = 1;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->Name = "AirCooledChillerScrewCmpEIRfPLR";
+    curve3->coeff[0] = -0.08117804;
+    curve3->coeff[1] = 1.433532026;
+    curve3->coeff[2] = -0.762289434;
+    curve3->coeff[3] = 0.412199944;
+    curve3->inputLimits[0].min = 0;
+    curve3->inputLimits[0].max = 1;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
@@ -1118,60 +1113,55 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.10;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MaxPartLoadRat = 1.15;
 
-    int CurveNum;
-    state->dataCurveManager->NumCurves = 3;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
-
-    state->dataCurveManager->NumCurves = 3;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(3);
 
     // Cap=f(T)
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 2.521130E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.324053E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -8.637329E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 8.581056E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -4.261176E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 8.661899E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 7.22;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 26.67;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::BiQuadratic;
+    curve1->numDims = 2;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT";
+    curve1->coeff[0] = 2.521130E-01;
+    curve1->coeff[1] = 1.324053E-02;
+    curve1->coeff[2] = -8.637329E-03;
+    curve1->coeff[3] = 8.581056E-02;
+    curve1->coeff[4] = -4.261176E-03;
+    curve1->coeff[5] = 8.661899E-03;
+    curve1->inputLimits[0].min = 7.22;
+    curve1->inputLimits[0].max = 12.78;
+    curve1->inputLimits[1].min = 12.78;
+    curve1->inputLimits[1].max = 26.67;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 4.475238E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -2.588210E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -1.459053E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 4.342595E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -1.000651E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 1.920106E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 7.22;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 26.67;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::BiQuadratic;
+    curve2->numDims = 2;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT";
+    curve2->coeff[0] = 4.475238E-01;
+    curve2->coeff[1] = -2.588210E-02;
+    curve2->coeff[2] = -1.459053E-03;
+    curve2->coeff[3] = 4.342595E-02;
+    curve2->coeff[4] = -1.000651E-03;
+    curve2->coeff[5] = 1.920106E-03;
+    curve2->inputLimits[0].min = 7.22;
+    curve2->inputLimits[0].max = 12.78;
+    curve2->inputLimits[1].min = 12.78;
+    curve2->inputLimits[1].max = 26.67;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 2.778889E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 2.338363E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 4.883748E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 1.15;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::Cubic;
+    curve3->numDims = 1;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
+    curve3->coeff[0] = 2.778889E-01;
+    curve3->coeff[1] = 2.338363E-01;
+    curve3->coeff[2] = 4.883748E-01;
+    curve3->inputLimits[0].min = 0;
+    curve3->inputLimits[0].max = 1.15;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
@@ -1208,66 +1198,64 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).MaxPartLoadRat = 1.08;
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).CondVolFlowRate = 0.01924;
 
-    int CurveNum;
-    state->dataCurveManager->NumCurves = 3;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(3);
 
     // Cap=f(T)
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -4.862465E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -7.293218E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -8.514849E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 1.463106E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -4.474066E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 9.813408E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 7.22;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 18.81;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 35.09;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::BiQuadratic;
+    curve1->numDims = 2;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT";
+    curve1->coeff[0] = -4.862465E-01;
+    curve1->coeff[1] = -7.293218E-02;
+    curve1->coeff[2] = -8.514849E-03;
+    curve1->coeff[3] = 1.463106E-01;
+    curve1->coeff[4] = -4.474066E-03;
+    curve1->coeff[5] = 9.813408E-03;
+    curve1->inputLimits[0].min = 7.22;
+    curve1->inputLimits[0].max = 12.78;
+    curve1->inputLimits[1].min = 18.81;
+    curve1->inputLimits[1].max = 35.09;
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 3.522647E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -3.311790E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -1.374491E-04;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 3.469525E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -3.624458E-04;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 6.749423E-04;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 7.22;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 18.81;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 35.09;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::BiQuadratic;
+    curve2->numDims = 2;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT";
+    curve2->coeff[0] = 3.522647E-01;
+    curve2->coeff[1] = -3.311790E-02;
+    curve2->coeff[2] = -1.374491E-04;
+    curve2->coeff[3] = 3.469525E-02;
+    curve2->coeff[4] = -3.624458E-04;
+    curve2->coeff[5] = 6.749423E-04;
+    curve2->inputLimits[0].min = 7.22;
+    curve2->inputLimits[0].max = 12.78;
+    curve2->inputLimits[1].min = 18.81;
+    curve2->inputLimits[1].max = 35.09;
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiCubic;
-    state->dataCurveManager->PerfCurve(CurveNum).numDims = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 8.215998E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -2.209969E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -1.725652E-05;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -3.831448E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 1.896948E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 2.308518E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[6] = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[7] = 1.349969E-02;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[8] = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[9] = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 17.52;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 33.32;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.10;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 1.08;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::BiCubic;
+    curve3->numDims = 2;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
+    curve3->coeff[0] = 8.215998E-01;
+    curve3->coeff[1] = -2.209969E-02;
+    curve3->coeff[2] = -1.725652E-05;
+    curve3->coeff[3] = -3.831448E-02;
+    curve3->coeff[4] = 1.896948E-01;
+    curve3->coeff[5] = 2.308518E-02;
+    curve3->coeff[6] = 0;
+    curve3->coeff[7] = 1.349969E-02;
+    curve3->coeff[8] = 0;
+    curve3->coeff[9] = 0;
+    curve3->inputLimits[0].min = 17.52;
+    curve3->inputLimits[0].max = 33.32;
+    curve3->inputLimits[1].min = 0.10;
+    curve3->inputLimits[1].max = 1.08;
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     state->dataPlnt->TotNumLoops = 1;
@@ -1430,10 +1418,10 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.PLFFPLR(1)));
     // ckeck user PLF curve coefficients
     //?? Default PLF cofficients source ?
-    EXPECT_EQ(0.90, thisCoolPLFfPLR.coeff[0]);
-    EXPECT_EQ(0.10, thisCoolPLFfPLR.coeff[1]);
-    EXPECT_EQ(0.0, thisCoolPLFfPLR.inputLimits[0].min);
-    EXPECT_EQ(1.0, thisCoolPLFfPLR.inputLimits[0].max);
+    EXPECT_EQ(0.90, thisCoolPLFfPLR->coeff[0]);
+    EXPECT_EQ(0.10, thisCoolPLFfPLR->coeff[1]);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR->inputLimits[0].min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR->inputLimits[0].max);
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     // check user PLF curve PLR limits
@@ -1495,10 +1483,10 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.coeff[0] = 0.75;          // = a 0.8
-    thisCoolPLFfPLR.coeff[1] = 0.25;          // = b 0.2
-    thisCoolPLFfPLR.inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR->coeff[0] = 0.75;          // = a 0.8
+    thisCoolPLFfPLR->coeff[1] = 0.25;          // = b 0.2
+    thisCoolPLFfPLR->inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR->inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
@@ -1542,10 +1530,10 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // Test 3: user PLF curve is the same as the AHRI Std 210/240-2023 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2023 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.coeff[0] = 0.80;          //
-    thisCoolPLFfPLR.coeff[1] = 0.20;          //
-    thisCoolPLFfPLR.inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR->coeff[0] = 0.80;          //
+    thisCoolPLFfPLR->coeff[1] = 0.20;          //
+    thisCoolPLFfPLR->inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR->inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
@@ -1800,10 +1788,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     auto &thisCoil(state->dataDXCoils->DXCoil(1));
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.MSPLFFPLR(1)));
     // ckeck user PLF curve coefficients
-    EXPECT_EQ(0.90, thisCoolPLFfPLR.coeff[0]);
-    EXPECT_EQ(0.10, thisCoolPLFfPLR.coeff[1]);
-    EXPECT_EQ(0.0, thisCoolPLFfPLR.inputLimits[0].min);
-    EXPECT_EQ(1.0, thisCoolPLFfPLR.inputLimits[0].max);
+    EXPECT_EQ(0.90, thisCoolPLFfPLR->coeff[0]);
+    EXPECT_EQ(0.10, thisCoolPLFfPLR->coeff[1]);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR->inputLimits[0].min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR->inputLimits[0].max);
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     // check user PLF curve PLR limits
@@ -1856,10 +1844,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.coeff[0] = 0.75;          // = a
-    thisCoolPLFfPLR.coeff[1] = 0.25;          // = b
-    thisCoolPLFfPLR.inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR->coeff[0] = 0.75;          // = a
+    thisCoolPLFfPLR->coeff[1] = 0.25;          // = b
+    thisCoolPLFfPLR->inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR->inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
@@ -1907,10 +1895,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // Test 3: user PLF curve is the same as the AHRI Std 210/240-2023 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2023 default PLF curve
     // AHRI Std 210/240-2023 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.coeff[0] = 0.80;          // = a
-    thisCoolPLFfPLR.coeff[1] = 0.20;          // = b
-    thisCoolPLFfPLR.inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR->coeff[0] = 0.80;          // = a
+    thisCoolPLFfPLR->coeff[1] = 0.20;          // = b
+    thisCoolPLFfPLR->inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR->inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;

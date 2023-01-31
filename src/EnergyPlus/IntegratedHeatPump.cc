@@ -1443,7 +1443,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirInletNodeNum != InNode) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirOutletNodeNum != OutNode)) {
-            ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + ihp.SCWHCoilName + "-wrong coil node names.");
+            ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCWHCoilName));
             ErrorsFound = true;
         }
         SetUpCompSets(state, CurrentModuleObject, ihp.Name + " Cooling Coil", ihp.SCWHCoilType, ihp.SCWHCoilName, InNodeName, OutNodeName);
@@ -1468,7 +1468,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).AirInletNodeNum != InNode) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).AirOutletNodeNum != OutNode)) {
-            ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + ihp.SCDWHCoolCoilName + "-wrong coil node names.");
+            ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCDWHCoolCoilName));
             ErrorsFound = true;
         }
         SetUpCompSets(state, CurrentModuleObject, ihp.Name + " Cooling Coil", ihp.SCDWHCoolCoilType, ihp.SCDWHCoolCoilName, InNodeName, OutNodeName);

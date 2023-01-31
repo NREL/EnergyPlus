@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/member.functions.hh>
 
@@ -148,7 +147,7 @@ PlantComponent *WaterThermalTankData::factory(EnergyPlusData &state, std::string
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "LocalWaterTankFactory: Error getting inputs for tank named: " + objectName); // LCOV_EXCL_LINE
+    ShowFatalError(state, format("LocalWaterTankFactory: Error getting inputs for tank named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
     return nullptr; // LCOV_EXCL_LINE
 }
@@ -169,7 +168,7 @@ void WaterThermalTankData::onInitLoopEquip(EnergyPlusData &state, const PlantLoc
     } else {
         this->SizeTankForDemandSide(state);
         this->SizeDemandSidePlantConnections(state);
-        this->SizeSupplySidePlantConnections(state);
+        this->SizeSupplySidePlantConnections(state, this->SrcSidePlantLoc.loopNum);
         this->SizeTankForSupplySide(state);
     }
 
@@ -205,7 +204,7 @@ int getTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
     if (CompIndex == 0) {
         CompNum = UtilityRoutines::FindItem(CompName, state.dataWaterThermalTanks->WaterThermalTank);
         if (CompNum == 0) {
-            ShowFatalError(state, "SimWaterThermalTank_WaterTank:  Unit not found=" + std::string{CompName});
+            ShowFatalError(state, format("SimWaterThermalTank_WaterTank:  Unit not found={}", CompName));
         }
         CompIndex = CompNum;
     } else {
@@ -244,7 +243,7 @@ int getHPTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompInde
     if (CompIndex == 0) {
         CompNum = UtilityRoutines::FindItem(CompName, state.dataWaterThermalTanks->HPWaterHeater);
         if (CompNum == 0) {
-            ShowFatalError(state, "SimWaterThermalTank_HeatPump:  Unit not found=" + std::string{CompName});
+            ShowFatalError(state, format("SimWaterThermalTank_HeatPump:  Unit not found={}", CompName));
         }
         CompIndex = CompNum;
     } else {
@@ -334,7 +333,7 @@ PlantComponent *HeatPumpWaterHeaterData::factory(EnergyPlusData &state, std::str
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "LocalHeatPumpWaterHeaterFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+    ShowFatalError(state, format("LocalHeatPumpWaterHeaterFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
     return nullptr; // LCOV_EXCL_LINE
 }
@@ -541,7 +540,7 @@ void SimHeatPumpWaterHeater(EnergyPlusData &state,
     if (CompIndex == 0) {
         HeatPumpNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterThermalTanks->HPWaterHeater);
         if (HeatPumpNum == 0) {
-            ShowFatalError(state, "SimHeatPumpWaterHeater: Unit not found=" + std::string{CompName});
+            ShowFatalError(state, format("SimHeatPumpWaterHeater: Unit not found={}", CompName));
         }
         CompIndex = HeatPumpNum;
     } else {
@@ -715,8 +714,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         if (!lAlphaFieldBlanks(2)) {
             DesupHtr.AvailSchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
             if (DesupHtr.AvailSchedPtr == 0) {
-                ShowSevereError(state, "Invalid, " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", cAlphaFieldNames(2), cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         } else {
@@ -726,8 +725,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         // convert schedule name to pointer
         DesupHtr.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
         if (DesupHtr.SetPointTempSchedule == 0) {
-            ShowSevereError(state, "Invalid, " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
-            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+            ShowSevereError(state, format("Invalid, {} = {}", cAlphaFieldNames(3), cAlphaArgs(3)));
+            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
@@ -752,7 +751,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         if (!lAlphaFieldBlanks(4)) {
             DesupHtr.HEffFTemp = Curve::GetCurveIndex(state, cAlphaArgs(4));
             if (DesupHtr.HEffFTemp == 0) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + DesupHtr.Name + ":  " + cAlphaFieldNames(4) + " not found = " + cAlphaArgs(4));
+                ShowSevereError(state,
+                                format("{} = {}:  {} not found = {}", cCurrentModuleObject, DesupHtr.Name, cAlphaFieldNames(4), cAlphaArgs(4)));
                 ErrorsFound = true;
             } else {
                 ErrorsFound |= Curve::CheckCurveDims(state,
@@ -767,8 +767,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                         Real64 HEffFTemp = min(
                             1.0, max(0.0, Curve::CurveValue(state, DesupHtr.HEffFTemp, DesupHtr.RatedInletWaterTemp, DesupHtr.RatedOutdoorAirTemp)));
                         if (std::abs(HEffFTemp - 1.0) > 0.05) {
-                            ShowWarningError(state, cCurrentModuleObject + ", \"" + DesupHtr.Name + "\":");
-                            ShowContinueError(state, "The " + cAlphaFieldNames(4) + " should be normalized ");
+                            ShowWarningError(state, format("{}, \"{}\":", cCurrentModuleObject, DesupHtr.Name));
+                            ShowContinueError(state, format("The {} should be normalized ", cAlphaFieldNames(4)));
                             ShowContinueError(state, format(" to 1.0 at the rating point. Curve output at the rating point = {:.3T}", HEffFTemp));
                             ShowContinueError(state, " The simulation continues using the user-specified curve.");
                         }
@@ -805,8 +805,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         if (!UtilityRoutines::SameString(DesupHtr.TankType, cMixedWHModuleObj) &&
             !UtilityRoutines::SameString(DesupHtr.TankType, cStratifiedWHModuleObj)) {
 
-            ShowSevereError(state, cCurrentModuleObject + " = " + state.dataWaterThermalTanks->HPWaterHeater(DesuperheaterNum).Name + ":");
-            ShowContinueError(state, "Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + ".");
+            ShowSevereError(state, format("{} = {}:", cCurrentModuleObject, state.dataWaterThermalTanks->HPWaterHeater(DesuperheaterNum).Name));
+            ShowContinueError(state, format("Desuperheater can only be used with {} or {}.", cMixedWHModuleObj, cStratifiedWHModuleObj));
             ErrorsFound = true;
         }
 
@@ -872,11 +872,12 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                     DesupHtr.ValidSourceType = true;
                     HeatReclaim.ReclaimEfficiencyTotal += DesupHtr.HeatReclaimRecoveryEff;
                     if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + DesupHtr.Name +
-                                            ": "
-                                            " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            DesupHtr.HeatingSourceName + "\" cannot be over 0.3");
+                        ShowSevereError(
+                            state,
+                            format("{} = {}:  sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                                   cCurrentModuleObject,
+                                   DesupHtr.Name,
+                                   DesupHtr.HeatingSourceName));
                         ErrorsFound = true;
                     }
                 }
@@ -900,11 +901,12 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                     DesupHtr.ValidSourceType = true;
                     HeatReclaim.ReclaimEfficiencyTotal += DesupHtr.HeatReclaimRecoveryEff;
                     if (HeatReclaim.ReclaimEfficiencyTotal > 0.9) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + " = " + DesupHtr.Name +
-                                            ": "
-                                            " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            DesupHtr.HeatingSourceName + "\" cannot be over 0.9");
+                        ShowSevereError(
+                            state,
+                            format("{} = {}:  sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.9",
+                                   cCurrentModuleObject,
+                                   DesupHtr.Name,
+                                   DesupHtr.HeatingSourceName));
                         ErrorsFound = true;
                     }
                 }
@@ -934,10 +936,10 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 HeatReclaim.ReclaimEfficiencyTotal += DesupHtr.HeatReclaimRecoveryEff;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + " = " + DesupHtr.Name +
-                                        ": "
-                                        " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                        DesupHtr.HeatingSourceName + "\" cannot be over 0.3");
+                                    format("{} = {}:  sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                                           cCurrentModuleObject,
+                                           DesupHtr.Name,
+                                           DesupHtr.HeatingSourceName));
                     ErrorsFound = true;
                 }
             }
@@ -955,10 +957,10 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 HeatReclaim.ReclaimEfficiencyTotal += DesupHtr.HeatReclaimRecoveryEff;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + " = " + DesupHtr.Name +
-                                        ": "
-                                        " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                        DesupHtr.HeatingSourceName + "\" cannot be over 0.3");
+                                    format("{} = {}:  sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                                           cCurrentModuleObject,
+                                           DesupHtr.Name,
+                                           DesupHtr.HeatingSourceName));
                     ErrorsFound = true;
                 }
             }
@@ -977,10 +979,10 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 HeatReclaim.ReclaimEfficiencyTotal += DesupHtr.HeatReclaimRecoveryEff;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + " = " + DesupHtr.Name +
-                                        ": "
-                                        " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                        DesupHtr.HeatingSourceName + "\" cannot be over 0.3");
+                                    format("{} = {}:  sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                                           cCurrentModuleObject,
+                                           DesupHtr.Name,
+                                           DesupHtr.HeatingSourceName));
                     ErrorsFound = true;
                 }
             }
@@ -1003,15 +1005,17 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 DesupHtr.ValidSourceType = true;
                 HeatReclaim.ReclaimEfficiencyTotal += DesupHtr.HeatReclaimRecoveryEff;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
-                    ShowSevereError(state,
-                                    cCurrentModuleObject + ", \"" + DesupHtr.Name +
-                                        "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" + DesupHtr.HeatingSourceName +
-                                        "\" cannot be over 0.3");
+                    ShowSevereError(
+                        state,
+                        format("{}, \"{}\" sum of heat reclaim recovery efficiencies from the same source coil: \"{}\" cannot be over 0.3",
+                               cCurrentModuleObject,
+                               DesupHtr.Name,
+                               DesupHtr.HeatingSourceName));
                     ErrorsFound = true;
                 }
             }
         } else {
-            ShowSevereError(state, cCurrentModuleObject + " = " + DesupHtr.Name + ':');
+            ShowSevereError(state, format("{} = {}:", cCurrentModuleObject, DesupHtr.Name));
             ShowContinueError(state, " desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ");
             ShowContinueError(state,
                               " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, "
@@ -1019,18 +1023,21 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                               "Coil:Cooling:WaterToAirHeatPump:EquationFit, Refrigeration:CompressorRack,");
             ShowContinueError(state, " Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, ");
             ShowContinueError(state, " or Refrigeration:Condenser:WaterCooled.");
-            ShowContinueError(state, " Invalid desuperheater heat source object: " + heatSourceObjType + " \"" + cAlphaArgs(10) + "\"");
+            ShowContinueError(state, format(" Invalid desuperheater heat source object: {} \"{}\"", heatSourceObjType, cAlphaArgs(10)));
             ErrorsFound = true;
         }
         if (errFlag) {
-            ShowContinueError(state, "...occurs in " + cCurrentModuleObject + '=' + DesupHtr.Name);
+            ShowContinueError(state, format("...occurs in {}={}", cCurrentModuleObject, DesupHtr.Name));
             ErrorsFound = true;
         }
 
         if (DesupHtr.ReclaimHeatingSourceIndexNum == 0 && DesupHtr.ReclaimHeatingSource != ReclaimHeatObjectType::CoilCoolingDX) {
             ShowSevereError(state,
-                            cCurrentModuleObject + ", \"" + DesupHtr.Name + "\" desuperheater heat source object not found: " + heatSourceObjType +
-                                " \"" + cAlphaArgs(10) + "\"");
+                            format("{}, \"{}\" desuperheater heat source object not found: {} \"{}\"",
+                                   cCurrentModuleObject,
+                                   DesupHtr.Name,
+                                   heatSourceObjType,
+                                   cAlphaArgs(10)));
             ErrorsFound = true;
         }
 
@@ -1068,7 +1075,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                                     cNumericFieldNames(7),
                                     cNumericFieldNames(6),
                                     (DesupHtr.PumpElecPower / DesupHtr.OperatingWaterFlowRate)));
-            ShowContinueError(state, " Suggest reducing " + cNumericFieldNames(7) + " or increasing " + cNumericFieldNames(6) + '.');
+            ShowContinueError(state, format(" Suggest reducing {} or increasing {}.", cNumericFieldNames(7), cNumericFieldNames(6)));
             ShowContinueError(state, " The simulation will continue using the user defined values.");
         }
 
@@ -1110,7 +1117,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination.");
+        ShowFatalError(state, format("Errors found in getting {} input. Preceding condition causes termination.", cCurrentModuleObject));
     }
 
     return ErrorsFound;
@@ -1212,8 +1219,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (!hpwhAlphaBlank[2]) {
             HPWH.AvailSchedPtr = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[2]);
             if (HPWH.AvailSchedPtr == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                ShowContinueError(state, hpwhAlphaFieldNames[2] + "=\"" + hpwhAlpha[2] + "\".");
+                ShowSevereError(state, format("{}=\"{}\", not found", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[2], hpwhAlpha[2]));
                 ErrorsFound = true;
             }
         } else {
@@ -1225,23 +1232,24 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (!hpwhAlphaBlank[3]) {
             HPWH.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[3]);
             if (HPWH.SetPointTempSchedule == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                ShowContinueError(state, hpwhAlphaFieldNames[3] + "=\"" + hpwhAlpha[3] + "\".");
+                ShowSevereError(state, format("{}=\"{}\", not found", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[3], hpwhAlpha[3]));
                 ErrorsFound = true;
             }
         } else {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-            ShowContinueError(state, "required " + hpwhAlphaFieldNames[3] + " is blank.");
+            ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+            ShowContinueError(state, format("required {} is blank.", hpwhAlphaFieldNames[3]));
             ErrorsFound = true;
         }
 
         // Dead Band Temperature Difference
         HPWH.DeadBandTempDiff = hpwhNumeric[1 + nNumericOffset];
         if (HPWH.DeadBandTempDiff <= 0.0 || HPWH.DeadBandTempDiff > 20.0) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+            ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state,
-                              hpwhNumericFieldNames[1 + nNumericOffset] +
-                                  format(" difference must be > 0 and <= 20. Dead band = {:.1T}", hpwhNumeric[1 + nNumericOffset]));
+                              format("{}{}",
+                                     hpwhNumericFieldNames[1 + nNumericOffset],
+                                     format(" difference must be > 0 and <= 20. Dead band = {:.1T}", hpwhNumeric[1 + nNumericOffset])));
             ErrorsFound = true;
         }
 
@@ -1272,7 +1280,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             // Condenser Water Flow Rate
             HPWH.OperatingWaterFlowRate = hpwhNumeric[2];
             if (HPWH.OperatingWaterFlowRate <= 0.0 && hpwhNumeric[2] != DataGlobalConstants::AutoCalculate) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state,
                                   format("{} must be greater than 0. Condenser water flow rate = {:.6T}", hpwhNumericFieldNames[2], hpwhNumeric[2]));
                 ErrorsFound = true;
@@ -1285,7 +1293,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             HPWH.WrappedCondenserTopLocation = hpwhNumeric[3 + nNumericOffset];
 
             if (HPWH.WrappedCondenserBottomLocation < 0.0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state,
                                   format("{} must be greater than 0. Condenser bottom location = {:.6T}",
                                          hpwhNumericFieldNames[2],
@@ -1294,7 +1302,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             }
 
             if (HPWH.WrappedCondenserBottomLocation >= HPWH.WrappedCondenserTopLocation) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state,
                                   format("{} ({:.6T}) must be greater than {} ({:.6T}).",
                                          HPWH.WrappedCondenserTopLocation,
@@ -1315,10 +1323,11 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // Evaporator Air Flow Rate
         HPWH.OperatingAirFlowRate = hpwhNumeric[3 + nNumericOffset];
         if (HPWH.OperatingAirFlowRate <= 0.0 && hpwhNumeric[3 + nNumericOffset] != DataGlobalConstants::AutoCalculate) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+            ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state,
-                              hpwhNumericFieldNames[3 + nNumericOffset] +
-                                  format(" must be greater than 0. Evaporator air flow rate = {:.6T}", hpwhNumeric[3 + nNumericOffset]));
+                              format("{}{}",
+                                     hpwhNumericFieldNames[3 + nNumericOffset],
+                                     format(" must be greater than 0. Evaporator air flow rate = {:.6T}", hpwhNumeric[3 + nNumericOffset])));
             ErrorsFound = true;
         }
 
@@ -1332,13 +1341,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
                 HPWH.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[11 + nAlphaOffset]);
                 if (HPWH.AmbientTempSchedule == 0) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                    ShowContinueError(state, hpwhAlphaFieldNames[11 + nAlphaOffset] + "=\"" + hpwhAlpha[11 + nAlphaOffset] + "\".");
+                    ShowSevereError(state, format("{}=\"{}\", not found", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                    ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[11 + nAlphaOffset], hpwhAlpha[11 + nAlphaOffset]));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state, "required " + hpwhAlphaFieldNames[11 + nAlphaOffset] + " is blank.");
+                ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("required {} is blank.", hpwhAlphaFieldNames[11 + nAlphaOffset]));
                 ErrorsFound = true;
             }
 
@@ -1346,21 +1355,22 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             if (!hpwhAlphaBlank[12 + nAlphaOffset]) {
                 HPWH.AmbientRHSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[12 + nAlphaOffset]);
                 if (HPWH.AmbientRHSchedule == 0) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                    ShowContinueError(state, hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
+                    ShowSevereError(state, format("{}=\"{}\", not found", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                    ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[12 + nAlphaOffset], hpwhAlpha[12 + nAlphaOffset]));
                     ErrorsFound = true;
                 } else {
                     if (!ScheduleManager::CheckScheduleValueMinMax(state, HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values");
+                        ShowSevereError(state, format("{}=\"{}\", invalid values", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                         ShowContinueError(state,
-                                          hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] +
-                                              "\", schedule values must be (>=0., <=1.)");
+                                          format("{}=\"{}\", schedule values must be (>=0., <=1.)",
+                                                 hpwhAlphaFieldNames[12 + nAlphaOffset],
+                                                 hpwhAlpha[12 + nAlphaOffset]));
                         ErrorsFound = true;
                     }
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state, "required " + hpwhAlphaFieldNames[12 + nAlphaOffset] + " is blank.");
+                ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("required {} is blank.", hpwhAlphaFieldNames[12 + nAlphaOffset]));
                 ErrorsFound = true;
             }
 
@@ -1373,13 +1383,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
                 HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], state.dataHeatBal->Zone);
                 if (HPWH.AmbientTempZone == 0) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                    ShowContinueError(state, hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
+                    ShowSevereError(state, format("{}=\"{}\", not found", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                    ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[13 + nAlphaOffset], hpwhAlpha[13 + nAlphaOffset]));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state, "required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
+                ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("required {} is blank.", hpwhAlphaFieldNames[13 + nAlphaOffset]));
                 ErrorsFound = true;
             }
             break;
@@ -1453,8 +1463,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                     state, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", HPWH.DXCoilName, bVSCoilErrFlag);
 
                 if (bVSCoilErrFlag) {
-                    ShowContinueError(state, "...occurs in " + state.dataIPShortCut->cCurrentModuleObject + " =" + HPWH.Name);
-                    ShowContinueError(state, "...could not find either DXCoils::DXCoil or Variable Speed Coil " + HPWH.DXCoilName);
+                    ShowContinueError(state, format("...occurs in {} ={}", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                    ShowContinueError(state, format("...could not find either DXCoils::DXCoil or Variable Speed Coil {}", HPWH.DXCoilName));
                     ErrorsFound = true;
                 }
             }
@@ -1470,9 +1480,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             // this is a single speed coil
             DXCoils::DXCoilData &Coil = state.dataDXCoils->DXCoil(HPWH.DXCoilNum);
             if (!UtilityRoutines::SameString(HPWH.DXCoilType, Coil.DXCoilType)) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state, "specifies the coil " + HPWH.DXCoilType + "=\"" + HPWH.DXCoilName + "\".");
-                ShowContinueError(state, "However, " + HPWH.DXCoilName + " is a coil of type " + Coil.DXCoilType + ".");
+                ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("specifies the coil {}=\"{}\".", HPWH.DXCoilType, HPWH.DXCoilName));
+                ShowContinueError(state, format("However, {} is a coil of type {}.", HPWH.DXCoilName, Coil.DXCoilType));
                 ErrorsFound = true;
             }
             HPWH.DXCoilTypeNum = Coil.DXCoilType_Num;
@@ -1481,7 +1491,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // Make sure that the coil and tank are compatible.
         if (bIsVScoil) {
             if (HPWH.HPWHType != DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state,
                                   "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed can only be used with a pumped condenser heat pump "
                                   "water heater.");
@@ -1492,7 +1502,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                    HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped) ||
                   (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped &&
                    HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped))) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 std::string ExpectedCoilType;
                 if (HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped) {
                     ExpectedCoilType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped);
@@ -1501,7 +1511,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 } else {
                     assert(0);
                 }
-                ShowContinueError(state, "can only be used with " + ExpectedCoilType);
+                ShowContinueError(state, format("can only be used with {}", ExpectedCoilType));
                 ErrorsFound = true;
             }
         }
@@ -1539,8 +1549,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         HPWH.MaxAirTempForHPOperation = hpwhNumeric[5 + nNumericOffset];
         if (HPWH.MaxAirTempForHPOperation <= HPWH.MinAirTempForHPOperation) {
             ShowWarningError(state,
-                             state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
-                                 "\": maximum inlet air temperature for heat pump compressor operation");
+                             format("{}=\"{}\": maximum inlet air temperature for heat pump compressor operation",
+                                    state.dataIPShortCut->cCurrentModuleObject,
+                                    HPWH.Name));
             ShowContinueError(state, "must be greater than the minimum inlet air temperature for heat pump compressor operation.");
             ShowContinueError(state, format("...Minimum inlet air temperature = {:.1T}", HPWH.MinAirTempForHPOperation));
             ShowContinueError(state, format("...Maximum inlet air temperature = {:.1T}", HPWH.MaxAirTempForHPOperation));
@@ -1555,13 +1566,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 // Compressor Ambient Temperature Schedule
                 HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[21 + nAlphaOffset]);
                 if (HPWH.CrankcaseTempSchedule == 0) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                    ShowContinueError(state, hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[21 + nAlphaOffset] + "\".");
+                    ShowSevereError(state, format("{}=\"{}\", not found", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                    ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[21 + nAlphaOffset], hpwhAlpha[21 + nAlphaOffset]));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state, "required " + hpwhAlphaFieldNames[21 + nAlphaOffset] + " is blank.");
+                ShowSevereError(state, format("{}=\"{}\", ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("required {} is blank.", hpwhAlphaFieldNames[21 + nAlphaOffset]));
                 ErrorsFound = true;
             }
 
@@ -1570,26 +1581,32 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         case CrankcaseHeaterControlTemp::Zone: {
             if (HPWH.InletAirConfiguration == WTTAmbientTemp::OutsideAir || HPWH.InletAirConfiguration == WTTAmbientTemp::Schedule) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
-                                    "\":  Inlet Air Configuration must be Zone Air Only or Zone And");
+                                format("{}=\"{}\":  Inlet Air Configuration must be Zone Air Only or Zone And",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       HPWH.Name));
                 ShowContinueError(state, " Outdoor Air when compressor location equals ZONE.");
                 ErrorsFound = true;
             }
 
             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
-                                     " was provided but will not be used based on compressor location input=\"" + hpwhAlpha[20 + nAlphaOffset] +
-                                     "\".");
+                                 format("{}=\"{}\"  {} was provided but will not be used based on compressor location input=\"{}\".",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        HPWH.Name,
+                                        hpwhAlphaFieldNames[21 + nAlphaOffset],
+                                        hpwhAlpha[20 + nAlphaOffset]));
             }
             break;
         }
         case CrankcaseHeaterControlTemp::Outdoors: {
             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
-                                     " was provided but will not be used based on " + hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" +
-                                     hpwhAlpha[20 + nAlphaOffset] + "\".");
+                                 format("{}=\"{}\"  {} was provided but will not be used based on {}=\"{}\".",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        HPWH.Name,
+                                        hpwhAlphaFieldNames[21 + nAlphaOffset],
+                                        hpwhAlphaFieldNames[21 + nAlphaOffset],
+                                        hpwhAlpha[20 + nAlphaOffset]));
             }
             break;
         }
@@ -1607,7 +1624,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         Real64 FanVolFlow = 0.0;
         if (errFlag) {
-            ShowContinueError(state, "...occurs in " + state.dataIPShortCut->cCurrentModuleObject + ", unit=\"" + HPWH.Name + "\".");
+            ShowContinueError(state, format("...occurs in {}, unit=\"{}\".", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ErrorsFound = true;
         } else {
             if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
@@ -1636,13 +1653,14 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (errFlag) {
             ErrorsFound = true;
         } else if (HPWH.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff && HPWH.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.");
+            ShowSevereError(state, format("{}=\"{}\": illegal fan type specified.", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(
-                state, " The fan object (" + HPWH.FanName + ") type must be Fan:SystemModel or Fan:OnOff when used with a heat pump water heater.");
+                state,
+                format(" The fan object ({}) type must be Fan:SystemModel or Fan:OnOff when used with a heat pump water heater.", HPWH.FanName));
             ErrorsFound = true;
         } else if (!UtilityRoutines::SameString(HPWH.FanType, "Fan:OnOff") && !UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.");
-            ShowContinueError(state, " The " + state.dataIPShortCut->cCurrentModuleObject + " must specify that the fan object");
+            ShowSevereError(state, format("{}=\"{}\": illegal fan type specified.", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+            ShowContinueError(state, format(" The {} must specify that the fan object", state.dataIPShortCut->cCurrentModuleObject));
             ShowContinueError(state,
                               " is of type FanSystemModel or Fan:OnOff in addition to the fan actually being of that type and defined elsewhere.");
         }
@@ -1655,7 +1673,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                        FanVolFlow,
                                        HPWH.FanName));
                 ShowContinueError(state, " The fan flow rate must be >= to the HPWHs evaporator volumetric air flow rate.");
-                ShowContinueError(state, " Occurs in unit = " + HPWH.Name);
+                ShowContinueError(state, format(" Occurs in unit = {}", HPWH.Name));
                 ErrorsFound = true;
             }
         }
@@ -1668,8 +1686,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             HPWH.FanPlacement = DataHVACGlobals::DrawThru;
 
         } else {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid ");
-            ShowContinueError(state, hpwhAlphaFieldNames[24 + nAlphaOffset] + "=\"" + hpwhAlpha[24 + nAlphaOffset] + "\".");
+            ShowSevereError(state, format("{}=\"{}\", invalid ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+            ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[24 + nAlphaOffset], hpwhAlpha[24 + nAlphaOffset]));
             ErrorsFound = true;
         }
 
@@ -1683,11 +1701,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 0.1422) {
                 ShowWarningError(
                     state,
-                    state.dataDXCoils->DXCoil(HPWH.DXCoilNum).DXCoilType + "= " + state.dataDXCoils->DXCoil(HPWH.DXCoilNum).Name +
-                        format(": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 "
-                               "W/W (41.67 watt/MBH). Condenser pump power per watt = {:.4T}",
-                               (state.dataDXCoils->DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower /
-                                state.dataDXCoils->DXCoil(HPWH.DXCoilNum).RatedTotCap2)));
+                    format("{}= {}{}",
+                           state.dataDXCoils->DXCoil(HPWH.DXCoilNum).DXCoilType,
+                           state.dataDXCoils->DXCoil(HPWH.DXCoilNum).Name,
+                           format(": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 "
+                                  "W/W (41.67 watt/MBH). Condenser pump power per watt = {:.4T}",
+                                  (state.dataDXCoils->DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower /
+                                   state.dataDXCoils->DXCoil(HPWH.DXCoilNum).RatedTotCap2))));
             }
         } else if ((HPWH.DXCoilNum > 0) && (bIsVScoil)) {
 
@@ -1718,20 +1738,24 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // On Cycle Parasitic Electric Load
         HPWH.OnCycParaLoad = hpwhNumeric[6 + nNumericOffset];
         if (HPWH.OnCycParaLoad < 0.0) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
+            ShowSevereError(state, format("{}=\"{}\",", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state,
-                              hpwhNumericFieldNames[6 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[6 + nNumericOffset] +
-                                  format(" = {:.2T}", hpwhNumeric[6 + nNumericOffset]));
+                              format("{} must be >= 0. {}{}",
+                                     hpwhNumericFieldNames[6 + nNumericOffset],
+                                     hpwhNumericFieldNames[6 + nNumericOffset],
+                                     format(" = {:.2T}", hpwhNumeric[6 + nNumericOffset])));
             ErrorsFound = true;
         }
 
         // Off Cycle Parasitic Electric Load
         HPWH.OffCycParaLoad = hpwhNumeric[7 + nNumericOffset];
         if (HPWH.OffCycParaLoad < 0.0) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
+            ShowSevereError(state, format("{}=\"{}\",", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state,
-                              hpwhNumericFieldNames[7 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[2 + nNumericOffset] +
-                                  format(" = {:.2T}", hpwhNumeric[7 + nNumericOffset]));
+                              format("{} must be >= 0. {}{}",
+                                     hpwhNumericFieldNames[7 + nNumericOffset],
+                                     hpwhNumericFieldNames[2 + nNumericOffset],
+                                     format(" = {:.2T}", hpwhNumeric[7 + nNumericOffset])));
             ErrorsFound = true;
         }
 
@@ -1739,15 +1763,15 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Zone")) {
             HPWH.ParasiticTempIndicator = WTTAmbientTemp::TempZone;
             if (HPWH.InletAirConfiguration == WTTAmbientTemp::OutsideAir || HPWH.InletAirConfiguration == WTTAmbientTemp::Schedule) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
-                ShowContinueError(state, hpwhAlphaFieldNames[25 + nAlphaOffset] + " must be ZoneAirOnly or ZoneAndOutdoorAir");
+                ShowSevereError(state, format("{}=\"{}\",", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("{} must be ZoneAirOnly or ZoneAndOutdoorAir", hpwhAlphaFieldNames[25 + nAlphaOffset]));
                 ShowContinueError(state, " when parasitic heat rejection location equals Zone.");
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Outdoors")) {
             HPWH.ParasiticTempIndicator = WTTAmbientTemp::OutsideAir;
         } else {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+            ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state, " parasitic heat rejection location must be either Zone or Outdoors.");
             ErrorsFound = true;
         }
@@ -1767,13 +1791,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsNotParent);
             } else {
-                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowWarningError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state,
                                   "Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as "
                                   "Zone and OutdoorAir. Node name disregarded and simulation continues.");
             }
         } else if (hpwhAlphaBlank[26 + nAlphaOffset] && HPWH.InletAirConfiguration == WTTAmbientTemp::ZoneAndOA) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+            ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state, "Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
             ErrorsFound = true;
         }
@@ -1792,13 +1816,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             } else {
-                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowWarningError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state,
                                   "Outlet air splitter node name specified but only required when Inlet Air Configuration is selected as "
                                   "ZoneAndOutdoorAir. Node name disregarded and simulation continues.");
             }
         } else if (hpwhAlphaBlank[27 + nAlphaOffset] && HPWH.InletAirConfiguration == WTTAmbientTemp::ZoneAndOA) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+            ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state, "Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
             ErrorsFound = true;
         }
@@ -1841,8 +1865,10 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, HPWH.OutsideAirNode, Okay);
                 if (!Okay) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
-                                         "\": Adding outdoor air node=" + hpwhAlpha[9 + nAlphaOffset]);
+                                     format("{}=\"{}\": Adding outdoor air node={}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            HPWH.Name,
+                                            hpwhAlpha[9 + nAlphaOffset]));
                 }
             }
 
@@ -1917,8 +1943,10 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                         OutAirNodeManager::CheckAndAddAirNodeNumber(state, HPWH.OutsideAirNode, Okay);
                         if (!Okay) {
                             ShowWarningError(state,
-                                             state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
-                                                 "\": Adding outdoor air node =" + hpwhAlpha[9 + nAlphaOffset]);
+                                             format("{}=\"{}\": Adding outdoor air node ={}",
+                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    HPWH.Name,
+                                                    hpwhAlpha[9 + nAlphaOffset]));
                         }
                     }
 
@@ -1937,31 +1965,31 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // check that required node names are present
         if (HPWH.InletAirConfiguration == WTTAmbientTemp::Schedule || HPWH.InletAirConfiguration == WTTAmbientTemp::TempZone) {
             if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
-                ShowContinueError(state,
-                                  hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] + " must be specified.");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("When {}=\"{}\".", hpwhAlphaFieldNames[6 + nAlphaOffset], hpwhAlpha[6 + nAlphaOffset]));
+                ShowContinueError(
+                    state, format("{} and {} must be specified.", hpwhAlphaFieldNames[7 + nAlphaOffset], hpwhAlphaFieldNames[8 + nAlphaOffset]));
                 ErrorsFound = true;
             }
         } else if (HPWH.InletAirConfiguration == WTTAmbientTemp::OutsideAir) {
             if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
-                ShowContinueError(state,
-                                  hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] + " must be specified.");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("When {}=\"{}\".", hpwhAlphaFieldNames[6 + nAlphaOffset], hpwhAlpha[6 + nAlphaOffset]));
+                ShowContinueError(
+                    state, format("{} and {} must be specified.", hpwhAlphaFieldNames[9 + nAlphaOffset], hpwhAlphaFieldNames[10 + nAlphaOffset]));
                 ErrorsFound = true;
             }
         } else if (HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == WTTAmbientTemp::ZoneAndOA) {
             if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 || HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("When {}=\"{}\".", hpwhAlphaFieldNames[6 + nAlphaOffset], hpwhAlpha[6 + nAlphaOffset]));
                 if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
                     ShowContinueError(
-                        state, hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] + " must be specified.");
+                        state, format("{} and {} must be specified.", hpwhAlphaFieldNames[7 + nAlphaOffset], hpwhAlphaFieldNames[8 + nAlphaOffset]));
                 }
                 if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
                     ShowContinueError(
-                        state, hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] + " must be specified.");
+                        state, format("{} and {} must be specified.", hpwhAlphaFieldNames[9 + nAlphaOffset], hpwhAlphaFieldNames[10 + nAlphaOffset]));
                 }
                 ErrorsFound = true;
             }
@@ -1989,23 +2017,26 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                         FoundInletNode = true;
                     }
                     if (!FoundInletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError(state, "The HPWH's air inlet node name = " + hpwhAlpha[7 + nAlphaOffset] + " was not properly specified ");
+                        ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                         ShowContinueError(state,
-                                          "as an exhaust air node for zone = " + hpwhAlpha[13 + nAlphaOffset] +
-                                              " in a ZoneHVAC:EquipmentConnections object.");
+                                          format("The HPWH's air inlet node name = {} was not properly specified ", hpwhAlpha[7 + nAlphaOffset]));
+                        ShowContinueError(
+                            state,
+                            format("as an exhaust air node for zone = {} in a ZoneHVAC:EquipmentConnections object.", hpwhAlpha[13 + nAlphaOffset]));
                         ErrorsFound = true;
                     }
                     if (!FoundOutletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError(state, "The HPWH's air outlet node name = " + hpwhAlpha[8 + nAlphaOffset] + " was not properly specified ");
+                        ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                        ShowContinueError(state,
+                                          format("The HPWH's air outlet node name = {} was not properly specified ", hpwhAlpha[8 + nAlphaOffset]));
                         ShowContinueError(
-                            state, "as an inlet air node for zone = " + hpwhAlpha[13 + nAlphaOffset] + " in a ZoneHVAC:EquipmentConnections object.");
+                            state,
+                            format("as an inlet air node for zone = {} in a ZoneHVAC:EquipmentConnections object.", hpwhAlpha[13 + nAlphaOffset]));
                         ErrorsFound = true;
                     }
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state,
                                   "Heat pump water heater air inlet node name and air outlet node name must be listed in a "
                                   "ZoneHVAC:EquipmentConnections object when Inlet Air Configuration is equal to ZoneAirOnly or "
@@ -2018,16 +2049,17 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == WTTAmbientTemp::ZoneAndOA) {
             HPWH.InletAirMixerSchPtr = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[28 + nAlphaOffset]);
             if (HPWH.InletAirMixerSchPtr == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                ShowContinueError(state, hpwhAlphaFieldNames[28 + nAlphaOffset] + "=\"" + hpwhAlpha[28 + nAlphaOffset] + "\",");
+                ShowSevereError(state, format("{}=\"{}\", not found", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                ShowContinueError(state, format("{}=\"{}\",", hpwhAlphaFieldNames[28 + nAlphaOffset], hpwhAlpha[28 + nAlphaOffset]));
                 ErrorsFound = true;
             } else {
                 bool ValidScheduleValue = ScheduleManager::CheckScheduleValueMinMax(state, HPWH.InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0);
                 if (!ValidScheduleValue) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                    ShowSevereError(state, format("{}=\"{}\", not found", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                     ShowContinueError(state,
-                                      hpwhAlphaFieldNames[28 + nAlphaOffset] + " values out of range of 0 to 1, Schedule=\"" +
-                                          hpwhAlpha[28 + nAlphaOffset] + "\".");
+                                      format("{} values out of range of 0 to 1, Schedule=\"{}\".",
+                                             hpwhAlphaFieldNames[28 + nAlphaOffset],
+                                             hpwhAlpha[28 + nAlphaOffset]));
                     ErrorsFound = true;
                 }
                 //           set outlet air splitter schedule index equal to inlet air mixer schedule index
@@ -2068,18 +2100,18 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             errFlag = false;
             FanOutletNodeNum = Fans::GetFanOutletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
             if (errFlag) {
-                ShowContinueError(state, "...occurs in unit=\"" + HPWH.Name + "\".");
+                ShowContinueError(state, format("...occurs in unit=\"{}\".", HPWH.Name));
                 ErrorsFound = true;
             }
         }
         if (FanOutletNodeNum != HPWH.FanOutletNode) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+            ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
             ShowContinueError(state, "Heat pump water heater fan outlet node name does not match next connected component.");
             if (FanOutletNodeNum != 0) {
-                ShowContinueError(state, "Fan outlet node name = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
+                ShowContinueError(state, format("Fan outlet node name = {}", state.dataLoopNodes->NodeID(FanOutletNodeNum)));
             }
             if (HPWH.FanOutletNode != 0) {
-                ShowContinueError(state, "Expected fan outlet node name = " + state.dataLoopNodes->NodeID(HPWH.FanOutletNode));
+                ShowContinueError(state, format("Expected fan outlet node name = {}", state.dataLoopNodes->NodeID(HPWH.FanOutletNode)));
             }
             ErrorsFound = true;
         }
@@ -2090,7 +2122,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             errFlag = false;
             FanInletNodeNum = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
             if (errFlag) {
-                ShowContinueError(state, "...occurs in unit=\"" + HPWH.Name + "\".");
+                ShowContinueError(state, format("...occurs in unit=\"{}\".", HPWH.Name));
                 ErrorsFound = true;
             }
         }
@@ -2106,13 +2138,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
         if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
             if (FanInletNodeNum != HPWHFanInletNodeNum) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state, "Heat pump water heater fan inlet node name does not match previous connected component.");
                 if (FanOutletNodeNum != 0) {
-                    ShowContinueError(state, "Fan inlet node name = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                    ShowContinueError(state, format("Fan inlet node name = {}", state.dataLoopNodes->NodeID(FanInletNodeNum)));
                 }
                 if (HPWH.FanOutletNode != 0) {
-                    ShowContinueError(state, "Expected fan inlet node name = " + state.dataLoopNodes->NodeID(HPWHFanInletNodeNum));
+                    ShowContinueError(state, format("Expected fan inlet node name = {}", state.dataLoopNodes->NodeID(HPWHFanInletNodeNum)));
                 }
                 ErrorsFound = true;
             }
@@ -2131,13 +2163,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
         if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
             if (FanInletNodeNum != DXCoilAirOutletNodeNum) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state, "Heat pump water heater fan inlet node name does not match previous connected component.");
                 if (FanInletNodeNum != 0) {
-                    ShowContinueError(state, "Fan inlet node name = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
+                    ShowContinueError(state, format("Fan inlet node name = {}", state.dataLoopNodes->NodeID(FanInletNodeNum)));
                 }
                 if (DXCoilAirOutletNodeNum != 0) {
-                    ShowContinueError(state, "Expected fan inlet node name = " + state.dataLoopNodes->NodeID(DXCoilAirOutletNodeNum));
+                    ShowContinueError(state, format("Expected fan inlet node name = {}", state.dataLoopNodes->NodeID(DXCoilAirOutletNodeNum)));
                 }
                 ErrorsFound = true;
             }
@@ -2153,13 +2185,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 }
             }
             if (DXCoilAirOutletNodeNum != HPWHCoilOutletNodeNum) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state, "Heat pump water heater coil outlet node name does not match next connected component.");
                 if (DXCoilAirOutletNodeNum != 0) {
-                    ShowContinueError(state, "Coil outlet node name = " + state.dataLoopNodes->NodeID(DXCoilAirOutletNodeNum));
+                    ShowContinueError(state, format("Coil outlet node name = {}", state.dataLoopNodes->NodeID(DXCoilAirOutletNodeNum)));
                 }
                 if (HPWHCoilOutletNodeNum != 0) {
-                    ShowContinueError(state, "Expected coil outlet node name = " + state.dataLoopNodes->NodeID(HPWHCoilOutletNodeNum));
+                    ShowContinueError(state, format("Expected coil outlet node name = {}", state.dataLoopNodes->NodeID(HPWHCoilOutletNodeNum)));
                 }
                 ErrorsFound = true;
             }
@@ -2240,8 +2272,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(CtrlLogicFlag, "MUTUALLYEXCLUSIVE")) {
             HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = false;
         } else {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-            ShowContinueError(state, CtrlLogicFlag + " is not a valid value for field Tank Element Control Logic.");
+            ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+            ShowContinueError(state, format("{} is not a valid value for field Tank Element Control Logic.", CtrlLogicFlag));
             ErrorsFound = true;
         }
 
@@ -2324,15 +2356,18 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", missing data.");
-            ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(2) + " is required");
+            ShowSevereError(
+                state,
+                format("{}{}=\"{}\", missing data.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("blank field, missing {} is required", state.dataIPShortCut->cAlphaFieldNames(2)));
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  " +
-                                state.dataIPShortCut->cAlphaFieldNames(2) + " not found = " + state.dataIPShortCut->cAlphaArgs(2));
+                            format("{} = {}:  {} not found = {}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaFieldNames(2),
+                                   state.dataIPShortCut->cAlphaArgs(2)));
             ErrorsFound = true;
         }
 
@@ -2358,8 +2393,9 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         if ((state.dataIPShortCut->rNumericArgs(5) > Tank.MaxCapacity) && (!Tank.MaxCapacityWasAutoSized)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Heater Minimum Capacity cannot be greater than Heater Maximum Capacity");
+                            format("{} = {}:  Heater Minimum Capacity cannot be greater than Heater Maximum Capacity",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         } else {
             Tank.MinCapacity = state.dataIPShortCut->rNumericArgs(5);
@@ -2383,8 +2419,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
         default: {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Control Type entered=" + state.dataIPShortCut->cAlphaArgs(3));
+                            format("{} = {}:  Invalid Control Type entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(3)));
             ErrorsFound = true;
             break;
         }
@@ -2399,8 +2437,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         switch (Tank.FuelType) {
         case Fuel::Invalid: {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(4));
+                            format("{} = {}:  Invalid Heater Fuel Type entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(4)));
             // Set to Electric to avoid errors when setting up output variables
             Tank.FuelType = Fuel::Electricity;
             ErrorsFound = true;
@@ -2414,8 +2454,9 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             Tank.Efficiency = state.dataIPShortCut->rNumericArgs(8);
         } else {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Heater Thermal Efficiency must be greater than zero");
+                            format("{} = {}:  Heater Thermal Efficiency must be greater than zero",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
@@ -2423,17 +2464,21 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             Tank.PLFCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
             if (Tank.PLFCurve == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Part Load Factor curve not found = " + state.dataIPShortCut->cAlphaArgs(5));
+                                format("{} = {}:  Part Load Factor curve not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(5)));
                 ErrorsFound = true;
             } else {
                 bool IsValid;
                 EnergyPlus::WaterThermalTanks::WaterThermalTankData::ValidatePLFCurve(state, Tank.PLFCurve, IsValid);
 
                 if (!IsValid) {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Part Load Factor curve failed to evaluate to greater than zero for all numbers in the domain of 0 to 1");
+                    ShowSevereError(
+                        state,
+                        format("{} = {}:  Part Load Factor curve failed to evaluate to greater than zero for all numbers in the domain of 0 to 1",
+                               state.dataIPShortCut->cCurrentModuleObject,
+                               state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
 
@@ -2458,8 +2503,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                 Tank.OffCycParaFuelType = Tank.FuelType;
             } else { // could have been an unsupported value
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(6));
+                                format("{} = {}:  Invalid Off-Cycle Parasitic Fuel Type entered={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(6)));
                 // Set to Electric to avoid errors when setting up output variables
                 Tank.OffCycParaFuelType = Fuel::Electricity;
                 ErrorsFound = true;
@@ -2482,8 +2529,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                 Tank.OnCycParaFuelType = Tank.FuelType;
             } else { // could have been an unsupported value
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid On-Cycle Parasitic Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(7));
+                                format("{} = {}:  Invalid On-Cycle Parasitic Fuel Type entered={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(7)));
                 // Set to Electric to avoid errors when setting up output variables
                 Tank.OnCycParaFuelType = Fuel::Electricity;
                 ErrorsFound = true;
@@ -2502,8 +2551,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
             if (Tank.AmbientTempSchedule == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Ambient Temperature Schedule not found = " + state.dataIPShortCut->cAlphaArgs(9));
+                                format("{} = {}:  Ambient Temperature Schedule not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(9)));
                 ErrorsFound = true;
             }
 
@@ -2513,8 +2564,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(10), state.dataHeatBal->Zone);
             if (Tank.AmbientTempZone == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Ambient Temperature Zone not found = " + state.dataIPShortCut->cAlphaArgs(10));
+                                format("{} = {}:  Ambient Temperature Zone not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(10)));
                 ErrorsFound = true;
             }
 
@@ -2533,13 +2586,14 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             if (!state.dataIPShortCut->cAlphaArgs(11).empty()) {
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
-                    ShowContinueError(state, "...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(11));
+                                    format("{} = {}: Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node",
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(state, format("...Referenced Node Name={}", state.dataIPShortCut->cAlphaArgs(11)));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
                 ErrorsFound = true;
             }
@@ -2548,8 +2602,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
         default: {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(8));
+                            format("{} = {}:  Invalid Ambient Temperature Indicator entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(8)));
             ShowContinueError(state, " Valid entries are SCHEDULE, ZONE, and OUTDOORS.");
             ErrorsFound = true;
             break;
@@ -2569,8 +2625,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                 Tank.FlowRateSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(12));
                 if (Tank.FlowRateSchedule == 0) {
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Flow Rate Schedule not found = " + state.dataIPShortCut->cAlphaArgs(12));
+                                    format("{} = {}:  Flow Rate Schedule not found = {}",
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(12)));
                     ErrorsFound = true;
                 }
             }
@@ -2580,8 +2638,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             Tank.UseInletTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
             if (Tank.UseInletTempSchedule == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Cold Water Supply Temperature Schedule not found = " + state.dataIPShortCut->cAlphaArgs(13));
+                                format("{} = {}:  Cold Water Supply Temperature Schedule not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(13)));
                 ErrorsFound = true;
             }
         }
@@ -2589,8 +2649,9 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         if (NumNums > 17) {
             if ((state.dataIPShortCut->rNumericArgs(18) > 1) || (state.dataIPShortCut->rNumericArgs(18) < 0)) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Use Side Effectiveness is out of bounds (0 to 1)");
+                                format("{} = {}:  Use Side Effectiveness is out of bounds (0 to 1)",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             Tank.UseEffectiveness = state.dataIPShortCut->rNumericArgs(18);
@@ -2601,8 +2662,9 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         if (NumNums > 18) {
             if ((state.dataIPShortCut->rNumericArgs(19) > 1) || (state.dataIPShortCut->rNumericArgs(19) <= 0)) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Source Side Effectiveness is out of bounds (>0 to 1)");
+                                format("{} = {}:  Source Side Effectiveness is out of bounds (>0 to 1)",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             Tank.SourceEffectiveness = state.dataIPShortCut->rNumericArgs(19);
@@ -2666,20 +2728,23 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
             if (state.dataIPShortCut->rNumericArgs(17) > 0) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                     ":  Use side nodes are specified; Peak Volumetric Use Flow Rate will not be used");
+                                 format("{} = {}:  Use side nodes are specified; Peak Volumetric Use Flow Rate will not be used",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
             }
 
             if (Tank.FlowRateSchedule > 0) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                     ":  Use side nodes are specified; Use Flow Rate Fraction Schedule will not be used");
+                                 format("{} = {}:  Use side nodes are specified; Use Flow Rate Fraction Schedule will not be used",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
             }
 
             if (Tank.UseInletTempSchedule > 0) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                     ":  Use side nodes are specified; Cold Water Supply Temperature Schedule will not be used");
+                                 format("{} = {}:  Use side nodes are specified; Cold Water Supply Temperature Schedule will not be used",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
             }
         }
 
@@ -2711,8 +2776,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                 getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(18))));
             if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Control Mode entered=" + state.dataIPShortCut->cAlphaArgs(18));
+                                format("{} = {}:  Invalid Control Mode entered={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(18)));
                 ErrorsFound = true;
             }
         } else {
@@ -2723,8 +2790,11 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             Tank.SourceSideAltSetpointSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(19));
             if (Tank.SourceSideAltSetpointSchedNum == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  " +
-                                    state.dataIPShortCut->cAlphaFieldNames(19) + " not found = " + state.dataIPShortCut->cAlphaArgs(19));
+                                format("{} = {}:  {} not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(19),
+                                       state.dataIPShortCut->cAlphaArgs(19)));
                 ErrorsFound = true;
             }
         }
@@ -2805,8 +2875,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 Tank.Perimeter = state.dataIPShortCut->rNumericArgs(3);
             } else {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Tank Perimeter must be greater than zero for Tank Shape=OTHER");
+                                format("{} = {}:  Tank Perimeter must be greater than zero for Tank Shape=OTHER",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -2814,8 +2885,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
         default: {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Tank Shape entered=" + state.dataIPShortCut->cAlphaArgs(3));
+                            format("{} = {}:  Invalid Tank Shape entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(3)));
             Tank.Shape = TankShape::VertCylinder;
             ErrorsFound = true;
             break;
@@ -2834,22 +2907,27 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             getEnumerationValue(PriorityControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         if (Tank.StratifiedControlMode == PriorityControlMode::Invalid) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Heater Priority Control entered=" + state.dataIPShortCut->cAlphaArgs(4));
+                            format("{} = {}:  Invalid Heater Priority Control entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(4)));
             ErrorsFound = true;
         }
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", missing data.");
-            ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(5) + " is required");
+            ShowSevereError(
+                state,
+                format("{}{}=\"{}\", missing data.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("blank field, missing {} is required", state.dataIPShortCut->cAlphaFieldNames(5)));
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " +
-                                state.dataIPShortCut->cAlphaFieldNames(5) + " not found = " + state.dataIPShortCut->cAlphaArgs(5));
+                            format("{} = {}: {} not found = {}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaFieldNames(5),
+                                   state.dataIPShortCut->cAlphaArgs(5)));
             ErrorsFound = true;
         }
 
@@ -2878,8 +2956,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         // Test if Heater height is within range
         if ((!Tank.HeightWasAutoSized) && (Tank.HeaterHeight1 > tankHeightForTesting)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Heater 1 is located higher than overall tank height.");
+                            format("{} = {}: Heater 1 is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)));
             ErrorsFound = true;
@@ -2887,15 +2966,18 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule2 = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", missing data.");
-            ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(6) + " is required");
+            ShowSevereError(
+                state,
+                format("{}{}=\"{}\", missing data.", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("blank field, missing {} is required", state.dataIPShortCut->cAlphaFieldNames(6)));
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule2 == 0) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  " +
-                                state.dataIPShortCut->cAlphaFieldNames(6) + " not found = " + state.dataIPShortCut->cAlphaArgs(6));
+                            format("{} = {}:  {} not found = {}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaFieldNames(6),
+                                   state.dataIPShortCut->cAlphaArgs(6)));
             ErrorsFound = true;
         }
 
@@ -2912,8 +2994,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         // Test if Heater height is within range
         if ((!Tank.HeightWasAutoSized) && (Tank.HeaterHeight2 > tankHeightForTesting)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Heater 2 is located higher than overall tank height.");
+                            format("{} = {}: Heater 2 is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
             ErrorsFound = true;
@@ -2926,8 +3009,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                                     7)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.FuelType == Fuel::Invalid) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(7));
+                            format("{} = {}:  Invalid Heater Fuel Type entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(7)));
             // Set to Electric to avoid errors when setting up output variables
             Tank.FuelType = Fuel::Electricity;
             ErrorsFound = true;
@@ -2937,8 +3022,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.Efficiency = state.dataIPShortCut->rNumericArgs(11);
         } else {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Heater Thermal Efficiency must be greater than zero");
+                            format("{} = {}:  Heater Thermal Efficiency must be greater than zero",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
@@ -2954,8 +3040,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 Tank.OffCycParaFuelType = Tank.FuelType;
             } else {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(8));
+                                format("{} = {}:  Invalid Off-Cycle Parasitic Fuel Type entered={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(8)));
                 // Set to Electric to avoid errors when setting up output variables
                 Tank.OffCycParaFuelType = Fuel::Electricity;
                 ErrorsFound = true;
@@ -2977,8 +3065,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 Tank.OnCycParaFuelType = Tank.FuelType;
             } else {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid On-Cycle Parasitic Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(9));
+                                format("{} = {}:  Invalid On-Cycle Parasitic Fuel Type entered={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(9)));
                 // Set to Electric to avoid errors when setting up output variables
                 Tank.OnCycParaFuelType = Fuel::Electricity;
                 ErrorsFound = true;
@@ -2996,8 +3086,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
             if (Tank.AmbientTempSchedule == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Ambient Temperature Schedule not found = " + state.dataIPShortCut->cAlphaArgs(11));
+                                format("{} = {}:  Ambient Temperature Schedule not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(11)));
                 ErrorsFound = true;
             }
 
@@ -3007,8 +3099,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataHeatBal->Zone);
             if (Tank.AmbientTempZone == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Ambient Temperature Zone not found = " + state.dataIPShortCut->cAlphaArgs(12));
+                                format("{} = {}:  Ambient Temperature Zone not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(12)));
                 ErrorsFound = true;
             }
 
@@ -3027,13 +3121,14 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             if (!state.dataIPShortCut->cAlphaArgs(13).empty()) {
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
-                    ShowContinueError(state, "...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(13));
+                                    format("{} = {}: Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node",
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(state, format("...Referenced Node Name={}", state.dataIPShortCut->cAlphaArgs(13)));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
                 ErrorsFound = true;
             }
@@ -3042,8 +3137,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
         default: {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(10));
+                            format("{} = {}:  Invalid Ambient Temperature Indicator entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(10)));
             ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
             ErrorsFound = true;
             break;
@@ -3064,8 +3161,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 Tank.FlowRateSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(14));
                 if (Tank.FlowRateSchedule == 0) {
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ":  Flow Rate Schedule not found = " + state.dataIPShortCut->cAlphaArgs(14));
+                                    format("{} = {}:  Flow Rate Schedule not found = {}",
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(14)));
                     ErrorsFound = true;
                 }
             }
@@ -3075,8 +3174,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.UseInletTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(15));
             if (Tank.UseInletTempSchedule == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Cold Water Supply Temperature Schedule not found = " + state.dataIPShortCut->cAlphaArgs(15));
+                                format("{} = {}:  Cold Water Supply Temperature Schedule not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(15)));
                 ErrorsFound = true;
             }
         }
@@ -3095,8 +3196,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
         if ((!Tank.HeightWasAutoSized) && (Tank.UseInletHeight > Tank.Height)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Use inlet is located higher than overall tank height.");
+                            format("{} = {}: Use inlet is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(24), state.dataIPShortCut->rNumericArgs(24)));
             ErrorsFound = true;
@@ -3113,8 +3215,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
         if ((!Tank.HeightWasAutoSized) && (Tank.UseOutletHeight > Tank.Height)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Use outlet is located higher than overall tank height.");
+                            format("{} = {}: Use outlet is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(25), state.dataIPShortCut->rNumericArgs(25)));
             ErrorsFound = true;
@@ -3123,8 +3226,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if (NumNums > 25) {
             if ((state.dataIPShortCut->rNumericArgs(26) > 1) || (state.dataIPShortCut->rNumericArgs(26) <= 0)) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Source Side Effectiveness is out of bounds (>0 to 1)");
+                                format("{} = {}:  Source Side Effectiveness is out of bounds (>0 to 1)",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             Tank.SourceEffectiveness = state.dataIPShortCut->rNumericArgs(26);
@@ -3143,8 +3247,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
         if ((!Tank.HeightWasAutoSized) && (Tank.SourceInletHeight > Tank.Height)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Source inlet is located higher than overall tank height.");
+                            format("{} = {}: Source inlet is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(27), state.dataIPShortCut->rNumericArgs(27)));
             ErrorsFound = true;
@@ -3158,8 +3263,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
         if ((!Tank.HeightWasAutoSized) && (Tank.SourceOutletHeight > Tank.Height)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Source outlet is located higher than overall tank height.");
+                            format("{} = {}: Source outlet is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(28), state.dataIPShortCut->rNumericArgs(28)));
             ErrorsFound = true;
@@ -3222,20 +3328,23 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
             if (state.dataIPShortCut->rNumericArgs(22) > 0) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                     ":  Use side nodes are specified; Peak Volumetric Use Flow Rate will not be used");
+                                 format("{} = {}:  Use side nodes are specified; Peak Volumetric Use Flow Rate will not be used",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
             }
 
             if (Tank.FlowRateSchedule > 0) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                     ":  Use side nodes are specified; Use Flow Rate Fraction Schedule will not be used");
+                                 format("{} = {}:  Use side nodes are specified; Use Flow Rate Fraction Schedule will not be used",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
             }
 
             if (Tank.UseInletTempSchedule > 0) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                     ":  Use side nodes are specified; Cold Water Supply Temperature Schedule will not be used");
+                                 format("{} = {}:  Use side nodes are specified; Cold Water Supply Temperature Schedule will not be used",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaArgs(1)));
             }
         }
 
@@ -3288,9 +3397,11 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         if (specifiedNodes > Tank.Nodes) {
-            ShowWarningError(state,
-                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                 ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used");
+            ShowWarningError(
+                state,
+                format("{} = {}:  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used",
+                       state.dataIPShortCut->cCurrentModuleObject,
+                       state.dataIPShortCut->cAlphaArgs(1)));
         }
 
         Tank.SetupStratifiedNodes(state);
@@ -3300,8 +3411,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(21))));
             if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Control Mode entered=" + state.dataIPShortCut->cAlphaArgs(21));
+                                format("{} = {}:  Invalid Control Mode entered={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaArgs(21)));
                 ErrorsFound = true;
             }
         } else {
@@ -3312,8 +3425,11 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.SourceSideAltSetpointSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(22));
             if (Tank.SourceSideAltSetpointSchedNum == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  " +
-                                    state.dataIPShortCut->cAlphaFieldNames(22) + " not found = " + state.dataIPShortCut->cAlphaArgs(22));
+                                format("{} = {}:  {} not found = {}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(22),
+                                       state.dataIPShortCut->cAlphaArgs(22)));
                 ErrorsFound = true;
             }
         }
@@ -3375,8 +3491,8 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
         if (Tank.SetPointTempSchedule == 0) {
-            ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
 
             ErrorsFound = true;
         }
@@ -3422,8 +3538,9 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         case WTTAmbientTemp::Schedule: {
             Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (Tank.AmbientTempSchedule == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
+                ShowContinueError(state,
+                                  format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found.");
                 ErrorsFound = true;
             }
@@ -3433,8 +3550,9 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         case WTTAmbientTemp::TempZone: {
             Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
             if (Tank.AmbientTempZone == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                ShowContinueError(state,
+                                  format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Zone was not found.");
                 ErrorsFound = true;
             }
@@ -3453,14 +3571,15 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                                                                                  DataLoopNode::ObjectIsNotParent);
             if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                    ShowSevereError(state,
+                                    format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                     ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                      format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
                 ErrorsFound = true;
             }
@@ -3469,8 +3588,10 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         }
         default: {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(3));
+                            format("{} = {}:  Invalid Ambient Temperature Indicator entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(3)));
             ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
             ErrorsFound = true;
             break;
@@ -3493,16 +3614,18 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
 
         if ((state.dataIPShortCut->rNumericArgs(6) > 1) || (state.dataIPShortCut->rNumericArgs(6) < 0)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Use Side Effectiveness is out of bounds (0 to 1)");
+                            format("{} = {}:  Use Side Effectiveness is out of bounds (0 to 1)",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         }
         Tank.UseEffectiveness = state.dataIPShortCut->rNumericArgs(6);
 
         if ((state.dataIPShortCut->rNumericArgs(8) > 1) || (state.dataIPShortCut->rNumericArgs(8) <= 0)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Source Side Effectiveness is out of bounds (>0 to 1)");
+                            format("{} = {}:  Source Side Effectiveness is out of bounds (>0 to 1)",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         }
         Tank.SourceEffectiveness = state.dataIPShortCut->rNumericArgs(8);
@@ -3523,8 +3646,9 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         } else {
             Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
             if (Tank.UseSideAvailSchedNum == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+                ShowContinueError(state,
+                                  format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found.");
                 ErrorsFound = true;
             }
@@ -3546,8 +3670,9 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         } else {
             Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(12));
             if (Tank.SourceSideAvailSchedNum == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + state.dataIPShortCut->cAlphaArgs(12));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12)));
+                ShowContinueError(state,
+                                  format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found.");
                 ErrorsFound = true;
             }
@@ -3681,16 +3806,19 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                 Tank.Perimeter = state.dataIPShortCut->rNumericArgs(3);
             } else {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Tank Perimeter must be greater than zero for Tank Shape=OTHER");
+                                format("{} = {}:  Tank Perimeter must be greater than zero for Tank Shape=OTHER",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             break;
         }
         default: {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Tank Shape entered=" + state.dataIPShortCut->cAlphaArgs(2));
+                            format("{} = {}:  Invalid Tank Shape entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(2)));
             Tank.Shape = TankShape::VertCylinder;
             ErrorsFound = true;
             break;
@@ -3706,8 +3834,8 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
         if (Tank.SetPointTempSchedule == 0) {
-            ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
+            ShowContinueError(state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "Schedule was not found.");
             ErrorsFound = true;
         }
@@ -3747,8 +3875,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         case WTTAmbientTemp::Schedule: {
             Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
             if (Tank.AmbientTempSchedule == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
+                ShowContinueError(state,
+                                  format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found.");
                 ErrorsFound = true;
             }
@@ -3758,8 +3887,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         case WTTAmbientTemp::TempZone: {
             Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
             if (Tank.AmbientTempZone == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
+                ShowContinueError(state,
+                                  format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Zone was not found.");
                 ErrorsFound = true;
             }
@@ -3780,14 +3910,15 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                                                     DataLoopNode::ObjectIsNotParent);
             if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
+                    ShowSevereError(state,
+                                    format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
                     ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                                      format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
                 ErrorsFound = true;
             }
@@ -3796,8 +3927,10 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
         default: {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(4));
+                            format("{} = {}:  Invalid Ambient Temperature Indicator entered={}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaArgs(4)));
             ShowContinueError(state, "  Valid entries are Schedule, Zone, and Outdoors.");
             ErrorsFound = true;
             break;
@@ -3824,8 +3957,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
         if (Tank.UseInletHeight > Tank.Height) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Use inlet is located higher than overall tank height.");
+                            format("{} = {}: Use inlet is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
             ErrorsFound = true;
@@ -3834,8 +3968,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         Tank.UseOutletHeight = state.dataIPShortCut->rNumericArgs(11);
         if (Tank.UseOutletHeight > Tank.Height) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Use outlet is located higher than overall tank height.");
+                            format("{} = {}: Use outlet is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(11), state.dataIPShortCut->rNumericArgs(11)));
             ErrorsFound = true;
@@ -3843,8 +3978,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
 
         if ((state.dataIPShortCut->rNumericArgs(13) > 1) || (state.dataIPShortCut->rNumericArgs(13) <= 0)) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ":  Source Side Effectiveness is out of bounds (>0 to 1)");
+                            format("{} = {}:  Source Side Effectiveness is out of bounds (>0 to 1)",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         }
         Tank.SourceEffectiveness = state.dataIPShortCut->rNumericArgs(13);
@@ -3852,8 +3988,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         Tank.SourceInletHeight = state.dataIPShortCut->rNumericArgs(14);
         if (Tank.SourceInletHeight > Tank.Height) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Source inlet is located higher than overall tank height.");
+                            format("{} = {}: Source inlet is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(14), state.dataIPShortCut->rNumericArgs(14)));
             ErrorsFound = true;
@@ -3865,8 +4002,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
         if (Tank.SourceOutletHeight > Tank.Height) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Source outlet is located higher than overall tank height.");
+                            format("{} = {}: Source outlet is located higher than overall tank height.",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(15), state.dataIPShortCut->rNumericArgs(15)));
             ErrorsFound = true;
@@ -3949,8 +4087,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         } else {
             Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
             if (Tank.UseSideAvailSchedNum == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(10) + " = " + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
+                ShowContinueError(state,
+                                  format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found.");
                 ErrorsFound = true;
             }
@@ -3965,8 +4104,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         } else {
             Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
             if (Tank.SourceSideAvailSchedNum == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + state.dataIPShortCut->cAlphaArgs(13));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13)));
+                ShowContinueError(state,
+                                  format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found.");
                 ErrorsFound = true;
             }
@@ -3990,9 +4130,11 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
 
         if (NumNums > 19 + Tank.Nodes) {
-            ShowWarningError(state,
-                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                 ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used");
+            ShowWarningError(
+                state,
+                format("{} = {}:  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used",
+                       state.dataIPShortCut->cCurrentModuleObject,
+                       state.dataIPShortCut->cAlphaArgs(1)));
         }
 
         Tank.SetupStratifiedNodes(state);
@@ -4123,33 +4265,37 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                     //         verify Desuperheater/tank source node connections
                     if (DesuperHtr.WaterInletNode != Tank.SourceOutletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':');
+                        ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, DesuperHtr.Name));
                         ShowContinueError(state, "Desuperheater inlet node name does not match thermal tank source outlet node name.");
                         ShowContinueError(state,
-                                          "Desuperheater water inlet and outlet node names = " + DesuperHtr.InletNodeName1 + " and " +
-                                              DesuperHtr.OutletNodeName1);
+                                          format("Desuperheater water inlet and outlet node names = {} and {}",
+                                                 DesuperHtr.InletNodeName1,
+                                                 DesuperHtr.OutletNodeName1));
                         ShowContinueError(state,
-                                          "Thermal tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
-                                              Tank.OutletNodeName2);
+                                          format("Thermal tank source side inlet and outlet node names      = {} and {}",
+                                                 Tank.InletNodeName2,
+                                                 Tank.OutletNodeName2));
                         ErrorsFound = true;
                     }
 
                     if (DesuperHtr.WaterOutletNode != Tank.SourceInletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':');
+                        ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, DesuperHtr.Name));
                         ShowContinueError(state, "Desuperheater water outlet node name does not match thermal tank source inlet node name.");
                         ShowContinueError(state,
-                                          "Desuperheater water inlet and outlet node names = " + DesuperHtr.InletNodeName1 + " and " +
-                                              DesuperHtr.OutletNodeName1);
+                                          format("Desuperheater water inlet and outlet node names = {} and {}",
+                                                 DesuperHtr.InletNodeName1,
+                                                 DesuperHtr.OutletNodeName1));
                         ShowContinueError(state,
-                                          "Thermal tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
-                                              Tank.OutletNodeName2);
+                                          format("Thermal tank source side inlet and outlet node names      = {} and {}",
+                                                 Tank.InletNodeName2,
+                                                 Tank.OutletNodeName2));
                         ErrorsFound = true;
                     }
                 }
 
                 if (DesuperHtr.WaterHeaterTankNum == 0) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':');
-                    ShowContinueError(state, " Water heater tank = " + DesuperHtr.TankName + " not found.");
+                    ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, DesuperHtr.Name));
+                    ShowContinueError(state, format(" Water heater tank = {} not found.", DesuperHtr.TankName));
                     ErrorsFound = true;
                 }
             }
@@ -4194,8 +4340,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         HPWH.TankType = Tank.Type;
                         HPWH.HPWHTankType = Tank.WaterThermalTankType;
                     } else {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state, "Invalid water heater tank type = " + Tank.Type);
+                        ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                        ShowContinueError(state, format("Invalid water heater tank type = {}", Tank.Type));
                         ErrorsFound = true;
                     }
 
@@ -4219,8 +4365,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     // If WaterHeaterMixed: do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
                     if ((Tank.WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) &&
                         (Tank.ControlType == HeaterControlMode::Modulate)) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state, "Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
+                        ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                        ShowContinueError(state, format("Heater Control Type for {} = {} must be CYCLE.", Tank.Type, Tank.Name));
                         ErrorsFound = true;
                     }
 
@@ -4229,10 +4375,13 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     HPWH.FoundTank = true;
 
                     if (Tank.DesuperheaterNum > 0) {
-                        ShowSevereError(state,
-                                        state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + "and Coil:WaterHeating:Desuperheater = " +
-                                            state.dataWaterThermalTanks->WaterHeaterDesuperheater(CheckWaterHeaterNum).Name +
-                                            ":  cannot be connected to the same water heater tank = " + Tank.Name);
+                        ShowSevereError(
+                            state,
+                            format("{} = {}and Coil:WaterHeating:Desuperheater = {}:  cannot be connected to the same water heater tank = {}",
+                                   state.dataIPShortCut->cCurrentModuleObject,
+                                   HPWH.Name,
+                                   state.dataWaterThermalTanks->WaterHeaterDesuperheater(CheckWaterHeaterNum).Name,
+                                   Tank.Name));
                     }
 
                     // check that water heater source side effectiveness is greater than 0
@@ -4249,9 +4398,9 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     // Set up the source side nodes for wrapped condensers
                     if (HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped) {
                         if (Tank.SourceInletNode > 0 || Tank.SourceOutletNode > 0) {
-                            ShowSevereError(state, Tank.Type + " = " + Tank.Name + " has a source inlet or outlet node specified,");
+                            ShowSevereError(state, format("{} = {} has a source inlet or outlet node specified,", Tank.Type, Tank.Name));
                             ShowContinueError(
-                                state, "but it is attached to " + HPWH.Type + " = " + HPWH.Name + ", which doesn't permit source side connections.");
+                                state, format("but it is attached to {} = {}, which doesn't permit source side connections.", HPWH.Type, HPWH.Name));
                             ShowContinueError(state, "Please leave the source side inlet and outlet fields blank.");
                             ErrorsFound = true;
                         } else {
@@ -4289,17 +4438,20 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     if (Tank.UseInletNode == 0 && Tank.UseOutletNode == 0) HPWH.StandAlone = true;
 
                     if (HPWH.WHUseInletNode != Tank.UseInletNode || HPWH.WHUseOutletNode != Tank.UseOutletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                        ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                         ShowContinueError(state,
-                                          "Heat pump water heater tank use side inlet and outlet node names must match the use side inlet and "
-                                          "outlet node names for water heater tank = " +
-                                              HPWH.TankType + ": " + HPWH.TankName);
+                                          format("Heat pump water heater tank use side inlet and outlet node names must match the use side inlet and "
+                                                 "outlet node names for water heater tank = {}: {}",
+                                                 HPWH.TankType,
+                                                 HPWH.TankName));
                         ShowContinueError(state,
-                                          "Heat pump water heater use side inlet and outlet node names = " + HPWH.InletNodeName2 + " and " +
-                                              HPWH.OutletNodeName2);
+                                          format("Heat pump water heater use side inlet and outlet node names = {} and {}",
+                                                 HPWH.InletNodeName2,
+                                                 HPWH.OutletNodeName2));
                         ShowContinueError(state,
-                                          "Water heater tank use side inlet and outlet node names      = " + Tank.InletNodeName1 + " and " +
-                                              Tank.OutletNodeName1);
+                                          format("Water heater tank use side inlet and outlet node names      = {} and {}",
+                                                 Tank.InletNodeName1,
+                                                 Tank.OutletNodeName1));
                         ErrorsFound = true;
                     } else {
                         if (!HPWH.StandAlone) {
@@ -4309,26 +4461,30 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                     // verify HP/tank source node connections
                     if (HPWH.CondWaterInletNode != Tank.SourceOutletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                        ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                         ShowContinueError(state,
                                           "Heat Pump condenser water inlet node name does not match water heater tank source outlet node name.");
                         ShowContinueError(
-                            state, "Heat pump condenser water inlet and outlet node names = " + HPWH.InletNodeName1 + " and " + HPWH.OutletNodeName1);
+                            state,
+                            format("Heat pump condenser water inlet and outlet node names = {} and {}", HPWH.InletNodeName1, HPWH.OutletNodeName1));
                         ShowContinueError(state,
-                                          "Water heater tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
-                                              Tank.OutletNodeName2);
+                                          format("Water heater tank source side inlet and outlet node names      = {} and {}",
+                                                 Tank.InletNodeName2,
+                                                 Tank.OutletNodeName2));
                         ErrorsFound = true;
                     }
 
                     if (HPWH.CondWaterOutletNode != Tank.SourceInletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                        ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                         ShowContinueError(state,
                                           "Heat Pump condenser water outlet node name does not match water heater tank source inlet node name.");
                         ShowContinueError(
-                            state, "Heat pump condenser water inlet and outlet node names = " + HPWH.InletNodeName1 + " and " + HPWH.OutletNodeName1);
+                            state,
+                            format("Heat pump condenser water inlet and outlet node names = {} and {}", HPWH.InletNodeName1, HPWH.OutletNodeName1));
                         ShowContinueError(state,
-                                          "Water heater tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
-                                              Tank.OutletNodeName2);
+                                          format("Water heater tank source side inlet and outlet node names      = {} and {}",
+                                                 Tank.InletNodeName2,
+                                                 Tank.OutletNodeName2));
                         ErrorsFound = true;
                     }
 
@@ -4336,7 +4492,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     if (HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped) {
                         // make sure the top of the condenser is not above the tank height.
                         if (HPWH.WrappedCondenserTopLocation > Tank.Height) {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                            ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                             ShowContinueError(state, "The height of the top of the wrapped condenser is greater than the height of the tank.");
                             ErrorsFound = true;
                         }
@@ -4360,7 +4516,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                 break;
                             } // EquipmentTypeNum
                             if (!FoundTankInList) {
-                                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                                ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                                 ShowContinueError(state,
                                                   "Heat pump water heater type and name must be listed in the correct "
                                                   "ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal to "
@@ -4380,7 +4536,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                 }
                             } // EquipmentTypeNum
                             if (TankNotLowestPriority && FoundTankInList) {
-                                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                                ShowWarningError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                                 ShowContinueError(state,
                                                   "Heat pump water heaters should be simulated first, before other space "
                                                   "conditioning equipment.");
@@ -4389,7 +4545,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                                   "not 1 in the ZoneHVAC:EquipmentList.");
                             }
                         } else {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                            ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                             ShowContinueError(state,
                                               "ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections objects are required when Inlet Air "
                                               "Configuration is either ZoneAirOnly or ZoneAndOutdoorAir.");
@@ -4402,7 +4558,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         // Nodal heat distribution fraction for stratified tank wrapped condensers
                         if (HPWH.HPWHType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped) {
                             if (Tank.Shape == TankShape::HorizCylinder) {
-                                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ":");
+                                ShowWarningError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                                 ShowContinueError(state, "A wrapped condenser HPWH model should not be used with a horizontal stratified tank.");
                                 ShowContinueError(
                                     state, "Ignoring condenser location and distributing heat evenly throughout the tank. Simulation continues.");
@@ -4471,12 +4627,12 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                         // Make sure the control sensor locations are in the tank
                         if (HPWH.ControlSensor1Height < 0.0 || HPWH.ControlSensor1Height > TankHeight) {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                            ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                             ShowContinueError(state, "Control Sensor 1 is located outside the tank.");
                             ErrorsFound = true;
                         }
                         if (HPWH.ControlSensor2Height < 0.0 || HPWH.ControlSensor2Height > TankHeight) {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                            ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                             ShowContinueError(state, "Control Sensor 2 is located outside the tank.");
                             ErrorsFound = true;
                         }
@@ -4509,8 +4665,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 } // DO CheckWaterHeaterNum = 1, NumWaterHeater
 
                 if (!HPWH.FoundTank) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                    ShowContinueError(state, "Water heater tank object not found = " + HPWH.TankType + ", " + HPWH.TankName);
+                    ShowSevereError(state, format("{} = {}:", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+                    ShowContinueError(state, format("Water heater tank object not found = {}, {}", HPWH.TankType, HPWH.TankName));
                     ErrorsFound = true;
                 }
 
@@ -4543,8 +4699,9 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 if (WaterThermalTankNum == 0) {
                     // did not match name throw warning.
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " object name: " + state.dataIPShortCut->cAlphaArgs(1) +
-                                        " does not match any of the water heaters defined in the file");
+                                    format("{} object name: {} does not match any of the water heaters defined in the file",
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                     continue;
                 } else { // we have a match
@@ -4565,8 +4722,10 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     } else {
                         // wrong design mode entered, throw error
                         ShowSevereError(state,
-                                        state.dataIPShortCut->cCurrentModuleObject + " object named: " + state.dataIPShortCut->cAlphaArgs(1) +
-                                            " contains an incorrect Design Mode of: " + state.dataIPShortCut->cAlphaArgs(2));
+                                        format("{} object named: {} contains an incorrect Design Mode of: {}",
+                                               state.dataIPShortCut->cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(2)));
                         ErrorsFound = true;
                     }
 
@@ -4605,15 +4764,17 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     case SizingMode::PeakDraw: { // need to have entered a reasonable value for TankDrawTime
                         if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankDrawTime <= 0.0) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", design mode set to Peak Draw but needs a positive value for tank draw time");
+                                            format("{}, named {}, design mode set to Peak Draw but needs a positive value for tank draw time",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         // constrain crazy sizes by limiting to 10 years or 8760*10
                         if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankDrawTime > 87600.0) {
                             ShowWarningError(state,
-                                             state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                 ",  has input with an unreasonably large Tank Draw Time, more than 10 years");
+                                             format("{}, named {},  has input with an unreasonably large Tank Draw Time, more than 10 years",
+                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         // if both volume and demand side flow connections are autosized, must be a good NominalVolForSizingDemandSideFlow
@@ -4622,8 +4783,9 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).UseDesignVolFlowRateWasAutoSized)) {
                             if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NominalVolForSizingDemandSideFlow <= 0.0) {
                                 ShowWarningError(state,
-                                                 state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                     " needs a value for Nominal Tank Volume for Autosizing Plant Connections");
+                                                 format("{}, named {} needs a value for Nominal Tank Volume for Autosizing Plant Connections",
+                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1)));
                                 ErrorsFound = true;
                             }
                         }
@@ -4632,8 +4794,9 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).SourceDesignVolFlowRateWasAutoSized)) {
                             if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NominalVolForSizingDemandSideFlow <= 0.0) {
                                 ShowWarningError(state,
-                                                 state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                     " needs a value for Nominal Tank Volume for Autosizing Plant Connections");
+                                                 format("{}, named {} needs a value for Nominal Tank Volume for Autosizing Plant Connections",
+                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1)));
                                 ErrorsFound = true;
                             }
                         }
@@ -4644,14 +4807,16 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         // it would have to have at least on bedroom and any more than 10 is crazy for this mode
                         if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NumberOfBedrooms < 1) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", mode needs at least one bedroom");
+                                            format("{}, named {}, mode needs at least one bedroom",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NumberOfBedrooms > 10) {
                             ShowWarningError(state,
-                                             state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                 ", probably has too many bedrooms for the selected design mode");
+                                             format("{}, named {}, probably has too many bedrooms for the selected design mode",
+                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaArgs(1)));
                         }
 
                         break;
@@ -4661,16 +4826,18 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerPerson <= 0.0)) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerPerson mode needs positive value input for storage capacity per person");
+                                            format("{}, named {}, PerPerson mode needs positive value input for storage capacity per person",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
 
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).MaxCapacityWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.RecoveryCapacityPerPerson <= 0.0)) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerPerson mode needs positive value input for recovery capacity per person");
+                                            format("{}, named {}, PerPerson mode needs positive value input for recovery capacity per person",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
 
@@ -4680,15 +4847,17 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerArea <= 0.0)) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerArea mode needs positive value input for storage capacity per floor area");
+                                            format("{}, named {}, PerArea mode needs positive value input for storage capacity per floor area",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).MaxCapacityWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.RecoveryCapacityPerArea <= 0.0)) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerArea mode needs positive value input for recovery capacity per floor area");
+                                            format("{}, named {}, PerArea mode needs positive value input for recovery capacity per floor area",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
 
@@ -4698,29 +4867,33 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerUnit <= 0.0)) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerUnit mode needs positive value input for storage capacity per unit");
+                                            format("{}, named {}, PerUnit mode needs positive value input for storage capacity per unit",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NumberOfUnits <= 0.0)) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerUnit mode needs positive value input for number of units");
+                                            format("{}, named {}, PerUnit mode needs positive value input for number of units",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).MaxCapacityWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.RecoveryCapacityPerUnit <= 0.0)) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerUnit mode needs positive value input for recovery capacity per unit");
+                                            format("{}, named {}, PerUnit mode needs positive value input for recovery capacity per unit",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).MaxCapacityWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NumberOfUnits <= 0.0)) {
                             ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerUnit mode needs positive value input for number of units");
+                                            format("{}, named {}, PerUnit mode needs positive value input for number of units",
+                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         break;
@@ -4728,9 +4901,11 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     case SizingMode::PerSolarColArea: {
                         if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerCollectorArea <= 0.0)) {
-                            ShowSevereError(state,
-                                            state.dataIPShortCut->cCurrentModuleObject + ", named " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ", PerSolarCollectorArea mode needs positive value input for storage capacity per collector area");
+                            ShowSevereError(
+                                state,
+                                format("{}, named {}, PerSolarCollectorArea mode needs positive value input for storage capacity per collector area",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                             ErrorsFound = true;
                         }
                         break;
@@ -4750,23 +4925,26 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                     (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Invalid)) {
-                    ShowWarningError(state,
-                                     "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
-                                         "has tank volume set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
+                    ShowWarningError(
+                        state,
+                        format("Water heater named {}has tank volume set to AUTOSIZE but it is missing associated WaterHeater:Sizing object",
+                               state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name));
                     ErrorsFound = true;
                 }
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).MaxCapacityWasAutoSized) &&
                     (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Invalid)) {
-                    ShowWarningError(state,
-                                     "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
-                                         "has heater capacity set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
+                    ShowWarningError(
+                        state,
+                        format("Water heater named {}has heater capacity set to AUTOSIZE but it is missing associated WaterHeater:Sizing object",
+                               state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name));
                     ErrorsFound = true;
                 }
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).HeightWasAutoSized) &&
                     (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Invalid)) {
-                    ShowWarningError(state,
-                                     "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
-                                         "has tank height set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
+                    ShowWarningError(
+                        state,
+                        format("Water heater named {}has tank height set to AUTOSIZE but it is missing associated WaterHeater:Sizing object",
+                               state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name));
                     ErrorsFound = true;
                 }
             }
@@ -5927,7 +6105,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->Mass = this->Volume * rho;
             this->UseSidePlantSizNum = state.dataPlnt->PlantLoop(this->UseSidePlantLoc.loopNum).PlantSizNum;
             if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
-                ShowSevereError(state, "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
+                ShowSevereError(state,
+                                format("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = {}", this->Name));
                 ShowFatalError(state, "InitWaterThermalTank: Program terminated due to previous condition(s).");
             }
         }
@@ -5941,7 +6120,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->Mass = this->Volume * rho;
             this->UseSidePlantSizNum = state.dataPlnt->PlantLoop(this->UseSidePlantLoc.loopNum).PlantSizNum;
             if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
-                ShowSevereError(state, "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
+                ShowSevereError(state,
+                                format("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = {}", this->Name));
                 ShowFatalError(state, "InitWaterThermalTank: Program terminated due to previous condition(s).");
             }
         }
@@ -5954,8 +6134,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->PlantSourceMassFlowRateMax = this->SourceDesignVolFlowRate * rho;
             this->SourceSidePlantSizNum = state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).PlantSizNum;
             if ((this->SourceDesignVolFlowRateWasAutoSized) && (this->SourceSidePlantSizNum == 0)) {
-                ShowSevereError(state,
-                                "InitWaterThermalTank: Did not find Sizing:Plant object for source side of plant thermal tank = " + this->Name);
+                ShowSevereError(
+                    state, format("InitWaterThermalTank: Did not find Sizing:Plant object for source side of plant thermal tank = {}", this->Name));
                 ShowFatalError(state, "InitWaterThermalTank: Program terminated due to previous condition(s).");
             }
         }
@@ -5994,7 +6174,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                     Real64 TankChangeRateScale = this->Volume / MaxSideVolFlow;
                     if (TankChangeRateScale < 60.0) { // nominal change over in less than one minute
                         ShowSevereError(state, "InitWaterThermalTank: Detected problem for stratified tank model.  Model cannot be applied.");
-                        ShowContinueError(state, "Occurs for stratified tank name = " + this->Name);
+                        ShowContinueError(state, format("Occurs for stratified tank name = {}", this->Name));
                         ShowContinueError(state, format("Tank volume = {:.4R} [m3]", this->Volume));
                         ShowContinueError(state, format("Tank use side volume flow rate = {:.4R} [m3/s]", this->UseDesignVolFlowRate));
                         ShowContinueError(state, format("Tank source side volume flow rate = {:.4R} [m3/s]", this->SourceDesignVolFlowRate));
@@ -6178,9 +6358,10 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                 this->SetPointTemp = this->TankTempLimit - 1.0;
 
                 if (this->ShowSetPointWarning) {
-                    ShowSevereError(state,
-                                    "Water heater = " + this->Name +
-                                        ":  Water heater tank set point temperature is greater than the maximum tank temperature limit.");
+                    ShowSevereError(
+                        state,
+                        format("Water heater = {}:  Water heater tank set point temperature is greater than the maximum tank temperature limit.",
+                               this->Name));
                     ShowContinueErrorTimeStamp(state,
                                                format("Water heater tank set point temperature is reset to Tank Temperature Limit minus 1 C "
                                                       "({:.2T}) and simulation continues.",
@@ -6194,9 +6375,10 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                 this->SetPointTemp = this->TankTempLimit + 1.0;
 
                 if (this->ShowSetPointWarning) {
-                    ShowSevereError(state,
-                                    "Chilled Water Tank = " + this->Name +
-                                        ":  Water heater tank set point temperature is lower than the minimum tank temperature limit.");
+                    ShowSevereError(
+                        state,
+                        format("Chilled Water Tank = {}:  Water heater tank set point temperature is lower than the minimum tank temperature limit.",
+                               this->Name));
                     ShowContinueErrorTimeStamp(state,
                                                format("Chilled water tank set point temperature is reset to Tank Temperature Limit plus 1 C "
                                                       "({:.2T}) and simulation continues.",
@@ -6259,10 +6441,10 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                 state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SetPointTemp = this->TankTempLimit - 1.0;
 
                 if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).ShowSetPointWarning) {
-                    ShowSevereError(
-                        state,
-                        "Heat Pump Water Heater = " + state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Name +
-                            ":  Heat Pump water heater set point temperature is equal to or greater than the maximum tank temperature limit.");
+                    ShowSevereError(state,
+                                    format("Heat Pump Water Heater = {}:  Heat Pump water heater set point temperature is equal to or greater than "
+                                           "the maximum tank temperature limit.",
+                                           state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Name));
                     ShowContinueErrorTimeStamp(state,
                                                format("Heat Pump water heater tank set point temperature is reset to Tank Temperature Limit "
                                                       "minus 1 C ({:.2T}) and simulation continues.",
@@ -6577,7 +6759,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                 ShowContinueError(state,
                                   " The MSHP system flow rate when waterheating is required is reset to the"
                                   " fan flow rate and the simulation continues.");
-                ShowContinueError(state, " Occurs in " + state.dataWaterThermalTanks->HPWaterHeater(HPNum).Name);
+                ShowContinueError(state, format(" Occurs in {}", state.dataWaterThermalTanks->HPWaterHeater(HPNum).Name));
                 state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirVolFlowRate(state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed) =
                     FanVolFlow;
                 // Check flow rates in other speeds and ensure flow rates are not above the max flow rate
@@ -6588,7 +6770,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                                           format(" The MSHP system flow rate when waterheating is required is reset to the flow rate at higher "
                                                  "speed and the simulation continues at Speed{}.",
                                                  Iter));
-                        ShowContinueError(state, " Occurs in " + state.dataWaterThermalTanks->HPWaterHeater(HPNum).Name);
+                        ShowContinueError(state, format(" Occurs in {}", state.dataWaterThermalTanks->HPWaterHeater(HPNum).Name));
                         state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) =
                             state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter + 1);
                     }
@@ -7155,7 +7337,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
 
             if (!state.dataGlobal->WarmupFlag) {
                 if (this->MaxCycleErrorIndex == 0) {
-                    ShowWarningError(state, "WaterHeater:Mixed = " + this->Name + ":  Heater is cycling on and off more than once per second.");
+                    ShowWarningError(state, format("WaterHeater:Mixed = {}:  Heater is cycling on and off more than once per second.", this->Name));
                     ShowContinueError(state, "Try increasing Deadband Temperature Difference or Tank Volume");
                     ShowContinueErrorTimeStamp(state, "");
                 }
@@ -8404,9 +8586,10 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
             ++DesupHtr.SetPointError;
             if (DesupHtr.SetPointError < 5) {
                 ShowWarningError(state,
-                                 DesupHtr.Type + " \"" + DesupHtr.Name +
-                                     "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of the "
-                                     "desuperheater. Desuperheater will be disabled.");
+                                 format("{} \"{}\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of "
+                                        "the desuperheater. Desuperheater will be disabled.",
+                                        DesupHtr.Type,
+                                        DesupHtr.Name));
                 ShowContinueErrorTimeStamp(state, format(" ...Desuperheater cut-in temperature = {:.2R}", MinTemp));
             } else {
                 ShowRecurringWarningErrorAtEnd(state,
@@ -8571,7 +8754,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                             if (!state.dataGlobal->WarmupFlag) {
                                 ++DesupHtr.IterLimitExceededNum1;
                                 if (DesupHtr.IterLimitExceededNum1 == 1) {
-                                    ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                    ShowWarningError(state, format("{} \"{}\"", DesupHtr.Type, DesupHtr.Name));
                                     ShowContinueError(state,
                                                       format("Iteration limit exceeded calculating desuperheater unit part-load ratio, "
                                                              "maximum iterations = {}. Part-load ratio returned = {:.3R}",
@@ -8596,7 +8779,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                             if (!state.dataGlobal->WarmupFlag) {
                                 ++DesupHtr.RegulaFalsiFailedNum1;
                                 if (DesupHtr.RegulaFalsiFailedNum1 == 1) {
-                                    ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                    ShowWarningError(state, format("{} \"{}\"", DesupHtr.Type, DesupHtr.Name));
                                     ShowContinueError(state,
                                                       format("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 "
                                                              "exceeded. Part-load ratio used = {:.3R}",
@@ -8697,7 +8880,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                                 if (!state.dataGlobal->WarmupFlag) {
                                     ++DesupHtr.IterLimitExceededNum2;
                                     if (DesupHtr.IterLimitExceededNum2 == 1) {
-                                        ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                        ShowWarningError(state, format("{} \"{}\"", DesupHtr.Type, DesupHtr.Name));
                                         ShowContinueError(state,
                                                           format("Iteration limit exceeded calculating desuperheater unit part-load ratio, "
                                                                  "maximum iterations = {}. Part-load ratio returned = {:.3R}",
@@ -8720,7 +8903,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                                 if (!state.dataGlobal->WarmupFlag) {
                                     ++DesupHtr.RegulaFalsiFailedNum2;
                                     if (DesupHtr.RegulaFalsiFailedNum2 == 1) {
-                                        ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                        ShowWarningError(state, format("{} \"{}\"", DesupHtr.Type, DesupHtr.Name));
                                         ShowContinueError(state,
                                                           format("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to "
                                                                  "1 exceeded. Part-load ratio used = {:.3R}",
@@ -8754,10 +8937,10 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
             //   should never get here, case is checked in GetWaterThermalTankInput
         } else {
             ShowFatalError(state,
-                           "Coil:WaterHeating:Desuperheater = " + state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name +
-                               ":  invalid water heater tank type and name entered = " +
-                               state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankType + ", " +
-                               state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankName);
+                           format("Coil:WaterHeating:Desuperheater = {}:  invalid water heater tank type and name entered = {}, {}",
+                                  state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                  state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankType,
+                                  state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankName));
         }
     }
 
@@ -9097,10 +9280,11 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 //  add logic for warmup, DataGlobals::KickOffSimulation and doing sizing here
                 if (HeatPump.HPSetPointError == 1) {
                     ShowWarningError(state,
-                                     HeatPump.Type + " \"" + HeatPump.Name +
-                                         ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of the heat "
-                                         "pump water heater. Heat Pump will be disabled and simulation continues.");
-                    ShowContinueErrorTimeStamp(state, " ...Heat Pump cut-in temperature=" + HPMinTempChar);
+                                     format("{} \"{}:  Water heater tank set point temperature is greater than or equal to the cut-in temperature of "
+                                            "the heat pump water heater. Heat Pump will be disabled and simulation continues.",
+                                            HeatPump.Type,
+                                            HeatPump.Name));
+                    ShowContinueErrorTimeStamp(state, format(" ...Heat Pump cut-in temperature={}", HPMinTempChar));
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
                                                    HeatPump.Type + " \"" + HeatPump.Name +
@@ -9421,7 +9605,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     if (!state.dataGlobal->WarmupFlag) {
                         ++HeatPump.IterLimitExceededNum2;
                         if (HeatPump.IterLimitExceededNum2 == 1) {
-                            ShowWarningError(state, HeatPump.Type + " \"" + HeatPump.Name + "\"");
+                            ShowWarningError(state, format("{} \"{}\"", HeatPump.Type, HeatPump.Name));
                             ShowContinueError(state,
                                               format("Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, "
                                                      "maximum iterations = {}. Part-load ratio returned = {:.3R}",
@@ -9444,7 +9628,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     if (!state.dataGlobal->WarmupFlag) {
                         ++HeatPump.RegulaFalsiFailedNum2;
                         if (HeatPump.RegulaFalsiFailedNum2 == 1) {
-                            ShowWarningError(state, HeatPump.Type + " \"" + HeatPump.Name + "\"");
+                            ShowWarningError(state, format("{} \"{}\"", HeatPump.Type, HeatPump.Name));
                             ShowContinueError(state,
                                               format("Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 "
                                                      "exceeded. Part-load ratio used = {:.3R}",
@@ -9609,7 +9793,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         if (!state.dataGlobal->WarmupFlag) {
                             ++HeatPump.IterLimitExceededNum1;
                             if (HeatPump.IterLimitExceededNum1 == 1) {
-                                ShowWarningError(state, HeatPump.Type + " \"" + HeatPump.Name + "\"");
+                                ShowWarningError(state, format("{} \"{}\"", HeatPump.Type, HeatPump.Name));
                                 ShowContinueError(state,
                                                   format("Iteration limit exceeded calculating heat pump water heater speed speed ratio ratio, "
                                                          "maximum iterations = {}. speed ratio returned = {:.3R}",
@@ -9631,7 +9815,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                         if (!state.dataGlobal->WarmupFlag) {
                             ++HeatPump.RegulaFalsiFailedNum1;
                             if (HeatPump.RegulaFalsiFailedNum1 == 1) {
-                                ShowWarningError(state, HeatPump.Type + " \"" + HeatPump.Name + "\"");
+                                ShowWarningError(state, format("{} \"{}\"", HeatPump.Type, HeatPump.Name));
                                 ShowContinueError(state,
                                                   format("Heat pump water heater speed ratio calculation failed: speed ratio limits of 0 to 1 "
                                                          "exceeded. speed ratio used = {:.3R}",
@@ -10626,8 +10810,9 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
 
         if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
             ShowSevereError(state,
-                            "Water heater = " + this->Name + " for autosizing Use side flow rate, did not find Sizing:Plant object " +
-                                state.dataPlnt->PlantLoop(PlantLoopNum).Name);
+                            format("Water heater = {} for autosizing Use side flow rate, did not find Sizing:Plant object {}",
+                                   this->Name,
+                                   state.dataPlnt->PlantLoop(PlantLoopNum).Name));
             ErrorsFound = true;
         }
         // Is this wh Use side plumbed in series (default) or are there other branches in parallel?
@@ -10646,8 +10831,9 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
         if ((this->SourceDesignVolFlowRateWasAutoSized) && (this->SourceSidePlantSizNum == 0) && (this->DesuperheaterNum == 0) &&
             (this->HeatPumpNum == 0)) {
             ShowSevereError(state,
-                            "Water heater = " + this->Name + "for autosizing Source side flow rate, did not find Sizing:Plant object " +
-                                state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).Name);
+                            format("Water heater = {}for autosizing Source side flow rate, did not find Sizing:Plant object {}",
+                                   this->Name,
+                                   state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).Name));
             ErrorsFound = true;
         }
         // Is this wh Source side plumbed in series (default) or are there other branches in parallel?
@@ -10667,7 +10853,7 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
     }
 }
 
-void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, ObjexxFCL::Optional_int_const LoopNum)
+void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, const int loopNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -10693,14 +10879,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
     Real64 tmpUseDesignVolFlowRate = this->UseDesignVolFlowRate;
     Real64 tmpSourceDesignVolFlowRate = this->SourceDesignVolFlowRate;
 
-    int tmpLoopNum;
-    if (!present(LoopNum)) {
-        tmpLoopNum = this->SrcSidePlantLoc.loopNum;
-    } else {
-        tmpLoopNum = LoopNum;
-    }
-
-    if ((this->UseInletNode > 0) && (tmpLoopNum == this->UseSidePlantLoc.loopNum)) {
+    if ((this->UseInletNode > 0) && (loopNum == this->UseSidePlantLoc.loopNum)) {
         if (this->UseDesignVolFlowRateWasAutoSized) {
             int PltSizNum = this->UseSidePlantSizNum;
             if (PltSizNum > 0) { // we have a Plant Sizing Object
@@ -10763,7 +10942,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
         } // autosizing needed.
     }     // connected to plant
 
-    if ((this->SourceInletNode > 0) && (tmpLoopNum == this->SrcSidePlantLoc.loopNum)) {
+    if ((this->SourceInletNode > 0) && (loopNum == this->SrcSidePlantLoc.loopNum)) {
         if (this->SourceDesignVolFlowRateWasAutoSized) {
             int PltSizNum = this->SourceSidePlantSizNum;
             if (PltSizNum > 0) {
@@ -11244,9 +11423,9 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
                 tmpMaxCapacity = (this->Volume * rho * Cp * (Tfinish - Tstart)) /
                                  (this->Sizing.RecoveryTime * DataGlobalConstants::SecInHour); // m3 | kg/m3 | J/Kg/K | K | seconds
             } else {
-                ShowFatalError(state,
-                               "SizeTankForSupplySide: Tank=\"" + this->Name +
-                                   "\", requested sizing for max capacity but entered Recovery Time is zero.");
+                ShowFatalError(
+                    state,
+                    format("SizeTankForSupplySide: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.", this->Name));
             }
         }
 
@@ -11383,13 +11562,13 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
                             ShowSevereError(state,
                                             "Autosizing of Use side water heater design flow rate requires Sizing:Plant object to have an exit "
                                             "temperature >= 58C");
-                            ShowContinueError(state, "Occurs for water heater object=" + this->Name);
+                            ShowContinueError(state, format("Occurs for water heater object={}", this->Name));
                         } else {
                             // plant sizing object design temperature is set too hi throw warning.
                             ShowSevereError(state,
                                             "Autosizing of Use side chilled water tank design flow rate requires Sizing:Plant object to have an "
                                             "exit temperature <= 8C");
-                            ShowContinueError(state, "Occurs for chilled water storage tank object=" + this->Name);
+                            ShowContinueError(state, format("Occurs for chilled water storage tank object={}", this->Name));
                         }
                         ErrorsFound = true;
                     }
@@ -11470,13 +11649,13 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
                             ShowSevereError(state,
                                             "Autosizing of Source side water heater design flow rate requires Sizing:Plant object to have an "
                                             "exit temperature >= 58C");
-                            ShowContinueError(state, "Occurs for WaterHeater:Mixed object=" + this->Name);
+                            ShowContinueError(state, format("Occurs for WaterHeater:Mixed object={}", this->Name));
                         } else {
                             // plant sizing object design temperature is set too hi throw warning.
                             ShowSevereError(state,
                                             "Autosizing of Source side chilled water tank design flow rate requires Sizing:Plant object to have "
                                             "an exit temperature <= 8C");
-                            ShowContinueError(state, "Occurs for chilled water storage tank object=" + this->Name);
+                            ShowContinueError(state, format("Occurs for chilled water storage tank object={}", this->Name));
                         }
                         ErrorsFound = true;
                     }
@@ -11578,9 +11757,10 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                     tmpMaxCapacity = (this->Volume * rho * Cp * (Tfinish - Tstart)) /
                                      (this->Sizing.RecoveryTime * DataGlobalConstants::SecInHour); // m3 | kg/m3 | J/Kg/K | K | seconds
                 } else {
-                    ShowFatalError(state,
-                                   "SizeStandAloneWaterHeater: Tank=\"" + this->Name +
-                                       "\", requested sizing for max capacity but entered Recovery Time is zero.");
+                    ShowFatalError(
+                        state,
+                        format("SizeStandAloneWaterHeater: Tank=\"{}\", requested sizing for max capacity but entered Recovery Time is zero.",
+                               this->Name));
                 }
                 this->MaxCapacity = tmpMaxCapacity;
                 BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
@@ -12288,9 +12468,10 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
             EnergyFactor = 0.0;
             // If this a regular tank, or an HPWH that's not an Integrated one
             if ((this->HeatPumpNum == 0) || !state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).bIsIHP) {
-                ShowWarningError(state,
-                                 "Water heater = " + this->Name +
-                                     ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings");
+                ShowWarningError(
+                    state,
+                    format("Water heater = {}:  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings",
+                           this->Name));
                 ShowContinueError(state, "Setpoint was never recovered and/or heater never turned on");
             }
         }
@@ -12498,7 +12679,7 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
             } else {
                 FanInletNodeIndex = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, ErrorsFound);
                 if (ErrorsFound) {
-                    ShowWarningError(state, "Could not retrieve fan outlet node for this unit=\"" + HPWH.Name + "\".");
+                    ShowWarningError(state, format("Could not retrieve fan outlet node for this unit=\"{}\".", HPWH.Name));
                     ErrorsFound = true;
                 }
             }

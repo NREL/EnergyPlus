@@ -109,7 +109,7 @@ namespace BaseboardElectric {
         if (CompIndex == 0) {
             BaseboardNum = UtilityRoutines::FindItemInList(EquipName, baseboard->baseboards, &BaseboardParams::EquipName);
             if (BaseboardNum == 0) {
-                ShowFatalError(state, "SimElectricBaseboard: Unit not found=" + EquipName);
+                ShowFatalError(state, format("SimElectricBaseboard: Unit not found={}", EquipName));
             }
             CompIndex = BaseboardNum;
         } else {

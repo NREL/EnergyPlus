@@ -495,7 +495,7 @@ namespace HeatRecovery {
             } else {
                 if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
                     ShowSevereError(state, "Rotary HX Speed Modulation or Plate Bypass for Temperature Control for ");
-                    ShowContinueError(state, thisExchanger.Name + " must be set to Yes or No");
+                    ShowContinueError(state, format("{} must be set to Yes or No", thisExchanger.Name));
                     ErrorsFound = true;
                 }
             }

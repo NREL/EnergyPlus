@@ -146,7 +146,7 @@ void SimulateFanComponents(EnergyPlusData &state,
     if (CompIndex == 0) {
         FanNum = UtilityRoutines::FindItemInList(CompName, Fan, &FanEquipConditions::FanName);
         if (FanNum == 0) {
-            ShowFatalError(state, "SimulateFanComponents: Fan not found=" + std::string{CompName});
+            ShowFatalError(state, format("SimulateFanComponents: Fan not found={}", CompName));
         }
         CompIndex = FanNum;
     } else {
@@ -353,8 +353,13 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
-                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaFieldNames(2),
+                                       cAlphaArgs(2),
+                                       cAlphaFieldNames(1),
+                                       cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -365,8 +370,9 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).MaxAirFlowRate = rNumericArgs(3);
         if (Fan(FanNum).MaxAirFlowRate == 0.0) {
             ShowWarningError(state,
-                             cCurrentModuleObject + "=\"" + Fan(FanNum).FanName +
-                                 "\" has specified 0.0 max air flow rate. It will not be used in the simulation.");
+                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
+                                    cCurrentModuleObject,
+                                    Fan(FanNum).FanName));
         }
         Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
         Fan(FanNum).MotEff = rNumericArgs(4);
@@ -432,8 +438,13 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
-                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaFieldNames(2),
+                                       cAlphaArgs(2),
+                                       cAlphaFieldNames(1),
+                                       cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -444,8 +455,9 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).MaxAirFlowRate = rNumericArgs(3);
         if (Fan(FanNum).MaxAirFlowRate == 0.0) {
             ShowWarningError(state,
-                             cCurrentModuleObject + "=\"" + Fan(FanNum).FanName +
-                                 "\" has specified 0.0 max air flow rate. It will not be used in the simulation.");
+                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
+                                    cCurrentModuleObject,
+                                    Fan(FanNum).FanName));
         }
         Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
         if (UtilityRoutines::SameString(cAlphaArgs(3), "Fraction")) {
@@ -453,8 +465,8 @@ void GetFanInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(cAlphaArgs(3), "FixedFlowRate")) {
             Fan(FanNum).FanMinAirFracMethod = FixedMin;
         } else {
-            ShowSevereError(state, cAlphaFieldNames(3) + " should be either Fraction or FixedFlowRate.");
-            ShowContinueError(state, "Occurs in " + Fan(FanNum).FanName + " object.");
+            ShowSevereError(state, format("{} should be either Fraction or FixedFlowRate.", cAlphaFieldNames(3)));
+            ShowContinueError(state, format("Occurs in {} object.", Fan(FanNum).FanName));
             ErrorsFound = true;
         }
         //        Fan(FanNum)%MinAirFlowRate= rNumericArgs(4)
@@ -470,7 +482,7 @@ void GetFanInput(EnergyPlusData &state)
         if (Fan(FanNum).FanCoeff(1) == 0.0 && Fan(FanNum).FanCoeff(2) == 0.0 && Fan(FanNum).FanCoeff(3) == 0.0 && Fan(FanNum).FanCoeff(4) == 0.0 &&
             Fan(FanNum).FanCoeff(5) == 0.0) {
             ShowWarningError(state, "Fan Coefficients are all zero.  No Fan power will be reported.");
-            ShowContinueError(state, "For " + cCurrentModuleObject + ", Fan=" + cAlphaArgs(1));
+            ShowContinueError(state, format("For {}, Fan={}", cCurrentModuleObject, cAlphaArgs(1)));
         }
         Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
                                                      cAlphaArgs(4),
@@ -531,14 +543,21 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
-                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaFieldNames(2),
+                                       cAlphaArgs(2),
+                                       cAlphaFieldNames(1),
+                                       cAlphaArgs(1)));
                 ErrorsFound = true;
             } else {
                 if (HasFractionalScheduleValue(state, Fan(FanNum).AvailSchedPtrNum)) {
                     ShowWarningError(state,
-                                     cCurrentModuleObject + "=\"" + Fan(FanNum).FanName + "\" has fractional values in Schedule=" + cAlphaArgs(2) +
-                                         ". Only 0.0 in the schedule value turns the fan off.");
+                                     format("{}=\"{}\" has fractional values in Schedule={}. Only 0.0 in the schedule value turns the fan off.",
+                                            cCurrentModuleObject,
+                                            Fan(FanNum).FanName,
+                                            cAlphaArgs(2)));
                 }
             }
         }
@@ -556,8 +575,9 @@ void GetFanInput(EnergyPlusData &state)
 
         if (Fan(FanNum).MaxAirFlowRate == 0.0) {
             ShowWarningError(state,
-                             cCurrentModuleObject + "=\"" + Fan(FanNum).FanName +
-                                 "\" has specified 0.0 max air flow rate. It will not be used in the simulation.");
+                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
+                                    cCurrentModuleObject,
+                                    Fan(FanNum).FanName));
         }
 
         Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
@@ -589,15 +609,24 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).FlowFractSchedNum = GetScheduleIndex(state, cAlphaArgs(6));
             if (Fan(FanNum).FlowFractSchedNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " entered =" + cAlphaArgs(6) +
-                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaFieldNames(6),
+                                       cAlphaArgs(6),
+                                       cAlphaFieldNames(1),
+                                       cAlphaArgs(1)));
                 ErrorsFound = true;
             } else if (Fan(FanNum).FlowFractSchedNum > 0) {
                 if (!CheckScheduleValueMinMax(state, Fan(FanNum).FlowFractSchedNum, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " for " +
-                                        cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                    ShowContinueError(state, "Error found in " + cAlphaFieldNames(6) + " = " + cAlphaArgs(6));
+                                    format("{}{}: invalid {} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           cAlphaFieldNames(6),
+                                           cAlphaFieldNames(1),
+                                           cAlphaArgs(1)));
+                    ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(6), cAlphaArgs(6)));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
                 }
@@ -610,8 +639,13 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).AvailManagerMode = static_cast<AvailabilityManagerCoupling>(getEnumerationValue(couplingsUC, cAlphaArgs(7)));
             if (Fan(FanNum).AvailManagerMode == AvailabilityManagerCoupling::Invalid) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) +
-                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaFieldNames(7),
+                                       cAlphaArgs(7),
+                                       cAlphaFieldNames(1),
+                                       cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         } else {
@@ -622,8 +656,13 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).MinTempLimitSchedNum = GetScheduleIndex(state, cAlphaArgs(8));
             if (Fan(FanNum).MinTempLimitSchedNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(8) + " entered =" + cAlphaArgs(8) +
-                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaFieldNames(8),
+                                       cAlphaArgs(8),
+                                       cAlphaFieldNames(1),
+                                       cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         } else {
@@ -635,8 +674,13 @@ void GetFanInput(EnergyPlusData &state)
             if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) {
                 // do not include adjusted for "balanced" exhaust flow in the zone total return calculation
                 ShowWarningError(state,
-                                 std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) +
-                                     " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                 format("{}{}: invalid {} = {} for {}={}",
+                                        RoutineName,
+                                        cCurrentModuleObject,
+                                        cAlphaFieldNames(9),
+                                        cAlphaArgs(9),
+                                        cAlphaFieldNames(1),
+                                        cAlphaArgs(1)));
                 ShowContinueError(state, "When zone air mass flow balance is enforced, this input field should be left blank.");
                 ShowContinueError(state, "This schedule will be ignored in the simulation.");
                 Fan(FanNum).BalancedFractSchedNum = 0;
@@ -644,15 +688,24 @@ void GetFanInput(EnergyPlusData &state)
                 Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(state, cAlphaArgs(9));
                 if (Fan(FanNum).BalancedFractSchedNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) +
-                                        " entered =" + cAlphaArgs(9) + " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                    format("{}{}: invalid {} entered ={} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           cAlphaFieldNames(9),
+                                           cAlphaArgs(9),
+                                           cAlphaFieldNames(1),
+                                           cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (Fan(FanNum).BalancedFractSchedNum > 0) {
                     if (!CheckScheduleValueMinMax(state, Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " +
-                                            cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
+                                        format("{}{}: invalid {} for {}={}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               cAlphaFieldNames(9),
+                                               cAlphaFieldNames(1),
+                                               cAlphaArgs(1)));
+                        ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(9), cAlphaArgs(9)));
                         ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                         ErrorsFound = true;
                     }
@@ -694,8 +747,13 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
-                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaFieldNames(2),
+                                       cAlphaArgs(2),
+                                       cAlphaFieldNames(1),
+                                       cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -706,8 +764,9 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).MaxAirFlowRate = rNumericArgs(3);
         if (Fan(FanNum).MaxAirFlowRate == 0.0) {
             ShowWarningError(state,
-                             cCurrentModuleObject + "=\"" + Fan(FanNum).FanName +
-                                 "\" has specified 0.0 max air flow rate. It will not be used in the simulation.");
+                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
+                                    cCurrentModuleObject,
+                                    Fan(FanNum).FanName));
         }
         Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
         //       the following two structure variables are set here, as well as in InitFan, for the Heat Pump:Water Heater object
@@ -802,7 +861,7 @@ void GetFanInput(EnergyPlusData &state)
             }
         }
         if (!NVPerfFanFound) {
-            ShowSevereError(state, cCurrentModuleObject + ", fan name not found=" + cAlphaArgs(1));
+            ShowSevereError(state, format("{}, fan name not found={}", cCurrentModuleObject, cAlphaArgs(1)));
             ErrorsFound = true;
         }
     }
@@ -860,8 +919,13 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(4));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4) + " entered =" + cAlphaArgs(4) +
-                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                format("{}{}: invalid {} entered ={} for {}={}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaFieldNames(4),
+                                       cAlphaArgs(4),
+                                       cAlphaFieldNames(1),
+                                       cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -871,8 +935,9 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).MaxAirFlowRate = rNumericArgs(1);
         if (Fan(FanNum).MaxAirFlowRate == 0.0) {
             ShowWarningError(state,
-                             cCurrentModuleObject + "=\"" + Fan(FanNum).FanName +
-                                 "\" has specified 0.0 max air flow rate. It will not be used in the simulation.");
+                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
+                                    cCurrentModuleObject,
+                                    Fan(FanNum).FanName));
         }
         Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
         Fan(FanNum).MinAirFlowRate = rNumericArgs(2);
@@ -929,24 +994,24 @@ void GetFanInput(EnergyPlusData &state)
             if (Fan(FanNum).InletNodeNum == Fan(checkNum).InletNodeNum) {
                 ErrorsFound = true;
                 ShowSevereError(state, "GetFanInput, duplicate fan inlet node names, must be unique for fans.");
-                ShowContinueError(state,
-                                  "Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
-                                      Fan(checkNum).FanName + '.');
-                ShowContinueError(state, "Inlet Node Name=\"" + state.dataLoopNodes->NodeID(Fan(FanNum).InletNodeNum) + "\".");
+                ShowContinueError(
+                    state,
+                    format("Fan={}:{} and Fan={}:{}.", Fan(FanNum).FanType, Fan(FanNum).FanName, Fan(checkNum).FanType, Fan(checkNum).FanName));
+                ShowContinueError(state, format("Inlet Node Name=\"{}\".", state.dataLoopNodes->NodeID(Fan(FanNum).InletNodeNum)));
             }
             if (Fan(FanNum).OutletNodeNum == Fan(checkNum).OutletNodeNum) {
                 ErrorsFound = true;
                 ShowSevereError(state, "GetFanInput, duplicate fan outlet node names, must be unique for fans.");
-                ShowContinueError(state,
-                                  "Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
-                                      Fan(checkNum).FanName + '.');
-                ShowContinueError(state, "Outlet Node Name=\"" + state.dataLoopNodes->NodeID(Fan(FanNum).OutletNodeNum) + "\".");
+                ShowContinueError(
+                    state,
+                    format("Fan={}:{} and Fan={}:{}.", Fan(FanNum).FanType, Fan(FanNum).FanName, Fan(checkNum).FanType, Fan(checkNum).FanName));
+                ShowContinueError(state, format("Outlet Node Name=\"{}\".", state.dataLoopNodes->NodeID(Fan(FanNum).OutletNodeNum)));
             }
         }
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Program terminates.");
+        ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
     }
 
     for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
@@ -1106,8 +1171,9 @@ void InitFan(EnergyPlusData &state,
             if (!UtilityRoutines::SameString(Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
             if (CheckZoneEquipmentList(state, Fan(Loop).FanType, Fan(Loop).FanName)) continue;
             ShowSevereError(state,
-                            "InitFans: Fan=[" + Fan(Loop).FanType + ',' + Fan(Loop).FanName +
-                                "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                            format("InitFans: Fan=[{},{}] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.",
+                                   Fan(Loop).FanType,
+                                   Fan(Loop).FanName));
         }
     }
 
@@ -1358,8 +1424,9 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         // Check for inconsistent drive ratio and motor speed, and report design fan speed with warning
         if (MotorSpeed > (Fan(FanNum).MotorMaxSpd + 1.e-5)) {
             ShowWarningError(state,
-                             "Drive ratio for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
-                                 " is too low at design conditions -- check motor speed and drive ratio inputs");
+                             format("Drive ratio for {}: {} is too low at design conditions -- check motor speed and drive ratio inputs",
+                                    Fan(FanNum).FanType,
+                                    Fan(FanNum).FanName));
             ShowContinueError(state, format("...Design fan speed [rev/min]: {:.2R}", Fan(FanNum).FanSpd));
         }
 
@@ -1375,7 +1442,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         // Check for undersized belt and report design size with warning
         if (Fan(FanNum).FanTrq > (Fan(FanNum).BeltMaxTorque + 1.e-5)) {
             ShowWarningError(
-                state, "Belt for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName + " is undersized at design conditions -- check belt inputs");
+                state, format("Belt for {}: {} is undersized at design conditions -- check belt inputs", Fan(FanNum).FanType, Fan(FanNum).FanName));
             ShowContinueError(state, format("...Design belt output torque (without oversizing) [Nm]: {:.2R}", Fan(FanNum).FanTrq));
         }
 
@@ -1417,7 +1484,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         // Check for undersized motor and report design size with warning
         if (Fan(FanNum).BeltInputPower > (Fan(FanNum).MotorMaxOutPwr + 1.e-5)) {
             ShowWarningError(
-                state, "Motor for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName + " is undersized at design conditions -- check motor inputs");
+                state, format("Motor for {}: {} is undersized at design conditions -- check motor inputs", Fan(FanNum).FanType, Fan(FanNum).FanName));
             ShowContinueError(state, format("...Design motor output power (without oversizing) [W]: {:.2R}", Fan(FanNum).BeltInputPower));
         }
 
@@ -1457,9 +1524,9 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
                 // Check for undersized VFD and report design size with warning
                 if (Fan(FanNum).MotorInputPower > (Fan(FanNum).VFDMaxOutPwr + 1.e-5)) {
-                    ShowWarningError(state,
-                                     "VFD for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
-                                         " is undersized at design conditions -- check VFD inputs");
+                    ShowWarningError(
+                        state,
+                        format("VFD for {}: {} is undersized at design conditions -- check VFD inputs", Fan(FanNum).FanType, Fan(FanNum).FanName));
                     ShowContinueError(state, format("...Design VFD output power (without oversizing) [W]: {:.2R}", Fan(FanNum).MotorInputPower));
                 }
 
@@ -1532,13 +1599,15 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Check fault availability schedules
         if (!state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
-            ShowSevereError(state, "FaultModel:Fouling:AirFilter = \"" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name + "\"");
+            ShowSevereError(state,
+                            format("FaultModel:Fouling:AirFilter = \"{}\"", state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name));
             ShowContinueError(state,
-                              "Invalid Fan Curve Name = \"" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve +
-                                  "\" does not cover ");
-            ShowContinueError(state, "the operational point of Fan " + Fan(FanNum).FanName);
-            ShowFatalError(state,
-                           "SizeFan: Invalid FaultModel:Fouling:AirFilter=" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name);
+                              format("Invalid Fan Curve Name = \"{}\" does not cover ",
+                                     state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve));
+            ShowContinueError(state, format("the operational point of Fan {}", Fan(FanNum).FanName));
+            ShowFatalError(
+                state,
+                format("SizeFan: Invalid FaultModel:Fouling:AirFilter={}", state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name));
         }
     }
 
@@ -1985,7 +2054,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
                 SpeedRaisedToPower = CurveValue(state, Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
                 if (SpeedRaisedToPower < 0.0) {
                     if (Fan(FanNum).OneTimePowerRatioCheck && !state.dataGlobal->WarmupFlag) {
-                        ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
+                        ShowSevereError(state, format("{} = {}\"", cFanTypes(Fan(FanNum).FanType_Num), Fan(FanNum).FanName));
                         ShowContinueError(state, "Error in Fan Power Ratio curve. Curve output less than 0.0.");
                         ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", SpeedRaisedToPower, SpeedRatio));
                         ShowContinueError(state, "Check curve coefficients to ensure proper power ratio as a function of fan speed ratio.");
@@ -1999,7 +2068,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
                     EffRatioAtSpeedRatio = CurveValue(state, Fan(FanNum).FanEffRatioCurveIndex, SpeedRatio);
                     if (EffRatioAtSpeedRatio < 0.01) {
                         if (Fan(FanNum).OneTimeEffRatioCheck && !state.dataGlobal->WarmupFlag) {
-                            ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
+                            ShowSevereError(state, format("{} = {}\"", cFanTypes(Fan(FanNum).FanType_Num), Fan(FanNum).FanName));
                             ShowContinueError(state, "Error in Fan Efficiency Ratio curve. Curve output less than 0.01.");
                             ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", EffRatioAtSpeedRatio, SpeedRatio));
                             ShowContinueError(state, "Check curve coefficients to ensure proper efficiency ratio as a function of fan speed ratio.");
@@ -2502,7 +2571,7 @@ void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanInde
         if (!ThisObjectType.empty()) {
             ShowSevereError(state, fmt::format("{}, GetFanIndex: Fan not found={}", ThisObjectType, FanName));
         } else {
-            ShowSevereError(state, "GetFanIndex: Fan not found=" + FanName);
+            ShowSevereError(state, format("GetFanIndex: Fan not found={}", FanName));
         }
         ErrorsFound = true;
     }
@@ -2583,7 +2652,7 @@ void GetFanType(EnergyPlusData &state,
         } else if (!ThisObjectType.empty()) {
             ShowSevereError(state, fmt::format("{}, GetFanType: Fan not found={}", ThisObjectType, FanName));
         } else {
-            ShowSevereError(state, "GetFanType: Fan not found=" + FanName);
+            ShowSevereError(state, format("GetFanType: Fan not found={}", FanName));
         }
         FanType = 0;
         ErrorsFound = true;
@@ -2632,8 +2701,7 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
         if (WhichFan != 0) {
             DesignVolumeFlowRate = Fan(WhichFan).MaxAirFlowRate;
         } else {
-            ShowSevereError(
-                state, "GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + std::string{FanType} + "\" Name=\"" + std::string{FanName} + "\"");
+            ShowSevereError(state, format("GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
             ShowContinueError(state, "... Design Volume Flow rate returned as -1000.");
             ErrorsFound = true;
             DesignVolumeFlowRate = -1000.0;
@@ -2679,7 +2747,7 @@ int GetFanInletNode(EnergyPlusData &state,
     if (WhichFan != 0) {
         NodeNumber = Fan(WhichFan).InletNodeNum;
     } else {
-        ShowSevereError(state, "GetFanInletNode: Could not find Fan, Type=\"" + std::string{FanType} + "\" Name=\"" + std::string{FanName} + "\"");
+        ShowSevereError(state, format("GetFanInletNode: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
         ErrorsFound = true;
         NodeNumber = 0;
     }
@@ -2749,7 +2817,7 @@ int GetFanOutletNode(EnergyPlusData &state,
     if (WhichFan != 0) {
         NodeNumber = Fan(WhichFan).OutletNodeNum;
     } else {
-        ShowSevereError(state, "GetFanOutletNode: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+        ShowSevereError(state, format("GetFanOutletNode: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
         ErrorsFound = true;
         NodeNumber = 0;
     }
@@ -2793,7 +2861,7 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
     if (WhichFan != 0) {
         FanAvailSchPtr = Fan(WhichFan).AvailSchedPtrNum;
     } else {
-        ShowSevereError(state, "GetFanAvailSchPtr: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+        ShowSevereError(state, format("GetFanAvailSchPtr: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
         ErrorsFound = true;
         FanAvailSchPtr = 0;
     }
@@ -2849,7 +2917,7 @@ int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
     if (WhichFan != 0) {
         FanSpeedRatioCurveIndex = Fan(WhichFan).FanPowerRatAtSpeedRatCurveIndex;
     } else {
-        ShowSevereError(state, "GetFanSpeedRatioCurveIndex: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+        ShowSevereError(state, format("GetFanSpeedRatioCurveIndex: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
         FanSpeedRatioCurveIndex = 0;
     }
 
@@ -2894,7 +2962,7 @@ void SetFanData(EnergyPlusData &state,
     }
 
     if (WhichFan <= 0 || WhichFan > state.dataFans->NumFans) {
-        ShowSevereError(state, "SetFanData: Could not find fan = \"" + FanName + "\"");
+        ShowSevereError(state, format("SetFanData: Could not find fan = \"{}\"", FanName));
         ErrorsFound = true;
         return;
     }
@@ -2990,7 +3058,7 @@ Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
     // Check whether the fan curve covers the design operational point of the fan
     FanCalDeltaPress = CurveValue(state, FanCurvePtr, FanDesignAirFlowRate);
     if ((FanCalDeltaPress < 0.9 * FanDesignDeltaPress) || (FanCalDeltaPress > 1.1 * FanDesignDeltaPress)) {
-        ShowWarningError(state, "The design operational point of the fan " + FanName + " does not fall ");
+        ShowWarningError(state, format("The design operational point of the fan {} does not fall ", FanName));
         ShowContinueError(state, "on the fan curve provided in the FaultModel:Fouling:AirFilter object. ");
         return 0.0;
     }
@@ -3005,9 +3073,9 @@ Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
         FanCalDeltaPresstemp = CurveValue(state, FanCurvePtr, FanFaultyAirFlowRate);
 
         if ((FanCalDeltaPresstemp <= FanCalDeltaPress) ||
-            (FanFaultyAirFlowRate <= state.dataCurveManager->PerfCurve(FanCurvePtr).inputLimits[0].min)) {
+            (FanFaultyAirFlowRate <= state.dataCurveManager->PerfCurve(FanCurvePtr)->inputLimits[0].min)) {
             // The new operational point of the fan go beyond the fan selection range
-            ShowWarningError(state, "The operational point of the fan " + FanName + " may go beyond the fan selection ");
+            ShowWarningError(state, format("The operational point of the fan {} may go beyond the fan selection ", FanName));
             ShowContinueError(state, "range in the faulty fouling air filter cases");
             break;
         }
