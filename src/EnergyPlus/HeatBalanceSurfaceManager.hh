@@ -91,6 +91,10 @@ namespace HeatBalanceSurfaceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
+    void MaterialAddOnOverrideByType(EnergyPlusData &state, EPVector<Material::VariableAbsAddOn> &addOnVec, Array1D<Real64> &arrayToBeOverride);
+
+    void MaterialAddOnOverride(EnergyPlusData &state);
+
     void InitSurfaceHeatBalance(EnergyPlusData &state);
 
     void GatherForPredefinedReport(EnergyPlusData &state);

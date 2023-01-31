@@ -2831,21 +2831,7 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_vie
         }
     }
 
-    int surfIdx = GetSurfNumFromMaterial(state, thisMaterial->Name);
-    if (surfIdx < 0) {
-        ShowSevereError(state, format("cannot find an exterior surface associated with material {}\n", thisMaterial->Name));
-        errorsFound = true;
-        return;
-    }
-    int zoneIdx = state.dataSurface->Surface(surfIdx).Zone;
-    if (zoneIdx < 0) {
-        ShowSevereError(state, format("cannot find a zone associated with material {}\n", thisMaterial->Name));
-        errorsFound = true;
-        return;
-    }
-
-    // Once the material derived type number is found then load the additional CondFD variable material properties
-    //   Some or all may be zero (default).  They will be checked when calculating node temperatures
+    std::vector<int> surfList = GetSurfNumListFromMaterial(state, alphas(2));
     if (addOnType == "Thermal") {
         auto &thisAbsAddOn = state.dataMaterial->variableThermalAbsAddOns(i);
         thisAbsAddOn.Name = alphas(1);
@@ -2854,10 +2840,9 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_vie
         thisAbsAddOn.ControlSignal = controlSignal;
         thisAbsAddOn.FunctionName = alphas(4);
         thisAbsAddOn.FunctionIdx = functionIdx;
-        thisAbsAddOn.SurfIdx = surfIdx;
-        thisAbsAddOn.ZoneIdx = zoneIdx;
         thisAbsAddOn.ScheduleName = alphas(5);
         thisAbsAddOn.ScheduleIdx = scheduleIdx;
+        thisAbsAddOn.SurfList = surfList;
     } else if (addOnType == "Solar") {
         auto &thisAbsAddOn = state.dataMaterial->variableSolarAbsAddOns(i);
         thisAbsAddOn.Name = alphas(1);
@@ -2866,10 +2851,9 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_vie
         thisAbsAddOn.ControlSignal = controlSignal;
         thisAbsAddOn.FunctionName = alphas(4);
         thisAbsAddOn.FunctionIdx = functionIdx;
-        thisAbsAddOn.SurfIdx = surfIdx;
-        thisAbsAddOn.ZoneIdx = zoneIdx;
         thisAbsAddOn.ScheduleName = alphas(5);
         thisAbsAddOn.ScheduleIdx = scheduleIdx;
+        thisAbsAddOn.SurfList = surfList;
     }
 }
 
@@ -2897,82 +2881,24 @@ void GetVariableSolarAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
     }
 }
 
-void GetMaterialAddOnData(EnergyPlusData &state, bool &errorsFound)
+void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound)
 {
     GetVariableThermalAbsorptanceInput(state, errorsFound);
     GetVariableSolarAbsorptanceInput(state, errorsFound);
 }
 
-// assume only one matching surface
-int GetSurfNumFromMaterial(EnergyPlusData &state, std::string_view materialName)
+std::vector<int> GetSurfNumListFromMaterial(EnergyPlusData &state, std::string_view materialName)
 {
-    // fixme: debug print
-    for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; surfNum++) {
-        fmt::print("surf {}={}\n", surfNum, state.dataSurface->Surface(surfNum).Name);
-    }
+    std::vector<int> acc;
     for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; surfNum++) {
         if (state.dataSurface->Surface(surfNum).ExtBoundCond == DataSurfaces::ExternalEnvironment) {
             auto const &thisConstruct = state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction);
             if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Name == materialName) {
-                return surfNum;
+                acc.push_back(surfNum);
             }
         }
     }
-    return -1;
-}
-
-Real64 GetMaterialOverrideValue(EnergyPlusData &state, const VariableAbsAddOn &thisAbsAddOn)
-{
-    // yujie: fixme: add initial values when surface temperature, zone load etc. are not available
-    int surfNum = thisAbsAddOn.SurfIdx;
-    int zoneNum = thisAbsAddOn.ZoneIdx;
-    if (thisAbsAddOn.ControlSignal == VariableAbsCtrlSignal::Scheduled) {
-        return ScheduleManager::GetCurrentScheduleValue(state, thisAbsAddOn.ScheduleIdx);
-    } else {
-        Real64 triggerValue;
-        if (thisAbsAddOn.ControlSignal == VariableAbsCtrlSignal::SurfaceTemperature) {
-            triggerValue = state.dataEnvrn->OutDryBulbTemp;
-            if (isize(state.dataHeatBalSurf->SurfTempOut) > 0) { // surface data structure not set up yet
-                triggerValue = state.dataHeatBalSurf->SurfTempOut(surfNum);
-            }
-        } else if (thisAbsAddOn.ControlSignal == VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation) {
-            triggerValue = state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad;
-            if (isize(state.dataHeatBal->SurfQRadSWOutIncident) > 0) { // surface data structure not set up yet
-                triggerValue = state.dataHeatBal->SurfQRadSWOutIncident(surfNum);
-            }
-        } else { // controlled by heating cooling mode
-            triggerValue = 0.0;
-            if (isize(state.dataZoneEnergyDemand->ZoneSysEnergyDemand) > 0) {
-                bool isCooling = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).TotalOutputRequired < 0);
-                triggerValue = static_cast<Real64>(isCooling);
-            }
-        }
-        return Curve::CurveValue(state, thisAbsAddOn.FunctionIdx, triggerValue);
-    }
-}
-
-void MaterialAddOnOverride(EnergyPlusData &state)
-{
-    if (state.dataMaterial->TotVariableThermalAbsAddOns > 0) {
-        for (auto &thisAbsAddOn : state.dataMaterial->variableThermalAbsAddOns) {
-            auto &thisMaterial = state.dataMaterial->Material(thisAbsAddOn.MaterialIdx);
-            thisMaterial->AbsorpThermalMatAddOnOverrideOn = true;
-            if (thisAbsAddOn.FunctionIdx > 0) {
-                thisMaterial->AbsorpThermalMatAddOnOverride = GetMaterialOverrideValue(state, thisAbsAddOn);
-                thisMaterial->AbsorpThermal = max(min(thisMaterial->AbsorpThermalMatAddOnOverride, 0.9999), 0.0001);
-            }
-        }
-    }
-    if (state.dataMaterial->TotVariableSolarAbsAddOns > 0) {
-        for (auto &thisAbsAddOn : state.dataMaterial->variableSolarAbsAddOns) {
-            auto &thisMaterial = state.dataMaterial->Material(thisAbsAddOn.MaterialIdx);
-            thisMaterial->AbsorpSolarMatAddOnOverrideOn = true;
-            if (thisAbsAddOn.FunctionIdx > 0) {
-                thisMaterial->AbsorpSolarMatAddOnOverride = GetMaterialOverrideValue(state, thisAbsAddOn);
-                thisMaterial->AbsorpSolar = max(min(thisMaterial->AbsorpSolarMatAddOnOverride, 0.9999), 0.0001);
-            }
-        }
-    }
+    return acc;
 }
 
 } // namespace EnergyPlus::Material
