@@ -1673,7 +1673,14 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             }
         } else if (state.dataSize->ZoneEqFanCoil) {
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                Real64 desOAFlowFrac = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatOAFlowFrac;
+                Real64 desOAFlowFrac = 0.0;
+                if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
+                    desOAFlowFrac = std::min(state.dataEnvrn->StdRhoAir * ZoneEqSizing(curZoneEqNum).OAVolFlow /
+                                                 state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatMassFlow,
+                                             1.0);
+                } else {
+                    desOAFlowFrac = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatOAFlowFrac;
+                }
                 c->coilDesEntTemp = desOAFlowFrac * state.dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak +
                                     (1.0 - desOAFlowFrac) * state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak;
                 c->coilDesEntHumRat = desOAFlowFrac * state.dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak +
