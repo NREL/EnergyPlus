@@ -3164,7 +3164,7 @@ namespace UnitarySystems {
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_DesignHeatingCapacity = DataSizing::AutoSize;
-                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple)
+                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
                     // adjusted cooling coil capacity
                     WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                                     blankString,
@@ -3179,12 +3179,13 @@ namespace UnitarySystems {
                                                                     DataHVACGlobals::CompressorOperation::Off,
                                                                     0.0,
                                                                     FirstHVACIteration);
-                state.dataSize->DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(
-                    state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
-                EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
-                state.dataSize->DataFractionUsedForSizing = 1.0;
-                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
-                this->m_DesignCoolingCapacity = DataSizing::AutoSize;
+                    state.dataSize->DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(
+                        state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
+                    EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
+                    state.dataSize->DataFractionUsedForSizing = 1.0;
+                    SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                    this->m_DesignCoolingCapacity = DataSizing::AutoSize;
+                }
             }
 
             TempSize = this->m_DesignHeatingCapacity;
