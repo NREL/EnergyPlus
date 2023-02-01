@@ -2639,7 +2639,8 @@ namespace UnitarySystems {
 
             newCoil.size(state);
             if (MSHPIndex == -1) {
-                for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
+                // Gotta loop backwards since we may try to access the last element when there are no fans
+                for (Iter = this->m_NumOfSpeedCooling; Iter >= 1; --Iter) {
                     this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
                     this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
                     // it seems the ratio should reference the actual flow rates, not the fan flow ???
