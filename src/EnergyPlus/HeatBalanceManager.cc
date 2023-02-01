@@ -331,6 +331,8 @@ namespace HeatBalanceManager {
         // need surface data to be set up before these add-on can be constructed
         Material::GetMaterialAddOnInput(state, ErrorsFound); // Read variable thermal and solar absorptance addon data
 
+        Material::GetAddOnOverrideSurfaceList(state);
+
         GetIncidentSolarMultiplier(state, ErrorsFound);
 
         // Added SV 6/26/2013 to load scheduled surface gains

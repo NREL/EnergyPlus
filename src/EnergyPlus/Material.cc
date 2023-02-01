@@ -2795,7 +2795,7 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_vie
         errorsFound = true;
         return;
     }
-    auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
+    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
 
     if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
         ShowSevereError(state,
@@ -2809,8 +2809,8 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_vie
         return;
     }
 
-    Material::VariableAbsCtrlSignal controlSignal =
-        static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
+    Material::VariableAbsCtrlSignal controlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature; // default value
+    controlSignal = static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
     int functionIdx = -1;
     int scheduleIdx = -1;
     if (controlSignal == VariableAbsCtrlSignal::Scheduled) {
@@ -2830,53 +2830,30 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_vie
         }
     }
 
-    std::vector<int> surfList = GetSurfNumListFromMaterial(state, alphas(2));
     if (addOnType == "Thermal") {
-        auto &thisAbsAddOn = state.dataMaterial->variableThermalAbsAddOns(i);
-        thisAbsAddOn.Name = alphas(1);
-        thisAbsAddOn.MaterialName = alphas(2);
-        thisAbsAddOn.MaterialIdx = MaterNum;
-        thisAbsAddOn.ControlSignal = controlSignal;
-        thisAbsAddOn.FunctionName = alphas(4);
-        thisAbsAddOn.FunctionIdx = functionIdx;
-        thisAbsAddOn.ScheduleName = alphas(5);
-        thisAbsAddOn.ScheduleIdx = scheduleIdx;
-        thisAbsAddOn.SurfList = surfList;
+        thisMaterial->variableThermalAbsorptanceCtrlSignal = controlSignal;
+        thisMaterial->variableThermalAbsporptanceScheduleIdx = scheduleIdx;
+        thisMaterial->variableThermalAbsorptanceFunctionIdx = functionIdx;
     } else if (addOnType == "Solar") {
-        auto &thisAbsAddOn = state.dataMaterial->variableSolarAbsAddOns(i);
-        thisAbsAddOn.Name = alphas(1);
-        thisAbsAddOn.MaterialName = alphas(2);
-        thisAbsAddOn.MaterialIdx = MaterNum;
-        thisAbsAddOn.ControlSignal = controlSignal;
-        thisAbsAddOn.FunctionName = alphas(4);
-        thisAbsAddOn.FunctionIdx = functionIdx;
-        thisAbsAddOn.ScheduleName = alphas(5);
-        thisAbsAddOn.ScheduleIdx = scheduleIdx;
-        thisAbsAddOn.SurfList = surfList;
+        thisMaterial->variableSolarAbsorptanceCtrlSignal = controlSignal;
+        thisMaterial->variableSolarAbsporptanceScheduleIdx = scheduleIdx;
+        thisMaterial->variableSolarAbsorptanceFunctionIdx = functionIdx;
     }
 }
 
 void GetVariableThermalAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 {
     int numVariThermalAbs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalAbsorptance");
-    if (numVariThermalAbs > 0) { //  Get Variable Thermal Absorptance Material Info
-        state.dataMaterial->TotVariableThermalAbsAddOns = numVariThermalAbs;
-        state.dataMaterial->variableThermalAbsAddOns.allocate(numVariThermalAbs);
-        for (int i = 1; i <= numVariThermalAbs; ++i) {
-            ReadingOneMaterialAddOn(state, i, "Thermal", errorsFound);
-        }
+    for (int i = 1; i <= numVariThermalAbs; ++i) {
+        ReadingOneMaterialAddOn(state, i, "Thermal", errorsFound);
     }
 }
 
 void GetVariableSolarAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 {
     int numVariSolarAbs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableSolarAbsorptance");
-    state.dataMaterial->TotVariableSolarAbsAddOns = numVariSolarAbs;
-    state.dataMaterial->variableSolarAbsAddOns.allocate(numVariSolarAbs);
-    if (numVariSolarAbs > 0) { //  Get Variable Thermal Absorptance Material Info
-        for (int i = 1; i <= numVariSolarAbs; ++i) {
-            ReadingOneMaterialAddOn(state, i, "Solar", errorsFound);
-        }
+    for (int i = 1; i <= numVariSolarAbs; ++i) {
+        ReadingOneMaterialAddOn(state, i, "Solar", errorsFound);
     }
 }
 
@@ -2886,18 +2863,29 @@ void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound)
     GetVariableSolarAbsorptanceInput(state, errorsFound);
 }
 
-std::vector<int> GetSurfNumListFromMaterial(EnergyPlusData &state, std::string_view materialName)
+int GetMaterialNumFromSurfNum(EnergyPlusData &state, int surfNum)
 {
-    std::vector<int> acc;
-    for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; surfNum++) {
-        if (state.dataSurface->Surface(surfNum).ExtBoundCond == DataSurfaces::ExternalEnvironment) {
-            auto const &thisConstruct = state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction);
-            if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Name == materialName) {
-                acc.push_back(surfNum);
-            }
+    int ConstrNum = state.dataSurface->Surface(surfNum).Construction;
+    if (ConstrNum <= 0) return 0;
+    auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+    int TotLayers = thisConstruct.TotLayers;
+    if (TotLayers == 0) return 0;
+    return thisConstruct.LayerPoint(1);
+}
+
+void GetAddOnOverrideSurfaceList(EnergyPlusData &state)
+{
+    for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
+        int materNum = GetMaterialNumFromSurfNum(state, surfNum);
+        if (materNum == 0) return; // error finding material number
+        auto const *thisMaterial = state.dataMaterial->Material(materNum);
+        if (thisMaterial->variableThermalAbsorptanceCtrlSignal != VariableAbsCtrlSignal::Invalid) {
+            state.dataSurface->AllVaryThermalAbsOpaqSurfaceList.push_back(surfNum);
+        }
+        if (thisMaterial->variableSolarAbsorptanceCtrlSignal != VariableAbsCtrlSignal::Invalid) {
+            state.dataSurface->AllVarySolarAbsOpaqSurfaceList.push_back(surfNum);
         }
     }
-    return acc;
 }
 
 } // namespace EnergyPlus::Material

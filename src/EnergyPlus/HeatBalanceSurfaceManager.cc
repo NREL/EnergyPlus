@@ -249,50 +249,50 @@ void ManageSurfaceHeatBalance(EnergyPlusData &state)
 // Beginning Initialization Section of the Module
 //******************************************************************************
 
-void MaterialAddOnOverrideByType(EnergyPlusData &state, EPVector<Material::VariableAbsAddOn> &addOnVec, Array1D<Real64> &arrayToBeOverride)
+Real64 GetSurfAddOnOverrideValue(EnergyPlusData &state, int surfNum, Material::VariableAbsCtrlSignal controlSignal, int scheduleIdx, int functionIdx)
 {
-    for (auto &thisAbsAddOn : addOnVec) {
-        Real64 overrideValue;
-        if (thisAbsAddOn.ControlSignal == Material::VariableAbsCtrlSignal::Scheduled) {
-            overrideValue = ScheduleManager::GetCurrentScheduleValue(state, thisAbsAddOn.ScheduleIdx);
-            overrideValue = max(min(overrideValue, 0.9999), 0.0001);
-            for (int surfNum : thisAbsAddOn.SurfList) {
-                arrayToBeOverride(surfNum) = overrideValue;
-            }
-        } else {
-            Real64 triggerValue;
-            if (thisAbsAddOn.ControlSignal == Material::VariableAbsCtrlSignal::SurfaceTemperature) {
-                for (int surfNum : thisAbsAddOn.SurfList) {
-                    triggerValue = state.dataHeatBalSurf->SurfTempOut(surfNum);
-                    overrideValue = Curve::CurveValue(state, thisAbsAddOn.FunctionIdx, triggerValue);
-                    overrideValue = max(min(overrideValue, 0.9999), 0.0001);
-                    arrayToBeOverride(surfNum) = max(min(overrideValue, 0.9999), 0.0001);
-                }
-            } else if (thisAbsAddOn.ControlSignal == Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation) {
-                for (int surfNum : thisAbsAddOn.SurfList) {
-                    triggerValue = state.dataHeatBal->SurfQRadSWOutIncident(surfNum);
-                    overrideValue = Curve::CurveValue(state, thisAbsAddOn.FunctionIdx, triggerValue);
-                    overrideValue = max(min(overrideValue, 0.9999), 0.0001);
-                    arrayToBeOverride(surfNum) = max(min(overrideValue, 0.9999), 0.0001);
-                }
-            } else { // controlled by heating cooling mode
-                for (int surfNum : thisAbsAddOn.SurfList) {
-                    int zoneNum = state.dataSurface->Surface(surfNum).Zone;
-                    bool isCooling = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).TotalOutputRequired < 0);
-                    triggerValue = static_cast<Real64>(isCooling);
-                    overrideValue = Curve::CurveValue(state, thisAbsAddOn.FunctionIdx, triggerValue);
-                    overrideValue = max(min(overrideValue, 0.9999), 0.0001);
-                    arrayToBeOverride(surfNum) = max(min(overrideValue, 0.9999), 0.0001);
-                }
-            }
+    Real64 overrideValue;
+    if (controlSignal == Material::VariableAbsCtrlSignal::Scheduled) {
+        overrideValue = ScheduleManager::GetCurrentScheduleValue(state, scheduleIdx);
+        return max(min(overrideValue, 0.9999), 0.0001);
+    } else {
+        Real64 triggerValue;
+        if (controlSignal == Material::VariableAbsCtrlSignal::SurfaceTemperature) {
+            triggerValue = state.dataHeatBalSurf->SurfTempOut(surfNum);
+            overrideValue = Curve::CurveValue(state, functionIdx, triggerValue);
+        } else if (controlSignal == Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation) {
+            triggerValue = state.dataHeatBal->SurfQRadSWOutIncident(surfNum);
+            overrideValue = Curve::CurveValue(state, functionIdx, triggerValue);
+        } else { // controlled by heating cooling mode
+            int zoneNum = state.dataSurface->Surface(surfNum).Zone;
+            bool isCooling = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).TotalOutputRequired < 0);
+            triggerValue = static_cast<Real64>(isCooling);
+            overrideValue = Curve::CurveValue(state, functionIdx, triggerValue);
         }
+        return max(min(overrideValue, 0.9999), 0.0001);
     }
 }
 
 void MaterialAddOnOverride(EnergyPlusData &state)
 {
-    MaterialAddOnOverrideByType(state, state.dataMaterial->variableThermalAbsAddOns, state.dataHeatBalSurf->SurfAbsThermalExt);
-    MaterialAddOnOverrideByType(state, state.dataMaterial->variableSolarAbsAddOns, state.dataHeatBalSurf->SurfAbsSolarExt);
+    for (int surfNum : state.dataSurface->AllVaryThermalAbsOpaqSurfaceList) {
+        auto const &thisConstruct = state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction);
+        auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+        state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) = GetSurfAddOnOverrideValue(state,
+                                                                                      surfNum,
+                                                                                      thisMaterial->variableThermalAbsorptanceCtrlSignal,
+                                                                                      thisMaterial->variableThermalAbsporptanceScheduleIdx,
+                                                                                      thisMaterial->variableThermalAbsorptanceFunctionIdx);
+    }
+    for (int surfNum : state.dataSurface->AllVarySolarAbsOpaqSurfaceList) {
+        auto const &thisConstruct = state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction);
+        auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+        state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) = GetSurfAddOnOverrideValue(state,
+                                                                                    surfNum,
+                                                                                    thisMaterial->variableSolarAbsorptanceCtrlSignal,
+                                                                                    thisMaterial->variableSolarAbsporptanceScheduleIdx,
+                                                                                    thisMaterial->variableSolarAbsorptanceFunctionIdx);
+    }
 }
 
 void InitSurfaceHeatBalance(EnergyPlusData &state)
