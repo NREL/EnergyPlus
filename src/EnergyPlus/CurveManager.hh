@@ -196,7 +196,7 @@ namespace Curve {
                                        const Real64 Var2, // 2nd independent variable
                                        const Real64 Var3, // 3rd independent variable
                                        const Real64 Var4, // 4th independent variable
-                                       const Real64 Var5 // 5th independent variable
+                                       const Real64 Var5  // 5th independent variable
         );
         Real64 BtwxtTableInterpolation(EnergyPlusData &state,
                                        const Real64 Var1, // 1st independent variable

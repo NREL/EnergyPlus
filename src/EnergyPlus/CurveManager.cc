@@ -3256,7 +3256,6 @@ namespace Curve {
         Var5Max = thisCurve->inputLimits[4].max;
     }
 
-    
     void GetCurveMinMaxValues(EnergyPlusData &state,
                               int const CurveIndex, // index of curve in curve array
                               Real64 &Var1Min,      // Minimum values of 1st independent variable
@@ -3329,9 +3328,9 @@ namespace Curve {
     }
 
     void SetCurveOutputMaxValue(EnergyPlusData &state,
-                               int const CurveIndex, // index of curve in curve array
-                               bool &ErrorsFound,    // TRUE when errors occur
-                               const Real64 CurveMax // Maximum values of curve output
+                                int const CurveIndex, // index of curve in curve array
+                                bool &ErrorsFound,    // TRUE when errors occur
+                                const Real64 CurveMax // Maximum values of curve output
     )
     {
 
