@@ -725,7 +725,6 @@ void GetDXCoils(EnergyPlusData &state)
     using Curve::checkCurveIsNormalizedToOne;
     using Curve::CurveValue;
     using Curve::GetCurveIndex;
-    using Curve::SetCurveOutputMinMaxValues;
     using DataSizing::AutoSize;
     using EMSManager::ManageEMS;
 
@@ -1150,7 +1149,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                    Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7);
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -1160,7 +1159,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                    Curve::SetCurveOutputMaxValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 1.0);
                 }
             }
         }
@@ -1729,7 +1728,7 @@ void GetDXCoils(EnergyPlusData &state)
                                         state,
                                         format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, _);
+                                    Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7);
                                 }
 
                                 if (MaxCurveVal > 1.0) {
@@ -1739,7 +1738,7 @@ void GetDXCoils(EnergyPlusData &state)
                                         state,
                                         format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, _, 1.0);
+                                    Curve::SetCurveOutputMaxValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 1.0);
                                 }
                             }
                         }
@@ -2218,7 +2217,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                    Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7);
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -2228,7 +2227,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                    Curve::SetCurveOutputMaxValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 1.0);
                 }
             }
         }
@@ -2687,7 +2686,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                    Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7);
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -2697,7 +2696,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                    Curve::SetCurveOutputMaxValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 1.0);
                 }
             }
         }
@@ -3500,7 +3499,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                        Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7);
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -3510,7 +3509,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                        Curve::SetCurveOutputMaxValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 1.0);
                     }
                 }
             }
@@ -3887,7 +3886,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                        Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7);
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -3897,7 +3896,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                        Curve::SetCurveOutputMaxValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 1.0);
                     }
                 }
             }
@@ -4352,7 +4351,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, _);
+                        Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7);
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -4363,7 +4362,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, _, 1.0);
+                        Curve::SetCurveOutputMaxValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, 1.0);
                     }
                 }
             }
@@ -4910,8 +4909,8 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, 0.7, _);
+                        Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7);
+                        Curve::SetCurveOutputMinValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, 0.7);
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -4922,7 +4921,7 @@ void GetDXCoils(EnergyPlusData &state)
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, _, 1.0);
+                        Curve::SetCurveOutputMaxValue(state, state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, 1.0);
                     }
                 }
             }
