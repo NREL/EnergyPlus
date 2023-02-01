@@ -1474,8 +1474,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
 
     // outlet temp should equal inlet temp since mass flow rate = 0
-    Real64 calculatedOutletTemp = state->dataLoopNodes->Node(HeatRecInNode).Temp +
-                                  state->dataHVACGlobal->MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
+    Real64 calculatedOutletTemp = state->dataLoopNodes->Node(HeatRecInNode).Temp;
     EXPECT_DOUBLE_EQ(0.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp);
