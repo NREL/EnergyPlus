@@ -4915,6 +4915,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
     SurfaceGeometry::AllocateSurfaceArrays(*state);
 
     state->dataSolarShading->SurfWinTransBmSolar(1) = 0.8;
+    state->dataSolarShading->SurfWinExtBeamAbsByShadFac(1) = 0.0;
     state->dataSurface->Surface(1).ViewFactorGround = 1.0;
     state->dataSurface->SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::NoShade;
 
@@ -4922,6 +4923,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
     state->dataEnvrn->BeamSolarRad = 0.1;
     state->dataEnvrn->GndSolarRad = 0.2;
     state->dataEnvrn->DifSolarRad = 0.3;
+    state->dataEnvrn->SOLCOS(1) = 0.84471127222777276;
+    state->dataEnvrn->SOLCOS(2) = -0.53484539135440257;
+    state->dataEnvrn->SOLCOS(3) = 0.020081681162033127;
 
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
 
@@ -5313,6 +5317,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
     state->dataEnvrn->BeamSolarRad = 50;
     state->dataEnvrn->GndSolarRad = 50;
     state->dataEnvrn->DifSolarRad = 0;
+    state->dataEnvrn->SOLCOS(1) = 0.84471127222777276;
+    state->dataEnvrn->SOLCOS(2) = -0.53484539135440257;
+    state->dataEnvrn->SOLCOS(3) = 0.020081681162033127;
+
     for (auto &thisSurf : state->dataSurface->Surface) {
         thisSurf.SolarEnclIndex = 1;
         thisSurf.RadEnclIndex = 1;
@@ -5961,9 +5969,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataConstruction->Construct(state->dataSurface->Surface(8).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput(*state);
 
+    state->dataGlobal->TimeStepZoneSec = 60.0;
+
     CalcHeatBalanceInsideSurf(*state);
-    EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(7), 0.1);
-    EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(8), 0.1);
+    EXPECT_NEAR(31.79, state->dataSurface->SurfWinHeatGain(7), 0.1);
+    EXPECT_NEAR(31.79, state->dataSurface->SurfWinHeatGain(8), 0.1);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsInit)
