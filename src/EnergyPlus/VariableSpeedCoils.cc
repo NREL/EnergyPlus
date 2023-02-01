@@ -279,7 +279,6 @@ namespace VariableSpeedCoils {
         using namespace OutputReportPredefined;
         using Curve::CurveValue;
         using Curve::GetCurveIndex;
-        using Curve::SetCurveOutputMinMaxValues;
 
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
