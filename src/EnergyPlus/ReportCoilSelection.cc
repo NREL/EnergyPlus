@@ -1483,13 +1483,6 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     Real64 const DXFlowPerCapMaxRatio  // non dimensional ratio, capacity adjustment ratio max
 )
 {
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-    auto &TermUnitSizing(state.dataSize->TermUnitSizing);
-    auto &OASysEqSizing(state.dataSize->OASysEqSizing);
-    auto &UnitarySysEqSizing(state.dataSize->UnitarySysEqSizing);
-    auto &FinalZoneSizing(state.dataSize->FinalZoneSizing);
-    auto &TermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing);
-
     int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->capIsAutosized = isAutoSize;
@@ -1609,8 +1602,8 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             }
         }
 
-    } else if (curZoneEqNum > 0 && allocated(FinalZoneSizing)) {
-        auto &finalZoneSizing = FinalZoneSizing(curZoneEqNum);
+    } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
+        auto &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
         c->zoneNum[0] = curZoneEqNum;
@@ -1632,7 +1625,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
         c->rmSensibleAtPeak = finalZoneSizing.DesHeatLoad;
 
-        auto &zoneEqSizing = ZoneEqSizing(curZoneEqNum);
+        auto &zoneEqSizing = state.dataSize->ZoneEqSizing(curZoneEqNum);
         if (zoneEqSizing.OAVolFlow > 0.0) {
             c->oaPeakVolFlow = zoneEqSizing.OAVolFlow;
         } else if (zoneEqSizing.ATMixerVolFlow > 0.0) {
@@ -1644,22 +1637,22 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         // set typeof_Coil integer
         if (state.dataSize->TermUnitIU) {      // an unpowered induction terminal unit
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                auto &termUnitFinalZoneSizing = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
+                auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
                 c->coilDesEntTemp = termUnitFinalZoneSizing.DesHeatCoilInTempTU;
                 c->coilDesEntHumRat = termUnitFinalZoneSizing.DesHeatCoilInHumRatTU;
             }
         } else if (state.dataSize->TermUnitSingDuct) {
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                auto &termUnitFinalZoneSizing = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
+                auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
                 c->coilDesEntTemp = termUnitFinalZoneSizing.DesHeatCoilInTempTU;
                 c->coilDesEntHumRat = termUnitFinalZoneSizing.DesHeatCoilInHumRatTU;
             }
         } else if (state.dataSize->TermUnitPIU) {
-            auto &termUnitSizing = TermUnitSizing(state.dataSize->CurTermUnitSizingNum);
+            auto &termUnitSizing = state.dataSize->TermUnitSizing(state.dataSize->CurTermUnitSizingNum);
             Real64 MinPriFlowFrac = termUnitSizing.MinFlowFrac;
             if (termUnitSizing.InducesPlenumAir) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    auto &termUnitFinalZoneSizing = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
+                    auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
                     c->coilDesEntTemp = (termUnitFinalZoneSizing.DesHeatCoilInTempTU * MinPriFlowFrac) +
                                         (termUnitFinalZoneSizing.ZoneRetTempAtHeatPeak * (1.0 - MinPriFlowFrac));
                     c->coilDesEntHumRat = (termUnitFinalZoneSizing.DesHeatCoilInHumRatTU * MinPriFlowFrac) +
@@ -1667,7 +1660,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 }
             } else {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    auto &termUnitFinalZoneSizing = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
+                    auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
                     c->coilDesEntTemp = (termUnitFinalZoneSizing.DesHeatCoilInTempTU * MinPriFlowFrac) +
                                         (termUnitFinalZoneSizing.ZoneTempAtHeatPeak * (1.0 - MinPriFlowFrac));
                     c->coilDesEntHumRat = (termUnitFinalZoneSizing.DesHeatCoilInHumRatTU * MinPriFlowFrac) +
@@ -1737,16 +1730,16 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     if (c->coilDesVolFlow <= 0.0) {
         if (state.dataSize->DataFlowUsedForSizing > 0.0) { // flow has been set in global, so use it
             c->coilDesVolFlow = state.dataSize->DataFlowUsedForSizing;
-        } else if (curZoneEqNum > 0 && allocated(FinalZoneSizing)) {
-            auto &finalZoneSizing = FinalZoneSizing(curZoneEqNum);
+        } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
+            auto &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
             if (finalZoneSizing.DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow) {
                 c->coilDesMassFlow = finalZoneSizing.DesHeatMassFlow;
                 c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
             }
         } else if (curSysNum > 0 && allocated(state.dataSize->FinalSysSizing)) {
             auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
-            if (curOASysNum > 0 && allocated(OASysEqSizing)) {
-                auto &oASysEqSizing = OASysEqSizing(curSysNum);
+            if (curOASysNum > 0 && allocated(state.dataSize->OASysEqSizing)) {
+                auto &oASysEqSizing = state.dataSize->OASysEqSizing(curSysNum);
                 if (oASysEqSizing.AirFlow) {
                     c->coilDesVolFlow = oASysEqSizing.AirVolFlow;
                 } else if (oASysEqSizing.HeatingAirFlow) {
@@ -1757,10 +1750,13 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             } else {
                 if (state.dataSize->DataFlowUsedForSizing > 0.0) {
                     c->coilDesVolFlow = state.dataSize->DataFlowUsedForSizing;
-                } else if (UnitarySysEqSizing(curSysNum).AirFlow) {
-                    c->coilDesVolFlow = UnitarySysEqSizing(curSysNum).AirVolFlow;
-                } else if (UnitarySysEqSizing(curSysNum).HeatingAirFlow) {
-                    c->coilDesVolFlow = UnitarySysEqSizing(curSysNum).HeatingAirVolFlow;
+                } else if (curSysNum > 0 && allocated(state.dataSize->UnitarySysEqSizing)) {
+                    auto &unitarySysEqSizing = state.dataSize->UnitarySysEqSizing(curSysNum);
+                    if (unitarySysEqSizing.AirFlow) {
+                        c->coilDesVolFlow = unitarySysEqSizing.AirVolFlow;
+                    } else if (unitarySysEqSizing.HeatingAirFlow) {
+                        c->coilDesVolFlow = unitarySysEqSizing.HeatingAirVolFlow;
+                    }
                 } else {
                     if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Main) {
                         if (finalSysSizing.SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
