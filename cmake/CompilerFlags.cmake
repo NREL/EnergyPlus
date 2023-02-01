@@ -64,6 +64,9 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/DMSVC_DEBUG>) # Triggers code in main.cc to catch floating point NaNs
 elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
 
+  option(FORCE_DEBUG_ARITHM_GCC_OR_CLANG "Enable trapping floating point exceptions in non Debug mode" OFF)
+  mark_as_advanced(FORCE_DEBUG_ARITHM_GCC_OR_CLANG)
+
   # COMPILER FLAGS
   target_compile_options(project_options INTERFACE -pipe) # Faster compiler processing
   target_compile_options(project_warnings INTERFACE -Wpedantic
@@ -90,20 +93,22 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
     target_compile_options(project_warnings INTERFACE -Wno-invalid-source-encoding)
   endif()
 
+  set(need_arithm_debug_genex "$<OR:$<BOOL:${FORCE_DEBUG_ARITHM_GCC_OR_CLANG}>,$<CONFIG:Debug>>")
+
   # in main.cc for E+ and gtest: feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW)
-  target_compile_definitions(project_fp_options INTERFACE $<$<CONFIG:Debug>:DEBUG_ARITHM_GCC_OR_CLANG>)
+  target_compile_definitions(project_fp_options INTERFACE $<${need_arithm_debug_genex}:DEBUG_ARITHM_GCC_OR_CLANG>)
   include(CheckCXXSymbolExists)
   check_cxx_symbol_exists(feenableexcept "fenv.h" HAVE_FEENABLEEXCEPT)
-  message(AUTHOR_WARNING "HAVE_FEENABLEEXCEPT=${HAVE_FEENABLEEXCEPT}")
+  message(VERBOSE "HAVE_FEENABLEEXCEPT=${HAVE_FEENABLEEXCEPT}")
   if(HAVE_FEENABLEEXCEPT)
     target_compile_definitions(project_fp_options INTERFACE HAVE_FEENABLEEXCEPT)
   endif()
 
   # ADDITIONAL GCC-SPECIFIC FLAGS
   if(CMAKE_COMPILER_IS_GNUCXX) # g++
-    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ffloat-store>) # Improve debug run solution stability
-    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fsignaling-nans>) # Disable optimizations that may have concealed NaN behavior
-    target_compile_definitions(project_options INTERFACE $<$<CONFIG:Debug>:_GLIBCXX_DEBUG>) # Standard container debug mode (bounds checking, ...>)
+    target_compile_options(project_options INTERFACE $<${need_arithm_debug_genex}:-ffloat-store>) # Improve debug run solution stability
+    target_compile_options(project_options INTERFACE $<${need_arithm_debug_genex}:-fsignaling-nans>) # Disable optimizations that may have concealed NaN behavior
+    target_compile_definitions(project_options INTERFACE $<${need_arithm_debug_genex}:_GLIBCXX_DEBUG>) # Standard container debug mode (bounds checking, ...>)
     # ADD_CXX_RELEASE_DEFINITIONS("-finline-limit=2000") # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
   else()
     #check_cxx_compiler_flag(<flag> <var>)
