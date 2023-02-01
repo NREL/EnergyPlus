@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,7 +65,7 @@
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
-using HeatBalanceManager::GetMaterialData;
+using Material::GetMaterialData;
 using SurfaceGeometry::GetOSCMData;
 
 TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs)
@@ -1915,11 +1915,12 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
     Real64 Thickness;
     int MaterialIndex;
 
-    state->dataMaterial->Material.allocate(1);
+    Material::MaterialProperties *p = new Material::MaterialProperties;
+    state->dataMaterial->Material.push_back(p);
 
     // Test 1: Material has a valid thickness and is not R-only, result should be false
     MaterialIndex = 1;
-    state->dataMaterial->Material(MaterialIndex).ROnly = false;
+    state->dataMaterial->Material(MaterialIndex)->ROnly = false;
     Thickness = 0.01;
     ExpectedResult = false;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1929,7 +1930,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
     // Test 2a: Material has a valid thickness but is R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    state->dataMaterial->Material(MaterialIndex).ROnly = true;
+    state->dataMaterial->Material(MaterialIndex)->ROnly = true;
     Thickness = 0.01;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1939,7 +1940,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
     // Test 2b: Material does not have a valid thickness but is not R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    state->dataMaterial->Material(MaterialIndex).ROnly = false;
+    state->dataMaterial->Material(MaterialIndex)->ROnly = false;
     Thickness = 0.0;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1948,7 +1949,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
 
     // Test 3: Material does not have a valid thickness and is not R-only, result should be true
     MaterialIndex = 1;
-    state->dataMaterial->Material(MaterialIndex).ROnly = true;
+    state->dataMaterial->Material(MaterialIndex)->ROnly = true;
     Thickness = 0.0;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);

@@ -223,6 +223,7 @@ set(SRC
     DataWater.hh
     DataWindowEquivalentLayer.hh
     DataZoneControls.hh
+    DataZoneEnergyDemands.cc
     DataZoneEnergyDemands.hh
     DataZoneEquipment.cc
     DataZoneEquipment.hh
@@ -404,6 +405,7 @@ set(SRC
     InternalHeatGains.hh
     LowTempRadiantSystem.cc
     LowTempRadiantSystem.hh
+    Material.cc
     Material.hh
     MatrixDataManager.cc
     MatrixDataManager.hh

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -202,7 +202,7 @@ namespace AirLoopHVACDOAS {
             }
         }
 
-        ShowSevereError(state, "AirLoopMixer factory: Error getting inputs for system named: " + objectName);
+        ShowSevereError(state, format("AirLoopMixer factory: Error getting inputs for system named: {}", objectName));
         return nullptr;
     }
 
@@ -210,7 +210,7 @@ namespace AirLoopHVACDOAS {
     {
         bool errorsFound(false);
 
-        std::string cCurrentModuleObject = "AirLoopHVAC:Mixer";
+        std::string const &cCurrentModuleObject = "AirLoopHVAC:Mixer";
         std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -222,7 +222,7 @@ namespace AirLoopHVACDOAS {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 ++AirLoopMixerNum;
                 AirLoopMixer thisMixer;
@@ -245,7 +245,7 @@ namespace AirLoopHVACDOAS {
                     auto NodeArray = NodeNames.value();
                     thisMixer.numOfInletNodes = NodeArray.size();
                     int num = 0;
-                    for (auto NodeDOASName : NodeArray) {
+                    for (nlohmann::json &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("inlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
@@ -254,7 +254,7 @@ namespace AirLoopHVACDOAS {
                             thisMixer.InletNodeNum.push_back(NodeNum);
                         } else {
                             cFieldName = "Inlet Node Name";
-                            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisMixer.name + "\" " + name + " not found: " + cFieldName);
+                            ShowSevereError(state, format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisMixer.name, name, cFieldName));
                             errorsFound = true;
                         }
                     }
@@ -311,7 +311,7 @@ namespace AirLoopHVACDOAS {
                 return index;
             }
         }
-        ShowSevereError(state, "getAirLoopMixer: did not find AirLoopHVAC:Mixer name =" + objectName + ". Check inputs");
+        ShowSevereError(state, format("getAirLoopMixer: did not find AirLoopHVAC:Mixer name ={}. Check inputs", objectName));
         return index;
     }
 
@@ -330,7 +330,7 @@ namespace AirLoopHVACDOAS {
                 return &dSpec;
             }
         }
-        ShowSevereError(state, "AirLoopSplitter factory: Error getting inputs for system named: " + objectName);
+        ShowSevereError(state, format("AirLoopSplitter factory: Error getting inputs for system named: {}", objectName));
         return nullptr;
     }
 
@@ -359,7 +359,7 @@ namespace AirLoopHVACDOAS {
                 return index;
             }
         }
-        ShowSevereError(state, "getAirLoopSplitter: did not find AirLoopSplitter name =" + objectName + ". Check inputs");
+        ShowSevereError(state, format("getAirLoopSplitter: did not find AirLoopSplitter name ={}. Check inputs", objectName));
         return index;
     }
 
@@ -367,7 +367,7 @@ namespace AirLoopHVACDOAS {
     {
         bool errorsFound(false);
 
-        std::string cCurrentModuleObject = "AirLoopHVAC:Splitter";
+        std::string const &cCurrentModuleObject = "AirLoopHVAC:Splitter";
         std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -379,7 +379,7 @@ namespace AirLoopHVACDOAS {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                 ++AirLoopSplitterNum;
@@ -394,7 +394,7 @@ namespace AirLoopHVACDOAS {
                     auto NodeArray = NodeNames.value();
                     thisSplitter.numOfOutletNodes = NodeArray.size();
                     int num = 0;
-                    for (auto NodeDOASName : NodeArray) {
+                    for (nlohmann::json &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("outlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
@@ -403,7 +403,7 @@ namespace AirLoopHVACDOAS {
                             thisSplitter.OutletNodeNum.push_back(NodeNum);
                         } else {
                             cFieldName = "Outlet Node Name";
-                            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisSplitter.name + "\" " + cFieldName + " not found: " + name);
+                            ShowSevereError(state, format("{}, \"{}\"{} not found: {}", cCurrentModuleObject, thisSplitter.name, cFieldName, name));
                             errorsFound = true;
                         }
                     }
@@ -424,7 +424,7 @@ namespace AirLoopHVACDOAS {
 
         bool errorsFound(false);
 
-        std::string cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
+        std::string const &cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
         std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -436,7 +436,7 @@ namespace AirLoopHVACDOAS {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
                 auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 ++AirLoopDOASNum;
                 AirLoopDOAS thisDOAS;
@@ -448,18 +448,18 @@ namespace AirLoopHVACDOAS {
                 if (thisDOAS.m_OASystemNum == 0) {
                     cFieldName = "AirLoopHVAC:OutdoorAirSystem Name";
                     ShowSevereError(state,
-                                    cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.OASystemName);
+                                    format("{}, \"{}\", {} not found: {}\n", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.OASystemName));
                     errorsFound = true;
                 }
                 // Check controller type
-                std::string CurrentModuleObject = "AirLoopHVAC:OutdoorAirSystem";
+                std::string_view CurrentModuleObject = "AirLoopHVAC:OutdoorAirSystem";
                 for (int InListNum = 1; InListNum <= state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumControllers; ++InListNum) {
                     if (UtilityRoutines::SameString(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ControllerType(InListNum),
                                                     "Controller:OutdoorAir")) {
                         ShowSevereError(state,
-                                        "When " + CurrentModuleObject + " = " +
-                                            state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ControllerName(InListNum) +
-                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
+                                        format("When {} = {} is used in AirLoopHVAC:DedicatedOutdoorAirSystem,",
+                                               CurrentModuleObject,
+                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ControllerName(InListNum)));
                         ShowContinueError(state, "The Controller:OutdoorAir can not be used as a controller. Please remove it");
                         errorsFound = true;
                     }
@@ -478,7 +478,8 @@ namespace AirLoopHVACDOAS {
                     bool InletNodeErrFlag = false;
                     bool OutletNodeErrFlag = false;
 
-                    auto typeNameUC = UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum));
+                    const std::string typeNameUC =
+                        UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum));
                     auto foundType = static_cast<ValidEquipListType>(getEnumerationValue(validEquipNamesUC, typeNameUC));
 
                     switch (foundType) {
@@ -694,11 +695,11 @@ namespace AirLoopHVACDOAS {
                         thisDOAS.FanBeforeCoolingCoilFlag = true;
                     }
                     if (InletNodeErrFlag) {
-                        ShowSevereError(state, "Inlet node number is not found in " + CurrentModuleObject + " = " + std::string{CompName});
+                        ShowSevereError(state, format("Inlet node number is not found in {} = {}", CurrentModuleObject, CompName));
                         errorsFound = true;
                     }
                     if (OutletNodeErrFlag) {
-                        ShowSevereError(state, "Outlet node number is not found in " + CurrentModuleObject + " = " + std::string{CompName});
+                        ShowSevereError(state, format("Outlet node number is not found in {} = {}", CurrentModuleObject, CompName));
                         errorsFound = true;
                     }
                 }
@@ -734,8 +735,8 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_AirLoopMixerIndex = getAirLoopMixerIndex(state, thisDOAS.AirLoopMixerName);
                 if (thisDOAS.m_AirLoopMixerIndex < 0) {
                     cFieldName = "AirLoopHVAC:Mixer Name";
-                    ShowSevereError(state,
-                                    cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.AirLoopMixerName);
+                    ShowSevereError(
+                        state, format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.AirLoopMixerName));
                     errorsFound = true;
                 }
                 AirLoopMixer thisAirLoopMixer;
@@ -745,7 +746,7 @@ namespace AirLoopHVACDOAS {
                 if (thisDOAS.m_AirLoopSplitterIndex < 0) {
                     cFieldName = "AirLoopHVAC:Splitter Name";
                     ShowSevereError(
-                        state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.AirLoopSplitterName);
+                        state, format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.AirLoopSplitterName));
                     errorsFound = true;
                 }
                 AirLoopSplitter thisAirLoopSplitter;
@@ -781,7 +782,7 @@ namespace AirLoopHVACDOAS {
                             thisDOAS.m_AirLoopNum.push_back(LoopNum);
                         } else {
                             cFieldName = "AirLoopHVAC Name";
-                            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + name);
+                            ShowSevereError(state, format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, name));
                             errorsFound = true;
                         }
                     }
@@ -796,8 +797,8 @@ namespace AirLoopHVACDOAS {
                 if (UtilityRoutines::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerListName, "")) {
                     if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
                         ShowSevereError(state,
-                                        "AirLoopHVAC:OutdoorAirSystem = \"" + state.dataAirLoop->OutsideAirSys(OASysNum).Name +
-                                            "\" invalid Controller List Name = \" not found.");
+                                        format("AirLoopHVAC:OutdoorAirSystem = \"{}\" invalid Controller List Name = \" not found.",
+                                               state.dataAirLoop->OutsideAirSys(OASysNum).Name));
                         errorsFound = true;
                     }
                 }
@@ -1014,7 +1015,7 @@ namespace AirLoopHVACDOAS {
             if (maxDiff > 1.0e-6) {
                 if (loop.ConveCount == 0) {
                     ++loop.ConveCount;
-                    ShowWarningError(state, "Convergence limit is above 1.0e-6 for unit=" + loop.Name);
+                    ShowWarningError(state, format("Convergence limit is above 1.0e-6 for unit={}", loop.Name));
                     ShowContinueErrorTimeStamp(
                         state, format("The max difference of node temperatures between AirLoopDOAS outlet and OA mixer inlet ={:.6R}", maxDiff));
                 } else {

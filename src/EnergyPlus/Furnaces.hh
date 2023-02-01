@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -360,34 +360,49 @@ namespace Furnaces {
                                 Real64 const MoistureLoad                          // the control zone latent load (watts)
     );
 
-    void CalcFurnaceOutput(EnergyPlusData &state,
-                           int const FurnaceNum,
-                           bool const FirstHVACIteration,
-                           int const FanOpMode,                               // Cycling fan or constant fan
-                           DataHVACGlobals::CompressorOperation CompressorOp, // Compressor on/off; 1=on, 0=off
-                           Real64 const CoolPartLoadRatio,                    // DX cooling coil part load ratio
-                           Real64 const HeatPartLoadRatio,                    // DX heating coil part load ratio (0 for other heating coil types)
-                           Real64 const HeatCoilLoad,                         // Heating coil load for gas heater
-                           Real64 const ReheatCoilLoad,                       // Reheating coil load for gas heater
-                           Real64 &SensibleLoadMet,   // Sensible cooling load met (furnace outlet with respect to control zone temp)
-                           Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-                           Real64 &OnOffAirFlowRatio, // Ratio of compressor ON mass flow rate to AVERAGE
-                           bool const HXUnitOn,       // flag to enable HX based on zone moisture load
-                           Optional<Real64 const> CoolingHeatingPLRRat = _ // cooling PLR to heating PLR ratio, used for cycling fan RH control
+    void
+    CalcFurnaceOutput(EnergyPlusData &state,
+                      int const FurnaceNum,
+                      bool const FirstHVACIteration,
+                      int const FanOpMode,                               // Cycling fan or constant fan
+                      DataHVACGlobals::CompressorOperation CompressorOp, // Compressor on/off; 1=on, 0=off
+                      Real64 const CoolPartLoadRatio,                    // DX cooling coil part load ratio
+                      Real64 const HeatPartLoadRatio,                    // DX heating coil part load ratio (0 for other heating coil types)
+                      Real64 const HeatCoilLoad,                         // Heating coil load for gas heater
+                      Real64 const ReheatCoilLoad,                       // Reheating coil load for gas heater
+                      Real64 &SensibleLoadMet,   // Sensible cooling load met (furnace outlet with respect to control zone temp)
+                      Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
+                      Real64 &OnOffAirFlowRatio, // Ratio of compressor ON mass flow rate to AVERAGE
+                      bool const HXUnitOn,       // flag to enable HX based on zone moisture load
+                      ObjexxFCL::Optional<Real64 const> CoolingHeatingPLRRat = _ // cooling PLR to heating PLR ratio, used for cycling fan RH control
     );
 
     //        End of Update subroutines for the Furnace Module
     // *****************************************************************************
 
     Real64 CalcFurnaceResidual(EnergyPlusData &state,
-                               Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                               Array1D<Real64> const &Par  // Function parameters
-    );
+                               Real64 PartLoadRatio, // DX cooling coil part load ratio
+                               int FurnaceNum,
+                               bool FirstHVACIteration,
+                               int FanOpMode,
+                               DataHVACGlobals::CompressorOperation CompressorOp,
+                               Real64 LoadToBeMet,
+                               Real64 par6_loadFlag,
+                               Real64 par7_sensLatentFlag,
+                               Real64 par9_HXOnFlag,
+                               Real64 par10_HeatingCoilPLR);
 
     Real64 CalcWaterToAirResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadRatio,      // DX cooling coil part load ratio
-                                  std::array<Real64, 9> const &Par // Function parameters
-    );
+                                  Real64 PartLoadRatio, // DX cooling coil part load ratio
+                                  int FurnaceNum,
+                                  bool FirstHVACIteration,
+                                  int FanOpMode,
+                                  DataHVACGlobals::CompressorOperation CompressorOp,
+                                  Real64 LoadToBeMet,
+                                  Real64 par6_loadTypeFlag,
+                                  Real64 par7_latentOrSensible,
+                                  Real64 ZoneSensLoadMetFanONCompOFF,
+                                  Real64 par9_HXUnitOne);
 
     void SetAverageAirFlow(EnergyPlusData &state,
                            int const FurnaceNum,       // Unit index
@@ -417,11 +432,6 @@ namespace Furnaces {
                                Real64 const QCoilLoad,         // load met by unit (watts)
                                int const FanMode,              // fan operation mode
                                Real64 &HeatCoilLoadmet         // Heating Load Met
-    );
-
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,             // hot water flow rate in kg/s
-                                std::array<Real64, 4> const &Par // Par(5) is the requested coil load
     );
 
     //        End of Reporting subroutines for the Furnace Module
@@ -474,23 +484,36 @@ namespace Furnaces {
     //******************************************************************************
 
     Real64 VSHPCyclingResidual(EnergyPlusData &state,
-                               Real64 const PartLoadFrac,        // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               std::array<Real64, 10> const &Par // par(1) = FurnaceNum
-    );
+                               Real64 PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               int FurnaceNum,
+                               // int ZoneNum,
+                               bool FirstHVACIteration,
+                               // int OpMode,
+                               Real64 LoadToBeMet,
+                               Real64 OnOffAirFlowRatio,
+                               Real64 SupHeaterLoad,
+                               DataHVACGlobals::CompressorOperation CompressorOp,
+                               Real64 par9_SensLatFlag);
 
     //******************************************************************************
 
     Real64 VSHPSpeedResidual(EnergyPlusData &state,
-                             Real64 const SpeedRatio,          // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                             std::array<Real64, 10> const &Par // par(1) = MSHPNum
-    );
+                             Real64 SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                             int FurnaceNum,
+                             bool FirstHVACIteration,
+                             Real64 LoadToBeMet,
+                             Real64 OnOffAirFlowRatio,
+                             Real64 SupHeaterLoad,
+                             int SpeedNum,
+                             DataHVACGlobals::CompressorOperation CompressorOp,
+                             Real64 par9_SensLatFlag);
 
     void SetVSHPAirFlow(EnergyPlusData &state,
-                        int const FurnaceNum,                 // Unit index
-                        Real64 const PartLoadRatio,           // unit part load ratio
-                        Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
-                        Optional_int_const SpeedNum = _,      // Speed number
-                        Optional<Real64 const> SpeedRatio = _ // Speed ratio
+                        int const FurnaceNum,                            // Unit index
+                        Real64 const PartLoadRatio,                      // unit part load ratio
+                        Real64 &OnOffAirFlowRatio,                       // ratio of compressor ON airflow to average airflow over timestep
+                        ObjexxFCL::Optional_int_const SpeedNum = _,      // Speed number
+                        ObjexxFCL::Optional<Real64 const> SpeedRatio = _ // Speed ratio
     );
 
     void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,

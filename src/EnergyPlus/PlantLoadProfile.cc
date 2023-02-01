@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -105,7 +105,7 @@ PlantComponent *PlantProfileData::factory(EnergyPlusData &state, std::string con
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName);
+    ShowFatalError(state, format("PlantLoadProfile::factory: Error getting inputs for pipe named: {}", objectName));
     // Shut up the compiler
     return nullptr;
 }
@@ -376,8 +376,11 @@ void GetPlantProfileInput(EnergyPlusData &state)
 
             if (state.dataPlantLoadProfile->PlantProfile(ProfileNum).LoadSchedule == 0) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"  The Schedule for " +
-                                    state.dataIPShortCut->cAlphaFieldNames(4) + " called " + state.dataIPShortCut->cAlphaArgs(4) + " was not found.");
+                                format("{}=\"{}\"  The Schedule for {} called {} was not found.",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(4),
+                                       state.dataIPShortCut->cAlphaArgs(4)));
                 ErrorsFound = true;
             }
 
@@ -387,8 +390,11 @@ void GetPlantProfileInput(EnergyPlusData &state)
 
             if (state.dataPlantLoadProfile->PlantProfile(ProfileNum).FlowRateFracSchedule == 0) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"  The Schedule for " +
-                                    state.dataIPShortCut->cAlphaFieldNames(5) + " called " + state.dataIPShortCut->cAlphaArgs(5) + " was not found.");
+                                format("{}=\"{}\"  The Schedule for {} called {} was not found.",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(5),
+                                       state.dataIPShortCut->cAlphaArgs(5)));
 
                 ErrorsFound = true;
             }
@@ -474,7 +480,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                  state.dataPlantLoadProfile->PlantProfile(ProfileNum).EMSPowerValue);
             }
 
-            if (ErrorsFound) ShowFatalError(state, "Errors in " + cCurrentModuleObject + " input.");
+            if (ErrorsFound) ShowFatalError(state, format("Errors in {} input.", cCurrentModuleObject));
 
         } // ProfileNum
     }

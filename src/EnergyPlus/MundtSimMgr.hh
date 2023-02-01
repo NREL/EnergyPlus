@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -98,14 +98,9 @@ namespace MundtSimMgr {
     struct DefineZoneData
     {
         // Members
-        int SurfFirst;      // index for first surface of the zone
-        int NumOfSurfs;     // number of surfaces in the zone
-        int MundtZoneIndex; // index for zones using Mundt model
-
-        // Default Constructor
-        DefineZoneData() : SurfFirst(0), NumOfSurfs(0), MundtZoneIndex(0)
-        {
-        }
+        int NumOfSurfs = 0;             // number of surfaces in the zone
+        int MundtZoneIndex = 0;         // index for zones using Mundt model
+        EPVector<int> HBsurfaceIndexes; // list of surface indexes in this Mundt model zone
     };
 
     // Functions

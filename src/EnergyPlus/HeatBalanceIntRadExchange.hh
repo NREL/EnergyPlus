@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,10 +68,10 @@ struct EnergyPlusData;
 namespace HeatBalanceIntRadExchange {
 
     void CalcInteriorRadExchange(EnergyPlusData &state,
-                                 Array1S<Real64> const SurfaceTemp,       // Current surface temperatures
-                                 int const SurfIterations,                // Number of iterations in calling subroutine
-                                 Array1D<Real64> &NetLWRadToSurf,         // Net long wavelength radiant exchange from other surfaces
-                                 Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
+                                 Array1S<Real64> const SurfaceTemp,                  // Current surface temperatures
+                                 int const SurfIterations,                           // Number of iterations in calling subroutine
+                                 Array1D<Real64> &NetLWRadToSurf,                    // Net long wavelength radiant exchange from other surfaces
+                                 ObjexxFCL::Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
                                  std::string_view CalledFrom = "");
 
     void UpdateMovableInsulationFlag(EnergyPlusData &state,

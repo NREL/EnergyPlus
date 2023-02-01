@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -170,7 +170,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             auto const &surface = state.dataSurface->Surface(surfaceNumber);
             state.dataSQLiteProcedures->sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
-        for (int materialNum = 1; materialNum <= state.dataHeatBal->TotMaterials; ++materialNum) {
+        for (int materialNum = 1; materialNum <= state.dataMaterial->TotMaterials; ++materialNum) {
             state.dataSQLiteProcedures->sqlite->addMaterialData(materialNum, state.dataMaterial->Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= state.dataHeatBal->TotConstructs; ++constructNum) {
@@ -1421,12 +1421,12 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
 
 void SQLite::createSQLiteReportDataRecord(int const recordIndex,
                                           Real64 const value,
-                                          Optional_int_const reportingInterval,
-                                          Optional<Real64 const> minValue,
-                                          Optional_int_const minValueDate,
-                                          Optional<Real64 const> maxValue,
-                                          Optional_int_const maxValueDate,
-                                          Optional_int_const minutesPerTimeStep)
+                                          ObjexxFCL::Optional_int_const reportingInterval,
+                                          ObjexxFCL::Optional<Real64 const> minValue,
+                                          ObjexxFCL::Optional_int_const minValueDate,
+                                          ObjexxFCL::Optional<Real64 const> maxValue,
+                                          ObjexxFCL::Optional_int_const maxValueDate,
+                                          ObjexxFCL::Optional_int_const minutesPerTimeStep)
 {
     if (m_writeOutputToSQLite) {
         ++m_dataIndex;
@@ -1538,13 +1538,13 @@ void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
                                          int const cumlativeSimulationDays,
                                          int const curEnvirNum,
                                          int const simulationYear,
-                                         Optional_int_const month,
-                                         Optional_int_const dayOfMonth,
-                                         Optional_int_const hour,
-                                         Optional<Real64 const> endMinute,
-                                         Optional<Real64 const> startMinute,
-                                         Optional_int_const dst,
-                                         Optional_string_const dayType,
+                                         ObjexxFCL::Optional_int_const month,
+                                         ObjexxFCL::Optional_int_const dayOfMonth,
+                                         ObjexxFCL::Optional_int_const hour,
+                                         ObjexxFCL::Optional<Real64 const> endMinute,
+                                         ObjexxFCL::Optional<Real64 const> startMinute,
+                                         ObjexxFCL::Optional_int_const dst,
+                                         ObjexxFCL::Optional_string_const dayType,
                                          bool const warmupFlag)
 {
     if (m_writeOutputToSQLite) {
@@ -1758,14 +1758,14 @@ void SQLite::addSQLiteZoneSizingRecord(std::string const &zoneName,   // the nam
     }
 }
 
-void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,      // the name of the system
-                                         std::string const &LoadType,     // either "Cooling" or "Heating"
-                                         std::string const &PeakLoadType, // either "Sensible" or "Total"
-                                         Real64 const &UserDesCap,        // User  Design Capacity
-                                         Real64 const &CalcDesVolFlow,    // Calculated Cooling Design Air Flow Rate
-                                         Real64 const &UserDesVolFlow,    // User Cooling Design Air Flow Rate
-                                         std::string const &DesDayName,   // the name of the design day that produced the peak
-                                         std::string const &PeakHrMin     // time stamp of the peak
+void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,    // the name of the system
+                                         std::string_view LoadType,     // either "Cooling" or "Heating"
+                                         std::string_view PeakLoadType, // either "Sensible" or "Total"
+                                         Real64 const UserDesCap,       // User  Design Capacity
+                                         Real64 const CalcDesVolFlow,   // Calculated Cooling Design Air Flow Rate
+                                         Real64 const UserDesVolFlow,   // User Cooling Design Air Flow Rate
+                                         std::string const &DesDayName, // the name of the design day that produced the peak
+                                         std::string const &PeakHrMin   // time stamp of the peak
 )
 {
     if (m_writeOutputToSQLite) {
@@ -2124,7 +2124,7 @@ void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData c
     zoneGroups.push_back(std::make_unique<ZoneGroup>(m_errorStream, m_db, number, zoneGroupData));
 }
 
-void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const &materialData)
+void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const *materialData)
 {
     materials.push_back(std::make_unique<Material>(m_errorStream, m_db, number, materialData));
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -264,6 +264,9 @@ namespace DataSurfaces {
         VerySmooth,
         Num
     };
+
+    constexpr std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> SurfaceRoughnessUC{
+        "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
 
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
@@ -729,10 +732,9 @@ namespace DataSurfaces {
         Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
         bool SurfHasSurroundingSurfProperty;   // true if surrounding surfaces properties are listed for an external surface
         bool SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
-        bool SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
         int SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
         int SurfExternalShadingSchInd;         // Schedule for a the external shading
-        int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
+        int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node, zero if none
         Real64 AE = 0.0;                       // Product of area and emissivity for each surface
         Real64 enclAESum = 0.0;                // Sum of area times emissivity for all other surfaces in enclosure
 
@@ -752,7 +754,7 @@ namespace DataSurfaces {
               SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid),
               IsSurfPropertyGndSurfacesDefined(false), SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false),
               UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0), SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false),
-              SurfHasLinkedOutAirNode(false), SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
+              SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
         {
         }
 

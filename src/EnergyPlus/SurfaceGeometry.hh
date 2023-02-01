@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,7 +88,9 @@ namespace SurfaceGeometry {
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CreateMissingSpaces(EnergyPlusData &state, bool &ErrorsFound);
+    void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces);
+
+    void createSpaceSurfaceLists(EnergyPlusData &state, bool &ErrorsFound);
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)
@@ -364,7 +366,7 @@ namespace SurfaceGeometry {
 
     void CreateStormWindowConstructions(EnergyPlusData &state);
 
-    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string namePrefix); // return new material number
+    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string_view namePrefix); // return new material number
 
     // create a new construction with storm based on an old construction and storm and gap materials
     int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string name, int stormMaterial, int gapMaterial);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -224,7 +224,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
     } else {
         if (state.dataPollutionModule->PollutionReportSetup)
-            ShowWarningError(state, cCurrentModuleObject + ": not entered.  Values will be defaulted.");
+            ShowWarningError(state, format("{}: not entered.  Values will be defaulted.", cCurrentModuleObject));
     }
 
     Pollution.PurchHeatEffic = 0.3;
@@ -281,8 +281,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
             auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
             if (SELECT_CASE_var == "NATURALGAS") {
                 if (Pollution.NatGasCoef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.NatGasCoef.FuelFactorUsed = true;
@@ -460,8 +460,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "FUELOILNO2") {
                 if (Pollution.FuelOil2Coef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.FuelOil2Coef.FuelFactorUsed = true;
@@ -639,8 +639,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "FUELOILNO1") {
                 if (Pollution.FuelOil1Coef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.FuelOil1Coef.FuelFactorUsed = true;
@@ -818,8 +818,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "COAL") {
                 if (Pollution.CoalCoef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.CoalCoef.FuelFactorUsed = true;
@@ -997,8 +997,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "ELECTRICITY") {
                 if (Pollution.ElecCoef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.ElecCoef.FuelFactorUsed = true;
@@ -1176,8 +1176,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "GASOLINE") {
                 if (Pollution.GasolineCoef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.GasolineCoef.FuelFactorUsed = true;
@@ -1355,8 +1355,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "PROPANE") {
                 if (Pollution.PropaneCoef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.PropaneCoef.FuelFactorUsed = true;
@@ -1534,8 +1534,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "DIESEL") {
                 if (Pollution.DieselCoef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.DieselCoef.FuelFactorUsed = true;
@@ -1713,8 +1713,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "OTHERFUEL1") {
                 if (Pollution.OtherFuel1Coef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.OtherFuel1Coef.FuelFactorUsed = true;
@@ -1892,8 +1892,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
             } else if (SELECT_CASE_var == "OTHERFUEL2") {
                 if (Pollution.OtherFuel2Coef.FuelFactorUsed) {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) + " already entered. Previous entry will be used.");
+                    ShowWarningError(
+                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
                     continue;
                 }
                 Pollution.OtherFuel2Coef.FuelFactorUsed = true;
@@ -2070,7 +2070,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
                 }
 
             } else {
-                ShowSevereError(state, "Illegal FuelType for Pollution Calc Entered=" + FuelType.FuelTypeNames(Loop));
+                ShowSevereError(state, format("Illegal FuelType for Pollution Calc Entered={}", FuelType.FuelTypeNames(Loop)));
                 ErrorsFound = true;
             }
         }
@@ -2099,53 +2099,53 @@ void GetPollutionFactorInput(EnergyPlusData &state)
         // Check for Electricity
         if (!Pollution.ElecCoef.FuelFactorUsed &&
             ((FuelType.ElecFacilityIndex > 0) || (FuelType.ElecProducedFacilityIndex > 0) || (FuelType.PurchCoolFacilityIndex > 0))) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for ELECTRICITY");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for ELECTRICITY", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Natural Gas
         if (!Pollution.NatGasCoef.FuelFactorUsed &&
             ((FuelType.NatGasFacilityIndex > 0) || (FuelType.PurchHeatFacilityIndex > 0) || (FuelType.SteamFacilityIndex > 0))) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for FuelOilNo2 (Residual Oil)
         if (!Pollution.FuelOil2Coef.FuelFactorUsed && (FuelType.FuelOil2FacilityIndex > 0)) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for FuelOilNo1 (Distillate Oil)
         if (!Pollution.FuelOil1Coef.FuelFactorUsed && (FuelType.FuelOil1FacilityIndex > 0)) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Coal
         if (!Pollution.CoalCoef.FuelFactorUsed && (FuelType.CoalFacilityIndex > 0)) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for COAL");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for COAL", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Gasoline
         if (!Pollution.GasolineCoef.FuelFactorUsed && (FuelType.GasolineFacilityIndex > 0)) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for GASOLINE");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for GASOLINE", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Propane
         if (!Pollution.PropaneCoef.FuelFactorUsed && (FuelType.PropaneFacilityIndex > 0)) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for PROPANE");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for PROPANE", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Diesel
         if (!Pollution.DieselCoef.FuelFactorUsed && (FuelType.DieselFacilityIndex > 0)) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for DIESEL");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for DIESEL", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for OtherFuel1
         if (!Pollution.OtherFuel1Coef.FuelFactorUsed && (FuelType.OtherFuel1FacilityIndex > 0)) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL1");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL1", cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for OtherFuel2
         if (!Pollution.OtherFuel2Coef.FuelFactorUsed && (FuelType.OtherFuel2FacilityIndex > 0)) {
-            ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL2");
+            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL2", cCurrentModuleObject));
             ErrorsFound = true;
         }
     }
@@ -4374,10 +4374,10 @@ void CheckFFSchedule(EnergyPlusData &state,
 
     SchedulePtr = GetScheduleIndex(state, ScheduleName);
     if (SchedulePtr == 0) {
-        ShowSevereError(state, currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" not found.");
+        ShowSevereError(state, format("{}: {}, invalid {}=\"{}\" not found.", currentModuleObject, resourceType, fieldName, ScheduleName));
         ErrorsFound = true;
     } else if (!CheckScheduleValueMinMax(state, SchedulePtr, ">=", 0.0)) {
-        ShowSevereError(state, currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" invalid values.");
+        ShowSevereError(state, format("{}: {}, invalid {}=\"{}\" invalid values.", currentModuleObject, resourceType, fieldName, ScheduleName));
         ShowContinueError(state, "Schedule values must be (>=0.).");
         ErrorsFound = true;
     }

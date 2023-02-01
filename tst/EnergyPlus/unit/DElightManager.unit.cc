@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,6 +61,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -308,8 +309,8 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");

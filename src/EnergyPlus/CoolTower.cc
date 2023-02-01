@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -66,6 +65,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -202,8 +202,8 @@ namespace CoolTower {
             } else {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-                    ShowContinueError(state, "Invalid-Schedule not found " + cAlphaFields(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                    ShowSevereError(state, format("{}=\"{}\" invalid data", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid-Schedule not found {}=\"{}\".", cAlphaFields(2), state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 }
             }
@@ -213,12 +213,17 @@ namespace CoolTower {
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(3)));
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(3),
+                                           state.dataIPShortCut->cAlphaArgs(3)));
                 }
                 ErrorsFound = true;
             }
@@ -241,8 +246,11 @@ namespace CoolTower {
                     static_cast<FlowCtrl>(getEnumerationValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::Invalid) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(5) + "\".");
+                                    format("{}=\"{}\" invalid {}=\"{}\".",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(5),
+                                           state.dataIPShortCut->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
             }
@@ -251,12 +259,17 @@ namespace CoolTower {
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(6)));
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(6) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(6),
+                                           state.dataIPShortCut->cAlphaArgs(6)));
                 }
                 ErrorsFound = true;
             }
@@ -427,7 +440,7 @@ namespace CoolTower {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(state, CurrentModuleObject + " errors occurred in input.  Program terminates.");
+        if (ErrorsFound) ShowFatalError(state, format("{} errors occurred in input.  Program terminates.", CurrentModuleObject));
 
         for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
             SetupOutputVariable(state,
@@ -633,19 +646,20 @@ namespace CoolTower {
         Real64 OutletTemp;      // Dry bulb temperature of air at the cooltower outlet
         Real64 IntHumRat;       // Humidity ratio of initialized air
 
-        state.dataHeatBalFanSys->MCPTC = 0.0;
-        state.dataHeatBalFanSys->MCPC = 0.0;
-        state.dataHeatBalFanSys->CTMFL = 0.0;
-
         auto &Zone(state.dataHeatBal->Zone);
 
         for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
             ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+            thisZoneHB.MCPTC = 0.0;
+            thisZoneHB.MCPC = 0.0;
+            thisZoneHB.CTMFL = 0.0;
 
             if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
                 // check component operation
                 if (state.dataEnvrn->WindSpeed < MinWindSpeed || state.dataEnvrn->WindSpeed > MaxWindSpeed) continue;
-                if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp) continue;
+                if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp)
+                    continue;
 
                 // Unit is on and simulate this component
                 // Determine the temperature and air flow rate at the cooltower outlet
@@ -678,7 +692,7 @@ namespace CoolTower {
 
                 if (OutletTemp < state.dataEnvrn->OutWetBulbTemp) {
                     ShowSevereError(state, "Cooltower outlet temperature exceed the outdoor wet bulb temperature reset to input values");
-                    ShowContinueError(state, "Occurs in Cooltower =" + state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name);
+                    ShowContinueError(state, format("Occurs in Cooltower ={}", state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name));
                 }
 
                 WaterFlowRate /= UCFactor;
@@ -719,25 +733,22 @@ namespace CoolTower {
                 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
                 CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate *
                               GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
-                state.dataHeatBalFanSys->MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;
-                state.dataHeatBalFanSys->MCPTC(ZoneNum) = state.dataHeatBalFanSys->MCPC(ZoneNum) * OutletTemp;
-                state.dataHeatBalFanSys->CTMFL(ZoneNum) = state.dataHeatBalFanSys->MCPC(ZoneNum) / AirSpecHeat;
+                thisZoneHB.MCPC = CVF_ZoneNum * AirDensity * AirSpecHeat;
+                thisZoneHB.MCPTC = thisZoneHB.MCPC * OutletTemp;
+                thisZoneHB.CTMFL = thisZoneHB.MCPC / AirSpecHeat;
 
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower =
-                    state.dataHeatBalFanSys->MCPC(ZoneNum) * std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - OutletTemp);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower =
-                    CVF_ZoneNum * std::abs(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) - OutletHumRat);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower = thisZoneHB.MCPC * std::abs(thisZoneHB.ZT - OutletTemp);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower = CVF_ZoneNum * std::abs(thisZoneHB.ZoneAirHumRat - OutletHumRat);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp = OutletTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat = OutletHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate = CVF_ZoneNum;
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate = state.dataHeatBalFanSys->CTMFL(ZoneNum);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd =
-                    state.dataHeatBalFanSys->CTMFL(ZoneNum) / state.dataEnvrn->StdRhoAir;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate = thisZoneHB.CTMFL;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd = thisZoneHB.CTMFL / state.dataEnvrn->StdRhoAir;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletDBTemp = Zone(ZoneNum).OutDryBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletWBTemp = Zone(ZoneNum).OutWetBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletHumRat = state.dataEnvrn->OutHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate =
-                    (std::abs(InletHumRat - OutletHumRat) * state.dataHeatBalFanSys->CTMFL(ZoneNum)) / RhoWater;
+                    (std::abs(InletHumRat - OutletHumRat) * thisZoneHB.CTMFL) / RhoWater;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeupRate = 0.0; // initialize -- calc in update
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpElecPower =
                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).RatedPumpPower * PumpPartLoadRat;

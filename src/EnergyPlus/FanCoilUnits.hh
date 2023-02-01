@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -267,160 +267,145 @@ namespace FanCoilUnits {
     {
         // Members
         Array1D_string FieldNames;
-
-        // Default Constructor
-        FanCoilNumericFieldData()
-        {
-        }
     };
 
     void SimFanCoilUnit(EnergyPlusData &state,
-                        std::string_view CompName,     // name of the fan coil unit
-                        int const ControlledZoneNum,   // number of zone being served
-                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                        Real64 &PowerMet,              // Sensible power supplied (W)
-                        Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
+                        std::string_view CompName, // name of the fan coil unit
+                        int ControlledZoneNum,     // number of zone being served
+                        bool FirstHVACIteration,   // TRUE if 1st HVAC simulation of system timestep
+                        Real64 &PowerMet,          // Sensible power supplied (W)
+                        Real64 &LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                         int &CompIndex);
 
     void GetFanCoilUnits(EnergyPlusData &state);
 
     void InitFanCoilUnits(EnergyPlusData &state,
-                          int const FanCoilNum,         // number of the current fan coil unit being simulated
-                          int const ControlledZoneNum); // number of zone being served
+                          int FanCoilNum,         // number of the current fan coil unit being simulated
+                          int ControlledZoneNum); // number of zone being served
 
-    void SizeFanCoilUnit(EnergyPlusData &state, int const FanCoilNum,
-                         int const ControlledZoneNum); // index into ZoneEquipConfig array
+    void SizeFanCoilUnit(EnergyPlusData &state, int FanCoilNum,
+                         int ControlledZoneNum); // index into ZoneEquipConfig array
 
     void Sim4PipeFanCoil(EnergyPlusData &state,
-                         int &FanCoilNum,               // number of the current fan coil unit being simulated
-                         int const ControlledZoneNum,   // index into ZoneEqupConfig
-                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                         Real64 &PowerMet,              // Sensible power supplied (W)
-                         Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
+                         int &FanCoilNum,          // number of the current fan coil unit being simulated
+                         int ControlledZoneNum,    // index into ZoneEqupConfig
+                         bool FirstHVACIteration,  // TRUE if 1st HVAC simulation of system timestep
+                         Real64 &PowerMet,         // Sensible power supplied (W)
+                         Real64 &LatOutputProvided // Latent power supplied (kg/s), negative = dehumidification
     );
 
     void TightenWaterFlowLimits(EnergyPlusData &state,
-                                int const FanCoilNum,          // Unit index in fan coil array
-                                bool const CoolingLoad,        // true if zone requires cooling
-                                bool const HeatingLoad,        // true if zone requires heating
-                                int const WaterControlNode,    // water control node, either cold or hot water
-                                int const ControlledZoneNum,   // controlling zone index
-                                bool const FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
-                                Real64 const QZnReq,           // zone load [W]
-                                Real64 &MinWaterFlow,          // minimum water flow rate
-                                Real64 &MaxWaterFlow           // maximum water flow rate
+                                int FanCoilNum,          // Unit index in fan coil array
+                                bool CoolingLoad,        // true if zone requires cooling
+                                bool HeatingLoad,        // true if zone requires heating
+                                int WaterControlNode,    // water control node, either cold or hot water
+                                int ControlledZoneNum,   // controlling zone index
+                                bool FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
+                                Real64 QZnReq,           // zone load [W]
+                                Real64 &MinWaterFlow,    // minimum water flow rate
+                                Real64 &MaxWaterFlow     // maximum water flow rate
     );
 
     void TightenAirAndWaterFlowLimits(EnergyPlusData &state,
-                                      int const FanCoilNum,          // Unit index in fan coil array
-                                      bool const CoolingLoad,        // true if zone requires cooling
-                                      bool const HeatingLoad,        // true if zone requires heating
-                                      int const WaterControlNode,    // water control node, either cold or hot water
-                                      int const ControlledZoneNum,   // controlling zone index
-                                      bool const FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
-                                      Real64 const QZnReq,           // zone load [W]
-                                      Real64 &PLRMin,                // minimum part-load ratio
-                                      Real64 &PLRMax                 // maximum part-load ratio
+                                      int FanCoilNum,          // Unit index in fan coil array
+                                      bool CoolingLoad,        // true if zone requires cooling
+                                      bool HeatingLoad,        // true if zone requires heating
+                                      int WaterControlNode,    // water control node, either cold or hot water
+                                      int ControlledZoneNum,   // controlling zone index
+                                      bool FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
+                                      Real64 QZnReq,           // zone load [W]
+                                      Real64 &PLRMin,          // minimum part-load ratio
+                                      Real64 &PLRMax           // maximum part-load ratio
     );
 
     void Calc4PipeFanCoil(EnergyPlusData &state,
-                          int const FanCoilNum,          // Unit index in fan coil array
-                          int const ControlledZoneNum,   // ZoneEquipConfig index
-                          bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                          Real64 &LoadMet,               // load met by unit (watts)
-                          Optional<Real64> PLR = _,      // Part Load Ratio, fraction of time step fancoil is on
-                          Real64 ElecHeatCoilPLR = 1.0   // electric heating coil PLR used with MultiSpeedFan capacity control
+                          int FanCoilNum,                      // Unit index in fan coil array
+                          int ControlledZoneNum,               // ZoneEquipConfig index
+                          bool FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
+                          Real64 &LoadMet,                     // load met by unit (watts)
+                          ObjexxFCL::Optional<Real64> PLR = _, // Part Load Ratio, fraction of time step fancoil is on
+                          Real64 ElecHeatCoilPLR = 1.0         // electric heating coil PLR used with MultiSpeedFan capacity control
     );
 
     void SimMultiStage4PipeFanCoil(EnergyPlusData &state,
-                                   int &FanCoilNum,               // number of the current fan coil unit being simulated
-                                   int const ControlledZoneNum,   // index into ZoneEqupConfig
-                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                                   Real64 &PowerMet               // Sensible power supplied (W)
+                                   int &FanCoilNum,         // number of the current fan coil unit being simulated
+                                   int ControlledZoneNum,   // index into ZoneEqupConfig
+                                   bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                                   Real64 &PowerMet         // Sensible power supplied (W)
     );
 
     void CalcMultiStage4PipeFanCoil(EnergyPlusData &state,
-                                    int &FanCoilNum,               // number of the current fan coil unit being simulated
-                                    int const ZoneNum,             // number of zone being served
-                                    bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                                    Real64 const QZnReq,           // current zone cooling or heating load
-                                    Real64 &SpeedRatio,            // fan coil speed ratio
-                                    Real64 &PartLoadRatio,         // fan coil part load ratio
-                                    Real64 &PowerMet               // Sensible power supplied (W)
+                                    int &FanCoilNum,         // number of the current fan coil unit being simulated
+                                    int ZoneNum,             // number of zone being served
+                                    bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                                    Real64 QZnReq,           // current zone cooling or heating load
+                                    Real64 &SpeedRatio,      // fan coil speed ratio
+                                    Real64 &PartLoadRatio,   // fan coil part load ratio
+                                    Real64 &PowerMet         // Sensible power supplied (W)
     );
 
-    void ReportFanCoilUnit(EnergyPlusData &state, int const FanCoilNum); // number of the current fan coil unit being simulated
+    void ReportFanCoilUnit(EnergyPlusData &state, int FanCoilNum); // number of the current fan coil unit being simulated
 
-    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int const FanCoilNum);
+    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int FanCoilNum);
 
-    int GetFanCoilOutAirNode(EnergyPlusData &state, int const FanCoilNum);
+    int GetFanCoilOutAirNode(EnergyPlusData &state, int FanCoilNum);
 
-    int GetFanCoilReturnAirNode(EnergyPlusData &state, int const FanCoilNum);
+    int GetFanCoilReturnAirNode(EnergyPlusData &state, int FanCoilNum);
 
-    int GetFanCoilMixedAirNode(EnergyPlusData &state, int const FanCoilNum);
-
-    int GetFanCoilInletAirNode(EnergyPlusData &state, int const FanCoilNum);
-
-    void GetFanCoilIndex(EnergyPlusData &state, std::string const &FanCoilName, int &FanCoilIndex);
+    int GetFanCoilMixedAirNode(EnergyPlusData &state, int FanCoilNum);
 
     Real64 CalcFanCoilLoadResidual(EnergyPlusData &state,
-                                   Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                                   Array1D<Real64> const &Par  // Function parameters
+                                   int FanCoilNum,          // Index to this fan coil unit
+                                   bool FirstHVACIteration, // FirstHVACIteration flag
+                                   int ControlledZoneNum,   // zone index
+                                   Real64 QZnReq,           // Sensible load to be met [W]
+                                   Real64 PartLoadRatio     // coil part load ratio
     );
 
     Real64 CalcFanCoilPLRResidual(EnergyPlusData &state,
-                                  Real64 const PLR,          // part-load ratio of air and water mass flow rate
-                                  Array1D<Real64> const &Par // Function parameters
+                                  Real64 PLR,              // part-load ratio of air and water mass flow rate
+                                  int FanCoilNum,          // Index to this fan coil unit
+                                  bool FirstHVACIteration, // FirstHVACIteration flag
+                                  int ControlledZoneNum,   // zone index
+                                  int WaterControlNode,    // water node to control
+                                  Real64 QZnReq            // Sensible load to be met [W] // Function parameters
     );
 
     Real64 CalcFanCoilHeatCoilPLRResidual(EnergyPlusData &state,
-                                          Real64 const CyclingR,     // electric heating coil cycling ratio
-                                          Array1D<Real64> const &Par // Function parameters
-    );
-
-    Real64 CalcFanCoilHWLoadResidual(EnergyPlusData &state,
-                                     Real64 const HWFlow,       // water mass flow rate [kg/s]
-                                     Array1D<Real64> const &Par // Function parameters
+                                          Real64 CyclingR, // electric heating coil cycling ratio
+                                          int FanCoilNum,
+                                          bool FirstHVACIteration,
+                                          int ZoneNum,
+                                          Real64 QZnReq // Function parameters
     );
 
     Real64 CalcFanCoilCWLoadResidual(EnergyPlusData &state,
-                                     Real64 const CWFlow,       // water mass flow rate [kg/s]
-                                     Array1D<Real64> const &Par // Function parameters
-    );
-    Real64 CalcFanCoilWaterFlowTempResidual(EnergyPlusData &state,
-                                            Real64 const WaterFlow,    // water mass flow rate [kg/s]
-                                            Array1D<Real64> const &Par // Function parameters
-    );
+                                     Real64 CWFlow, // water mass flow rate [kg/s]
+                                     int FanCoilNum,
+                                     bool FirstHVACIteration,
+                                     int ControlledZoneNum,
+                                     Real64 QZnReq);
 
     Real64 CalcFanCoilWaterFlowResidual(EnergyPlusData &state,
-                                        Real64 const WaterFlow,    // water mass flow rate [kg/s]
-                                        Array1D<Real64> const &Par // Function parameters
-    );
+                                        Real64 PLR,
+                                        int FanCoilNum,
+                                        bool FirstHVACIteration,
+                                        int ControlledZoneNum,
+                                        Real64 QZnReq,
+                                        int AirInNode,
+                                        int WaterControlNode,
+                                        Real64 maxCoilFluidFlow,
+                                        Real64 AirMassFlowRate);
 
     Real64 CalcFanCoilAirAndWaterFlowResidual(EnergyPlusData &state,
-                                              Real64 const WaterFlow,    // water mass flow rate [kg/s]
-                                              Array1D<Real64> const &Par // Function parameters
-    );
-
-    Real64 CalcFanCoilAirAndWaterInStepResidual(EnergyPlusData &state,
-                                                Real64 const PLR,          // air and water mass flow rate ratio
-                                                Array1D<Real64> const &Par // Function parameters
-    );
-
-    Real64 CalcFanCoilBothFlowResidual(EnergyPlusData &state,
-                                       Real64 const PLR,          // air and water mass flow rate ratio
-                                       Array1D<Real64> const &Par // Function parameters
-    );
-
-    Real64 CalcFanCoilElecHeatResidual(EnergyPlusData &state,
-                                       Real64 const PLR,          // electric heating coil part load ratio
-                                       Array1D<Real64> const &Par // Function parameters
-    );
-
-    Real64 CalcFanCoilElecHeatTempResidual(EnergyPlusData &state,
-                                           Real64 const PLR,          // electric heating coil part load ratio
-                                           Array1D<Real64> const &Par // Function parameters
-    );
+                                              Real64 WaterFlow, // water mass flow rate [kg/s]
+                                              int FanCoilNum,
+                                              bool FirstHVACIteration,
+                                              int ControlledZoneNum,
+                                              Real64 QZnReq,
+                                              int AirInNode,
+                                              int WaterControlNode,
+                                              Real64 MinWaterFlow);
 
 } // namespace FanCoilUnits
 
@@ -462,35 +447,7 @@ struct FanCoilUnitsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumFanCoils = 0;
-        this->Num4PipeFanCoils = 0;
-        this->MySizeFlag.deallocate();
-        this->CheckEquipName.deallocate();
-        this->GetFanCoilInputFlag = true;
-        this->FanFlowRatio = 0.0;
-        this->HeatingLoad = false;
-        this->CoolingLoad = false;
-        this->FanCoil.deallocate();
-        this->FanCoilNumericFields.deallocate();
-        this->InitFanCoilUnitsOneTimeFlag = true;
-        this->InitFanCoilUnitsCheckInZoneEquipmentListFlag = false;
-        this->ErrorsFound = false;
-        this->errFlag = false;
-        this->TotalArgs = 0;
-        this->ZoneExNodeNotFound = false;
-        this->ZoneInNodeNotFound = false;
-        this->ATMixerNum = 0;
-        this->ATMixerType = 0;
-        this->ATMixerPriNode = 0;
-        this->ATMixerSecNode = 0;
-        this->ATMixerOutNode = 0;
-        this->MyEnvrnFlag.clear();
-        this->MyPlantScanFlag.clear();
-        this->MyZoneEqFlag.clear();
-        this->CoilWaterInletNode = 0;
-        this->CoilWaterOutletNode = 0;
-        this->ATMixOutNode = 0;
-        this->ZoneNode = 0;
+        new (this) FanCoilUnitsData();
     }
 };
 

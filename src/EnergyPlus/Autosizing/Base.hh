@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,8 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/api/TypeDefs.h>
+
+#include <ObjexxFCL/Optional.hh>
 
 namespace EnergyPlus {
 
@@ -167,7 +169,7 @@ struct BaseSizer
     bool zoneEqVentedSlab = false; // ventilated slab zone equipment
 
     // global sizing data
-    Real64 minOA = 0.0;
+    DataSizing::OAControl minOA = DataSizing::OAControl::Invalid;
 
     // global Data* sizing constants
     bool dataEMSOverrideON = false;
@@ -302,8 +304,8 @@ public:
                                   std::string_view CompName,
                                   std::string_view VarDesc,
                                   Real64 VarValue,
-                                  Optional_string_const UsrDesc = _,
-                                  Optional<Real64 const> UsrValue = _);
+                                  ObjexxFCL::Optional_string_const UsrDesc = _,
+                                  ObjexxFCL::Optional<Real64 const> UsrValue = _);
 
     Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
     Real64 setHeatCoilInletTempForZoneEqSizing(Real64 outAirFrac,

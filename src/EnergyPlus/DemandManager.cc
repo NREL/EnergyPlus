@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -340,7 +340,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     int IOStat;    // IO Status when calling get input subroutine
     bool ErrorsFound(false);
 
-    std::string cCurrentModuleObject = "DemandManagerAssignmentList";
+    constexpr std::string_view cCurrentModuleObject = "DemandManagerAssignmentList";
     state.dataDemandManager->NumDemandManagerList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataDemandManager->NumDemandManagerList > 0) {
@@ -699,8 +699,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           AlphArray(2)));
                     ErrorsFound = true;
                 }
             } else {
@@ -742,13 +745,17 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
                     } else {
                         ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                            state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4) + "=\"" + AlphArray(LoadNum + 4) + "\" not found.");
+                                        format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                               CurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4),
+                                               AlphArray(LoadNum + 4)));
                         ErrorsFound = true;
                     }
                 } // LoadNum
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
+                ShowSevereError(state,
+                                format("{}=\"{}\" invalid value for number of loads.", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
@@ -790,8 +797,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           AlphArray(2)));
                     ErrorsFound = true;
                 }
             } else {
@@ -832,8 +842,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
                         ++DemandMgr(MgrNum).NumOfLoads;
                     } else {
                         ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                            state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4) + "=\"" + AlphArray(LoadNum + 4) + "\" not found.");
+                                        format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                               CurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4),
+                                               AlphArray(LoadNum + 4)));
                         ErrorsFound = true;
                     }
                 }
@@ -860,7 +873,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 } // LoadNum
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
+                ShowSevereError(state,
+                                format("{}=\"{}\" invalid value for number of loads.", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
@@ -902,8 +916,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           AlphArray(2)));
                     ErrorsFound = true;
                 }
             } else {
@@ -944,8 +961,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
                         ++DemandMgr(MgrNum).NumOfLoads;
                     } else {
                         ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                            state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4) + "=\"" + AlphArray(LoadNum + 4) + "\" not found.");
+                                        format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                               CurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4),
+                                               AlphArray(LoadNum + 4)));
                         ErrorsFound = true;
                     }
                 }
@@ -972,7 +992,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 } // LoadNum
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
+                ShowSevereError(state,
+                                format("{}=\"{}\" invalid value for number of loads.", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
@@ -1015,8 +1036,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           AlphArray(2)));
                     ErrorsFound = true;
                 }
             } else {
@@ -1037,7 +1061,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).UpperLimit = NumArray(3);
 
             if (DemandMgr(MgrNum).LowerLimit > DemandMgr(MgrNum).UpperLimit) {
-                ShowSevereError(state, "Invalid input for " + CurrentModuleObject + " = " + AlphArray(1));
+                ShowSevereError(state, format("Invalid input for {} = {}", CurrentModuleObject, AlphArray(1)));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(2),
@@ -1045,7 +1069,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                                          state.dataIPShortCut->cNumericFieldNames(3),
                                          NumArray(3)));
                 ShowContinueError(
-                    state, state.dataIPShortCut->cNumericFieldNames(2) + " cannot be greater than " + state.dataIPShortCut->cNumericFieldNames(3));
+                    state,
+                    format("{} cannot be greater than {}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->cNumericFieldNames(3)));
                 ErrorsFound = true;
             }
 
@@ -1071,8 +1096,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
                         ++DemandMgr(MgrNum).NumOfLoads;
                     } else {
                         ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                            state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4) + "=\"" + AlphArray(LoadNum + 4) + "\" not found.");
+                                        format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                               CurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4),
+                                               AlphArray(LoadNum + 4)));
                         ErrorsFound = true;
                     }
                 }
@@ -1097,7 +1125,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 } // LoadNum
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
+                ShowSevereError(state,
+                                format("{}=\"{}\" invalid value for number of loads.", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
@@ -1139,8 +1168,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           AlphArray(2)));
                     ErrorsFound = true;
                 }
             } else {
@@ -1184,9 +1216,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     ++DemandMgr(MgrNum).NumOfLoads;
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(LoadNum + AlphaShift) + "=\"" + AlphArray(LoadNum + AlphaShift) +
-                                        "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(LoadNum + AlphaShift),
+                                           AlphArray(LoadNum + AlphaShift)));
                     ErrorsFound = true;
                 }
             }
@@ -1200,7 +1234,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
+                ShowSevereError(state,
+                                format("{}=\"{}\" invalid value for number of loads.", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }

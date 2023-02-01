@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -155,229 +156,141 @@ enum class RptKey
 constexpr std::array<std::string_view, static_cast<int>(RptKey::Num)> RptKeyNamesUC{
     "COSTINFO", "DXF", "DXF:WIREFRAME", "VRML", "VERTICES", "DETAILS", "DETAILSWITHVERTICES", "LINES"};
 
-Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
-                     Array1S<Real64> const PropArray // Array of blind properties
-)
+// A second version that does not require a payload -- use lambdas
+void SolveRoot(EnergyPlusData &state,
+               Real64 Eps,   // required absolute accuracy
+               int MaxIte,   // maximum number of allowed iterations
+               int &Flag,    // integer storing exit status
+               Real64 &XRes, // value of x that solves f(x,Par) = 0
+               const std::function<Real64(Real64)> &f,
+               Real64 X_0, // 1st bound of interval that contains the solution
+               Real64 X_1) // 2nd bound of interval that contains the solution
 {
-
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   May 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+    //       AUTHOR         Michael Wetter
+    //       DATE WRITTEN   March 1999
+    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+    //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Does profile-angle interpolation of window blind solar-thermal properties
+    // Find the value of x between x0 and x1 such that f(x,Par)
+    // is equal to zero.
 
     // METHODOLOGY EMPLOYED:
-    // Linear interpolation.
+    // Uses the Regula Falsi (false position) method (similar to secant method)
 
-    // Return value
-    Real64 InterpProfAng;
+    // REFERENCES:
+    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+    // 2nd edition, 1992. Page 347 ff.
 
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    // = -2: f(x0) and f(x1) have the same sign
+    // = -1: no convergence
+    // >  0: number of iterations performed
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 InterpFac; // Interpolation factor
-    int IAlpha;       // Profile angle index
+    Real64 constexpr SMALL(1.e-10);
+    Real64 X0 = X_0;   // present 1st bound
+    Real64 X1 = X_1;   // present 2nd bound
+    Real64 XTemp = X0; // new estimate
+    int NIte = 0;      // number of interations
+    int AltIte = 0;    // an accounter used for Alternation choice
 
-    // DeltaAng = Pi/36
-    if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-        InterpProfAng = 0.0;
-    } else {
-        IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
-        InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
-        InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
+    Real64 Y0 = f(X0); // f at X0
+    Real64 Y1 = f(X1); // f at X1
+    // check initial values
+    if (Y0 * Y1 > 0) {
+        Flag = -2;
+        XRes = X0;
+        return;
     }
-    return InterpProfAng;
-}
+    XRes = XTemp;
 
-Real64 InterpSlatAng(Real64 const SlatAng,           // Slat angle (rad)
-                     bool const VarSlats,            // True if slat angle is variable
-                     Array1S<Real64> const PropArray // Array of blind properties as function of slat angle
-)
-{
+    while (true) {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   Dec 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Does slat-angle interpolation of window blind solar-thermal properties that
-    // do not depend on profile angle
-
-    // METHODOLOGY EMPLOYED:
-    // Linear interpolation.
-
-    // Using/Aliasing
-    using DataSurfaces::MaxSlatAngs;
-
-    // Return value
-    Real64 InterpSlatAng;
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    static Real64 const DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
-    static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 InterpFac; // Interpolation factor
-    int IBeta;        // Slat angle index
-    Real64 SlatAng1;
-
-    if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
-        SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
-    } else {
-        SlatAng1 = SlatAng;
-    }
-
-    if (VarSlats) { // Variable-angle slats
-        IBeta = 1 + int(SlatAng1 * DeltaAng_inv);
-        InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv;
-        InterpSlatAng = PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
-    } else { // Fixed-angle slats or shade
-        InterpSlatAng = PropArray(1);
-    }
-
-    return InterpSlatAng;
-}
-
-Real64 InterpProfSlatAng(Real64 const ProfAng,           // Profile angle (rad)
-                         Real64 const SlatAng,           // Slat angle (rad)
-                         bool const VarSlats,            // True if variable-angle slats
-                         Array2A<Real64> const PropArray // Array of blind properties
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   Dec 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Does simultaneous profile-angle and slat-angle interpolation of window
-    // blind solar-thermal properties that depend on profile angle and slat angle
-
-    // METHODOLOGY EMPLOYED:
-    // Linear interpolation.
-
-    // Using/Aliasing
-    using DataSurfaces::MaxSlatAngs;
-
-    // Return value
-    Real64 InterpProfSlatAng;
-
-    // Argument array dimensioning
-    PropArray.dim(MaxSlatAngs, 37);
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const DeltaProfAng(DataGlobalConstants::Pi / 36.0);
-    Real64 const DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 ProfAngRatio; // Profile angle interpolation factor
-    Real64 SlatAngRatio; // Slat angle interpolation factor
-    int IAlpha;          // Profile angle index
-    int IBeta;           // Slat angle index
-    Real64 Val1;         // Property values at points enclosing the given ProfAngle and SlatAngle
-    Real64 Val2;
-    Real64 Val3;
-    Real64 Val4;
-    Real64 ValA; // Property values at given SlatAngle to be interpolated in profile angle
-    Real64 ValB;
-    Real64 SlatAng1;
-    Real64 ProfAng1;
-
-    if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-        SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
-
-        // This is not correct, fixed 2/17/2010
-        // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-        ProfAng1 = min(max(ProfAng, -DataGlobalConstants::PiOvr2), DataGlobalConstants::PiOvr2);
-    } else {
-        SlatAng1 = SlatAng;
-        ProfAng1 = ProfAng;
-    }
-
-    IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1;
-    ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
-
-    if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
-        IBeta = int(SlatAng1 / DeltaSlatAng) + 1;
-        SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng;
-        Val1 = PropArray(IBeta, IAlpha);
-        Val2 = PropArray(min(MaxSlatAngs, IBeta + 1), IAlpha);
-        Val3 = PropArray(IBeta, min(37, IAlpha + 1));
-        Val4 = PropArray(min(MaxSlatAngs, IBeta + 1), min(37, IAlpha + 1));
-        ValA = Val1 + SlatAngRatio * (Val2 - Val1);
-        ValB = Val3 + SlatAngRatio * (Val4 - Val3);
-        InterpProfSlatAng = ValA + ProfAngRatio * (ValB - ValA);
-    } else { // Fixed-angle slats: interpolate only in profile angle
-        Val1 = PropArray(1, IAlpha);
-        Val2 = PropArray(1, min(37, IAlpha + 1));
-        InterpProfSlatAng = Val1 + ProfAngRatio * (Val2 - Val1);
-    }
-
-    return InterpProfSlatAng;
-}
-
-Real64 BlindBeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (rad)
-                          Real64 const SlatAng,        // Slat angle (rad)
-                          Real64 const SlatWidth,      // Slat width (m)
-                          Real64 const SlatSeparation, // Slat separation (distance between surfaces of adjacent slats) (m)
-                          Real64 const SlatThickness   // Slat thickness (m)
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   Jan 2002
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Calculates beam-to-beam transmittance of a window blind
-
-    // METHODOLOGY EMPLOYED:
-    // Based on solar profile angle and slat geometry
-
-    // Return value
-    Real64 BlindBeamBeamTrans;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 fEdge;      // Slat edge correction factor
-    Real64 wbar;       // Intermediate variable
-    Real64 gamma;      // Intermediate variable
-    Real64 fEdge1;     // Intermediate variable
-    Real64 CosProfAng; // Cosine of profile angle
-
-    CosProfAng = std::cos(ProfAng);
-    gamma = SlatAng - ProfAng;
-    wbar = SlatSeparation;
-    if (CosProfAng != 0.0) wbar = SlatWidth * std::cos(gamma) / CosProfAng;
-    BlindBeamBeamTrans = max(0.0, 1.0 - std::abs(wbar / SlatSeparation));
-
-    if (BlindBeamBeamTrans > 0.0) {
-
-        // Correction factor that accounts for finite thickness of slats. It is used to modify the
-        // blind transmittance to account for reflection and absorption by the slat edges.
-        // fEdge is ratio of area subtended by edge of slat to area between tops of adjacent slats.
-
-        fEdge = 0.0;
-        fEdge1 = 0.0;
-        if (std::abs(std::sin(gamma)) > 0.01) {
-            if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2 && ProfAng <= SlatAng) ||
-                (SlatAng > DataGlobalConstants::PiOvr2 && SlatAng <= DataGlobalConstants::Pi && ProfAng > -(DataGlobalConstants::Pi - SlatAng)))
-                fEdge1 = SlatThickness * std::abs(std::sin(gamma)) / ((SlatSeparation + SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
-            fEdge = min(1.0, std::abs(fEdge1));
+        Real64 DY = Y0 - Y1;
+        if (std::abs(DY) < SMALL) DY = SMALL;
+        if (std::abs(X1 - X0) < SMALL) {
+            break;
         }
-        BlindBeamBeamTrans *= (1.0 - fEdge);
-    }
+        // new estimation
+        switch (state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver) {
+        case HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+            XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::Bisection: {
+            XTemp = (X1 + X0) / 2.0;
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+            if (NIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+            if (NIte <= state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::Alternation: {
+            if (AltIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+                if (AltIte >= 2 * state.dataRootFinder->HVACSystemRootFinding.NumOfIter) AltIte = 0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        default: {
+            XTemp = (Y0 * X1 - Y1 * X0) / DY;
+        }
+        }
 
-    return BlindBeamBeamTrans;
+        Real64 const YTemp = f(XTemp);
+
+        ++NIte;
+        ++AltIte;
+
+        // check convergence
+        if (std::abs(YTemp) < Eps) {
+            Flag = NIte;
+            XRes = XTemp;
+            return;
+        };
+
+        // OK, so we didn't converge, lets check max iterations to see if we should break early
+        if (NIte > MaxIte) break;
+
+        // Finally, if we make it here, we have not converged, and we still have iterations left, so continue
+        // and reassign values (only if further iteration required)
+        if (Y0 < 0.0) {
+            if (YTemp < 0.0) {
+                X0 = XTemp;
+                Y0 = YTemp;
+            } else {
+                X1 = XTemp;
+                Y1 = YTemp;
+            }
+        } else {
+            if (YTemp < 0.0) {
+                X1 = XTemp;
+                Y1 = YTemp;
+            } else {
+                X0 = XTemp;
+                Y0 = YTemp;
+            }
+        } // ( Y0 < 0 )
+    }     // Cont
+
+    // if we make it here we haven't converged, so just set the flag and leave
+    Flag = -1;
+    XRes = XTemp;
 }
 
 std::string &strip_trailing_zeros(std::string &InputString)
@@ -447,7 +360,7 @@ void ProcessDateString(EnergyPlusData &state,
                        int &PWeekDay,
                        WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                        bool &ErrorsFound,
-                       Optional_int PYear)
+                       ObjexxFCL::Optional_int PYear)
 {
 
     // SUBROUTINE INFORMATION:
@@ -477,7 +390,7 @@ void ProcessDateString(EnergyPlusData &state,
             PDay = 0;
             DateType = WeatherManager::DateType::MonthDay;
         } else if (FstNum < 0 || FstNum > 366) {
-            ShowSevereError(state, "Invalid Julian date Entered=" + String);
+            ShowSevereError(state, format("Invalid Julian date Entered={}", String));
             ErrorsFound = true;
         } else {
             InvOrdinalDay(FstNum, PMonth, PDay, 0);
@@ -512,7 +425,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                          int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
                          WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                          bool &ErrorsFound,                  // Set to true if cannot process this string as a date
-                         Optional_int TokenYear              // Value of Year if one appears to be present and this argument is present
+                         ObjexxFCL::Optional_int TokenYear   // Value of Year if one appears to be present and this argument is present
 )
 {
 
@@ -577,7 +490,7 @@ void DetermineDateTokens(EnergyPlusData &state,
 
     strip(CurrentString);
     if (CurrentString == BlankString) {
-        ShowSevereError(state, "Invalid date field=" + String);
+        ShowSevereError(state, format("Invalid date field={}", String));
         ErrorsFound = true;
     } else {
         Loop = 0;
@@ -591,7 +504,7 @@ void DetermineDateTokens(EnergyPlusData &state,
             strip(CurrentString);
         }
         if (not_blank(CurrentString)) {
-            ShowSevereError(state, "Invalid date field=" + String);
+            ShowSevereError(state, format("Invalid date field={}", String));
             ErrorsFound = true;
         } else if (Loop == 2) {
             // Field must be Day Month or Month Day (if both numeric, mon / day)
@@ -601,7 +514,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                 // Month day, but first field is not numeric, 2nd must be
                 NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                 if (errFlag) {
-                    ShowSevereError(state, "Invalid date field=" + String);
+                    ShowSevereError(state, format("Invalid date field={}", String));
                     InternalError = true;
                 } else {
                     TokenDay = NumField2;
@@ -669,7 +582,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                             if (TokenMonth == 0) InternalError = true;
                         }
                     } else { // error....
-                        ShowSevereError(state, "First date field not numeric, field=" + String);
+                        ShowSevereError(state, format("First date field not numeric, field={}", String));
                     }
                 }
             } else { // mm/dd/yyyy or yyyy/mm/dd
@@ -694,7 +607,7 @@ void DetermineDateTokens(EnergyPlusData &state,
             }
         } else {
             // Not enough or too many fields
-            ShowSevereError(state, "Invalid date field=" + String);
+            ShowSevereError(state, format("Invalid date field={}", String));
             ErrorsFound = true;
         }
     }
@@ -734,7 +647,7 @@ void ValidateMonthDay(EnergyPlusData &state,
         if (Day < 1 || Day > EndMonthDay[Month - 1]) InternalError = true;
     }
     if (InternalError) {
-        ShowSevereError(state, "Invalid Month Day date format=" + String);
+        ShowSevereError(state, format("Invalid Month Day date format={}", String));
         ErrorsFound = true;
     } else {
         ErrorsFound = false;
@@ -918,7 +831,7 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
         ActualTimeMinS = 0;
     }
     const auto TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
-    auto minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
+    Real64 minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
 
     auto TimeStmpE = format("{:02}:{:2.0F}", static_cast<int>(ActualTimeE), minutes);
 
@@ -1383,9 +1296,9 @@ void ParseTime(Real64 const Time, // Time value in seconds
 void ScanForReports(EnergyPlusData &state,
                     std::string const &reportName,
                     bool &DoReport,
-                    Optional_string_const ReportKey,
-                    Optional_string Option1,
-                    Optional_string Option2)
+                    ObjexxFCL::Optional_string_const ReportKey,
+                    ObjexxFCL::Optional_string Option1,
+                    ObjexxFCL::Optional_string Option2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1494,14 +1407,16 @@ void ScanForReports(EnergyPlusData &state,
                     state.dataGlobal->ShowDecayCurvesInEIO = true;
                     break;
                 default: // including empty
-                    ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
+                    ShowWarningError(state, format("{}: No {} supplied.", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1)));
                     ShowContinueError(state,
                                       R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
                 }
             } catch (int e) {
                 ShowWarningError(state,
-                                 cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                     state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
+                                 format("{}: Invalid {}=\"{}\" supplied.",
+                                        cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaFieldNames(1),
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
             }
@@ -1744,15 +1659,15 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     bool TooLong = false;
     if (ItemLength > DataGlobalConstants::MaxNameLength) {
         ShowWarningError(state, fmt::format("{}{} Combination of ZoneList and Object Name generate a name too long.", calledFrom, CurrentObject));
-        ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
-        ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
+        ShowContinueError(state, format("Object Name=\"{}\".", ItemName));
+        ShowContinueError(state, format("ZoneList/Zone Name=\"{}\".", ZoneName));
         ShowContinueError(
             state,
             format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.", ItemLength, DataGlobalConstants::MaxNameLength));
         ShowContinueError(state,
                           format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
                                  MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength));
-        ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
+        ShowContinueError(state, format("name that will be used (may be needed in reporting)=\"{}\".", ResultName));
         TooLong = true;
     }
 

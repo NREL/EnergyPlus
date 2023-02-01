@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -817,10 +817,10 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
                                         int &NumAlphas,
                                         Array1D<Real64> &Numbers,
                                         int &NumNumbers,
-                                        Optional<Array1D_bool> NumBlank,
-                                        Optional<Array1D_bool> AlphaBlank,
-                                        Optional<Array1D_string> AlphaFieldNames,
-                                        Optional<Array1D_string> NumericFieldNames)
+                                        ObjexxFCL::Optional<Array1D_bool> NumBlank,
+                                        ObjexxFCL::Optional<Array1D_bool> AlphaBlank,
+                                        ObjexxFCL::Optional<Array1D_string> AlphaFieldNames,
+                                        ObjexxFCL::Optional<Array1D_string> NumericFieldNames)
 {
     auto const is_AlphaBlank = present(AlphaBlank);
     auto const is_AlphaFieldNames = present(AlphaFieldNames);
@@ -906,10 +906,10 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
                                    Array1D<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
-                                   Optional<Array1D_bool> NumBlank,
-                                   Optional<Array1D_bool> AlphaBlank,
-                                   Optional<Array1D_string> AlphaFieldNames,
-                                   Optional<Array1D_string> NumericFieldNames)
+                                   ObjexxFCL::Optional<Array1D_bool> NumBlank,
+                                   ObjexxFCL::Optional<Array1D_bool> AlphaBlank,
+                                   ObjexxFCL::Optional<Array1D_string> AlphaFieldNames,
+                                   ObjexxFCL::Optional<Array1D_string> NumericFieldNames)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -1419,7 +1419,7 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
         for (auto const &obj : object.value()) {
             auto const &find_extensions = obj.find(extension_key);
             if (find_extensions != obj.end()) {
-                auto const size = find_extensions.value().size();
+                size_t const size = find_extensions.value().size();
                 if (size > max_size) max_size = size;
             }
         }
@@ -1501,7 +1501,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
 
     for (auto const &obj : *objects) {
         if (obj.find(extension_key) != obj.end()) {
-            auto const size = obj[extension_key].size();
+            size_t const size = obj[extension_key].size();
             if (size > max_size) max_size = size;
         }
     }

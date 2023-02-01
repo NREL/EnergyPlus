@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,7 +78,7 @@ namespace InternalHeatGains {
     };
 
     void ManageInternalHeatGains(EnergyPlusData &state,
-                                 Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
+                                 ObjexxFCL::Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
     void GetInternalHeatGainsInput(EnergyPlusData &state);
 
@@ -108,10 +108,15 @@ namespace InternalHeatGains {
 
     void CheckLightsReplaceableMinMaxForZone(EnergyPlusData &state, int const WhichZone); // Zone Number
 
-    void UpdateInternalGainValues(EnergyPlusData &state, Optional_bool_const SuppressRadiationUpdate = _, Optional_bool_const SumLatentGains = _);
+    void UpdateInternalGainValues(EnergyPlusData &state,
+                                  ObjexxFCL::Optional_bool_const SuppressRadiationUpdate = _,
+                                  ObjexxFCL::Optional_bool_const SumLatentGains = _);
 
-    Real64 SumAllInternalConvectionGains(EnergyPlusData &state,
-                                         int const ZoneNum); // zone index pointer for which zone to sum gains for
+    Real64 zoneSumAllInternalConvectionGains(EnergyPlusData &state,
+                                             int const zoneNum); // zone index pointer to sum gains for
+
+    Real64 spaceSumAllInternalConvectionGains(EnergyPlusData &state,
+                                              int const spaceNum); // space index pointer to sum gains for
 
     Real64 SumAllInternalConvectionGainsExceptPeople(EnergyPlusData &state,
                                                      int const ZoneNum); // zone index pointer for which zone to sum gains for
@@ -151,9 +156,14 @@ namespace InternalHeatGains {
         const Array1D<Real64> &FractionARR // array of fractional multipliers to apply to devices
     );
 
-    Real64 SumAllReturnAirConvectionGains(EnergyPlusData &state,
-                                          int const ZoneNum,      // zone index pointer for which zone to sum gains for
-                                          int const ReturnNodeNum // return air node number
+    Real64 zoneSumAllReturnAirConvectionGains(EnergyPlusData &state,
+                                              int const zoneNum,      // zone index pointer to sum gains for
+                                              int const returnNodeNum // return air node number
+    );
+
+    Real64 spaceSumAllReturnAirConvectionGains(EnergyPlusData &state,
+                                               int const spaceNum,     // space index pointer to sum gains for
+                                               int const returnNodeNum // return air node number
     );
 
     Real64 SumReturnAirConvectionGainsByTypes(

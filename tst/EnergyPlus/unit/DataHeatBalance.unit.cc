@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -813,8 +813,8 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound);                  // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);            // expect no errors
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     ErrorsFound = false;
     GetFrameAndDividerData(*state, ErrorsFound);
@@ -844,9 +844,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
     EXPECT_EQ(state->dataConstruction->Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
-    EXPECT_EQ(state->dataMaterial->Material(4).Name, "SINGLEPANE"); // single pane glass
-    EXPECT_EQ(state->dataMaterial->Material(5).Name, "WINGAS");     // air gap
-    EXPECT_EQ(state->dataMaterial->Material(6).Name, "BLIND");      // window blind
+    EXPECT_EQ(state->dataMaterial->Material(4)->Name, "SINGLEPANE"); // single pane glass
+    EXPECT_EQ(state->dataMaterial->Material(5)->Name, "WINGAS");     // air gap
+    EXPECT_EQ(state->dataMaterial->Material(6)->Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(1), 4); // glass, outer layer

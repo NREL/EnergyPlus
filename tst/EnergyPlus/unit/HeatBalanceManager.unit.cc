@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,6 +80,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <nlohmann/json_literals.hpp>
 
@@ -167,7 +168,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     bool ErrorsFound(false);
 
-    GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -204,7 +205,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     bool ErrorsFound(false);
 
-    GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -339,20 +340,23 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
 
     bool ErrorsFound(false); // If errors detected in input
 
-    state->dataHeatBal->TotMaterials = 3;
-    state->dataMaterial->Material.allocate(state->dataHeatBal->TotMaterials);
-    state->dataMaterial->Material(1).Name = "GLASS";
-    state->dataMaterial->Material(2).Name = "AIRGAP";
-    state->dataMaterial->Material(3).Name = "GLASS";
+    state->dataMaterial->TotMaterials = 3;
+    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
+        Material::MaterialProperties *p = new Material::MaterialProperties;
+        state->dataMaterial->Material.push_back(p);
+    }
+    state->dataMaterial->Material(1)->Name = "GLASS";
+    state->dataMaterial->Material(2)->Name = "AIRGAP";
+    state->dataMaterial->Material(3)->Name = "GLASS";
 
     // Material layer group index
-    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::WindowGlass;
-    state->dataMaterial->Material(2).Group = DataHeatBalance::MaterialGroup::WindowGas;
-    state->dataMaterial->Material(3).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(2)->Group = Material::MaterialGroup::WindowGas;
+    state->dataMaterial->Material(3)->Group = Material::MaterialGroup::WindowGlass;
 
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
-    state->dataHeatBal->NominalR.allocate(state->dataHeatBal->TotMaterials);
+    state->dataHeatBal->NominalR.allocate(state->dataMaterial->TotMaterials);
     state->dataHeatBal->NominalR(1) = 0.4; // Set these explicity for each material layer to avoid random failures of check for
                                            // NominalRforNominalUCalculation == 0.0 at end of GetConstructData
     state->dataHeatBal->NominalR(2) = 0.4;
@@ -712,15 +716,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
-    EXPECT_EQ(state->dataMaterial->Material(1).Name, "THICKSOIL");
+    EXPECT_EQ(state->dataMaterial->Material(1)->Name, "THICKSOIL");
     // check maximum (saturated) moisture content
-    EXPECT_EQ(0.4, state->dataMaterial->Material(1).Porosity);
+    EXPECT_EQ(0.4, state->dataMaterial->Material(1)->Porosity);
     // check initial moisture Content was reset
-    EXPECT_EQ(0.4, state->dataMaterial->Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
+    EXPECT_EQ(0.4, state->dataMaterial->Material(1)->InitMoisture); // reset from 0.45 to 0.4 during get input
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
@@ -1219,7 +1223,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1255,7 +1259,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
 
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -1772,10 +1776,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, errorsfound);
+    Material::GetMaterialData(*state, errorsfound);
 
     EXPECT_FALSE(errorsfound);
-    EXPECT_NEAR(state->dataMaterial->Material(1).Resistance, 0.158, 0.0001);
+    EXPECT_NEAR(state->dataMaterial->Material(1)->Resistance, 0.158, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
@@ -1853,7 +1857,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     // skip call to get material data since this doesn't use IRT
     ErrorsFound = false;
-    EXPECT_EQ(state->dataHeatBal->TotMaterials, 0);
+    EXPECT_EQ(state->dataMaterial->TotMaterials, 0);
 
     // get constructions
     ErrorsFound = false;
@@ -2444,7 +2448,7 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput_invalidSched)
     });
     ASSERT_TRUE(process_idf(idf_objects_invalid_sch));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -2592,7 +2596,7 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 0);
     ScheduleManager::UpdateScheduleValues(*state);
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -2631,7 +2635,7 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     state->dataSurface->Surface(2).HasShadeControl = false;
-    state->dataMaterial->Material(3).Group = DataHeatBalance::MaterialGroup::Screen;
+    state->dataMaterial->Material(3)->Group = Material::MaterialGroup::Screen;
     GetIncidentSolarMultiplier(*state, ErrorsFound);
     error_string =
         delimited_string({"   ** Severe  ** Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window"});
