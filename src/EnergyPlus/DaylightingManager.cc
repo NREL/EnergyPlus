@@ -567,7 +567,8 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
 
     if (state.dataDaylightingManager->doSkyReporting) {
         if (!state.dataGlobal->KickOffSizing && !state.dataGlobal->KickOffSimulation) {
-            if (state.dataDaylightingManager->FirstTimeDaylFacCalc && state.dataDaylightingManager->TotWindowsWithDayl > 0) {
+            if (state.dataDaylightingManager->FirstTimeDaylFacCalc && state.dataDaylightingManager->TotWindowsWithDayl > 0 &&
+                (!state.dataSysVars->DetailedSolarTimestepIntegration || state.dataGlobal->HourOfDay == 12)) {
                 // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                 // for first time that daylight factors are calculated and so is insensitive to possible variation
                 // due to change in ground reflectance from month to month, or change in storm window status.
