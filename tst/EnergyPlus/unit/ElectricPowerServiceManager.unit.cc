@@ -692,6 +692,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+
     createFacilityElectricPowerServiceObject(*state);
     bool SimElecCircuitsFlag = false;
     // GetInput and other code will be executed and SimElectricCircuits will be true

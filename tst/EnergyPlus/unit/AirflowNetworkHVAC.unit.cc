@@ -2161,6 +2161,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataEnvrn->OutBaroPress = 99063.0;
     state->dataEnvrn->WindSpeed = 4.9;
     state->dataEnvrn->WindDir = 270.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     int index = UtilityRoutines::FindItemInList("OA INLET NODE", state->afn->AirflowNetworkNodeData);
     for (i = 1; i <= 36; ++i) {
@@ -2206,6 +2207,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     state->afn->PressureControllerData(1).OANodeNum = state->afn->DisSysCompReliefAirData(1).OutletNode;
+    state->afn->ANZT = 26.0;
+    state->afn->ANZW = 0.0011;
     state->afn->calculate_balance();
 
     // Check indoor pressure and mass flow rate
@@ -2225,7 +2228,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_NEAR(0.0, state->afn->linkReport(50).FLOW, 0.0001);
 
     // Start a test for #6005
-    state->afn->ANZT = 26.0;
     state->afn->MultizoneSurfaceData(2).HybridVentClose = true;
     state->afn->MultizoneSurfaceData(5).HybridVentClose = true;
     state->afn->MultizoneSurfaceData(14).HybridVentClose = true;

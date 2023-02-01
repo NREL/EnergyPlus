@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -411,6 +412,12 @@ TEST_F(EnergyPlusFixture, ExerciseSingleSpeedFluidCooler)
     state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
     state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
     state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+
+    // We don't set ptr->OutdoorAirInletNodeNum to a node, so the fluid cooler uses the dataEnvrn values
+    // We don't want them as 0 to avoid a divide by zero error, when PsyRhoAirFnPbTdbW will be called with these value in CalcFluidCoolerOutlet
+    EXPECT_EQ(0, ptr->OutdoorAirInletNodeNum);
+    state->dataEnvrn->OutBaroPress = 101325;
+    state->dataEnvrn->OutHumRat = 0.0001;
 
     bool firstHVAC = true;
     Real64 curLoad = 0.0;

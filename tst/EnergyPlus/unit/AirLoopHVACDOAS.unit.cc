@@ -4031,13 +4031,29 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     ZoneEquipmentManager::GetZoneEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
+
+    // EXPECT_TRUE(false) << fmt::format("constexpr std::array<std::string_view, {}> nodeNames = {{\"{}\"}}",
+    //                                   state->dataLoopNodes->NumOfNodes,
+    //                                   fmt::join(state->dataLoopNodes->NodeID, "\", \""));
+
     // OA inlet node
+    EXPECT_EQ("PSZ-AC:1_OAINLET NODE", state->dataLoopNodes->NodeID(2));
+    EXPECT_EQ("PSZ-AC:2_OAINLET NODE", state->dataLoopNodes->NodeID(3));
+    EXPECT_EQ("PSZ-AC:3_OAINLET NODE", state->dataLoopNodes->NodeID(4));
+    EXPECT_EQ("PSZ-AC:4_OAINLET NODE", state->dataLoopNodes->NodeID(5));
+    EXPECT_EQ("PSZ-AC:5_OAINLET NODE", state->dataLoopNodes->NodeID(6));
     state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(5).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(6).MassFlowRate = 0.1;
+
     // OA relief node
+    EXPECT_EQ("PSZ-AC:1_OARELIEF NODE", state->dataLoopNodes->NodeID(62));
+    EXPECT_EQ("PSZ-AC:2_OARELIEF NODE", state->dataLoopNodes->NodeID(63));
+    EXPECT_EQ("PSZ-AC:3_OARELIEF NODE", state->dataLoopNodes->NodeID(64));
+    EXPECT_EQ("PSZ-AC:4_OARELIEF NODE", state->dataLoopNodes->NodeID(65));
+    EXPECT_EQ("PSZ-AC:5_OARELIEF NODE", state->dataLoopNodes->NodeID(66));
     state->dataLoopNodes->Node(62).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(63).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(64).MassFlowRate = 0.1;
@@ -4058,16 +4074,22 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     int index = 0;
     thisAirLoopDOASObjec.SizingOnceFlag = false;
+    EXPECT_EQ("OUTSIDE AIR INLET NODE 1", state->dataLoopNodes->NodeID(11));
     state->dataLoopNodes->Node(11).Temp = -10.0;
     state->dataLoopNodes->Node(11).HumRat = 0.0008;
-    state->dataLoopNodes->Node(70).TempSetPoint = 4.5;
+
+    EXPECT_EQ("AIRLOOPDOASSPLITTERINLET", state->dataLoopNodes->NodeID(70));
+    state->dataLoopNodes->Node(67).TempSetPoint = 4.5;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
+    state->dataEnvrn->OutBaroPress = 101325.0;
     thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
 
     // Mixer outlet
+    EXPECT_EQ("AIRLOOPDOASMIXEROUTLET", state->dataLoopNodes->NodeID(68));
     EXPECT_NEAR(23.0, state->dataLoopNodes->Node(68).Temp, 0.0001);
     EXPECT_NEAR(0.5, state->dataLoopNodes->Node(68).MassFlowRate, 0.0001);
     // Outlet of HX
+    EXPECT_EQ("DOAS HEAT RECOVERY SUPPLY OUTLET", state->dataLoopNodes->NodeID(67));
     EXPECT_NEAR(-8.0710884, state->dataLoopNodes->Node(67).Temp, 0.0001);
     // Outlet of Central DOAS
     EXPECT_NEAR(4.5, state->dataLoopNodes->Node(70).Temp, 0.0001);

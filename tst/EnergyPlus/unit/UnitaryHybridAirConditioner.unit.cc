@@ -683,12 +683,42 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInp
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     GetInputZoneHybridUnitaryAirConditioners(*state, ErrorsFound);
+
+    // Avoid a crash in Psychrometrics function because nodes aren't initialized
+    auto &thisUnitary = state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
+
+    auto &inletNode = state->dataLoopNodes->Node(thisUnitary.InletNode);
+    inletNode.Temp = 17.57;
+    inletNode.HumRat = 0.007;
+    inletNode.Press = 101325.0;
+    inletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat);
+    inletNode.MassFlowRate = 0.25;
+
+    auto &outletNode = state->dataLoopNodes->Node(thisUnitary.OutletNode);
+    outletNode.Temp = 21.1;
+    outletNode.HumRat = 0.007;
+    outletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(outletNode.Temp, outletNode.HumRat);
+    outletNode.MassFlowRate = 0.25;
+
+    auto &secondaryInletNode = state->dataLoopNodes->Node(thisUnitary.SecondaryInletNode);
+    secondaryInletNode.Temp = 17.57;
+    secondaryInletNode.HumRat = 0.007;
+    secondaryInletNode.Press = 101325.0;
+    secondaryInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(secondaryInletNode.Temp, secondaryInletNode.HumRat);
+    secondaryInletNode.MassFlowRate = 0.25;
+
+    auto &secondaryOutletNode = state->dataLoopNodes->Node(thisUnitary.SecondaryOutletNode);
+    secondaryOutletNode.Temp = 21.1;
+    secondaryOutletNode.HumRat = 0.007;
+    secondaryOutletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(secondaryOutletNode.Temp, secondaryOutletNode.HumRat);
+    secondaryOutletNode.MassFlowRate = 0.25;
+
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
-    Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
-    pZoneHybridUnitaryAirConditioner->Initialize(1);
-    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+    // Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
+    thisUnitary.Initialize(1);
+    thisUnitary.InitializeModelParams();
     constexpr unsigned long expectedOperatingModesSize = 1;
-    EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), expectedOperatingModesSize);
+    EXPECT_EQ(thisUnitary.OperatingModes.size(), expectedOperatingModesSize);
 }
 
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
