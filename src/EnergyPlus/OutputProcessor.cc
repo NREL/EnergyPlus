@@ -137,7 +137,7 @@ namespace OutputProcessor {
         state.dataOutputProcessor->IVariableTypes.redimension(state.dataOutputProcessor->MaxIVariable += IVarAllocInc);
     }
 
-    int DetermineMinuteForReporting(EnergyPlusData &state, TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:

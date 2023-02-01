@@ -550,8 +550,7 @@ namespace OutputProcessor {
         Array1D_string spaceTypeName; // Array of space type names
     };
 
-    int DetermineMinuteForReporting(EnergyPlusData &state,
-                                    OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(EnergyPlusData &state);
 
     void InitializeOutput(EnergyPlusData &state);
 

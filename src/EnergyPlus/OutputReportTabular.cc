@@ -3714,7 +3714,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                 newDuration = 0.0;
                 activeNewValue = false;
                 // the current timestamp
-                minuteCalculated = OutputProcessor::DetermineMinuteForReporting(state, t_timeStepType);
+                minuteCalculated = OutputProcessor::DetermineMinuteForReporting(state);
                 //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                 //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated +
                 //      SysTimeElapsed * 60 minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
@@ -4294,7 +4294,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                     ort->gatherDemandTotal(iResource) = curDemandValue;
                     // save the time that the peak demand occurred
                     //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
-                    minuteCalculated = OutputProcessor::DetermineMinuteForReporting(state, t_timeStepType);
+                    minuteCalculated = OutputProcessor::DetermineMinuteForReporting(state);
                     EncodeMonDayHrMin(
                         timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                     ort->gatherDemandTimeStamp(iResource) = timestepTimeStamp;
@@ -4857,7 +4857,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
                 //      ActualtimeE = ActualTimeS+TimeStepSys
                 //      ActualTimeHrS=INT(ActualTimeS)
                 //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-                ActualTimeMin = OutputProcessor::DetermineMinuteForReporting(state, t_timeStepType);
+                ActualTimeMin = OutputProcessor::DetermineMinuteForReporting(state);
                 EncodeMonDayHrMin(state.dataOutRptTab->timestepTimeStampGHGR,
                                   state.dataEnvrn->Month,
                                   state.dataEnvrn->DayOfMonth,
@@ -4970,7 +4970,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
                 //      ActualtimeE = ActualTimeS+TimeStepSys
                 //      ActualTimeHrS=INT(ActualTimeS)
                 //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-                ActualTimeMin = OutputProcessor::DetermineMinuteForReporting(state, t_timeStepType);
+                ActualTimeMin = OutputProcessor::DetermineMinuteForReporting(state);
                 EncodeMonDayHrMin(state.dataOutRptTab->timestepTimeStampGHGR,
                                   state.dataEnvrn->Month,
                                   state.dataEnvrn->DayOfMonth,
@@ -5091,7 +5091,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
         //  ActualtimeE = ActualTimeS+TimeStepSys
         //  ActualTimeHrS=INT(ActualTimeS)
         //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-        ActualTimeMin = OutputProcessor::DetermineMinuteForReporting(state, t_timeStepType);
+        ActualTimeMin = OutputProcessor::DetermineMinuteForReporting(state);
         EncodeMonDayHrMin(state.dataOutRptTab->timestepTimeStampGHGR,
                           state.dataEnvrn->Month,
                           state.dataEnvrn->DayOfMonth,
@@ -5197,7 +5197,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
         //  ActualtimeE = ActualTimeS+TimeStepSys
         //  ActualTimeHrS=INT(ActualTimeS)
         //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-        ActualTimeMin = OutputProcessor::DetermineMinuteForReporting(state, t_timeStepType);
+        ActualTimeMin = OutputProcessor::DetermineMinuteForReporting(state);
         EncodeMonDayHrMin(state.dataOutRptTab->timestepTimeStampGHGR,
                           state.dataEnvrn->Month,
                           state.dataEnvrn->DayOfMonth,
