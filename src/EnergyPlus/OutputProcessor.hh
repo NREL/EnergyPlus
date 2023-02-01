@@ -603,8 +603,6 @@ namespace OutputProcessor {
     // The following routines implement Energy Meters in EnergyPlus.
     // *****************************************************************************
 
-    void InitializeMeters(EnergyPlusData &state);
-
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound);
 
     void
