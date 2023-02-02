@@ -8419,6 +8419,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     DOAS_OAInletNode.HumRat = 0.0008;
     AirLoopDOAS_SplitterInletNode.TempSetPoint = 7.5;
 
+    state->dataEnvrn->OutBaroPress = 101325.0;
+
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     // simulte the DOAS
     thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
