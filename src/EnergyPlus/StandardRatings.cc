@@ -469,22 +469,22 @@ namespace StandardRatings {
             if (CondenserType == DataPlant::CondenserType::WaterCooled) {
                 // get the entering water temperature for the reduced capacity test conditions
                 if (ReducedPLR[RedCapNum] > 0.50) {
-                    EnteringWaterTempReduced = 8.0 + 22.0 * ReducedPLR[RedCapNum];
+                    EnteringWaterTempReduced = 7.22 + 22.22 * ReducedPLR[RedCapNum];
                 } else {
-                    EnteringWaterTempReduced = 19.0;
+                    EnteringWaterTempReduced = 18.33;
                 }
                 CondenserInletTemp = EnteringWaterTempReduced;
             } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
                 // get the outdoor air dry bulb temperature for the reduced capacity test conditions
-                if (ReducedPLR[RedCapNum] > 0.3125) {
-                    EnteringAirDryBulbTempReduced = 3.0 + 32.0 * ReducedPLR[RedCapNum];
+                if (ReducedPLR[RedCapNum] > 0.33) {
+                    EnteringAirDryBulbTempReduced = 1.67 + 33.33 * ReducedPLR[RedCapNum];
                 } else {
-                    EnteringAirDryBulbTempReduced = 13.0;
+                    EnteringAirDryBulbTempReduced = 12.78;
                 }
                 CondenserInletTemp = EnteringAirDryBulbTempReduced;
             } else { // EvaporativelyCooled Condenser
                 // get the outdoor air wet bulb temperature for the reduced capacity test conditions
-                EnteringAirWetBulbTempReduced = 10.0 + 14.0 * ReducedPLR[RedCapNum];
+                EnteringAirWetBulbTempReduced = 10.0 + 13.89 * ReducedPLR[RedCapNum];
                 CondenserInletTemp = EnteringAirWetBulbTempReduced;
             }
 
