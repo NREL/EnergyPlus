@@ -2416,7 +2416,6 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
     // REFERENCES: None
 
     // Using/Aliasing
-    using General::GetPreviousHVACTime;
     using HVACInterfaceManager::UpdateHVACInterface;
 
     // Locals
@@ -2481,7 +2480,7 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
     // reflect the numerical work. The condition to detect a new HVAC time step is essentially
     // based on the time stamp at the beginning of the current HVAC step (expressed in seconds).
     if (FirstHVACIteration) {
-        rxTime = GetPreviousHVACTime(state);
+        rxTime = HVACControllers::GetPreviousHVACTime(state);
         if (state.dataSimAirServingZones->SavedPreviousHVACTime != rxTime) {
             state.dataSimAirServingZones->SavedPreviousHVACTime = rxTime;
             state.dataSimAirServingZones->salIterTot = 0;
