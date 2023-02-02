@@ -2045,6 +2045,7 @@ namespace WaterToAirHeatPumpSimple {
                             // Set the global DX cooling coil capacity variable for use by other objects
                             state.dataSize->DXCoolCap = simpleWatertoAirHP.RatedCapCoolTotal;
                         }
+                        state.dataSize->DataCoolCoilCap = state.dataSize->DXCoolCap;
                     } else {
                         // adjust for system air flow -- capacity is based on cooling design day calcs
                         // adjust by ratio of system to cooling air flow rate and enthalpy delta across the coil at these different airflow
@@ -2321,7 +2322,7 @@ namespace WaterToAirHeatPumpSimple {
                         state,
                         format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                         simpleWatertoAirHP.Name);
-                    if (HeatingAirVolFlowRateDes > 0.0) {
+                    if (HeatingAirVolFlowRateDes > 0.0 && state.dataSize->DXCoolCap == 0.0) { // not a HP
                         VolFlowRate = HeatingAirVolFlowRateDes;
                     } else {
                         VolFlowRate = CoolingAirVolFlowRateDes; // system air flow
@@ -2367,8 +2368,12 @@ namespace WaterToAirHeatPumpSimple {
                             HeatdTratio = (HeatSupTemp - HeatMixTempSys) / (HeatSupTemp - HeatMixTemp);
                         }
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HeatMixTemp, HeatMixHumRat, RoutineName);
-                        HeatCapAtPeak = rhoair * VolFlowRate * Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
-                                        (HeatSupTemp - HeatMixTemp);                                     // heating coil load
+                        if (state.dataSize->DXCoolCap > 0.0) {
+                            HeatCapAtPeak = state.dataSize->DXCoolCap; // parent set coil load
+                        } else {
+                            HeatCapAtPeak = rhoair * VolFlowRate * Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
+                                            (HeatSupTemp - HeatMixTemp); // heating coil load
+                        }
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // remove fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
                             case DataAirSystems::StructArrayLegacyFanModels: {
@@ -2441,7 +2446,11 @@ namespace WaterToAirHeatPumpSimple {
                         // note: the rated capacity can be different than the capacity at
                         // rated conditions if the capacity curve isn't normalized at the
                         // rated conditions
-                        RatedCapHeatDes = (PeakHeatCapTempModFac > 0.0) ? HeatCapAtPeak / PeakHeatCapTempModFac : HeatCapAtPeak;
+                        if (state.dataSize->DXCoolCap > 0.0) {
+                            RatedCapHeatDes = state.dataSize->DXCoolCap;
+                        } else {
+                            RatedCapHeatDes = (PeakHeatCapTempModFac > 0.0) ? HeatCapAtPeak / PeakHeatCapTempModFac : HeatCapAtPeak;
+                        }
                     } else {
                         RatedCapHeatDes = 0.0;
                         RatedHeatratioTS = 0.0; // Clang complains it is used uninitialized if you don't give it a value

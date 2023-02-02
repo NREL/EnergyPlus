@@ -1717,6 +1717,7 @@ namespace UnitarySystems {
             state.dataSize->DataIsDXCoil = false;
             state.dataSize->DataTotCapCurveIndex = 0;
             state.dataSize->DataFlowUsedForSizing = 0.0;
+            state.dataSize->DataCoolCoilCap = CoolCapAtPeak;
         }
 
         // STEP 2: find the DataSizing::AutoSized heating air flow rate and capacity

@@ -337,6 +337,8 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 } else {
                     if (this->dataCoolCoilCap > 0.0) { // this line can't get executed with same logic above else
                         NominalCapacityDes = this->dataCoolCoilCap;
+                    } else if (state.dataSize->DXCoolCap > 0.0) {
+                        NominalCapacityDes = state.dataSize->DXCoolCap;
                     } else if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
                         NominalCapacityDes = DesCoilLoad;
                     } else {
