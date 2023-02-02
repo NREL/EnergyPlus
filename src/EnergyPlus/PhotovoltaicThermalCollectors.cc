@@ -1645,7 +1645,7 @@ namespace PhotovoltaicThermalCollectors {
         }
         ThEff = 0.0;
         if ((q > small_num) && (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) > small_num))
-            ThEff = q / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + small_num); // Thermal efficiency of BIPVT
+            ThEff = q / (area_wall_total * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + small_num); // Thermal efficiency of BIPVT
         this->BIPVT.Tcoll = t1;
         this->BIPVT.HrPlen = hrad12;
         this->BIPVT.Tplen = tfavg;

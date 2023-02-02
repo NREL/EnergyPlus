@@ -90,6 +90,18 @@ TEST_F(EnergyPlusFixture, BIPVT_calc_k_taoalpha)
     k_glass = 10.0; // higher value
     k_taoalpha = thisBIPVT.calc_k_taoalpha(theta, glass_thickness, refrac_index_glass, k_glass);
     EXPECT_NEAR(k_taoalpha, 0.986, 0.001);
+    k_glass = 32.0; // higher value
+    theta = 0.0;
+    glass_thickness = 0.006;
+    refrac_index_glass = 1.52;
+    k_taoalpha = thisBIPVT.calc_k_taoalpha(theta, glass_thickness, refrac_index_glass, k_glass);
+    EXPECT_EQ(k_taoalpha, 1.0);
+    k_glass = 32.0; // higher value
+    theta = DataGlobalConstants::Pi / 4.0;
+    glass_thickness = 0.006;
+    refrac_index_glass = 1.52;
+    k_taoalpha = thisBIPVT.calc_k_taoalpha(theta, glass_thickness, refrac_index_glass, k_glass);
+    EXPECT_NEAR(k_taoalpha, 0.965, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
@@ -282,7 +294,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(bypassFraction, 0.0, 0.001);
     EXPECT_NEAR(potentialHeatGain, 41.68, 0.01);
     EXPECT_NEAR(potentialOutletTemp, 14.14, 0.01);
-    EXPECT_NEAR(eff, 0.0733, 0.0001);
+    EXPECT_NEAR(eff, 0.0013, 0.0001);
     EXPECT_NEAR(tCollector, 21.57, 0.01);
 
     // case 2: double the channel depth vs case 1
@@ -301,7 +313,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(bypassFraction, 0.0, 0.001);
     EXPECT_NEAR(potentialHeatGain, 41.59, 0.01);
     EXPECT_NEAR(potentialOutletTemp, 14.13, 0.01);
-    EXPECT_NEAR(eff, 0.0731, 0.001);
+    EXPECT_NEAR(eff, 0.0013, 0.001);
     EXPECT_NEAR(tCollector, 21.64, 0.01);
 
     // case 3: higher mass flow rate vs case 1
@@ -320,7 +332,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(bypassFraction, 0.0, 0.001);
     EXPECT_NEAR(potentialHeatGain, 524.64, 0.01);
     EXPECT_NEAR(potentialOutletTemp, 15.21, 0.01);
-    EXPECT_NEAR(eff, 0.922, 0.001);
+    EXPECT_NEAR(eff, 0.016, 0.001);
     EXPECT_NEAR(tCollector, 20.93, 0.01);
 
     // case 4: heating mode and bypass fraction > 0.0
@@ -338,7 +350,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(bypassFraction, 0.430, 0.001);
     EXPECT_NEAR(potentialHeatGain, 9.27, 0.01);
     EXPECT_NEAR(potentialOutletTemp, 23.92, 0.01);
-    EXPECT_NEAR(eff, 0.0163, 0.0001);
+    EXPECT_NEAR(eff, 0.0003, 0.0001);
     EXPECT_NEAR(tCollector, 31.32, 0.01);
 
     // case 5: heating mode and bypass fraction = 1.0
@@ -430,6 +442,44 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     EXPECT_NEAR(potentialOutletTemp, 20.0, 0.01);
     EXPECT_NEAR(eff, 0.0, 0.0001);
     EXPECT_NEAR(tCollector, 15.91, 0.01);
+
+    // case 10: heating mode and bypass fraction > 0.0, more realistic conditions
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
+    tempSetPoint = 24.0;
+    state->dataLoopNodes->Node(InletNode).Temp = -20.0;
+    state->dataEnvrn->SkyTemp = -20.0; 
+    state->dataEnvrn->OutDryBulbTemp = -20.0;
+    state->dataHeatBalSurf->SurfTempOut(thisBIPVT.SurfNum) = -18.0;
+    thisBIPVT.MassFlowRate = 1.0;
+    state->dataHeatBal->SurfQRadSWOutIncidentBeam(thisBIPVT.SurfNum) = 500.0;
+    state->dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(thisBIPVT.SurfNum) = 100.0;
+    state->dataHeatBal->SurfQRadSWOutIncident(thisBIPVT.SurfNum) = 568.7;
+    state->dataPhotovoltaic->PVarray(thisBIPVT.PVnum).TRNSYSPVcalc.ArrayEfficiency = 0.22;
+    thisBIPVT.calculateBIPVTMaxHeatGain(*state, tempSetPoint, bypassFraction, potentialHeatGain, potentialOutletTemp, eff, tCollector);
+
+    EXPECT_NEAR(bypassFraction, 0.0, 0.001);
+    EXPECT_NEAR(potentialHeatGain, 6832.41, 0.01);
+    EXPECT_NEAR(potentialOutletTemp, -13.21, 0.01);
+    EXPECT_NEAR(eff, 0.2084, 0.0001);
+    EXPECT_NEAR(tCollector, -5.61, 0.01);
+
+    // case 11: heating mode bypass fraction = 0.0
+    thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
+    tempSetPoint = 24.0;
+    state->dataLoopNodes->Node(InletNode).Temp = 10.0;                              // inlet fluid temperature (DegC)
+    state->dataEnvrn->OutDryBulbTemp = 10.0;                                        // ambient temperature (DegC)
+    state->dataHeatBalSurf->SurfTempOut(thisBIPVT.SurfNum) = 12.0;                  // temperature of bldg surface (DegC)
+    thisBIPVT.MassFlowRate = 1.0;                                                  // fluid mass flow rate (kg/s)
+    state->dataHeatBal->SurfQRadSWOutIncidentBeam(thisBIPVT.SurfNum) = 500.0;       // Exterior beam solar incident on surface (W/m2)
+    state->dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(thisBIPVT.SurfNum) = 100.0; // Exterior sky diffuse solar incident on surface (W/m2)
+    state->dataHeatBal->SurfQRadSWOutIncident(thisBIPVT.SurfNum) = 568.7;           // total incident solar radiation
+    thisBIPVT.calculateBIPVTMaxHeatGain(*state, tempSetPoint, bypassFraction, potentialHeatGain, potentialOutletTemp, eff, tCollector);
+
+    EXPECT_NEAR(bypassFraction, 0.0, 0.001);
+    EXPECT_NEAR(potentialHeatGain, 5145.21, 0.01);
+    EXPECT_NEAR(potentialOutletTemp, 15.11, 0.01);
+    EXPECT_NEAR(eff, 0.1569, 0.0001);
+    EXPECT_NEAR(tCollector, 20.24, 0.01);
 
     //  Add a few more cases with some changes to external conditions and/or BIPVT properties
     // If you want to use different idf inputs, then probably best to copy the entire test
