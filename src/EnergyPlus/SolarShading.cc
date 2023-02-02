@@ -4214,7 +4214,6 @@ void CLIPPOLY(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // The Sutherland-Hodgman algorithm for polygon clipping is employed.
 
-    using General::ReallocateRealArray;
     using General::SafeDivide;
 
     typedef Array2D<Int64>::size_type size_type;

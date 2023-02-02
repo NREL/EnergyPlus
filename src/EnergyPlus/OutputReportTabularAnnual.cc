@@ -359,7 +359,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                     Real64 newDuration = 0.0;
                     bool activeNewValue = false;
                     // the current timestamp
-                    int minuteCalculated = General::DetermineMinuteForReporting(state, kindOfTimeStep);
+                    int minuteCalculated = OutputProcessor::DetermineMinuteForReporting(state);
                     General::EncodeMonDayHrMin(
                         timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
