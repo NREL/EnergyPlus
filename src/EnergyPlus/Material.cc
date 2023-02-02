@@ -2762,14 +2762,14 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     GetMaterialAddOnInput(state, ErrorsFound); // Read variable thermal and solar absorptance add-on data
 }
 
-void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_view addOnType, bool &errorsFound)
+void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, bool &errorsFound)
 {
     int IOStat; // IO Status when calling get input subroutine
     int numAlphas;
     int numNumbers;
-    Array1D_string alphas(5);   // character string data
+    Array1D_string alphas(7);   // character string data
     Array1D<Real64> numbers(1); // numeric data
-    std::string_view cCurrentModuleObject{fmt::format("MaterialProperty:Variable{}Absorptance", addOnType)};
+    std::string_view cCurrentModuleObject{"MaterialProperty:VariableAbsorptance"};
     // Call Input Get routine to retrieve material data
     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                              cCurrentModuleObject,
@@ -2799,68 +2799,57 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_vie
 
     if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
         ShowSevereError(state,
-                        format("{}: Reference Material is not appropriate type for {} Absorptance properties, material={}, must have regular "
-                               "properties ({} Absorptance)",
+                        format("{}: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, material={}, must have regular "
+                               "properties (Thermal/Solar Absorptance)",
                                cCurrentModuleObject,
-                               addOnType,
-                               thisMaterial->Name,
-                               addOnType));
+                               thisMaterial->Name));
         errorsFound = true;
         return;
     }
 
     Material::VariableAbsCtrlSignal controlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature; // default value
     controlSignal = static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
-    int functionIdx = -1;
-    int scheduleIdx = -1;
+    //    init to 0 as GetScheduleIndex returns 0 for not-found schedule or curves
+    int functionIdxThermal = 0;
+    int scheduleIdxThermal = 0;
+    int functionIdxSolar = 0;
+    int scheduleIdxSolar = 0;
     if (controlSignal == VariableAbsCtrlSignal::Scheduled) {
-        if (alphas(5) == "") {
-            ShowSevereError(state, format("{}: Schedule not defined for object {}", cCurrentModuleObject, alphas(1)));
+        scheduleIdxThermal = ScheduleManager::GetScheduleIndex(state, alphas(5));
+        scheduleIdxSolar = ScheduleManager::GetScheduleIndex(state, alphas(7));
+        if (scheduleIdxThermal + scheduleIdxSolar == 0) {
+            ShowSevereError(
+                state,
+                format("{}: Control signal \"Scheduled\" is chosen but both thermal and solar absorptance schedules are undefined, for object {}",
+                       cCurrentModuleObject,
+                       alphas(1)));
             errorsFound = true;
             return;
-        } else {
-            scheduleIdx = ScheduleManager::GetScheduleIndex(state, alphas(5));
         }
     } else { // controlled by performance table or curve
-        functionIdx = Curve::GetCurveIndex(state, alphas(4));
-        if (functionIdx == 0) {
-            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), alphas(4)));
+        functionIdxThermal = Curve::GetCurveIndex(state, alphas(4));
+        functionIdxSolar = Curve::GetCurveIndex(state, alphas(6));
+        if (functionIdxThermal + functionIdxSolar == 0) {
+            format("{}: non-schedule control signal is chosen but both thermal and solar absorptance table or curve are undefined, for object {}",
+                   cCurrentModuleObject,
+                   alphas(1));
             errorsFound = true;
             return;
         }
     }
-
-    if (addOnType == "Thermal") {
-        thisMaterial->variableThermalAbsorptanceCtrlSignal = controlSignal;
-        thisMaterial->variableThermalAbsporptanceScheduleIdx = scheduleIdx;
-        thisMaterial->variableThermalAbsorptanceFunctionIdx = functionIdx;
-    } else if (addOnType == "Solar") {
-        thisMaterial->variableSolarAbsorptanceCtrlSignal = controlSignal;
-        thisMaterial->variableSolarAbsporptanceScheduleIdx = scheduleIdx;
-        thisMaterial->variableSolarAbsorptanceFunctionIdx = functionIdx;
-    }
-}
-
-void GetVariableThermalAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
-{
-    int numVariThermalAbs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalAbsorptance");
-    for (int i = 1; i <= numVariThermalAbs; ++i) {
-        ReadingOneMaterialAddOn(state, i, "Thermal", errorsFound);
-    }
-}
-
-void GetVariableSolarAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
-{
-    int numVariSolarAbs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableSolarAbsorptance");
-    for (int i = 1; i <= numVariSolarAbs; ++i) {
-        ReadingOneMaterialAddOn(state, i, "Solar", errorsFound);
-    }
+    thisMaterial->variableAbsorptanceCtrlSignal = controlSignal;
+    thisMaterial->variableThermalAbsporptanceScheduleIdx = scheduleIdxThermal;
+    thisMaterial->variableThermalAbsorptanceFunctionIdx = functionIdxThermal;
+    thisMaterial->variableSolarAbsporptanceScheduleIdx = scheduleIdxSolar;
+    thisMaterial->variableSolarAbsorptanceFunctionIdx = functionIdxSolar;
 }
 
 void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound)
 {
-    GetVariableThermalAbsorptanceInput(state, errorsFound);
-    GetVariableSolarAbsorptanceInput(state, errorsFound);
+    int numVariAbs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableAbsorptance");
+    for (int i = 1; i <= numVariAbs; ++i) {
+        ReadingOneMaterialAddOn(state, i, errorsFound);
+    }
 }
 
 } // namespace EnergyPlus::Material

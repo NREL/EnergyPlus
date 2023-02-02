@@ -221,18 +221,13 @@
     0.7500000,               !- Solar Absorptance
     0.7500000;               !- Visible Absorptance
 
-  MaterialProperty:VariableThermalAbsorptance,
+  MaterialProperty:VariableAbsorptance,
     variableThermalR13LAYER, !- Name
     R13LAYER_vary,           !- Reference Material Name
     SurfaceTemperature,      !- Control Signal
     ThermalAbsorptanceTemperatureTable,   !- Trigger Solar Absorptance Function Name
-    ;                        !- Thermal Absorptance Schedule Name
-    
-  MaterialProperty:VariableSolarAbsorptance,
-    variableSolarR13LAYER,   !- Name
-    R13LAYER_vary,           !- Reference Material Name
-    SurfaceTemperature,      !- Control Signal
-    SolarAbsorptanceTemperatureCurve,   !- Trigger Solar Absorptance Function Name
+    ,                        !- Thermal Absorptance Schedule Name
+    ,   !- Trigger Solar Absorptance Function Name
     ;                        !- Solar Absorptance Schedule Name
 
   Table:IndependentVariable,

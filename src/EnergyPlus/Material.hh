@@ -186,18 +186,16 @@ namespace Material {
         Real64 AbsorpSolarInput = 0.0;         // Layer solar absorptance input by user
         bool AbsorpSolarEMSOverrideOn = false; // if true, then EMS calling to override value for solar absorptance
         Real64 AbsorpSolarEMSOverride = false; // value to use when EMS calling to override value for solar absorptance
-        // dynamic Solar absorptance coating parameters
-        VariableAbsCtrlSignal variableSolarAbsorptanceCtrlSignal = VariableAbsCtrlSignal::Invalid;
-        int variableSolarAbsporptanceScheduleIdx = -1;
-        int variableSolarAbsorptanceFunctionIdx = -1;
         Real64 AbsorpThermal = 0.0;              // Layer thermal absorptance
         Real64 AbsorpThermalInput = 0.0;         // Layer thermal absorptance input by user
         bool AbsorpThermalEMSOverrideOn = false; // if true, then EMS calling to override value for thermal absorptance
         Real64 AbsorpThermalEMSOverride = 0.0;   // value to use when EMS calling to override value for thermal absorptance
-        // dynamic thermal absorptance coating parameters
-        VariableAbsCtrlSignal variableThermalAbsorptanceCtrlSignal = VariableAbsCtrlSignal::Invalid;
+        // dynamic thermal and solar absorptance coating parameters
+        VariableAbsCtrlSignal variableAbsorptanceCtrlSignal = VariableAbsCtrlSignal::Invalid;
         int variableThermalAbsporptanceScheduleIdx = -1;
         int variableThermalAbsorptanceFunctionIdx = -1;
+        int variableSolarAbsporptanceScheduleIdx = -1;
+        int variableSolarAbsorptanceFunctionIdx = -1;
         Real64 AbsorpVisible = 0.0;              // Layer Visible Absorptance
         Real64 AbsorpVisibleInput = 0.0;         // Layer Visible Absorptance input by user
         bool AbsorpVisibleEMSOverrideOn = false; // if true, then EMS calling to override value for visible absorptance
@@ -352,7 +350,6 @@ namespace Material {
     void GetVariableThermalAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     void GetVariableSolarAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound);
-    void GetAddOnOverrideSurfaceList(EnergyPlusData &state);
 
 } // namespace Material
 

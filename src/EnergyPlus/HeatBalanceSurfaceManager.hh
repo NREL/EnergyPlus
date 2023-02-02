@@ -92,8 +92,14 @@ namespace HeatBalanceSurfaceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    Real64
-    GetSurfAddOnOverrideValue(EnergyPlusData &state, int surfNum, Material::VariableAbsCtrlSignal controlSignal, int scheduleIdx, int FunctionIdx);
+    Real64 truncateOverrideValue(Real64 value);
+    std::pair<Real64, Real64> GetSurfAddOnOverrideValue(EnergyPlusData &state,
+                                                        int surfNum,
+                                                        Material::VariableAbsCtrlSignal controlSignal,
+                                                        int scheduleIdxThermal,
+                                                        int FunctionIdxThermal,
+                                                        int scheduleIdxSolar,
+                                                        int FunctionIdxSolar);
 
     void UpdateVariableAbsorptances(EnergyPlusData &state);
 

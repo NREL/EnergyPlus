@@ -740,11 +740,8 @@ void GetAddOnOverrideSurfaceList(EnergyPlusData &state)
         int materNum = GetMaterialNumFromSurfNum(state, surfNum);
         if (materNum == 0) continue; // error finding material number
         auto const *thisMaterial = state.dataMaterial->Material(materNum);
-        if (thisMaterial->variableThermalAbsorptanceCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
-            state.dataSurface->AllVaryThermalAbsOpaqSurfaceList.push_back(surfNum);
-        }
-        if (thisMaterial->variableSolarAbsorptanceCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
-            state.dataSurface->AllVarySolarAbsOpaqSurfaceList.push_back(surfNum);
+        if (thisMaterial->variableAbsorptanceCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+            state.dataSurface->AllVaryAbsOpaqSurfaceList.push_back(surfNum);
         }
     }
 }
