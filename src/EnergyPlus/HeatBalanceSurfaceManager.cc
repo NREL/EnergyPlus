@@ -273,7 +273,7 @@ Real64 GetSurfAddOnOverrideValue(EnergyPlusData &state, int surfNum, Material::V
     }
 }
 
-void MaterialAddOnOverride(EnergyPlusData &state)
+void UpdateVariableAbsorptances(EnergyPlusData &state)
 {
     for (int surfNum : state.dataSurface->AllVaryThermalAbsOpaqSurfaceList) {
         auto const &thisConstruct = state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction);
@@ -405,7 +405,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     }
 
     // yujie: variable thermal solar absorptance overrides
-    MaterialAddOnOverride(state);
+    UpdateVariableAbsorptances(state);
 
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag) {

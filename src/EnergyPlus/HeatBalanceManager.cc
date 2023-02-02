@@ -328,10 +328,7 @@ namespace HeatBalanceManager {
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
 
-        // need surface data to be set up before these add-on can be constructed
-        Material::GetMaterialAddOnInput(state, ErrorsFound); // Read variable thermal and solar absorptance addon data
-
-        Material::GetAddOnOverrideSurfaceList(state);
+        DataSurfaces::GetAddOnOverrideSurfaceList(state);
 
         GetIncidentSolarMultiplier(state, ErrorsFound);
 

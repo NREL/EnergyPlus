@@ -352,7 +352,6 @@ namespace Material {
     void GetVariableThermalAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     void GetVariableSolarAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound);
-    int GetMaterialNumFromSurfNum(EnergyPlusData &state, int surfNum);
     void GetAddOnOverrideSurfaceList(EnergyPlusData &state);
 
 } // namespace Material

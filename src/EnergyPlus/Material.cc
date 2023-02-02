@@ -49,11 +49,9 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -2760,6 +2758,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     for (auto *m : state.dataMaterial->Material) {
         m->phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(state, m->Name);
     }
+
+    GetMaterialAddOnInput(state, ErrorsFound); // Read variable thermal and solar absorptance add-on data
 }
 
 void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_view addOnType, bool &errorsFound)
@@ -2861,31 +2861,6 @@ void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound)
 {
     GetVariableThermalAbsorptanceInput(state, errorsFound);
     GetVariableSolarAbsorptanceInput(state, errorsFound);
-}
-
-int GetMaterialNumFromSurfNum(EnergyPlusData &state, int surfNum)
-{
-    int ConstrNum = state.dataSurface->Surface(surfNum).Construction;
-    if (ConstrNum <= 0) return 0;
-    auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-    int TotLayers = thisConstruct.TotLayers;
-    if (TotLayers == 0) return 0;
-    return thisConstruct.LayerPoint(1);
-}
-
-void GetAddOnOverrideSurfaceList(EnergyPlusData &state)
-{
-    for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
-        int materNum = GetMaterialNumFromSurfNum(state, surfNum);
-        if (materNum == 0) return; // error finding material number
-        auto const *thisMaterial = state.dataMaterial->Material(materNum);
-        if (thisMaterial->variableThermalAbsorptanceCtrlSignal != VariableAbsCtrlSignal::Invalid) {
-            state.dataSurface->AllVaryThermalAbsOpaqSurfaceList.push_back(surfNum);
-        }
-        if (thisMaterial->variableSolarAbsorptanceCtrlSignal != VariableAbsCtrlSignal::Invalid) {
-            state.dataSurface->AllVarySolarAbsOpaqSurfaceList.push_back(surfNum);
-        }
-    }
 }
 
 } // namespace EnergyPlus::Material
