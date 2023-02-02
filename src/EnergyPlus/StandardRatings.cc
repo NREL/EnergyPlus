@@ -787,7 +787,9 @@ namespace StandardRatings {
         Real64 constexpr HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
         Real64 constexpr LowEWTemp(19.0);        // Entering water temp in degrees C at minimum reduced capacity (65F)
         Real64 constexpr OAHighEDBTemp(35.0);    // Outdoor air dry-bulb temp in degrees C at full load capacity (95F)
+        Real64 constexpr OALowEDBTemp(12.78);    // Outdoor air dry-bulb temp in degrees C at part load capacity for AirCooled Chillers (55F)
         Real64 constexpr OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
+        Real64 constexpr OALowEWBTemp(13.47);    // Outdoor air wet-bulb temp in degrees C at full load capacity for EvapCooled Chillers (56.25F)
         Real64 constexpr LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
 
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
@@ -817,10 +819,10 @@ namespace StandardRatings {
             LowCondenserEnteringTempLimit = LowEWTemp;
         } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
             HighCondenserEnteringTempLimit = OAHighEDBTemp;
-            LowCondenserEnteringTempLimit = OAHighEDBTemp;
+            LowCondenserEnteringTempLimit = OALowEDBTemp;
         } else { // Evaporatively Cooled Condenser
             HighCondenserEnteringTempLimit = OAHighEWBTemp;
-            LowCondenserEnteringTempLimit = OAHighEWBTemp;
+            LowCondenserEnteringTempLimit = OALowEWBTemp;
         }
 
         // Checking the limits of capacity modifying curve for temperatures (IPLV high and low test conditions)
