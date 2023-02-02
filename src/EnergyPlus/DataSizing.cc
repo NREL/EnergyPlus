@@ -370,6 +370,7 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataNomCapInpMeth = false;
     state.dataSize->DataFanPlacement = ZoneFanPlacement::NotSet;
     state.dataSize->DataDXSpeedNum = 0;
+    state.dataSize->DXCoolCap = 0.0;
     state.dataSize->DataCoilSizingAirInTemp = 0.0;
     state.dataSize->DataCoilSizingAirInHumRat = 0.0;
     state.dataSize->DataCoilSizingAirOutTemp = 0.0;
