@@ -182,10 +182,10 @@ namespace Material {
         Array1D<Real64> GasSpecHeatRatio = Array1D<Real64>(5, 0.0); // Gas specific heat ratio (used for low pressure calculations)
         Array1D<Real64> GasFract = Array1D<Real64>(5, 0.0);         // Gas fractions for up to 5 gases in a mixture
         // Radiation parameters
-        Real64 AbsorpSolar = 0.0;              // Layer solar absorptance
-        Real64 AbsorpSolarInput = 0.0;         // Layer solar absorptance input by user
-        bool AbsorpSolarEMSOverrideOn = false; // if true, then EMS calling to override value for solar absorptance
-        Real64 AbsorpSolarEMSOverride = false; // value to use when EMS calling to override value for solar absorptance
+        Real64 AbsorpSolar = 0.0;                // Layer solar absorptance
+        Real64 AbsorpSolarInput = 0.0;           // Layer solar absorptance input by user
+        bool AbsorpSolarEMSOverrideOn = false;   // if true, then EMS calling to override value for solar absorptance
+        Real64 AbsorpSolarEMSOverride = false;   // value to use when EMS calling to override value for solar absorptance
         Real64 AbsorpThermal = 0.0;              // Layer thermal absorptance
         Real64 AbsorpThermalInput = 0.0;         // Layer thermal absorptance input by user
         bool AbsorpThermalEMSOverrideOn = false; // if true, then EMS calling to override value for thermal absorptance

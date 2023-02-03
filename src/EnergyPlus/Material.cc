@@ -2798,11 +2798,12 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, bool &errorsFound)
     auto *thisMaterial = state.dataMaterial->Material(MaterNum);
 
     if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
-        ShowSevereError(state,
-                        format("{}: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, material={}, must have regular "
-                               "properties (Thermal/Solar Absorptance)",
-                               cCurrentModuleObject,
-                               thisMaterial->Name));
+        ShowSevereError(
+            state,
+            format("{}: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, material={}, must have regular "
+                   "properties (Thermal/Solar Absorptance)",
+                   cCurrentModuleObject,
+                   thisMaterial->Name));
         errorsFound = true;
         return;
     }
