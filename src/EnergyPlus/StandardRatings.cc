@@ -466,27 +466,8 @@ namespace StandardRatings {
 
         // IPLV calculations:
         for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
-            if (CondenserType == DataPlant::CondenserType::WaterCooled) {
-                // get the entering water temperature for the reduced capacity test conditions
-                if (ReducedPLR[RedCapNum] > 0.50) {
-                    EnteringWaterTempReduced = 7.22 + 22.22 * ReducedPLR[RedCapNum];
-                } else {
-                    EnteringWaterTempReduced = 18.33;
-                }
-                CondenserInletTemp = EnteringWaterTempReduced;
-            } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
-                // get the outdoor air dry bulb temperature for the reduced capacity test conditions
-                if (ReducedPLR[RedCapNum] > 0.33) {
-                    EnteringAirDryBulbTempReduced = 1.67 + 33.33 * ReducedPLR[RedCapNum];
-                } else {
-                    EnteringAirDryBulbTempReduced = 12.78;
-                }
-                CondenserInletTemp = EnteringAirDryBulbTempReduced;
-            } else { // EvaporativelyCooled Condenser
-                // get the outdoor air wet bulb temperature for the reduced capacity test conditions
-                EnteringAirWetBulbTempReduced = 10.0 + 13.89 * ReducedPLR[RedCapNum];
-                CondenserInletTemp = EnteringAirWetBulbTempReduced;
-            }
+
+            CondenserInletTemp = CondenserEnteringFluidTemperature(state, CondenserType, ReducedPLR[RedCapNum]);
 
             if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                 if (RedCapNum == 0) {
@@ -4982,6 +4963,32 @@ namespace StandardRatings {
         default:
             break;
         }
+    }
+
+    Real64 CondenserEnteringFluidTemperature(EnergyPlusData &state, DataPlant::CondenserType const CondenserType, Real64 LoadRatio)
+    {
+
+        Real64 CondenserEnteringFluidTemp = 0.0;
+        if (CondenserType == DataPlant::CondenserType::WaterCooled) {
+            // get the condenser entering water temperature for a given part load ratio in deg C
+            Real64 enteringWaterTemp = 18.33;
+            if (LoadRatio > 0.50) {
+                enteringWaterTemp = 7.22 + 22.22 * LoadRatio;
+            }
+            CondenserEnteringFluidTemp = enteringWaterTemp;
+        } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
+            // get the outdoor air dry bulb temperature for a given part load ratio in deg C
+            Real64 enteringAirDBTemp = 12.78;
+            if (LoadRatio > 0.33) {
+                enteringAirDBTemp = 1.67 + 33.33 * LoadRatio;
+            }
+            CondenserEnteringFluidTemp = enteringAirDBTemp;
+        } else { // EvaporativelyCooled Condenser
+            // get the outdoor air wet bulb temperature for a given part load ratio in deg C
+            Real64 enteringAirWBTemp = 10.0 + 13.89 * LoadRatio;
+            CondenserEnteringFluidTemp = enteringAirWBTemp;
+        }
+        return CondenserEnteringFluidTemp;
     }
 
 } // namespace StandardRatings
