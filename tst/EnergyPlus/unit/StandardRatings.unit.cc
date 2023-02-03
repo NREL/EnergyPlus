@@ -1096,7 +1096,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
                     ObjexxFCL::Optional_int_const(),
                     ObjexxFCL::Optional<const Real64>());
 
-    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
+    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.89); // 13.20 IPLV
 }
 
 TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
@@ -1180,7 +1180,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
                     ObjexxFCL::Optional_int_const(),
                     ObjexxFCL::Optional<const Real64>());
 
-    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 5.44); // 18.56 IPLV
+    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 5.47); // 18.56 IPLV
 }
 
 TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
@@ -1289,7 +1289,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
                     1,
                     1.0);
 
-    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 4.83);
+    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 4.95);
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
@@ -1945,6 +1945,57 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     EXPECT_NEAR(13.64, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 
     // SEER and SEER_Default must match for the same PLF curve
+}
+
+TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRITestConditions)
+{
+    // Tests chiller's condenser entering fluid temperature
+    // at different AHRI test conditions
+
+    // set AHRI test load ratios
+    Real64 const LoadRatio100 = 1.0;
+    Real64 const LoadRatio75 = 0.75;
+    Real64 const LoadRatio50 = 0.50;
+    Real64 const LoadRatio25 = 0.25;
+    Real64 const ZeroLoadRatio = 0.0;
+
+    // Test 1: WaterCooled Condenser Entering Water Temperatures
+    DataPlant::CondenserType CondenserType = DataPlant::CondenserType::WaterCooled;
+    Real64 result_EWT100LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio100);
+    Real64 result_EWT75LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio75);
+    Real64 result_EWT50LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio50);
+    Real64 result_EWT25LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio25);
+    // checking expected water temperatures
+    EXPECT_NEAR(29.44, result_EWT100LoadRatio, 0.01);
+    EXPECT_NEAR(23.89, result_EWT75LoadRatio, 0.01);
+    EXPECT_NEAR(18.33, result_EWT50LoadRatio, 0.01);
+    EXPECT_NEAR(18.33, result_EWT25LoadRatio, 0.01);
+
+    // Test 2: AirCooled Condenser Entering Air Dry-Bulb Temperatures
+    CondenserType = DataPlant::CondenserType::AirCooled;
+    Real64 result_EDBT100LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio100);
+    Real64 result_EDBT75LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio75);
+    Real64 result_EDBT50LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio50);
+    Real64 result_EDBT25LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio25);
+    // checking expected dry-bulb temperatures
+    EXPECT_NEAR(35.0, result_EDBT100LoadRatio, 0.01);
+    EXPECT_NEAR(26.67, result_EDBT75LoadRatio, 0.01);
+    EXPECT_NEAR(18.33, result_EDBT50LoadRatio, 0.01);
+    EXPECT_NEAR(12.78, result_EDBT25LoadRatio, 0.01);
+
+    // Test 3: EvapCooled Condenser Entering Air Wet-Bulb Temperatures
+    CondenserType = DataPlant::CondenserType::EvapCooled;
+    Real64 result_EWBT100LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio100);
+    Real64 result_EWBT75LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio75);
+    Real64 result_EWBT50LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio50);
+    Real64 result_EWBT25LoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, LoadRatio25);
+    Real64 result_EWBTZeroLoadRatio = CondenserEnteringFluidTemperature(*state, CondenserType, ZeroLoadRatio);
+    // checking expected wet-bulb temperatures
+    EXPECT_NEAR(23.89, result_EWBT100LoadRatio, 0.01);
+    EXPECT_NEAR(20.42, result_EWBT75LoadRatio, 0.01);
+    EXPECT_NEAR(16.95, result_EWBT50LoadRatio, 0.01);
+    EXPECT_NEAR(13.47, result_EWBT25LoadRatio, 0.01);
+    EXPECT_NEAR(10.0, result_EWBTZeroLoadRatio, 0.01);
 }
 
 } // namespace EnergyPlus

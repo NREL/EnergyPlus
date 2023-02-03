@@ -495,6 +495,7 @@ namespace StandardRatings {
                 }
 
             } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
+                EnteringWaterTempReduced = CondenserInletTemp;
                 Cp = GetSpecificHeatGlycol(state,
                                            state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
                                            EnteringWaterTempReduced,
