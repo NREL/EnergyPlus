@@ -347,8 +347,6 @@ namespace Material {
 
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_view addOnType, bool &errorsFound);
-    void GetVariableThermalAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
-    void GetVariableSolarAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound);
 
 } // namespace Material

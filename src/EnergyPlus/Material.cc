@@ -2810,7 +2810,7 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, bool &errorsFound)
 
     Material::VariableAbsCtrlSignal controlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature; // default value
     controlSignal = static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
-    //    init to 0 as GetScheduleIndex returns 0 for not-found schedule or curves
+    //    init to 0 as GetScheduleIndex returns 0 for not-found schedule
     int functionIdxThermal = 0;
     int scheduleIdxThermal = 0;
     int functionIdxSolar = 0;
