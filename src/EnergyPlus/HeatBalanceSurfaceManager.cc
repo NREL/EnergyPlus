@@ -257,11 +257,11 @@ void UpdateVariableAbsorptances(EnergyPlusData &state)
         if (thisMaterial->absorpVarCtrlSignal == Material::VariableAbsCtrlSignal::Scheduled) {
             if (thisMaterial->absorpThermalVarSchedIdx > 0) {
                 state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) =
-                    max(min(ScheduleManager::GetCurrentScheduleValue(state, scheduleIdxThermal), 0.9999), 0.0001);
+                    max(min(ScheduleManager::GetCurrentScheduleValue(state, thisMaterial->absorpThermalVarSchedIdx), 0.9999), 0.0001);
             }
             if (thisMaterial->absorpSolarVarSchedIdx > 0) {
                 state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) =
-                    max(min(ScheduleManager::GetCurrentScheduleValue(state, scheduleIdxSolar), 0.9999), 0.0001);
+                    max(min(ScheduleManager::GetCurrentScheduleValue(state, thisMaterial->absorpThermalVarSchedIdx), 0.9999), 0.0001);
             }
         } else {
             Real64 triggerValue;
@@ -274,12 +274,13 @@ void UpdateVariableAbsorptances(EnergyPlusData &state)
                 bool isCooling = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).TotalOutputRequired < 0);
                 triggerValue = static_cast<Real64>(isCooling);
             }
-            if (functionIdxThermal > 0) {
+            if (thisMaterial->absorpThermalVarFuncIdx > 0) {
                 state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) =
-                    max(min(Curve::CurveValue(state, functionIdxThermal, triggerValue), 0.9999), 0.0001);
+                    max(min(Curve::CurveValue(state, thisMaterial->absorpThermalVarFuncIdx, triggerValue), 0.9999), 0.0001);
             }
-            if (functionIdxSolar > 0) {
-                state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) = max(min(Curve::CurveValue(state, functionIdxSolar, triggerValue), 0.9999), 0.0001);
+            if (thisMaterial->absorpSolarVarFuncIdx > 0) {
+                state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) =
+                    max(min(Curve::CurveValue(state, thisMaterial->absorpSolarVarFuncIdx, triggerValue), 0.9999), 0.0001);
             }
         }
     }
