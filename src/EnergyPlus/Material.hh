@@ -191,11 +191,11 @@ namespace Material {
         bool AbsorpThermalEMSOverrideOn = false; // if true, then EMS calling to override value for thermal absorptance
         Real64 AbsorpThermalEMSOverride = 0.0;   // value to use when EMS calling to override value for thermal absorptance
         // dynamic thermal and solar absorptance coating parameters
-        VariableAbsCtrlSignal variableAbsorptanceCtrlSignal = VariableAbsCtrlSignal::Invalid;
-        int variableThermalAbsporptanceScheduleIdx = -1;
-        int variableThermalAbsorptanceFunctionIdx = -1;
-        int variableSolarAbsporptanceScheduleIdx = -1;
-        int variableSolarAbsorptanceFunctionIdx = -1;
+        VariableAbsCtrlSignal absorpVarCtrlSignal = VariableAbsCtrlSignal::Invalid;
+        int absorpThermalVarSchedIdx = 0;
+        int absorpThermalVarFuncIdx = 0;
+        int absorpSolarVarSchedIdx = 0;
+        int absorpSolarVarFuncIdx = 0;
         Real64 AbsorpVisible = 0.0;              // Layer Visible Absorptance
         Real64 AbsorpVisibleInput = 0.0;         // Layer Visible Absorptance input by user
         bool AbsorpVisibleEMSOverrideOn = false; // if true, then EMS calling to override value for visible absorptance
@@ -346,8 +346,7 @@ namespace Material {
     };
 
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
-    void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, const std::string_view addOnType, bool &errorsFound);
-    void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound);
+    void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
 
 } // namespace Material
 

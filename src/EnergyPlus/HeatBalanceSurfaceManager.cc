@@ -300,11 +300,11 @@ void UpdateVariableAbsorptances(EnergyPlusData &state)
         auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
         std::pair<Real64, Real64> overrideValues = GetSurfAddOnOverrideValue(state,
                                                                              surfNum,
-                                                                             thisMaterial->variableAbsorptanceCtrlSignal,
-                                                                             thisMaterial->variableThermalAbsporptanceScheduleIdx,
-                                                                             thisMaterial->variableThermalAbsorptanceFunctionIdx,
-                                                                             thisMaterial->variableSolarAbsporptanceScheduleIdx,
-                                                                             thisMaterial->variableSolarAbsorptanceFunctionIdx);
+                                                                             thisMaterial->absorpVarCtrlSignal,
+                                                                             thisMaterial->absorpThermalVarSchedIdx,
+                                                                             thisMaterial->absorpThermalVarFuncIdx,
+                                                                             thisMaterial->absorpSolarVarSchedIdx,
+                                                                             thisMaterial->absorpSolarVarFuncIdx);
         if (overrideValues.first > 0.0) state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) = overrideValues.first;
         if (overrideValues.second > 0.0) state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) = overrideValues.second;
     }

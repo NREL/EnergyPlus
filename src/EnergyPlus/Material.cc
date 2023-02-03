@@ -2759,10 +2759,10 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         m->phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(state, m->Name);
     }
 
-    GetMaterialAddOnInput(state, ErrorsFound); // Read variable thermal and solar absorptance add-on data
+    GetVariableAbsorptanceInput(state, ErrorsFound); // Read variable thermal and solar absorptance add-on data
 }
 
-void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, bool &errorsFound)
+void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 {
     int IOStat; // IO Status when calling get input subroutine
     int numAlphas;
@@ -2770,86 +2770,72 @@ void ReadingOneMaterialAddOn(EnergyPlusData &state, int i, bool &errorsFound)
     Array1D_string alphas(7);   // character string data
     Array1D<Real64> numbers(1); // numeric data
     std::string_view cCurrentModuleObject{"MaterialProperty:VariableAbsorptance"};
-    // Call Input Get routine to retrieve material data
-    state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                             cCurrentModuleObject,
-                                                             i,
-                                                             alphas,
-                                                             numAlphas,
-                                                             numbers,
-                                                             numNumbers,
-                                                             IOStat,
-                                                             state.dataIPShortCut->lNumericFieldBlanks,
-                                                             state.dataIPShortCut->lAlphaFieldBlanks,
-                                                             state.dataIPShortCut->cAlphaFieldNames,
-                                                             state.dataIPShortCut->cNumericFieldNames);
+    int numVariAbs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    for (int i = 1; i <= numVariAbs; ++i) {
+        // Call Input Get routine to retrieve material data
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 i,
+                                                                 alphas,
+                                                                 numAlphas,
+                                                                 numbers,
+                                                                 numNumbers,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
-    // Load the material derived type from the input data.
-    int MaterNum = UtilityRoutines::FindItemInPtrList(alphas(2), state.dataMaterial->Material);
-    if (MaterNum == 0) {
-        ShowSevereError(state,
-                        format("{}: invalid {} entered={}, must match to a valid Material name.",
-                               cCurrentModuleObject,
-                               state.dataIPShortCut->cAlphaFieldNames(1),
-                               alphas(2)));
-        errorsFound = true;
-        return;
-    }
-    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
+        // Load the material derived type from the input data.
+        int MaterNum = UtilityRoutines::FindItemInPtrList(alphas(2), state.dataMaterial->Material);
+        if (MaterNum == 0) {
+            ShowSevereError(state,
+                            format("{}: invalid {} entered={}, must match to a valid Material name.",
+                                   cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaFieldNames(1),
+                                   alphas(2)));
+            errorsFound = true;
+            return;
+        }
+        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
 
-    if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
-        ShowSevereError(
-            state,
-            format("{}: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, material={}, must have regular "
-                   "properties (Thermal/Solar Absorptance)",
-                   cCurrentModuleObject,
-                   thisMaterial->Name));
-        errorsFound = true;
-        return;
-    }
-
-    Material::VariableAbsCtrlSignal controlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature; // default value
-    controlSignal = static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
-    //    init to 0 as GetScheduleIndex returns 0 for not-found schedule
-    int functionIdxThermal = 0;
-    int scheduleIdxThermal = 0;
-    int functionIdxSolar = 0;
-    int scheduleIdxSolar = 0;
-    if (controlSignal == VariableAbsCtrlSignal::Scheduled) {
-        scheduleIdxThermal = ScheduleManager::GetScheduleIndex(state, alphas(5));
-        scheduleIdxSolar = ScheduleManager::GetScheduleIndex(state, alphas(7));
-        if (scheduleIdxThermal + scheduleIdxSolar == 0) {
+        if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
             ShowSevereError(
                 state,
-                format("{}: Control signal \"Scheduled\" is chosen but both thermal and solar absorptance schedules are undefined, for object {}",
+                format("{}: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, material={}, must have regular "
+                       "properties (Thermal/Solar Absorptance)",
                        cCurrentModuleObject,
-                       alphas(1)));
+                       thisMaterial->Name));
             errorsFound = true;
             return;
         }
-    } else { // controlled by performance table or curve
-        functionIdxThermal = Curve::GetCurveIndex(state, alphas(4));
-        functionIdxSolar = Curve::GetCurveIndex(state, alphas(6));
-        if (functionIdxThermal + functionIdxSolar == 0) {
-            format("{}: non-schedule control signal is chosen but both thermal and solar absorptance table or curve are undefined, for object {}",
-                   cCurrentModuleObject,
-                   alphas(1));
-            errorsFound = true;
-            return;
-        }
-    }
-    thisMaterial->variableAbsorptanceCtrlSignal = controlSignal;
-    thisMaterial->variableThermalAbsporptanceScheduleIdx = scheduleIdxThermal;
-    thisMaterial->variableThermalAbsorptanceFunctionIdx = functionIdxThermal;
-    thisMaterial->variableSolarAbsporptanceScheduleIdx = scheduleIdxSolar;
-    thisMaterial->variableSolarAbsorptanceFunctionIdx = functionIdxSolar;
-}
 
-void GetMaterialAddOnInput(EnergyPlusData &state, bool &errorsFound)
-{
-    int numVariAbs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableAbsorptance");
-    for (int i = 1; i <= numVariAbs; ++i) {
-        ReadingOneMaterialAddOn(state, i, errorsFound);
+        Material::VariableAbsCtrlSignal controlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature; // default value
+        controlSignal = static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
+        //    init to 0 as GetScheduleIndex returns 0 for not-found schedule
+        if (controlSignal == VariableAbsCtrlSignal::Scheduled) {
+            thisMaterial->absorpThermalVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(5));
+            thisMaterial->absorpSolarVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(7));
+            if ((thisMaterial->absorpThermalVarSchedIdx == 0) && (thisMaterial->absorpSolarVarSchedIdx == 0)) {
+                ShowSevereError(
+                    state,
+                    format("{}: Control signal \"Scheduled\" is chosen but both thermal and solar absorptance schedules are undefined, for object {}",
+                           cCurrentModuleObject,
+                           alphas(1)));
+                errorsFound = true;
+                return;
+            }
+        } else { // controlled by performance table or curve
+            thisMaterial->absorpThermalVarFuncIdx = Curve::GetCurveIndex(state, alphas(4));
+            thisMaterial->absorpSolarVarFuncIdx = Curve::GetCurveIndex(state, alphas(6));
+            if ((thisMaterial->absorpThermalVarFuncIdx == 0) && (thisMaterial->absorpSolarVarFuncIdx == 0)) {
+                format("{}: non-schedule control signal is chosen but both thermal and solar absorptance table or curve are undefined, for object {}",
+                       cCurrentModuleObject,
+                       alphas(1));
+                errorsFound = true;
+                return;
+            }
+        }
     }
 }
 

@@ -328,7 +328,7 @@ namespace HeatBalanceManager {
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
 
-        DataSurfaces::GetAddOnOverrideSurfaceList(state);
+        DataSurfaces::GetVariableAbsorptanceSurfaceList(state);
 
         GetIncidentSolarMultiplier(state, ErrorsFound);
 

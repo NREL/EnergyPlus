@@ -1319,9 +1319,7 @@ namespace DataSurfaces {
 
     Real64 AbsBackSide(EnergyPlusData &state, int SurfNum);
 
-    int GetMaterialNumFromSurfNum(EnergyPlusData &state, int surfNum);
-
-    void GetAddOnOverrideSurfaceList(EnergyPlusData &state);
+    void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state);
 
     std::string cSurfaceClass(SurfaceClass ClassNo);
 

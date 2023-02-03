@@ -734,26 +734,21 @@ Real64 AbsBackSide(EnergyPlusData &state, int SurfNum)
     return AbsorptanceFromExteriorBackSide + AbsorptanceFromInteriorBackSide;
 }
 
-void GetAddOnOverrideSurfaceList(EnergyPlusData &state)
+void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
 {
     for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
-        int materNum = GetMaterialNumFromSurfNum(state, surfNum);
+        int ConstrNum = state.dataSurface->Surface(surfNum).Construction;
+        if (ConstrNum <= 0) continue;
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        int TotLayers = thisConstruct.TotLayers;
+        if (TotLayers == 0) continue;
+        int materNum = thisConstruct.LayerPoint(1);
         if (materNum == 0) continue; // error finding material number
         auto const *thisMaterial = state.dataMaterial->Material(materNum);
-        if (thisMaterial->variableAbsorptanceCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+        if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
             state.dataSurface->AllVaryAbsOpaqSurfaceList.push_back(surfNum);
         }
     }
-}
-
-int GetMaterialNumFromSurfNum(EnergyPlusData &state, int surfNum)
-{
-    int ConstrNum = state.dataSurface->Surface(surfNum).Construction;
-    if (ConstrNum <= 0) return 0;
-    auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-    int TotLayers = thisConstruct.TotLayers;
-    if (TotLayers == 0) return 0;
-    return thisConstruct.LayerPoint(1);
 }
 
 } // namespace EnergyPlus::DataSurfaces
