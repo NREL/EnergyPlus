@@ -467,7 +467,7 @@ namespace StandardRatings {
         // IPLV calculations:
         for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
 
-            CondenserInletTemp = CondenserEnteringFluidTemperature(state, CondenserType, ReducedPLR[RedCapNum]);
+            CondenserInletTemp = CondenserEnteringFluidTemperature(CondenserType, ReducedPLR[RedCapNum]);
 
             if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                 if (RedCapNum == 0) {
@@ -4966,7 +4966,7 @@ namespace StandardRatings {
         }
     }
 
-    Real64 CondenserEnteringFluidTemperature(EnergyPlusData &state, DataPlant::CondenserType const CondenserType, Real64 LoadRatio)
+    Real64 CondenserEnteringFluidTemperature(DataPlant::CondenserType const CondenserType, Real64 LoadRatio)
     {
 
         Real64 CondenserEnteringFluidTemp = 0.0;

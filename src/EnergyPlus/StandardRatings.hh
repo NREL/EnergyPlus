@@ -451,7 +451,6 @@ namespace StandardRatings {
     );
 
     Real64 CondenserEnteringFluidTemperature(
-        EnergyPlusData &state,
         DataPlant::CondenserType const CondenserType, // Chillers Condenser Type: AirCooled, WaterCooled, or EvaporativelyCooled
         Real64 LoadRatio                              // AHRI Std 550/590 test load ratio: 1.0, 0.75, 0.5, 0.25
     );
