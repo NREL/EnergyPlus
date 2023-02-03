@@ -227,7 +227,7 @@
     SurfaceTemperature,      !- Control Signal
     ThermalAbsorptanceTemperatureTable,   !- Trigger Solar Absorptance Function Name
     ,                        !- Thermal Absorptance Schedule Name
-    ,   !- Trigger Solar Absorptance Function Name
+    SolarAbsorptanceTemperatureCurve,   !- Trigger Solar Absorptance Function Name
     ;                        !- Solar Absorptance Schedule Name
 
   Table:IndependentVariable,
