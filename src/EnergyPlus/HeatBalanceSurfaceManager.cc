@@ -249,64 +249,39 @@ void ManageSurfaceHeatBalance(EnergyPlusData &state)
 // Beginning Initialization Section of the Module
 //******************************************************************************
 
-Real64 truncateOverrideValue(Real64 value)
-{
-    if (value > 0) {
-        return max(min(value, 0.9999), 0.0001);
-    } else { // special value for illegal index
-        return value;
-    }
-}
-
-std::pair<Real64, Real64> GetSurfAddOnOverrideValue(EnergyPlusData &state,
-                                                    int surfNum,
-                                                    Material::VariableAbsCtrlSignal controlSignal,
-                                                    int scheduleIdxThermal,
-                                                    int functionIdxThermal,
-                                                    int scheduleIdxSolar,
-                                                    int functionIdxSolar)
-{
-    // 0.0 means invalid, will not be used in absorptance value override
-    Real64 overrideValueThermal = 0.0;
-    Real64 overrideValueSolar = 0.0;
-    if (controlSignal == Material::VariableAbsCtrlSignal::Scheduled) {
-        overrideValueThermal = ScheduleManager::GetCurrentScheduleValue(state, scheduleIdxThermal);
-        overrideValueSolar = ScheduleManager::GetCurrentScheduleValue(state, scheduleIdxSolar);
-    } else {
-        Real64 triggerValue;
-        if (controlSignal == Material::VariableAbsCtrlSignal::SurfaceTemperature) {
-            triggerValue = state.dataHeatBalSurf->SurfTempOut(surfNum);
-        } else if (controlSignal == Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation) {
-            triggerValue = state.dataHeatBal->SurfQRadSWOutIncident(surfNum);
-        } else { // controlled by heating cooling mode
-            int zoneNum = state.dataSurface->Surface(surfNum).Zone;
-            bool isCooling = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).TotalOutputRequired < 0);
-            triggerValue = static_cast<Real64>(isCooling);
-        }
-        if (functionIdxThermal > 0) {
-            overrideValueThermal = Curve::CurveValue(state, functionIdxThermal, triggerValue);
-        }
-        if (functionIdxSolar > 0) {
-            overrideValueSolar = Curve::CurveValue(state, functionIdxSolar, triggerValue);
-        }
-    }
-    return std::pair<Real64, Real64>(truncateOverrideValue(overrideValueThermal), truncateOverrideValue(overrideValueSolar));
-}
-
 void UpdateVariableAbsorptances(EnergyPlusData &state)
 {
     for (int surfNum : state.dataSurface->AllVaryAbsOpaqSurfaceList) {
         auto const &thisConstruct = state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction);
         auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
-        std::pair<Real64, Real64> overrideValues = GetSurfAddOnOverrideValue(state,
-                                                                             surfNum,
-                                                                             thisMaterial->absorpVarCtrlSignal,
-                                                                             thisMaterial->absorpThermalVarSchedIdx,
-                                                                             thisMaterial->absorpThermalVarFuncIdx,
-                                                                             thisMaterial->absorpSolarVarSchedIdx,
-                                                                             thisMaterial->absorpSolarVarFuncIdx);
-        if (overrideValues.first > 0.0) state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) = overrideValues.first;
-        if (overrideValues.second > 0.0) state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) = overrideValues.second;
+        if (thisMaterial->absorpVarCtrlSignal == Material::VariableAbsCtrlSignal::Scheduled) {
+            if (thisMaterial->absorpThermalVarSchedIdx > 0) {
+                state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) =
+                    max(min(ScheduleManager::GetCurrentScheduleValue(state, scheduleIdxThermal), 0.9999), 0.0001);
+            }
+            if (thisMaterial->absorpSolarVarSchedIdx > 0) {
+                state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) =
+                    max(min(ScheduleManager::GetCurrentScheduleValue(state, scheduleIdxSolar), 0.9999), 0.0001);
+            }
+        } else {
+            Real64 triggerValue;
+            if (thisMaterial->absorpVarCtrlSignal == Material::VariableAbsCtrlSignal::SurfaceTemperature) {
+                triggerValue = state.dataHeatBalSurf->SurfTempOut(surfNum);
+            } else if (thisMaterial->absorpVarCtrlSignal == Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation) {
+                triggerValue = state.dataHeatBal->SurfQRadSWOutIncident(surfNum);
+            } else { // controlled by heating cooling mode
+                int zoneNum = state.dataSurface->Surface(surfNum).Zone;
+                bool isCooling = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).TotalOutputRequired < 0);
+                triggerValue = static_cast<Real64>(isCooling);
+            }
+            if (functionIdxThermal > 0) {
+                state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) =
+                    max(min(Curve::CurveValue(state, functionIdxThermal, triggerValue), 0.9999), 0.0001);
+            }
+            if (functionIdxSolar > 0) {
+                state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) = max(min(Curve::CurveValue(state, functionIdxSolar, triggerValue), 0.9999), 0.0001);
+            }
+        }
     }
 }
 
