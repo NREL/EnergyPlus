@@ -2810,10 +2810,11 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
             return;
         }
 
-        Material::VariableAbsCtrlSignal controlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature; // default value
-        controlSignal = static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
+        thisMaterial->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature; // default value
+        thisMaterial->absorpVarCtrlSignal =
+            static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
         //    init to 0 as GetScheduleIndex returns 0 for not-found schedule
-        if (controlSignal == VariableAbsCtrlSignal::Scheduled) {
+        if (thisMaterial->absorpVarCtrlSignal == VariableAbsCtrlSignal::Scheduled) {
             thisMaterial->absorpThermalVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(5));
             thisMaterial->absorpSolarVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(7));
             if ((thisMaterial->absorpThermalVarSchedIdx == 0) && (thisMaterial->absorpSolarVarSchedIdx == 0)) {
