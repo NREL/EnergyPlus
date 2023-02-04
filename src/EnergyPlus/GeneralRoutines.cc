@@ -2103,10 +2103,11 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
     LatentOutput = 0.0;
     SensibleOutput = 0.0;
     if (MassFlow > 0.0) {
+        Real64 minW = std::min(WEquip, WZone);
         TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDBEquip, WEquip) -
-                                  Psychrometrics::PsyHFnTdbW(TDBZone, WZone));                         // total addition/removal rate, {W};
-        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
-        LatentOutput = TotalOutput - SensibleOutput;                                                   // latent addition/removal rate, {W}
+                                  Psychrometrics::PsyHFnTdbW(TDBZone, WZone));                        // total addition/removal rate, {W};
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, minW); // sensible addition/removal rate, {W};
+        LatentOutput = TotalOutput - SensibleOutput;                                                  // latent addition/removal rate, {W}
     }
 }
 
