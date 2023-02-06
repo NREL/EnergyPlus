@@ -2002,4 +2002,53 @@ TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRITestConditions)
     EXPECT_NEAR(13.47, result_EWBT25LoadRatio, 0.01);
 }
 
+TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRISITestConditions)
+{
+    // Tests chiller's condenser entering fluid temperature
+    // at different AHRI Std 551/591 (SI) test conditions
+
+    // set AHRI test load ratios
+    Real64 constexpr LoadRatio100 = 1.0;
+    Real64 constexpr LoadRatio75 = 0.75;
+    Real64 constexpr LoadRatio50 = 0.50;
+    Real64 constexpr LoadRatio25 = 0.25;
+
+    // Test 1: WaterCooled Condenser Entering Water Temperatures
+    DataPlant::CondenserType CondenserType = DataPlant::CondenserType::WaterCooled;
+    StandardRatings::AhriChillerStd Ahri_Chiller_Std = StandardRatings::AhriChillerStd::AHRI551_591;
+    Real64 result_EWT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100, Ahri_Chiller_Std);
+    Real64 result_EWT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75, Ahri_Chiller_Std);
+    Real64 result_EWT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50, Ahri_Chiller_Std);
+    Real64 result_EWT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25, Ahri_Chiller_Std);
+    // checking expected water temperatures
+    EXPECT_NEAR(30.0, result_EWT100LoadRatio, 0.01);
+    EXPECT_NEAR(24.5, result_EWT75LoadRatio, 0.01);
+    EXPECT_NEAR(19.0, result_EWT50LoadRatio, 0.01);
+    EXPECT_NEAR(19.0, result_EWT25LoadRatio, 0.01);
+
+    // Test 2: AirCooled Condenser Entering Air Dry-Bulb Temperatures
+    CondenserType = DataPlant::CondenserType::AirCooled;
+    Real64 result_EDBT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100, Ahri_Chiller_Std);
+    Real64 result_EDBT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75, Ahri_Chiller_Std);
+    Real64 result_EDBT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50, Ahri_Chiller_Std);
+    Real64 result_EDBT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25, Ahri_Chiller_Std);
+    // checking expected dry-bulb temperatures
+    EXPECT_NEAR(35.0, result_EDBT100LoadRatio, 0.01);
+    EXPECT_NEAR(27.0, result_EDBT75LoadRatio, 0.01);
+    EXPECT_NEAR(19.0, result_EDBT50LoadRatio, 0.01);
+    EXPECT_NEAR(13.0, result_EDBT25LoadRatio, 0.01);
+
+    // Test 3: EvapCooled Condenser Entering Air Wet-Bulb Temperatures
+    CondenserType = DataPlant::CondenserType::EvapCooled;
+    Real64 result_EWBT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100, Ahri_Chiller_Std);
+    Real64 result_EWBT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75, Ahri_Chiller_Std);
+    Real64 result_EWBT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50, Ahri_Chiller_Std);
+    Real64 result_EWBT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25, Ahri_Chiller_Std);
+    // checking expected wet-bulb temperatures
+    EXPECT_NEAR(24.0, result_EWBT100LoadRatio, 0.01);
+    EXPECT_NEAR(20.5, result_EWBT75LoadRatio, 0.01);
+    EXPECT_NEAR(17.0, result_EWBT50LoadRatio, 0.01);
+    EXPECT_NEAR(13.5, result_EWBT25LoadRatio, 0.01);
+}
+
 } // namespace EnergyPlus
