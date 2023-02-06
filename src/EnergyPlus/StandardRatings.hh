@@ -92,6 +92,16 @@ namespace StandardRatings {
         Num
     };
 
+    enum class AhriChillerStd
+    {
+        Invalid = -1,
+        AHRI550_590 = 1,
+        AHRI551_591 = 2,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(AhriChillerStd::Num)> AhriChillerStdNamesUC{"AHRI550_590", "AHRI551_591"};
+
     // Functions
 
     void CalcChillerIPLV(EnergyPlusData &state,
@@ -104,7 +114,8 @@ namespace StandardRatings {
                          int const EIRFTempCurveIndex,                 // Index for the energy input ratio modifier curve
                          int const EIRFPLRCurveIndex,                  // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,                    // Minimum unloading ratio
-                         Real64 &IPLV,
+                         Real64 &IPLVSI,                               // IPLV.SI determined using AHRI Std 551/591 (SI)
+                         Real64 &IPLVIP,                               // IPLV.IP determined using AHRI Std 550/590 (IP)
                          ObjexxFCL::Optional<Real64 const> CondVolFlowRate,
                          ObjexxFCL::Optional_int_const CondLoopNum,
                          ObjexxFCL::Optional<Real64 const> OpenMotorEff);
@@ -451,8 +462,9 @@ namespace StandardRatings {
     );
 
     Real64 CondenserEnteringFluidTemperature(
-        DataPlant::CondenserType const CondenserType, // Chillers Condenser Type: AirCooled, WaterCooled, or EvaporativelyCooled
-        Real64 LoadRatio                              // AHRI Std 550/590 test load ratio: 1.0, 0.75, 0.5, 0.25
+        DataPlant::CondenserType const CondenserType,    // Chillers Condenser Type: AirCooled, WaterCooled, or EvaporativelyCooled
+        Real64 LoadRatio,                                // AHRI Std 550/590 or 551/591 test load ratio: 1.0, 0.75, 0.5, 0.25
+        StandardRatings::AhriChillerStd const ChillerStd // AHRI Std 550/590 (IP), or AHRI Std 551/591 (SI)
     );
 
 } // namespace StandardRatings
