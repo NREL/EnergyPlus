@@ -226,25 +226,6 @@ TEST_F(EnergyPlusFixture, General_CreateTimeString)
     }
 }
 
-TEST_F(EnergyPlusFixture, General_CreateTimeIntervalString)
-{
-    { // Time = 0 - 1
-        EXPECT_EQ("00:00:00.0 - 00:00:01.0", General::CreateTimeIntervalString(0, 1));
-    }
-    { // Time = 0 - 0
-        EXPECT_EQ("00:00:00.0 - 00:00:00.0", General::CreateTimeIntervalString(0, 0));
-    }
-    { // Time = 1 - 0
-        EXPECT_EQ("00:00:01.0 - 00:00:00.0", General::CreateTimeIntervalString(1, 0));
-    }
-    { // Time = 1 - 59
-        EXPECT_EQ("00:00:01.0 - 00:00:59.0", General::CreateTimeIntervalString(1, 59));
-    }
-    { // Time = 59 - 59.9
-        EXPECT_EQ("00:00:59.0 - 00:00:59.9", General::CreateTimeIntervalString(59, 59.9));
-    }
-}
-
 TEST_F(EnergyPlusFixture, General_SolveRootTest)
 {
     // New feature: Multiple solvers

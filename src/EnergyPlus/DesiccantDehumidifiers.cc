@@ -1590,13 +1590,13 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ExhaustFanCurveIndex = GetCurveIndex(state, Alphas(15));
 
             if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
-                ErrorsFoundGeneric |= Curve::CheckCurveDims(state,
-                                                            DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
-                                                            {1},                                            // Valid dimensions
-                                                            RoutineName,                                    // Routine name
-                                                            CurrentModuleObject,                            // Object Type
-                                                            DesicDehum(DesicDehumNum).Name,                 // Object Name
-                                                            cAlphaFields(15));                              // Field Name
+                ErrorsFoundGeneric |= EnergyPlus::Curve::CheckCurveDims(state,
+                                                                        DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
+                                                                        {1},                                            // Valid dimensions
+                                                                        RoutineName,                                    // Routine name
+                                                                        CurrentModuleObject,                            // Object Type
+                                                                        DesicDehum(DesicDehumNum).Name,                 // Object Name
+                                                                        cAlphaFields(15));                              // Field Name
             }
 
             if (DesicDehum(DesicDehumNum).Preheat == Selection::Yes) {

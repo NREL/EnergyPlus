@@ -1687,8 +1687,6 @@ void ShowRecurringErrors(EnergyPlusData &state)
     // Using/Aliasing
     using namespace DataErrorTracking;
 
-    using General::strip_trailing_zeros;
-
     static constexpr std::string_view StatMessageStart(" **   ~~~   ** ");
 
     int Loop;
@@ -1739,20 +1737,17 @@ void ShowRecurringErrors(EnergyPlusData &state)
             }
             StatMessage = "";
             if (error.ReportMax) {
-                MaxOut = format("{:.6R}", error.MaxValue);
-                strip_trailing_zeros(MaxOut);
+                MaxOut = format("{:.6f}", error.MaxValue);
                 StatMessage += "  Max=" + MaxOut;
                 if (!error.MaxUnits.empty()) StatMessage += ' ' + error.MaxUnits;
             }
             if (error.ReportMin) {
-                MinOut = format("{:.6R}", error.MinValue);
-                strip_trailing_zeros(MinOut);
+                MinOut = format("{:.6f}", error.MinValue);
                 StatMessage += "  Min=" + MinOut;
                 if (!error.MinUnits.empty()) StatMessage += ' ' + error.MinUnits;
             }
             if (error.ReportSum) {
-                SumOut = format("{:.6R}", error.SumValue);
-                strip_trailing_zeros(SumOut);
+                SumOut = format("{:.6f}", error.SumValue);
                 StatMessage += "  Sum=" + SumOut;
                 if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;
             }

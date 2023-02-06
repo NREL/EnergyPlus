@@ -190,7 +190,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using General::CheckCreatedZoneItemName;
 
         using namespace OutputReportPredefined;
         using namespace DataLoopNode;

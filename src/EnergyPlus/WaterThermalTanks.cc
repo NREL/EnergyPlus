@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/member.functions.hh>
 
@@ -169,7 +168,7 @@ void WaterThermalTankData::onInitLoopEquip(EnergyPlusData &state, const PlantLoc
     } else {
         this->SizeTankForDemandSide(state);
         this->SizeDemandSidePlantConnections(state);
-        this->SizeSupplySidePlantConnections(state);
+        this->SizeSupplySidePlantConnections(state, this->SrcSidePlantLoc.loopNum);
         this->SizeTankForSupplySide(state);
     }
 
@@ -10854,7 +10853,7 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
     }
 }
 
-void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, ObjexxFCL::Optional_int_const LoopNum)
+void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, const int loopNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -10880,14 +10879,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
     Real64 tmpUseDesignVolFlowRate = this->UseDesignVolFlowRate;
     Real64 tmpSourceDesignVolFlowRate = this->SourceDesignVolFlowRate;
 
-    int tmpLoopNum;
-    if (!present(LoopNum)) {
-        tmpLoopNum = this->SrcSidePlantLoc.loopNum;
-    } else {
-        tmpLoopNum = LoopNum;
-    }
-
-    if ((this->UseInletNode > 0) && (tmpLoopNum == this->UseSidePlantLoc.loopNum)) {
+    if ((this->UseInletNode > 0) && (loopNum == this->UseSidePlantLoc.loopNum)) {
         if (this->UseDesignVolFlowRateWasAutoSized) {
             int PltSizNum = this->UseSidePlantSizNum;
             if (PltSizNum > 0) { // we have a Plant Sizing Object
@@ -10950,7 +10942,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
         } // autosizing needed.
     }     // connected to plant
 
-    if ((this->SourceInletNode > 0) && (tmpLoopNum == this->SrcSidePlantLoc.loopNum)) {
+    if ((this->SourceInletNode > 0) && (loopNum == this->SrcSidePlantLoc.loopNum)) {
         if (this->SourceDesignVolFlowRateWasAutoSized) {
             int PltSizNum = this->SourceSidePlantSizNum;
             if (PltSizNum > 0) {

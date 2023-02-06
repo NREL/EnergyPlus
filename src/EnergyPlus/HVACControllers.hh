@@ -315,6 +315,10 @@ namespace HVACControllers {
                                    DataHVACControllers::ControllerOperation Operation, // Operation to execute
                                    bool IsConvergedFlag);
 
+    Real64 GetCurrentHVACTime(EnergyPlusData &state);
+
+    Real64 GetPreviousHVACTime(EnergyPlusData &state);
+
     std::string CreateHVACTimeString(EnergyPlusData &state);
 
     std::string CreateHVACStepFullString(EnergyPlusData &state);
