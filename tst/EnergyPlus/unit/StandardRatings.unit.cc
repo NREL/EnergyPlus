@@ -1080,7 +1080,8 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     curve3->inputLimits[0].max = 1;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
-    Real64 IPLV;
+    Real64 IPLVSI = 0.0;
+    Real64 IPLVIP = 0.0;
     CalcChillerIPLV(*state,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
                     DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
@@ -1091,12 +1092,13 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat,
-                    IPLV,
+                    IPLVSI,
+                    IPLVIP,
                     ObjexxFCL::Optional<const Real64>(),
                     ObjexxFCL::Optional_int_const(),
                     ObjexxFCL::Optional<const Real64>());
 
-    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.89); // 13.20 IPLV
+    EXPECT_DOUBLE_EQ(round(IPLVIP * 100) / 100, 3.89); // 13.20 IPLV
 }
 
 TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
@@ -1164,7 +1166,8 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     curve3->inputLimits[0].max = 1.15;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
-    Real64 IPLV;
+    Real64 IPLVSI = 0.0;
+    Real64 IPLVIP = 0.0;
     CalcChillerIPLV(*state,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
                     DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
@@ -1175,12 +1178,13 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat,
-                    IPLV,
+                    IPLVSI,
+                    IPLVIP,
                     ObjexxFCL::Optional<const Real64>(),
                     ObjexxFCL::Optional_int_const(),
                     ObjexxFCL::Optional<const Real64>());
 
-    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 5.47); // 18.56 IPLV
+    EXPECT_DOUBLE_EQ(round(IPLVIP * 100) / 100, 5.47); // 18.56 IPLV
 }
 
 TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
@@ -1273,7 +1277,8 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
 
-    Real64 IPLV;
+    Real64 IPLVSI = 0.0;
+    Real64 IPLVIP = 0.0;
     CalcChillerIPLV(*state,
                     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).Name,
                     DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR,
@@ -1284,12 +1289,13 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
                     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFTIndex,
                     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFPLRIndex,
                     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).MinUnloadRat,
-                    IPLV,
+                    IPLVSI,
+                    IPLVIP,
                     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).CondVolFlowRate,
                     1,
                     1.0);
 
-    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 4.95);
+    EXPECT_DOUBLE_EQ(round(IPLVIP * 100) / 100, 4.95);
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
@@ -1950,7 +1956,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
 TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRITestConditions)
 {
     // Tests chiller's condenser entering fluid temperature
-    // at different AHRI test conditions
+    // at different AHRI Std 550/590 (IP) test conditions
 
     // set AHRI test load ratios
     Real64 constexpr LoadRatio100 = 1.0;
@@ -1960,10 +1966,11 @@ TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRITestConditions)
 
     // Test 1: WaterCooled Condenser Entering Water Temperatures
     DataPlant::CondenserType CondenserType = DataPlant::CondenserType::WaterCooled;
-    Real64 result_EWT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100);
-    Real64 result_EWT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75);
-    Real64 result_EWT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50);
-    Real64 result_EWT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25);
+    StandardRatings::AhriChillerStd Ahri_Chiller_Std = StandardRatings::AhriChillerStd::AHRI550_590;
+    Real64 result_EWT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100, Ahri_Chiller_Std);
+    Real64 result_EWT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75, Ahri_Chiller_Std);
+    Real64 result_EWT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50, Ahri_Chiller_Std);
+    Real64 result_EWT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25, Ahri_Chiller_Std);
     // checking expected water temperatures
     EXPECT_NEAR(29.44, result_EWT100LoadRatio, 0.01);
     EXPECT_NEAR(23.89, result_EWT75LoadRatio, 0.01);
@@ -1972,10 +1979,10 @@ TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRITestConditions)
 
     // Test 2: AirCooled Condenser Entering Air Dry-Bulb Temperatures
     CondenserType = DataPlant::CondenserType::AirCooled;
-    Real64 result_EDBT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100);
-    Real64 result_EDBT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75);
-    Real64 result_EDBT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50);
-    Real64 result_EDBT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25);
+    Real64 result_EDBT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100, Ahri_Chiller_Std);
+    Real64 result_EDBT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75, Ahri_Chiller_Std);
+    Real64 result_EDBT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50, Ahri_Chiller_Std);
+    Real64 result_EDBT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25, Ahri_Chiller_Std);
     // checking expected dry-bulb temperatures
     EXPECT_NEAR(35.0, result_EDBT100LoadRatio, 0.01);
     EXPECT_NEAR(26.67, result_EDBT75LoadRatio, 0.01);
@@ -1984,10 +1991,10 @@ TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRITestConditions)
 
     // Test 3: EvapCooled Condenser Entering Air Wet-Bulb Temperatures
     CondenserType = DataPlant::CondenserType::EvapCooled;
-    Real64 result_EWBT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100);
-    Real64 result_EWBT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75);
-    Real64 result_EWBT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50);
-    Real64 result_EWBT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25);
+    Real64 result_EWBT100LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio100, Ahri_Chiller_Std);
+    Real64 result_EWBT75LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio75, Ahri_Chiller_Std);
+    Real64 result_EWBT50LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio50, Ahri_Chiller_Std);
+    Real64 result_EWBT25LoadRatio = CondenserEnteringFluidTemperature(CondenserType, LoadRatio25, Ahri_Chiller_Std);
     // checking expected wet-bulb temperatures
     EXPECT_NEAR(23.89, result_EWBT100LoadRatio, 0.01);
     EXPECT_NEAR(20.42, result_EWBT75LoadRatio, 0.01);
