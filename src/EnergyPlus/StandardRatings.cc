@@ -590,7 +590,7 @@ namespace StandardRatings {
 
                         QCond = Power * OpenMotorEff + QEvap;
 
-                        if (CapFTempCurveIndex > DataBranchAirLoopPlant::MassFlowTolerance) {
+                        if (CondVolFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                             CondenserInletTemp = CondenserOutletTemp - QCond / (CondVolFlowRate * Rho) / Cp;
                         }
                         return (EnteringWaterTempReduced - CondenserInletTemp) / EnteringWaterTempReduced;
