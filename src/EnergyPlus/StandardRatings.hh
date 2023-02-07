@@ -462,9 +462,9 @@ namespace StandardRatings {
     );
 
     Real64 CondenserEnteringFluidTemperature(
-        DataPlant::CondenserType const CondenserType,    // Chillers Condenser Type: AirCooled, WaterCooled, or EvaporativelyCooled
-        Real64 LoadRatio,                                // AHRI Std 550/590 or 551/591 test load ratio: 1.0, 0.75, 0.5, 0.25
-        StandardRatings::AhriChillerStd const ChillerStd // AHRI Std 550/590 (IP), or AHRI Std 551/591 (SI)
+        DataPlant::CondenserType const CondenserType,     // Chiller Condenser Type: AirCooled, WaterCooled, or EvaporativelyCooled
+        StandardRatings::AhriChillerStd const ChillerStd, // AHRI Std 550/590 (IP), or AHRI Std 551/591 (SI)
+        Real64 LoadRatio                                  // AHRI Std test load ratio: 1.0, 0.75, 0.5, 0.25
     );
 
 } // namespace StandardRatings

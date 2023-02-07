@@ -484,7 +484,7 @@ namespace StandardRatings {
             // IPLV calculations:
             for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
 
-                CondenserInletTemp = CondenserEnteringFluidTemperature(CondenserType, ReducedPLR[RedCapNum], ahri_chiller_std);
+                CondenserInletTemp = CondenserEnteringFluidTemperature(CondenserType, ahri_chiller_std, ReducedPLR[RedCapNum]);
 
                 if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                     if (RedCapNum == 0) {
@@ -4993,28 +4993,28 @@ namespace StandardRatings {
     }
 
     Real64 CondenserEnteringFluidTemperature(DataPlant::CondenserType const CondenserType,
-                                             Real64 LoadRatio,
-                                             StandardRatings::AhriChillerStd const ChillerStd)
+                                             StandardRatings::AhriChillerStd const ChillerStd,
+                                             Real64 LoadRatio)
     {
         Real64 CondenserEnteringFluidTemp = 0.0;
         if (ChillerStd == StandardRatings::AhriChillerStd::AHRI550_590) {
 
             if (CondenserType == DataPlant::CondenserType::WaterCooled) {
-                // get the condenser entering water temperature for a given part load ratio in deg C
+                // get the condenser entering water temperature for a given load ratio in deg C
                 Real64 enteringWaterTemp = 18.33;
                 if (LoadRatio > 0.50) {
                     enteringWaterTemp = 7.22 + 22.22 * LoadRatio;
                 }
                 CondenserEnteringFluidTemp = enteringWaterTemp;
             } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
-                // get the outdoor air dry bulb temperature for a given part load ratio in deg C
+                // get the outdoor air dry bulb temperature for a given load ratio in deg C
                 Real64 enteringAirDBTemp = 12.78;
                 if (LoadRatio > 0.33) {
                     enteringAirDBTemp = 1.67 + 33.33 * LoadRatio;
                 }
                 CondenserEnteringFluidTemp = enteringAirDBTemp;
             } else { // EvaporativelyCooled Condenser
-                // get the outdoor air wet bulb temperature for a given part load ratio in deg C
+                // get the outdoor air wet bulb temperature for a given load ratio in deg C
                 Real64 enteringAirWBTemp = 10.0 + 13.89 * LoadRatio;
                 CondenserEnteringFluidTemp = enteringAirWBTemp;
             }
@@ -5022,25 +5022,24 @@ namespace StandardRatings {
         } else if (ChillerStd == StandardRatings::AhriChillerStd::AHRI551_591) {
 
             if (CondenserType == DataPlant::CondenserType::WaterCooled) {
-                // get the condenser entering water temperature for a given part load ratio in deg C
+                // get the condenser entering water temperature for a given load ratio in deg C
                 Real64 enteringWaterTemp = 19.0;
                 if (LoadRatio > 0.50) {
                     enteringWaterTemp = 8.0 + 22.0 * LoadRatio;
                 }
                 CondenserEnteringFluidTemp = enteringWaterTemp;
             } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
-                // get the outdoor air dry bulb temperature for a given part load ratio in deg C
+                // get the outdoor air dry bulb temperature for a given load ratio in deg C
                 Real64 enteringAirDBTemp = 13.0;
                 if (LoadRatio > 0.3125) {
                     enteringAirDBTemp = 3.0 + 32.0 * LoadRatio;
                 }
                 CondenserEnteringFluidTemp = enteringAirDBTemp;
             } else { // EvaporativelyCooled Condenser
-                // get the outdoor air wet bulb temperature for a given part load ratio in deg C
+                // get the outdoor air wet bulb temperature for a given load ratio in deg C
                 Real64 enteringAirWBTemp = 10.0 + 14.0 * LoadRatio;
                 CondenserEnteringFluidTemp = enteringAirWBTemp;
             }
-        } else {
         }
         return CondenserEnteringFluidTemp;
     }
