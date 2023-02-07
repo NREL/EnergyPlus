@@ -2623,7 +2623,7 @@ The defrost fuel usage correction is modeled using the ambient air temperature a
 \end{equation}
 
 \subsection{Cycling Ratio Correction}
-The cyclying ratio correction is also used for fuel usage calculations. 
+The cyclying ratio correction is also used for fuel usage calculations. This curve can be inputted by the user. An example correlation for CRF is as follows: 
 \begin{equation}
 \mathrm{CRF} = 0.4167 \times \mathrm{CR} + 0.5833,
 \end{equation}
@@ -2640,6 +2640,6 @@ Please note that since the object is based on curve inputs, the user also has th
 
 The electricity usage for the fuel-fired absorption heat pump is modeled using EIR (Electricity based relation) input curves. The two part of electricity usage is the ``auxiliary electricty'' usage and the ``standby electricity usage'':
 \begin{equation}
-\mathrm{Electricity usage} = \mathrm{EIR}_{\mathrm{auxiliary}} \times \mathrm{Load} + \mathrm{Electricty}_{\mathrm{Standby}},
+\mathrm{Electricity usage} = \mathrm{Norminal Auxilary Power} \times \mathrm{EIR}_{\mathrm{auxiliary}} + \mathrm{Electricty}_{\mathrm{Standby}},
 \end{equation}
-where $\mathrm{EIR}_{\mathrm{auxiliary}}$ is supplied by the curve input and $\mathrm{Electricty}_{\mathrm{Standby}}$ is supplied by the equipment standby electricity input. 
+where $\mathrm{EIR}_{\mathrm{auxiliary}}$ are supplied by the curve input, and $\mathrm{Norminal Auxilary Power}$ and $\mathrm{Electricty}_{\mathrm{Standby}}$ are supplied by the equipment standby electricity inputs. 
