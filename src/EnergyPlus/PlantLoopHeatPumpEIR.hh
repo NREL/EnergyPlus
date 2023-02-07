@@ -57,7 +57,6 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
-#include <EnergyPlus/WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
 
@@ -76,7 +75,7 @@ namespace EIRPlantLoopHeatPumps {
         }
     };
 
-    struct EIRPlantLoopHeatPump : public EnergyPlus::BasePlantLoopHeatPump
+    struct EIRPlantLoopHeatPump : public EnergyPlus::PlantComponent
     {
 
         // fixed configuration parameters
