@@ -469,13 +469,16 @@ namespace StandardRatings {
         Real64 EvapOutletTemp = 0.0;              // evaporator leaving water temperature, deg C
         Real64 constexpr EvapOutletTempSI = 7.0;  // evaporator LWT, 2011 AHRI Std 551 / 591(SI)
         Real64 constexpr EvapOutletTempIP = 6.67; // evaporator LWT, 2011 AHRI Std 550 / 590(IP), (44F)
+        bool ReportStdRatingsOnce = true;
 
         for (const auto &AhriStd : AhriChillerStdNamesUC) {
             AhriChillerStd ahri_chiller_std = static_cast<AhriChillerStd>(getEnumerationValue(AhriChillerStdNamesUC, AhriStd));
             if (ahri_chiller_std == AhriChillerStd::AHRI550_590) {
                 EvapOutletTemp = EvapOutletTempIP;
+                ReportStdRatingsOnce = true;
             } else { // AhriChillerStd::AHRI551_591
                 EvapOutletTemp = EvapOutletTempSI;
+                ReportStdRatingsOnce = false;
             }
             IPLV = 0.0;
 
@@ -491,8 +494,10 @@ namespace StandardRatings {
                         ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
                         // Report rated capacity and chiller COP
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                        if (ReportStdRatingsOnce) {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                        }
                     }
 
                     // Get capacity curve info with respect to CW setpoint and entering condenser temps
@@ -606,8 +611,10 @@ namespace StandardRatings {
                         ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
 
                         // Report rated capacity and chiller COP
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                        if (ReportStdRatingsOnce) {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                        }
                     }
 
                     ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
