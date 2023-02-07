@@ -1098,6 +1098,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
                     ObjexxFCL::Optional_int_const(),
                     ObjexxFCL::Optional<const Real64>());
 
+    EXPECT_DOUBLE_EQ(round(IPLVSI * 100) / 100, 3.88); // 3.88 IPLV.SI (AHRI Std 551/591 Test Condition)
     EXPECT_DOUBLE_EQ(round(IPLVIP * 100) / 100, 3.89); // 13.27 IPLV.IP (AHRI Std 550/590 Test Condition)
 }
 
@@ -1184,6 +1185,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
                     ObjexxFCL::Optional_int_const(),
                     ObjexxFCL::Optional<const Real64>());
 
+    EXPECT_DOUBLE_EQ(round(IPLVSI * 100) / 100, 5.44); // 5.44 IPLV.SI (AHRI Std 551/591 Test Condition)
     EXPECT_DOUBLE_EQ(round(IPLVIP * 100) / 100, 5.47); // 18.66 IPLV.IP (AHRI Std 550/590 Test Condition)
 }
 
@@ -1295,6 +1297,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
                     1,
                     1.0);
 
+    EXPECT_DOUBLE_EQ(round(IPLVSI * 100) / 100, 4.83); // 4.83 IPLV.SI (AHRI Std 551/591 Test Condition)
     EXPECT_DOUBLE_EQ(round(IPLVIP * 100) / 100, 4.95); // 16.89 IPLV.IP (AHRI Std 550/590 Test Condition)
 }
 
