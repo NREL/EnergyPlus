@@ -1388,7 +1388,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     using Curve::checkCurveIsNormalizedToOne;
     using Curve::CurveValue;
     using Curve::GetCurveIndex;
-    using Curve::SetCurveOutputMinMaxValues;
     using DXCoils::GetDXCoilIndex;
     using Fans::GetFanAvailSchPtr;
     using Fans::GetFanDesignVolumeFlowRate;
@@ -1802,7 +1801,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, ErrorsFound, 0.7, _);
+                    Curve::SetCurveOutputMinValue(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, ErrorsFound, 0.7);
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -1812,7 +1811,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, ErrorsFound, _, 1.0);
+                    Curve::SetCurveOutputMaxValue(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolPLFFPLR, ErrorsFound, 1.0);
                 }
             }
         }
@@ -2013,7 +2012,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                     ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, ErrorsFound, 0.7, _);
+                    Curve::SetCurveOutputMaxValue(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, ErrorsFound, 0.7);
                 }
 
                 if (MaxCurveVal > 1.0) {
@@ -2023,7 +2022,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                     ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-                    SetCurveOutputMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, ErrorsFound, _, 1.0);
+                    Curve::SetCurveOutputMaxValue(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatPLFFPLR, ErrorsFound, 1.0);
                 }
             }
         }
