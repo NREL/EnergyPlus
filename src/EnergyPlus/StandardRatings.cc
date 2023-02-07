@@ -469,11 +469,9 @@ namespace StandardRatings {
         Real64 EvapOutletTemp = 0.0;              // evaporator leaving water temperature, deg C
         Real64 constexpr EvapOutletTempSI = 7.0;  // evaporator LWT, 2011 AHRI Std 551 / 591(SI)
         Real64 constexpr EvapOutletTempIP = 6.67; // evaporator LWT, 2011 AHRI Std 550 / 590(IP), (44F)
-        AhriChillerStd ahri_chiller_std;
-
 
         for (const auto &AhriStd : AhriChillerStdNamesUC) {
-            ahri_chiller_std = static_cast<AhriChillerStd>(getEnumerationValue(AhriChillerStdNamesUC, UtilityRoutines::MakeUPPERCase(AhriStd)));
+            AhriChillerStd ahri_chiller_std = static_cast<AhriChillerStd>(getEnumerationValue(AhriChillerStdNamesUC, AhriStd));
             if (ahri_chiller_std == AhriChillerStd::AHRI550_590) {
                 EvapOutletTemp = EvapOutletTempIP;
             } else { // AhriChillerStd::AHRI551_591

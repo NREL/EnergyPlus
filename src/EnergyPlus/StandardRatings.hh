@@ -100,7 +100,8 @@ namespace StandardRatings {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(AhriChillerStd::Num)> AhriChillerStdNamesUC{"AHRI550_590", "AHRI551_591"};
+    static constexpr std::array<std::string_view, static_cast<int>(StandardRatings::AhriChillerStd::Num)> AhriChillerStdNamesUC{"AHRI550_590",
+                                                                                                                                "AHRI551_591"};
 
     // Functions
 
