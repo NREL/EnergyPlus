@@ -48,11 +48,11 @@ There could be two potential idd designs as follows. The first design creates a 
 
 Based on the reasoning above, two material add-on objects will be added, *MaterialProperty:VariableThermalAbsorptance* and *MaterialProperty:VariableSolarAbsorptance*.
 
-    MaterialProperty:VariableThermalAbsorptance,
+    MaterialProperty:VariableAbsorptance,
       A1 , \field Name
            \required-field
            \type alpha
-           \note The name of the dynamic coating material with variable thermal absorptance.
+           \note The name of the dynamic coating material with variable thermal or solar absorptance.
       A2 , \field Reference Material Name
            \required-field
            \type object-list
@@ -67,39 +67,23 @@ Based on the reasoning above, two material add-on objects will be added, *Materi
            \key SpaceHeatingCoolingMode
            \key Scheduled
            \default SurfaceTemperature
-      A4 , \field Trigger Thermal Absorptance Function Name
-          \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance. For longwave radiation.
-      A5 ; \field Thermal Absorptance Schedule Name
-           \note only used when Control Signal = “Scheduled”
+           \note the variable that drives the change in thermal/solar absorptance
+      A4 , \field Thermal Absorptance Function Name
+           \note A Curve:* or Table:Lookup object encoding the relationship between
+           \note the control signal value and the surface thermal absorptance.
+      A5 , \field Thermal Absorptance Schedule Name
+           \note only used when Control Signal = "Scheduled"
+      A6 , \field Solar Absorptance Function Name
+           \note A Curve:* or Table:Lookup object encoding the relationship between
+           \note the control signal value and the surface solar absorptance.
+      A7 ; \field Solar Absorptance Schedule Name
+           \note only used when Control Signal = "Scheduled"
 
-    MaterialProperty:VariableSolarAbsorptance,
-      A1 , \field Name
-           \required-field
-           \type alpha
-           \note The name of the dynamic coating material with variable solar absorptance.
-      A2 , \field Reference Material Name
-           \required-field
-           \type object-list
-           \object-list MaterialName
-           \note Regular Material Name to which the additional properties will be added.
-           \note this the material name for the basic material properties.
-      A3 , \field Control Signal
-           \required-field
-           \type choice
-           \key SurfaceTemperature
-           \key SurfaceReceivedSolarRadiation
-           \key SpaceHeatingCoolingMode
-           \key Scheduled
-           \default SurfaceTemperature
-      A4 , \field Trigger Solar Absorptance Function Name
-          \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface solar absorptance. For longwave radiation.
-      A5 ; \field Solar Absorptance Schedule Name
-           \note only used when Control Signal = “Scheduled”
 
 ## Proposed additions to Meters:
 
 N/A
- 
+
 ## Proposed Report Variables:
 
 N/A
