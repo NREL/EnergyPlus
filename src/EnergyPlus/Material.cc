@@ -2792,7 +2792,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
             ShowSevereError(state,
                             format("{}: invalid {} entered={}, must match to a valid Material name.",
                                    cCurrentModuleObject,
-                                   state.dataIPShortCut->cAlphaFieldNames(1),
+                                   state.dataIPShortCut->cAlphaFieldNames(2),
                                    alphas(2)));
             errorsFound = true;
             return;
@@ -2814,9 +2814,11 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
         thisMaterial->absorpVarCtrlSignal =
             static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
         //    init to 0 as GetScheduleIndex returns 0 for not-found schedule
+        thisMaterial->absorpThermalVarFuncIdx = Curve::GetCurveIndex(state, alphas(4));
+        thisMaterial->absorpThermalVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(5));
+        thisMaterial->absorpSolarVarFuncIdx = Curve::GetCurveIndex(state, alphas(6));
+        thisMaterial->absorpSolarVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(7));
         if (thisMaterial->absorpVarCtrlSignal == VariableAbsCtrlSignal::Scheduled) {
-            thisMaterial->absorpThermalVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(5));
-            thisMaterial->absorpSolarVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(7));
             if ((thisMaterial->absorpThermalVarSchedIdx == 0) && (thisMaterial->absorpSolarVarSchedIdx == 0)) {
                 ShowSevereError(
                     state,
@@ -2826,13 +2828,31 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
                 errorsFound = true;
                 return;
             }
+            if ((thisMaterial->absorpThermalVarFuncIdx > 0) || (thisMaterial->absorpSolarVarFuncIdx > 0)) {
+                ShowWarningError(state,
+                                 format("{}: Control signal \"Scheduled\" is chosen. Thermal or solar absorptance function name is going to be "
+                                        "ignored, for object {}",
+                                        cCurrentModuleObject,
+                                        alphas(1)));
+                errorsFound = true;
+                return;
+            }
         } else { // controlled by performance table or curve
-            thisMaterial->absorpThermalVarFuncIdx = Curve::GetCurveIndex(state, alphas(4));
-            thisMaterial->absorpSolarVarFuncIdx = Curve::GetCurveIndex(state, alphas(6));
             if ((thisMaterial->absorpThermalVarFuncIdx == 0) && (thisMaterial->absorpSolarVarFuncIdx == 0)) {
-                format("{}: non-schedule control signal is chosen but both thermal and solar absorptance table or curve are undefined, for object {}",
-                       cCurrentModuleObject,
-                       alphas(1));
+                ShowSevereError(state,
+                                format("{}: Non-schedule control signal is chosen but both thermal and solar absorptance table or curve are "
+                                       "undefined, for object {}",
+                                       cCurrentModuleObject,
+                                       alphas(1)));
+                errorsFound = true;
+                return;
+            }
+            if ((thisMaterial->absorpThermalVarSchedIdx > 0) || (thisMaterial->absorpSolarVarSchedIdx > 0)) {
+                ShowWarningError(state,
+                                 format("{}: Non-scedule control signal is chosen. Thermal or solar absorptance schedule name is going to be "
+                                        "ignored, for object {}",
+                                        cCurrentModuleObject,
+                                        alphas(1)));
                 errorsFound = true;
                 return;
             }

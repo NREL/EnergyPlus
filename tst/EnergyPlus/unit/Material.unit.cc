@@ -133,4 +133,114 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     EXPECT_TRUE(compare_enums(state->dataMaterial->Material(3)->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled));
     EXPECT_EQ(state->dataMaterial->Material(3)->absorpThermalVarSchedIdx, 1);
     EXPECT_EQ(state->dataMaterial->Material(3)->absorpSolarVarSchedIdx, 1);
+
+    std::string idf_objects_bad_inputs = delimited_string({
+        "MaterialProperty:VariableAbsorptance,",
+        "variableThermal_wall_1,  !- Name",
+        "WALL_1,                  !- Reference Material Name",
+        "SurfaceTemperature,      !- Control Signal",
+        ",                        !- Thermal Absorptance Function Name",
+        ",                        !- Thermal Absorptance Schedule Name",
+        ",                        !- Solar Absorptance Function Name",
+        ";                        !- Solar Absorptance Schedule Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
+
+    // empty function
+    Material::GetVariableAbsorptanceInput(*state, errors_found);
+    compare_err_stream("   ** Severe  ** MaterialProperty:VariableAbsorptance: Non-schedule control signal is chosen but both thermal and solar "
+                       "absorptance table or "
+                       "curve are undefined, for object VARIABLETHERMAL_WALL_1\n");
+
+    // control variable is surface temperature but solar absorptance uses schedule
+    idf_objects_bad_inputs = delimited_string({
+        "MaterialProperty:VariableAbsorptance,",
+        "variableThermal_wall_1,  !- Name",
+        "WALL_1,                  !- Reference Material Name",
+        "Scheduled,               !- Control Signal",
+        ",                        !- Thermal Absorptance Function Name",
+        ",                        !- Thermal Absorptance Schedule Name",
+        ",                        !- Solar Absorptance Function Name",
+        ";                        !- Solar Absorptance Schedule Name",
+    });
+    ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
+    Material::GetVariableAbsorptanceInput(*state, errors_found);
+    compare_err_stream("   ** Severe  ** MaterialProperty:VariableAbsorptance: Control signal \"Scheduled\" is chosen but both thermal and solar "
+                       "absorptance schedules are undefined, for object "
+                       "VARIABLETHERMAL_WALL_1\n",
+                       true);
+
+    // control variable is surface temperature but solar absorptance has schedule
+    idf_objects_bad_inputs = delimited_string({
+        "MaterialProperty:VariableAbsorptance,",
+        "variableThermal_wall_1,  !- Name",
+        "WALL_1,                  !- Reference Material Name",
+        "SurfaceTemperature,      !- Control Signal",
+        ",                        !- Thermal Absorptance Function Name",
+        "ABS_SCH,                 !- Thermal Absorptance Schedule Name",
+        "SOLAR_ABSORPTANCE_CURVE, !- Solar Absorptance Function Name",
+        ";                        !- Solar Absorptance Schedule Name",
+    });
+    ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
+    Material::GetVariableAbsorptanceInput(*state, errors_found);
+    compare_err_stream("   ** Warning ** MaterialProperty:VariableAbsorptance: Non-scedule control signal is chosen. Thermal or solar absorptance "
+                       "schedule name is going to be "
+                       "ignored, for object VARIABLETHERMAL_WALL_1\n",
+                       true);
+
+    // control variable is surface temperature but solar absorptance has schedule
+    idf_objects_bad_inputs = delimited_string({
+        "MaterialProperty:VariableAbsorptance,",
+        "variableThermal_wall_1,  !- Name",
+        "WALL_1,                  !- Reference Material Name",
+        "Scheduled,      !- Control Signal",
+        ",                        !- Thermal Absorptance Function Name",
+        "ABS_SCH,                 !- Thermal Absorptance Schedule Name",
+        "SOLAR_ABSORPTANCE_CURVE, !- Solar Absorptance Function Name",
+        ";                        !- Solar Absorptance Schedule Name",
+    });
+    ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
+    Material::GetVariableAbsorptanceInput(*state, errors_found);
+    compare_err_stream("   ** Warning ** MaterialProperty:VariableAbsorptance: Control signal \"Scheduled\" is chosen. Thermal or solar absorptance "
+                       "function name is going to be "
+                       "ignored, for object VARIABLETHERMAL_WALL_1\n",
+                       true);
+
+    // wrong reference material
+    idf_objects_bad_inputs = delimited_string({
+        "MaterialProperty:VariableAbsorptance,",
+        "variableThermal_wall_1,  !- Name",
+        "WALL_0,                  !- Reference Material Name",
+        "SurfaceTemperature,      !- Control Signal",
+        "THERMAL_ABSORPTANCE_TABLE, !- Thermal Absorptance Function Name",
+        ",                        !- Thermal Absorptance Schedule Name",
+        "SOLAR_ABSORPTANCE_CURVE, !- Solar Absorptance Function Name",
+        ";                        !- Solar Absorptance Schedule Name",
+    });
+    ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
+    Material::GetVariableAbsorptanceInput(*state, errors_found);
+    compare_err_stream("   ** Severe  ** MaterialProperty:VariableAbsorptance: invalid Reference Material Name entered=WALL_0, must match to a valid "
+                       "Material name.\n",
+                       true);
+
+    // wrong material group
+    idf_objects_bad_inputs = delimited_string({
+        "MaterialProperty:VariableAbsorptance,",
+        "variableThermal_wall_1,  !- Name",
+        "WALL_1,                  !- Reference Material Name",
+        "SurfaceTemperature,      !- Control Signal",
+        "THERMAL_ABSORPTANCE_TABLE, !- Thermal Absorptance Function Name",
+        ",                        !- Thermal Absorptance Schedule Name",
+        "SOLAR_ABSORPTANCE_CURVE, !- Solar Absorptance Function Name",
+        ";                        !- Solar Absorptance Schedule Name",
+    });
+    ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
+    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::WindowGlass;
+    Material::GetVariableAbsorptanceInput(*state, errors_found);
+    compare_err_stream(
+        "   ** Severe  ** MaterialProperty:VariableAbsorptance: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, "
+        "material=WALL_1, must have regular "
+        "properties (Thermal/Solar Absorptance)\n",
+        true);
 }
