@@ -471,12 +471,11 @@ namespace StandardRatings {
         Real64 constexpr EvapOutletTempIP = 6.67; // evaporator LWT, 2011 AHRI Std 550 / 590(IP), (44F)
         bool ReportStdRatingsOnce = true;
 
-        for (const auto &AhriStd : AhriChillerStdNamesUC) {
-            AhriChillerStd ahri_chiller_std = static_cast<AhriChillerStd>(getEnumerationValue(AhriChillerStdNamesUC, AhriStd));
-            if (ahri_chiller_std == AhriChillerStd::AHRI550_590) {
+        for (const auto &AhriStd : {AhriChillerStd::AHRI550_590, AhriChillerStd::AHRI551_591}) {
+            if (AhriStd == AhriChillerStd::AHRI550_590) {
                 EvapOutletTemp = EvapOutletTempIP;
                 ReportStdRatingsOnce = true;
-            } else { // AhriChillerStd::AHRI551_591
+            } else if (AhriStd == AhriChillerStd::AHRI551_591) {
                 EvapOutletTemp = EvapOutletTempSI;
                 ReportStdRatingsOnce = false;
             }
@@ -485,7 +484,7 @@ namespace StandardRatings {
             // IPLV calculations:
             for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
 
-                CondenserInletTemp = CondenserEnteringFluidTemperature(CondenserType, ahri_chiller_std, ReducedPLR[RedCapNum]);
+                CondenserInletTemp = CondenserEnteringFluidTemperature(CondenserType, AhriStd, ReducedPLR[RedCapNum]);
 
                 if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                     if (RedCapNum == 0) {
@@ -711,7 +710,7 @@ namespace StandardRatings {
                 }
             }
 
-            if (ahri_chiller_std == AhriChillerStd::AHRI550_590) {
+            if (AhriStd == AhriChillerStd::AHRI550_590) {
                 IPLVIP = IPLV;
             } else {
                 IPLVSI = IPLV;
