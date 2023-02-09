@@ -4625,9 +4625,9 @@ These outputs are the steam inlet and outlet temperatures and steam flow rate fo
 
 These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOilNo1, FuelOilNo2, Coal, Diesel, Gasoline, OtherFuel1, and OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
-\subsection{Water to Water Heat Pumps}\label{water-to-water-heat-pumps}
+\subsection{Plant Loop Heat Pumps}\label{plant-loop-heat-pumps}
 
-The EnergyPlus has three water-to-water heat pump models, parameter estimation, equation fit and an EIR-formulated version, to choose from.
+EnergyPlus has four plant loop heat pump models: parameter estimation (water-source only), equation fit (water-source only), EIR-formulated (water or air source), and fuel-fired absorption (air-source only).
 
 \textbf{\hyperref[heatpumpwatertowaterequationfitcooling]{HeatPump:WaterToWater:EquationFit:Cooling}}
 
@@ -4647,11 +4647,18 @@ Jin, Hui. 2002. Parameter Estimation Based Models of Water Source Heat Pumps. Ph
 
 Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simulation Program. M.S. Thesis. Department of Mechanical and Aerospace Engineering, Oklahoma State University. (downloadable from \href{http://www.hvac.okstate.edu}{http://www.hvac.okstate.edu/})
 
-\textbf{HeatPump:PlantLoop:EIR:Cooling}
+\textbf{\hyperref[plhp_eir]{HeatPump:PlantLoop:EIR:Cooling}}
 
-\textbf{HeatPump:PlantLoop:EIR:Heating}
+\textbf{\hyperref[plhp_eir]{HeatPump:PlantLoop:EIR:Heating}}
 
 Beginning with version 9.1, an EIR-formulated heat pump model was added. This heat pump can be operated as a water-source object with the source-side connected to another plant loop, or as an air-source object with the source-side interacting with the outdoor air. This formulation allows the user to enter curves for specifying the capacity and energy usage in a more generic way, allowing the curves to be applicable to a wide variety of components. With the original equation fit model, the curve form was locked in to a specific set of linear coefficients. With the new form, the curve can be a quadratic function of temperatures, or an even more generic lookup table.
+
+\textbf{\hyperref[plhp_fuelfired]{HeatPump:AirToWater:FuelFired:Cooling}}
+
+\textbf{\hyperref[plhp_fuelfired]{HeatPump:AirToWater:FuelFired:Heating}}
+
+This is a fuel-fired air-to-water absorption cycle heat pump.
+
 
 \textbf{Configuration}
 
@@ -5529,9 +5536,9 @@ This output variable represents the average load side mass flow rate during the 
 
 This output variable represents the average source side mass flow rate during the specified reporting window.
 
-\subsection{HeatPump:AirToWater:FuelFired:Heating (and Cooling)}
+\subsection{HeatPump:AirToWater:FuelFired:Heating (and Cooling)}\label{plhp_fuelfired}
 
-HeatPump:AirToWater:FuelFired:Heating is a gas-fired (or fuel fired) absorption heat pump that can be used for space heating and domestic hot water. It is can be considered a more efficient heat source (like a boiler) for hot water loop or DHW loop. It can be used as the heat source for a low temperature radiant heating system. 
+HeatPump:AirToWater:FuelFired:Heating is a gas-fired (or fuel fired) air-to-water absorption heat pump that can be used for space heating and domestic hot water. 
 
 \subsubsection{Inputs}
 
