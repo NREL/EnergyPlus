@@ -1937,7 +1937,6 @@ namespace HeatingCoils {
         // Simulates a simple Electric heating coil with an efficiency
 
         // Using/Aliasing
-        auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2042,7 +2041,6 @@ namespace HeatingCoils {
         }
 
         heatingCoil.HeatingCoilLoad = HeatingCoilLoad;
-        ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
 
         // Set the outlet conditions
         heatingCoil.OutletAirTemp = TempAirOut;
@@ -2067,6 +2065,11 @@ namespace HeatingCoils {
             }
         }
 
+        if (state.dataHeatingCoils->CoilIsSuppHeater) {
+            state.dataHVACGlobal->SuppHeatingCoilPower = heatingCoil.ElecUseLoad;
+        } else {
+            state.dataHVACGlobal->ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
+        }
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         state.dataLoopNodes->Node(heatingCoil.AirOutletNodeNum).Temp = heatingCoil.OutletAirTemp;
     }
@@ -2098,7 +2101,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using Curve::CurveValue;
-        auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -2174,7 +2176,6 @@ namespace HeatingCoils {
                 // Power calculation
                 heatingCoil.ElecUseLoad = SpeedRatio * HSElecHeatingPower + (1.0 - SpeedRatio) * LSElecHeatingPower;
 
-                ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
                 heatingCoil.HeatingCoilLoad = TotCapHS * SpeedRatio + TotCapLS * (1.0 - SpeedRatio);
 
                 OutletAirEnthalpy = InletAirEnthalpy + heatingCoil.HeatingCoilLoad / heatingCoil.InletAirMassFlowRate;
@@ -2238,8 +2239,6 @@ namespace HeatingCoils {
 
                 heatingCoil.ElecUseLoad = heatingCoil.HeatingCoilLoad / EffLS;
 
-                ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
-
                 heatingCoil.OutletAirTemp = OutletAirTemp;
                 heatingCoil.OutletAirHumRat = OutletAirHumRat;
                 heatingCoil.OutletAirEnthalpy = OutletAirEnthalpy;
@@ -2267,10 +2266,14 @@ namespace HeatingCoils {
             // some of these are reset in Init, can be removed to speed up code
             heatingCoil.ElecUseLoad = 0.0;
             heatingCoil.HeatingCoilLoad = 0.0;
-            ElecHeatingCoilPower = 0.0;
 
         } // end of on/off if - else
 
+        if (state.dataHeatingCoils->CoilIsSuppHeater) {
+            state.dataHVACGlobal->SuppHeatingCoilPower = heatingCoil.ElecUseLoad;
+        } else {
+            state.dataHVACGlobal->ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
+        }
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         state.dataLoopNodes->Node(heatingCoil.AirOutletNodeNum).Temp = heatingCoil.OutletAirTemp;
 
