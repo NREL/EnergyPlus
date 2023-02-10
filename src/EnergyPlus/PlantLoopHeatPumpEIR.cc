@@ -1707,7 +1707,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         this->fuelRate = 0.0;
         this->powerUsage = 0.0;
     } else {
-        this->fuelRate = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
+        this->fuelRate = this->loadSideHeatTransfer / this->referenceCOP * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
 
         this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR;
         if (this->defrostType == DefrostType::Timed) {
@@ -1993,7 +1993,11 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.referenceCapacity = tmpRefCapacity.get<Real64>();
                 }
 
-                // N2 Design flow rate
+                // N2 Nominal heating capacity
+                thisPLHP.referenceCOP = fields.at("nominal_COP").get<Real64>();
+                if (thisPLHP.referenceCOP <= 0.0) thisPLHP.referenceCOP = 1.0;
+
+                // N3 Design flow rate
                 auto tmpFlowRate = fields.at("design_flow_rate");
                 if (tmpFlowRate == "Autosize") {
                     thisPLHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
@@ -2014,7 +2018,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 //    thisPLHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate.get<Real64>();
                 //}
 
-                // N3 Design supply temperature
+                // N4 Design supply temperature
                 auto tmpDesSupTemp = fields.at("design_supply_temperature");
                 if (tmpDesSupTemp == "Autosize") {
                     // sizing
@@ -2022,7 +2026,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.desSupplyTemp = tmpDesSupTemp.get<Real64>();
                 }
 
-                // N4 Design temperature lift
+                // N5 Design temperature lift
                 auto tmpDesTempLift = fields.at("design_temperature_lift");
                 if (tmpDesTempLift == "Autosize") {
                     // sizing
@@ -2030,7 +2034,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.desTempLift = tmpDesTempLift.get<Real64>();
                 }
 
-                // N5 Sizing factor
+                // N6 Sizing factor
                 if (fields.find("sizing_factor") != fields.end()) {
                     thisPLHP.sizingFactor = fields.at("sizing_factor").get<Real64>();
                     if (thisPLHP.sizingFactor <= 0.0) thisPLHP.sizingFactor = 1.0;
@@ -2126,7 +2130,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     errorsFound = true;
                 }
 
-                // N6 min PLR
+                // N7 min PLR
                 if (fields.find("minimum_part_load_ratio") != fields.end()) {
                     thisPLHP.minPLR = fields.at("minimum_part_load_ratio").get<Real64>();
                 } else {
@@ -2144,7 +2148,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     }
                 }
 
-                // N7 max PLR
+                // N8 max PLR
                 if (fields.find("maximum_part_load_ratio") != fields.end()) {
                     thisPLHP.maxPLR = fields.at("maximum_part_load_ratio").get<Real64>();
                 } else {
@@ -2194,7 +2198,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // 2022-08-08: better give a warning for resetting to default
                     }
                 }
-                // N8 defrost_operation_time_fraction
+                // N9 defrost_operation_time_fraction
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
                     thisPLHP.defrostOpTimeFrac = 0.0;
                 } else {
@@ -2216,7 +2220,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     }
                 }
 
-                // N9 Resistive Defrost Heater Capacity
+                // N10 Resistive Defrost Heater Capacity
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
                     thisPLHP.defrostResistiveHeaterCap = 0.0;
                 } else {
@@ -2239,7 +2243,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     }
                 }
 
-                // N10 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
+                // N11 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
                     thisPLHP.defrostMaxOADBT = -99.0;
                 } else {
@@ -2277,7 +2281,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.cycRatioCurveIndex = 0;
                 }
 
-                // N11 nominal_auxiliary_electric_power
+                // N12 nominal_auxiliary_electric_power
                 if (fields.find("nominal_auxiliary_electric_power") != fields.end()) {
                     thisPLHP.nominalAuxElecPower = fields.at("nominal_auxiliary_electric_power").get<Real64>();
                 } else {
@@ -2328,7 +2332,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.auxElecEIRFoPLRCurveIndex = 0;
                 }
 
-                // N12 standby_electric_power
+                // N13 standby_electric_power
                 if (fields.find("standby_electric_power") != fields.end()) {
                     thisPLHP.standbyElecPower = fields.at("standby_electric_power").get<Real64>();
                 } else {
