@@ -161,9 +161,9 @@ namespace AirflowNetwork {
 
     int constexpr NumOfVentCtrTypes(6); // Number of zone level venting control types
 
-    void Solver::manage_balance(Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
-                                Optional_int_const Iter,                // Iteration number
-                                Optional_bool ResimulateAirZone         // True when solution technique on third iteration
+    void Solver::manage_balance(ObjexxFCL::Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
+                                ObjexxFCL::Optional_int_const Iter,                // Iteration number
+                                ObjexxFCL::Optional_bool ResimulateAirZone         // True when solution technique on third iteration
     )
     {
 
@@ -6814,20 +6814,20 @@ namespace AirflowNetwork {
         Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
 
         int CurveNum = static_cast<int>(state.dataCurveManager->PerfCurve.size()) + 1;
-        state.dataCurveManager->PerfCurve.push_back(Curve::PerformanceCurveData());
+        state.dataCurveManager->PerfCurve.push_back(new Curve::Curve());
 
-        state.dataCurveManager->PerfCurve(CurveNum).Name = name;
-        state.dataCurveManager->PerfCurve(CurveNum).numDims = 1;
+        state.dataCurveManager->PerfCurve(CurveNum)->Name = name;
+        state.dataCurveManager->PerfCurve(CurveNum)->numDims = 1;
 
-        state.dataCurveManager->PerfCurve(CurveNum).interpolationType = Curve::InterpType::BtwxtMethod;
+        state.dataCurveManager->PerfCurve(CurveNum)->interpolationType = Curve::InterpType::BtwxtMethod;
 
-        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].minPresent = true;
-        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 360.0;
-        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].maxPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].minPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 360.0;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].maxPresent = true;
 
-        state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
-        state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
+        state.dataCurveManager->PerfCurve(CurveNum)->TableIndex = gridIndex;
+        state.dataCurveManager->PerfCurve(CurveNum)->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
 
         state.dataCurveManager->NumCurves += 1;
         return CurveNum;
@@ -9323,7 +9323,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::update(Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
+    void Solver::update(ObjexxFCL::Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
     {
 
         // SUBROUTINE INFORMATION:

@@ -34,9 +34,9 @@ private: // Friend
 
 public: // Types
 
-	typedef  T  Value;
-	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
-	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+	using Value = T;
+	using Tc = typename std::conditional<std::is_scalar<T>::value, const T, const T &>::type;
+	using Tr = typename std::conditional<std::is_scalar<T>::value, typename std::remove_const<T>::type, const T &>::type;
 
 public: // Creation
 
@@ -264,6 +264,13 @@ present( Optional< T > const & o )
 {
 	return o.present();
 }
+
+template <typename T>
+std::ostream& operator<< (std::ostream & os, const Optional<T>& rhs) {
+	os << T{rhs};
+	return os;
+}
+
 
 } // ObjexxFCL
 

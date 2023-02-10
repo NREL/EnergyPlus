@@ -137,7 +137,7 @@ namespace HVACDuct {
         if (CompIndex == 0) {
             DuctNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACDuct->Duct);
             if (DuctNum == 0) {
-                ShowFatalError(state, "SimDuct: Component not found=" + std::string{CompName});
+                ShowFatalError(state, format("SimDuct: Component not found={}", CompName));
             }
             CompIndex = DuctNum;
         } else {
@@ -247,7 +247,7 @@ namespace HVACDuct {
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + " Errors found in input");
+            ShowFatalError(state, format("{} Errors found in input", RoutineName));
         }
     }
 

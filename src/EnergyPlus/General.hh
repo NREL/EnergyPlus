@@ -64,11 +64,6 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-// Forward declaration
-namespace OutputProcessor {
-    enum class TimeStepType;
-}
-
 namespace WeatherManager {
     enum class DateType;
     struct ReportPeriodData;
@@ -102,8 +97,6 @@ namespace General {
         }
     }
 
-    std::string &strip_trailing_zeros(std::string &InputString);
-
     void MovingAvg(Array1D<Real64> &DataIn, int NumItemsInAvg);
 
     void ProcessDateString(EnergyPlusData &state,
@@ -113,7 +106,7 @@ namespace General {
                            int &PWeekDay,
                            WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
-                           Optional_int PYear = _);
+                           ObjexxFCL::Optional_int PYear = _);
 
     void DetermineDateTokens(EnergyPlusData &state,
                              std::string const &String,
@@ -123,7 +116,7 @@ namespace General {
                              int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
                              WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                              bool &ErrorsFound,                  // Set to true if cannot process this string as a date
-                             Optional_int TokenYear = _          // Value of Year if one appears to be present and this argument is present
+                             ObjexxFCL::Optional_int TokenYear = _ // Value of Year if one appears to be present and this argument is present
     );
 
     void ValidateMonthDay(EnergyPlusData &state,
@@ -195,10 +188,6 @@ namespace General {
                            int &Minute // minute in integer format (0:59)
     );
 
-    // TODO: this probably shouldn't be here
-    int DetermineMinuteForReporting(EnergyPlusData &state,
-                                    OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
-
     void EncodeMonDayHrMin(int &Item, // word containing encoded month, day, hour, minute
                            int Month, // month in integer format (1:12)
                            int Day,   // day in integer format (1:31)
@@ -206,19 +195,7 @@ namespace General {
                            int Minute // minute in integer format (0:59)
     );
 
-    int LogicalToInteger(bool Flag);
-
-    Real64 GetCurrentHVACTime(EnergyPlusData &state);
-
-    Real64 GetPreviousHVACTime(EnergyPlusData &state);
-
-    std::string CreateHVACTimeIntervalString(EnergyPlusData &state);
-
     std::string CreateTimeString(Real64 Time); // Time in seconds
-
-    std::string CreateTimeIntervalString(Real64 StartTime, // Start of current interval in seconds
-                                         Real64 EndTime    // End of current interval in seconds
-    );
 
     void ParseTime(Real64 Time,    // Time value in seconds
                    int &Hours,     // Number of hours
@@ -229,17 +206,9 @@ namespace General {
     void ScanForReports(EnergyPlusData &state,
                         std::string const &reportName,
                         bool &DoReport,
-                        Optional_string_const ReportKey = _,
-                        Optional_string Option1 = _,
-                        Optional_string Option2 = _);
-
-    inline void ReallocateRealArray(Array1D<Real64> &Array,
-                                    int &ArrayMax,     // Current and resultant dimension for Array
-                                    int const ArrayInc // increment for redimension
-    )
-    {
-        Array.redimension(ArrayMax += ArrayInc, 0.0);
-    }
+                        ObjexxFCL::Optional_string_const ReportKey = _,
+                        ObjexxFCL::Optional_string Option1 = _,
+                        ObjexxFCL::Optional_string Option2 = _);
 
     void CheckCreatedZoneItemName(EnergyPlusData &state,
                                   std::string_view calledFrom,              // routine called from
@@ -271,8 +240,6 @@ namespace General {
             ItemNames[i] = Items[i].Name;
         CheckCreatedZoneItemName(state, calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag);
     }
-
-    std::vector<std::string> splitString(const std::string &string, char delimiter);
 
     bool isReportPeriodBeginning(EnergyPlusData &state, int periodIdx);
 
@@ -322,31 +289,7 @@ struct GeneralData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->GetReportInput = true;
-        this->SurfVert = false;
-        this->SurfDet = false;
-        this->SurfDetWVert = false;
-        this->DXFReport = false;
-        this->DXFWFReport = false;
-        this->VRMLReport = false;
-        this->CostInfo = false;
-        this->ViewFactorInfo = false;
-        this->Constructions = false;
-        this->Materials = false;
-        this->LineRpt = false;
-        this->VarDict = false;
-        this->EMSoutput = false;
-        this->XNext = 0.0;
-        this->DXFOption1.clear();
-        this->DXFOption2.clear();
-        this->DXFWFOption1.clear();
-        this->DXFWFOption2.clear();
-        this->VRMLOption1.clear();
-        this->VRMLOption2.clear();
-        this->ViewRptOption1.clear();
-        this->LineRptOption1.clear();
-        this->VarDictOption1.clear();
-        this->VarDictOption2.clear();
+        new (this) GeneralData();
     }
 };
 

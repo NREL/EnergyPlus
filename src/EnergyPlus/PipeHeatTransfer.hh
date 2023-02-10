@@ -237,7 +237,7 @@ namespace PipeHeatTransfer {
 
         void CalcBuriedPipeSoil(EnergyPlusData &state);
 
-        void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
+        void CalcPipesHeatTransfer(EnergyPlusData &state, ObjexxFCL::Optional_int_const LengthIndex = _);
 
         Real64 OutsidePipeHeatTransCoef(EnergyPlusData &state);
 
