@@ -1504,9 +1504,9 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // Source (air) side variable to use
     auto &thisloadsideinletnode = state.dataLoopNodes->Node(this->loadSideNodes.inlet);
     Real64 oaTempforCurve = thisloadsideinletnode.Temp; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
-    if (this->oaTempCurveInputVar == OATempCurveVar::DryBulb) {
+    if (this->oaTempCurveInputVar == OATempCurveVar::WetBulb) {
         oaTempforCurve = Psychrometrics::PsyTwbFnTdbWPb(
-            state, thisloadsideinletnode.Temp, thisloadsideinletnode.HumRat, thisloadsideinletnode.Press, "PLFFHPEIR::simulate()");
+            state, thisloadsideinletnode.Temp, thisloadsideinletnode.HumRat, thisloadsideinletnode.Press, "PLFFHPEIR::doPhysics()");
     } else {
         //
     }
@@ -1590,7 +1590,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         eirModifierFuncTemp = 0.0;
     }
 
-    Real64 miniPLR_mod = 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
+    Real64 miniPLR_mod = this->minPLR; // 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
     Real64 PLFf = max(miniPLR_mod, partLoadRatio);
 
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, PLFf);
