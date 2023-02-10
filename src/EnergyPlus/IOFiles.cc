@@ -52,6 +52,7 @@
 #include "FileSystem.hh"
 #include "InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "InputProcessing/InputProcessor.hh"
+#include "ResultsFramework.hh"
 #include "UtilityRoutines.hh"
 
 #include <algorithm>
@@ -480,6 +481,26 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
                 for (auto extensibleInstance = extensiblesArray.begin(); extensibleInstance != extensiblesArray.end(); ++extensibleInstance) {
                     mviKeyNames.emplace_back(ip->getAlphaFieldValue(extensibleInstance.value(), extensionSchemaProps, "key_name"));
                 }
+            }
+        }
+    }
+
+    auto const timestamp_instances = ip->epJSON.find("OutputControl:Timestamp");
+    if (timestamp_instances != ip->epJSON.end()) {
+        auto const &objectSchemaProps = ip->getObjectSchemaProps(state, "OutputControl:Timestamp");
+        auto const &instancesValue = timestamp_instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            ip->markObjectAsUsed("OutputControl:Timestamp", instance.key());
+
+            auto item = fields.find("iso_8601_format");
+            if (item != fields.end()) {
+                state.dataResultsFramework->resultsFramework->setISO8601(item->get<std::string>() == "Yes");
+            }
+
+            item = fields.find("timestamp_at_end_of_interval");
+            if (item != fields.end()) {
+                state.dataResultsFramework->resultsFramework->setStartOfInterval(item->get<std::string>() == "Yes");
             }
         }
     }
