@@ -1994,7 +1994,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // N2 Nominal heating capacity
-                thisPLHP.referenceCOP = fields.at("nominal_COP").get<Real64>();
+                thisPLHP.referenceCOP = fields.at("nominal_cop").get<Real64>();
                 if (thisPLHP.referenceCOP <= 0.0) thisPLHP.referenceCOP = 1.0;
 
                 // N3 Design flow rate

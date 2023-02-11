@@ -2601,29 +2601,31 @@ Part Load Ratio is the ratio for the actual heating/cooling load over the curren
 \end{equation}
 
 \subsubsection{Fuel Use}
+The fuel usage is calculated using the folloiwing formula, taking consideration of the load capacity, nominal COP, and the various adjustment factors (temperature, PLR, Defrosting, and Cycling Ratio):
+
 \begin{equation}
-\mathrm{Fuel Use} = \frac{\mathrm{Load} \times \mathrm{EIRFT} \times \mathrm{EIRFPLR} \times \mathrm{EIRDEFROST}}{\mathrm{CRF}}
+\mathrm{Fuel Use} = \frac{\mathrm{Load} \times \mathrm{EIRFT} \times \mathrm{EIRFPLR} \times \mathrm{EIRDEFROST}}{\mathrm{COP}_\mathrm{nominal} \times \mathrm{CRF}}
 \end{equation}
 
-\subsubsection{EIR Temperature Correction}
+\subsubsection{EIR Temperature Adjustment}
 A typical EIR temperature correction function will involve two independent temperature variables---the ambient air temperature ($T_{mathrm{amb}}$) and the returning (or entering) water temeprature ($T_{\mathrm{ret}}$) of the load side. 
 \begin{equation}
 \mathrm{EIRFT} = a_2 \times Tamb + b_2 \times T_{\mathrm{amb}}^{2} + c_2 \times T_{\mathrm{ret}}^{2} + d_2 \times T_{\mathrm{ret}}^{2} + e_2 \times T_{\mathrm{amb}} \times T_{\mathrm{ret}} + f_2
 \end{equation}
 
-\subsubsection{EIR PLR Correction}
+\subsubsection{EIR PLR Adjustment}
 The EIR PLR correction function is a cubic function that takes the PLR as the sole independent variable. For example, a potential curve can be used is like the following:  
 \begin{equation}
 \mathrm{EIRFPLR} = 0.0865 \times \mathrm{PLR}^{2} - 0.006 \times \mathrm{PLR} + 0.9814, \mathrm{for} 0.25 \leq \mathrm{PLR} \leq 1 
 \end{equation}
 
-\subsubsection{Defrost Correction (Heating mode only)}
+\subsubsection{Defrosting Adjustment (Heating mode only)}
 If the defrost control type is OnDemand, then the defrost fuel use correction is modeled using the ambient air temperature as the independent varable. The inputs allows a cubic (or lower order) function. For example, one possible curve correlation can look like the following:  
 \begin{equation}
 \mathrm{EIRDEFROST} = -0.0011 \times T_{\mathrm{amb}}^{2} - 0.006 \times T_{\mathrm{amb}} + 1.0317, \mathrm{for} -8.89^{\circ}\mathrm{C} \leq T_{\mathrm{amb}} \leq 3.33^{\circ}\mathrm{C} 
 \end{equation}
 
-\subsubsection{Cycling Ratio Correction}
+\subsubsection{Cycling Ratio Adjustment}
 The cycling ratio correction is also used for fuel use calculations when the PLR is below the minimum. This curve can be inputted by the user. An example correlation for CRF is as follows: 
 \begin{equation}
 \mathrm{CRF} = 0.4167 \times \mathrm{CR} + 0.5833,

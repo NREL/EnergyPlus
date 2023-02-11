@@ -5579,6 +5579,12 @@ The nominal heating capacity in [W].
 
 For the HeatPump:AirToWater:FuelFired:Cooling object, this field name is ``Nominal Cooling Capacity''.
 
+\paragraph{Field: Nominal COP}
+
+The nominal COP (Coefficient of Performance) in [W/W], which is the fuel based COP of the heat pump in the rating conditions. This is a require-field. The default value is set to 1.0 in case the input filed is accidently left blank.
+
+For the HeatPump:AirToWater:FuelFired:Heating object, this is the fuel based nominal heatinging COP; and for the HeatPump:AirToWater:FuelFired:Cooling object, this is the fuel based nominal cooling COP.
+
 \paragraph{Field: Design Flow Rate}
 
 The volumetric design flow rate of the water side in [m3/s].
@@ -5629,17 +5635,17 @@ A positive fraction that represents the minimum heating output possible when ope
 
 A positive fraction that represents the maximum heating output possible when operated continually at rated temperature conditions divided by the available heating capacity at those same conditions. If greater than 1.0, the equipment is typically thought of as capable of being overloaded. The default is 1.0.
 
-\paragraph{Field: Fuel Energy Input Ratio Defrost Adjustment Curve name}
-
-This is a normalized curve that would adjust the fuel energy input ratio taken into consideration of the defrost operation. The EIR (Energy Input Ratio) adjustment is a function of the outdoor air temperature---the temperature that the condenser is exposed to.
-
-This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
-
 \paragraph{Field: Defrost Control Type}
 
 The defrost control type. There are two options for this input: \emph{Timed}, or \emph{OnDemand}. The \emph{Timed} option will use a fraction of time per hour to account for the defrost action. The \emph{OnDemand} option will work when the outdoor air temperature drops to a certain point. The default choice is \emph{OnDemand}.
 
 Currently, the \emph{Timed} option is to be used with an electric resistive defrost heater only (see Field: Resistive Defrost Heater Capacity). the \emph{OnDemand} option is used with fuel resources and the defrost EIR curve is used for the fuel energy adjustment.
+
+This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+
+\paragraph{Field: Fuel Energy Input Ratio Defrost Adjustment Curve name}
+
+This is a normalized curve that would adjust the fuel energy input ratio taken into consideration of the defrost operation. The EIR (Energy Input Ratio) adjustment is a function of the outdoor air temperature---the temperature that the condenser is exposed to.
 
 This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 

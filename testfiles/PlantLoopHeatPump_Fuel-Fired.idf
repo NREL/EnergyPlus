@@ -22369,36 +22369,37 @@
 
 
 HeatPump:AirToWater:FuelFired:Heating,
-GAHP_module, ! A1
-GAHP Inlet Node, ! A2
-GAHP Outlet Node, ! A3
-GAHP_Cond_Inlet, ! A4
-, ! A5 Comanion coil
-NaturalGas, ! A6 fuel type
-GAHP_Custom, ! A7 end use cat
-19255, ! N1 capacity
-0.0001892706, ! N2 design flow rate
-60, ! N3 Design Supply Temp
-13, ! N4 Design Lift
-1.0, ! N5 sizing factor
-NotModulated, ! A8 flow mode
-DryBulb, ! A9 oa temp var type
-EnteringCondenser, ! A10 oa temp var type
-CapCurveFuncTempCurve, ! A11 CapFoT
-EIRCurveFuncTempCurve, ! A12 EIRFoT
-EIRCurveFuncPLRCurve, ! A13 EIRFoPLR
-0.2, ! N6 minPLR
-1.0, ! N7 maxPLR
-EIRDefrostFoTCurve, ! A14 EIRdefrost curve
-OnDemand, ! A15 defrost control type
-0.0, ! N8 defrost time frac
-0.0, ! N9 Electric defrost resister Wattage
-3.0, ! N10 max oa DBT for defrost
-CRFCurve, ! A16 crf curve name
-500, ! N11 nominal aux elec power
-auxElecEIRCurveFuncTempCurve, ! A17 EIRAuxFoT
-auxElecEIRFoPLRCurve, ! A18 EIRAuxFoPLR
-20; ! N12 standby elec power
+  GAHP_module, ! A1
+  GAHP Inlet Node, ! A2
+  GAHP Outlet Node, ! A3
+  GAHP_Cond_Inlet, ! A4
+  , ! A5 Comanion coil
+  NaturalGas, ! A6 fuel type
+  GAHP_Custom, ! A7 end use cat
+  19255, ! N1 capacity
+  1.5, ! N2 nominal COP
+  0.0001892706, ! N3 design flow rate
+  60, ! N4 Design Supply Temp
+  13, ! N5 Design Lift
+  1.0, ! N6 sizing factor
+  NotModulated, ! A8 flow mode
+  DryBulb, ! A9 oa temp var type
+  EnteringCondenser, ! A10 oa temp var type
+  CapCurveFuncTempCurve, ! A11 CapFoT
+  EIRCurveFuncTempCurve, ! A12 EIRFoT
+  EIRCurveFuncPLRCurve, ! A13 EIRFoPLR
+  0.2, ! N7 minPLR
+  1.0, ! N8 maxPLR
+  OnDemand, ! A14 defrost control type
+  0.0, ! N9 defrost time frac
+  EIRDefrostFoTCurve, ! A15 EIRdefrost curve
+  0.0, ! N10 Electric defrost resister Wattage
+  3.0, ! N11 max oa DBT for defrost
+  CRFCurve, ! A16 crf curve name
+  500, ! N12 nominal aux elec power
+  auxElecEIRCurveFuncTempCurve, ! A17 EIRAuxFoT
+  auxElecEIRFoPLRCurve, ! A18 EIRAuxFoPLR
+  20; ! N13 standby elec power
 
 
   Curve:Biquadratic,
