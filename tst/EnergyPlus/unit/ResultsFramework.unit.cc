@@ -233,10 +233,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
@@ -507,10 +507,11 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_explicit_keys)
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
     state->dataResultsFramework->resultsFramework->addReportVariable(
         "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->setISO8601(true);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
@@ -548,10 +549,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_explicit_keys)
                                  OutputProcessor::ReportingFrequency::TimeStep,
                                  rvi_keys);
 
-    std::map<std::string, std::vector<std::string>> expected_output = {{"02/25 00:45:00", {"9.0", "1.0"}},
-                                                                       {"02/25 01:00:00", {"10.0", "2.0"}},
-                                                                       {"02/25 23:45:00", {"11.0", "3.0"}},
-                                                                       {"02/25 24:00:00", {"12.0", "4.0"}}};
+    std::map<std::string, std::vector<std::string>> expected_output = {{"2017-02-25T00:45:00", {"9.0", "1.0"}},
+                                                                       {"2017-02-25T01:00:00", {"10.0", "2.0"}},
+                                                                       {"2017-02-25T23:45:00", {"11.0", "3.0"}},
+                                                                       {"2017-02-25T24:00:00", {"12.0", "4.0"}}};
 
     EXPECT_EQ(expected_output, outputs);
 }
@@ -567,10 +568,11 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_pattern_key)
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
     state->dataResultsFramework->resultsFramework->addReportVariable(
         "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->setStartOfInterval(true);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
@@ -609,10 +611,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_pattern_key)
                                  OutputProcessor::ReportingFrequency::TimeStep,
                                  rvi_keys);
 
-    std::map<std::string, std::vector<std::string>> expected_output = {{"02/25 00:45:00", {"1.0", "9.0"}},
-                                                                       {"02/25 01:00:00", {"2.0", "10.0"}},
-                                                                       {"02/25 23:45:00", {"3.0", "11.0"}},
-                                                                       {"02/25 24:00:00", {"4.0", "12.0"}}};
+    std::map<std::string, std::vector<std::string>> expected_output = {{"02/25 00:00:00", {"1.0", "9.0"}},
+                                                                       {"02/25 00:45:00", {"2.0", "10.0"}},
+                                                                       {"02/25 01:00:00", {"3.0", "11.0"}},
+                                                                       {"02/25 23:45:00", {"4.0", "12.0"}}};
 
     EXPECT_EQ(expected_output, outputs);
 }
@@ -627,10 +629,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_explicit_key)
     Variable var0("Electricity:Facility", ReportingFrequency::TimeStep, indexType, reportId, Unit::J);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
     state->dataResultsFramework->resultsFramework->addReportMeter("Electricity:Facility", "J", ReportingFrequency::TimeStep);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
@@ -673,11 +675,13 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_pattern_key)
     //    Electricity:Facility,NaturalGas:Plant,NaturalGas:Facility
     Variable var0("Electricity:Facility", ReportingFrequency::TimeStep, indexType, reportId, Unit::J);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
+    state->dataResultsFramework->resultsFramework->setISO8601(true);
+    state->dataResultsFramework->resultsFramework->setStartOfInterval(true);
     state->dataResultsFramework->resultsFramework->addReportMeter("Electricity:Facility", "J", ReportingFrequency::TimeStep);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
@@ -706,7 +710,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_pattern_key)
                                  mvi_keys);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
-        {"02/25 00:45:00", {"1.0"}}, {"02/25 01:00:00", {"2.0"}}, {"02/25 23:45:00", {"3.0"}}, {"02/25 24:00:00", {"4.0"}}};
+        {"2017-02-25T00:00:00", {"1.0"}}, {"2017-02-25T00:45:00", {"2.0"}}, {"2017-02-25T01:00:00", {"3.0"}}, {"2017-02-25T23:45:00", {"4.0"}}};
 
     EXPECT_EQ(expected_output, outputs);
 }

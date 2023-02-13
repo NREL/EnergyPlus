@@ -230,7 +230,7 @@ namespace ResultsFramework {
         [[nodiscard]] bool rVariablesScanned() const;
         [[nodiscard]] bool iVariablesScanned() const;
 
-        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin, int calendarYear = 2012);
+        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin, int calendarYear);
         //        void newRow(const std::string &ts);
         virtual void pushVariableValue(const int reportID, double value);
 

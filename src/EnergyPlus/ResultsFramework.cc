@@ -396,13 +396,12 @@ namespace ResultsFramework {
         }
         // future start of ISO 8601 datetime output
         // fmt::format("YYYY-{:02d}/{:02d}T{:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin);
-        //TS.emplace_back(fmt::format("{:02d}/{:02d} {:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin));
+        // fmt::format("{:02d}/{:02d} {:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin);
         if (iso8601) {
             TS.emplace_back(fmt::format("{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:00", calendarYear, month, dayOfMonth, hourOfDay, curMin));
         } else {
             TS.emplace_back(fmt::format("{:02d}/{:02d} {:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin));
         }
-
     }
 
     //    void DataFrame::newRow(const std::string &ts)
@@ -854,7 +853,7 @@ namespace ResultsFramework {
             time = datetime.substr(pos);
         }
         if (time != " 24:00:00") {
-            //ShowFatalError(state, "Monthly output variables should occur at the end of the day.");
+            ShowFatalError(state, "Monthly output variables should occur at the end of the day."); // This seems like a developer error -> assert
         }
         datetime = months.find(month)->second;
         return datetime;
