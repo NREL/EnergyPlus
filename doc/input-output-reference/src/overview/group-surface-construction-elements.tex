@@ -762,12 +762,15 @@ These will output the half-node heat capacitance in surfaces being simulated wit
 \subsection{MaterialProperty:VariableAbsorptance}\label{materialpropertyvariableabsorptance}
 
 This object is used to describe a dynamic coating material for exterior opaque walls or roofs. The object will modify
-the thermal or solar absorptance of a existing material defined in the field ``Reference Material Name''.
+the thermal or solar absorptance of an existing material defined in the field ``Reference Material Name''.
 The variation of the thermal or solar absorptance of the coating can be driven by any of the following four
 control variables: surface temperature, surface received solar radiation, zone heating/cooling mode, or a schedule.
 If both the thermal and the solar absorptance are varying, the control signals are assumed to be the same,
 but different functions/schedules are allowed. The material can have a variable thermal absorptance and
-a constant solar absorptance, or a constant thermal absorptance and a variable solar absorptance.
+a constant solar absorptance, or a constant thermal absorptance and a variable solar absorptance. Note that the
+variable-absorptance coatings modeled with this object are not exactly equivalent to those modeled with EMS. This object
+only adjusts the thermal or solar absorptance of the exterior surfaces, while the EMS approach overwrites the absorptance
+of both the interior and exterior surfaces.
 
 \subsubsection{Inputs}\label{inputs-6-028}
 
