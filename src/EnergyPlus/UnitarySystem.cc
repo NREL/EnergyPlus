@@ -16069,7 +16069,8 @@ namespace UnitarySystems {
         }
 
         if (this->m_SuppCoilExists) {
-            if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric) {
+            if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
+                this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
                 suppHeatingPower = state.dataHVACGlobal->SuppHeatingCoilPower;
             }
         }
