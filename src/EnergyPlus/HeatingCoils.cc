@@ -2065,11 +2065,6 @@ namespace HeatingCoils {
             }
         }
 
-        if (state.dataHeatingCoils->CoilIsSuppHeater) {
-            state.dataHVACGlobal->SuppHeatingCoilPower = heatingCoil.ElecUseLoad;
-        } else {
-            state.dataHVACGlobal->ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
-        }
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         state.dataLoopNodes->Node(heatingCoil.AirOutletNodeNum).Temp = heatingCoil.OutletAirTemp;
     }
@@ -2269,11 +2264,6 @@ namespace HeatingCoils {
 
         } // end of on/off if - else
 
-        if (state.dataHeatingCoils->CoilIsSuppHeater) {
-            state.dataHVACGlobal->SuppHeatingCoilPower = heatingCoil.ElecUseLoad;
-        } else {
-            state.dataHVACGlobal->ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
-        }
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         state.dataLoopNodes->Node(heatingCoil.AirOutletNodeNum).Temp = heatingCoil.OutletAirTemp;
 
