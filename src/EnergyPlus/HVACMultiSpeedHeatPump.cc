@@ -270,6 +270,7 @@ namespace HVACMultiSpeedHeatPump {
         state.dataHVACMultiSpdHP->SaveCompressorPLR = 0.0;
         state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
         state.dataHVACGlobal->SuppHeatingCoilPower = 0.0;
+        state.dataHVACGlobal->DefrostElecPower = 0.0;
 
         auto &MSHeatPump(state.dataHVACMultiSpdHP->MSHeatPump);
 
@@ -474,7 +475,7 @@ namespace HVACMultiSpeedHeatPump {
         locFanElecPower = Fans::GetFanPower(state, MSHeatPump(MSHeatPumpNum).FanNum);
         MSHeatPump(MSHeatPumpNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + state.dataHVACGlobal->DXElecHeatingPower +
                                               state.dataHVACGlobal->ElecHeatingCoilPower + state.dataHVACGlobal->SuppHeatingCoilPower +
-                                              MSHeatPump(MSHeatPumpNum).AuxElecPower;
+                                              state.dataHVACGlobal->DefrostElecPower + MSHeatPump(MSHeatPumpNum).AuxElecPower;
     }
 
     //******************************************************************************
