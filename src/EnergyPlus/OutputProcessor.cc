@@ -65,6 +65,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -136,6 +137,22 @@ namespace OutputProcessor {
         state.dataOutputProcessor->IVariableTypes.redimension(state.dataOutputProcessor->MaxIVariable += IVarAllocInc);
     }
 
+    int DetermineMinuteForReporting(EnergyPlusData &state)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   January 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // When reporting peaks, minutes are used but not necessarily easily calculated.
+
+        Real64 constexpr FracToMin(60.0);
+        return ((state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed) - int(state.dataGlobal->CurrentTime)) * FracToMin;
+    }
+
     void InitializeOutput(EnergyPlusData &state)
     {
 
@@ -147,29 +164,6 @@ namespace OutputProcessor {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the OutputProcessor data structures.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         auto &op(state.dataOutputProcessor);
 
@@ -237,7 +231,7 @@ namespace OutputProcessor {
 
         op->TimeStepZoneSec = double(state.dataGlobal->MinutesPerTimeStep) * 60.0;
 
-        InitializeMeters(state);
+        state.files.mtd.ensure_open(state, "InitializeMeters", state.files.outputControl.mtd);
     }
 
     void SetupTimePointers(EnergyPlusData &state,
@@ -642,52 +636,33 @@ namespace OutputProcessor {
         // Prior to calling this routine, the basic value string will be
         // produced, but DecodeMonDayHrMin will not have been called.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::DecodeMonDayHrMin;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view DayFormat("{},{:2},{:2}");
         static constexpr std::string_view MonthFormat("{},{:2},{:2},{:2}");
         static constexpr std::string_view EnvrnFormat("{},{:2},{:2},{:2},{:2}");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Mon;
         int Day;
         int Hour;
         int Minute;
-        std::string StrOut;
-
-        DecodeMonDayHrMin(DateValue, Mon, Day, Hour, Minute);
+        General::DecodeMonDayHrMin(DateValue, Mon, Day, Hour, Minute);
 
         switch (ReportFreq) {
         case ReportingFrequency::Daily:
-            StrOut = format(DayFormat, strip(String), Hour, Minute);
-            break;
+            String = format(DayFormat, strip(String), Hour, Minute);
+            return;
         case ReportingFrequency::Monthly:
-            StrOut = format(MonthFormat, strip(String), Day, Hour, Minute);
-            break;
+            String = format(MonthFormat, strip(String), Day, Hour, Minute);
+            return;
         case ReportingFrequency::Yearly:
         case ReportingFrequency::Simulation:
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
-            break;
+            String = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
+            return;
         default: // Each, TimeStep, Hourly dont have this
-            StrOut = std::string();
-            break;
+            String = std::string();
+            return;
         }
-
-        String = StrOut;
     }
 
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
@@ -736,39 +711,13 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // Look it up in a list of valid index types.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        std::string StandardTimeStepTypeKey;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (timeStepType == TimeStepType::Zone) {
-            StandardTimeStepTypeKey = "Zone";
+            return "Zone";
         } else if (timeStepType == TimeStepType::System) {
-            StandardTimeStepTypeKey = "HVAC";
+            return "HVAC";
         } else {
-            StandardTimeStepTypeKey = "UNKW";
+            return "UNKW";
         }
-
-        return StandardTimeStepTypeKey;
     }
 
     StoreType validateVariableType(EnergyPlusData &state, OutputProcessor::SOVStoreType const VariableTypeKey)
@@ -815,37 +764,12 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // From variable type value, produce proper string.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
+        // TODO: Use a constexpr std::array<std::string_view, ... for this
         switch (VariableType) {
         case StoreType::Averaged:
             return "Average";
-            break;
         case StoreType::Summed:
             return "Sum";
-            break;
         default:
             return "Unknown";
         }
@@ -854,47 +778,6 @@ namespace OutputProcessor {
     // *****************************************************************************
     // The following routines implement Energy Meters in EnergyPlus.
     // *****************************************************************************
-
-    void InitializeMeters(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   January 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine creates the set of meters in EnergyPlus.  In this initial
-        // implementation, it is a static set of meters.
-
-        // METHODOLOGY EMPLOYED:
-        // Allocate the static set.  Use "AddMeter" with appropriate arguments that will
-        // allow expansion later.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        state.files.mtd.ensure_open(state, "InitializeMeters", state.files.outputControl.mtd);
-    }
 
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound)
     {
@@ -971,20 +854,6 @@ namespace OutputProcessor {
         //    A5,  \field Report Variable or Meter Name 1
         //         \required-field
         // <etc>
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
@@ -2338,10 +2207,9 @@ namespace OutputProcessor {
         // and we need to add WATER (for m3/gal, etc)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string UC_ResourceType;
 
         ErrorsFound = false;
-        UC_ResourceType = UtilityRoutines::MakeUPPERCase(ResourceType);
+        std::string UC_ResourceType = UtilityRoutines::MakeUPPERCase(ResourceType);
 
         CodeForIPUnits = RT_IPUnits::OtherJ;
         if (has(UC_ResourceType, "ELEC")) {
@@ -2364,8 +2232,8 @@ namespace OutputProcessor {
         }
         //  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
         //  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
-        if (!(MtrUnits == OutputProcessor::Unit::kg) && !(MtrUnits == OutputProcessor::Unit::J) && !(MtrUnits == OutputProcessor::Unit::m3) &&
-            !(MtrUnits == OutputProcessor::Unit::L)) {
+        if (MtrUnits != OutputProcessor::Unit::kg && MtrUnits != OutputProcessor::Unit::J && MtrUnits != OutputProcessor::Unit::m3 &&
+            MtrUnits != OutputProcessor::Unit::L) {
             ShowWarningError(state,
                              format("DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[{}].", unitEnumToString(MtrUnits)));
             ErrorsFound = true;
@@ -2388,24 +2256,6 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // Goes thru the number of meters, setting min/max as appropriate.  Uses timestamp
         // from calling program.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
@@ -2506,64 +2356,44 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // Cycle through the meters and reset all accumulating values
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Meter; // Loop Control
-        int Loop;  // Loop Variable
         auto &op(state.dataOutputProcessor);
 
-        for (Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
-            op->EnergyMeters(Meter).HRValue = 0.0;
+        for (auto &m : op->EnergyMeters) {
+            m.HRValue = 0.0;
 
-            op->EnergyMeters(Meter).DYValue = 0.0;
-            op->EnergyMeters(Meter).DYMaxVal = MaxSetValue;
-            op->EnergyMeters(Meter).DYMaxValDate = 0;
-            op->EnergyMeters(Meter).DYMinVal = MinSetValue;
-            op->EnergyMeters(Meter).DYMinValDate = 0;
+            m.DYValue = 0.0;
+            m.DYMaxVal = MaxSetValue;
+            m.DYMaxValDate = 0;
+            m.DYMinVal = MinSetValue;
+            m.DYMinValDate = 0;
 
-            op->EnergyMeters(Meter).MNValue = 0.0;
-            op->EnergyMeters(Meter).MNMaxVal = MaxSetValue;
-            op->EnergyMeters(Meter).MNMaxValDate = 0;
-            op->EnergyMeters(Meter).MNMinVal = MinSetValue;
-            op->EnergyMeters(Meter).MNMinValDate = 0;
+            m.MNValue = 0.0;
+            m.MNMaxVal = MaxSetValue;
+            m.MNMaxValDate = 0;
+            m.MNMinVal = MinSetValue;
+            m.MNMinValDate = 0;
 
-            op->EnergyMeters(Meter).YRValue = 0.0;
-            op->EnergyMeters(Meter).YRMaxVal = MaxSetValue;
-            op->EnergyMeters(Meter).YRMaxValDate = 0;
-            op->EnergyMeters(Meter).YRMinVal = MinSetValue;
-            op->EnergyMeters(Meter).YRMinValDate = 0;
+            m.YRValue = 0.0;
+            m.YRMaxVal = MaxSetValue;
+            m.YRMaxValDate = 0;
+            m.YRMinVal = MinSetValue;
+            m.YRMinValDate = 0;
 
-            op->EnergyMeters(Meter).SMValue = 0.0;
-            op->EnergyMeters(Meter).SMMaxVal = MaxSetValue;
-            op->EnergyMeters(Meter).SMMaxValDate = 0;
-            op->EnergyMeters(Meter).SMMinVal = MinSetValue;
-            op->EnergyMeters(Meter).SMMinValDate = 0;
+            m.SMValue = 0.0;
+            m.SMMaxVal = MaxSetValue;
+            m.SMMaxValDate = 0;
+            m.SMMinVal = MinSetValue;
+            m.SMMinValDate = 0;
 
-            op->EnergyMeters(Meter).FinYrSMValue = 0.0;
-            op->EnergyMeters(Meter).FinYrSMMaxVal = MaxSetValue;
-            op->EnergyMeters(Meter).FinYrSMMaxValDate = 0;
-            op->EnergyMeters(Meter).FinYrSMMinVal = MinSetValue;
-            op->EnergyMeters(Meter).FinYrSMMinValDate = 0;
+            m.FinYrSMValue = 0.0;
+            m.FinYrSMMaxVal = MaxSetValue;
+            m.FinYrSMMaxValDate = 0;
+            m.FinYrSMMinVal = MinSetValue;
+            m.FinYrSMMinValDate = 0;
         }
 
-        for (Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
+        for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
             auto &rVar(op->RVariableTypes(Loop).VarPtr);
             if (rVar.frequency == ReportingFrequency::Monthly || rVar.frequency == ReportingFrequency::Yearly ||
                 rVar.frequency == ReportingFrequency::Simulation) {
@@ -2572,7 +2402,7 @@ namespace OutputProcessor {
             }
         }
 
-        for (Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
+        for (int Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
             auto &iVar(op->IVariableTypes(Loop).VarPtr);
             if (iVar.frequency == ReportingFrequency::Monthly || iVar.frequency == ReportingFrequency::Yearly ||
                 iVar.frequency == ReportingFrequency::Simulation) {
@@ -2599,24 +2429,6 @@ namespace OutputProcessor {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reports on the meters that have been requested for
         // reporting on each time step.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
@@ -2727,25 +2539,6 @@ namespace OutputProcessor {
         // This subroutine reports on the meters that have been requested for
         // reporting on each hour.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
@@ -2828,25 +2621,6 @@ namespace OutputProcessor {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reports on the meters that have been requested for
         // reporting on each day.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
@@ -2932,25 +2706,6 @@ namespace OutputProcessor {
         // This subroutine reports on the meters that have been requested for
         // reporting on each month.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
@@ -3023,25 +2778,6 @@ namespace OutputProcessor {
         // This subroutine reports on the meters that have been requested for
         // reporting on each year.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
@@ -3108,27 +2844,6 @@ namespace OutputProcessor {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reports on the meters that have been requested for
         // reporting on each environment/run period.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // using namespace OutputReportPredefined;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
@@ -3213,181 +2928,95 @@ namespace OutputProcessor {
         // for SM (Simulation period) meters, the value of the last calculation is stored
         // in the data structure.
 
-        // Using/Aliasing
-        using namespace OutputReportPredefined;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop; // Loop Control
         auto &op(state.dataOutputProcessor);
 
-        for (Loop = 1; Loop <= op->NumEnergyMeters; ++Loop) {
-            OutputProcessor::RT_IPUnits const RT_forIPUnits(op->EnergyMeters(Loop).RT_forIPUnits);
+        for (auto &m : op->EnergyMeters) {
+            OutputProcessor::RT_IPUnits const RT_forIPUnits(m.RT_forIPUnits);
             if (RT_forIPUnits == RT_IPUnits::Electricity) {
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMelecannual,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMelecminvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMelecminvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMelecmaxvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMelecmaxvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMelecannual, m.Name, m.FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMelecminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMelecminvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMinValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMelecmaxvalue, m.Name, m.FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMelecmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits::Gas) {
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMgasannual,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMgasminvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMgasminvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMgasmaxvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMgasmaxvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMgasannual, m.Name, m.FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMgasminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMgasminvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMinValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMgasmaxvalue, m.Name, m.FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMgasmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits::Cooling) {
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMcoolannual,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMcoolminvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMcoolminvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMcoolmaxvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMcoolmaxvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMcoolannual, m.Name, m.FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMcoolminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMcoolminvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMinValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMcoolmaxvalue, m.Name, m.FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMcoolmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits::Water) {
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchEMwaterannual, op->EnergyMeters(Loop).Name, op->EnergyMeters(Loop).FinYrSMValue);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMwaterminvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMwaterminvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMwatermaxvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMwatermaxvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterannual, m.Name, m.FinYrSMValue);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMwaterminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMwaterminvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMinValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMwatermaxvalue, m.Name, m.FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMwatermaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits::OtherKG) {
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchEMotherKGannual, op->EnergyMeters(Loop).Name, op->EnergyMeters(Loop).FinYrSMValue);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherKGminvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherKGminvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherKGmaxvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherKGmaxvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGannual, m.Name, m.FinYrSMValue);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherKGminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherKGminvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMinValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherKGmaxvalue, m.Name, m.FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherKGmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits::OtherM3) {
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchEMotherM3annual, op->EnergyMeters(Loop).Name, op->EnergyMeters(Loop).FinYrSMValue, 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherM3minvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherM3minvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherM3maxvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherM3maxvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3annual, m.Name, m.FinYrSMValue, 3);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherM3minvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherM3minvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMinValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherM3maxvalue, m.Name, m.FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherM3maxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits::OtherL) {
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchEMotherLannual, op->EnergyMeters(Loop).Name, op->EnergyMeters(Loop).FinYrSMValue, 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherLminvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherLminvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherLmaxvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherLmaxvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLannual, m.Name, m.FinYrSMValue, 3);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherLminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherLminvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMinValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherLmaxvalue, m.Name, m.FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherLmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else {
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherJannual,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherJminvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherJminvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherJmaxvalue,
-                                 op->EnergyMeters(Loop).Name,
-                                 op->EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchEMotherJmaxvaluetime,
-                                 op->EnergyMeters(Loop).Name,
-                                 DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherJannual, m.Name, m.FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherJminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherJminvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMinValDate));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherJmaxvalue, m.Name, m.FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchEMotherJmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             }
         }
     }
@@ -3484,28 +3113,6 @@ namespace OutputProcessor {
         // PURPOSE OF THIS SUBROUTINE:
         // Writes the meter details report.  This shows which variables are on
         // meters as well as the meter contents.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
@@ -3697,6 +3304,7 @@ namespace OutputProcessor {
             ShowSevereError(state, format("Nonexistent end use passed to addEndUseSpaceType={}", EndUseName));
         }
     }
+
     void WriteTimeStampFormatData(
         EnergyPlusData &state,
         InputOutputFile &outputFile,
@@ -3726,27 +3334,6 @@ namespace OutputProcessor {
         // Much of the code in this function was embedded in earlier versions of EnergyPlus
         // and was moved to this location to simplify maintenance and to allow for data output
         // to the SQL database
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         assert(reportIDString.length() + DayOfSimChr.length() + (DayType.present() ? DayType().length() : 0u) + 26 <
                N_WriteTimeStampFormatData); // Check will fit in stamp size
@@ -3903,25 +3490,6 @@ namespace OutputProcessor {
         // This subroutine writes the ESO data dictionary information to the output files
         // and the SQL database
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string FreqString;
         auto &op(state.dataOutputProcessor);
@@ -4017,26 +3585,6 @@ namespace OutputProcessor {
         // and was moved here for the purposes of ease of maintenance and to allow easy
         // data reporting to the SQL database
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string UnitsString = unitEnumToString(unit);
 
@@ -4119,29 +3667,6 @@ namespace OutputProcessor {
         // SQL database. Much of the code here was an included in earlier versions
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (realVar.Report && realVar.frequency == reportType && realVar.Stored) {
             if (realVar.NumStored > 0.0) {
@@ -4478,29 +4003,6 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
 
         if (intVar.Report && intVar.frequency == reportType && intVar.Stored) {
@@ -4554,27 +4056,6 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::strip_trailing_zeros;
-
-        // Locals
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string NumberOut; // Character for producing "number out"
         std::string MaxOut;    // Character for Max out string
@@ -4590,8 +4071,7 @@ namespace OutputProcessor {
         if (repValue == 0.0) {
             NumberOut = "0.0";
         } else {
-            NumberOut = format("{:N}", repVal);
-            strip_trailing_zeros(strip(NumberOut));
+            NumberOut = format("{:f}", repVal);
         }
 
         // Append the min and max strings with date information
@@ -4653,23 +4133,6 @@ namespace OutputProcessor {
         // grouped.  It does this by parsing the meter name and then assigns a
         // indexGroupKey based on the name
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int DetermineIndexGroupKeyFromMeterName;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
         // Facility indices are in the 100s
         if (has(meterName, "Electricity:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 100;
@@ -4705,9 +4168,7 @@ namespace OutputProcessor {
             state.dataOutputProcessor->indexGroupKey = -11;
         }
 
-        DetermineIndexGroupKeyFromMeterName = state.dataOutputProcessor->indexGroupKey;
-
-        return DetermineIndexGroupKeyFromMeterName;
+        return state.dataOutputProcessor->indexGroupKey;
     }
 
     std::string DetermineIndexGroupFromMeterGroup(MeterType const &meter) // the meter
@@ -4723,22 +4184,8 @@ namespace OutputProcessor {
         // This function attemps to determine how a meter variable should be
         // grouped.  It does this by parsing the meter group
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string indexGroup;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         if (len(meter.Group) > 0) {
             indexGroup = meter.Group;
@@ -4783,24 +4230,6 @@ namespace OutputProcessor {
         // given a variable type and variable index,
         // assign the pointers the values passed in.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
 
@@ -4837,157 +4266,108 @@ namespace OutputProcessor {
     std::string unitEnumToString(EnergyPlus::OutputProcessor::Unit const unitIn)
     {
         // J.Glazer - August/September 2017
+        // TODO: Use a constexpr array of string views
         switch (unitIn) {
         case OutputProcessor::Unit::J:
             return "J";
-            break;
         case OutputProcessor::Unit::W:
             return "W";
-            break;
         case OutputProcessor::Unit::C:
             return "C";
-            break;
         case OutputProcessor::Unit::None:
             return "";
-            break;
         case OutputProcessor::Unit::kg:
             return "kg";
-            break;
         case OutputProcessor::Unit::W_m2:
             return "W/m2";
-            break;
         case OutputProcessor::Unit::m3:
             return "m3";
-            break;
         case OutputProcessor::Unit::hr:
             return "hr";
-            break;
         case OutputProcessor::Unit::kg_s:
             return "kg/s";
-            break;
         case OutputProcessor::Unit::deg:
             return "deg";
-            break;
         case OutputProcessor::Unit::m3_s:
             return "m3/s";
-            break;
         case OutputProcessor::Unit::W_m2K:
             return "W/m2-K";
-            break;
         case OutputProcessor::Unit::kgWater_kgDryAir:
             return "kgWater/kgDryAir";
-            break;
         case OutputProcessor::Unit::Perc:
             return "%";
-            break;
         case OutputProcessor::Unit::m_s:
             return "m/s";
-            break;
         case OutputProcessor::Unit::lux:
             return "lux";
-            break;
         case OutputProcessor::Unit::kgWater_s:
             return "kgWater/s";
-            break;
         case OutputProcessor::Unit::rad:
             return "rad";
-            break;
         case OutputProcessor::Unit::Pa:
             return "Pa";
-            break;
         case OutputProcessor::Unit::J_kg:
             return "J/kg";
-            break;
         case OutputProcessor::Unit::m:
             return "m";
-            break;
         case OutputProcessor::Unit::lum_W:
             return "lum/W";
-            break;
         case OutputProcessor::Unit::kg_m3:
             return "kg/m3";
-            break;
         case OutputProcessor::Unit::L:
             return "L";
-            break;
         case OutputProcessor::Unit::ach:
             return "ach";
-            break;
         case OutputProcessor::Unit::m2:
             return "m2";
-            break;
         case OutputProcessor::Unit::deltaC:
             return "deltaC";
-            break;
         case OutputProcessor::Unit::J_kgK:
             return "J/kg-K";
-            break;
         case OutputProcessor::Unit::W_W:
             return "W/W";
-            break;
         case OutputProcessor::Unit::clo:
             return "clo";
-            break;
         case OutputProcessor::Unit::W_mK:
             return "W/m-K";
-            break;
         case OutputProcessor::Unit::W_K:
             return "W/K";
-            break;
         case OutputProcessor::Unit::K_W:
             return "K/W";
-            break;
         case OutputProcessor::Unit::ppm:
             return "ppm";
-            break;
         case OutputProcessor::Unit::kg_kg:
             return "kg/kg";
-            break;
         case OutputProcessor::Unit::s:
             return "s";
-            break;
         case OutputProcessor::Unit::cd_m2:
             return "cd/m2";
-            break;
         case OutputProcessor::Unit::kmol_s:
             return "kmol/s";
-            break;
         case OutputProcessor::Unit::K_m:
             return "K/m";
-            break;
         case OutputProcessor::Unit::min:
             return "min";
-            break;
         case OutputProcessor::Unit::J_kgWater:
             return "J/kgWater";
-            break;
         case OutputProcessor::Unit::rev_min:
             return "rev/min";
-            break;
         case OutputProcessor::Unit::kg_m2s:
             return "kg/m2-s";
-            break;
         case OutputProcessor::Unit::J_m2:
             return "J/m2";
-            break;
         case OutputProcessor::Unit::A:
             return "A";
-            break;
         case OutputProcessor::Unit::V:
             return "V";
-            break;
         case OutputProcessor::Unit::W_m2C:
             return "W/m2-C";
-            break;
         case OutputProcessor::Unit::Ah:
             return "Ah";
-            break;
         case OutputProcessor::Unit::Btu_h_W:
             return "Btu/h-W";
-            break;
         default:
             return "unknown";
-            break;
         }
     }
 
@@ -5099,13 +4479,7 @@ namespace OutputProcessor {
 
 } // namespace OutputProcessor
 
-//==============================================================================================
-// *****************************************************************************
-// These routines are available outside the OutputProcessor Module (i.e. calling
-// routines do not have to "USE OutputProcessor".  But each of these routines
-// will use the OutputProcessor and take advantage that everything is PUBLIC
-// within the OutputProcessor.
-// *****************************************************************************
+// TODO: Probably move these to a different location
 
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const VariableName,                    // String Name of variable (with units)
