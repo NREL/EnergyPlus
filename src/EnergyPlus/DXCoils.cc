@@ -14658,6 +14658,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
     // Using/Aliasing
     auto &DXElecCoolingPower = state.dataHVACGlobal->DXElecCoolingPower;
     auto &DXElecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+    auto &DefrostElecPower = state.dataHVACGlobal->DefrostElecPower;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using Psychrometrics::RhoH2O;
 
@@ -14695,6 +14696,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
         state.dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterConsumption =
             state.dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower * ReportingConstant;
         DXElecHeatingPower = state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower + state.dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower;
+        DefrostElecPower = state.dataDXCoils->DXCoil(DXCoilNum).DefrostPower;
     } break;
     case CoilDX_MultiSpeedHeating: {
         state.dataDXCoils->DXCoil(DXCoilNum).TotalHeatingEnergy = state.dataDXCoils->DXCoil(DXCoilNum).TotalHeatingEnergyRate * ReportingConstant;
@@ -14707,6 +14709,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
         state.dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterConsumption =
             state.dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower * ReportingConstant;
         DXElecHeatingPower = state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower + state.dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower;
+        DefrostElecPower = state.dataDXCoils->DXCoil(DXCoilNum).DefrostPower;
     } break;
     case CoilDX_MultiSpeedCooling: {
         state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergy = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate * ReportingConstant;

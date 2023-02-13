@@ -7701,6 +7701,7 @@ namespace VariableSpeedCoils {
 
         //  Add power to global variable so power can be summed by parent object
         state.dataHVACGlobal->DXElecHeatingPower = state.dataVariableSpeedCoils->Winput;
+        state.dataHVACGlobal->DefrostElecPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower;
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure

@@ -444,6 +444,7 @@ struct HVACGlobalsData : BaseGlobalStruct
     Real64 ElecHeatingCoilPower = 0.0;     // Electric power consumed by electric heating coil
     Real64 SuppHeatingCoilPower = 0.0;     // Electric power consumed by electric supplemental heating coil
     Real64 AirToAirHXElecPower = 0.0;      // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
+    Real64 DefrostElecPower = 0.0;         // Electric power consumed by DX heating coil for defrosting (electric resistance or reverse cycle)
     // from last simulation in HeatRecovery.cc
     Real64 UnbalExhMassFlow = 0.0;      // unbalanced zone exhaust from a zone equip component [kg/s]
     Real64 BalancedExhMassFlow = 0.0;   // balanced zone exhaust (declared as so by user)  [kg/s]
