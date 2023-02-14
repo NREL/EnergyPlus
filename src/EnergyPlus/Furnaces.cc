@@ -10716,6 +10716,7 @@ namespace Furnaces {
         state.dataFurnaces->SaveCompressorPLR = 0.0;
         state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
         state.dataHVACGlobal->SuppHeatingCoilPower = 0.0;
+        state.dataHVACGlobal->DefrostElecPower = 0.0;
 
         SystemSensibleLoad = QZnReq;
         TotalZoneSensibleLoad = QZnReq;

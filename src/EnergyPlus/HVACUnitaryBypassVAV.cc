@@ -223,6 +223,7 @@ namespace HVACUnitaryBypassVAV {
         state.dataHVACGlobal->DXElecHeatingPower = 0.0;
         state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
         state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = 0.0;
+        state.dataHVACGlobal->DefrostElecPower = 0.0;
 
         // initialize local variables
         bool UnitOn = true;

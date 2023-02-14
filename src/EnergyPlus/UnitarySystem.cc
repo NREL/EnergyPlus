@@ -1189,6 +1189,7 @@ namespace UnitarySystems {
             state.dataHVACGlobal->DXElecCoolingPower = 0.0;
             state.dataHVACGlobal->DXElecHeatingPower = 0.0;
             state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
+            state.dataHVACGlobal->DefrostElecPower = 0.0;
         }
     }
 
