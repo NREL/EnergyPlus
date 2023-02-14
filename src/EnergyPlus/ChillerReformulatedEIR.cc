@@ -1430,7 +1430,8 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
     std::string equipName; // Name of chiller
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         if (this->MySizeFlag) {
-            Real64 IPLV = 0.0;
+            Real64 IPLVSI = 0.0;
+            Real64 IPLVIP = 0.0;
             StandardRatings::CalcChillerIPLV(state,
                                              this->Name,
                                              DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR,
@@ -1441,7 +1442,8 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                                              this->ChillerEIRFTIndex,
                                              this->ChillerEIRFPLRIndex,
                                              this->MinUnloadRat,
-                                             IPLV,
+                                             IPLVSI,
+                                             IPLVIP,
                                              this->CondVolFlowRate,
                                              this->CDPlantLoc.loopNum,
                                              this->CompPowerToCondenserFrac);
