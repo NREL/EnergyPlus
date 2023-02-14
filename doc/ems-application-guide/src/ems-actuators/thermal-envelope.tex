@@ -51,11 +51,10 @@ available with the control types ``Surface Property Solar Absorptance,''
 ``Surface Property Thermal Absorptance,'' and ``Surface Property Visible
 Absorptance.''~ These are dimensionless parameters between 0.0 and 1.0.~ These
 actuators are useful for modeling switchable coatings such as thermochromic
-paints. Note that these actuators with overwrite both the interior and the
-exterior surface property. This might not be desired for coatings applied only
-to exterior surfaces. Use ``MaterialProperty:VariableAbsorptance'' (see Section
-\ref{materialpropertyvariableabsorptance}) to only override the absorptance
-properties of the exterior surfaces.
+paints. Note that for a single-layer construction, both the inside and outside
+properties will be overwritten. For overwriting outside properties alone, please
+use ``MaterialProperty:VariableAbsorptance'' (see Section
+\ref{materialpropertyvariableabsorptance}).
 
 \subsection{Surface Construction State}\label{surface-construction-state}
 

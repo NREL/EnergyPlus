@@ -737,7 +737,8 @@ Real64 AbsBackSide(EnergyPlusData &state, int SurfNum)
 void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
 {
     for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
-        int ConstrNum = state.dataSurface->Surface(surfNum).Construction;
+        auto const thisSurface = state.dataSurface->Surface(surfNum);
+        int ConstrNum = thisSurface.Construction;
         if (ConstrNum <= 0) continue;
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
         int TotLayers = thisConstruct.TotLayers;
@@ -746,7 +747,19 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
         if (materNum == 0) continue; // error finding material number
         auto const *thisMaterial = state.dataMaterial->Material(materNum);
         if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
-            state.dataSurface->AllVaryAbsOpaqSurfaceList.push_back(surfNum);
+            // check for dynamic coating defined on interior surface
+            if (thisSurface.ExtBoundCond != ExternalEnvironment) {
+                ShowWarningError(state, format("MaterialProperty:VariableAbsorptance defined on an interior surface, ", thisSurface.Name));
+            } else {
+                state.dataSurface->AllVaryAbsOpaqSurfaceList.push_back(surfNum);
+            }
+        }
+        // check for dynamic coating defined on the non-outside layer of a construction
+        for (int Layer = 2; Layer <= thisConstruct.TotLayers; ++Layer) {
+            auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
+            if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+                ShowWarningError(state, format("MaterialProperty:VariableAbsorptance defined on a inside-layer materials, {}", thisMaterial->Name));
+            }
         }
     }
 }
