@@ -360,7 +360,8 @@ namespace StandardRatings {
                          int const EIRFTempCurveIndex,                 // Index for the energy input ratio modifier curve
                          int const EIRFPLRCurveIndex,                  // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,                    // Minimum unloading ratio
-                         Real64 &IPLV,
+                         Real64 &IPLVSI,                               // IPLV.SI determined using AHRI Std 551/591 (SI)
+                         Real64 &IPLVIP,                               // IPLV.IP determined using AHRI Std 550/590 (IP)
                          ObjexxFCL::Optional<Real64 const> CondVolFlowRate,
                          ObjexxFCL::Optional_int_const CondLoopNum,
                          ObjexxFCL::Optional<Real64 const> OpenMotorEff)
@@ -396,10 +397,9 @@ namespace StandardRatings {
         using FluidProperties::GetSpecificHeatGlycol;
         using General::SolveRoot;
 
-        Real64 constexpr EvapOutletTemp(6.67); // (44F)
-        Real64 constexpr Acc(0.0001);          // Accuracy of result
-        int constexpr NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
-        int constexpr IterMax(500);            // Maximum number of iterations
+        Real64 constexpr Acc(0.0001);     // Accuracy of result
+        int constexpr NumOfReducedCap(4); // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
+        int constexpr IterMax(500);       // Maximum number of iterations
         static constexpr std::array<Real64, 4> IPLVWeightingFactor = {0.010, 0.42, 0.45, 0.12}; // EER Weighting factors (IPLV)
         static constexpr std::string_view RoutineName("CalcChillerIPLV");
 
@@ -449,7 +449,8 @@ namespace StandardRatings {
         CondenserOutletTemp = 0.0;
         Cp = 0.0;
         Rho = 0.0;
-        IPLV = 0.0;
+        IPLVSI = 0.0;
+        IPLVIP = 0.0;
         EIR = 0.0;
         Power = 0.0;
         COPReduced = 0.0;
@@ -464,248 +465,259 @@ namespace StandardRatings {
 
         CheckCurveLimitsForIPLV(state, ChillerName, ChillerType, CondenserType, CapFTempCurveIndex, EIRFTempCurveIndex);
 
-        // IPLV calculations:
-        for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
-            if (CondenserType == DataPlant::CondenserType::WaterCooled) {
-                // get the entering water temperature for the reduced capacity test conditions
-                if (ReducedPLR[RedCapNum] > 0.50) {
-                    EnteringWaterTempReduced = 8.0 + 22.0 * ReducedPLR[RedCapNum];
-                } else {
-                    EnteringWaterTempReduced = 19.0;
-                }
-                CondenserInletTemp = EnteringWaterTempReduced;
-            } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
-                // get the outdoor air dry bulb temperature for the reduced capacity test conditions
-                if (ReducedPLR[RedCapNum] > 0.3125) {
-                    EnteringAirDryBulbTempReduced = 3.0 + 32.0 * ReducedPLR[RedCapNum];
-                } else {
-                    EnteringAirDryBulbTempReduced = 13.0;
-                }
-                CondenserInletTemp = EnteringAirDryBulbTempReduced;
-            } else { // EvaporativelyCooled Condenser
-                // get the outdoor air wet bulb temperature for the reduced capacity test conditions
-                EnteringAirWetBulbTempReduced = 10.0 + 14.0 * ReducedPLR[RedCapNum];
-                CondenserInletTemp = EnteringAirWetBulbTempReduced;
+        Real64 IPLV = 0.0;                        // current IPLV
+        Real64 EvapOutletTemp = 0.0;              // evaporator leaving water temperature, deg C
+        Real64 constexpr EvapOutletTempSI = 7.0;  // evaporator LWT, 2011 AHRI Std 551 / 591(SI)
+        Real64 constexpr EvapOutletTempIP = 6.67; // evaporator LWT, 2011 AHRI Std 550 / 590(IP), (44F)
+        bool ReportStdRatingsOnce = true;
+
+        for (const auto &AhriStd : {AhriChillerStd::AHRI550_590, AhriChillerStd::AHRI551_591}) {
+            if (AhriStd == AhriChillerStd::AHRI550_590) {
+                EvapOutletTemp = EvapOutletTempIP;
+                ReportStdRatingsOnce = true;
+            } else if (AhriStd == AhriChillerStd::AHRI551_591) {
+                EvapOutletTemp = EvapOutletTempSI;
+                ReportStdRatingsOnce = false;
             }
+            IPLV = 0.0;
 
-            if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
-                if (RedCapNum == 0) {
-                    // Get curve modifier values at rated conditions (load = 100%)
-                    ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
-                    ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+            // IPLV calculations:
+            for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
 
-                    // Report rated capacity and chiller COP
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
-                }
+                CondenserInletTemp = CondenserEnteringFluidTemperature(CondenserType, AhriStd, ReducedPLR[RedCapNum]);
 
-                // Get capacity curve info with respect to CW setpoint and entering condenser temps
-                ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+                if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
+                    if (RedCapNum == 0) {
+                        // Get curve modifier values at rated conditions (load = 100%)
+                        ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+                        ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+                        // Report rated capacity and chiller COP
+                        if (ReportStdRatingsOnce) {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                        }
+                    }
 
-                PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
+                    // Get capacity curve info with respect to CW setpoint and entering condenser temps
+                    ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                if (PartLoadRatio >= MinUnloadRat) {
-                    ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, PartLoadRatio);
-                } else {
-                    ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, MinUnloadRat);
-                    PartLoadRatio = MinUnloadRat;
-                }
+                    ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-            } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
-                Cp = GetSpecificHeatGlycol(state,
+                    PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
+
+                    if (PartLoadRatio >= MinUnloadRat) {
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, PartLoadRatio);
+                    } else {
+                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, MinUnloadRat);
+                        PartLoadRatio = MinUnloadRat;
+                    }
+
+                } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
+                    EnteringWaterTempReduced = CondenserInletTemp;
+                    Cp = GetSpecificHeatGlycol(state,
+                                               state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
+                                               EnteringWaterTempReduced,
+                                               state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex,
+                                               RoutineName);
+
+                    Rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
                                            EnteringWaterTempReduced,
                                            state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex,
                                            RoutineName);
 
-                Rho = GetDensityGlycol(state,
-                                       state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
-                                       EnteringWaterTempReduced,
-                                       state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex,
-                                       RoutineName);
+                    Real64 reducedPLR = ReducedPLR[RedCapNum];
+                    CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
+                    CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
 
-                Real64 reducedPLR = ReducedPLR[RedCapNum];
-                CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
-                CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
+                    // CONST_LAMBDA_CAPTURE Issue, see PR 9670
+                    Real64 tmpEvapOutletTemp = EvapOutletTemp;
+                    auto f = [&state,
+                              EnteringWaterTempReduced,
+                              Cp,
+                              reducedPLR,
+                              CondVolFlowRate,
+                              Rho,
+                              CapFTempCurveIndex,
+                              EIRFTempCurveIndex,
+                              EIRFPLRCurveIndex,
+                              RefCap,
+                              RefCOP,
+                              OpenMotorEff,
+                              tmpEvapOutletTemp,
+                              ChillerCapFT_rated](Real64 const CondenserOutletTemp) {
+                        Real64 AvailChillerCap(0.0);         // Chiller available capacity at current operating conditions [W]
+                        Real64 CondenserInletTemp(0.0);      // Calculated condenser inlet temperature [C]
+                        Real64 QEvap(0.0);                   // Rate of heat transfer to the evaporator coil [W]
+                        Real64 QCond(0.0);                   // Rate of heat transfer to the condenser coil [W]
+                        Real64 Power(0.0);                   // Power at reduced capacity test conditions (100%, 75%, 50%, and 25%)
+                        Real64 ReformEIRChillerCapFT(0.0);   // Chiller capacity fraction (evaluated as a function of temperature)
+                        Real64 ReformEIRChillerEIRFT(0.0);   // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
+                        Real64 ReformEIRChillerEIRFPLR(0.0); // Chiller EIR as a function of part-load ratio (PLR)
+                        Real64 PartLoadRatio(0.0);           // Chiller part load ratio
 
-                // CONST_LAMBDA_CAPTURE Issue, see PR 9670
-                Real64 tmpEvapOutletTemp = EvapOutletTemp;
-                auto f = [&state,
-                          EnteringWaterTempReduced,
-                          Cp,
-                          reducedPLR,
-                          CondVolFlowRate,
-                          Rho,
-                          CapFTempCurveIndex,
-                          EIRFTempCurveIndex,
-                          EIRFPLRCurveIndex,
-                          RefCap,
-                          RefCOP,
-                          OpenMotorEff,
-                          tmpEvapOutletTemp,
-                          ChillerCapFT_rated](Real64 const CondenserOutletTemp) {
-                    Real64 AvailChillerCap(0.0);         // Chiller available capacity at current operating conditions [W]
-                    Real64 CondenserInletTemp(0.0);      // Calculated condenser inlet temperature [C]
-                    Real64 QEvap(0.0);                   // Rate of heat transfer to the evaporator coil [W]
-                    Real64 QCond(0.0);                   // Rate of heat transfer to the condenser coil [W]
-                    Real64 Power(0.0);                   // Power at reduced capacity test conditions (100%, 75%, 50%, and 25%)
-                    Real64 ReformEIRChillerCapFT(0.0);   // Chiller capacity fraction (evaluated as a function of temperature)
-                    Real64 ReformEIRChillerEIRFT(0.0);   // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
-                    Real64 ReformEIRChillerEIRFPLR(0.0); // Chiller EIR as a function of part-load ratio (PLR)
-                    Real64 PartLoadRatio(0.0);           // Chiller part load ratio
+                        ReformEIRChillerCapFT = CurveValue(state, CapFTempCurveIndex, tmpEvapOutletTemp, CondenserOutletTemp);
 
-                    ReformEIRChillerCapFT = CurveValue(state, CapFTempCurveIndex, tmpEvapOutletTemp, CondenserOutletTemp);
+                        ReformEIRChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, tmpEvapOutletTemp, CondenserOutletTemp);
 
-                    ReformEIRChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, tmpEvapOutletTemp, CondenserOutletTemp);
+                        // Available chiller capacity as a function of temperature
+                        AvailChillerCap = RefCap * ReformEIRChillerCapFT;
 
-                    // Available chiller capacity as a function of temperature
-                    AvailChillerCap = RefCap * ReformEIRChillerCapFT;
+                        switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex)->numDims) {
+                        case 1:
+                            ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp);
+                            break;
+                        case 2:
+                            ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR);
+                            break;
+                        case 3:
+                        default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
+                            ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR, 0.0);
+                            break;
+                        }
 
-                    switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex)->numDims) {
-                    case 1:
-                        ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp);
-                        break;
-                    case 2:
-                        ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR);
-                        break;
-                    case 3:
-                    default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
-                        ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR, 0.0);
-                        break;
+                        Power = (AvailChillerCap / RefCOP) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
+
+                        if (reducedPLR >= 1.0) {
+                            PartLoadRatio = reducedPLR;
+                        } else {
+                            PartLoadRatio = reducedPLR * ChillerCapFT_rated / ReformEIRChillerCapFT;
+                        }
+
+                        QEvap = AvailChillerCap * PartLoadRatio;
+
+                        QCond = Power * OpenMotorEff + QEvap;
+
+                        if (CondVolFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                            CondenserInletTemp = CondenserOutletTemp - QCond / (CondVolFlowRate * Rho) / Cp;
+                        }
+                        return (EnteringWaterTempReduced - CondenserInletTemp) / EnteringWaterTempReduced;
+                    };
+
+                    General::SolveRoot(state, Acc, IterMax, SolFla, CondenserOutletTemp, f, CondenserOutletTemp0, CondenserOutletTemp1);
+                    if (SolFla == -1) {
+                        ShowWarningError(state, "Iteration limit exceeded in calculating Reform Chiller IPLV");
+                        ShowContinueError(state, format("Reformulated Chiller IPLV calculation failed for {}", ChillerName));
+                    } else if (SolFla == -2) {
+                        ShowWarningError(state, "Bad starting values for calculating Reform Chiller IPLV");
+                        ShowContinueError(state, format("Reformulated Chiller IPLV calculation failed for {}", ChillerName));
                     }
 
-                    Power = (AvailChillerCap / RefCOP) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
+                    if (RedCapNum == 0) {
+                        // Get curve modifier values at rated conditions (load = 100%)
+                        ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+                        ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
 
-                    if (reducedPLR >= 1.0) {
-                        PartLoadRatio = reducedPLR;
+                        // Report rated capacity and chiller COP
+                        if (ReportStdRatingsOnce) {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                        }
+                    }
+
+                    ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+
+                    ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+
+                    PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
+
+                    if (PartLoadRatio >= MinUnloadRat) {
+                        switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex)->numDims) {
+                        case 1:
+                            ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp);
+                            break;
+                        case 2:
+                            ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
+                            break;
+                        case 3:
+                        default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
+                            ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio, 0.0);
+                            break;
+                        }
                     } else {
-                        PartLoadRatio = reducedPLR * ChillerCapFT_rated / ReformEIRChillerCapFT;
-                    }
-
-                    QEvap = AvailChillerCap * PartLoadRatio;
-
-                    QCond = Power * OpenMotorEff + QEvap;
-
-                    if (CapFTempCurveIndex > DataBranchAirLoopPlant::MassFlowTolerance) {
-                        CondenserInletTemp = CondenserOutletTemp - QCond / (CondVolFlowRate * Rho) / Cp;
-                    }
-                    return (EnteringWaterTempReduced - CondenserInletTemp) / EnteringWaterTempReduced;
-                };
-
-                General::SolveRoot(state, Acc, IterMax, SolFla, CondenserOutletTemp, f, CondenserOutletTemp0, CondenserOutletTemp1);
-                if (SolFla == -1) {
-                    ShowWarningError(state, "Iteration limit exceeded in calculating Reform Chiller IPLV");
-                    ShowContinueError(state, format("Reformulated Chiller IPLV calculation failed for {}", ChillerName));
-                } else if (SolFla == -2) {
-                    ShowWarningError(state, "Bad starting values for calculating Reform Chiller IPLV");
-                    ShowContinueError(state, format("Reformulated Chiller IPLV calculation failed for {}", ChillerName));
-                }
-
-                if (RedCapNum == 0) {
-                    // Get curve modifier values at rated conditions (load = 100%)
-                    ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
-                    ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
-
-                    // Report rated capacity and chiller COP
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
-                }
-
-                ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
-
-                ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
-
-                PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
-
-                if (PartLoadRatio >= MinUnloadRat) {
-                    switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex)->numDims) {
-                    case 1:
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp);
-                        break;
-                    case 2:
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
-                        break;
-                    case 3:
-                    default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio, 0.0);
-                        break;
+                        switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex)->numDims) {
+                        case 1:
+                            ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp);
+                            break;
+                        case 2:
+                            ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
+                            break;
+                        case 3:
+                        default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
+                            ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat, 0.0);
+                            break;
+                        }
+                        PartLoadRatio = MinUnloadRat;
                     }
                 } else {
-                    switch (state.dataCurveManager->PerfCurve(EIRFPLRCurveIndex)->numDims) {
-                    case 1:
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp);
-                        break;
-                    case 2:
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
-                        break;
-                    case 3:
-                    default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat, 0.0);
-                        break;
-                    }
-                    PartLoadRatio = MinUnloadRat;
+                    assert(false);
                 }
-            } else {
-                assert(false);
+
+                // Available chiller capacity as a function of temperature
+                if (RefCap > 0.0 && RefCOP > 0.0 && ChillerCapFT > 0.0 && ChillerEIRFT > 0.0) {
+                    AvailChillerCap = RefCap * ChillerCapFT;
+                    Power = (AvailChillerCap / RefCOP) * ChillerEIRFPLR * ChillerEIRFT;
+                    EIR = Power / (PartLoadRatio * AvailChillerCap);
+
+                    if (ReducedPLR[RedCapNum] >= MinUnloadRat) {
+                        COPReduced = 1.0 / EIR;
+                    } else {
+                        LoadFactor = (ReducedPLR[RedCapNum] * RefCap) / (MinUnloadRat * AvailChillerCap);
+                        DegradationCoeff = 1.130 - 0.130 * LoadFactor;
+                        COPReduced = 1.0 / (DegradationCoeff * EIR);
+                    }
+                    IPLV += IPLVWeightingFactor[RedCapNum] * COPReduced;
+                } else {
+                    {
+                        if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
+                            ShowWarningError(
+                                state, format("Chiller:Electric:EIR = {}:  Integrated Part Load Value (IPLV) cannot be calculated.", ChillerName));
+                        } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
+
+                            ShowWarningError(state,
+                                             format("Chiller:Electric:ReformulatedEIR = {}:  Integrated Part Load Value (IPLV) cannot be calculated.",
+                                                    ChillerName));
+                        }
+                    }
+                    if (RefCap <= 0.0) {
+                        ShowContinueError(
+                            state,
+                            format(" Check the chiller autosized or user specified capacity. Autosized or specified chiller capacity = {:.2R}",
+                                   RefCap));
+                    }
+                    if (RefCOP <= 0.0) {
+                        ShowContinueError(state, format(" Check the chiller reference or rated COP specified. Specified COP = {:.2R}", RefCOP));
+                    }
+                    if (ChillerCapFT <= 0.0) {
+                        ShowContinueError(
+                            state,
+                            format(" Check limits in Cooling Capacity Function of Temperature Curve, Curve Type = {}, Curve Name = {}.",
+                                   Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(CapFTempCurveIndex)->curveType)],
+                                   GetCurveName(state, CapFTempCurveIndex)));
+                        ShowContinueError(state, format(" ..ChillerCapFT value at standard test condition = {:.2R}", ChillerCapFT));
+                    }
+                    if (ChillerEIRFT <= 0.0) {
+                        ShowContinueError(
+                            state,
+                            format(" Check limits in EIR Function of Temperature Curve, Curve Type = {}, Curve Name = {}.",
+                                   Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(EIRFTempCurveIndex)->curveType)],
+                                   GetCurveName(state, EIRFTempCurveIndex)));
+                        ShowContinueError(state, format(" ..ChillerEIRFT value at standard test condition = {:.2R}", ChillerEIRFT));
+                    }
+                    IPLV = 0.0;
+                    break;
+                }
             }
 
-            // Available chiller capacity as a function of temperature
-            if (RefCap > 0.0 && RefCOP > 0.0 && ChillerCapFT > 0.0 && ChillerEIRFT > 0.0) {
-                AvailChillerCap = RefCap * ChillerCapFT;
-                Power = (AvailChillerCap / RefCOP) * ChillerEIRFPLR * ChillerEIRFT;
-                EIR = Power / (PartLoadRatio * AvailChillerCap);
-
-                if (ReducedPLR[RedCapNum] >= MinUnloadRat) {
-                    COPReduced = 1.0 / EIR;
-                } else {
-                    LoadFactor = (ReducedPLR[RedCapNum] * RefCap) / (MinUnloadRat * AvailChillerCap);
-                    DegradationCoeff = 1.130 - 0.130 * LoadFactor;
-                    COPReduced = 1.0 / (DegradationCoeff * EIR);
-                }
-                IPLV += IPLVWeightingFactor[RedCapNum] * COPReduced;
+            if (AhriStd == AhriChillerStd::AHRI550_590) {
+                IPLVIP = IPLV;
             } else {
-                {
-                    if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
-                        ShowWarningError(state,
-                                         format("Chiller:Electric:EIR = {}:  Integrated Part Load Value (IPLV) cannot be calculated.", ChillerName));
-                    } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
-
-                        ShowWarningError(
-                            state,
-                            format("Chiller:Electric:ReformulatedEIR = {}:  Integrated Part Load Value (IPLV) cannot be calculated.", ChillerName));
-                    }
-                }
-                if (RefCap <= 0.0) {
-                    ShowContinueError(
-                        state,
-                        format(" Check the chiller autosized or user specified capacity. Autosized or specified chiller capacity = {:.2R}", RefCap));
-                }
-                if (RefCOP <= 0.0) {
-                    ShowContinueError(state, format(" Check the chiller reference or rated COP specified. Specified COP = {:.2R}", RefCOP));
-                }
-                if (ChillerCapFT <= 0.0) {
-                    ShowContinueError(state,
-                                      format(" Check limits in Cooling Capacity Function of Temperature Curve, Curve Type = {}, Curve Name = {}.",
-                                             Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(CapFTempCurveIndex)->curveType)],
-                                             GetCurveName(state, CapFTempCurveIndex)));
-                    ShowContinueError(state, format(" ..ChillerCapFT value at standard test condition = {:.2R}", ChillerCapFT));
-                }
-                if (ChillerEIRFT <= 0.0) {
-                    ShowContinueError(state,
-                                      format(" Check limits in EIR Function of Temperature Curve, Curve Type = {}, Curve Name = {}.",
-                                             Curve::objectNames[static_cast<int>(state.dataCurveManager->PerfCurve(EIRFTempCurveIndex)->curveType)],
-                                             GetCurveName(state, EIRFTempCurveIndex)));
-                    ShowContinueError(state, format(" ..ChillerEIRFT value at standard test condition = {:.2R}", ChillerEIRFT));
-                }
-                IPLV = 0.0;
-                break;
+                IPLVSI = IPLV;
             }
         }
-
         // Writes the IPLV value to the EIO file and standard tabular output tables
-        ReportChillerIPLV(state, ChillerName, ChillerType, IPLV, IPLV * ConvFromSIToIP);
+        ReportChillerIPLV(state, ChillerName, ChillerType, IPLVSI, IPLVIP * ConvFromSIToIP);
     }
 
     void ReportChillerIPLV(EnergyPlusData &state,
@@ -787,7 +799,9 @@ namespace StandardRatings {
         Real64 constexpr HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
         Real64 constexpr LowEWTemp(19.0);        // Entering water temp in degrees C at minimum reduced capacity (65F)
         Real64 constexpr OAHighEDBTemp(35.0);    // Outdoor air dry-bulb temp in degrees C at full load capacity (95F)
+        Real64 constexpr OALowEDBTemp(12.78);    // Outdoor air dry-bulb temp in degrees C at part load capacity for AirCooled Chillers (55F)
         Real64 constexpr OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
+        Real64 constexpr OALowEWBTemp(13.47);    // Outdoor air wet-bulb temp in degrees C at full load capacity for EvapCooled Chillers (56.25F)
         Real64 constexpr LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
 
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
@@ -817,10 +831,10 @@ namespace StandardRatings {
             LowCondenserEnteringTempLimit = LowEWTemp;
         } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
             HighCondenserEnteringTempLimit = OAHighEDBTemp;
-            LowCondenserEnteringTempLimit = OAHighEDBTemp;
+            LowCondenserEnteringTempLimit = OALowEDBTemp;
         } else { // Evaporatively Cooled Condenser
             HighCondenserEnteringTempLimit = OAHighEWBTemp;
-            LowCondenserEnteringTempLimit = OAHighEWBTemp;
+            LowCondenserEnteringTempLimit = OALowEWBTemp;
         }
 
         // Checking the limits of capacity modifying curve for temperatures (IPLV high and low test conditions)
@@ -4980,6 +4994,58 @@ namespace StandardRatings {
         default:
             break;
         }
+    }
+
+    Real64 CondenserEnteringFluidTemperature(DataPlant::CondenserType const CondenserType,
+                                             StandardRatings::AhriChillerStd const ChillerStd,
+                                             Real64 LoadRatio)
+    {
+        Real64 CondenserEnteringFluidTemp = 0.0;
+        if (ChillerStd == StandardRatings::AhriChillerStd::AHRI550_590) {
+
+            if (CondenserType == DataPlant::CondenserType::WaterCooled) {
+                // get the condenser entering water temperature for a given load ratio in deg C
+                Real64 enteringWaterTemp = 18.33;
+                if (LoadRatio > 0.50) {
+                    enteringWaterTemp = 7.22 + 22.22 * LoadRatio;
+                }
+                CondenserEnteringFluidTemp = enteringWaterTemp;
+            } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
+                // get the outdoor air dry bulb temperature for a given load ratio in deg C
+                Real64 enteringAirDBTemp = 12.78;
+                if (LoadRatio > 0.33) {
+                    enteringAirDBTemp = 1.67 + 33.33 * LoadRatio;
+                }
+                CondenserEnteringFluidTemp = enteringAirDBTemp;
+            } else { // EvaporativelyCooled Condenser
+                // get the outdoor air wet bulb temperature for a given load ratio in deg C
+                Real64 enteringAirWBTemp = 10.0 + 13.89 * LoadRatio;
+                CondenserEnteringFluidTemp = enteringAirWBTemp;
+            }
+
+        } else if (ChillerStd == StandardRatings::AhriChillerStd::AHRI551_591) {
+
+            if (CondenserType == DataPlant::CondenserType::WaterCooled) {
+                // get the condenser entering water temperature for a given load ratio in deg C
+                Real64 enteringWaterTemp = 19.0;
+                if (LoadRatio > 0.50) {
+                    enteringWaterTemp = 8.0 + 22.0 * LoadRatio;
+                }
+                CondenserEnteringFluidTemp = enteringWaterTemp;
+            } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
+                // get the outdoor air dry bulb temperature for a given load ratio in deg C
+                Real64 enteringAirDBTemp = 13.0;
+                if (LoadRatio > 0.3125) {
+                    enteringAirDBTemp = 3.0 + 32.0 * LoadRatio;
+                }
+                CondenserEnteringFluidTemp = enteringAirDBTemp;
+            } else { // EvaporativelyCooled Condenser
+                // get the outdoor air wet bulb temperature for a given load ratio in deg C
+                Real64 enteringAirWBTemp = 10.0 + 14.0 * LoadRatio;
+                CondenserEnteringFluidTemp = enteringAirWBTemp;
+            }
+        }
+        return CondenserEnteringFluidTemp;
     }
 
 } // namespace StandardRatings
