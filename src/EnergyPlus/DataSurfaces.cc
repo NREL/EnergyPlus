@@ -749,7 +749,7 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
         if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
             // check for dynamic coating defined on interior surface
             if (thisSurface.ExtBoundCond != ExternalEnvironment) {
-                ShowWarningError(state, format("MaterialProperty:VariableAbsorptance defined on an interior surface, ", thisSurface.Name));
+                ShowWarningError(state, format("MaterialProperty:VariableAbsorptance defined on an interior surface, {}", thisSurface.Name));
             } else {
                 state.dataSurface->AllVaryAbsOpaqSurfaceList.push_back(surfNum);
             }
