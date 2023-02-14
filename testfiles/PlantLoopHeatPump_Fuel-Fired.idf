@@ -1,4 +1,4 @@
-PlantLoopHeatPump_Fuel-Fired.idf
+! PlantLoopHeatPump_Fuel-Fired.idf
 !
 ! Basic file description:
 ! The fuel-fired air-to-water heat pump is demonstrated using a simple collection of plant loops.  Building loads
@@ -258,38 +258,38 @@ PlantLoopHeatPump_Fuel-Fired.idf
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
-  HeatPump:AirToWater:FuelFired:Heating,
-    Heating Coil, ! A1
-    Heating Coil Load Loop Intermediate Node, ! A2
-    Heating Coil Load Loop Supply Outlet Node, ! A3
-    Outdoor Air Inlet Node, ! A4
-    Cooling Coil, ! A5 Comanion coil
-    NaturalGas, ! A6 fuel type
-    Fuel-Fired_Heat_Pump, ! A7 end use cat
-    80000, ! N1 capacity
-    1.5, ! N2 nominal COP
-    0.005, ! N3 design flow rate
-    60, ! N4 Design Supply Temp
-    13, ! N5 Design Lift
-    1.0, ! N6 sizing factor
-    NotModulated, ! A8 flow mode
-    DryBulb, ! A9 oa temp var type
-    EnteringCondenser, ! A10 oa temp var type
-    CapCurveFuncTemp, ! A11 CapFoT
-    EIRCurveFuncTemp, ! A12 EIRFoT
-    EIRCurveFuncPLR, ! A13 EIRFoPLR
-    0.2, ! N7 minPLR
-    1.0, ! N8 maxPLR
-    OnDemand, ! A14 defrost control type
-    0.0, ! N9 defrost time frac
-    EIRDefrostFoTCurve, ! A15 EIRdefrost curve
-    0.0, ! N10 Electric defrost resister Wattage
-    3.0, ! N11 max oa DBT for defrost
-    CRFCurve, ! A16 crf curve name
-    500, ! N12 nominal aux elec power
-    auxElecEIRCurveFuncTempCurve, ! A17 EIRAuxFoT
-    auxElecEIRFoPLRCurve, ! A18 EIRAuxFoPLR
-    20; ! N13 standby elec power
+HeatPump:AirToWater:FuelFired:Heating,
+    Heating Coil,            !- Name
+    Heating Coil Load Loop Intermediate Node,  !- Water Inlet Node Name
+    Heating Coil Load Loop Supply Outlet Node,  !- Water Outlet Node Name
+    Outdoor Air Inlet Node,  !- Air Source Node Name
+    Cooling Coil,            !- Companion Cooling Heat Pump Name
+    NaturalGas,              !- Fuel Type
+    Fuel-Fired_Heat_Pump,    !- End-Use Subcategory
+    80000,                   !- Nominal Heating Capacity {W}
+    1.5,                     !- Nominal COP {W/W}
+    0.005,                   !- Design Flow Rate {m3/s}
+    60,                      !- Design Supply Temperature {C}
+    13,                      !- Design Temperature Lift {deltaC}
+    1.0,                     !- Sizing Factor
+    NotModulated,            !- Flow Mode
+    DryBulb,                 !- Outdoor Air Temperature Curve Input Variable
+    EnteringCondenser,       !- Water Temperature Curve Input Variable
+    CapCurveFuncTemp,        !- Normalized Capacity Function of Temperature Curve Name
+    EIRCurveFuncTemp,        !- Fuel Energy Input Ratio Function of Temperature Curve Name
+    EIRCurveFuncPLR,         !- Fuel Energy Input Ratio Function of PLR Curve Name
+    0.2,                     !- Minimum Part Load Ratio
+    1.0,                     !- Maximum Part Load Ratio
+    OnDemand,                !- Defrost Control Type
+    0.0,                     !- Defrost Operation Time Fraction
+    EIRDefrostFoTCurve,      !- Fuel Energy Input Ratio Defrost Adjustment Curve Name
+    0.0,                     !- Resistive Defrost Heater Capacity {W}
+    3.0,                     !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
+    CRFCurve,                !- Cycling Ratio Factor Curve Name
+    500,                     !- Nominal Auxiliary Electric Power {W}
+    auxElecEIRCurveFuncTempCurve,  !- Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
+    auxElecEIRFoPLRCurve,    !- Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
+    20;                      !- Standby Electric Power {W}
 
 
   Curve:Quadratic,
@@ -477,33 +477,33 @@ PlantLoopHeatPump_Fuel-Fired.idf
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
-  HeatPump:AirToWater:FuelFired:Cooling,
-    Cooling Coil, ! A1
-    Cooling Coil Load Loop Intermediate Node, ! A2
-    Cooling Coil Load Loop Supply Outlet Node, ! A3
-    Outdoor Air Inlet Node, ! A4
-    Heating Coil, ! A5 Comanion coil
-    NaturalGas, ! A6 fuel type
-    Fuel-Fired_Heat_Pump, ! A7 end use cat
-    400000, ! N1 capacity
-    2.0, ! N2 nominal COP
-    0.005, ! N3 design flow rate
-    7, ! N4 Design Supply Temp
-    11.1, ! N5 Design Lift
-    1.0, ! N6 sizing factor
-    NotModulated, ! A8 flow mode
-    DryBulb, ! A9 oa temp var type
-    EnteringVaporator, ! A10 oa temp var type
-    CapCurveFuncTemp2, ! A11 CapFoT
-    EIRCurveFuncTemp2, ! A12 EIRFoT
-    EIRCurveFuncPLR2, ! A13 EIRFoPLR
-    0.2, ! N7 minPLR
-    1.0, ! N8 maxPLR
-    CRFCurve, ! A14 crf curve name
-    500, ! N9 nominal aux elec power
-    auxElecEIRCurveFuncTempCurve, ! A15 EIRAuxFoT
-    auxElecEIRFoPLRCurve, ! A16 EIRAuxFoPLR
-    20; ! N10 standby elec power
+HeatPump:AirToWater:FuelFired:Cooling,
+    Cooling Coil,            !- Name
+    Cooling Coil Load Loop Intermediate Node,  !- Water Inlet Node Name
+    Cooling Coil Load Loop Supply Outlet Node,  !- Water Outlet Node Name
+    Outdoor Air Inlet Node,  !- Air Source Node Name
+    Heating Coil,            !- Companion Heating Heat Pump Name
+    NaturalGas,              !- Fuel Type
+    Fuel-Fired_Heat_Pump,    !- End-Use Subcategory
+    400000,                  !- Nominal Cooling Capacity {W}
+    2.0,                     !- Nominal COP {W/W}
+    0.005,                   !- Design Flow Rate {m3/s}
+    7,                       !- Design Supply Temperature {C}
+    11.1,                    !- Design Temperature Lift {deltaC}
+    1.0,                     !- Sizing Factor
+    NotModulated,            !- Flow Mode
+    DryBulb,                 !- Outdoor Air Temperature Curve Input Variable
+    EnteringEvaporator,      !- Water Temperature Curve Input Variable
+    CapCurveFuncTemp2,       !- Normalized Capacity Function of Temperature Curve Name
+    EIRCurveFuncTemp2,       !- Fuel Energy Input Ratio Function of Temperature Curve Name
+    EIRCurveFuncPLR2,        !- Fuel Energy Input Ratio Function of PLR Curve Name
+    0.2,                     !- Minimum Part Load Ratio
+    1.0,                     !- Maximum Part Load Ratio
+    CRFCurve,                !- Cycling Ratio Factor Curve Name
+    500,                     !- Nominal Auxiliary Electric Power {W}
+    auxElecEIRCurveFuncTempCurve,  !- Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
+    auxElecEIRFoPLRCurve,    !- Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
+    20;                      !- Standby Electric Power {W}
 
 
   Curve:Biquadratic,
