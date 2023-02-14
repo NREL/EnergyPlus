@@ -184,7 +184,7 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     });
     ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    compare_err_stream("   ** Warning ** MaterialProperty:VariableAbsorptance: Non-scedule control signal is chosen. Thermal or solar absorptance "
+    compare_err_stream("   ** Warning ** MaterialProperty:VariableAbsorptance: Non-schedule control signal is chosen. Thermal or solar absorptance "
                        "schedule name is going to be "
                        "ignored, for object VARIABLETHERMAL_WALL_1\n",
                        true);

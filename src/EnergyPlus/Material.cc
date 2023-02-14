@@ -2771,6 +2771,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
     Array1D<Real64> numbers(1); // numeric data
     std::string_view cCurrentModuleObject{"MaterialProperty:VariableAbsorptance"};
     int numVariAbs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->AnyVariableAbsorptance = (numVariAbs > 0);
     for (int i = 1; i <= numVariAbs; ++i) {
         // Call Input Get routine to retrieve material data
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2849,7 +2850,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
             }
             if ((thisMaterial->absorpThermalVarSchedIdx > 0) || (thisMaterial->absorpSolarVarSchedIdx > 0)) {
                 ShowWarningError(state,
-                                 format("{}: Non-scedule control signal is chosen. Thermal or solar absorptance schedule name is going to be "
+                                 format("{}: Non-schedule control signal is chosen. Thermal or solar absorptance schedule name is going to be "
                                         "ignored, for object {}",
                                         cCurrentModuleObject,
                                         alphas(1)));
