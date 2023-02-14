@@ -1221,7 +1221,6 @@ void SQLite::initializeTabularDataTable()
                              "SimulationIndex INTEGER, "
                              "RowId INTEGER, "
                              "ColumnId INTEGER, "
-                             "Value TEXT "
                              "Value TEXT, "
                              "FOREIGN KEY(ReportNameIndex) REFERENCES Strings(StringIndex) "
                              "ON UPDATE CASCADE "
