@@ -738,7 +738,7 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
 {
     if (!state.dataHeatBal->AnyVariableAbsorptance) return;
     for (int surfNum : state.dataSurface->AllHTSurfaceList) {
-        auto const thisSurface = state.dataSurface->Surface(surfNum);
+        auto const &thisSurface = state.dataSurface->Surface(surfNum);
         int ConstrNum = thisSurface.Construction;
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
         int TotLayers = thisConstruct.TotLayers;
