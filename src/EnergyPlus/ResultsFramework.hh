@@ -83,14 +83,18 @@ namespace ResultsFramework {
     class BaseResultObject
     {
     public:
-        BaseResultObject(){};
+        BaseResultObject() = default;
+        virtual ~BaseResultObject() = default;
     };
 
     class SimInfo : public BaseResultObject
     {
     public:
+        SimInfo() = default;
+        ~SimInfo() override = default;
+
         void setProgramVersion(const std::string &programVersion);
-        std::string getProgramVersion() const;
+        [[nodiscard]] std::string getProgramVersion() const;
         void setSimulationEnvironment(const std::string &simulationEnvironment);
         void setInputModelURI(const std::string &inputModelURI);
         void setStartDateTimeStamp(const std::string &startDateTimeStamp);
@@ -98,7 +102,7 @@ namespace ResultsFramework {
         void setNumErrorsWarmup(const std::string &numWarningsDuringWarmup, const std::string &numSevereDuringWarmup);
         void setNumErrorsSizing(const std::string &numWarningsDuringSizing, const std::string &numSevereDuringSizing);
         void setNumErrorsSummary(const std::string &numWarnings, const std::string &numSevere);
-        json getJSON() const;
+        [[nodiscard]] json getJSON() const;
 
     protected:
         std::string ProgramVersion;
@@ -113,6 +117,7 @@ namespace ResultsFramework {
     {
     public:
         Variable() = default;
+        ~Variable() override = default;
         Variable(const std::string &VarName,
                  const OutputProcessor::ReportingFrequency reportFrequency,
                  const OutputProcessor::TimeStepType timeStepType,
@@ -125,30 +130,30 @@ namespace ResultsFramework {
                  OutputProcessor::Unit units,
                  const std::string &customUnits);
 
-        std::string variableName() const;
+        [[nodiscard]] std::string variableName() const;
         void setVariableName(const std::string &VarName);
 
-        std::string sReportFrequency() const;
-        OutputProcessor::ReportingFrequency iReportFrequency() const;
+        [[nodiscard]] std::string sReportFrequency() const;
+        [[nodiscard]] OutputProcessor::ReportingFrequency iReportFrequency() const;
         void setReportFrequency(const OutputProcessor::ReportingFrequency reportFrequency);
 
-        OutputProcessor::TimeStepType timeStepType() const;
+        [[nodiscard]] OutputProcessor::TimeStepType timeStepType() const;
         void setTimeStepType(const OutputProcessor::TimeStepType timeStepType);
 
-        int reportID() const;
+        [[nodiscard]] int reportID() const;
         void setReportID(const int Id);
 
-        OutputProcessor::Unit units() const;
+        [[nodiscard]] OutputProcessor::Unit units() const;
         void setUnits(OutputProcessor::Unit units);
 
-        std::string customUnits() const;
+        [[nodiscard]] std::string customUnits() const;
         void setCustomUnits(const std::string &customUnits);
 
         void pushValue(const double val);
-        double value(size_t index) const;
-        size_t numValues() const;
+        [[nodiscard]] double value(size_t index) const;
+        [[nodiscard]] size_t numValues() const;
 
-        virtual json getJSON() const;
+        [[nodiscard]] virtual json getJSON() const;
 
     protected:
         std::string varName;
@@ -156,7 +161,7 @@ namespace ResultsFramework {
         OutputProcessor::ReportingFrequency iReportFreq = OutputProcessor::ReportingFrequency::EachCall;
         OutputProcessor::TimeStepType m_timeStepType = OutputProcessor::TimeStepType::Zone;
         int rptID = -1;
-        OutputProcessor::Unit Units;
+        OutputProcessor::Unit Units = OutputProcessor::Unit::unknown;
         std::string m_customUnits;
         std::vector<double> Values;
     };
@@ -176,6 +181,7 @@ namespace ResultsFramework {
                        const int ReportID,
                        OutputProcessor::Unit units,
                        const std::string &customUnits);
+        ~OutputVariable() override = default;
     };
 
     class MeterVariable : public Variable
@@ -188,13 +194,14 @@ namespace ResultsFramework {
                       OutputProcessor::Unit units,
                       const bool MeterOnly,
                       const bool Acculumative = false);
+        ~MeterVariable() override = default;
 
-        bool accumulative() const;
+        [[nodiscard]] bool accumulative() const;
         void setAccumulative(bool state);
-        bool meterOnly() const;
+        [[nodiscard]] bool meterOnly() const;
         void setMeterOnly(bool state);
 
-        json getJSON() const override;
+        [[nodiscard]] json getJSON() const override;
 
     protected:
         bool acc = false;
@@ -207,38 +214,43 @@ namespace ResultsFramework {
         typedef std::pair<int, Variable> VarPtrPair;
 
         explicit DataFrame(const std::string &ReportFreq);
-        virtual ~DataFrame() = default;
+        ~DataFrame() override = default;
 
         void addVariable(Variable const &var);
 
         void setRDataFrameEnabled(bool state);
         void setIDataFrameEnabled(bool state);
 
-        bool rDataFrameEnabled() const;
-        bool iDataFrameEnabled() const;
+        [[nodiscard]] bool rDataFrameEnabled() const;
+        [[nodiscard]] bool iDataFrameEnabled() const;
 
         void setRVariablesScanned(bool state);
         void setIVariablesScanned(bool state);
 
-        bool rVariablesScanned() const;
-        bool iVariablesScanned() const;
+        [[nodiscard]] bool rVariablesScanned() const;
+        [[nodiscard]] bool iVariablesScanned() const;
 
-        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
+        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin, int calendarYear);
         //        void newRow(const std::string &ts);
         virtual void pushVariableValue(const int reportID, double value);
 
         Variable &lastVariable();
 
-        json getVariablesJSON();
-        json getJSON() const;
+        [[nodiscard]] json getVariablesJSON();
+        [[nodiscard]] json getJSON() const;
 
         void writeReport(JsonOutputFilePaths &jsonOutputFilePaths, bool outputJSON, bool outputCBOR, bool outputMsgPack);
+
+        bool iso8601 = false;
+        bool startOfInterval = false;
 
     protected:
         bool IDataFrameEnabled = false;
         bool RDataFrameEnabled = false;
         bool RVariablesScanned = false;
         bool IVariablesScanned = false;
+        int lastHour = 0;
+        int lastMinute = 0;
         std::string ReportFrequency;
         std::vector<std::string> TS;
         std::map<int, Variable> variableMap;
@@ -249,13 +261,13 @@ namespace ResultsFramework {
     {
     public:
         explicit MeterDataFrame(const std::string &ReportFreq) : DataFrame(ReportFreq){};
-        virtual ~MeterDataFrame() = default;
+        ~MeterDataFrame() override = default;
 
         void addVariable(MeterVariable const &var);
 
         void pushVariableValue(const int reportID, double value) override;
 
-        json getJSON(bool meterOnlyCheck = false) const;
+        [[nodiscard]] json getJSON(bool meterOnlyCheck = false) const;
 
     protected:
         std::map<int, MeterVariable> meterMap;
@@ -264,6 +276,9 @@ namespace ResultsFramework {
     class Table : public BaseResultObject
     {
     public:
+        Table() = default;
+        ~Table() override = default;
+
         std::string TableName;
         std::string FootnoteText;
         std::vector<std::string> ColHeaders;
@@ -276,7 +291,7 @@ namespace ResultsFramework {
               std::string const &tableName,
               std::string const &footnoteText);
 
-        json getJSON() const;
+        [[nodiscard]] json getJSON() const;
     };
 
     class Report : public BaseResultObject
@@ -286,7 +301,10 @@ namespace ResultsFramework {
         std::string ReportForString;
         std::vector<Table> Tables;
 
-        json getJSON() const;
+        Report() = default;
+        ~Report() override = default;
+
+        [[nodiscard]] json getJSON() const;
     };
 
     class ReportsCollection : public BaseResultObject
@@ -295,6 +313,7 @@ namespace ResultsFramework {
         typedef std::pair<std::string, Report> RptPtrPair;
 
         ReportsCollection();
+        ~ReportsCollection() override = default;
 
         void addReportTable(Array2D_string const &body,
                             Array1D_string const &rowLabels,
@@ -311,7 +330,7 @@ namespace ResultsFramework {
                             std::string const &tableName,
                             std::string const &footnoteText);
 
-        json getJSON() const;
+        [[nodiscard]] json getJSON() const;
 
     protected:
         std::unordered_map<std::string, Report> reportsMap;
@@ -322,16 +341,44 @@ namespace ResultsFramework {
     {
     public:
         CSVWriter() = default;
-        explicit CSVWriter(std::size_t num_output_variables)
+        ~CSVWriter() override = default;
+
+        CSVWriter(std::vector<std::string> const &key_names,
+                  std::vector<std::string> const &output_variables,
+                  std::map<std::string, std::vector<std::string>> const &outputVariableKeyNames)
         {
-            outputVariableIndices = std::vector<bool>(num_output_variables, false);
+            outputVariableIndices = std::vector<bool>(output_variables.size(), false);
+            outputVariableIndexToKeyNameIndexMapping = std::vector<int>(output_variables.size(), -1);
+            for (std::size_t i = 0; i < output_variables.size(); ++i) {
+                outputVariables.emplace(output_variables[i], i);
+            }
+
+            int index = 0;
+            for (auto const &keyName : key_names) {
+
+                auto exact_match = outputVariables.find(keyName);
+                if (exact_match != outputVariables.end()) {
+                    keyNames.emplace_back(exact_match->first);
+                    outputVariableIndexToKeyNameIndexMapping[exact_match->second] = index;
+                    ++index;
+                    continue;
+                }
+
+                std::string lowerKeyName = keyName;
+                std::transform(keyName.begin(), keyName.end(), lowerKeyName.begin(), ::tolower);
+                auto it = outputVariableKeyNames.find(lowerKeyName);
+                if (it != outputVariableKeyNames.end()) {
+                    for (auto const &outputVariableIndex : it->second) {
+                        outputVariableIndexToKeyNameIndexMapping[outputVariables.at(outputVariableIndex)] = index;
+                        keyNames.emplace_back(outputVariableIndex);
+                        ++index;
+                    }
+                }
+            }
         }
 
-        void writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl);
-        void parseTSOutputs(EnergyPlusData &state,
-                            json const &data,
-                            std::vector<std::string> const &outputVariables,
-                            OutputProcessor::ReportingFrequency reportingFrequency);
+        void writeOutput(EnergyPlusData &state, InputOutputFile &outputFile, bool outputControl, bool rewriteTimestamp = false);
+        void parseTSOutputs(EnergyPlusData &state, json const &data, OutputProcessor::ReportingFrequency reportingFrequency);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
@@ -341,11 +388,12 @@ namespace ResultsFramework {
         OutputProcessor::ReportingFrequency smallestReportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
         std::map<std::string, std::vector<std::string>> outputs;
         std::vector<bool> outputVariableIndices;
+        std::map<std::string, int> outputVariables;
+        std::vector<std::string> keyNames;
+        std::vector<int> outputVariableIndexToKeyNameIndexMapping;
 
         static std::string &convertToMonth(EnergyPlusData &state, std::string &datetime);
         void updateReportingFrequency(OutputProcessor::ReportingFrequency reportingFrequency);
-        // void readRVI();
-        // void readMVI();
     };
 
     class ResultsFramework : public BaseResultObject
@@ -353,19 +401,19 @@ namespace ResultsFramework {
     public:
         ResultsFramework() = default;
 
-        virtual ~ResultsFramework() = default;
+        ~ResultsFramework() override = default;
 
         void setupOutputOptions(EnergyPlusData &state);
 
-        bool timeSeriesEnabled() const;
+        [[nodiscard]] bool timeSeriesEnabled() const;
 
-        bool timeSeriesAndTabularEnabled() const;
+        [[nodiscard]] bool timeSeriesAndTabularEnabled() const;
 
-        bool JSONEnabled() const;
+        [[nodiscard]] bool JSONEnabled() const;
 
-        bool CBOREnabled() const;
+        [[nodiscard]] bool CBOREnabled() const;
 
-        bool MsgPackEnabled() const;
+        [[nodiscard]] bool MsgPackEnabled() const;
 
         void initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                     const Array1D<OutputProcessor::RealVariableType> &RVariableTypes,
@@ -394,6 +442,43 @@ namespace ResultsFramework {
         MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
         MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
+        void setISO8601(const bool value)
+        {
+            rewriteTimestamp = !value;
+            RIDetailedZoneTSData.iso8601 = value;
+            RIDetailedHVACTSData.iso8601 = value;
+            RITimestepTSData.iso8601 = value;
+            RIHourlyTSData.iso8601 = value;
+            RIDailyTSData.iso8601 = value;
+            RIMonthlyTSData.iso8601 = value;
+            RIRunPeriodTSData.iso8601 = value;
+            RIYearlyTSData.iso8601 = value;
+            TSMeters.iso8601 = value;
+            HRMeters.iso8601 = value;
+            DYMeters.iso8601 = value;
+            MNMeters.iso8601 = value;
+            SMMeters.iso8601 = value;
+            YRMeters.iso8601 = value;
+        }
+
+        void setStartOfInterval(const bool value)
+        {
+            RIDetailedZoneTSData.startOfInterval = value;
+            RIDetailedHVACTSData.startOfInterval = value;
+            RITimestepTSData.startOfInterval = value;
+            RIHourlyTSData.startOfInterval = value;
+            RIDailyTSData.startOfInterval = value;
+            RIMonthlyTSData.startOfInterval = value;
+            RIRunPeriodTSData.startOfInterval = value;
+            RIYearlyTSData.startOfInterval = value;
+            TSMeters.startOfInterval = value;
+            HRMeters.startOfInterval = value;
+            DYMeters.startOfInterval = value;
+            MNMeters.startOfInterval = value;
+            SMMeters.startOfInterval = value;
+            YRMeters.startOfInterval = value;
+        }
+
         void writeOutputs(EnergyPlusData &state);
 
         void addReportVariable(std::string_view const keyedValue,
@@ -401,7 +486,7 @@ namespace ResultsFramework {
                                std::string const &units,
                                OutputProcessor::ReportingFrequency const reportingInterval);
 
-        void addReportMeter(std::string const &meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval);
+        void addReportMeter(std::string_view const meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval);
 
         SimInfo SimulationInformation;
 
@@ -415,7 +500,9 @@ namespace ResultsFramework {
         bool outputJSON = false;
         bool outputCBOR = false;
         bool outputMsgPack = false;
+        bool rewriteTimestamp = true; // Convert monthly data timestamp to month name
         std::vector<std::string> outputVariables;
+        std::map<std::string, std::vector<std::string>> outputVariableKeyNames;
 
         void writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths);
 
@@ -428,88 +515,88 @@ namespace ResultsFramework {
         friend class EnergyPlus::ResultsFrameworkFixture;
 
     protected:
-        inline bool hasRIDetailedZoneTSData() const
+        [[nodiscard]] inline bool hasRIDetailedZoneTSData() const
         {
             return RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIDetailedHVACTSData() const
+        [[nodiscard]] inline bool hasRIDetailedHVACTSData() const
         {
             return RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRITimestepTSData() const
+        [[nodiscard]] inline bool hasRITimestepTSData() const
         {
             return RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIHourlyTSData() const
+        [[nodiscard]] inline bool hasRIHourlyTSData() const
         {
             return RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIDailyTSData() const
+        [[nodiscard]] inline bool hasRIDailyTSData() const
         {
             return RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIMonthlyTSData() const
+        [[nodiscard]] inline bool hasRIMonthlyTSData() const
         {
             return RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIRunPeriodTSData() const
+        [[nodiscard]] inline bool hasRIRunPeriodTSData() const
         {
             return RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled();
         };
 
-        inline bool hasRIYearlyTSData() const
+        [[nodiscard]] inline bool hasRIYearlyTSData() const
         {
             return RIYearlyTSData.iDataFrameEnabled() || RIYearlyTSData.rDataFrameEnabled();
         };
 
-        inline bool hasTSMeters() const
+        [[nodiscard]] inline bool hasTSMeters() const
         {
             return TSMeters.rDataFrameEnabled();
         };
 
-        inline bool hasHRMeters() const
+        [[nodiscard]] inline bool hasHRMeters() const
         {
             return HRMeters.rDataFrameEnabled();
         };
 
-        inline bool hasDYMeters() const
+        [[nodiscard]] inline bool hasDYMeters() const
         {
             return DYMeters.rDataFrameEnabled();
         };
 
-        inline bool hasMNMeters() const
+        [[nodiscard]] inline bool hasMNMeters() const
         {
             return MNMeters.rDataFrameEnabled();
         };
 
-        inline bool hasSMMeters() const
+        [[nodiscard]] inline bool hasSMMeters() const
         {
             return SMMeters.rDataFrameEnabled();
         };
 
-        inline bool hasYRMeters() const
+        [[nodiscard]] inline bool hasYRMeters() const
         {
             return YRMeters.rDataFrameEnabled();
         };
 
-        inline bool hasMeterData() const
+        [[nodiscard]] inline bool hasMeterData() const
         {
             return hasTSMeters() || hasHRMeters() || hasDYMeters() || hasMNMeters() || hasSMMeters() || hasYRMeters();
         };
 
-        inline bool hasTSData() const
+        [[nodiscard]] inline bool hasTSData() const
         {
             return hasRIDetailedZoneTSData() || hasRIDetailedHVACTSData() || hasRITimestepTSData() || hasRIHourlyTSData() || hasRIDailyTSData() ||
                    hasRIMonthlyTSData() || hasRIRunPeriodTSData() || hasRIYearlyTSData();
         };
 
-        inline bool hasOutputData() const
+        [[nodiscard]] inline bool hasOutputData() const
         {
             return hasTSData() || hasMeterData();
         };

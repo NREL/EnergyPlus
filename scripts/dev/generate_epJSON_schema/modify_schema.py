@@ -183,6 +183,8 @@ extension_renaming = {
     'PythonPlugin:Variables': 'global_py_vars',
     'PythonPlugin:SearchPaths': 'py_search_paths',
     'Output:Diagnostics': 'diagnostics',
+    'OutputControl:RVI': 'output_variables',
+    'OutputControl:MVI': 'output_meters'
 }
 remaining_objects = [
     'Site:SpectrumData',
