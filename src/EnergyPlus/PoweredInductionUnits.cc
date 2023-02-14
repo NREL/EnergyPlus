@@ -85,6 +85,7 @@
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 namespace EnergyPlus::PoweredInductionUnits {
 
@@ -262,6 +263,15 @@ void GetPIUs(EnergyPlusData &state)
     state.dataPowerInductionUnits->NumParallelPIUs =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:ParallelPIU:Reheat");
     state.dataPowerInductionUnits->NumPIUs = state.dataPowerInductionUnits->NumSeriesPIUs + state.dataPowerInductionUnits->NumParallelPIUs;
+
+    if (state.dataPowerInductionUnits->NumPIUs > 0) {
+        // GetZonePlenumInput might call this routine before the AirDistUnit has been populated
+        if (state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
+            ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+            state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+        }
+    }
+
     // allocate the data structures
     state.dataPowerInductionUnits->PIU.allocate(state.dataPowerInductionUnits->NumPIUs);
     state.dataPowerInductionUnits->PiuUniqueNames.reserve(static_cast<unsigned>(state.dataPowerInductionUnits->NumPIUs));
