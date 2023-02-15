@@ -213,8 +213,7 @@ namespace HVACUnitaryBypassVAV {
         // METHODOLOGY EMPLOYED:
         // Calls ControlCBVAVOutput to obtain the desired unit output
 
-        QSensUnitOut = 0.0;  // probably don't need this initialization
-        Real64 HeatingPower; // Power consumption of DX heating coil or electric heating coil [W]
+        QSensUnitOut = 0.0; // probably don't need this initialization
 
         auto &changeOverByPassVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
 
@@ -287,6 +286,7 @@ namespace HVACUnitaryBypassVAV {
         changeOverByPassVAV.LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
         changeOverByPassVAV.LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
 
+        Real64 HeatingPower = 0.0; // DX Htg coil Plus CrankCase electric power use or electric heating coil [W]
         Real64 locDefrostPower = 0.0;
         if (changeOverByPassVAV.HeatCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
             HeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
