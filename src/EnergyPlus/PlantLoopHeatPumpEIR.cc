@@ -1614,7 +1614,10 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         eirModifierFuncPLR = 0.0;
     }
 
-    Real64 oaTemp2 = max(-8.8888, min(3.3333, oaTempforCurve));
+    const Real64 minDefrostT = (16.0 - 32.0) * 5.0 / 9.0; // 16F
+    const Real64 maxDefrostT = (38.0 - 32.0) * 5.0 / 9.0; // 38F
+
+    Real64 oaTemp2 = std::clamp(oaTempforCurve, minDefrostT, maxDefrostT); // max(minDefrostT, min(maxDefrostT, oaTempforCurve));
     Real64 eirDefrost = 1.0;
 
     if ((state.dataEnvrn->OutDryBulbTemp <= this->defrostMaxOADBT) && this->defrostType == DefrostType::OnDemand) {
