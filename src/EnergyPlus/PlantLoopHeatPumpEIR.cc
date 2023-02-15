@@ -1496,8 +1496,6 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 // return;
             }
         } // This is the end of the FlowLock Block
-    } else {
-        //
     }
 
     // Determine which air variable to use for GAHP:
@@ -1507,15 +1505,12 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     if (this->oaTempCurveInputVar == OATempCurveVar::WetBulb) {
         oaTempforCurve = Psychrometrics::PsyTwbFnTdbWPb(
             state, thisloadsideinletnode.Temp, thisloadsideinletnode.HumRat, thisloadsideinletnode.Press, "PLFFHPEIR::doPhysics()");
-    } else {
-        //
     }
+
     // Load (water) side temperature variable
     Real64 waterTempforCurve = this->loadSideInletTemp;
     if (this->waterTempCurveInputVar == WaterTempCurveVar::LeavingCondenser || this->waterTempCurveInputVar == WaterTempCurveVar::LeavingEvaporator) {
         waterTempforCurve = this->loadSideOutletTemp;
-    } else {
-        //
     }
 
     // 2022-05-17: should the following curve evaluation based on the oaVariable and waterVariable choice:?
