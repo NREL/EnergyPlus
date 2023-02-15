@@ -33,7 +33,7 @@ Based on the above brief review of dynamic coating material, we propose to enabl
 
 ## Approach
 
-Two new idd object, *MaterialProperty:VariableThermalAbsorptance* and *MaterialProperty:VariableSolarAbsorptance*, will be added to host user input data on the trigger-coating property relationship.
+A new idd object, *MaterialProperty:VariableAbsorptance*, will be added to host user input data on the trigger-coating property relationship.
 
 ## Testing/Validation/Data Source(s)
 
@@ -44,9 +44,9 @@ The feature will be tested and demonstrated with a test file derived from *"RefB
 
 ## IDD Object changes
 
-There could be two potential idd designs as follows. The first design creates a material object with the full set of properties users can specify, including roughness, thickness, conductivity, etc. The second approach will add the specification of the trigger-solar/thermal absorption alone. The first approach has the flexibility of specifying the roughness, thickness, conductivity, etc. for the new material itself, but on the other hand, could be challenging for users when some of this information is not readily available. The second approach only requires the trigger-solar/thermal absorptance information, which could be handy for users to test out the performance of the coating while assuming the coating itself is thin enough and the conductivity difference between the coating and the opaque layer beneath it is negligible. When the "coating" is a thick structure, where such differences are not negligible, users can first create a *Material* layer with the roughness, thickness, conductivity, etc. of the thick dynamic coating layer, then add the *MaterialProperty:VariableThermalAbsorptance* on top of it to hold the trigger-solar/thermal absorptance data.
+There could be two potential idd designs as follows. The first design creates a material object with the full set of properties users can specify, including roughness, thickness, conductivity, etc. The second approach will add the specification of the trigger-solar/thermal absorption alone. The first approach has the flexibility of specifying the roughness, thickness, conductivity, etc. for the new material itself, but on the other hand, could be challenging for users when some of this information is not readily available. The second approach only requires the trigger-solar/thermal absorptance information, which could be handy for users to test out the performance of the coating while assuming the coating itself is thin enough and the conductivity difference between the coating and the opaque layer beneath it is negligible. When the "coating" is a thick structure, where such differences are not negligible, users can first create a *Material* layer with the roughness, thickness, conductivity, etc. of the thick dynamic coating layer, then add the *MaterialProperty:VariableAbsorptance* on top of it to hold the trigger-solar/thermal absorptance data.
 
-Based on the reasoning above, two material add-on objects will be added, *MaterialProperty:VariableThermalAbsorptance* and *MaterialProperty:VariableSolarAbsorptance*.
+Based on the reasoning above, two material add-on objects will be added, *MaterialProperty:VariableAbsorptance*.
 
     MaterialProperty:VariableAbsorptance,
       A1 , \field Name
