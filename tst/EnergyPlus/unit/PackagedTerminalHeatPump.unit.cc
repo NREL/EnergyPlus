@@ -4568,7 +4568,6 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
         UtilityRoutines::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     int zoneExhaustNode =
         UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneNum = UtilityRoutines::FindItemInList("THERMAL ZONE ONE", state->dataHeatBal->Zone);
     // test PTHP node connections
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", thisSys.UnitType);
@@ -4636,7 +4635,6 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     bool FirstHVACIteration = false;
     int CompIndex = 1;
     int AirLoopNum = 0;
-    int ControlZoneNum = 1;
     int constexpr ZoneOAUnitNum = 0;
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
