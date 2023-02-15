@@ -287,10 +287,13 @@ namespace HVACUnitaryBypassVAV {
         CBVAV(CBVAVNum).LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
         CBVAV(CBVAVNum).LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
 
+        Real64 locDefrostPower = 0.0;
         if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
             HeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+            locDefrostPower = state.dataHVACGlobal->DefrostElecPower;
         } else if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
             HeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+            locDefrostPower = state.dataHVACGlobal->DefrostElecPower;
         } else if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric) {
             HeatingPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         } else {
@@ -304,7 +307,7 @@ namespace HVACUnitaryBypassVAV {
             locFanElecPower = Fans::GetFanPower(state, CBVAV(CBVAVNum).FanIndex);
         }
 
-        CBVAV(CBVAVNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + HeatingPower;
+        CBVAV(CBVAVNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + HeatingPower + locDefrostPower;
     }
 
     void GetCBVAV(EnergyPlusData &state)
