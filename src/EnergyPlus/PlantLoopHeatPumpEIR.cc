@@ -76,6 +76,11 @@
 
 namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
+constexpr Real64 Fahrenheit2Celsius(Real64 F)
+{
+    return (F - 32.0) * 5.0 / 9.0;
+}
+
 void EIRPlantLoopHeatPump::simulate(
     EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
 {
@@ -1109,7 +1114,7 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
 void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 {
     // This function does all the one-time initialization
-    std::string static const routineName = std::string("EIRPlantLoopHeatPump : oneTimeInit"); // + __FUNCTION__;
+    constexpr std::string_view routineName = "EIRPlantLoopHeatPump : oneTimeInit"; // + __FUNCTION__;
 
     if (this->oneTimeInitFlag) {
         bool errFlag = false;
@@ -1389,8 +1394,9 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
             if ((this->loadSideMassFlowRate > 0.0) &&
                 ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) { // this FFHP has a heat load
                 // FFHPloadSideLoad = currentLoad;
-                if (FFHPloadSideLoad > this->referenceCapacity * this->maxPLR) FFHPloadSideLoad = this->referenceCapacity * this->maxPLR;
-                if (FFHPloadSideLoad < this->referenceCapacity * this->minPLR) FFHPloadSideLoad = this->referenceCapacity * this->minPLR;
+                // if (FFHPloadSideLoad > this->referenceCapacity * this->maxPLR) FFHPloadSideLoad = this->referenceCapacity * this->maxPLR;
+                // if (FFHPloadSideLoad < this->referenceCapacity * this->minPLR) FFHPloadSideLoad = this->referenceCapacity * this->minPLR;
+                FFHPloadSideLoad = std::clamp(FFHPloadSideLoad, this->referenceCapacity * this->minPLR, this->referenceCapacity * this->maxPLR);
                 this->loadSideOutletTemp = thisInletNode.Temp + FFHPloadSideLoad / (this->loadSideMassFlowRate * CpLoad);
             } else {
                 FFHPloadSideLoad = 0.0;
@@ -1603,8 +1609,8 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         eirModifierFuncPLR = 0.0;
     }
 
-    const Real64 minDefrostT = (16.0 - 32.0) * 5.0 / 9.0; // 16F
-    const Real64 maxDefrostT = (38.0 - 32.0) * 5.0 / 9.0; // 38F
+    constexpr Real64 minDefrostT = Fahrenheit2Celsius(16.0); // (16.0 - 32.0) * 5.0 / 9.0; // 16F
+    constexpr Real64 maxDefrostT = Fahrenheit2Celsius(38.0); // (38.0 - 32.0) * 5.0 / 9.0; // 38F
 
     Real64 oaTemp2 = std::clamp(oaTempforCurve, minDefrostT, maxDefrostT); // max(minDefrostT, min(maxDefrostT, oaTempforCurve));
     Real64 eirDefrost = 1.0;
@@ -1634,14 +1640,14 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
 
     // Cycling Ratio
-    const Real64 CR_min = 0.0;
-    const Real64 CR_max = 1.0;
+    constexpr Real64 CR_min = 0.0;
+    constexpr Real64 CR_max = 1.0;
     Real64 CR = std::clamp(max(this->minPLR, partLoadRatio) / miniPLR_mod,
                            CR_min,
                            CR_max); // min(max(0.0, max(this->minPLR, partLoadRatio) / miniPLR_mod), 1.0); // partLoadRatio / this->minPLR;
 
-    const Real64 CRF_Slope = 0.4167;
-    const Real64 CRF_Intercept = 0.5833;
+    constexpr Real64 CRF_Slope = 0.4167;
+    constexpr Real64 CRF_Intercept = 0.5833;
     Real64 CRF = CRF_Slope * CR + CRF_Intercept; // 2022-05-31: this is the fixed eqn in the paper, but with the curve input it could be any curve
     if (this->cycRatioCurveIndex > 0) {
         CRF = Curve::CurveValue(state, this->cycRatioCurveIndex, CR);
@@ -2432,7 +2438,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
 {
     // This function does all the one-time initialization
-    std::string static const routineName = std::string("EIRFuelFiredHeatPump : oneTimeInit"); // + __FUNCTION__;
+    constexpr std::string_view routineName = "EIRFuelFiredHeatPump : oneTimeInit"; // + __FUNCTION__;
 
     if (this->oneTimeInitFlag) {
         bool errFlag = false;
