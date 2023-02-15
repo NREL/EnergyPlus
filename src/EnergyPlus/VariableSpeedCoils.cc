@@ -6509,9 +6509,6 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
         QWasteHeat *= PartLoadRatio;
 
-        //  Add power to global variable so power can be summed by parent object
-        state.dataHVACGlobal->DXElecCoolingPower = state.dataVariableSpeedCoils->Winput;
-
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = state.dataVariableSpeedCoils->Winput;
@@ -7127,9 +7124,6 @@ namespace VariableSpeedCoils {
         //+ VarSpeedCoil(DXCoilNum)%BasinHeaterPower + VarSpeedCoil(DXCoilNum)%EvapCondPumpElecPower
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
 
-        //  Add power to global variable so power can be summed by parent object
-        state.dataHVACGlobal->DXElecCoolingPower = state.dataVariableSpeedCoils->Winput;
-
         ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower =
@@ -7698,10 +7692,6 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
         QWasteHeat *= PartLoadRatio;
-
-        //  Add power to global variable so power can be summed by parent object
-        state.dataHVACGlobal->DXElecHeatingPower = state.dataVariableSpeedCoils->Winput;
-        state.dataHVACGlobal->DefrostElecPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower;
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
@@ -8400,6 +8390,18 @@ namespace VariableSpeedCoils {
                 }
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).reportCoilFinalSizes = false;
             }
+        }
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit ||
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingAirToAirVariableSpeed) {
+            //  Add power to global variable so power can be summed by parent object
+            state.dataHVACGlobal->DXElecCoolingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power;
+        }
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingWaterToAirHPVSEquationFit ||
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingAirToAirVariableSpeed) {
+            //  Add power to global variable so power can be summed by parent object
+            state.dataHVACGlobal->DXElecHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power +
+                                                       state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower;
+            state.dataHVACGlobal->DefrostElecPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower;
         }
     }
 
