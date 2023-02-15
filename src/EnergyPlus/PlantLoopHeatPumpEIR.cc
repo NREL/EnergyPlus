@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ headers
-#include<algorithm>
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
@@ -1327,18 +1327,14 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     auto &sim_component(DataPlant::CompData::getPlantComponent(state, this->loadSidePlantLoc));
     bool RunFlag = true;
     if ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad <= 0.0) || !RunFlag) {
-        if (sim_component.FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive)
-            this->loadSideMassFlowRate = thisInletNode.MassFlowRate;
+        if (sim_component.FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) this->loadSideMassFlowRate = thisInletNode.MassFlowRate;
         this->resetReportingVariables();
         return;
     }
 
     DataPlant::PlantLoopData &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
-    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           thisLoadPlantLoop.FluidName,
-                                                           thisInletNode.Temp,
-                                                           thisLoadPlantLoop.FluidIndex,
-                                                           "PLFFHPEIR::simulate()");
+    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(
+        state, thisLoadPlantLoop.FluidName, thisInletNode.Temp, thisLoadPlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
 
     // Set the current load equal to the FFHP load
     Real64 FFHPloadSideLoad = currentLoad; // this->loadSidePlantLoad = MyLoad;
@@ -1358,7 +1354,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
                 if ((this->loadSideMassFlowRate != 0.0) &&
                     ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) {
-                    FFHPDeltaTemp = currentLoad / this->loadSideMassFlowRate / CpLoad;
+                    FFHPDeltaTemp = currentLoad / (this->loadSideMassFlowRate * CpLoad);
                 } else {
                     FFHPDeltaTemp = 0.0;
                 }
@@ -1377,7 +1373,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 this->loadSideOutletTemp = FFHPDeltaTemp + thisInletNode.Temp;
 
                 if ((FFHPDeltaTemp > 0.0) && ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad > 0.0))) {
-                    this->loadSideMassFlowRate = currentLoad / CpLoad / FFHPDeltaTemp;
+                    this->loadSideMassFlowRate = currentLoad / (CpLoad * FFHPDeltaTemp);
                     this->loadSideMassFlowRate = min(this->loadSideDesignMassFlowRate, this->loadSideMassFlowRate);
                 } else {
                     this->loadSideMassFlowRate = 0.0;
@@ -1395,8 +1391,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 // FFHPloadSideLoad = currentLoad;
                 if (FFHPloadSideLoad > this->referenceCapacity * this->maxPLR) FFHPloadSideLoad = this->referenceCapacity * this->maxPLR;
                 if (FFHPloadSideLoad < this->referenceCapacity * this->minPLR) FFHPloadSideLoad = this->referenceCapacity * this->minPLR;
-                this->loadSideOutletTemp =
-                    thisInletNode.Temp + FFHPloadSideLoad / (this->loadSideMassFlowRate * CpLoad);
+                this->loadSideOutletTemp = thisInletNode.Temp + FFHPloadSideLoad / (this->loadSideMassFlowRate * CpLoad);
             } else {
                 FFHPloadSideLoad = 0.0;
                 this->loadSideOutletTemp = thisInletNode.Temp;
@@ -1418,7 +1413,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 PlantUtilities::SetComponentFlowRate(
                     state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
                 if (this->loadSideMassFlowRate != 0.0) {
-                    evapDeltaTemp = std::abs(currentLoad) / this->loadSideMassFlowRate / CpLoad; // MyLoad = net evaporator capacity, QEvaporator
+                    evapDeltaTemp = std::abs(currentLoad) / (this->loadSideMassFlowRate * CpLoad); // MyLoad = net evaporator capacity, QEvaporator
                 } else {
                     evapDeltaTemp = 0.0;
                 }
@@ -1724,11 +1719,8 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // calculate source side outlet conditions
     Real64 CpSrc = 0.0;
     if (this->waterSource) {
-        CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
-                                                       thisLoadPlantLoop.FluidName,
-                                                       state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
-                                                       thisLoadPlantLoop.FluidIndex,
-                                                       "PLFFHPEIR::simulate()");
+        CpSrc = FluidProperties::GetSpecificHeatGlycol(
+            state, thisLoadPlantLoop.FluidName, thisInletNode.Temp, thisLoadPlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
