@@ -102,29 +102,9 @@ namespace FluidProperties {
     // supplying the same data for concentrations of 0.0 and 1.0 only.
     // Temperature data has to be supplied in ascending order only.
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS
-
-    // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
-
-    // Object Data
-
 #ifdef EP_cache_GlycolSpecificHeat
     std::array<cached_tsh, t_sh_cache_size> cached_t_sh;
 #endif
-    // Data Initializer Forward Declarations
-    // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
-
-    // MODULE SUBROUTINES:
-
-    // Functions
 
     void InitializeGlycRoutines()
     {
