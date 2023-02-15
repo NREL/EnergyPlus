@@ -1315,7 +1315,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
 
     // get setpoint on the load side outlet
-    Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
+    // Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
 
     // Use a logic similar to that for a boilder: If the specified load is 0.0 or the boiler should not run
     // then we leave this subroutine. Before leaving

@@ -3969,7 +3969,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource)
     {
         bool firstHVAC = true;
         Real64 curLoad = 1200;
-        Real64 availableCapacity = 950.0;
+        // Real64 availableCapacity = 950.0;
         bool runFlag = true;
         Real64 constexpr expectedLoadMassFlowRate = 0.09999;
         Real64 constexpr expectedCp = 4180;
@@ -4191,7 +4191,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
     {
         bool firstHVAC = true;
         Real64 curLoad = 1200;
-        Real64 availableCapacity = 950.0;
+        // Real64 availableCapacity = 950.0;
         bool runFlag = true;
         Real64 constexpr expectedLoadMassFlowRate = 0.09999;
         Real64 constexpr expectedCp = 4180;
