@@ -1634,15 +1634,19 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
 
     // Cycling Ratio
-    Real64 CR = 1.0;
-    Real64 CRF = 0.5833;
-    CR = min(max(0.0, max(this->minPLR, partLoadRatio) / miniPLR_mod), 1.0); // partLoadRatio / this->minPLR;
+    const Real64 CR_min = 0.0;
+    const Real64 CR_max = 1.0;
+    Real64 CR = std::clamp(max(this->minPLR, partLoadRatio) / miniPLR_mod,
+                           CR_min,
+                           CR_max); // min(max(0.0, max(this->minPLR, partLoadRatio) / miniPLR_mod), 1.0); // partLoadRatio / this->minPLR;
 
-    CRF = 0.4167 * CR + 0.5833; // 2022-05-31: this is the fixed eqn in the paper, but with the curve input it could be any curve
+    const Real64 CRF_Slope = 0.4167;
+    const Real64 CRF_Intercept = 0.5833;
+    Real64 CRF = CRF_Slope * CR + CRF_Intercept; // 2022-05-31: this is the fixed eqn in the paper, but with the curve input it could be any curve
     if (this->cycRatioCurveIndex > 0) {
         CRF = Curve::CurveValue(state, this->cycRatioCurveIndex, CR);
     }
-    if (CRF <= DataGlobalConstants::rTinyValue) CRF = 0.5833; // 2022-06-02: what could a proper default for too tiny CRF?
+    if (CRF <= DataGlobalConstants::rTinyValue) CRF = CRF_Intercept; // 2022-06-02: what could a proper default for too tiny CRF?
 
     // aux elec
     Real64 eirAuxElecFuncTemp = 0.0;
