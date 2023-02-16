@@ -233,10 +233,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute
 
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
@@ -494,6 +494,41 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_convertToMonth)
     EXPECT_EQ(datetime, "December");
     datetime = "01/01 23:00:00";
     EXPECT_THROW(convertToMonth(*state, datetime), FatalError);
+}
+
+TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp)
+{
+
+    json OutputData;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
+    int reportId = 1;
+
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
+    state->dataResultsFramework->resultsFramework->addReportVariable(
+        "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->setISO8601(true);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
+
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+
+    auto outputs = getCSVOutputs(*state,
+                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
+                                 *state->dataResultsFramework->resultsFramework,
+                                 OutputProcessor::ReportingFrequency::TimeStep);
+
+    std::map<std::string, std::vector<std::string>> expected_output = {{"2017-02-25T00:45:00", {"1.0"}},
+                                                                       {"2017-02-25T01:00:00", {"2.0"}},
+                                                                       {"2017-02-25T23:45:00", {"3.0"}},
+                                                                       {"2017-02-25T24:00:00", {"4.0"}}};
+
+    EXPECT_EQ(expected_output, outputs);
 }
 
 } // namespace EnergyPlus

@@ -84,6 +84,25 @@ protected:
     {
         return ResultsFramework::CSVWriter::convertToMonth(state, datetime);
     }
+
+    std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
+                                                                  json const &data,
+                                                                  OutputProcessor::ReportingFrequency reportingFrequency,
+                                                                  std::vector<std::string> const &outputVariables)
+    {
+        ResultsFramework::CSVWriter csv(outputVariables.size());
+        csv.parseTSOutputs(state, data, outputVariables, reportingFrequency);
+        return csv.outputs;
+    }
+
+    std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
+                                                                  json const &data,
+                                                                  ResultsFramework::ResultsFramework const &resultsFramework,
+                                                                  OutputProcessor::ReportingFrequency reportingFrequency)
+    {
+        return getCSVOutputs(state, data, reportingFrequency, resultsFramework.outputVariables);
+    }
+
 };
 
 } // namespace EnergyPlus
