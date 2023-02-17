@@ -2571,92 +2571,86 @@ namespace WaterToAirHeatPumpSimple {
 
                 // determine adjusted cooling and heating coil capacity
                 simpleWatertoAirHP.RatedCapHeatAtRatedCdts = RatedCapHeatDes * RatedHeatCapTempModFac;
-                if (simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
-                    auto &companionCoolingCoil(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum));
-                    if (companionCoolingCoil.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit &&
-                        companionCoolingCoil.RatedCapCoolTotal == DataSizing::AutoSize) {
-                        // case 1: companion coil is also of EquationFit type and is being autosized
-                        RatedCapCoolTotalDes = state.dataSize->DXCoolCap;
-                        RatedTotCapTempModFac = companionCoolingCoil.RatedCapCoolAtRatedCdts / RatedCapCoolTotalDes;
-                        RatedCapCoolHeatDD =
-                            simpleWatertoAirHP.RatedCapHeatAtRatedCdts / simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap / RatedTotCapTempModFac;
-                        RatedCoolPowerTempModFac = companionCoolingCoil.RatedPowerCoolAtRatedCdts / companionCoolingCoil.RatedPowerCool;
-                        if (RatedCapCoolHeatDD > RatedCapCoolTotalDes) {
-                            // total cooling capacity
-                            RatedCapCoolTotalDes = RatedCapCoolHeatDD;
-                            // adjust for system air flow -- capacity is based on heating design day calcs
-                            // adjust by ratio of system to heating air flow rate and temperature delta across the coil at these different airflow
-                            if (HeatingAirVolFlowRateDes > 0) {
-                                RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes) * HeatdTratio;
-                            }
-                            // calculate ajustment factor over previous capacity for sensible capacity adjustment
-                            Real64 CapCoolAdjFac = RatedCapCoolTotalDes / state.dataSize->DXCoolCap;
-                            // update cooling coil rated capacity after adjustments based on heating coil size
-                            state.dataSize->DXCoolCap = RatedCapCoolTotalDes;
-                            // sensible cooling capacity
-                            RatedCapCoolSensDes = companionCoolingCoil.RatedCapCoolSens * CapCoolAdjFac; // Assume that SHR stays the same
-                            companionCoolingCoil.RatedCapCoolSensDesAtRatedCdts *= CapCoolAdjFac;
-                            companionCoolingCoil.RatedCapCoolSens = RatedCapCoolSensDes;
-                            // update Water-to-Air Heat Pumps output reports
-                            OutputReportPredefined::PreDefTableEntry(state,
-                                                                     state.dataOutRptPredefined->pdchWAHPRatedSensCapAtRatedCdts,
-                                                                     companionCoolingCoil.Name,
-                                                                     companionCoolingCoil.RatedCapCoolSensDesAtRatedCdts);
-                            OutputReportPredefined::PreDefTableEntry(
-                                state, state.dataOutRptPredefined->pdchWAHPDD, companionCoolingCoil.Name, "Heating");
-                            OutputReportPredefined::PreDefTableEntry(
-                                state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Heating");
-                            // update Cooling Coils output reports
-                            OutputReportPredefined::PreDefTableEntry(state,
-                                                                     state.dataOutRptPredefined->pdchCoolCoilLatCap,
-                                                                     companionCoolingCoil.Name,
-                                                                     RatedCapCoolTotalDes - RatedCapCoolSensDes);
-                            OutputReportPredefined::PreDefTableEntry(state,
-                                                                     state.dataOutRptPredefined->pdchCoolCoilSHR,
-                                                                     companionCoolingCoil.Name,
-                                                                     RatedCapCoolSensDes / RatedCapCoolTotalDes);
-                            OutputReportPredefined::PreDefTableEntry(
-                                state, state.dataOutRptPredefined->pdchCoolCoilSensCap, companionCoolingCoil.Name, RatedCapCoolSensDes);
-                        } else {
-                            OutputReportPredefined::PreDefTableEntry(
-                                state, state.dataOutRptPredefined->pdchWAHPDD, companionCoolingCoil.Name, "Cooling");
-                            OutputReportPredefined::PreDefTableEntry(
-                                state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Cooling");
+                auto &companionCoolingCoil(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum));
+                if (companionCoolingCoil.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit &&
+                    companionCoolingCoil.RatedCapCoolTotal == DataSizing::AutoSize) {
+                    // case 1: companion coil is also of EquationFit type and is being autosized
+                    RatedCapCoolTotalDes = state.dataSize->DXCoolCap;
+                    RatedTotCapTempModFac = companionCoolingCoil.RatedCapCoolAtRatedCdts / RatedCapCoolTotalDes;
+                    RatedCapCoolHeatDD =
+                        simpleWatertoAirHP.RatedCapHeatAtRatedCdts / simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap / RatedTotCapTempModFac;
+                    RatedCoolPowerTempModFac = companionCoolingCoil.RatedPowerCoolAtRatedCdts / companionCoolingCoil.RatedPowerCool;
+                    if (RatedCapCoolHeatDD > RatedCapCoolTotalDes) {
+                        // total cooling capacity
+                        RatedCapCoolTotalDes = RatedCapCoolHeatDD;
+                        // adjust for system air flow -- capacity is based on heating design day calcs
+                        // adjust by ratio of system to heating air flow rate and temperature delta across the coil at these different airflow
+                        if (HeatingAirVolFlowRateDes > 0) {
+                            RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes) * HeatdTratio;
                         }
-                        RatedCapHeatDes =
-                            RatedCapCoolTotalDes * RatedTotCapTempModFac * simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap / RatedHeatCapTempModFac;
-                        companionCoolingCoil.RatedCapCoolTotal = RatedCapCoolTotalDes;
-                        companionCoolingCoil.RatedCapCoolAtRatedCdts = RatedCapCoolTotalDes * RatedTotCapTempModFac;
-                        companionCoolingCoil.RatedPowerCoolAtRatedCdts =
-                            companionCoolingCoil.RatedCapCoolAtRatedCdts / companionCoolingCoil.RatedCOPCoolAtRatedCdts;
-                        companionCoolingCoil.RatedPowerCool = companionCoolingCoil.RatedPowerCoolAtRatedCdts / RatedCoolPowerTempModFac;
+                        // calculate ajustment factor over previous capacity for sensible capacity adjustment
+                        Real64 CapCoolAdjFac = RatedCapCoolTotalDes / state.dataSize->DXCoolCap;
+                        // update cooling coil rated capacity after adjustments based on heating coil size
+                        state.dataSize->DXCoolCap = RatedCapCoolTotalDes;
+                        // sensible cooling capacity
+                        RatedCapCoolSensDes = companionCoolingCoil.RatedCapCoolSens * CapCoolAdjFac; // Assume that SHR stays the same
+                        companionCoolingCoil.RatedCapCoolSensDesAtRatedCdts *= CapCoolAdjFac;
+                        companionCoolingCoil.RatedCapCoolSens = RatedCapCoolSensDes;
                         // update Water-to-Air Heat Pumps output reports
                         OutputReportPredefined::PreDefTableEntry(state,
-                                                                 state.dataOutRptPredefined->pdchWAHPRatedCapAtRatedCdts,
+                                                                 state.dataOutRptPredefined->pdchWAHPRatedSensCapAtRatedCdts,
                                                                  companionCoolingCoil.Name,
-                                                                 companionCoolingCoil.RatedCapCoolAtRatedCdts);
+                                                                 companionCoolingCoil.RatedCapCoolSensDesAtRatedCdts);
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, companionCoolingCoil.Name, "Heating");
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Heating");
                         // update Cooling Coils output reports
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchCoolCoilLatCap,
+                                                                 companionCoolingCoil.Name,
+                                                                 RatedCapCoolTotalDes - RatedCapCoolSensDes);
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchCoolCoilSHR,
+                                                                 companionCoolingCoil.Name,
+                                                                 RatedCapCoolSensDes / RatedCapCoolTotalDes);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchCoolCoilTotCap, companionCoolingCoil.Name, RatedCapCoolTotalDes);
-                        BaseSizer::reportSizerOutput(
-                            state,
-                            format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(companionCoolingCoil.WAHPType)]),
-                            companionCoolingCoil.Name,
-                            "Design Size Rated Total Cooling Capacity [W]",
-                            companionCoolingCoil.RatedCapCoolTotal);
-                        BaseSizer::reportSizerOutput(
-                            state,
-                            format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(companionCoolingCoil.WAHPType)]),
-                            companionCoolingCoil.Name,
-                            "Design Size Rated Sensible Cooling Capacity [W]",
-                            companionCoolingCoil.RatedCapCoolSens);
-                    } else if (companionCoolingCoil.WAHPPlantType ==
-                               DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) { // case 2: companion coil is of EquationFit type but is
-                                                                                            // not autosized
-                        RatedCapHeatDes = companionCoolingCoil.RatedCapCoolTotal * simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap;
-                    } else { // case 3: companion type is different than EquationFit
-                        RatedCapHeatDes = state.dataSize->DXCoolCap;
+                            state, state.dataOutRptPredefined->pdchCoolCoilSensCap, companionCoolingCoil.Name, RatedCapCoolSensDes);
+                    } else {
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, companionCoolingCoil.Name, "Cooling");
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Cooling");
                     }
+                    RatedCapHeatDes =
+                        RatedCapCoolTotalDes * RatedTotCapTempModFac * simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap / RatedHeatCapTempModFac;
+                    companionCoolingCoil.RatedCapCoolTotal = RatedCapCoolTotalDes;
+                    companionCoolingCoil.RatedCapCoolAtRatedCdts = RatedCapCoolTotalDes * RatedTotCapTempModFac;
+                    companionCoolingCoil.RatedPowerCoolAtRatedCdts =
+                        companionCoolingCoil.RatedCapCoolAtRatedCdts / companionCoolingCoil.RatedCOPCoolAtRatedCdts;
+                    companionCoolingCoil.RatedPowerCool = companionCoolingCoil.RatedPowerCoolAtRatedCdts / RatedCoolPowerTempModFac;
+                    // update Water-to-Air Heat Pumps output reports
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchWAHPRatedCapAtRatedCdts,
+                                                             companionCoolingCoil.Name,
+                                                             companionCoolingCoil.RatedCapCoolAtRatedCdts);
+                    // update Cooling Coils output reports
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchCoolCoilTotCap, companionCoolingCoil.Name, RatedCapCoolTotalDes);
+                    BaseSizer::reportSizerOutput(
+                        state,
+                        format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(companionCoolingCoil.WAHPType)]),
+                        companionCoolingCoil.Name,
+                        "Design Size Rated Total Cooling Capacity [W]",
+                        companionCoolingCoil.RatedCapCoolTotal);
+                    BaseSizer::reportSizerOutput(
+                        state,
+                        format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(companionCoolingCoil.WAHPType)]),
+                        companionCoolingCoil.Name,
+                        "Design Size Rated Sensible Cooling Capacity [W]",
+                        companionCoolingCoil.RatedCapCoolSens);
+                } else if (companionCoolingCoil.WAHPPlantType ==
+                           DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) { // case 2: companion coil is of EquationFit type but is
+                                                                                        // not autosized
+                    RatedCapHeatDes = companionCoolingCoil.RatedCapCoolTotal * simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap;
+                } else { // case 3: companion type is different than EquationFit
+                    RatedCapHeatDes = state.dataSize->DXCoolCap;
                 }
                 // heating capacity final determination
                 simpleWatertoAirHP.RatedCapHeat = RatedCapHeatDes;
