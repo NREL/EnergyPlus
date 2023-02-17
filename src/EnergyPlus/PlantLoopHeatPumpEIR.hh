@@ -222,7 +222,7 @@ namespace EIRPlantLoopHeatPumps {
             Invalid = -1,
             EnteringCondenser,
             LeavingCondenser,
-            EnteringVaporator,
+            EnteringEvaporator,
             LeavingEvaporator,
             Num
         };

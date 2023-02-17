@@ -2096,8 +2096,16 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.waterTempCurveInputVar =
                     static_cast<WaterTempCurveVar>(getEnumerationValue(WaterTempCurveVarNamesUC, waterTempCurveInputVar));
                 if (thisPLHP.waterTempCurveInputVar == WaterTempCurveVar::Invalid) {
-                    thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
-                    // 2022-08-08: give warning for resetting
+                    ShowWarningError(
+                        state, format("Invalid Water Temperature Input Variable for EIR PLFFHP ({} name={})", cCurrentModuleObject, thisPLHP.name));
+                    if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling)
+                        thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringEvaporator;
+                    else { // if(thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating)
+                        thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
+                    }
+                    ShowContinueError(
+                        state,
+                        format("The Input Variable is reset to: {}", WaterTempCurveVarNamesUC[static_cast<int>(thisPLHP.waterTempCurveInputVar)]));
                 }
 
                 // A11 normalized_capacity_function_of_temperature_curve_name
