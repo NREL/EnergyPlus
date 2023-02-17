@@ -2193,7 +2193,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             } else {
                 auto defrostOpTimeFracFound = fields.find("defrost_operation_time_fraction");
                 if (defrostOpTimeFracFound != fields.end()) {
-                    thisPLHP.defrostOpTimeFrac = defrostOpTimeFracFound.value().at("defrost_operation_time_fraction").get<Real64>();
+                    thisPLHP.defrostOpTimeFrac = defrostOpTimeFracFound.value().get<Real64>();
                 } else {
                     Real64 defaultVal = 0.0;
                     if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
@@ -2212,7 +2212,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             } else {
                 auto resDefrostHeaterCapFound = fields.find("resistive_defrost_heater_capacity");
                 if (resDefrostHeaterCapFound != fields.end()) {
-                    thisPLHP.defrostResistiveHeaterCap = resDefrostHeaterCapFound.value().at("resistive_defrost_heater_capacity").get<Real64>();
+                    thisPLHP.defrostResistiveHeaterCap = resDefrostHeaterCapFound.value().get<Real64>();
                 } else {
                     Real64 defaultVal = 0.0;
                     if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
