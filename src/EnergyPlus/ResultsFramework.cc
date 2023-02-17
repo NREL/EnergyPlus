@@ -821,7 +821,7 @@ namespace ResultsFramework {
         }
     }
 
-    std::string &CSVWriter::convertToMonth(EnergyPlusData &state, std::string &datetime)
+    std::string &CSVWriter::convertToMonth(std::string &datetime)
     {
         // if running this function, there should only ever be 12 + design days values to change
         static const std::map<std::string, std::string> months({{"01", "January"},
@@ -873,7 +873,7 @@ namespace ResultsFramework {
                 if (smallestReportingFrequency < OutputProcessor::ReportingFrequency::Monthly) {
                     datetime = datetime.replace(datetime.find(' '), 1, "  ");
                 } else {
-                    convertToMonth(state, datetime);
+                    convertToMonth(datetime);
                 }
             }
             print<FormatSyntax::FMT>(outputFile, " {},", datetime);

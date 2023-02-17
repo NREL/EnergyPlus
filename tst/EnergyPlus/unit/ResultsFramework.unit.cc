@@ -457,43 +457,43 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_convertToMonth)
 {
     std::string datetime;
     datetime = "01/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "January");
     datetime = "02/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "February");
     datetime = "03/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "March");
     datetime = "04/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "April");
     datetime = "05/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "May");
     datetime = "06/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "June");
     datetime = "07/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "July");
     datetime = "08/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "August");
     datetime = "09/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "September");
     datetime = "10/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "October");
     datetime = "11/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "November");
     datetime = "12/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "December");
-    //datetime = "01/01 23:00:00";
-    //EXPECT_DEATH(convertToMonth(*state, datetime), "Assertion failed: time == \\\" 24:00:00\\\" \\|\\| time == \\\" 00:00:00\\\"");
+    // datetime = "01/01 23:00:00";
+    // EXPECT_DEATH(convertToMonth(*state, datetime), "Assertion failed: time == \\\" 24:00:00\\\" \\|\\| time == \\\" 00:00:00\\\"");
 }
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_Beginning)

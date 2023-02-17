@@ -352,7 +352,7 @@ namespace ResultsFramework {
         std::map<std::string, std::vector<std::string>> outputs;
         std::vector<bool> outputVariableIndices;
 
-        static std::string &convertToMonth(EnergyPlusData &state, std::string &datetime);
+        static std::string &convertToMonth(std::string &datetime);
         void updateReportingFrequency(OutputProcessor::ReportingFrequency reportingFrequency);
         // void readRVI();
         // void readMVI();

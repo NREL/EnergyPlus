@@ -447,7 +447,6 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 
     auto const timestamp_instances = ip->epJSON.find("OutputControl:Timestamp");
     if (timestamp_instances != ip->epJSON.end()) {
-        auto const &objectSchemaProps = ip->getObjectSchemaProps(state, "OutputControl:Timestamp");
         auto const &instancesValue = timestamp_instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
