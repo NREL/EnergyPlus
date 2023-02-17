@@ -1919,7 +1919,15 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
             EIRFuelFiredHeatPump thisPLHP;
+
             thisPLHP.EIRHPType = classToInput.thisType;
+            std::string companionCoilFieldTag = "companion_heating_heat_pump_name";
+            std::string refCapFieldTag = "nominal_cooling_capacity";
+            if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) {
+                companionCoilFieldTag = "companion_cooling_heat_pump_name";
+                refCapFieldTag = "nominal_heating_capacity";
+            }
+
             // A1-A3
             thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
             std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_inlet_node_name").get<std::string>());
@@ -1938,30 +1946,21 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             }
 
             // A5
-            if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) {
-                if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
-                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_cooling_heat_pump_name").get<std::string>());
-                }
-            } else if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                if (fields.find("companion_heating_heat_pump_name") != fields.end()) { // optional field
-                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_heating_heat_pump_name").get<std::string>());
-                }
+            if (fields.find(companionCoilFieldTag) != fields.end()) { // optional field
+                thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at(companionCoilFieldTag).get<std::string>());
             }
 
             // A6 Fuel Type
             std::string tempRsrStr = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
             thisPLHP.fuelType = DataGlobalConstants::AssignResourceTypeNum(tempRsrStr);
             // Validate fuel type input
-            // Locals
             static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
-            bool FuelTypeError(false);
+            bool FuelTypeError = false;
             UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(tempRsrStr, tempRsrStr, thisPLHP.fuelType, FuelTypeError);
             if (FuelTypeError) {
                 ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
-                // ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
                 ShowContinueError(state, format("Invalid Fuel Type = {}", tempRsrStr));
-                // Set to Electric to avoid errors when setting up output variables
-                tempRsrStr = "NaturalGas";
+                ShowContinueError(state, "Reset the Fuel Type to \"NaturalGas\".");
                 thisPLHP.fuelType = DataGlobalConstants::ResourceType::Natural_Gas;
                 errorsFound = true;
                 FuelTypeError = false;
@@ -1969,16 +1968,12 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A7 End use category
             thisPLHP.endUseSubcat = UtilityRoutines::MakeUPPERCase(fields.at("end_use_subcategory").get<std::string>());
-            // 2022-05-13: default: empty?
             if (thisPLHP.endUseSubcat == "") {
                 thisPLHP.endUseSubcat = "Heat Pump Fuel Fired"; // or "General"?
             }
 
             // N1 Nominal heating capacity
-            std::string const refCapFieldFlag = (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating)
-                                                    ? "nominal_heating_capacity"
-                                                    : "nominal_cooling_capacity";
-            auto tmpRefCapacity = fields.at(refCapFieldFlag);
+            auto tmpRefCapacity = fields.at(refCapFieldTag);
 
             if (tmpRefCapacity == "Autosize") {
                 thisPLHP.referenceCapacity = DataSizing::AutoSize;
@@ -2166,9 +2161,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
                 thisPLHP.defrostEIRCurveIndex = 0;
             } else {
-
                 if (fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name") != fields.end()) {
-                    auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
+                    auto eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
                     thisPLHP.defrostEIRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
                     if (thisPLHP.defrostEIRCurveIndex == 0) {
                         ShowSevereError(state,
@@ -2267,7 +2261,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
                 if (thisPLHP.cycRatioCurveIndex == 0) {
                     ShowSevereError(state,
-                                    format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
+                                    format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {})",
                                            thisPLHP.name,
                                            cycRatioCurveName.get<std::string>()));
                     errorsFound = true;
