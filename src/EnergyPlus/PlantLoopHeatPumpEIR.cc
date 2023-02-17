@@ -1980,9 +1980,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             }
 
             // N1 Nominal heating capacity
-            auto tmpRefCapacity =
-                fields.at((thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) ? "nominal_heating_capacity"
-                                                                                                          : "nominal_cooling_capacity");
+            std::string const refCapFieldFlag = (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating)
+                                                    ? "nominal_heating_capacity"
+                                                    : "nominal_cooling_capacity";
+            auto tmpRefCapacity = fields.at(refCapFieldFlag);
 
             if (tmpRefCapacity == "Autosize") {
                 thisPLHP.referenceCapacity = DataSizing::AutoSize;
