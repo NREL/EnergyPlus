@@ -1910,531 +1910,509 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
             getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(cCurrentModuleObject)));
 
-        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject) > 0) {
-            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
-            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
-                // Cannot imagine how you would have numPLHP > 0 and yet the instances is empty
-                // this would indicate a major problem in the input processor, not a problem here
-                // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
-                ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
-                                "EIR PLFFHP: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-                errorsFound = true;                                                                        // LCOV_EXCL_LINE
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) continue;
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            auto const &thisObjectName = instance.key();
+            state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+
+            EIRFuelFiredHeatPump thisPLHP;
+            thisPLHP.EIRHPType = classToInput.thisType;
+            // A1-A3
+            thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+            std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_inlet_node_name").get<std::string>());
+            std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_outlet_node_name").get<std::string>());
+            // Implicit
+            // std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
+            thisPLHP.waterSource = false;
+            thisPLHP.airSource = false;
+            // A4
+            std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
+            std::string sourceSideOutletNodeName =
+                "DUMMY_CONDENSER"; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
+            srand(time(NULL));
+            for (int i = 1; i <= 3; ++i) {
+                sourceSideOutletNodeName += ("_" + std::to_string(rand()));
             }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
-                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
-                EIRFuelFiredHeatPump thisPLHP;
-                thisPLHP.EIRHPType = classToInput.thisType;
-                // A1-A3
-                thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_inlet_node_name").get<std::string>());
-                std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_outlet_node_name").get<std::string>());
-                // Implicit
-                // std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
-                thisPLHP.waterSource = false;
-                thisPLHP.airSource = false;
-                // A4
-                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
-                std::string sourceSideOutletNodeName =
-                    "DUMMY_CONDENSER"; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
-                srand(time(NULL));
-                for (int i = 1; i <= 3; ++i) {
-                    sourceSideOutletNodeName += ("_" + std::to_string(rand()));
+            // A5
+            if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) {
+                if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
+                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_cooling_heat_pump_name").get<std::string>());
                 }
-
-                // A5
-                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) {
-                    if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
-                        thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_cooling_heat_pump_name").get<std::string>());
-                    }
-                } else if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    if (fields.find("companion_heating_heat_pump_name") != fields.end()) { // optional field
-                        thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_heating_heat_pump_name").get<std::string>());
-                    }
+            } else if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                if (fields.find("companion_heating_heat_pump_name") != fields.end()) { // optional field
+                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_heating_heat_pump_name").get<std::string>());
                 }
+            }
 
-                // A6 Fuel Type
-                std::string tempRsrStr = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
-                thisPLHP.fuelType = DataGlobalConstants::AssignResourceTypeNum(tempRsrStr);
-                // Validate fuel type input
-                // Locals
-                static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
-                bool FuelTypeError(false);
-                UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(tempRsrStr, tempRsrStr, thisPLHP.fuelType, FuelTypeError);
-                if (FuelTypeError) {
-                    ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
-                    // ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, format("Invalid Fuel Type = {}", tempRsrStr));
-                    // Set to Electric to avoid errors when setting up output variables
-                    tempRsrStr = "NaturalGas";
-                    thisPLHP.fuelType = DataGlobalConstants::ResourceType::Natural_Gas;
-                    errorsFound = true;
-                    FuelTypeError = false;
-                }
+            // A6 Fuel Type
+            std::string tempRsrStr = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
+            thisPLHP.fuelType = DataGlobalConstants::AssignResourceTypeNum(tempRsrStr);
+            // Validate fuel type input
+            // Locals
+            static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(tempRsrStr, tempRsrStr, thisPLHP.fuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
+                // ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+                ShowContinueError(state, format("Invalid Fuel Type = {}", tempRsrStr));
+                // Set to Electric to avoid errors when setting up output variables
+                tempRsrStr = "NaturalGas";
+                thisPLHP.fuelType = DataGlobalConstants::ResourceType::Natural_Gas;
+                errorsFound = true;
+                FuelTypeError = false;
+            }
 
-                // A7 End use category
-                thisPLHP.endUseSubcat = UtilityRoutines::MakeUPPERCase(fields.at("end_use_subcategory").get<std::string>());
-                // 2022-05-13: default: empty?
-                if (thisPLHP.endUseSubcat == "") {
-                    thisPLHP.endUseSubcat = "Heat Pump Fuel Fired"; // or "General"?
-                }
+            // A7 End use category
+            thisPLHP.endUseSubcat = UtilityRoutines::MakeUPPERCase(fields.at("end_use_subcategory").get<std::string>());
+            // 2022-05-13: default: empty?
+            if (thisPLHP.endUseSubcat == "") {
+                thisPLHP.endUseSubcat = "Heat Pump Fuel Fired"; // or "General"?
+            }
 
-                // N1 Nominal heating capacity
-                std::string const refCapFieldFlag = (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating)
-                                                        ? "nominal_heating_capacity"
-                                                        : "nominal_cooling_capacity";
-                auto tmpRefCapacity = fields.at(refCapFieldFlag);
+            // N1 Nominal heating capacity
+            std::string const refCapFieldFlag = (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating)
+                                                    ? "nominal_heating_capacity"
+                                                    : "nominal_cooling_capacity";
+            auto tmpRefCapacity = fields.at(refCapFieldFlag);
 
-                if (tmpRefCapacity == "Autosize") {
-                    thisPLHP.referenceCapacity = DataSizing::AutoSize;
-                    thisPLHP.referenceCapacityWasAutoSized = true;
+            if (tmpRefCapacity == "Autosize") {
+                thisPLHP.referenceCapacity = DataSizing::AutoSize;
+                thisPLHP.referenceCapacityWasAutoSized = true;
+            } else {
+                thisPLHP.referenceCapacity = tmpRefCapacity.get<Real64>();
+            }
+
+            // N2 Nominal heating capacity
+            thisPLHP.referenceCOP = fields.at("nominal_cop").get<Real64>();
+            if (thisPLHP.referenceCOP <= 0.0) thisPLHP.referenceCOP = 1.0;
+
+            // N3 Design flow rate
+            auto tmpFlowRate = fields.at("design_flow_rate");
+            if (tmpFlowRate == "Autosize") {
+                thisPLHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
+                thisPLHP.loadSideDesignVolFlowRateWasAutoSized = true;
+            } else {
+                thisPLHP.loadSideDesignVolFlowRate = tmpFlowRate.get<Real64>();
+            }
+
+            // GAHP: Add a default source side flow rate, not from input
+            Real64 defDummyASDesVolFlowRate = 1.0;
+            thisPLHP.sourceSideDesignVolFlowRate = defDummyASDesVolFlowRate;
+
+            // auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
+            // if (tmpSourceFlowRate == "Autosize") {
+            //    thisPLHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
+            //    thisPLHP.sourceSideDesignVolFlowRateWasAutoSized = true;
+            //} else {
+            //    thisPLHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate.get<Real64>();
+            //}
+
+            // N4 Design supply temperature
+            auto tmpDesSupTemp = fields.at("design_supply_temperature");
+            if (tmpDesSupTemp == "Autosize") {
+                // sizing
+            } else {
+                thisPLHP.desSupplyTemp = tmpDesSupTemp.get<Real64>();
+            }
+
+            // N5 Design temperature lift
+            auto tmpDesTempLift = fields.at("design_temperature_lift");
+            if (tmpDesTempLift == "Autosize") {
+                // sizing
+            } else {
+                thisPLHP.desTempLift = tmpDesTempLift.get<Real64>();
+            }
+
+            // N6 Sizing factor
+            if (fields.find("sizing_factor") != fields.end()) {
+                thisPLHP.sizingFactor = fields.at("sizing_factor").get<Real64>();
+                if (thisPLHP.sizingFactor <= 0.0) thisPLHP.sizingFactor = 1.0;
+            } else {
+                Real64 defaultVal = 0.0;
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "sizing_factor", defaultVal)) {
+                    // this error condition would mean that someone broke the input dictionary, not their
+                    // input file.  I can't really unit test it so I'll leave it here as a severe error
+                    // but excluding it from coverage
+                    ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
+                                    "EIR FFHP: Sizing factor not entered and could not get default value"); // LCOV_EXCL_LINE
+                    errorsFound = true;                                                                     // LCOV_EXCL_LINE
                 } else {
-                    thisPLHP.referenceCapacity = tmpRefCapacity.get<Real64>();
+                    thisPLHP.sizingFactor = defaultVal;
                 }
+            }
 
-                // N2 Nominal heating capacity
-                thisPLHP.referenceCOP = fields.at("nominal_cop").get<Real64>();
-                if (thisPLHP.referenceCOP <= 0.0) thisPLHP.referenceCOP = 1.0;
+            // A8 flow mode
+            thisPLHP.flowMode = static_cast<DataPlant::FlowMode>(
+                getEnumerationValue(DataPlant::FlowModeNamesUC, UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>())));
 
-                // N3 Design flow rate
-                auto tmpFlowRate = fields.at("design_flow_rate");
-                if (tmpFlowRate == "Autosize") {
-                    thisPLHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
-                    thisPLHP.loadSideDesignVolFlowRateWasAutoSized = true;
+            if (thisPLHP.flowMode == DataPlant::FlowMode::Invalid) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, thisPLHP.name));
+                ShowContinueError(state, format("Invalid Flow Mode ={}", DataPlant::FlowModeNamesUC[static_cast<int>(thisPLHP.flowMode)]));
+                ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
+                ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
+                // assume variable flow if not specified
+                thisPLHP.flowMode = DataPlant::FlowMode::NotModulated; // default NotModulated
+            }
+
+            // if (fields.find("reference_coefficient_of_performance") != fields.end()) {
+            //    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance").get<Real64>();
+            //} else {
+            //    Real64 defaultVal = 0.0;
+            //    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+            //            state, cCurrentModuleObject, "reference_coefficient_of_performance", defaultVal)) {
+            //        // this error condition would mean that someone broke the input dictionary, not their
+            //        // input file.  I can't really unit test it so I'll leave it here as a severe error
+            //        // but excluding it from coverage
+            //        ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
+            //                        "EIR PLHP: Reference COP not entered and could not get default value"); // LCOV_EXCL_LINE
+            //        errorsFound = true;                                                                     // LCOV_EXCL_LINE
+            //    } else {
+            //        thisPLHP.referenceCOP = defaultVal;
+            //    }
+            //}
+
+            // A9 outdoor_air_temperature_curve_input_variable
+            std::string oaTempCurveInputVar =
+                UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
+            thisPLHP.oaTempCurveInputVar = static_cast<OATempCurveVar>(getEnumerationValue(OATempCurveVarNamesUC, oaTempCurveInputVar));
+            if (thisPLHP.oaTempCurveInputVar == OATempCurveVar::Invalid) {
+                thisPLHP.oaTempCurveInputVar = OATempCurveVar::DryBulb; // set to default
+                // 2022-08-08: better give a warning for resetting to default
+            }
+
+            // A10 water_temperature_curve_input_variable
+            std::string waterTempCurveInputVar =
+                UtilityRoutines::MakeUPPERCase(fields.at("water_temperature_curve_input_variable").get<std::string>());
+            thisPLHP.waterTempCurveInputVar = static_cast<WaterTempCurveVar>(getEnumerationValue(WaterTempCurveVarNamesUC, waterTempCurveInputVar));
+            if (thisPLHP.waterTempCurveInputVar == WaterTempCurveVar::Invalid) {
+                ShowWarningError(state,
+                                 format("Invalid Water Temperature Input Variable for EIR PLFFHP ({} name={})", cCurrentModuleObject, thisPLHP.name));
+                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling)
+                    thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringEvaporator;
+                else { // if(thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating)
+                    thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
+                }
+                ShowContinueError(
+                    state, format("The Input Variable is reset to: {}", WaterTempCurveVarNamesUC[static_cast<int>(thisPLHP.waterTempCurveInputVar)]));
+            }
+
+            // A11 normalized_capacity_function_of_temperature_curve_name
+            auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
+            thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
+            if (thisPLHP.capFuncTempCurveIndex == 0) {
+                ShowSevereError(
+                    state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, capFtName.get<std::string>()));
+                errorsFound = true;
+            }
+
+            // A12 fuel_energy_input_ratio_function_of_temperature_curve_name
+            auto &eirFtName = fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name");
+            thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
+            if (thisPLHP.capFuncTempCurveIndex == 0) {
+                ShowSevereError(
+                    state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFtName.get<std::string>()));
+                errorsFound = true;
+            }
+            // A13 fuel_energy_input_ratio_function_of_plr_curve_name
+            auto &eirFplrName = fields.at("fuel_energy_input_ratio_function_of_plr_curve_name");
+            thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
+            if (thisPLHP.capFuncTempCurveIndex == 0) {
+                ShowSevereError(
+                    state,
+                    format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName.get<std::string>()));
+                errorsFound = true;
+            }
+
+            // N7 min PLR
+            if (fields.find("minimum_part_load_ratio") != fields.end()) {
+                thisPLHP.minPLR = fields.at("minimum_part_load_ratio").get<Real64>();
+            } else {
+                Real64 defaultVal = 0.1;
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "minimum_part_load_ratio", defaultVal)) {
+                    // this error condition would mean that someone broke the input dictionary, not their
+                    // input file.  I can't really unit test it so I'll leave it here as a severe error
+                    // but excluding it from coverage
+                    ShowSevereError(state,                                                                   // LCOV_EXCL_LINE
+                                    "EIR PLFFHP: minimum PLR not entered and could not get default value."); // LCOV_EXCL_LINE
+                    errorsFound = true;                                                                      // LCOV_EXCL_LINE
                 } else {
-                    thisPLHP.loadSideDesignVolFlowRate = tmpFlowRate.get<Real64>();
+                    thisPLHP.minPLR = defaultVal;
                 }
+            }
 
-                // GAHP: Add a default source side flow rate, not from input
-                Real64 defDummyASDesVolFlowRate = 1.0;
-                thisPLHP.sourceSideDesignVolFlowRate = defDummyASDesVolFlowRate;
-
-                // auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
-                // if (tmpSourceFlowRate == "Autosize") {
-                //    thisPLHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
-                //    thisPLHP.sourceSideDesignVolFlowRateWasAutoSized = true;
-                //} else {
-                //    thisPLHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate.get<Real64>();
-                //}
-
-                // N4 Design supply temperature
-                auto tmpDesSupTemp = fields.at("design_supply_temperature");
-                if (tmpDesSupTemp == "Autosize") {
-                    // sizing
+            // N8 max PLR
+            if (fields.find("maximum_part_load_ratio") != fields.end()) {
+                thisPLHP.maxPLR = fields.at("maximum_part_load_ratio").get<Real64>();
+            } else {
+                Real64 defaultVal = 1.0;
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "maximum_part_load_ratio", defaultVal)) {
+                    // this error condition would mean that someone broke the input dictionary, not their
+                    // input file.  I can't really unit test it so I'll leave it here as a severe error
+                    // but excluding it from coverage
+                    ShowSevereError(state,                                                                   // LCOV_EXCL_LINE
+                                    "EIR PLFFHP: maximum PLR not entered and could not get default value."); // LCOV_EXCL_LINE
+                    errorsFound = true;                                                                      // LCOV_EXCL_LINE
                 } else {
-                    thisPLHP.desSupplyTemp = tmpDesSupTemp.get<Real64>();
+                    thisPLHP.maxPLR = defaultVal;
                 }
+            }
 
-                // N5 Design temperature lift
-                auto tmpDesTempLift = fields.at("design_temperature_lift");
-                if (tmpDesTempLift == "Autosize") {
-                    // sizing
-                } else {
-                    thisPLHP.desTempLift = tmpDesTempLift.get<Real64>();
-                }
+            // A14 fuel_energy_input_ratio_defrost_adjustment_curve_name
+            if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                thisPLHP.defrostEIRCurveIndex = 0;
+            } else {
 
-                // N6 Sizing factor
-                if (fields.find("sizing_factor") != fields.end()) {
-                    thisPLHP.sizingFactor = fields.at("sizing_factor").get<Real64>();
-                    if (thisPLHP.sizingFactor <= 0.0) thisPLHP.sizingFactor = 1.0;
-                } else {
-                    Real64 defaultVal = 0.0;
-                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "sizing_factor", defaultVal)) {
-                        // this error condition would mean that someone broke the input dictionary, not their
-                        // input file.  I can't really unit test it so I'll leave it here as a severe error
-                        // but excluding it from coverage
-                        ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
-                                        "EIR FFHP: Sizing factor not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                     // LCOV_EXCL_LINE
-                    } else {
-                        thisPLHP.sizingFactor = defaultVal;
-                    }
-                }
-
-                // A8 flow mode
-                thisPLHP.flowMode = static_cast<DataPlant::FlowMode>(
-                    getEnumerationValue(DataPlant::FlowModeNamesUC, UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>())));
-
-                if (thisPLHP.flowMode == DataPlant::FlowMode::Invalid) {
-                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, thisPLHP.name));
-                    ShowContinueError(state, format("Invalid Flow Mode ={}", DataPlant::FlowModeNamesUC[static_cast<int>(thisPLHP.flowMode)]));
-                    ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-                    ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
-                    // assume variable flow if not specified
-                    thisPLHP.flowMode = DataPlant::FlowMode::NotModulated; // default NotModulated
-                }
-
-                // if (fields.find("reference_coefficient_of_performance") != fields.end()) {
-                //    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance").get<Real64>();
-                //} else {
-                //    Real64 defaultVal = 0.0;
-                //    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                //            state, cCurrentModuleObject, "reference_coefficient_of_performance", defaultVal)) {
-                //        // this error condition would mean that someone broke the input dictionary, not their
-                //        // input file.  I can't really unit test it so I'll leave it here as a severe error
-                //        // but excluding it from coverage
-                //        ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
-                //                        "EIR PLHP: Reference COP not entered and could not get default value"); // LCOV_EXCL_LINE
-                //        errorsFound = true;                                                                     // LCOV_EXCL_LINE
-                //    } else {
-                //        thisPLHP.referenceCOP = defaultVal;
-                //    }
-                //}
-
-                // A9 outdoor_air_temperature_curve_input_variable
-                std::string oaTempCurveInputVar =
-                    UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
-                thisPLHP.oaTempCurveInputVar = static_cast<OATempCurveVar>(getEnumerationValue(OATempCurveVarNamesUC, oaTempCurveInputVar));
-                if (thisPLHP.oaTempCurveInputVar == OATempCurveVar::Invalid) {
-                    thisPLHP.oaTempCurveInputVar = OATempCurveVar::DryBulb; // set to default
-                    // 2022-08-08: better give a warning for resetting to default
-                }
-
-                // A10 water_temperature_curve_input_variable
-                std::string waterTempCurveInputVar =
-                    UtilityRoutines::MakeUPPERCase(fields.at("water_temperature_curve_input_variable").get<std::string>());
-                thisPLHP.waterTempCurveInputVar =
-                    static_cast<WaterTempCurveVar>(getEnumerationValue(WaterTempCurveVarNamesUC, waterTempCurveInputVar));
-                if (thisPLHP.waterTempCurveInputVar == WaterTempCurveVar::Invalid) {
-                    ShowWarningError(
-                        state, format("Invalid Water Temperature Input Variable for EIR PLFFHP ({} name={})", cCurrentModuleObject, thisPLHP.name));
-                    if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling)
-                        thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringEvaporator;
-                    else { // if(thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating)
-                        thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
-                    }
-                    ShowContinueError(
-                        state,
-                        format("The Input Variable is reset to: {}", WaterTempCurveVarNamesUC[static_cast<int>(thisPLHP.waterTempCurveInputVar)]));
-                }
-
-                // A11 normalized_capacity_function_of_temperature_curve_name
-                auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
-                thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
-                if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state,
-                        format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, capFtName.get<std::string>()));
-                    errorsFound = true;
-                }
-
-                // A12 fuel_energy_input_ratio_function_of_temperature_curve_name
-                auto &eirFtName = fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name");
-                thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
-                if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state,
-                        format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFtName.get<std::string>()));
-                    errorsFound = true;
-                }
-                // A13 fuel_energy_input_ratio_function_of_plr_curve_name
-                auto &eirFplrName = fields.at("fuel_energy_input_ratio_function_of_plr_curve_name");
-                thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
-                if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state,
-                        format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName.get<std::string>()));
-                    errorsFound = true;
-                }
-
-                // N7 min PLR
-                if (fields.find("minimum_part_load_ratio") != fields.end()) {
-                    thisPLHP.minPLR = fields.at("minimum_part_load_ratio").get<Real64>();
-                } else {
-                    Real64 defaultVal = 0.1;
-                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                            state, cCurrentModuleObject, "minimum_part_load_ratio", defaultVal)) {
-                        // this error condition would mean that someone broke the input dictionary, not their
-                        // input file.  I can't really unit test it so I'll leave it here as a severe error
-                        // but excluding it from coverage
-                        ShowSevereError(state,                                                                   // LCOV_EXCL_LINE
-                                        "EIR PLFFHP: minimum PLR not entered and could not get default value."); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                      // LCOV_EXCL_LINE
-                    } else {
-                        thisPLHP.minPLR = defaultVal;
-                    }
-                }
-
-                // N8 max PLR
-                if (fields.find("maximum_part_load_ratio") != fields.end()) {
-                    thisPLHP.maxPLR = fields.at("maximum_part_load_ratio").get<Real64>();
-                } else {
-                    Real64 defaultVal = 1.0;
-                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                            state, cCurrentModuleObject, "maximum_part_load_ratio", defaultVal)) {
-                        // this error condition would mean that someone broke the input dictionary, not their
-                        // input file.  I can't really unit test it so I'll leave it here as a severe error
-                        // but excluding it from coverage
-                        ShowSevereError(state,                                                                   // LCOV_EXCL_LINE
-                                        "EIR PLFFHP: maximum PLR not entered and could not get default value."); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                      // LCOV_EXCL_LINE
-                    } else {
-                        thisPLHP.maxPLR = defaultVal;
-                    }
-                }
-
-                // A14 fuel_energy_input_ratio_defrost_adjustment_curve_name
-                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    thisPLHP.defrostEIRCurveIndex = 0;
-                } else {
-
-                    if (fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name") != fields.end()) {
-                        auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
-                        thisPLHP.defrostEIRCurveIndex =
-                            Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
-                        if (thisPLHP.defrostEIRCurveIndex == 0) {
-                            ShowSevereError(state,
-                                            format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
-                                                   thisPLHP.name,
-                                                   eirDefrostName.get<std::string>()));
-                            errorsFound = true;
-                        }
-                    } else {
-                        thisPLHP.defrostEIRCurveIndex = 0;
-                    }
-                }
-                // A15 defrost_control_type
-                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    thisPLHP.defrostType = DefrostType::Invalid;
-                } else {
-                    std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
-                    thisPLHP.defrostType = static_cast<DefrostType>(getEnumerationValue(DefrostTypeNamesUC, defrostControlType));
-                    if (thisPLHP.defrostType == DefrostType::Invalid) {
-                        thisPLHP.defrostType = DefrostType::OnDemand; // set to default
-                        thisPLHP.defrostOpTimeFrac = 0.0;
-                        // 2022-08-08: better give a warning for resetting to default
-                    }
-                }
-                // N9 defrost_operation_time_fraction
-                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    thisPLHP.defrostOpTimeFrac = 0.0;
-                } else {
-                    if (fields.find("defrost_operation_time_fraction") != fields.end()) {
-                        thisPLHP.defrostOpTimeFrac = fields.at("defrost_operation_time_fraction").get<Real64>();
-                    } else {
-                        Real64 defaultVal = 0.0;
-                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                                state, cCurrentModuleObject, "defrost_operation_time_fraction", defaultVal)) {
-                            // this error condition would mean that someone broke the input dictionary, not their
-                            // input file.  I can't really unit test it so I'll leave it here as a severe error
-                            // but excluding it from coverage
-                            ShowSevereError(state,                                                                             // LCOV_EXCL_LINE
-                                            "EIR PLFFHP: defrost time fraction not entered and could not get default value."); // LCOV_EXCL_LINE
-                            errorsFound = true;                                                                                // LCOV_EXCL_LINE
-                        } else {
-                            thisPLHP.defrostOpTimeFrac = defaultVal;
-                        }
-                    }
-                }
-
-                // N10 Resistive Defrost Heater Capacity
-                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    thisPLHP.defrostResistiveHeaterCap = 0.0;
-                } else {
-                    if (fields.find("resistive_defrost_heater_capacity") != fields.end()) {
-                        thisPLHP.defrostResistiveHeaterCap = fields.at("resistive_defrost_heater_capacity").get<Real64>();
-                    } else {
-                        Real64 defaultVal = 0.0;
-                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                                state, cCurrentModuleObject, "resistive_defrost_heater_capacity", defaultVal)) {
-                            // this error condition would mean that someone broke the input dictionary, not their
-                            // input file.  I can't really unit test it so I'll leave it here as a severe error
-                            // but excluding it from coverage
-                            ShowSevereError(
-                                state,                                                                                         // LCOV_EXCL_LINE
-                                "EIR PLFFHP: Resistive Defrost Heater Capacity not entered and could not get default value."); // LCOV_EXCL_LINE
-                            errorsFound = true;                                                                                // LCOV_EXCL_LINE
-                        } else {
-                            thisPLHP.defrostResistiveHeaterCap = defaultVal;
-                        }
-                    }
-                }
-
-                // N11 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
-                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    thisPLHP.defrostMaxOADBT = -99.0;
-                } else {
-                    if (fields.find("maximum_outdoor_dry_bulb_temperature_for_defrost_operation") != fields.end()) {
-                        thisPLHP.defrostMaxOADBT = fields.at("maximum_outdoor_dry_bulb_temperature_for_defrost_operation").get<Real64>();
-                    } else {
-                        Real64 defaultVal = 5.0;
-                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                                state, cCurrentModuleObject, "maximum_outdoor_dry_bulb_temperature_for_defrost_operation", defaultVal)) {
-                            // this error condition would mean that someone broke the input dictionary, not their
-                            // input file.  I can't really unit test it so I'll leave it here as a severe error
-                            // but excluding it from coverage
-                            ShowSevereError(
-                                state,                                                                                            // LCOV_EXCL_LINE
-                                "EIR PLFFHP: max defrost operation OA temperature not entered and could not get default value."); // LCOV_EXCL_LINE
-                            errorsFound = true;                                                                                   // LCOV_EXCL_LINE
-                        } else {
-                            thisPLHP.defrostMaxOADBT = defaultVal;
-                        }
-                    }
-                }
-
-                // A16 cycling_ratio_factor_curve_name
-                if (fields.find("cycling_ratio_factor_curve_name") != fields.end()) {
-                    auto &cycRatioCurveName = fields.at("cycling_ratio_factor_curve_name");
-                    thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
-                    if (thisPLHP.cycRatioCurveIndex == 0) {
+                if (fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name") != fields.end()) {
+                    auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
+                    thisPLHP.defrostEIRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
+                    if (thisPLHP.defrostEIRCurveIndex == 0) {
                         ShowSevereError(state,
-                                        format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
+                                        format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
                                                thisPLHP.name,
-                                               cycRatioCurveName.get<std::string>()));
+                                               eirDefrostName.get<std::string>()));
                         errorsFound = true;
                     }
                 } else {
-                    thisPLHP.cycRatioCurveIndex = 0;
+                    thisPLHP.defrostEIRCurveIndex = 0;
                 }
-
-                // N12 nominal_auxiliary_electric_power
-                if (fields.find("nominal_auxiliary_electric_power") != fields.end()) {
-                    thisPLHP.nominalAuxElecPower = fields.at("nominal_auxiliary_electric_power").get<Real64>();
+            }
+            // A15 defrost_control_type
+            if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                thisPLHP.defrostType = DefrostType::Invalid;
+            } else {
+                std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
+                thisPLHP.defrostType = static_cast<DefrostType>(getEnumerationValue(DefrostTypeNamesUC, defrostControlType));
+                if (thisPLHP.defrostType == DefrostType::Invalid) {
+                    thisPLHP.defrostType = DefrostType::OnDemand; // set to default
+                    thisPLHP.defrostOpTimeFrac = 0.0;
+                    // 2022-08-08: better give a warning for resetting to default
+                }
+            }
+            // N9 defrost_operation_time_fraction
+            if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                thisPLHP.defrostOpTimeFrac = 0.0;
+            } else {
+                if (fields.find("defrost_operation_time_fraction") != fields.end()) {
+                    thisPLHP.defrostOpTimeFrac = fields.at("defrost_operation_time_fraction").get<Real64>();
                 } else {
                     Real64 defaultVal = 0.0;
                     if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                            state, cCurrentModuleObject, "nominal_auxiliary_electric_power", defaultVal)) {
+                            state, cCurrentModuleObject, "defrost_operation_time_fraction", defaultVal)) {
+                        // this error condition would mean that someone broke the input dictionary, not their
+                        // input file.  I can't really unit test it so I'll leave it here as a severe error
+                        // but excluding it from coverage
+                        ShowSevereError(state,                                                                             // LCOV_EXCL_LINE
+                                        "EIR PLFFHP: defrost time fraction not entered and could not get default value."); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                                // LCOV_EXCL_LINE
+                    } else {
+                        thisPLHP.defrostOpTimeFrac = defaultVal;
+                    }
+                }
+            }
+
+            // N10 Resistive Defrost Heater Capacity
+            if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                thisPLHP.defrostResistiveHeaterCap = 0.0;
+            } else {
+                if (fields.find("resistive_defrost_heater_capacity") != fields.end()) {
+                    thisPLHP.defrostResistiveHeaterCap = fields.at("resistive_defrost_heater_capacity").get<Real64>();
+                } else {
+                    Real64 defaultVal = 0.0;
+                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                            state, cCurrentModuleObject, "resistive_defrost_heater_capacity", defaultVal)) {
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
                         ShowSevereError(
-                            state,                                                                                        // LCOV_EXCL_LINE
-                            "EIR PLFFHP: nominal auxiliary electric power not entered and could not get default value."); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                               // LCOV_EXCL_LINE
+                            state,                                                                                         // LCOV_EXCL_LINE
+                            "EIR PLFFHP: Resistive Defrost Heater Capacity not entered and could not get default value."); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                                // LCOV_EXCL_LINE
                     } else {
-                        thisPLHP.nominalAuxElecPower = defaultVal;
+                        thisPLHP.defrostResistiveHeaterCap = defaultVal;
                     }
                 }
+            }
 
-                // A17 auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name
-                if (fields.find("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name") != fields.end()) {
-                    auto &auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
-                    thisPLHP.auxElecEIRFoTempCurveIndex =
-                        Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
-                    if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
-                        ShowSevereError(state,
-                                        format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
-                                               thisPLHP.name,
-                                               auxEIRFTName.get<std::string>()));
-                        errorsFound = true;
-                    }
+            // N11 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
+            if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                thisPLHP.defrostMaxOADBT = -99.0;
+            } else {
+                if (fields.find("maximum_outdoor_dry_bulb_temperature_for_defrost_operation") != fields.end()) {
+                    thisPLHP.defrostMaxOADBT = fields.at("maximum_outdoor_dry_bulb_temperature_for_defrost_operation").get<Real64>();
                 } else {
-                    thisPLHP.auxElecEIRFoTempCurveIndex = 0;
-                }
-
-                // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
-                if (fields.find("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name") != fields.end()) {
-                    auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
-                    thisPLHP.auxElecEIRFoPLRCurveIndex =
-                        Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
-                    if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
-                        ShowSevereError(state,
-                                        format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
-                                               thisPLHP.name,
-                                               auxEIRFPLRName.get<std::string>()));
-                        errorsFound = true;
-                    }
-                } else {
-                    thisPLHP.auxElecEIRFoPLRCurveIndex = 0;
-                }
-
-                // N13 standby_electric_power
-                if (fields.find("standby_electric_power") != fields.end()) {
-                    thisPLHP.standbyElecPower = fields.at("standby_electric_power").get<Real64>();
-                } else {
-                    Real64 defaultVal = 0.0;
+                    Real64 defaultVal = 5.0;
                     if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                            state, cCurrentModuleObject, "standby_electric_power", defaultVal)) {
+                            state, cCurrentModuleObject, "maximum_outdoor_dry_bulb_temperature_for_defrost_operation", defaultVal)) {
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                            // LCOV_EXCL_LINE
-                                        "EIR FFHP: standby electric power not entered and could not get default value."); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                               // LCOV_EXCL_LINE
+                        ShowSevereError(
+                            state,                                                                                            // LCOV_EXCL_LINE
+                            "EIR PLFFHP: max defrost operation OA temperature not entered and could not get default value."); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                                   // LCOV_EXCL_LINE
                     } else {
-                        thisPLHP.standbyElecPower = defaultVal;
+                        thisPLHP.defrostMaxOADBT = defaultVal;
                     }
                 }
+            }
 
-                bool nodeErrorsFound = false;
-                thisPLHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
-                                                                                   loadSideInletNodeName,
-                                                                                   nodeErrorsFound,
-                                                                                   objType,
-                                                                                   thisPLHP.name,
-                                                                                   DataLoopNode::NodeFluidType::Water,
-                                                                                   DataLoopNode::ConnectionType::Inlet,
-                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                   DataLoopNode::ObjectIsNotParent);
-                thisPLHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
-                                                                                    loadSideOutletNodeName,
-                                                                                    nodeErrorsFound,
-                                                                                    objType,
-                                                                                    thisPLHP.name,
-                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                    DataLoopNode::ConnectionType::Outlet,
-                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                    DataLoopNode::ObjectIsNotParent);
-                // DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
-                // DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Blank;
-                // DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Blank;
-                // if (condenserType == "WATERSOURCE") {
-                //     thisPLHP.waterSource = true;
-                //     condenserNodeType = DataLoopNode::NodeFluidType::Water;
-                //     condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
-                //     condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
-                // } else if (condenserType == "AIRSOURCE") {
-                thisPLHP.airSource = true; // this is always true, at least for now, for Fuel-Fired PlantLoop Heat Pump
-                DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
-                DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
-                //} else {
-                //    // Again, this should be protected by the input processor
-                //    ShowErrorMessage(state,
-                //                     format("Invalid heat pump condenser type (name={}; entered type: {}).",
-                //                            thisPLHP.name,   // LCOV_EXCL_LINE
-                //                            condenserType)); // LCOV_EXCL_LINE
-                //    errorsFound = true;                      // LCOV_EXCL_LINE
-                //}
-                thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
-                                                                                     sourceSideInletNodeName,
-                                                                                     nodeErrorsFound,
-                                                                                     objType,
-                                                                                     thisPLHP.name,
-                                                                                     condenserNodeType,
-                                                                                     condenserNodeConnectionType_Inlet,
-                                                                                     NodeInputManager::CompFluidStream::Secondary,
-                                                                                     DataLoopNode::ObjectIsNotParent);
-                thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
-                                                                                      sourceSideOutletNodeName,
-                                                                                      nodeErrorsFound,
-                                                                                      objType,
-                                                                                      thisPLHP.name,
-                                                                                      condenserNodeType,
-                                                                                      condenserNodeConnectionType_Outlet,
-                                                                                      NodeInputManager::CompFluidStream::Secondary,
-                                                                                      DataLoopNode::ObjectIsNotParent);
-                if (nodeErrorsFound) errorsFound = true;
-                BranchNodeConnections::TestCompSet(
-                    state, cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName, classToInput.nodesType);
-
-                // if (thisPLHP.waterSource) {
-                //    BranchNodeConnections::TestCompSet(
-                //        state, cCurrentModuleObject, thisPLHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");
-                //}
-
-                // store the worker functions that generalized the heating/cooling sides
-                thisPLHP.calcLoadOutletTemp = classToInput.calcLoadOutletTemp;
-                thisPLHP.calcQsource = classToInput.calcQsource;
-                thisPLHP.calcSourceOutletTemp = classToInput.calcSourceOutletTemp;
-
-                if (!errorsFound) {
-                    state.dataEIRFuelFiredHeatPump->heatPumps.push_back(thisPLHP);
+            // A16 cycling_ratio_factor_curve_name
+            if (fields.find("cycling_ratio_factor_curve_name") != fields.end()) {
+                auto &cycRatioCurveName = fields.at("cycling_ratio_factor_curve_name");
+                thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
+                if (thisPLHP.cycRatioCurveIndex == 0) {
+                    ShowSevereError(state,
+                                    format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
+                                           thisPLHP.name,
+                                           cycRatioCurveName.get<std::string>()));
+                    errorsFound = true;
                 }
+            } else {
+                thisPLHP.cycRatioCurveIndex = 0;
+            }
+
+            // N12 nominal_auxiliary_electric_power
+            if (fields.find("nominal_auxiliary_electric_power") != fields.end()) {
+                thisPLHP.nominalAuxElecPower = fields.at("nominal_auxiliary_electric_power").get<Real64>();
+            } else {
+                Real64 defaultVal = 0.0;
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                        state, cCurrentModuleObject, "nominal_auxiliary_electric_power", defaultVal)) {
+                    // this error condition would mean that someone broke the input dictionary, not their
+                    // input file.  I can't really unit test it so I'll leave it here as a severe error
+                    // but excluding it from coverage
+                    ShowSevereError(state,                                                                                        // LCOV_EXCL_LINE
+                                    "EIR PLFFHP: nominal auxiliary electric power not entered and could not get default value."); // LCOV_EXCL_LINE
+                    errorsFound = true;                                                                                           // LCOV_EXCL_LINE
+                } else {
+                    thisPLHP.nominalAuxElecPower = defaultVal;
+                }
+            }
+
+            // A17 auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name
+            if (fields.find("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name") != fields.end()) {
+                auto &auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
+                thisPLHP.auxElecEIRFoTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
+                if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
+                    ShowSevereError(
+                        state,
+                        format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}", thisPLHP.name, auxEIRFTName.get<std::string>()));
+                    errorsFound = true;
+                }
+            } else {
+                thisPLHP.auxElecEIRFoTempCurveIndex = 0;
+            }
+
+            // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
+            if (fields.find("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name") != fields.end()) {
+                auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
+                thisPLHP.auxElecEIRFoPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
+                if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
+                    ShowSevereError(
+                        state,
+                        format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}", thisPLHP.name, auxEIRFPLRName.get<std::string>()));
+                    errorsFound = true;
+                }
+            } else {
+                thisPLHP.auxElecEIRFoPLRCurveIndex = 0;
+            }
+
+            // N13 standby_electric_power
+            if (fields.find("standby_electric_power") != fields.end()) {
+                thisPLHP.standbyElecPower = fields.at("standby_electric_power").get<Real64>();
+            } else {
+                Real64 defaultVal = 0.0;
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "standby_electric_power", defaultVal)) {
+                    // this error condition would mean that someone broke the input dictionary, not their
+                    // input file.  I can't really unit test it so I'll leave it here as a severe error
+                    // but excluding it from coverage
+                    ShowSevereError(state,                                                                            // LCOV_EXCL_LINE
+                                    "EIR FFHP: standby electric power not entered and could not get default value."); // LCOV_EXCL_LINE
+                    errorsFound = true;                                                                               // LCOV_EXCL_LINE
+                } else {
+                    thisPLHP.standbyElecPower = defaultVal;
+                }
+            }
+
+            bool nodeErrorsFound = false;
+            thisPLHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
+                                                                               loadSideInletNodeName,
+                                                                               nodeErrorsFound,
+                                                                               objType,
+                                                                               thisPLHP.name,
+                                                                               DataLoopNode::NodeFluidType::Water,
+                                                                               DataLoopNode::ConnectionType::Inlet,
+                                                                               NodeInputManager::CompFluidStream::Primary,
+                                                                               DataLoopNode::ObjectIsNotParent);
+            thisPLHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
+                                                                                loadSideOutletNodeName,
+                                                                                nodeErrorsFound,
+                                                                                objType,
+                                                                                thisPLHP.name,
+                                                                                DataLoopNode::NodeFluidType::Water,
+                                                                                DataLoopNode::ConnectionType::Outlet,
+                                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                                DataLoopNode::ObjectIsNotParent);
+            // DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
+            // DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Blank;
+            // DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Blank;
+            // if (condenserType == "WATERSOURCE") {
+            //     thisPLHP.waterSource = true;
+            //     condenserNodeType = DataLoopNode::NodeFluidType::Water;
+            //     condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
+            //     condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
+            // } else if (condenserType == "AIRSOURCE") {
+            thisPLHP.airSource = true; // this is always true, at least for now, for Fuel-Fired PlantLoop Heat Pump
+            DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Air;
+            DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
+            DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+            //} else {
+            //    // Again, this should be protected by the input processor
+            //    ShowErrorMessage(state,
+            //                     format("Invalid heat pump condenser type (name={}; entered type: {}).",
+            //                            thisPLHP.name,   // LCOV_EXCL_LINE
+            //                            condenserType)); // LCOV_EXCL_LINE
+            //    errorsFound = true;                      // LCOV_EXCL_LINE
+            //}
+            thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
+                                                                                 sourceSideInletNodeName,
+                                                                                 nodeErrorsFound,
+                                                                                 objType,
+                                                                                 thisPLHP.name,
+                                                                                 condenserNodeType,
+                                                                                 condenserNodeConnectionType_Inlet,
+                                                                                 NodeInputManager::CompFluidStream::Secondary,
+                                                                                 DataLoopNode::ObjectIsNotParent);
+            thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
+                                                                                  sourceSideOutletNodeName,
+                                                                                  nodeErrorsFound,
+                                                                                  objType,
+                                                                                  thisPLHP.name,
+                                                                                  condenserNodeType,
+                                                                                  condenserNodeConnectionType_Outlet,
+                                                                                  NodeInputManager::CompFluidStream::Secondary,
+                                                                                  DataLoopNode::ObjectIsNotParent);
+            if (nodeErrorsFound) errorsFound = true;
+            BranchNodeConnections::TestCompSet(
+                state, cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName, classToInput.nodesType);
+
+            // if (thisPLHP.waterSource) {
+            //    BranchNodeConnections::TestCompSet(
+            //        state, cCurrentModuleObject, thisPLHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");
+            //}
+
+            // store the worker functions that generalized the heating/cooling sides
+            thisPLHP.calcLoadOutletTemp = classToInput.calcLoadOutletTemp;
+            thisPLHP.calcQsource = classToInput.calcQsource;
+            thisPLHP.calcSourceOutletTemp = classToInput.calcSourceOutletTemp;
+
+            if (!errorsFound) {
+                state.dataEIRFuelFiredHeatPump->heatPumps.push_back(thisPLHP);
             }
         }
     }
