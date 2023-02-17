@@ -15050,7 +15050,8 @@ namespace UnitarySystems {
                                                                     SuppHeatingCoilFlag,
                                                                     FanOpMode,
                                                                     PartLoadFrac); // QCoilReq= 0.0d0,  &
-                        if (!(this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingDesuperheater)) {
+                        if (!(this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingDesuperheater) &&
+                            (this->m_DesignSuppHeatingCapacity > 0)) {
                             PartLoadFrac = QCoilActual / this->m_DesignSuppHeatingCapacity;
                         } else {
                             if (QCoilActual > DataHVACGlobals::SmallLoad) {
@@ -15126,7 +15127,9 @@ namespace UnitarySystems {
                                                                         SuppHeatingCoilFlag,
                                                                         FanOpMode,
                                                                         PartLoadFrac);
-                            PartLoadFrac = QCoilActual / this->m_DesignSuppHeatingCapacity;
+                            if (this->m_DesignSuppHeatingCapacity > 0.0) {
+                                PartLoadFrac = QCoilActual / this->m_DesignSuppHeatingCapacity;
+                            }
                         } break;
                         case DataHVACGlobals::Coil_HeatingElectric_MultiStage: {
                             CycRatio = 1.0;
