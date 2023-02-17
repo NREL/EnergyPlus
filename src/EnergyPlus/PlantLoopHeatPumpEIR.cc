@@ -1932,7 +1932,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_inlet_node_name").get<std::string>());
             std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_outlet_node_name").get<std::string>());
             // Implicit
-            std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
+            // std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
+            thisPLHP.waterSource = false;
+            thisPLHP.airSource = false;
             // A4
             std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
             std::string sourceSideOutletNodeName =
@@ -2363,27 +2365,27 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                 DataLoopNode::ConnectionType::Outlet,
                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
-            DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
-            DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Blank;
-            DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Blank;
-            if (condenserType == "WATERSOURCE") {
-                thisPLHP.waterSource = true;
-                condenserNodeType = DataLoopNode::NodeFluidType::Water;
-                condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
-                condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
-            } else if (condenserType == "AIRSOURCE") {
-                thisPLHP.airSource = true;
-                condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
-                condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
-            } else {
-                // Again, this should be protected by the input processor
-                ShowErrorMessage(state,
-                                 format("Invalid heat pump condenser type (name={}; entered type: {}).",
-                                        thisPLHP.name,   // LCOV_EXCL_LINE
-                                        condenserType)); // LCOV_EXCL_LINE
-                errorsFound = true;                      // LCOV_EXCL_LINE
-            }
+            // DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
+            // DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Blank;
+            // DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Blank;
+            // if (condenserType == "WATERSOURCE") {
+            //     thisPLHP.waterSource = true;
+            //     condenserNodeType = DataLoopNode::NodeFluidType::Water;
+            //     condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
+            //     condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
+            // } else if (condenserType == "AIRSOURCE") {
+            thisPLHP.airSource = true; // this is always true, at least for now, for Fuel-Fired PlantLoop Heat Pump
+            DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Air;
+            DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
+            DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+            //} else {
+            //    // Again, this should be protected by the input processor
+            //    ShowErrorMessage(state,
+            //                     format("Invalid heat pump condenser type (name={}; entered type: {}).",
+            //                            thisPLHP.name,   // LCOV_EXCL_LINE
+            //                            condenserType)); // LCOV_EXCL_LINE
+            //    errorsFound = true;                      // LCOV_EXCL_LINE
+            //}
             thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                  sourceSideInletNodeName,
                                                                                  nodeErrorsFound,
