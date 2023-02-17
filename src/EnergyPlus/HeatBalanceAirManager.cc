@@ -278,7 +278,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     // This subroutine gets the input for the "simple" air flow model.
 
     // Using/Aliasing
-    using General::CheckCreatedZoneItemName;
     using ScheduleManager::CheckScheduleValueMinMax;
     using ScheduleManager::GetScheduleIndex;
     using ScheduleManager::GetScheduleMinValue;

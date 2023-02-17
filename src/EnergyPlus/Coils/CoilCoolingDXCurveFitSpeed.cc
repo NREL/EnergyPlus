@@ -82,7 +82,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     errorsFound |= this->processCurve(state,
                                       input_data.total_cooling_capacity_function_of_temperature_curve_name,
                                       this->indexCapFT,
-                                      {1, 2},
+                                      {1, 2}, // MULTIPLECURVEDIMS
                                       routineName,
                                       "Total Cooling Capacity Function of Temperature Curve Name",
                                       RatedInletWetBulbTemp,
@@ -99,7 +99,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     errorsFound |= this->processCurve(state,
                                       input_data.energy_input_ratio_function_of_temperature_curve_name,
                                       this->indexEIRFT,
-                                      {1, 2},
+                                      {1, 2}, // MULTIPLECURVEDIMS
                                       routineName,
                                       "Energy Input Ratio Function of Temperature Curve Name",
                                       RatedInletWetBulbTemp,
@@ -184,7 +184,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
             ShowContinueError(state, "..." + fieldName + "=\"" + curveName + "\" has out of range values.");
             ShowContinueError(state, format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
             ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-            Curve::SetCurveOutputMinMaxValues(state, this->indexPLRFPLF, errorsFound, 0.7, _);
+            Curve::SetCurveOutputMinValue(state, this->indexPLRFPLF, errorsFound, 0.7);
         }
 
         if (MaxCurveVal > 1.0) {
@@ -192,7 +192,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
             ShowContinueError(state, "..." + fieldName + " = " + curveName + " has out of range value.");
             ShowContinueError(state, format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
             ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-            Curve::SetCurveOutputMinMaxValues(state, this->indexPLRFPLF, errorsFound, _, 1.0);
+            Curve::SetCurveOutputMaxValue(state, this->indexPLRFPLF, errorsFound, 1.0);
         }
     }
 
@@ -229,8 +229,13 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                                     this->name,           // Object Name
                                                     fieldName);           // Field Name
             if (!errorFound) {
-                Curve::checkCurveIsNormalizedToOne(
-                    state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2);
+                if (Var2.present()) {
+                    Curve::checkCurveIsNormalizedToOne(
+                        state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2);
+                } else {
+                    Curve::checkCurveIsNormalizedToOne(
+                        state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1);
+                }
             }
             return errorFound;
         }
@@ -473,7 +478,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
         Real64 TotCapTempModFac = 1.0;
         if (indexCapFT > 0) {
-            if (state.dataCurveManager->PerfCurve(indexCapFT).numDims == 2) {
+            if (state.dataCurveManager->PerfCurve(indexCapFT)->numDims == 2) {
                 TotCapTempModFac = Curve::CurveValue(state, indexCapFT, inletWetBulb, condInletTemp);
             } else {
                 TotCapTempModFac = Curve::CurveValue(state, indexCapFT, condInletTemp);
@@ -540,7 +545,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
     Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
     if (indexEIRFT > 0) {
-        if (state.dataCurveManager->PerfCurve(indexEIRFT).numDims == 2) {
+        if (state.dataCurveManager->PerfCurve(indexEIRFT)->numDims == 2) {
             EIRTempModFac = Curve::CurveValue(state, indexEIRFT, inletWetBulb, condInletTemp);
         } else {
             EIRTempModFac = Curve::CurveValue(state, indexEIRFT, condInletTemp);

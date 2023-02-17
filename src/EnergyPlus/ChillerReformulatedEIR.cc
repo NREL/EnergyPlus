@@ -307,10 +307,10 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
 
         // Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift
         if (UtilityRoutines::SameString(PartLoadCurveType, "LeavingCondenserWaterTemperature") &&
-            state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex).numDims == 2) {
+            state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex)->numDims == 2) {
             thisChiller.PartLoadCurveType = PLR::LeavingCondenserWaterTemperature;
         } else if (UtilityRoutines::SameString(PartLoadCurveType, "Lift") &&
-                   state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex).numDims == 3) {
+                   state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex)->numDims == 3) {
             thisChiller.PartLoadCurveType = PLR::Lift;
         } else {
             ShowSevereError(state,
@@ -1430,7 +1430,8 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
     std::string equipName; // Name of chiller
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         if (this->MySizeFlag) {
-            Real64 IPLV = 0.0;
+            Real64 IPLVSI = 0.0;
+            Real64 IPLVIP = 0.0;
             StandardRatings::CalcChillerIPLV(state,
                                              this->Name,
                                              DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR,
@@ -1441,7 +1442,8 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                                              this->ChillerEIRFTIndex,
                                              this->ChillerEIRFPLRIndex,
                                              this->MinUnloadRat,
-                                             IPLV,
+                                             IPLVSI,
+                                             IPLVIP,
                                              this->CondVolFlowRate,
                                              this->CDPlantLoc.loopNum,
                                              this->CompPowerToCondenserFrac);
