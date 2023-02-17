@@ -2102,7 +2102,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             }
 
             // A11 normalized_capacity_function_of_temperature_curve_name
-            auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
+            auto capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
             thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
             if (thisPLHP.capFuncTempCurveIndex == 0) {
                 ShowSevereError(
@@ -2111,7 +2111,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             }
 
             // A12 fuel_energy_input_ratio_function_of_temperature_curve_name
-            auto &eirFtName = fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name");
+            auto eirFtName = fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name");
             thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
             if (thisPLHP.capFuncTempCurveIndex == 0) {
                 ShowSevereError(
@@ -2119,7 +2119,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 errorsFound = true;
             }
             // A13 fuel_energy_input_ratio_function_of_plr_curve_name
-            auto &eirFplrName = fields.at("fuel_energy_input_ratio_function_of_plr_curve_name");
+            auto eirFplrName = fields.at("fuel_energy_input_ratio_function_of_plr_curve_name");
             thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
             if (thisPLHP.capFuncTempCurveIndex == 0) {
                 ShowSevereError(
@@ -2263,7 +2263,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A16 cycling_ratio_factor_curve_name
             if (fields.find("cycling_ratio_factor_curve_name") != fields.end()) {
-                auto &cycRatioCurveName = fields.at("cycling_ratio_factor_curve_name");
+                auto cycRatioCurveName = fields.at("cycling_ratio_factor_curve_name");
                 thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
                 if (thisPLHP.cycRatioCurveIndex == 0) {
                     ShowSevereError(state,
@@ -2296,7 +2296,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A17 auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name
             if (fields.find("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name") != fields.end()) {
-                auto &auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
+                auto auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
                 thisPLHP.auxElecEIRFoTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
                 if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
                     ShowSevereError(
@@ -2310,7 +2310,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
             if (fields.find("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name") != fields.end()) {
-                auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
+                auto auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
                 thisPLHP.auxElecEIRFoPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
                 if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
                     ShowSevereError(
