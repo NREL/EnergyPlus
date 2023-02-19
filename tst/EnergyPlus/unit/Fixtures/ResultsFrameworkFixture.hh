@@ -102,7 +102,6 @@ protected:
     {
         return getCSVOutputs(state, data, reportingFrequency, resultsFramework.outputVariables);
     }
-
 };
 
 } // namespace EnergyPlus

@@ -233,8 +233,8 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute
     state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute
     state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute
 
