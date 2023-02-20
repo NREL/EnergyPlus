@@ -137,6 +137,8 @@ public:
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
+    const json &getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName);
+
     void getObjectItem(EnergyPlusData &state,
                        std::string_view Object,
                        int const Number,
@@ -326,8 +328,12 @@ public:
     json epJSON;
 
 private:
+    // Maps OBJECTTYPE to ObjectType (example entry: {"ZONEHVAC:EQUIPMENTLIST", "ZoneHVAC:EquipmentList"})
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
+    // Maps ObjectType to ObjectCache (json::const_iterator const &schemaIterator, std::vector<json::const_iterator> const &inputObjectIterators)
     UnorderedObjectCacheMap objectCacheMap;
+
+    // ObjectType to vector of ObjectName
     UnusedObjectSet unusedInputs;
     char s[129] = {0};
 
