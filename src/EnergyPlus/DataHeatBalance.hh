@@ -1988,6 +1988,7 @@ struct HeatBalanceData : BaseGlobalStruct
     bool AnyKiva = false;                // Kiva used
     bool AnyAirBoundary = false;         // Construction:AirBoundary used (implies grouped solar and radiant is present)
     bool AnyBSDF = false;                // True if any WindowModelType == WindowModel:: BSDF
+    bool AnyVariableAbsorptance = false; // true if any MaterialProperty:VariableAbsorptance is present
     int MaxNumberOfWarmupDays = 25;      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays = 1;       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor = 1.0;      // Relaxation factor, for looping across all the surfaces.
