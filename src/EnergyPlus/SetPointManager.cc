@@ -7762,41 +7762,9 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     // using one curve to determine the optimum condenser entering water temperature for a given timestep
     // and two other curves to place boundary conditions on the optimal setpoint value.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-    using Curve::CurveValue;
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace DataPlant;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //////////// hoisted into namespace ////////////////////////////////////////////////
-    // static Real64 Dsn_EntCondTemp( 0.0 ); // The chiller design entering condenser temp, C; e.g. 29.44C {85F} // DCESPMDsn_EntCondTemp
-    // static Real64 Dsn_MinCondSetpt( 0.0 ); // The design minimum condenser water temp, C; e.g. 18.33C {65 F} // DCESPMDsn_MinCondSetpt
-    // static Real64 Cur_MinLiftTD( 0.0 ); // Minimum lift (TCond entering - Tevap leaving) TD this timestep // DCESPMCur_MinLiftTD
-    // static Real64 Design_Load_Sum( 0.0 ); // the design load of the chillers, W // DCESPMDesign_Load_Sum
-    // static Real64 Actual_Load_Sum( 0.0 ); // the actual load of the chillers, W // DCESPMActual_Load_Sum
-    // static Real64 Weighted_Actual_Load_Sum( 0.0 ); // Intermediate weighted value of actual load on plant, W // DCESPMWeighted_Actual_Load_Sum
-    // static Real64 Weighted_Design_Load_Sum( 0.0 ); // Intermediate weighted value of design load on plant, W // DCESPMWeighted_Design_Load_Sum
-    // static Real64 Weighted_Ratio( 0.0 ); // Weighted part load ratio of chillers // DCESPMWeighted_Ratio
-    // static Real64 Min_DesignWB( 0.0 ); // Minimum design twr wet bulb allowed, C // DCESPMMin_DesignWB
-    // static Real64 Min_ActualWb( 0.0 ); // Minimum actual oa wet bulb allowed, C // DCESPMMin_ActualWb
-    // static Real64 Opt_CondEntTemp( 0.0 ); // Optimized Condenser entering water temperature setpoint this timestep, C // DCESPMOpt_CondEntTemp
-    // static Real64 DesignClgCapacity_Watts( 0.0 ); // DCESPMDesignClgCapacity_Watts
-    // static Real64 CurrentLoad_Watts( 0.0 ); // DCESPMCurrentLoad_Watts
-    // static Real64 CondInletTemp( 0.0 ); // Condenser water inlet temperature (C) // DCESPMCondInletTemp
-    // static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C) // DCESPMEvapOutletTemp
-    ////////////////////////////////////////////////////////////////////////////////////
     Real64 NormDsnCondFlow(0.0);        // Normalized design condenser flow for cooling towers, m3/s per watt
     Real64 Twr_DesignWB(0.0);           // The cooling tower design inlet air wet bulb temperature, C
     Real64 Dsn_CondMinThisChiller(0.0); // Design Minimum Condenser Entering for current chillers this timestep
@@ -7935,28 +7903,28 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
         // In this section the optimal temperature is computed along with the minimum
         // design wet bulb temp and the minimum actual wet bulb temp.
         // Min_DesignWB = ACoef1 + ACoef2*OaWb + ACoef3*WPLR + ACoef4*TwrDsnWB + ACoef5*NF
-        state.dataSetPointManager->DCESPMMin_DesignWB = CurveValue(state,
-                                                                   this->MinTwrWbCurve,
-                                                                   state.dataEnvrn->OutWetBulbTemp,
-                                                                   state.dataSetPointManager->DCESPMWeighted_Ratio,
-                                                                   Twr_DesignWB,
-                                                                   NormDsnCondFlow);
+        state.dataSetPointManager->DCESPMMin_DesignWB = EnergyPlus::Curve::CurveValue(state,
+                                                                                      this->MinTwrWbCurve,
+                                                                                      state.dataEnvrn->OutWetBulbTemp,
+                                                                                      state.dataSetPointManager->DCESPMWeighted_Ratio,
+                                                                                      Twr_DesignWB,
+                                                                                      NormDsnCondFlow);
 
         // Min_ActualWb = BCoef1 + BCoef2*MinDsnWB + BCoef3*WPLR + BCoef4*TwrDsnWB + BCoef5*NF
-        state.dataSetPointManager->DCESPMMin_ActualWb = CurveValue(state,
-                                                                   this->MinOaWbCurve,
-                                                                   state.dataSetPointManager->DCESPMMin_DesignWB,
-                                                                   state.dataSetPointManager->DCESPMWeighted_Ratio,
-                                                                   Twr_DesignWB,
-                                                                   NormDsnCondFlow);
+        state.dataSetPointManager->DCESPMMin_ActualWb = EnergyPlus::Curve::CurveValue(state,
+                                                                                      this->MinOaWbCurve,
+                                                                                      state.dataSetPointManager->DCESPMMin_DesignWB,
+                                                                                      state.dataSetPointManager->DCESPMWeighted_Ratio,
+                                                                                      Twr_DesignWB,
+                                                                                      NormDsnCondFlow);
 
         // Opt_CondEntTemp = CCoef1 + CCoef2*OaWb + CCoef3*WPLR + CCoef4*TwrDsnWB + CCoef5*NF
-        state.dataSetPointManager->DCESPMOpt_CondEntTemp = CurveValue(state,
-                                                                      this->OptCondEntCurve,
-                                                                      state.dataEnvrn->OutWetBulbTemp,
-                                                                      state.dataSetPointManager->DCESPMWeighted_Ratio,
-                                                                      Twr_DesignWB,
-                                                                      NormDsnCondFlow);
+        state.dataSetPointManager->DCESPMOpt_CondEntTemp = EnergyPlus::Curve::CurveValue(state,
+                                                                                         this->OptCondEntCurve,
+                                                                                         state.dataEnvrn->OutWetBulbTemp,
+                                                                                         state.dataSetPointManager->DCESPMWeighted_Ratio,
+                                                                                         Twr_DesignWB,
+                                                                                         NormDsnCondFlow);
 
         // ***** Calculate (Cond ent - Evap lvg) Section *****
         // In this section we find the worst case of (Cond ent - Evap lvg) for the

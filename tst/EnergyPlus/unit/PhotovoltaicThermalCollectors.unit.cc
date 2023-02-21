@@ -447,7 +447,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     thisBIPVT.OperatingMode = PhotovoltaicThermalCollectors::PVTMode::Heating;
     tempSetPoint = 24.0;
     state->dataLoopNodes->Node(InletNode).Temp = -20.0;
-    state->dataEnvrn->SkyTemp = -20.0; 
+    state->dataEnvrn->SkyTemp = -20.0;
     state->dataEnvrn->OutDryBulbTemp = -20.0;
     state->dataHeatBalSurf->SurfTempOut(thisBIPVT.SurfNum) = -18.0;
     thisBIPVT.MassFlowRate = 1.0;
@@ -469,7 +469,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     state->dataLoopNodes->Node(InletNode).Temp = 10.0;                              // inlet fluid temperature (DegC)
     state->dataEnvrn->OutDryBulbTemp = 10.0;                                        // ambient temperature (DegC)
     state->dataHeatBalSurf->SurfTempOut(thisBIPVT.SurfNum) = 12.0;                  // temperature of bldg surface (DegC)
-    thisBIPVT.MassFlowRate = 1.0;                                                  // fluid mass flow rate (kg/s)
+    thisBIPVT.MassFlowRate = 1.0;                                                   // fluid mass flow rate (kg/s)
     state->dataHeatBal->SurfQRadSWOutIncidentBeam(thisBIPVT.SurfNum) = 500.0;       // Exterior beam solar incident on surface (W/m2)
     state->dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(thisBIPVT.SurfNum) = 100.0; // Exterior sky diffuse solar incident on surface (W/m2)
     state->dataHeatBal->SurfQRadSWOutIncident(thisBIPVT.SurfNum) = 568.7;           // total incident solar radiation
