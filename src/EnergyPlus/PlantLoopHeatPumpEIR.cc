@@ -1543,13 +1543,14 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
     Real64 partLoadRatio = 0.0;
     if (availableCapacity > 0) {
-        partLoadRatio = max(0.0, min(std::abs(FFHPloadSideLoad) / availableCapacity, 1.0));
+        partLoadRatio = std::clamp(
+            std::abs(FFHPloadSideLoad) / availableCapacity, 0.0, 1.0); // max(0.0, min(std::abs(FFHPloadSideLoad) / availableCapacity, 1.0));
     }
 
     // evaluate the actual current operating load side heat transfer rate
 
     // this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
-    this->loadSideHeatTransfer = availableCapacity * (partLoadRatio >= this->minPLR ? partLoadRatio : 0.0);
+    this->loadSideHeatTransfer = availableCapacity * partLoadRatio; // (partLoadRatio >= this->minPLR ? partLoadRatio : 0.0);
     this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
 
     // calculate load side outlet conditions
@@ -1827,7 +1828,7 @@ PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::
         }
     }
 
-    ShowFatalError(state, format("EIR Fuel-Fired Heat Pump factory: Error getting inputs for PLFFHP named: {}", hp_name));
+    ShowFatalError(state, format("EIR Fuel-Fired Heat Pump factory: Error getting inputs for PLFFHP named: {}.", hp_name));
     return nullptr; // LCOV_EXCL_LINE
 }
 
@@ -1938,7 +1939,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
             // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
             srand(time(NULL));
-            std::string sourceSideOutletNodeName = format("DUMMY_CONDENSER_{}_{}", std::to_string(rand()), std::to_string(rand()));
+            std::string sourceSideOutletNodeName = format("DUMMY_CONDENSER_{}_{}", rand(), rand());
 
             // A5
             auto compCoilFound = fields.find(companionCoilFieldTag);
