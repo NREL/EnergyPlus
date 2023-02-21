@@ -928,6 +928,7 @@ const json &InputProcessor::getJSONObjectItem(EnergyPlusData &state, std::string
     }
 
     ShowFatalError(state, format(R"(Name "{}" requested was not found in input for ObjectType "{}")", objectInfo.objectType, objectInfo.objectName));
+    throw;
 }
 
 void InputProcessor::getObjectItem(EnergyPlusData &state,
