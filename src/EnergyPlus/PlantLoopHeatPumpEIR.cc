@@ -1439,7 +1439,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 }
 
                 if (evapDeltaTemp != 0) {
-                    this->loadSideMassFlowRate = max(0.0, (std::abs(currentLoad) / CpLoad / evapDeltaTemp));
+                    this->loadSideMassFlowRate = max(0.0, (std::abs(currentLoad) / (CpLoad * evapDeltaTemp)));
                     // Check to see if the Maximum is exceeded, if so set to maximum
                     this->loadSideMassFlowRate = min(this->loadSideDesignMassFlowRate, this->loadSideMassFlowRate);
                     // Use PlantUtilities::SetComponentFlowRate to decide actual flow
@@ -1513,8 +1513,6 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         waterTempforCurve = this->loadSideOutletTemp;
     }
 
-    // 2022-05-17: should the following curve evaluation based on the oaVariable and waterVariable choice:?
-    // 2022-05-17: Maybe how this is set up is related to the flow mode?
     // evaluate capacity modifier curve and determine load side heat transfer
     Real64 capacityModifierFuncTemp =
         // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
@@ -1585,7 +1583,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         eirModifierFuncTemp = 0.0;
     }
 
-    Real64 miniPLR_mod = this->minPLR; // 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
+    Real64 miniPLR_mod = this->minPLR;
     Real64 PLFf = max(miniPLR_mod, partLoadRatio);
 
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, PLFf);
@@ -1648,11 +1646,11 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     constexpr Real64 CRF_Slope = 0.4167;
     constexpr Real64 CRF_Intercept = 0.5833;
-    Real64 CRF = CRF_Slope * CR + CRF_Intercept; // 2022-05-31: this is the fixed eqn in the paper, but with the curve input it could be any curve
+    Real64 CRF = CRF_Slope * CR + CRF_Intercept; // Use the the fixed eqn in the paper as the default curve (or maybe choose constant 1 as default)
     if (this->cycRatioCurveIndex > 0) {
         CRF = Curve::CurveValue(state, this->cycRatioCurveIndex, CR);
     }
-    if (CRF <= DataGlobalConstants::rTinyValue) CRF = CRF_Intercept; // 2022-06-02: what could a proper default for too tiny CRF?
+    if (CRF <= DataGlobalConstants::rTinyValue) CRF = CRF_Intercept; // What could a proper default for too tiny CRF?
 
     // aux elec
     Real64 eirAuxElecFuncTemp = 0.0;
@@ -1709,7 +1707,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         this->fuelRate = 0.0;
         this->powerUsage = 0.0;
     } else {
-        this->fuelRate = this->loadSideHeatTransfer / this->referenceCOP * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
+        this->fuelRate = this->loadSideHeatTransfer / (this->referenceCOP * CRF) * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost;
 
         this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR;
         if (this->defrostType == DefrostType::Timed) {
@@ -1734,7 +1732,6 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
-    // 2022-05-18: The following line needs a protection on setting this->sourceSideMassFlowRate to a safe value for GAHP
     // Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate) * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
@@ -1807,10 +1804,10 @@ void EIRFuelFiredHeatPump::resetReportingVariables()
     this->loadSideHeatTransfer = 0.0;
     this->loadSideEnergy = 0.0;
     this->loadSideOutletTemp = this->loadSideInletTemp;
-    this->powerUsage = 0.0;
-    this->powerEnergy = 0.0;
     this->fuelRate = 0.0;
     this->fuelEnergy = 0.0;
+    this->powerUsage = 0.0;
+    this->powerEnergy = 0.0;
     this->sourceSideHeatTransfer = 0.0;
     this->sourceSideOutletTemp = this->sourceSideInletTemp;
     this->sourceSideEnergy = 0.0;
