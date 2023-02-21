@@ -83,6 +83,8 @@ namespace StandardRatings {
         Num,
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(DefrostStrat::Num)> DefrostStratUC = {"REVERSECYCLE", "RESISTIVE"};
+
     // Defrost control  (heat pump only)
     enum class HPdefrostControl : int
     {
@@ -91,6 +93,8 @@ namespace StandardRatings {
         OnDemand, // defrost cycle occurs only when required
         Num
     };
+
+    static constexpr std::array<std::string_view, static_cast<int>(HPdefrostControl::Num)> HPdefrostControlUC = {"TIMED", "ONDEMAND"};
 
     enum class AhriChillerStd
     {
