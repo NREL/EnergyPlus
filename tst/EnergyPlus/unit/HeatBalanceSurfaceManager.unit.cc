@@ -54,6 +54,7 @@
 #include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -8415,6 +8416,130 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     EXPECT_DOUBLE_EQ(0.2, Surface_Living_East.ViewFactorGroundIR);
     EXPECT_DOUBLE_EQ(0.3, Surface_Living_South.ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.3, Surface_Living_South.ViewFactorGroundIR);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestUpdateVariableAbsorptances)
+{
+    std::string const idf_objects = delimited_string({
+        "Table:IndependentVariable,",
+        "THERMAL_ABSORPTANCE_TABLE_INDEPENDENTVARIABLE,  !- Name",
+        "Linear,                  !- Interpolation Method",
+        "Constant,                !- Extrapolation Method",
+        "0.0,                     !- Minimum Value",
+        "100.0,                   !- Maximum Value",
+        ",                        !- Normalization Reference Value",
+        "Temperature,             !- Unit Type",
+        ",                        !- External File Name",
+        ",                        !- External File Column Number",
+        ",                        !- External File Starting Row Number",
+        "0.0,                     !- Value 1",
+        "20.0,                    !- Value 2",
+        "20.1,                    !- Value 3",
+        "50.0;                    !- Value 4",
+
+        "Table:IndependentVariableList,",
+        "THERMAL_ABSORPTANCE_TABLE_INDEPENDENTVARIABLELIST,  !- Name",
+        "THERMAL_ABSORPTANCE_TABLE_INDEPENDENTVARIABLE;      !- Independent Variable 1 Name",
+
+        "Table:Lookup,",
+        "THERMAL_ABSORPTANCE_TABLE,  !- Name",
+        "THERMAL_ABSORPTANCE_TABLE_INDEPENDENTVARIABLELIST,  !- Independent Variable List Name",
+        ",                        !- Normalization Method",
+        ",                        !- Normalization Divisor",
+        "0.0,                     !- Minimum Output",
+        ",                        !- Maximum Output",
+        "Dimensionless,           !- Output Unit Type",
+        ",                        !- External File Name",
+        ",                        !- External File Column Number",
+        ",                        !- External File Starting Row Number",
+        "0.10,                    !- Output Value 1",
+        "0.10,                    !- Output Value 2",
+        "0.30,                    !- Output Value 3",
+        "0.30;                    !- Output Value 4",
+
+        "Curve:Linear,",
+        "SOLAR_ABSORPTANCE_CURVE,    !- Name",
+        "0.2,                     !- Coefficient1 Constant",
+        "0.01,                   !- Coefficient2 x",
+        "-40.0,                   !- Minimum Value of x",
+        "60.0;                    !- Maximum Value of x",
+        "ScheduleTypeLimits,",
+        "  Fraction,                 !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  1,                        !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  Dimensionless;            !- Unit Type",
+
+        "Schedule:Constant,",
+        "    THERMAL_ABS_SCH,      !- Name",
+        "    Fraction,                   !- Schedule Type Limits Name",
+        "    0.9;                       !- Hourly Value",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    Curve::GetCurveInput(*state);
+    EXPECT_EQ(state->dataCurveManager->PerfCurve(1)->Name, "SOLAR_ABSORPTANCE_CURVE");
+    EXPECT_EQ(state->dataCurveManager->PerfCurve(2)->Name, "THERMAL_ABSORPTANCE_TABLE");
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
+    state->dataSurface->Surface.allocate(3);
+    state->dataSurface->Surface(1).Name = "SURF_1_WALL_1";
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Name = "SURF_2_WALL_1";
+    state->dataSurface->Surface(2).Construction = 1;
+    state->dataSurface->Surface(3).Name = "SURF_1_WALL_2";
+    state->dataSurface->Surface(3).Construction = 2;
+    state->dataConstruction->Construct.allocate(2);
+    state->dataConstruction->Construct(1).Name = "CONSTRUCT_WALL_1";
+    state->dataConstruction->Construct(1).LayerPoint.allocate(1);
+    state->dataConstruction->Construct(1).LayerPoint(1) = 1;
+    state->dataConstruction->Construct(2).Name = "CONSTRUCT_WALL_2";
+    state->dataConstruction->Construct(2).LayerPoint.allocate(1);
+    state->dataConstruction->Construct(2).LayerPoint(1) = 2;
+    for (int i = 0; i < 2; i++) {
+        Material::MaterialProperties *p = new Material::MaterialProperties;
+        state->dataMaterial->Material.push_back(p);
+    }
+    state->dataMaterial->Material(1)->Name = "WALL_1";
+    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(1)->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature;
+    state->dataMaterial->Material(1)->absorpThermalVarFuncIdx = 2;
+    state->dataMaterial->Material(1)->absorpSolarVarFuncIdx = 1;
+    state->dataMaterial->Material(2)->Name = "WALL_2";
+    state->dataMaterial->Material(2)->Group = Material::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(2)->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::Scheduled;
+    state->dataMaterial->Material(2)->absorpThermalVarSchedIdx = 1;
+    state->dataCurveManager->allocateCurveVector(2);
+    state->dataHeatBalSurf->SurfTempOut.allocate(2);
+    state->dataHeatBalSurf->SurfTempOut(1) = 10;
+    state->dataHeatBalSurf->SurfTempOut(2) = 30;
+    state->dataSurface->AllVaryAbsOpaqSurfaceList = {1, 2, 3};
+    state->dataHeatBalSurf->SurfAbsThermalExt.allocate(3);
+    state->dataHeatBalSurf->SurfAbsThermalExt = 0.5;
+    state->dataHeatBalSurf->SurfAbsSolarExt.allocate(3);
+    state->dataHeatBalSurf->SurfAbsSolarExt = 0.8;
+    UpdateVariableAbsorptances(*state);
+    // controlled by a lookup table
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfAbsThermalExt(1), 0.1, 1e-6);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfAbsThermalExt(2), 0.3, 1e-6);
+    // controlled by a schedule
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfAbsThermalExt(3), 0.9, 1e-6);
+    // controlled by a linear function
+    //    0.2 + 10 * 0.01 = 0.3
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfAbsSolarExt(1), 0.3, 1e-6);
+    //    0.2 + 30 * 0.01 = 0.5
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfAbsSolarExt(2), 0.5, 1e-6);
 }
 
 } // namespace EnergyPlus

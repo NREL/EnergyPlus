@@ -34,6 +34,7 @@ add_simulation_test(IDF_FILE 1ZoneUncontrolledUTF8.idf EPW_FILE USA_CO_Golden-NR
 add_simulation_test(IDF_FILE 1ZoneUncontrolled_DD2009.idf EPW_FILE 94810-1953-1957.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled_DDChanges.idf EPW_FILE 94810-1953-1957.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled_OtherEquipmentWithFuel.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+add_simulation_test(IDF_FILE 1ZoneUncontrolled_variableThermalSolarAbs.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled_FCfactor_Slab_UGWall.idf EPW_FILE 94810-1953-1957.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled_win_1.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled_win_2.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
