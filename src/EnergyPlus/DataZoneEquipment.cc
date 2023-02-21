@@ -416,7 +416,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
             auto extensibles = epListFields.find("equipment");
             if (extensibles != epListFields.end()) {
-                auto extensiblesArray = extensibles.value();
+                auto &extensiblesArray = extensibles.value();
                 thisZoneEquipList.NumOfEquipTypes = static_cast<int>(extensiblesArray.size());
 
                 // Increment overall count of equipment
