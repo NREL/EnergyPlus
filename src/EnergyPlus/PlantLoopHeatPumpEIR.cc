@@ -1936,14 +1936,12 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
             thisPLHP.waterSource = false;
             thisPLHP.airSource = false;
+
             // A4
             std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
-            std::string sourceSideOutletNodeName =
-                "DUMMY_CONDENSER"; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
+            // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
             srand(time(NULL));
-            for (int i = 1; i <= 3; ++i) {
-                sourceSideOutletNodeName += ("_" + std::to_string(rand()));
-            }
+            std::string sourceSideOutletNodeName = format("DUMMY_CONDENSER_{}_{}", std::to_string(rand()), std::to_string(rand()));
 
             // A5
             auto compCoilFound = fields.find(companionCoilFieldTag);
