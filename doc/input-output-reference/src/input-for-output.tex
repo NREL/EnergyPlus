@@ -2381,3 +2381,65 @@ OutputControl:Files,
   No , ! ExtShd
   No ; ! Tarcog
 \end{lstlisting}
+
+\subsection{OutputControl:Timestamp}\label{outputcontrol_timestamp}
+
+Controls the format of the timestamp used in the native CSV and JSON outputs. The default timestamp is formated
+as ``$MM$/$DD$ $hh$:$mm$:$ss$'', where
+
+\begin{wherelist}
+\item[MM] the two-digit month, 
+\item[DD] the two-digit day of the month,
+\item[hh] the two-digit hours since the beginning of the day,
+\item[mm] the two-digit minutes since the beginning of the last hour, and
+\item[ss] the two-digit seconds (which is always ``00'').
+\end{wherelist}
+
+The time portion of this timestamp has traditionally been the elapsed time since the beginning of the day and associates values
+with the elapsed time at the end of the interval of interest.  For example, the timestamp for the interval from 1~AM to 2~AM on
+December 7 is written as ``12/07 02:00:00''. Unfortunately, some common software used to postprocess results has trouble
+interpreting the last timestamp for each day, which will include ``24:00:00''. An alternative that avoids this problem is to
+associate values with the elapsed time at the beginning of the interval of interest. In this case, the interval from 1~AM to
+2~AM on December 7 is written as ``12/07 01:00:00'' and 24 will never appear as the hours value (but 00 will). The ISO 8601
+timestamp format is ``$YYYY$-$MM$-$DD$T$hh$:$mm$:$ss$'' where
+
+\begin{wherelist}
+\item[YYYY] the four-digit year,
+\item[MM] the two-digit month, 
+\item[DD] the two-digit day of the month,
+\item[hh] the two-digit hours since the beginning of the day,
+\item[mm] the two-digit minutes since the beginning of the last hour,
+\item[ss] the two-digit seconds (which is always ``00''),
+\end{wherelist}
+
+and a capital letter ``T'' separates the time portion of the timestamp from the date portion. The timestamp for the interval from
+1~AM to 2~AM on December 7, 2022 is written either as
+
+\begin{itemize}
+\item ``2022-12-07T02:00:00'' at the end of the interval or
+\item ``2022-12-07T01:00:00'' at the beginning of the interval.
+\end{itemize}
+
+Output workflows using the ReadVars postprocessing program will not be impacted by the selections made here.
+
+\subsubsection{Inputs}\label{inputs-for-timestamp}
+
+\paragraph{Field: ISO 8601 Format}\label{field-timestamp-iso8601format}
+
+This field determines whether the ISO 8601 or traditional format is used. If the field is ``\textbf{No}'', the traditional format is
+used. If the field is ``\textbf{Yes}'', the ISO 8601 format is used. The default is ``\textbf{No}''.
+
+\paragraph{Field: Timestamp at Beginning of Interval}\label{field-timestamp-beginning}
+
+This field determines whether the timestamp is placed at the beginning of the interval (``\textbf{Yes}'') or at the end of the
+interval (``\textbf{No}''). The default is ``\textbf{No}''.
+
+\subsubsection{Example}\label{example-for-timestamp}
+
+An example IDF input object that uses the ISO 8601 format and places the timestamp at beginning of the interval.
+\begin{lstlisting}
+Output:SQLite,
+   Yes,           !- ISO 8601 Format
+   Yes;           !- Timestamp at Beginning of Interval
+\end{lstlisting}
+
