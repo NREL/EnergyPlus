@@ -377,7 +377,7 @@ namespace ResultsFramework {
         return variableMap.at(lastVarID);
     }
 
-    void DataFrame::newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin)
+    void DataFrame::newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin, int calendarYear)
     {
         if (curMin > 0) {
             hourOfDay -= 1;
@@ -387,9 +387,21 @@ namespace ResultsFramework {
             hourOfDay += 1;
         }
 
+        if (beginningOfInterval) {
+            if (hourOfDay == 24) {
+                hourOfDay = 0;
+            }
+            std::swap(hourOfDay, lastHour);
+            std::swap(curMin, lastMinute);
+        }
         // future start of ISO 8601 datetime output
         // fmt::format("YYYY-{:02d}/{:02d}T{:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin);
-        TS.emplace_back(fmt::format("{:02d}/{:02d} {:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin));
+        // fmt::format("{:02d}/{:02d} {:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin);
+        if (iso8601) {
+            TS.emplace_back(fmt::format("{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:00", calendarYear, month, dayOfMonth, hourOfDay, curMin));
+        } else {
+            TS.emplace_back(fmt::format("{:02d}/{:02d} {:02d}:{:02d}:00", month, dayOfMonth, hourOfDay, curMin));
+        }
     }
 
     //    void DataFrame::newRow(const std::string &ts)
@@ -809,7 +821,7 @@ namespace ResultsFramework {
         }
     }
 
-    std::string &CSVWriter::convertToMonth(EnergyPlusData &state, std::string &datetime)
+    std::string &CSVWriter::convertToMonth(std::string &datetime)
     {
         // if running this function, there should only ever be 12 + design days values to change
         static const std::map<std::string, std::string> months({{"01", "January"},
@@ -831,15 +843,18 @@ namespace ResultsFramework {
         if (pos != std::string::npos) {
             time = datetime.substr(pos);
         }
-        if (time != " 24:00:00") {
-            ShowFatalError(state, "Monthly output variables should occur at the end of the day.");
-        }
+        // This assert replaces ShowFatalError(state, "Monthly output variables should occur at the end of the day.");
+        assert(time == " 24:00:00" || time == " 00:00:00");
+
         datetime = months.find(month)->second;
         return datetime;
     }
 
-    void
-    CSVWriter::writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl)
+    void CSVWriter::writeOutput(EnergyPlusData &state,
+                                std::vector<std::string> const &outputVariables,
+                                InputOutputFile &outputFile,
+                                bool outputControl,
+                                bool rewriteTimestamp)
     {
         outputFile.ensure_open(state, "OpenOutputFiles", outputControl);
 
@@ -854,10 +869,12 @@ namespace ResultsFramework {
 
         for (auto &item : outputs) {
             std::string datetime = item.first;
-            if (smallestReportingFrequency < OutputProcessor::ReportingFrequency::Monthly) {
-                datetime = datetime.replace(datetime.find(' '), 1, "  ");
-            } else {
-                convertToMonth(state, datetime);
+            if (rewriteTimestamp) {
+                if (smallestReportingFrequency < OutputProcessor::ReportingFrequency::Monthly) {
+                    datetime = datetime.replace(datetime.find(' '), 1, "  ");
+                } else {
+                    convertToMonth(datetime);
+                }
             }
             print<FormatSyntax::FMT>(outputFile, " {},", datetime);
             item.second.erase(std::remove_if(item.second.begin(),
@@ -1392,9 +1409,9 @@ namespace ResultsFramework {
             csv.parseTSOutputs(state, RIDetailedZoneTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
         }
 
-        csv.writeOutput(state, outputVariables, state.files.csv, state.files.outputControl.csv);
+        csv.writeOutput(state, outputVariables, state.files.csv, state.files.outputControl.csv, rewriteTimestamp);
         if (hasMeterData()) {
-            mtr_csv.writeOutput(state, outputVariables, state.files.mtr_csv, state.files.outputControl.csv);
+            mtr_csv.writeOutput(state, outputVariables, state.files.mtr_csv, state.files.outputControl.csv, rewriteTimestamp);
         }
     }
 
