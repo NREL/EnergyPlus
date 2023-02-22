@@ -82,6 +82,11 @@ namespace HVACVariableRefrigerantFlow {
         Num
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(ThermostatCtrlType::Num)> ThermostatCtrlTypeUC = {
+        "LOADPRIORITY", "ZONEPRIORITY", "THERMOSTATOFFSETPRIORITY", "SCHEDULEDPRIORITY", "MASTERTHERMOSTATPRIORITY",
+        // "FIRSTONPRIORITY",
+    };
+
     enum class EvapWaterSupply
     {
         Invalid = -1,
