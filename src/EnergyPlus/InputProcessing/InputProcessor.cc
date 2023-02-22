@@ -898,6 +898,39 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
     }
 }
 
+const json &InputProcessor::getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName)
+{
+    auto objectInfo = ObjectInfo(std::string{ObjType}, std::string{ObjName});
+
+    auto obj_iter = epJSON.find(std::string(ObjType));
+    if (obj_iter == epJSON.end() || obj_iter.value().find(objectInfo.objectName) == obj_iter.value().end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectInfo.objectType));
+        if (tmp_umit == caseInsensitiveObjectMap.end()) {
+            // indicates object type not found, see function GeneralRoutines::ValidateComponent
+            ShowFatalError(state, format(R"(ObjectType of type "{}" requested was not found in input)", objectInfo.objectType));
+        }
+        objectInfo.objectType = tmp_umit->second;
+        obj_iter = epJSON.find(objectInfo.objectType);
+    }
+
+    std::string const upperObjName = convertToUpper(objectInfo.objectName);
+
+    for (const auto &[key, val] : obj_iter->items()) {
+        if (convertToUpper(key) == upperObjName) {
+            objectInfo.objectName = key;
+            // markObjectAsUsed(objectInfo.objectType, objectInfo.objectName);
+            auto const find_unused = unusedInputs.find(objectInfo);
+            if (find_unused != unusedInputs.end()) {
+                unusedInputs.erase(find_unused);
+            }
+            return val;
+        }
+    }
+
+    ShowFatalError(state, format(R"(Name "{}" requested was not found in input for ObjectType "{}")", objectInfo.objectType, objectInfo.objectName));
+    throw;
+}
+
 void InputProcessor::getObjectItem(EnergyPlusData &state,
                                    std::string_view Object,
                                    int const Number,

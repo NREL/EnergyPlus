@@ -155,6 +155,7 @@ set(test_src
     InternalHeatGains.unit.cc
     KusudaAchenbachGroundTemperatureModel.unit.cc
     LowTempRadiantSystem.unit.cc
+    Material.unit.cc
     MicroCHPElectricGenerator.unit.cc
     MicroturbineElectricGenerator.unit.cc
     MixedAir.unit.cc

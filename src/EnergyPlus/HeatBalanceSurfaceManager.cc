@@ -61,6 +61,7 @@
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -79,6 +80,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -247,6 +249,43 @@ void ManageSurfaceHeatBalance(EnergyPlusData &state)
 // Beginning Initialization Section of the Module
 //******************************************************************************
 
+void UpdateVariableAbsorptances(EnergyPlusData &state)
+{
+    for (int surfNum : state.dataSurface->AllVaryAbsOpaqSurfaceList) {
+        auto const &thisConstruct = state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction);
+        auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+        if (thisMaterial->absorpVarCtrlSignal == Material::VariableAbsCtrlSignal::Scheduled) {
+            if (thisMaterial->absorpThermalVarSchedIdx > 0) {
+                state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) =
+                    max(min(ScheduleManager::GetCurrentScheduleValue(state, thisMaterial->absorpThermalVarSchedIdx), 0.9999), 0.0001);
+            }
+            if (thisMaterial->absorpSolarVarSchedIdx > 0) {
+                state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) =
+                    max(min(ScheduleManager::GetCurrentScheduleValue(state, thisMaterial->absorpThermalVarSchedIdx), 0.9999), 0.0001);
+            }
+        } else {
+            Real64 triggerValue;
+            if (thisMaterial->absorpVarCtrlSignal == Material::VariableAbsCtrlSignal::SurfaceTemperature) {
+                triggerValue = state.dataHeatBalSurf->SurfTempOut(surfNum);
+            } else if (thisMaterial->absorpVarCtrlSignal == Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation) {
+                triggerValue = state.dataHeatBal->SurfQRadSWOutIncident(surfNum);
+            } else { // controlled by heating cooling mode
+                int zoneNum = state.dataSurface->Surface(surfNum).Zone;
+                bool isCooling = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).TotalOutputRequired < 0);
+                triggerValue = static_cast<Real64>(isCooling);
+            }
+            if (thisMaterial->absorpThermalVarFuncIdx > 0) {
+                state.dataHeatBalSurf->SurfAbsThermalExt(surfNum) =
+                    max(min(Curve::CurveValue(state, thisMaterial->absorpThermalVarFuncIdx, triggerValue), 0.9999), 0.0001);
+            }
+            if (thisMaterial->absorpSolarVarFuncIdx > 0) {
+                state.dataHeatBalSurf->SurfAbsSolarExt(surfNum) =
+                    max(min(Curve::CurveValue(state, thisMaterial->absorpSolarVarFuncIdx, triggerValue), 0.9999), 0.0001);
+            }
+        }
+    }
+}
+
 void InitSurfaceHeatBalance(EnergyPlusData &state)
 {
 
@@ -355,6 +394,9 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             }
         }
     }
+
+    // yujie: variable thermal solar absorptance overrides
+    UpdateVariableAbsorptances(state);
 
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag) {
