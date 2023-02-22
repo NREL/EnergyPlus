@@ -881,15 +881,15 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         }
     };
     std::array<ClassType, 2> classesToInput = {ClassType{DataPlant::PlantEquipmentType::HeatPumpEIRCooling,
-                                                       "Chilled Water Nodes",
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add},
-                                             ClassType{DataPlant::PlantEquipmentType::HeatPumpEIRHeating,
-                                                       "Hot Water Nodes",
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract}};
+                                                         "Chilled Water Nodes",
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add},
+                                               ClassType{DataPlant::PlantEquipmentType::HeatPumpEIRHeating,
+                                                         "Hot Water Nodes",
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract}};
 
     bool errorsFound = false;
     std::string &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -1919,8 +1919,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_outlet_node_name").get<std::string>());
             // Implicit
             // std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
+            thisPLHP.airSource = true;
             thisPLHP.waterSource = false;
-            thisPLHP.airSource = false;
 
             // A4
             std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
@@ -2026,15 +2026,14 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A8 flow mode
             thisPLHP.flowMode = static_cast<DataPlant::FlowMode>(
                 getEnumerationValue(DataPlant::FlowModeNamesUC, UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>())));
-
-            if (thisPLHP.flowMode == DataPlant::FlowMode::Invalid) {
-                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, thisPLHP.name));
-                ShowContinueError(state, format("Invalid Flow Mode ={}", DataPlant::FlowModeNamesUC[static_cast<int>(thisPLHP.flowMode)]));
-                ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-                ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
-                // assume variable flow if not specified
-                thisPLHP.flowMode = DataPlant::FlowMode::NotModulated; // default NotModulated
-            }
+            // if (thisPLHP.flowMode == DataPlant::FlowMode::Invalid) {
+            //     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, thisPLHP.name));
+            //     ShowContinueError(state, format("Invalid Flow Mode ={}", DataPlant::FlowModeNamesUC[static_cast<int>(thisPLHP.flowMode)]));
+            //     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
+            //     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
+            //     // assume variable flow if not specified
+            //     thisPLHP.flowMode = DataPlant::FlowMode::NotModulated; // default NotModulated
+            // }
 
             // if (fields.find("reference_coefficient_of_performance") != fields.end()) {
             //    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance").get<Real64>();
@@ -2086,29 +2085,28 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // }
 
             // A11 normalized_capacity_function_of_temperature_curve_name
-            auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
-            thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
+            std::string const &capFtName =
+                UtilityRoutines::MakeUPPERCase(fields.at("normalized_capacity_function_of_temperature_curve_name").get<std::string>());
+            thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, capFtName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
-                ShowSevereError(
-                    state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, capFtName.get<std::string>()));
+                ShowSevereError(state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, capFtName));
                 errorsFound = true;
             }
 
             // A12 fuel_energy_input_ratio_function_of_temperature_curve_name
-            auto &eirFtName = fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name");
-            thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
+            std::string const &eirFtName =
+                UtilityRoutines::MakeUPPERCase(fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name").get<std::string>());
+            thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, eirFtName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
-                ShowSevereError(
-                    state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFtName.get<std::string>()));
+                ShowSevereError(state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFtName));
                 errorsFound = true;
             }
             // A13 fuel_energy_input_ratio_function_of_plr_curve_name
-            auto &eirFplrName = fields.at("fuel_energy_input_ratio_function_of_plr_curve_name");
-            thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
+            std::string const &eirFplrName =
+                UtilityRoutines::MakeUPPERCase(fields.at("fuel_energy_input_ratio_function_of_plr_curve_name").get<std::string>());
+            thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, eirFplrName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
-                ShowSevereError(
-                    state,
-                    format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName.get<std::string>()));
+                ShowSevereError(state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName));
                 errorsFound = true;
             }
 
@@ -2146,8 +2144,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             } else {
                 auto eirDefrostCurveFound = fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name");
                 if (eirDefrostCurveFound != fields.end()) {
-                    std::string const eirDefrostCurveName = eirDefrostCurveFound.value().get<std::string>();
-                    thisPLHP.defrostEIRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostCurveName));
+                    std::string const &eirDefrostCurveName = UtilityRoutines::MakeUPPERCase(eirDefrostCurveFound.value().get<std::string>());
+                    thisPLHP.defrostEIRCurveIndex = Curve::GetCurveIndex(state, eirDefrostCurveName);
                     if (thisPLHP.defrostEIRCurveIndex == 0) {
                         ShowSevereError(
                             state, format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}", thisPLHP.name, eirDefrostCurveName));
@@ -2233,8 +2231,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A16 cycling_ratio_factor_curve_name
             auto crfCurveFound = fields.find("cycling_ratio_factor_curve_name");
             if (crfCurveFound != fields.end()) {
-                std::string const cycRatioCurveName = crfCurveFound.value().get<std::string>();
-                thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName));
+                std::string const &cycRatioCurveName = UtilityRoutines::MakeUPPERCase(crfCurveFound.value().get<std::string>());
+                thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, cycRatioCurveName);
                 if (thisPLHP.cycRatioCurveIndex == 0) {
                     ShowSevereError(state,
                                     format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {})", thisPLHP.name, cycRatioCurveName));
@@ -2262,8 +2260,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A17 auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name
             auto auxElecEIRFTCurveFound = fields.find("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
             if (auxElecEIRFTCurveFound != fields.end()) {
-                std::string const auxEIRFTName = auxElecEIRFTCurveFound.value().get<std::string>();
-                thisPLHP.auxElecEIRFoTempCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName));
+                std::string const &auxEIRFTName = UtilityRoutines::MakeUPPERCase(auxElecEIRFTCurveFound.value().get<std::string>());
+                thisPLHP.auxElecEIRFoTempCurveIndex = Curve::GetCurveIndex(state, auxEIRFTName);
                 if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}", thisPLHP.name, auxEIRFTName));
                     errorsFound = true;
@@ -2275,8 +2273,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
             auto auxElecEIRFPLRCurveFound = fields.find("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
             if (auxElecEIRFPLRCurveFound != fields.end()) {
-                std::string const auxEIRFPLRName = auxElecEIRFPLRCurveFound.value().get<std::string>();
-                thisPLHP.auxElecEIRFoPLRCurveIndex = Curve::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName));
+                std::string const &auxEIRFPLRName = UtilityRoutines::MakeUPPERCase(auxElecEIRFPLRCurveFound.value().get<std::string>());
+                thisPLHP.auxElecEIRFoPLRCurveIndex = Curve::GetCurveIndex(state, auxEIRFPLRName);
                 if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}", thisPLHP.name, auxEIRFPLRName));
                     errorsFound = true;
@@ -2318,34 +2316,16 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                 DataLoopNode::ConnectionType::Outlet,
                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
-            // DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
-            // DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Blank;
-            // DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Blank;
-            // if (condenserType == "WATERSOURCE") {
-            //     thisPLHP.waterSource = true;
-            //     condenserNodeType = DataLoopNode::NodeFluidType::Water;
-            //     condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
-            //     condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
-            // } else if (condenserType == "AIRSOURCE") {
-            thisPLHP.airSource = true; // this is always true, at least for now, for Fuel-Fired PlantLoop Heat Pump
-            DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Air;
-            DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
-            DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
-            //} else {
-            //    // Again, this should be protected by the input processor
-            //    ShowErrorMessage(state,
-            //                     format("Invalid heat pump condenser type (name={}; entered type: {}).",
-            //                            thisPLHP.name,   // LCOV_EXCL_LINE
-            //                            condenserType)); // LCOV_EXCL_LINE
-            //    errorsFound = true;                      // LCOV_EXCL_LINE
-            //}
+
+            thisPLHP.airSource = true;    // this is always true, at least for now, for Fuel-Fired PlantLoop Heat Pump
+            thisPLHP.waterSource = false; // this is always false, at least for now, for Fuel-Fired PlantLoop Heat Pump
             thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                  sourceSideInletNodeName,
                                                                                  nodeErrorsFound,
                                                                                  objType,
                                                                                  thisPLHP.name,
-                                                                                 condenserNodeType,
-                                                                                 condenserNodeConnectionType_Inlet,
+                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                 DataLoopNode::ConnectionType::OutsideAir,
                                                                                  NodeInputManager::CompFluidStream::Secondary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
@@ -2353,8 +2333,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                   nodeErrorsFound,
                                                                                   objType,
                                                                                   thisPLHP.name,
-                                                                                  condenserNodeType,
-                                                                                  condenserNodeConnectionType_Outlet,
+                                                                                  DataLoopNode::NodeFluidType::Air,
+                                                                                  DataLoopNode::ConnectionType::OutsideAir,
                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                   DataLoopNode::ObjectIsNotParent);
             if (nodeErrorsFound) errorsFound = true;
