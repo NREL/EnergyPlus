@@ -175,6 +175,7 @@ set(test_src
     PVWatts.unit.cc
     PackagedTerminalHeatPump.unit.cc
     Photovoltaics.unit.cc
+    PhotovoltaicThermalCollectors.unit.cc
     PierceSurface.unit.cc
     Pipes.unit.cc
     Plant/Branch.unit.cc

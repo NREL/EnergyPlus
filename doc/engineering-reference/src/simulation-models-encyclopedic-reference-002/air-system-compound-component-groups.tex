@@ -2085,7 +2085,7 @@ where:
 
 \({\dot{V}_{exhaust,max}}\) is the exhaust fan maximum volumetric flow rate, user input (m\(^{3}\)/s)
 
-\({\rho_{Std}}\) is the density of air at standard temperature and pressure {[}dry air at 20°C{]} (m\(^{3}\)/kg)
+\({\rho_{Std}}\) is the density of air at standard temperature and pressure {[}dry air at 20$^\circ$C{]} (m\(^{3}\)/kg)
 
 \({P_{exhaust,max}}\) is the exhaust fan maximum power, user input (W)
 
@@ -2341,16 +2341,17 @@ NTU = \frac{{UA}}{{(\dot mC{}_p){}_{water/air}}}
 
 UA for the source side and the load side are two of the parameters estimated in the parameter estimation procedure.
 
-Additional model details and a discussion of the parameters and parameter estimation technique are described in the following section on Water to Water Heat Pumps.
+Additional model details and a discussion of the parameters and parameter estimation technique are described in the following section on Plant Loop Heat Pumps.
 
-\section{Water To Water Heat Pumps}\label{water-to-water-heat-pumps}
+\section{Plant Loop Heat Pumps}\label{plant-loop-heat-pumps}
 
-There are three water-water heat pump models available in EnergyPlus:
+There are four plant loop heat pump models available in EnergyPlus:
 
 \begin{itemize}
-  \item Parameter estimation based
-  \item Equation fit
-  \item EIR-formulated
+  \item \hyperref[equation-fit-water-to-water-heat-pump-model]{Equation fit} (water-to-water)
+  \item \hyperref[parameter-estimation-water-to-water-heat-pump-model]{Parameter estimation} (water-to-water)
+  \item \hyperref[eir-plant-loop-heat-pump-model]{EIR-formulated} (water-to-water or air-to-water)
+  \item \hyperref[fuel-fired-air-to-water-heat-pumps]{Fuel-fired absorption} (air-to-water)
 \end{itemize}
 
 Detailed descriptions of the former two models are available in the references Tang and Jin.  The EIR formulation was added with EnergyPlus 9.1, based on the popular EIR formulation used in the chiller model.  This section describes the important details of the three models.
@@ -2574,3 +2575,74 @@ Once load and source flow rates have been established for the component using th
 	\item Evaluate power usage by evaluating the EIR curves using the source inlet temperature, actual load side outlet temperature, and the current part load ratio ($f_{eir,t} = f(T_{out,load,set}, T_{in,src})$, $f_{eir,plr} = f(PLR)$, $P = P_{reference} f_{eir,t} f_{eir,plr}$)
 	\item Perform an energy balance on the unit to determine the source side heat transfer rate and the source side outlet temperature ($q_{src} = q_{load} \pm P$, $T_{out,src} = T_{in,src} \pm \frac{\dot{q}_{src}}{\dot{m}_{src}C_{p,src}} $) -- again the plus/minus refers to the different behavior between cooling and heating mode.
 \end{enumerate}
+
+
+\subsection{Fuel-Fired Air to Water Heat Pumps}\label{fuel-fired-air-to-water-heat-pumps}
+
+This section describes the EIR formulated model for fuel-fired plant loop absorption air-to-water heat pumps. The object is similar to a conventional air-to-water heat pump, except that it uses an absorption cycle driven by fuel combustion. The object names are HeatPump:AirToWater:FuelFired:Heating and HeatPump:AirToWater:FuelFired:Cooling. In general, these heat pump objects are treated in the same way as the other plant loop heat pump models. When dealing with the heating and cooling modules of the equipment, it uses a similar paradigm as the electric-driven \hyperref[eir-plant-loop-heat-pump-model]{EIR Formulated Plant Loop Heat Pump}: even though a heat pump is generally a single load coil and a single source coil with a reversing valve, in EnergyPlus, the paradigm is to split the operation into two separate units, one for heating a hot water loop and one for cooling a chilled water loop. It is certainly possible to connect the load side of both of these to a single plant loop if the controls are established properly. This equipment only supports air-source operation with an outdoor air node used as the source-side inlet node.
+
+The underlying fuel-fired absorption heat pump model uses equation-fit models based on manufacturer data. The implemented model is as follows: 
+
+\subsubsection{Equipment Capacity}
+The heating and cooling capacities are derived from the nominal (rated) capacity and a capacity function of tempereatures. 
+\begin{equation}
+\mathrm{GAHP Heating/Cooling Capacity} = \mathrm{Rated Capacity} \times \mathrm{CAPFT}
+\end{equation}
+
+The temperatures used for the equation model are the ambient air temperature ($T_{mathrm{amb}}$) and the returning (or entering) water temeprature ($T_{\mathrm{ret}}$) of the load side.
+\begin{equation}
+\mathrm{CAPFT} = a_1 \times T_{\mathrm{amb}} + b_1 \times T_{\mathrm{amb}}^{2} + c_1 \times T_{\mathrm{ret}} + d_1 \times T_{\mathrm{ret}}^{2} + e_1 \times T_{\mathrm{amb}} \times T_{\mathrm{ret}} + f_1
+\end{equation}
+
+\subsubsection{Part Load Ratio}
+Part Load Ratio is the ratio for the actual heating/cooling load over the current full capacity load. In real absorption machines, the PLR is usually between 0.2 and 1.0. 
+\begin{equation}
+\mathrm{PLR} = \frac{\mathrm{Load}}{\mathrm{Capacity}}, 0.2 \leq \mathrm{PLR} \leq 1
+\end{equation}
+
+\subsubsection{Fuel Use}
+The fuel usage is calculated using the folloiwing formula, taking consideration of the load capacity, nominal COP, and the various adjustment factors (temperature, PLR, Defrosting, and Cycling Ratio):
+
+\begin{equation}
+\mathrm{Fuel Use} = \frac{\mathrm{Load} \times \mathrm{EIRFT} \times \mathrm{EIRFPLR} \times \mathrm{EIRDEFROST}}{\mathrm{COP}_\mathrm{nominal} \times \mathrm{CRF}}
+\end{equation}
+
+\subsubsection{EIR Temperature Adjustment}
+A typical EIR temperature correction function will involve two independent temperature variables---the ambient air temperature ($T_{mathrm{amb}}$) and the returning (or entering) water temeprature ($T_{\mathrm{ret}}$) of the load side. 
+\begin{equation}
+\mathrm{EIRFT} = a_2 \times Tamb + b_2 \times T_{\mathrm{amb}}^{2} + c_2 \times T_{\mathrm{ret}}^{2} + d_2 \times T_{\mathrm{ret}}^{2} + e_2 \times T_{\mathrm{amb}} \times T_{\mathrm{ret}} + f_2
+\end{equation}
+
+\subsubsection{EIR PLR Adjustment}
+The EIR PLR correction function is a cubic function that takes the PLR as the sole independent variable. For example, a potential curve can be used is like the following:  
+\begin{equation}
+\mathrm{EIRFPLR} = 0.0865 \times \mathrm{PLR}^{2} - 0.006 \times \mathrm{PLR} + 0.9814, \mathrm{for} 0.25 \leq \mathrm{PLR} \leq 1 
+\end{equation}
+
+\subsubsection{Defrosting Adjustment (Heating mode only)}
+If the defrost control type is OnDemand, then the defrost fuel use correction is modeled using the ambient air temperature as the independent varable. The inputs allows a cubic (or lower order) function. For example, one possible curve correlation can look like the following:  
+\begin{equation}
+\mathrm{EIRDEFROST} = -0.0011 \times T_{\mathrm{amb}}^{2} - 0.006 \times T_{\mathrm{amb}} + 1.0317, \mathrm{for} -8.89^{\circ}\mathrm{C} \leq T_{\mathrm{amb}} \leq 3.33^{\circ}\mathrm{C} 
+\end{equation}
+
+\subsubsection{Cycling Ratio Adjustment}
+The cycling ratio correction is also used for fuel use calculations when the PLR is below the minimum. This curve can be inputted by the user. An example correlation for CRF is as follows: 
+\begin{equation}
+\mathrm{CRF} = 0.4167 \times \mathrm{CR} + 0.5833,
+\end{equation}
+
+where $\mathrm{CRF}$ is the Cycling Ratio Factor; and $\mathrm{CR}$ is the Cycling Ratio, which is defined as: 
+
+\begin{equation}
+\mathrm{CR} = \frac{\mathrm{PLR}}{\mathrm{PLR}_{\mathrm{min}}}, \mathrm{for} 0.2 \leq \mathrm{PLR} \leq 0.25
+\end{equation}
+
+Please note that since the object is based on curve inputs, the user also has the flexibility of defining the curves by themselves---e.g. from the capactity function of temperature to the defrost EIR corrections. 
+
+\subsubsection{Electricty Use}
+
+The electricity use for the fuel-fired absorption heat pump is modeled using EIR (Electricity based relation) input curves. The two part of electricity use is the ``auxiliary electricty'' and the ``standby electricity'':
+\begin{equation}
+\mathrm{Electricity use} = \mathrm{Norminal Auxilary Power} \times \mathrm{EIR}_{\mathrm{auxiliary}} + \mathrm{Electricty}_{\mathrm{Standby}},
+\end{equation}
+where $\mathrm{EIR}_{\mathrm{auxiliary}}$ are supplied by the curve input, and $\mathrm{Norminal Auxilary Power}$ and $\mathrm{Electricty}_{\mathrm{Standby}}$ are supplied by the equipment standby electricity inputs. 
