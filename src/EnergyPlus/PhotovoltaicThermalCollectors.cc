@@ -107,10 +107,6 @@ namespace PhotovoltaicThermalCollectors {
     //  the first model is a "simple" or "ideal" model useful for sizing, early design, or policy analyses
     //  Simple PV/T model just converts incoming solar to electricity and temperature rise of a working fluid.
 
-    Real64 constexpr SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
-
-    int NumPVT(0); // count of all types of PVT in input file
-
     PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string_view objectName)
 
     {
@@ -304,8 +300,8 @@ namespace PhotovoltaicThermalCollectors {
     void GetMainPVTInput(EnergyPlusData &state,
                          int NumPVT,
                          Array1D<PVTCollectorStruct> &PVT,
-                         Array1D<SimplePVTModelStruct> tmpSimplePVTperf,
-                         Array1D<BIPVTModelStruct> tmpBIPVTperf)
+                         Array1D<SimplePVTModelStruct> const &tmpSimplePVTperf,
+                         Array1D<BIPVTModelStruct> const &tmpBIPVTperf)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -816,6 +812,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 }
             } else if (this->WPlantLoc.loopSideNum == DataPlant::LoopSideLocation::Demand) {
+                Real64 constexpr SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
                 DesignVolFlowRateDes = this->AreaCol * SimplePVTWaterSizeFactor;
             }
             if (this->DesignVolFlowRateWasAutoSized) {
@@ -1312,7 +1309,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 area_pv = w * l * this->BIPVT.PVAreaFract;                        // total area of pv modules
         Real64 area_wall_total = w * l;                                          // total area of wall
         Real64 length_conv = l;                                                  // length for wind convection coefficient calc
-        auto shape_bld_surf = state.dataSurface->Surface(this->SurfNum).Shape;
+        DataSurfaces::SurfaceShape shape_bld_surf = state.dataSurface->Surface(this->SurfNum).Shape;
 
         if (shape_bld_surf != EnergyPlus::DataSurfaces::SurfaceShape::Rectangle) {
             ShowFatalError(state,
@@ -1336,38 +1333,38 @@ namespace PhotovoltaicThermalCollectors {
         Real64 eff_pv(0.0); // efficiency pv panel
 
         // Weather/thermodynamic state/air properties/heat transfer
-        Real64 g(0.0);                          // Solar incident on surface of BIPVT collector (W/m^2)
-        Real64 tsurr, tsurrK;                   // surrouding temperature (DegC, DegK)
-        Real64 t1, t1K, t1_new;                 // temperature of pv backing surface (DegC, DegK, DegC)
-        Real64 tpv_new;                         // temperature of pv surface (DegC, DegC)
-        Real64 tpvg, tpvgK, tpvg_new;           // temperature of pv glass cover (DegC, DegK,DegC)
-        Real64 tfavg(18.0);                     // average fluid temperature (DegC)
-        Real64 tfout;                           // outlet fluid temperature from BIPVT channel (DegC)
-        Real64 hconvf1(100.0);                  // heat transfer coefficient between fluid and backing surface (W/m2-K)
-        Real64 hconvf2(100.0);                  // heat transfer coefficient between fluid and bldg surface (W/m2-K)
-        Real64 hconvt_nat(0.0);                 // htc external natural
-        Real64 hconvt_forced(0.0);              // htc external forced
-        Real64 hconvt(0.0);                     // htc external total
-        Real64 hpvg_pv;                         // conductance of pv glass cover (W/m2-K)
-        Real64 hpv_1;                           // conductance of pv backing (W/m2-K)
-        Real64 hrad12;                          // radiative heat transfer coefficient between bldg surface and pv backing surface (W/m2-K)
-        Real64 hrad_surr;                       // radiative heat transfer coefficient between pv glass cover and surrounding (W/m2-K)
-        constexpr Real64 sigma(5.67e-8);        // stephan bolzmann constant
-        Real64 reynolds(0.0);                   // Reynolds inside collector
-        Real64 nusselt(0.0);                    // Nusselt inside collector
-        Real64 vel(0.0);                        // flow velocity (m/s)
-        Real64 raleigh(0.0);                    // Raleigh number for stagnation calculations
-        Real64 dhyd(0.0);                       // Hydraulic diameter of channel (m)
-        Real64 gravity(9.81);                   // gravity (m/s^2)
-        Real64 mu_air(22.7e-6);                 // dynamic viscosity (kg/m-s)
-        Real64 k_air(0.026);                    // thermal conductivity (W/m-K)
-        Real64 prandtl_air(0.7);                // Prandtl number
-        Real64 density_air(1.2);                // density (kg/m^3)
-        Real64 diffusivity_air(0.0);            // thermal diffusivity (m^2/s)
-        Real64 kin_viscosity_air(0.0);          // kinematic viscosity (m^2/s)
-        Real64 extHTCcoeff(0.0);                // coefficient for calculating external forced HTC
-        Real64 extHTCexp(0.0);                  // exponent for calculating external forced HTC
-        int InletNode = this->HVACInletNodeNum; // HVAC node associated with inlet of BIPVT
+        Real64 g(0.0);                                // Solar incident on surface of BIPVT collector (W/m^2)
+        Real64 tsurr, tsurrK;                         // surrouding temperature (DegC, DegK)
+        Real64 t1, t1K, t1_new;                       // temperature of pv backing surface (DegC, DegK, DegC)
+        Real64 tpv_new;                               // temperature of pv surface (DegC, DegC)
+        Real64 tpvg, tpvgK, tpvg_new;                 // temperature of pv glass cover (DegC, DegK,DegC)
+        Real64 tfavg(18.0);                           // average fluid temperature (DegC)
+        Real64 tfout;                                 // outlet fluid temperature from BIPVT channel (DegC)
+        Real64 hconvf1(100.0);                        // heat transfer coefficient between fluid and backing surface (W/m2-K)
+        Real64 hconvf2(100.0);                        // heat transfer coefficient between fluid and bldg surface (W/m2-K)
+        Real64 hconvt_nat(0.0);                       // htc external natural
+        Real64 hconvt_forced(0.0);                    // htc external forced
+        Real64 hconvt(0.0);                           // htc external total
+        Real64 hpvg_pv;                               // conductance of pv glass cover (W/m2-K)
+        Real64 hpv_1;                                 // conductance of pv backing (W/m2-K)
+        Real64 hrad12;                                // radiative heat transfer coefficient between bldg surface and pv backing surface (W/m2-K)
+        Real64 hrad_surr;                             // radiative heat transfer coefficient between pv glass cover and surrounding (W/m2-K)
+        constexpr Real64 sigma(5.67e-8);              // stephan bolzmann constant
+        Real64 reynolds(0.0);                         // Reynolds inside collector
+        Real64 nusselt(0.0);                          // Nusselt inside collector
+        Real64 vel(0.0);                              // flow velocity (m/s)
+        Real64 raleigh(0.0);                          // Raleigh number for stagnation calculations
+        Real64 dhyd(0.0);                             // Hydraulic diameter of channel (m)
+        constexpr Real64 gravity(9.81);               // gravity (m/s^2)
+        Real64 mu_air(22.7e-6);                       // dynamic viscosity (kg/m-s)
+        Real64 k_air(0.026);                          // thermal conductivity (W/m-K)
+        Real64 prandtl_air(0.7);                      // Prandtl number
+        Real64 density_air(1.2);                      // density (kg/m^3)
+        Real64 diffusivity_air(0.0);                  // thermal diffusivity (m^2/s)
+        Real64 kin_viscosity_air(0.0);                // kinematic viscosity (m^2/s)
+        Real64 extHTCcoeff(0.0);                      // coefficient for calculating external forced HTC
+        Real64 extHTCexp(0.0);                        // exponent for calculating external forced HTC
+        int const InletNode = this->HVACInletNodeNum; // HVAC node associated with inlet of BIPVT
         Real64 tfin = state.dataLoopNodes->Node(InletNode).Temp;            // inlet fluid temperature (DegC)
         Real64 w_in = state.dataLoopNodes->Node(InletNode).HumRat;          // inlet air humidity ratio (kgda/kg)
         Real64 cp_in = Psychrometrics::PsyCpAirFnW(w_in);                   // inlet air specific heat (J/kg-K)
@@ -1405,9 +1402,9 @@ namespace PhotovoltaicThermalCollectors {
         constexpr Real64 rf(0.75);                                            // relaxation factor
         constexpr Real64 degc_to_kelvin(273.15);                              // conversion constant degC to Kelvin
         Real64 ebal1, ebal2, ebal3;                                           // energy balances on 3 surfaces
-        Real64 jj[9];                                                         // 3x3 array for coefficient matrix
-        Real64 f[3];                                                          // 3 element array for constant term
-        Real64 y[3];                                                          // solution array for tpvg,tpv, and t1
+        std::array<Real64, 9> jj = {0.0};                                     // 3x3 array for coefficient matrix
+        std::array<Real64, 3> f = {0.0};                                      // 3 element array for constant term
+        std::array<Real64, 3> y = {0.0};                                      // solution array for tpvg,tpv, and t1
         int m(3);                                                             // parameter for number of unknwons
         int i;                                                                // index
         int iter(0);                                                          // iteration counter
@@ -1643,7 +1640,7 @@ namespace PhotovoltaicThermalCollectors {
         this->BIPVT.HcPlen = hconvf2;
     }
 
-    void PVTCollectorStruct::solveLinSysBackSub(Real64 jj[9], Real64 f[3], Real64 (&y)[3])
+    void PVTCollectorStruct::solveLinSysBackSub(std::array<Real64, 9> &jj, std::array<Real64, 3> &f, std::array<Real64, 3> &y)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Solve a system of linear equations using Gaussian elimination and back substitution method.
