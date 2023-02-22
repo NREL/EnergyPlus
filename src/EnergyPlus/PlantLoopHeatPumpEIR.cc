@@ -1991,14 +1991,6 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             Real64 defDummyASDesVolFlowRate = 1.0;
             thisPLHP.sourceSideDesignVolFlowRate = defDummyASDesVolFlowRate;
 
-            // auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
-            // if (tmpSourceFlowRate == "Autosize") {
-            //    thisPLHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
-            //    thisPLHP.sourceSideDesignVolFlowRateWasAutoSized = true;
-            //} else {
-            //    thisPLHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate.get<Real64>();
-            //}
-
             // N4 Design supply temperature
             auto &tmpDesSupTemp = fields.at("design_supply_temperature");
             if (tmpDesSupTemp == "Autosize") {
@@ -2034,63 +2026,16 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A8 flow mode
             thisPLHP.flowMode = static_cast<DataPlant::FlowMode>(
                 getEnumerationValue(DataPlant::FlowModeNamesUC, UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>())));
-            // if (thisPLHP.flowMode == DataPlant::FlowMode::Invalid) {
-            //     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, thisPLHP.name));
-            //     ShowContinueError(state, format("Invalid Flow Mode ={}", DataPlant::FlowModeNamesUC[static_cast<int>(thisPLHP.flowMode)]));
-            //     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-            //     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
-            //     // assume variable flow if not specified
-            //     thisPLHP.flowMode = DataPlant::FlowMode::NotModulated; // default NotModulated
-            // }
-
-            // if (fields.find("reference_coefficient_of_performance") != fields.end()) {
-            //    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance").get<Real64>();
-            //} else {
-            //    Real64 defaultVal = 0.0;
-            //    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-            //            state, cCurrentModuleObject, "reference_coefficient_of_performance", defaultVal)) {
-            //        // this error condition would mean that someone broke the input dictionary, not their
-            //        // input file.  I can't really unit test it so I'll leave it here as a severe error
-            //        // but excluding it from coverage
-            //        ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
-            //                        "EIR PLHP: Reference COP not entered and could not get default value"); // LCOV_EXCL_LINE
-            //        errorsFound = true;                                                                     // LCOV_EXCL_LINE
-            //    } else {
-            //        thisPLHP.referenceCOP = defaultVal;
-            //    }
-            //}
 
             // A9 outdoor_air_temperature_curve_input_variable
             std::string oaTempCurveInputVar =
                 UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
             thisPLHP.oaTempCurveInputVar = static_cast<OATempCurveVar>(getEnumerationValue(OATempCurveVarNamesUC, oaTempCurveInputVar));
-            // if (thisPLHP.oaTempCurveInputVar == OATempCurveVar::Invalid) {
-            //     thisPLHP.oaTempCurveInputVar = OATempCurveVar::DryBulb; // set to default
-            //     ShowWarningError(
-            //         state,
-            //         format("Invalid Outdoor Air Temperature Curve Input Variable for EIR PLFFHP ({} name={})", cCurrentModuleObject,
-            //         thisPLHP.name));
-            //     ShowContinueError(
-            //         state, format("The Input Variable is reset to: {}", OATempCurveVarNamesUC[static_cast<int>(thisPLHP.oaTempCurveInputVar)]));
-            // }
 
             // A10 water_temperature_curve_input_variable
             std::string waterTempCurveInputVar =
                 UtilityRoutines::MakeUPPERCase(fields.at("water_temperature_curve_input_variable").get<std::string>());
             thisPLHP.waterTempCurveInputVar = static_cast<WaterTempCurveVar>(getEnumerationValue(WaterTempCurveVarNamesUC, waterTempCurveInputVar));
-            // if (thisPLHP.waterTempCurveInputVar == WaterTempCurveVar::Invalid) {
-            //     ShowWarningError(state,
-            //                      format("Invalid Water Temperature Input Variable for EIR PLFFHP ({} name={})", cCurrentModuleObject,
-            //                      thisPLHP.name));
-            //     if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling)
-            //         thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringEvaporator;
-            //     else { // if(thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating)
-            //         thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
-            //     }
-            //     ShowContinueError(
-            //         state, format("The Input Variable is reset to: {}",
-            //         WaterTempCurveVarNamesUC[static_cast<int>(thisPLHP.waterTempCurveInputVar)]));
-            // }
 
             // A11 normalized_capacity_function_of_temperature_curve_name
             std::string const &capFtName =
@@ -2349,11 +2294,6 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             BranchNodeConnections::TestCompSet(
                 state, cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName, classToInput.nodesType);
 
-            // if (thisPLHP.waterSource) {
-            //    BranchNodeConnections::TestCompSet(
-            //        state, cCurrentModuleObject, thisPLHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");
-            //}
-
             // store the worker functions that generalized the heating/cooling sides
             thisPLHP.calcLoadOutletTemp = classToInput.calcLoadOutletTemp;
             thisPLHP.calcQsource = classToInput.calcQsource;
@@ -2365,9 +2305,6 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         }
     }
     if (errorsFound) {
-        // currently there are no straightforward unit tests possible to get here
-        // all curves are required and inputs are validated by the input processor
-        // obviously this will stay here but I don't feel like counting it against coverage
         ShowFatalError(state, "Previous EIR PLFFHP errors cause program termination."); // LCOV_EXCL_LINE
     }
 }
