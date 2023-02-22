@@ -17,7 +17,6 @@ jobs:
       run: |
          cppcheck -UEP_Count_Calls -DEP_NO_OPENGL -UGROUND_PLOT -DLINK_WITH_PYTHON -DMSVC_DEBUG -DSKYLINE_MATRIX_REMOVE_ZERO_COLUMNS -U_OPENMP -Ugeneratetestdata \
           -DEP_cache_GlycolSpecificHeat -DEP_cache_PsyTsatFnPb -UEP_nocache_Psychrometrics -UEP_psych_errors -UEP_psych_stats  \
-          --showtime=summary --report-progress \
           --force \
           --std=c++17 \
           --enable=all \
