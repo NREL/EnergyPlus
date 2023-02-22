@@ -696,10 +696,7 @@ namespace PhotovoltaicThermalCollectors {
             this->CoolingUseful = false;
             this->HeatingUseful = false;
             this->Simple.LastCollectorTemp = 0.0;
-            this->Simple.CollectorTemp = 0.0;
             this->BIPVT.LastCollectorTemp = 0.0;
-            this->BIPVT.CollectorTemp = 0.0;
-            this->Report.ThermEfficiency = 0.0;
             this->Report.ThermPower = 0.0;
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermHeatLoss = 0.0;
@@ -1104,7 +1101,6 @@ namespace PhotovoltaicThermalCollectors {
                 BypassFraction = 0.0;
             }
 
-            this->Report.ThermEfficiency = Eff;
             this->Report.ThermHeatGain = PotentialHeatGain;
             this->Report.ThermPower = this->Report.ThermHeatGain;
             this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -1174,7 +1170,6 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
             this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-            this->Report.ThermEfficiency = 0.0;
             this->Simple.LastCollectorTemp = Tcollector;
             this->Report.BypassStatus = BypassFraction;
 
@@ -1184,7 +1179,6 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermHeatLoss = 0.0;
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermPower = 0.0;
-            this->Report.ThermEfficiency = 0.0;
             this->Report.ThermEnergy = 0.0;
             this->Report.BypassStatus = 1.0;
             this->Report.MdotWorkFluid = mdot;
@@ -1230,7 +1224,6 @@ namespace PhotovoltaicThermalCollectors {
                 }
             }
 
-            this->Report.ThermEfficiency = Eff;
             this->Report.ThermHeatGain = PotentialHeatGain;
             this->Report.ThermPower = this->Report.ThermHeatGain;
             this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -1283,7 +1276,6 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
             this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-            this->Report.ThermEfficiency = 0.0;
             if (PotentialHeatGain < 0.0) this->BIPVT.LastCollectorTemp = Tcollector;
             this->Report.BypassStatus = BypassFraction;
         } else {
@@ -1292,7 +1284,6 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermHeatLoss = 0.0;
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermPower = 0.0;
-            this->Report.ThermEfficiency = 0.0;
             this->Report.ThermEnergy = 0.0;
             this->Report.BypassStatus = 1.0;
             this->Report.MdotWorkFluid = mdot;
