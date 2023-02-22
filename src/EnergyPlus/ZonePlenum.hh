@@ -146,9 +146,9 @@ namespace ZonePlenum {
                           std::string_view CompName,
                           DataZoneEquipment::AirLoopHVACZone iCompType,
                           int &CompIndex,
-                          Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
-                          Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check
-                          Optional_bool PlenumInletChanged = _        // Autodesk:OPTIONAL Used without PRESENT check
+                          ObjexxFCL::Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
+                          ObjexxFCL::Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check
+                          ObjexxFCL::Optional_bool PlenumInletChanged = _        // Autodesk:OPTIONAL Used without PRESENT check
     );
 
     void GetZonePlenumInput(EnergyPlusData &state);

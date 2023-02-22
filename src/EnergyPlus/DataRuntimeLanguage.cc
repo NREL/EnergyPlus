@@ -114,32 +114,32 @@ namespace DataRuntimeLanguage {
 
         errFlag = false;
         if (has(cFieldValue, ' ')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain spaces");
+            ShowSevereError(state, format("{}=\"{}\", Invalid variable name entered.", cModuleObject, cFieldValue));
+            ShowContinueError(state, format("...{}; Names used as EMS variables cannot contain spaces", cFieldName));
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '-')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \"-\" characters.");
+            ShowSevereError(state, format("{}=\"{}\", Invalid variable name entered.", cModuleObject, cFieldValue));
+            ShowContinueError(state, format("...{}; Names used as EMS variables cannot contain \"-\" characters.", cFieldName));
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '+')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \"+\" characters.");
+            ShowSevereError(state, format("{}=\"{}\", Invalid variable name entered.", cModuleObject, cFieldValue));
+            ShowContinueError(state, format("...{}; Names used as EMS variables cannot contain \"+\" characters.", cFieldName));
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '.')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \".\" characters.");
+            ShowSevereError(state, format("{}=\"{}\", Invalid variable name entered.", cModuleObject, cFieldValue));
+            ShowContinueError(state, format("...{}; Names used as EMS variables cannot contain \".\" characters.", cFieldName));
             errFlag = true;
             ErrorsFound = true;
         }
         if ((cFieldValue.length() > 0) && (is_any_of(cFieldValue[0], InvalidStartCharacters))) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters.");
+            ShowSevereError(state, format("{}=\"{}\", Invalid variable name entered.", cModuleObject, cFieldValue));
+            ShowContinueError(state, format("...{}; Names used as EMS variables cannot start with numeric characters.", cFieldName));
             errFlag = true;
             ErrorsFound = true;
         }
@@ -188,20 +188,20 @@ namespace DataRuntimeLanguage {
 
         errFlag = false;
         if (has(cFieldValue, ' ')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain spaces");
+            ShowSevereError(state, format("{}=\"{}\", Invalid variable name entered.", cModuleObject, cFieldValue));
+            ShowContinueError(state, format("...{}; Names used for EMS {} cannot contain spaces", cFieldName, cSubType));
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '-')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"-\" characters.");
+            ShowSevereError(state, format("{}=\"{}\", Invalid variable name entered.", cModuleObject, cFieldValue));
+            ShowContinueError(state, format("...{}; Names used for EMS {} cannot contain \"-\" characters.", cFieldName, cSubType));
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '+')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"+\" characters.");
+            ShowSevereError(state, format("{}=\"{}\", Invalid variable name entered.", cModuleObject, cFieldValue));
+            ShowContinueError(state, format("...{}; Names used for EMS {} cannot contain \"+\" characters.", cFieldName, cSubType));
             errFlag = true;
             ErrorsFound = true;
         }

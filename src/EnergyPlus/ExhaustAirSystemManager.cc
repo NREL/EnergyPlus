@@ -112,7 +112,7 @@ namespace ExhaustAirSystemManager {
         bool ErrorsFound = false;
 
         constexpr std::string_view RoutineName("GetExhaustAirSystemInput: ");
-        std::string cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
+        std::string const &cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
         if (instances != ip->epJSON.end()) {
@@ -347,7 +347,7 @@ namespace ExhaustAirSystemManager {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
 
         constexpr std::string_view RoutineName = "CalExhaustAirSystem: ";
-        std::string cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
+        constexpr std::string_view cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
         bool ErrorsFound = false;
         if (!(state.afn->AirflowNetworkFanActivated && state.afn->distribution_simulated)) {
             MixerComponent::SimAirMixer(state, thisExhSys.ZoneMixerName, thisExhSys.ZoneMixerIndex);
@@ -470,7 +470,7 @@ namespace ExhaustAirSystemManager {
 
         // Use the json helper to process input
         constexpr std::string_view RoutineName("GetZoneExhaustControlInput: ");
-        std::string cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
+        std::string const &cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
         if (instances != ip->epJSON.end()) {
@@ -697,7 +697,7 @@ namespace ExhaustAirSystemManager {
         // report results if needed
     }
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Optional<bool const> FlowRatio)
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, ObjexxFCL::Optional<bool const> FlowRatio)
     {
         // Calculate a zonehvac exhaust control system
 

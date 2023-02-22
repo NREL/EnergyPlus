@@ -2335,7 +2335,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 NumLeft = GetNumChildren(state, SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                 if (NumLeft > 0) {
                                     ShowSevereError(
-                                        state, "Hanging Children for component=" + thisSubSubComponent.TypeOf + ':' + SubCompNames(SubSubCompNum));
+                                        state,
+                                        format("Hanging Children for component={}:{}", thisSubSubComponent.TypeOf, SubCompNames(SubSubCompNum)));
                                 }
                             }
                         }

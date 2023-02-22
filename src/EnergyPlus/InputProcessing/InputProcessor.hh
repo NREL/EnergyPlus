@@ -137,6 +137,8 @@ public:
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
+    const json &getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName);
+
     void getObjectItem(EnergyPlusData &state,
                        std::string_view Object,
                        int const Number,
@@ -145,10 +147,10 @@ public:
                        Array1D<Real64> &Numbers,
                        int &NumNumbers,
                        int &Status,
-                       Optional<Array1D_bool> NumBlank = _,
-                       Optional<Array1D_bool> AlphaBlank = _,
-                       Optional<Array1D_string> AlphaFieldNames = _,
-                       Optional<Array1D_string> NumericFieldNames = _);
+                       ObjexxFCL::Optional<Array1D_bool> NumBlank = _,
+                       ObjexxFCL::Optional<Array1D_bool> AlphaBlank = _,
+                       ObjexxFCL::Optional<Array1D_string> AlphaFieldNames = _,
+                       ObjexxFCL::Optional<Array1D_string> NumericFieldNames = _);
 
     int getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
@@ -280,10 +282,10 @@ private:
                             int &NumAlphas,
                             Array1D<Real64> &Numbers,
                             int &NumNumbers,
-                            Optional<Array1D_bool> NumBlank = _,
-                            Optional<Array1D_bool> AlphaBlank = _,
-                            Optional<Array1D_string> AlphaFieldNames = _,
-                            Optional<Array1D_string> NumericFieldNames = _);
+                            ObjexxFCL::Optional<Array1D_bool> NumBlank = _,
+                            ObjexxFCL::Optional<Array1D_bool> AlphaBlank = _,
+                            ObjexxFCL::Optional<Array1D_string> AlphaFieldNames = _,
+                            ObjexxFCL::Optional<Array1D_string> NumericFieldNames = _);
 
     void addVariablesForMonthlyReport(EnergyPlusData &state, std::string const &reportName);
 
@@ -326,8 +328,12 @@ public:
     json epJSON;
 
 private:
+    // Maps OBJECTTYPE to ObjectType (example entry: {"ZONEHVAC:EQUIPMENTLIST", "ZoneHVAC:EquipmentList"})
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
+    // Maps ObjectType to ObjectCache (json::const_iterator const &schemaIterator, std::vector<json::const_iterator> const &inputObjectIterators)
     UnorderedObjectCacheMap objectCacheMap;
+
+    // ObjectType to vector of ObjectName
     UnusedObjectSet unusedInputs;
     char s[129] = {0};
 

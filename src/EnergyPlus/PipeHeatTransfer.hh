@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/Plant/Enums.hh>
@@ -236,7 +237,7 @@ namespace PipeHeatTransfer {
 
         void CalcBuriedPipeSoil(EnergyPlusData &state);
 
-        void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
+        void CalcPipesHeatTransfer(EnergyPlusData &state, ObjexxFCL::Optional_int_const LengthIndex = _);
 
         Real64 OutsidePipeHeatTransCoef(EnergyPlusData &state);
 
