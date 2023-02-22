@@ -5,6 +5,7 @@ Improved Support for Multi-speed Fans
 
 **Florida Solar Energy Center**
 
+ - 2/2/23 Design Document
  - 1/12/23 (Final version) Final NFP
  - 1/9/23 (Second revision)
  - 11/30/22 (First revision)
@@ -835,5 +836,248 @@ An existing eample file will be modified by adding multiple fan performance. If 
 
 • https://www.shareddocs.com/hvac/docs/1001/Public/0B/A10-1604-3.pdf Toshiba-Carrier MMDB service manual. See pages 8 and 9 for relevant unit data. See pages 17 and 18 for multi-speed fan “auto” control explanations
 
+## Design Document ##
+
+This document covers 3 types of coils, implemented in two modules: UnitarySystem and HVACVariableRefrigerantFlow. The UnitarySystem covers two types of coils: Coil:Heating/Cooling:WaterToAirHeatPump:EquationFit and Coil:Heating/Cooling:WaterToAirHeatPump:VariableSpeedEquationFit. The HVACVariableRefrigerantFlow covers a single type of coil: Coil:Heating/Cooling:DX:VariableRefrigerantFlow.
+
+### Coil:Heating/Cooling:WaterToAirHeatPump:EquationFit ###
+
+Several functions will be modified in the UnitarySystem module to allow multiple airflow rates with the fixed water flow. The functions included GetInput, Sizing, and Report.
+
+#### Sizing ####
+
+If autosize is required, linear discrete size of fan flow rates are assigned. The cooling coil air flow size code is provide below. The heating coil flow size will be similaer. 
+
+               // airflow sizing
+                Real64 AirFlowRate = WaterToAirHeatPumpSimple::GetCoilAirFlowRate(
+                    state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
+                if (this->m_NumOfSpeedCooling > 1) {
+                    for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
+                        if (state.dataUnitarySystems->designSpecMSHP[this->m_DesignSpecMSHPIndex].coolingVolFlowRatio[i] == DataSizing::AutoSize) {
+                            this->m_CoolVolumeFlowRate[i] = double(i) / double(this->m_NumOfSpeedCooling) * AirFlowRate;
+                        } else {
+                            this->m_CoolVolumeFlowRate[i] =
+                                state.dataUnitarySystems->designSpecMSHP[this->m_DesignSpecMSHPIndex].coolingVolFlowRatio[i] * AirFlowRate;
+                        }
+                        this->m_CoolMassFlowRate[i] = this->m_CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
+                    }
+                }
+
+#### Input ####
+
+##### Read inputs of UnitarySystemPerformance:Multispeed and corresponding two fields  
+
+                    if (getPTUnitType == 3) {
+                        thisSys.m_DesignSpecMultispeedHPType =
+                            ip->getAlphaFieldValue(fields, objectSchemaProps, "design_specification_multispeed_object_type");
+                        thisSys.m_DesignSpecMultispeedHPName =
+                            ip->getAlphaFieldValue(fields, objectSchemaProps, "design_specification_multispeed_object_name");
+                        if (!thisSys.m_DesignSpecMultispeedHPType.empty() && !thisSys.m_DesignSpecMultispeedHPName.empty()) {
+                            int designSpecType_Num = 1;
+                            DesignSpecMSHP thisDesignSpec;
+                            thisSys.m_CompPointerMSHP = thisDesignSpec.factory(state, designSpecType_Num, thisSys.m_DesignSpecMultispeedHPName);
+                            thisSys.m_DesignSpecMSHPIndex = getDesignSpecMSHPIndex(state, thisSys.m_DesignSpecMultispeedHPName);
+                        }
+                    }
+
+##### Set up arrays to store multuiple air flows and associated flags  
+
+Use existing array of multiple speed coils to set up heaiting and cooling volumatric and mass flow rates, speed ratios
+
+                        this->m_HeatMassFlowRate[i] = 0.0;
+                        this->m_HeatVolumeFlowRate[i] = 0.0;
+                        this->m_MSHeatingSpeedRatio[i] = 1.0;
+
+In addition, set up bool varibales as true:
+
+                        this->m_MultiSpeedHeatingCoil = true;
+                        this->m_MultiOrVarSpeedHeatCoil = true;
+
+If the UnitarySystemPerformance:Multispeed object is not available, the program will check if the fan type is Fan:SystemModel with Discrete speed control or not. If yes, the multiple fan speed operation is also applied. Since the Fan:SystemModel only provideds the number of speeds without specification of heating and cooling, the same number for heating and cooling will be applied.
+
+##### Set up airflow rate with auto size given in UnitarySystemPerformance:Multispeed #####
+
+If the supply heating and cooling flow rates are given in the inputs, the multiple speed airflows will be determined in the input function with or without autosize. The procedure is similar with one provided in the sizing.
+
+##### Set up corresponding output variables
+
+                        SetupOutputVariable(state,
+                                            "Unitary System Water Coil Cycling Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System Water Coil Speed Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System Water Coil Speed Level",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedNum,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+
+##### Report output variables
+ 
+Assign corresponding values to these output variables.
+
+        case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple: {
+            if (this->m_NumOfSpeedHeating > 1) {
+                this->m_CycRatio = max(this->m_CoolingCycRatio, this->m_HeatingCycRatio);
+                this->m_SpeedRatio = max(this->m_CoolingSpeedRatio, this->m_HeatingSpeedRatio);
+                this->m_SpeedNum = max(this->m_CoolingSpeedNum, this->m_HeatingSpeedNum);
+            }
+            if (state.dataUnitarySystems->HeatingLoad) {
+                this->m_TotalAuxElecPower =
+                    this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
+                this->m_HeatingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
+            }
+            if (this->m_LastMode == HeatingMode) {
+                this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
+            }
+
+            elecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+        } break;
+
+###Coil:Heating/Cooling:WaterToAirHeatPump:VariableSpeedEquationFit###
+
+The example file library does not provide the test file with selected Coil:Heating/Cooling:WaterToAirHeatPump:VariableSpeedEquationFit coil under ZoneHVAC:WaterToAirHeatPump. I modified an example file of DOAToWaterToAirInlet.idf to replace Coil:Heating/Cooling:WaterToAirHeatPump:EquationFit by Cooling:WaterToAirHeatPump:VariableSpeedEquationFit. Due to mismatch of airflows, although Cooling:WaterToAirHeatPump:VariableSpeedEquationFit coils have 10 speed, the parent object does not have such capability, so that no multiple speed airflows are simulateed. 
+
+The proposed revisions to adopt inputs of multiple speed fans are described below: 
+
+#### Modify input ####
+
+The GetInput function will be modified to read two new fields and accept the UnitarySystemPerformance:Multispeed.
+Since the coil specifies the number of speed. The number of speed from the UnitarySystemPerformance:Multispeed should match the number of speed from the coil. If not, a warning is issued and the number of speed from the coil will be used.
+
+#### Check the number speeds from both the coil and UnitarySystemPerformance:Multispeed ####
+
+The nuymber of speeds should match each other. If not, the number of speeds from coil prevails. In other words, the number of speed provided from UnitarySystemPerformance:Multispeed will be overridden. At the same time, a warning will be posted in the err file to let users be aware of the changes.
+
+#### Craete corresponding output variables to present the speed number, cycle ratio and speed ratio, to be consistent with other multuiple speed coils and fans.     
+
+#### Modify the OutputControl function ####
+
+A similar procedure with multipseed AirToAirHeatPump coil will be implemented.
+
+###Coil:Heating/Cooling:DX:VariableRefrigerantFlow###
+
+Modifications will be performed in the HVACVariableRefrigerantFlow module
+
+#### GetVRFInputData ####
+
+1. Read two new fields
+2. Get index of UnitarySystemPerformance:Multispeed
+3. Assign number of cooling and heating speeds from UnitarySystemPerformance:Multispeed
+4. Create new arrays for volumatric and mass flow rates in size of number of cooling and heating speeds.
+5. When the supply airflows are not autosize, assign airflows to the new array with or without autosize
+
+        if (!lAlphaFieldBlanks(20) && !lAlphaFieldBlanks(21)) {
+            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMultispeedHPType = cAlphaArgs(20);
+            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMultispeedHPName = cAlphaArgs(21);
+            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMSHPIndex = UnitarySystems::getDesignSpecMSHPIndex(state, cAlphaArgs(21));
+            auto &designSpecFan = state.dataUnitarySystems->designSpecMSHP[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMSHPIndex];
+            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXCoolCoilType_Num == DataHVACGlobals::CoilVRF_Cooling) {
+                int NumSpeeds = designSpecFan.numOfSpeedCooling;
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate.resize(NumSpeeds + 1);
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate.resize(NumSpeeds + 1);
+                if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
+                    Real64 AirFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow;
+                    for (int i = 1; i <= state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling; ++i) {
+                        if (state.dataUnitarySystems->designSpecMSHP[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMSHPIndex]
+                                .coolingVolFlowRatio[i] == DataSizing::AutoSize) {
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] =
+                                double(i) / double(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling) * AirFlowRate;
+                        } else {
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] =
+                                state.dataUnitarySystems->designSpecMSHP[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMSHPIndex]
+                                    .coolingVolFlowRatio[i] *
+                                AirFlowRate;
+                        }
+                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
+                    }
+                }
+            }
+            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXHeatCoilType_Num == DataHVACGlobals::CoilVRF_Heating) {
+                int NumSpeeds = designSpecFan.numOfSpeedHeating;
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate.resize(NumSpeeds + 1);
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate.resize(NumSpeeds + 1);
+                if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
+                    Real64 AirFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow;
+                    for (int i = 1; i <= state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedHeating; ++i) {
+                        if (state.dataUnitarySystems->designSpecMSHP[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMSHPIndex]
+                                .heatingVolFlowRatio[i] == DataSizing::AutoSize) {
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] =
+                                double(i) / double(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedHeating) * AirFlowRate;
+                        } else {
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] =
+                                state.dataUnitarySystems->designSpecMSHP[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMSHPIndex]
+                                    .heatingVolFlowRatio[i] *
+                                AirFlowRate;
+                        }
+                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] =
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
+                    }
+                }
+            }
+
+        }
+
+
+#### Sizing
+
+The sizing of supply flow rates are determined in the sizing function. The rest of flow rates at different speeds are determined by flow fraction provided in UnitarySystemPerformance:Multispeed. If the UnitarySystemPerformance:Multispeed object fields are autosized, the proportional fraction ratios will be provided.
+
+        // Multispeed Fan cooling flow sizing
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling > 0) {
+            Real64 AirFlowRate = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow;
+            for (int i = 1; i <= state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling; ++i) {
+                if (state.dataUnitarySystems->designSpecMSHP[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMSHPIndex].coolingVolFlowRatio[i] ==
+                    DataSizing::AutoSize) {
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] =
+                        double(i) / double(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling) * AirFlowRate;
+                } else {
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] =
+                        state.dataUnitarySystems->designSpecMSHP[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DesignSpecMSHPIndex]
+                            .coolingVolFlowRatio[i] *
+                        AirFlowRate;
+                }
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
+            }
+        }
+
+
+#### SetAverageAirFlow 
+
+The currect function set up average airflow is based on system on and off flow rate adjusted by part load ratio. When multiple speed fan is used, the average flow rates may be determined by speed ratio with two consecutive fan speeds. The procedure mimics the one from UnitarySystem.
+
+If multiple speed fan is applied, the average air flow rate is given in two scenarios:
+
+##### Speed Number = 1 #####
+
+        AverageUnitMassFlow =
+            (PartLoadRatio * state.dataHVACVarRefFlow->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataHVACVarRefFlow->CompOffMassFlow);
+
+##### Speed Number > 1 #####
+
+Cooling
+        AverageUnitMassFlow =
+            (SpeedRatio * state.dataHVACVarRefFlow->CoolMassFlowRate[CoolSpeedNum]) + ((1 - SpeedRatio) * state.dataHVACVarRefFlow->CoolMassFlowRate[CoolSpeedNum - 1]);
+
+Heating
+        AverageUnitMassFlow =
+            (SpeedRatio * state.dataHVACVarRefFlow->HeatMassFlowRate[HeatSpeedNum]) + ((1 - SpeedRatio) * state.dataHVACVarRefFlow->HeatMassFlowRate[HeatSpeedNum - 1]);
+
+#### CalcVRF ####
+
+When multiple speed fan is applied, a for loop will be used to test which speed is used for the terminal unit. The procedure mimics one from HVACAirToAirHeatPump:MUltispeed. 
 
 
