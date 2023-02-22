@@ -293,47 +293,6 @@ void SolveRoot(EnergyPlusData &state,
     XRes = XTemp;
 }
 
-std::string &strip_trailing_zeros(std::string &InputString)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Stuart Mentzer (in-place version of RemoveTrailingZeros by Linda Lawrie)
-    //       DATE WRITTEN   July 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Remove trailing fractional zeros from floating point representation strings in place.
-
-    static constexpr std::string_view ED("ED");
-    static constexpr std::string_view zero_string("0.");
-
-    assert(!has_any_of(InputString, "ed"));       // Pre Not using lowercase exponent letter
-    assert(InputString == stripped(InputString)); // Pre Already stripped surrounding spaces
-
-    if (has(InputString, '.') && (!has_any_of(InputString, ED))) { // Has decimal point and no exponent part
-        std::string::size_type const pos(InputString.find_last_not_of('0'));
-        if (pos + 1 < InputString.length()) {
-            switch (pos) { // Handle [+/-].000... format
-            case 0u:       // .0*
-                InputString = zero_string;
-                break;
-            case 1u:
-                if (InputString[1] == '.') {
-                    char const c0(InputString[0]);
-                    if ((c0 == '+') || (c0 == '-')) {
-                        InputString = zero_string;
-                        break;
-                    }
-                }
-                // fallthrough
-            default:
-                InputString.erase(pos + 1);
-            }
-        }
-    }
-    return InputString; // Allows chaining
-}
-
 void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
     if (NumItemsInAvg <= 1) return; // no need to average/smooth
@@ -1025,49 +984,6 @@ void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, ho
     Minute = mod(TmpItem, DecHr);
 }
 
-int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   January 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // When reporting peaks, minutes are used but not necessarily easily calculated.
-
-    // METHODOLOGY EMPLOYED:
-    // Could use the access to the minute as OP (OutputProcessor) does but uses
-    // external calculation.
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    // Return value
-    int ActualTimeMin; // calculated Minute for reporting
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 constexpr FracToMin(60.0);
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 ActualTimeS; // Start of current interval (HVAC time step)
-    Real64 ActualTimeE; // End of current interval (HVAC time step)
-    int ActualTimeHrS;
-
-    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-        ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
-        ActualTimeE = ActualTimeS + TimeStepSys;
-        ActualTimeHrS = int(ActualTimeS);
-        ActualTimeMin = nint((ActualTimeE - ActualTimeHrS) * FracToMin);
-    } else {
-        ActualTimeMin = (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)) * FracToMin;
-    }
-
-    return ActualTimeMin;
-}
-
 void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, hour, minute
                        int const Month, // month in integer format (1:12)
                        int const Day,   // day in integer format (1:31)
@@ -1096,110 +1012,6 @@ void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, h
     Item = ((Month * 100 + Day) * 100 + Hour) * 100 + Minute;
 }
 
-int LogicalToInteger(bool const Flag)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This subroutine uses an input logical and makes
-    // an integer (true=1, false=0)
-
-    // Return value
-    int LogicalToInteger;
-
-    if (Flag) {
-        LogicalToInteger = 1;
-    } else {
-        LogicalToInteger = 0;
-    }
-
-    return LogicalToInteger;
-}
-
-Real64 GetCurrentHVACTime(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This routine returns the time in seconds at the end of the current HVAC step.
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    // Return value
-    Real64 GetCurrentHVACTime;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 CurrentHVACTime;
-
-    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
-    // erronously truncate all sub-minute system time steps down to the closest full minute.
-    // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
-    // as real.
-    CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed + TimeStepSys;
-    GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour;
-
-    return GetCurrentHVACTime;
-}
-
-Real64 GetPreviousHVACTime(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This routine returns the time in seconds at the beginning of the current HVAC step.
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-
-    // Return value
-    Real64 GetPreviousHVACTime;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 PreviousHVACTime;
-
-    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
-    // erronously truncate all sub-minute system time steps down to the closest full minute.
-    PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed;
-    GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour;
-
-    return GetPreviousHVACTime;
-}
-
-std::string CreateHVACTimeIntervalString(EnergyPlusData &state)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function creates the time stamp with the current time interval for the HVAC
-    // time step.
-
-    // Return value
-    std::string OutputString;
-
-    OutputString = CreateTimeIntervalString(GetPreviousHVACTime(state), GetCurrentHVACTime(state));
-
-    return OutputString;
-}
-
 std::string CreateTimeString(Real64 const Time) // Time in seconds
 {
 
@@ -1226,32 +1038,6 @@ std::string CreateTimeString(Real64 const Time) // Time in seconds
     // TimeStamp written with formatting
     // "hh:mm:ss.s"
     return fmt::format("{:02d}:{:02d}:{:04.1f}", Hours, Minutes, Seconds);
-}
-
-std::string CreateTimeIntervalString(Real64 const StartTime, // Start of current interval in seconds
-                                     Real64 const EndTime    // End of current interval in seconds
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function creates the time stamp with the current time interval from start and end
-    // time values specified in seconds.
-    // Inspired by similar function CreateSysTimeIntervalString() in General.cc
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    std::string TimeStmpS; // Character representation of start of interval
-    std::string TimeStmpE; // Character representation of end of interval
-
-    TimeStmpS = CreateTimeString(StartTime);
-    TimeStmpE = CreateTimeString(EndTime);
-
-    return TimeStmpS + " - " + TimeStmpE;
 }
 
 void ParseTime(Real64 const Time, // Time value in seconds
@@ -1323,16 +1109,6 @@ void ScanForReports(EnergyPlusData &state,
     int NumNames;
     int NumNumbers;
     int IOStat;
-    auto &DXFOption1 = state.dataGeneral->DXFOption1;
-    auto &DXFOption2 = state.dataGeneral->DXFOption2;
-    auto &DXFWFOption1 = state.dataGeneral->DXFWFOption1;
-    auto &DXFWFOption2 = state.dataGeneral->DXFWFOption2;
-    auto &VRMLOption1 = state.dataGeneral->VRMLOption1;
-    auto &VRMLOption2 = state.dataGeneral->VRMLOption2;
-    auto &ViewRptOption1 = state.dataGeneral->ViewRptOption1;
-    auto &LineRptOption1 = state.dataGeneral->LineRptOption1;
-    auto &VarDictOption1 = state.dataGeneral->VarDictOption1;
-    auto &VarDictOption2 = state.dataGeneral->VarDictOption2;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     if (state.dataGeneral->GetReportInput) {
@@ -1383,7 +1159,7 @@ void ScanForReports(EnergyPlusData &state,
                 switch (value) {
                 case LINES:
                     state.dataGeneral->LineRpt = true;
-                    LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                    state.dataGeneral->LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
                     break;
                 case VERTICES:
                     state.dataGeneral->SurfVert = true;
@@ -1400,7 +1176,7 @@ void ScanForReports(EnergyPlusData &state,
                     break;
                 case VIEWFACTORINFO: // actual reporting is in HeatBalanceIntRadExchange
                     state.dataGeneral->ViewFactorInfo = true;
-                    ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                    state.dataGeneral->ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
                     break;
                 case DECAYCURVESFROMCOMPONENTLOADSSUMMARY: // Should the Radiant to Convective Decay Curves from the
                                                            // load component report appear in the EIO file
@@ -1445,18 +1221,18 @@ void ScanForReports(EnergyPlusData &state,
             switch (checkReportType) {
             case ReportType::DXF: {
                 state.dataGeneral->DXFReport = true;
-                DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
+                state.dataGeneral->DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
             } break;
             case ReportType::DXFWireFrame: {
                 state.dataGeneral->DXFWFReport = true;
-                DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
+                state.dataGeneral->DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
             } break;
             case ReportType::VRML: {
                 state.dataGeneral->VRMLReport = true;
-                VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
+                state.dataGeneral->VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
             } break;
             default:
                 break;
@@ -1466,8 +1242,8 @@ void ScanForReports(EnergyPlusData &state,
         RepNum = state.dataInputProcessing->inputProcessor->getNumSectionsFound("Report Variable Dictionary");
         if (RepNum > 0) {
             state.dataGeneral->VarDict = true;
-            VarDictOption1 = "REGULAR";
-            VarDictOption2 = "";
+            state.dataGeneral->VarDictOption1 = "REGULAR";
+            state.dataGeneral->VarDictOption2 = "";
         }
 
         cCurrentModuleObject = "Output:VariableDictionary";
@@ -1487,8 +1263,8 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataGeneral->VarDict = true;
-            VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
-            VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataGeneral->VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataGeneral->VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
         }
 
         cCurrentModuleObject = "Output:Constructions";
@@ -1572,12 +1348,12 @@ void ScanForReports(EnergyPlusData &state,
     } break;
     case ReportName::Viewfactorinfo: {
         DoReport = state.dataGeneral->ViewFactorInfo;
-        if (present(Option1)) Option1 = ViewRptOption1;
+        if (present(Option1)) Option1 = state.dataGeneral->ViewRptOption1;
     } break;
     case ReportName::Variabledictionary: {
         DoReport = state.dataGeneral->VarDict;
-        if (present(Option1)) Option1 = VarDictOption1;
-        if (present(Option2)) Option2 = VarDictOption2;
+        if (present(Option1)) Option1 = state.dataGeneral->VarDictOption1;
+        if (present(Option2)) Option2 = state.dataGeneral->VarDictOption2;
         //    CASE ('SCHEDULES')
         //     DoReport=SchRpt
         //      IF (PRESENT(Option1)) Option1=SchRptOption
@@ -1590,18 +1366,18 @@ void ScanForReports(EnergyPlusData &state,
         } break;
         case RptKey::DXF: {
             DoReport = state.dataGeneral->DXFReport;
-            if (present(Option1)) Option1 = DXFOption1;
-            if (present(Option2)) Option2 = DXFOption2;
+            if (present(Option1)) Option1 = state.dataGeneral->DXFOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->DXFOption2;
         } break;
         case RptKey::DXFwireframe: {
             DoReport = state.dataGeneral->DXFWFReport;
-            if (present(Option1)) Option1 = DXFWFOption1;
-            if (present(Option2)) Option2 = DXFWFOption2;
+            if (present(Option1)) Option1 = state.dataGeneral->DXFWFOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->DXFWFOption2;
         } break;
         case RptKey::VRML: {
             DoReport = state.dataGeneral->VRMLReport;
-            if (present(Option1)) Option1 = VRMLOption1;
-            if (present(Option2)) Option2 = VRMLOption2;
+            if (present(Option1)) Option1 = state.dataGeneral->VRMLOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->VRMLOption2;
         } break;
         case RptKey::Vertices: {
             DoReport = state.dataGeneral->SurfVert;
@@ -1614,7 +1390,7 @@ void ScanForReports(EnergyPlusData &state,
         } break;
         case RptKey::Lines: {
             DoReport = state.dataGeneral->LineRpt;
-            if (present(Option1)) Option1 = LineRptOption1;
+            if (present(Option1)) Option1 = state.dataGeneral->LineRptOption1;
         } break;
         default:
             break;
@@ -1680,23 +1456,6 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
         ResultName = "xxxxxxx";
         errFlag = true;
     }
-}
-
-// This is from OpenStudio
-std::vector<std::string> splitString(const std::string &string, char delimiter)
-{
-    std::vector<std::string> results;
-    if (!string.empty()) { // Only do work if there is work to do
-        std::stringstream stream(string);
-        std::string substring;
-        while (std::getline(stream, substring, delimiter)) { // Loop and fill the results vector
-            results.push_back(substring);
-        }
-        if (*(string.end() - 1) == ',') { // Add an empty string if the last char is the delimiter
-            results.emplace_back();
-        }
-    }
-    return results;
 }
 
 bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx)

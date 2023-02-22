@@ -49,7 +49,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
@@ -128,11 +127,11 @@ namespace VariableSpeedCoils {
                                Real64 &FanDelayTime,                   // Fan delay time, time delay for the HP's fan to
                                CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
-                               int const SpeedNum,                               // compressor speed number
-                               Real64 const SpeedRatio,                          // compressor speed ratio
-                               Real64 const SensLoad,                            // Sensible demand load [W]
-                               Real64 const LatentLoad,                          // Latent demand load [W]
-                               ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
+                               int const SpeedNum,            // compressor speed number
+                               Real64 const SpeedRatio,       // compressor speed ratio
+                               Real64 const SensLoad,         // Sensible demand load [W]
+                               Real64 const LatentLoad,       // Latent demand load [W]
+                               const Real64 OnOffAirFlowRatio // ratio of comp on to comp off air flow rate
     )
     {
 
@@ -149,10 +148,9 @@ namespace VariableSpeedCoils {
         using General::SolveRoot;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DXCoilNum;            // The WatertoAirHP that you are currently loading input into
-        Real64 OnOffAirFlowRatio; // ratio of comp on to comp off air flow rate
-        Real64 RuntimeFrac;       // run time fraction
-        int SpeedCal;             // variable for error proof speed input
+        int DXCoilNum;      // The WatertoAirHP that you are currently loading input into
+        Real64 RuntimeFrac; // run time fraction
+        int SpeedCal;       // variable for error proof speed input
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -183,12 +181,6 @@ namespace VariableSpeedCoils {
                            CompName,
                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
             }
-        }
-
-        if (present(OnOffAirFlowRat)) {
-            OnOffAirFlowRatio = OnOffAirFlowRat;
-        } else {
-            OnOffAirFlowRatio = 1.0;
         }
 
         // ERROR PROOF
@@ -287,7 +279,6 @@ namespace VariableSpeedCoils {
         using namespace OutputReportPredefined;
         using Curve::CurveValue;
         using Curve::GetCurveIndex;
-        using Curve::SetCurveOutputMinMaxValues;
 
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;

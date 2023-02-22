@@ -328,6 +328,8 @@ namespace HeatBalanceManager {
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
 
+        DataSurfaces::GetVariableAbsorptanceSurfaceList(state);
+
         GetIncidentSolarMultiplier(state, ErrorsFound);
 
         // Added SV 6/26/2013 to load scheduled surface gains
