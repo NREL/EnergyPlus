@@ -83,6 +83,8 @@ namespace StandardRatings {
         Num,
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(DefrostStrat::Num)> DefrostStratUC = {"REVERSECYCLE", "RESISTIVE"};
+
     // Defrost control  (heat pump only)
     enum class HPdefrostControl : int
     {
@@ -91,6 +93,18 @@ namespace StandardRatings {
         OnDemand, // defrost cycle occurs only when required
         Num
     };
+
+    static constexpr std::array<std::string_view, static_cast<int>(HPdefrostControl::Num)> HPdefrostControlUC = {"TIMED", "ONDEMAND"};
+
+    enum class AhriChillerStd
+    {
+        Invalid = -1,
+        AHRI550_590,
+        AHRI551_591,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(AhriChillerStd::Num)> AhriChillerStdNamesUC{"AHRI550_590", "AHRI551_591"};
 
     // Functions
 
@@ -104,7 +118,8 @@ namespace StandardRatings {
                          int const EIRFTempCurveIndex,                 // Index for the energy input ratio modifier curve
                          int const EIRFPLRCurveIndex,                  // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,                    // Minimum unloading ratio
-                         Real64 &IPLV,
+                         Real64 &IPLVSI,                               // IPLV.SI determined using AHRI Std 551/591 (SI)
+                         Real64 &IPLVIP,                               // IPLV.IP determined using AHRI Std 550/590 (IP)
                          ObjexxFCL::Optional<Real64 const> CondVolFlowRate,
                          ObjexxFCL::Optional_int_const CondLoopNum,
                          ObjexxFCL::Optional<Real64 const> OpenMotorEff);
@@ -448,6 +463,12 @@ namespace StandardRatings {
                                             int const EIRFTempCurveIndex,  // Index for the EIR as a function of temperature modifier curve
                                             int const EIRFFlowCurveIndex,  // Index for the EIR as a function of flow fraction modifier curve
                                             int const PLFFPLRCurveIndex    // Index for the EIR vs part-load ratio curve
+    );
+
+    Real64 CondenserEnteringFluidTemperature(
+        DataPlant::CondenserType const CondenserType,     // Chiller Condenser Type: AirCooled, WaterCooled, or EvaporativelyCooled
+        StandardRatings::AhriChillerStd const ChillerStd, // AHRI Std 550/590 (IP), or AHRI Std 551/591 (SI)
+        Real64 LoadRatio                                  // AHRI Std test load ratio: 1.0, 0.75, 0.5, 0.25
     );
 
 } // namespace StandardRatings

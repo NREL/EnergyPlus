@@ -117,6 +117,7 @@ struct DemandManagerData;
 struct DesiccantDehumidifiersData;
 struct DisplacementVentMgrData;
 struct DualDuctData;
+struct EIRFuelFiredHeatPumpsData;
 struct EIRPlantLoopHeatPumpsData;
 struct EMSManagerData;
 struct EarthTubeData;
@@ -375,6 +376,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<DesiccantDehumidifiersData> dataDesiccantDehumidifiers;
     std::unique_ptr<DisplacementVentMgrData> dataDispVentMgr;
     std::unique_ptr<DualDuctData> dataDualDuct;
+    std::unique_ptr<EIRFuelFiredHeatPumpsData> dataEIRFuelFiredHeatPump;
     std::unique_ptr<EIRPlantLoopHeatPumpsData> dataEIRPlantLoopHeatPump;
     std::unique_ptr<EMSManagerData> dataEMSMgr;
     std::unique_ptr<EarthTubeData> dataEarthTube;
