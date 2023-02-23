@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -227,21 +227,21 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     } else if (this->unitarySysEqSizing(this->curSysNum).HeatingAirFlow) {
                         DesVolFlow = this->unitarySysEqSizing(this->curSysNum).HeatingAirVolFlow;
                     } else {
-                        if (this->curDuctType == DataHVACGlobals::Main) {
+                        if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
                             if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                 DesVolFlow =
                                     this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             } else {
                                 DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::Cooling) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
                             if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                 DesVolFlow =
                                     this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             } else {
                                 DesVolFlow = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::Heating) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                         } else {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
@@ -252,7 +252,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 // get the outside air fraction
                 if (this->curOASysNum > 0) {
                     OutAirFrac = 1.0;
-                } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::MinOA) {
+                } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::OAControl::MinOA) {
                     if (DesVolFlow > 0.0) {
                         OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / DesVolFlow;
                     } else {

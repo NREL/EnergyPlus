@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -441,60 +441,68 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 
     // Set plant loop temperature to 10C, below hot water temperature to trigger warning
     state->dataLoopNodes->Node(1).Temp = 10;
-    state->dataWaterUse->WaterConnections(WaterConnNum).InitConnections(*state);
     Real64 WaterEquipNum = 1;
-    state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
+    auto &thisWaterConnections = state->dataWaterUse->WaterConnections(WaterConnNum);
+    auto &thisWaterEquipment = state->dataWaterUse->WaterEquipment(WaterEquipNum);
+    thisWaterConnections.InitConnections(*state);
+    thisWaterEquipment.WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
     std::string const error_string1 = delimited_string({
-        "   ** Warning ** CalcEquipmentFlowRates: \"CORE_ZN WATER EQUIPMENT\" - Hot water temperature is less than the cold water temperature (5.00 "
-        "C)",
+        "   ** Warning ** CalcEquipmentFlowRates: \"CORE_ZN WATER EQUIPMENT\" - Hot water temperature is less than the cold water temperature by "
+        "(5.00 C)",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-        "   **   ~~~   ** ...hot water temperature       = 10.00 C",
+        "   **   ~~~   ** ...hot water temperature        = 10.00 C",
         "   **   ~~~   ** ...cold water temperature       = 15.00 C",
-        "   **   ~~~   ** ...Note: hot water temperature should be greater than or equal to the cold water temperature",
         "   **   ~~~   ** ...Hot water temperature should be greater than or equal to the cold water temperature. Verify temperature setpoints and "
         "schedules.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string1, true));
 
+    // configuration allows hot water mixing. A target temp schedule exists with either a hot temp schedule or a connnections object
+    EXPECT_TRUE(thisWaterEquipment.allowHotControl);
+    EXPECT_TRUE(thisWaterEquipment.TargetTempSchedule);
+    EXPECT_TRUE(thisWaterEquipment.HotTempSchedule || thisWaterEquipment.Connections);
+    EXPECT_GT(thisWaterEquipment.HotMassFlowRate, 0.0);
+    EXPECT_NEAR(thisWaterEquipment.ColdMassFlowRate + thisWaterEquipment.HotMassFlowRate, thisWaterEquipment.TotalMassFlowRate, 0.00000001);
+
     // Reset hot water temperature to 43.3C
     state->dataLoopNodes->Node(1).Temp = 43.3;
-    state->dataWaterUse->WaterConnections(WaterConnNum).InitConnections(*state);
+    thisWaterConnections.InitConnections(*state);
 
     // Set target temperature to 50C, above hot water temperature to trigger warning
     state->dataScheduleMgr->Schedule(4).CurrentValue = 50;
-    WaterEquipNum = 1;
-    state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
+    thisWaterEquipment.WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
     std::string const error_string2 = delimited_string({
         "   ** Warning ** CalcEquipmentFlowRates: \"CORE_ZN WATER EQUIPMENT\" - Target water temperature is greater than the hot water temperature "
-        "(6.70 C)",
+        "by (6.70 C)",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-        "   **   ~~~   ** ...target water temperature       = 50.00 C",
-        "   **   ~~~   ** ...hot water temperature       = 43.30 C",
-        "   **   ~~~   ** ...Note: target water temperature should be less than or equal to the hot water temperature",
+        "   **   ~~~   ** ...target water temperature     = 50.00 C",
+        "   **   ~~~   ** ...hot water temperature        = 43.30 C",
         "   **   ~~~   ** ...Target water temperature should be less than or equal to the hot water temperature. Verify temperature setpoints and "
         "schedules.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string2, true));
+    EXPECT_GT(thisWaterEquipment.HotMassFlowRate, 0.0);
+    EXPECT_NEAR(thisWaterEquipment.ColdMassFlowRate + thisWaterEquipment.HotMassFlowRate, thisWaterEquipment.TotalMassFlowRate, 0.00000001);
 
     // Set target temperature to 0C, below cold water temperature to trigger warning
     state->dataScheduleMgr->Schedule(4).CurrentValue = 0;
-    WaterEquipNum = 1;
-    state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
+    thisWaterEquipment.WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
     std::string const error_string3 = delimited_string({
         "   ** Warning ** CalcEquipmentFlowRates: \"CORE_ZN WATER EQUIPMENT\" - Target water temperature is less than the cold water temperature "
-        "(15.00 C)",
+        "by (15.00 C)",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-        "   **   ~~~   ** ...target water temperature       = 0.00 C",
+        "   **   ~~~   ** ...target water temperature     = 0.00 C",
         "   **   ~~~   ** ...cold water temperature       = 15.00 C",
-        "   **   ~~~   ** ...Note: target water temperature should be greater than or equal to the cold water temperature",
         "   **   ~~~   ** ...Target water temperature should be greater than or equal to the cold water temperature. Verify temperature setpoints "
         "and schedules.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string3, true));
+    EXPECT_GT(thisWaterEquipment.ColdMassFlowRate, 0.0);
+    EXPECT_NEAR(thisWaterEquipment.ColdMassFlowRate + thisWaterEquipment.HotMassFlowRate, thisWaterEquipment.TotalMassFlowRate, 0.00000001);
 }

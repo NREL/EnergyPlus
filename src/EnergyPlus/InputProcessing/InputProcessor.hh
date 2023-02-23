@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -117,7 +117,7 @@ public:
 
     int getNumSectionsFound(std::string const &SectionWord);
 
-    int getNumObjectsFound(EnergyPlusData &state, std::string_view const &ObjectWord);
+    int getNumObjectsFound(EnergyPlusData &state, std::string_view const ObjectWord);
 
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
@@ -137,6 +137,8 @@ public:
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
+    const json &getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName);
+
     void getObjectItem(EnergyPlusData &state,
                        std::string_view Object,
                        int const Number,
@@ -145,10 +147,10 @@ public:
                        Array1D<Real64> &Numbers,
                        int &NumNumbers,
                        int &Status,
-                       Optional<Array1D_bool> NumBlank = _,
-                       Optional<Array1D_bool> AlphaBlank = _,
-                       Optional<Array1D_string> AlphaFieldNames = _,
-                       Optional<Array1D_string> NumericFieldNames = _);
+                       ObjexxFCL::Optional<Array1D_bool> NumBlank = _,
+                       ObjexxFCL::Optional<Array1D_bool> AlphaBlank = _,
+                       ObjexxFCL::Optional<Array1D_string> AlphaFieldNames = _,
+                       ObjexxFCL::Optional<Array1D_string> NumericFieldNames = _);
 
     int getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
@@ -192,10 +194,10 @@ public:
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
 
     void getObjectDefMaxArgs(EnergyPlusData &state,
-                             std::string_view const &ObjectWord, // Object for definition
-                             int &NumArgs,                       // How many arguments (max) this Object can have
-                             int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
-                             int &NumNumeric                     // How many Numeric arguments (max) this Object can have
+                             std::string_view const ObjectWord, // Object for definition
+                             int &NumArgs,                      // How many arguments (max) this Object can have
+                             int &NumAlpha,                     // How many Alpha arguments (max) this Object can have
+                             int &NumNumeric                    // How many Numeric arguments (max) this Object can have
     );
 
     void preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal); // True if a preprocessor flags a fatal error
@@ -280,10 +282,10 @@ private:
                             int &NumAlphas,
                             Array1D<Real64> &Numbers,
                             int &NumNumbers,
-                            Optional<Array1D_bool> NumBlank = _,
-                            Optional<Array1D_bool> AlphaBlank = _,
-                            Optional<Array1D_string> AlphaFieldNames = _,
-                            Optional<Array1D_string> NumericFieldNames = _);
+                            ObjexxFCL::Optional<Array1D_bool> NumBlank = _,
+                            ObjexxFCL::Optional<Array1D_bool> AlphaBlank = _,
+                            ObjexxFCL::Optional<Array1D_string> AlphaFieldNames = _,
+                            ObjexxFCL::Optional<Array1D_string> NumericFieldNames = _);
 
     void addVariablesForMonthlyReport(EnergyPlusData &state, std::string const &reportName);
 
@@ -326,8 +328,12 @@ public:
     json epJSON;
 
 private:
+    // Maps OBJECTTYPE to ObjectType (example entry: {"ZONEHVAC:EQUIPMENTLIST", "ZoneHVAC:EquipmentList"})
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
+    // Maps ObjectType to ObjectCache (json::const_iterator const &schemaIterator, std::vector<json::const_iterator> const &inputObjectIterators)
     UnorderedObjectCacheMap objectCacheMap;
+
+    // ObjectType to vector of ObjectName
     UnusedObjectSet unusedInputs;
     char s[129] = {0};
 

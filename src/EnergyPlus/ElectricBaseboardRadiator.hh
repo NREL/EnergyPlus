@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -147,8 +147,6 @@ namespace ElectricBaseboardRadiator {
 
     void ReportElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
-
 } // namespace ElectricBaseboardRadiator
 
 struct ElectricBaseboardRadiatorData : BaseGlobalStruct
@@ -170,7 +168,6 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct
     Array1D<ElectricBaseboardRadiator::ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
     bool GetInputFlag = true; // One time get input flag
     bool MyOneTimeFlag = true;
-    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     Array1D_bool MyEnvrnFlag;
     void clear_state() override
@@ -179,7 +176,6 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct
         this->NumElecBaseboards = 0;
         this->GetInputFlag = true;
         this->MyOneTimeFlag = true;
-        this->ZoneEquipmentListChecked = false;
         this->QBBElecRadSource.clear();     // Need to keep the last value in case we are still iterating
         this->QBBElecRadSrcAvg.clear();     // Need to keep the last value in case we are still iterating
         this->ZeroSourceSumHATsurf.clear(); // Equal to the SumHATsurf for all the walls in a zone with no source

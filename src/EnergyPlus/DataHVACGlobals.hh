@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -112,12 +112,21 @@ namespace DataHVACGlobals {
         Num
     };
 
+    enum class AirDuctType
     // parameters describing air duct type
-    int constexpr Main(1);
+    {
+        Invalid = -1,
+        Main,
+        Cooling,
+        Heating,
+        Other,
+        RAB,
+        Num
+    };
+
     int constexpr Cooling(2);
     int constexpr Heating(3);
-    int constexpr Other(4);
-    int constexpr RAB(5);
+
     // parameters describing fan types
     int constexpr NumAllFanTypes(6);
 

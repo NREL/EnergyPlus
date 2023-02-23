@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -490,12 +490,6 @@ namespace FluidProperties {
                                 std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
-    Real64 GetSupHeatTempRefrigResidual(EnergyPlusData &state,
-                                        Real64 Temperature, // temperature of the refrigerant
-                                        std::array<Real64, 3> const &Par);
-
-    //*****************************************************************************
-
     Real64 GetSupHeatDensityRefrig(EnergyPlusData &state,
                                    std::string_view const Refrigerant, // carries in substance name
                                    Real64 Temperature,                 // actual temperature given as input
@@ -526,6 +520,7 @@ namespace FluidProperties {
 
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        DISABLE_WARNING_UNINITIALIZED
         std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);
         DISABLE_WARNING_POP
 

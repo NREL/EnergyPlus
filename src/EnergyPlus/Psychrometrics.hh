@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,6 +90,7 @@ struct EnergyPlusData;
 
 // purposfully doing nothing here - does MSVC not have a strict-aliasing warning?
 #define DISABLE_WARNING_STRICT_ALIASING
+#define DISABLE_WARNING_UNINITIALIZED
 #elif defined(__GNUC__) || defined(__clang__)
 #define DO_PRAGMA(X) _Pragma(#X)
 #define DISABLE_WARNING_PUSH DO_PRAGMA(GCC diagnostic push)
@@ -97,6 +98,8 @@ struct EnergyPlusData;
 #define DISABLE_WARNING(warningName) DO_PRAGMA(GCC diagnostic ignored #warningName)
 
 #define DISABLE_WARNING_STRICT_ALIASING DISABLE_WARNING(-Wstrict-aliasing)
+#define DISABLE_WARNING_UNINITIALIZED DISABLE_WARNING(-Wuninitialized)
+
 #endif
 // clang-format on
 

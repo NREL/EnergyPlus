@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -105,7 +104,7 @@ namespace NodeInputManager {
                      DataLoopNode::ConnectionType nodeConnectionType,   // Node Connection Type (see DataLoopNode)
                      CompFluidStream NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
                      bool ObjectIsParent,                               // True/False
-                     Optional_bool_const IncrementFluidStream = _,      // True/False
+                     bool const IncrementFluidStream = false,           // True/False
                      std::string_view const InputFieldName = {}         // Input Field Name
     );
 

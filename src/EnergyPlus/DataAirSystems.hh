@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -129,15 +130,15 @@ namespace DataAirSystems {
     struct AirLoopBranchData // a branch is a sequence of components
     {
         // Members
-        std::string Name;              // Name of the branch
-        std::string ControlType;       // Control type for the branch (not used)
-        int TotalComponents = 0;       // Total number of high level components on the branch
-        Array1D_int FirstCompIndex;    // Gives the component index in AllComp that corresponds to Comp
-        Array1D_int LastCompIndex;     // Gives comp index in AllComp that corresponds to last subcomponent
-        int NodeNumIn = 0;             // Branch inlet node number
-        int NodeNumOut = 0;            // Branch outlet node number
-        int DuctType = 0;              // 1=main, 2=cooling, 3=heating, 4=other
-        Array1D<AirLoopCompData> Comp; // Component list--high level components
+        std::string Name;           // Name of the branch
+        std::string ControlType;    // Control type for the branch (not used)
+        int TotalComponents = 0;    // Total number of high level components on the branch
+        Array1D_int FirstCompIndex; // Gives the component index in AllComp that corresponds to Comp
+        Array1D_int LastCompIndex;  // Gives comp index in AllComp that corresponds to last subcomponent
+        int NodeNumIn = 0;          // Branch inlet node number
+        int NodeNumOut = 0;         // Branch outlet node number
+        DataHVACGlobals::AirDuctType DuctType = DataHVACGlobals::AirDuctType::Invalid; // 1=main, 2=cooling, 3=heating, 4=other
+        Array1D<AirLoopCompData> Comp;                                                 // Component list--high level components
         //  This list would include children, grandchildren, etc.
         int TotalNodes = 0;  // total number of nodes on branch
         Array1D_int NodeNum; // node list (numbers)

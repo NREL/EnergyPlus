@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlnt->PlantLoop(PltSizNum).FluidName = "WATER";
     state->dataSize->PlantSizData(PltSizNum).DesVolFlowRate = 1.0;
     state->dataSize->PlantSizData(PltSizNum).DeltaT = 10.0;
-    state->dataSize->PlantSizData(PltSizNum).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(PltSizNum).LoopType = DataSizing::TypeOfPlantLoop::Cooling;
     // Assign to the wrapper
     state->dataPlantCentralGSHP->Wrapper(1).CWPlantLoc.loopNum = PltSizNum;
 
@@ -132,7 +132,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex = 1;
     state->dataPlnt->PlantLoop(PltSizCondNum).FluidName = "WATER";
     state->dataSize->PlantSizData(PltSizCondNum).DeltaT = 5.6;
-    state->dataSize->PlantSizData(PltSizCondNum).LoopType = DataSizing::CondenserLoop;
+    state->dataSize->PlantSizData(PltSizCondNum).LoopType = DataSizing::TypeOfPlantLoop::Condenser;
     // Assign to the wrapper
     state->dataPlantCentralGSHP->Wrapper(1).GLHEPlantLoc.loopNum = PltSizCondNum;
 

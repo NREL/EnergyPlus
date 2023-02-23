@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -203,10 +203,10 @@ namespace DataSystemVariables {
         }
 
         // If we get here, we didn't find the file
-        ShowSevereError(state, contextString + "\"" + originalInputFilePath.string() + "\" not found.");
+        ShowSevereError(state, format("{}\"{}\" not found.", contextString, originalInputFilePath.string()));
         ShowContinueError(state, "  Paths searched:");
         for (auto &path : pathsChecked) {
-            ShowContinueError(state, "    " + path.second + ": \"" + path.first.string() + "\"");
+            ShowContinueError(state, format("    {}: \"{}\"", path.second, path.first.string()));
         }
 
         return foundFilePath;

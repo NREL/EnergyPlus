@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,22.2;
+  Version,23.1;
 
   Building,
     Building,                !- Name
@@ -168,15 +168,11 @@
     31,                      !- End Day of Month
     2016,                    !- End Year
     Friday,                  !- Day of Week for Start Day
-    No,                      !- Use Weather File Holidays and Special Days
-    No,                      !- Use Weather File Daylight Saving Period
-    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    Yes,                     !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
-  RunPeriodControl:DaylightSavingTime,
-    3/11,                    !- Start Date
-    11/4;                    !- End Date
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name

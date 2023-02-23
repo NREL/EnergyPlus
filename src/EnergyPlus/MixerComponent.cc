@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -106,7 +106,7 @@ void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompInde
     if (CompIndex == 0) {
         MixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
         if (MixerNum == 0) {
-            ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + std::string{CompName});
+            ShowFatalError(state, format("SimAirLoopMixer: Mixer not found={}", CompName));
         }
         CompIndex = MixerNum;
     } else {
@@ -267,7 +267,7 @@ void GetMixerInput(EnergyPlusData &state)
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             if (lAlphaBlanks(2 + NodeNum)) {
-                ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
+                ShowSevereError(state, format("{} is Blank, {} = {}", cAlphaFields(2 + NodeNum), CurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
         }
@@ -280,9 +280,10 @@ void GetMixerInput(EnergyPlusData &state)
         for (InNodeNum1 = 1; InNodeNum1 <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeNum1) {
             if (NodeNum != state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeNum1)) continue;
             ShowSevereError(state,
-                            CurrentModuleObject + " = " + state.dataMixerComponent->MixerCond(MixerNum).MixerName +
-                                " specifies an inlet node name the same as the outlet node.");
-            ShowContinueError(state, ".." + cAlphaFields(2) + " = " + state.dataLoopNodes->NodeID(NodeNum));
+                            format("{} = {} specifies an inlet node name the same as the outlet node.",
+                                   CurrentModuleObject,
+                                   state.dataMixerComponent->MixerCond(MixerNum).MixerName));
+            ShowContinueError(state, format("..{} = {}", cAlphaFields(2), state.dataLoopNodes->NodeID(NodeNum)));
             ShowContinueError(state, format("..Inlet Node #{} is duplicate.", InNodeNum1));
             ErrorsFound = true;
         }
@@ -292,8 +293,9 @@ void GetMixerInput(EnergyPlusData &state)
                     state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeNum2))
                     continue;
                 ShowSevereError(state,
-                                CurrentModuleObject + " = " + state.dataMixerComponent->MixerCond(MixerNum).MixerName +
-                                    " specifies duplicate inlet nodes in its inlet node list.");
+                                format("{} = {} specifies duplicate inlet nodes in its inlet node list.",
+                                       CurrentModuleObject,
+                                       state.dataMixerComponent->MixerCond(MixerNum).MixerName));
                 ShowContinueError(state, format("..Inlet Node #{} Name={}", InNodeNum1, state.dataLoopNodes->NodeID(InNodeNum1)));
                 ShowContinueError(state, format("..Inlet Node #{} is duplicate.", InNodeNum2));
                 ErrorsFound = true;
@@ -309,7 +311,7 @@ void GetMixerInput(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
+        ShowFatalError(state, format("{}Errors found in getting input.", RoutineName));
     }
 }
 
@@ -619,9 +621,9 @@ void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int 
     MixerIndex = UtilityRoutines::FindItemInList(MixerName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
     if (MixerIndex == 0) {
         if (!ThisObjectType.empty()) {
-            ShowSevereError(state, ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
+            ShowSevereError(state, format("{}, GetZoneMixerIndex: Zone Mixer not found={}", ThisObjectType, MixerName));
         } else {
-            ShowSevereError(state, "GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
+            ShowSevereError(state, format("GetZoneMixerIndex: Zone Mixer not found={}", MixerName));
         }
         ErrorsFound = true;
     }

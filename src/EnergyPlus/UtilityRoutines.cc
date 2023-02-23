@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -335,13 +335,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, format("{}, duplicate name={}", StringToDisplay, NameToVerify));
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(state, StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, format("{}, cannot be blank", StringToDisplay));
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -373,13 +373,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             int Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, format("{}, duplicate name={}", StringToDisplay, NameToVerify));
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(state, StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, format("{}, cannot be blank", StringToDisplay));
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -390,7 +390,7 @@ namespace UtilityRoutines {
     bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string_view StringToDisplay, bool &ErrorFound)
     {
         if (NameToVerify.empty()) {
-            ShowSevereError(state, std::string{StringToDisplay} + " Name, cannot be blank");
+            ShowSevereError(state, format("{} Name, cannot be blank", StringToDisplay));
             ErrorFound = true;
             NameToVerify = "xxxxx";
             return true;
@@ -432,8 +432,8 @@ namespace UtilityRoutines {
                     fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::out); // open file normally
                     if (!fsPerfLog) {
                         ShowFatalError(state,
-                                       "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFilePath.string() +
-                                           "\" for output (write).");
+                                       format("appendPerfLog: Could not open file \"{}\" for output (write).",
+                                              state.dataStrGlobals->outputPerfLogFilePath.string()));
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
@@ -443,8 +443,8 @@ namespace UtilityRoutines {
                     fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::app); // append to already existing file
                     if (!fsPerfLog) {
                         ShowFatalError(state,
-                                       "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFilePath.string() +
-                                           "\" for output (append).");
+                                       format("appendPerfLog: Could not open file \"{}\" for output (append).",
+                                              state.dataStrGlobals->outputPerfLogFilePath.string()));
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -730,14 +730,14 @@ int AbortEnergyPlus(EnergyPlusData &state)
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-    ShowMessage(state,
-                "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
-                    " Severe Errors.");
-    ShowMessage(state,
-                "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
-                    " Severe Errors.");
-    ShowMessage(state,
-                "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
+    ShowMessage(
+        state,
+        format("EnergyPlus Warmup Error Summary. During Warmup: {} Warning; {} Severe Errors.", NumWarningsDuringWarmup, NumSevereDuringWarmup));
+    ShowMessage(
+        state,
+        format("EnergyPlus Sizing Error Summary. During Sizing: {} Warning; {} Severe Errors.", NumWarningsDuringSizing, NumSevereDuringSizing));
+    ShowMessage(
+        state, format("EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}", NumWarnings, NumSevere, Elapsed));
     DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
 
     {
@@ -873,13 +873,13 @@ int EndEnergyPlus(EnergyPlusData &state)
         UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
         UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
     }
-    ShowMessage(state,
-                "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
-                    " Severe Errors.");
-    ShowMessage(state,
-                "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
-                    " Severe Errors.");
-    ShowMessage(state, "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
+    ShowMessage(
+        state,
+        format("EnergyPlus Warmup Error Summary. During Warmup: {} Warning; {} Severe Errors.", NumWarningsDuringWarmup, NumSevereDuringWarmup));
+    ShowMessage(
+        state,
+        format("EnergyPlus Sizing Error Summary. During Sizing: {} Warning; {} Severe Errors.", NumWarningsDuringSizing, NumSevereDuringSizing));
+    ShowMessage(state, format("EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}", NumWarnings, NumSevere, Elapsed));
     DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
 
     {
@@ -1049,12 +1049,12 @@ void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, Opti
 
     using namespace DataErrorTracking;
 
-    ShowErrorMessage(state, " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
+    ShowErrorMessage(state, format(" **  Fatal  ** {}", ErrorMessage), OutUnit1, OutUnit2);
     DisplayString(state, "**FATAL:" + ErrorMessage);
 
     ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
     ShowErrorMessage(state, format(" ..... Reference severe error count={}", state.dataErrTracking->TotalSevereErrors), OutUnit1, OutUnit2);
-    ShowErrorMessage(state, " ..... Last severe error=" + state.dataErrTracking->LastSevereError, OutUnit1, OutUnit2);
+    ShowErrorMessage(state, format(" ..... Last severe error={}", state.dataErrTracking->LastSevereError), OutUnit1, OutUnit2);
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
         if (state.dataSQLiteProcedures->sqlite->sqliteWithinTransaction()) state.dataSQLiteProcedures->sqlite->sqliteCommit();
@@ -1094,7 +1094,7 @@ void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, Opt
         !state.dataErrTracking->AbortProcessing)
         ++state.dataErrTracking->TotalSevereErrorsDuringWarmup;
     if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalSevereErrorsDuringSizing;
-    ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+    ShowErrorMessage(state, format(" ** Severe  ** {}", ErrorMessage), OutUnit1, OutUnit2);
     state.dataErrTracking->LastSevereError = ErrorMessage;
 
     //  Could set a variable here that gets checked at some point?
@@ -1134,7 +1134,7 @@ void ShowSevereMessage(EnergyPlusData &state, std::string const &ErrorMessage, O
         if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
     }
 
-    ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+    ShowErrorMessage(state, format(" ** Severe  ** {}", ErrorMessage), OutUnit1, OutUnit2);
     state.dataErrTracking->LastSevereError = ErrorMessage;
 
     //  Could set a variable here that gets checked at some point?
@@ -1162,7 +1162,7 @@ void ShowContinueError(EnergyPlusData &state, std::string const &Message, Option
     // METHODOLOGY EMPLOYED:
     // Calls ShowErrorMessage utility routine.
 
-    ShowErrorMessage(state, " **   ~~~   ** " + Message, OutUnit1, OutUnit2);
+    ShowErrorMessage(state, format(" **   ~~~   ** {}", Message), OutUnit1, OutUnit2);
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(Message);
     }
@@ -1206,9 +1206,14 @@ void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Messag
     }
 
     if (len(Message) < 50) {
-        const auto m = Message + cEnvHeader + state.dataEnvrn->EnvironmentName + ", at Simulation time=" + state.dataEnvrn->CurMnDy + ' ' +
-                       CreateSysTimeIntervalString(state);
-        ShowErrorMessage(state, " **   ~~~   ** " + m, OutUnit1, OutUnit2);
+        const auto m = format("{}{}{}, at Simulation time={} {}",
+                              Message,
+                              cEnvHeader,
+                              state.dataEnvrn->EnvironmentName,
+                              state.dataEnvrn->CurMnDy,
+                              CreateSysTimeIntervalString(state));
+
+        ShowErrorMessage(state, format(" **   ~~~   ** {}", m), OutUnit1, OutUnit2);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(m);
         }
@@ -1216,16 +1221,18 @@ void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Messag
             state.dataGlobal->errorCallback(Error::Continue, m);
         }
     } else {
-        const auto m = " **   ~~~   ** " + Message;
-        const auto postfix = " **   ~~~   ** " + cEnvHeader + state.dataEnvrn->EnvironmentName + ", at Simulation time=" + state.dataEnvrn->CurMnDy +
-                             ' ' + CreateSysTimeIntervalString(state);
-        ShowErrorMessage(state, m);
-        ShowErrorMessage(state, postfix, OutUnit1, OutUnit2);
+        const auto postfix = format("{}{}, at Simulation time={} {}",
+                                    cEnvHeader,
+                                    state.dataEnvrn->EnvironmentName,
+                                    state.dataEnvrn->CurMnDy,
+                                    CreateSysTimeIntervalString(state));
+        ShowErrorMessage(state, format(" **   ~~~   ** {}", Message));
+        ShowErrorMessage(state, format(" **   ~~~   ** {}", postfix), OutUnit1, OutUnit2);
         if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(m);
+            state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(Message);
         }
         if (state.dataGlobal->errorCallback) {
-            state.dataGlobal->errorCallback(Error::Continue, m);
+            state.dataGlobal->errorCallback(Error::Continue, Message);
             state.dataGlobal->errorCallback(Error::Continue, postfix);
         }
     }
@@ -1249,7 +1256,7 @@ void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutp
     if (Message.empty()) {
         ShowErrorMessage(state, " *************", OutUnit1, OutUnit2);
     } else {
-        ShowErrorMessage(state, " ************* " + Message, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, format(" ************* {}", Message), OutUnit1, OutUnit2);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
         }
@@ -1288,7 +1295,7 @@ void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, Op
         !state.dataErrTracking->AbortProcessing)
         ++state.dataErrTracking->TotalWarningErrorsDuringWarmup;
     if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalWarningErrorsDuringSizing;
-    ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
+    ShowErrorMessage(state, format(" ** Warning ** {}", ErrorMessage), OutUnit1, OutUnit2);
 
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
@@ -1322,7 +1329,7 @@ void ShowWarningMessage(EnergyPlusData &state, std::string const &ErrorMessage, 
         if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
     }
 
-    ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
+    ShowErrorMessage(state, format(" ** Warning ** {}", ErrorMessage), OutUnit1, OutUnit2);
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
     }
@@ -1332,14 +1339,14 @@ void ShowWarningMessage(EnergyPlusData &state, std::string const &ErrorMessage, 
 }
 
 void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
-                                   std::string const &Message,         // Message automatically written to "error file" at end of simulation
-                                   int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                   Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
-                                   Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
-                                   Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
-                                   std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
-                                   std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
-                                   std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
+                                   std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                   int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                   ObjexxFCL::Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
+                                   ObjexxFCL::Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
+                                   ObjexxFCL::Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
+                                   std::string const &ReportMaxUnits,             // optional char string (<=15 length) of units for max value
+                                   std::string const &ReportMinUnits,             // optional char string (<=15 length) of units for min value
+                                   std::string const &ReportSumUnits              // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1387,14 +1394,14 @@ void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
 }
 
 void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
-                                    std::string const &Message,         // Message automatically written to "error file" at end of simulation
-                                    int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                    Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
-                                    Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
-                                    Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
-                                    std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
-                                    std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
-                                    std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
+                                    std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                    int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                    ObjexxFCL::Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
+                                    ObjexxFCL::Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
+                                    ObjexxFCL::Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
+                                    std::string const &ReportMaxUnits,             // optional char string (<=15 length) of units for max value
+                                    std::string const &ReportMinUnits,             // optional char string (<=15 length) of units for min value
+                                    std::string const &ReportSumUnits              // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1442,14 +1449,14 @@ void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
 }
 
 void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
-                                     std::string const &Message,         // Message automatically written to "error file" at end of simulation
-                                     int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                     Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
-                                     Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
-                                     Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
-                                     std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
-                                     std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
-                                     std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
+                                     std::string const &Message, // Message automatically written to "error file" at end of simulation
+                                     int &MsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                     ObjexxFCL::Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
+                                     ObjexxFCL::Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
+                                     ObjexxFCL::Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
+                                     std::string const &ReportMaxUnits,             // optional char string (<=15 length) of units for max value
+                                     std::string const &ReportMinUnits,             // optional char string (<=15 length) of units for min value
+                                     std::string const &ReportSumUnits              // optional char string (<=15 length) of units for sum value
 )
 {
 
@@ -1496,14 +1503,14 @@ void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
 }
 
 void StoreRecurringErrorMessage(EnergyPlusData &state,
-                                std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
-                                int &ErrorMsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                Optional<Real64 const> ErrorReportMaxOf, // Track and report the max of the values passed to this argument
-                                Optional<Real64 const> ErrorReportMinOf, // Track and report the min of the values passed to this argument
-                                Optional<Real64 const> ErrorReportSumOf, // Track and report the sum of the values passed to this argument
-                                std::string const &ErrorReportMaxUnits,  // Units for "max" reporting
-                                std::string const &ErrorReportMinUnits,  // Units for "min" reporting
-                                std::string const &ErrorReportSumUnits   // Units for "sum" reporting
+                                std::string const &ErrorMessage, // Message automatically written to "error file" at end of simulation
+                                int &ErrorMsgIndex,              // Recurring message index, if zero, next available index is assigned
+                                ObjexxFCL::Optional<Real64 const> ErrorReportMaxOf, // Track and report the max of the values passed to this argument
+                                ObjexxFCL::Optional<Real64 const> ErrorReportMinOf, // Track and report the min of the values passed to this argument
+                                ObjexxFCL::Optional<Real64 const> ErrorReportSumOf, // Track and report the sum of the values passed to this argument
+                                std::string const &ErrorReportMaxUnits,             // Units for "max" reporting
+                                std::string const &ErrorReportMinUnits,             // Units for "min" reporting
+                                std::string const &ErrorReportSumUnits              // Units for "sum" reporting
 )
 {
 
@@ -1611,11 +1618,11 @@ void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, Op
         // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
         if (state.dataGlobal->printConsoleOutput) std::cout << ErrorMessage << '\n';
     }
-    if (present(OutUnit1)) {
-        print(OutUnit1(), "  {}", ErrorMessage);
+    if (OutUnit1) {
+        print(OutUnit1.value(), "  {}", ErrorMessage);
     }
-    if (present(OutUnit2)) {
-        print(OutUnit2(), "  {}", ErrorMessage);
+    if (OutUnit2) {
+        print(OutUnit2.value(), "  {}", ErrorMessage);
     }
     // std::string tmp = "  " + ErrorMessage + '\n';
     // if (errorCallback) DataGlobals::errorCallback(tmp.c_str());
@@ -1652,7 +1659,7 @@ void SummarizeErrors(EnergyPlusData &state)
                     EndC = len(thisMoreDetails) - 1;
                     while (EndC != std::string::npos) {
                         EndC = index(thisMoreDetails.substr(StartC), "<CR");
-                        ShowMessage(state, ".." + thisMoreDetails.substr(StartC, EndC));
+                        ShowMessage(state, format("..{}", thisMoreDetails.substr(StartC, EndC)));
                         if (thisMoreDetails.substr(StartC + EndC, 5) == "<CRE>") break;
                         StartC += EndC + 4;
                         EndC = len(thisMoreDetails.substr(StartC)) - 1;
@@ -1679,8 +1686,6 @@ void ShowRecurringErrors(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace DataErrorTracking;
-
-    using General::strip_trailing_zeros;
 
     static constexpr std::string_view StatMessageStart(" **   ~~~   ** ");
 
@@ -1732,25 +1737,22 @@ void ShowRecurringErrors(EnergyPlusData &state)
             }
             StatMessage = "";
             if (error.ReportMax) {
-                MaxOut = format("{:.6R}", error.MaxValue);
-                strip_trailing_zeros(MaxOut);
+                MaxOut = format("{:.6f}", error.MaxValue);
                 StatMessage += "  Max=" + MaxOut;
                 if (!error.MaxUnits.empty()) StatMessage += ' ' + error.MaxUnits;
             }
             if (error.ReportMin) {
-                MinOut = format("{:.6R}", error.MinValue);
-                strip_trailing_zeros(MinOut);
+                MinOut = format("{:.6f}", error.MinValue);
                 StatMessage += "  Min=" + MinOut;
                 if (!error.MinUnits.empty()) StatMessage += ' ' + error.MinUnits;
             }
             if (error.ReportSum) {
-                SumOut = format("{:.6R}", error.SumValue);
-                strip_trailing_zeros(SumOut);
+                SumOut = format("{:.6f}", error.SumValue);
                 StatMessage += "  Sum=" + SumOut;
                 if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;
             }
             if (error.ReportMax || error.ReportMin || error.ReportSum) {
-                ShowMessage(state, std::string{StatMessageStart} + StatMessage);
+                ShowMessage(state, format("{}{}", StatMessageStart, StatMessage));
             }
         }
         ShowMessage(state, "");

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -255,8 +255,8 @@ TEST_F(AutoSizingFixture, CoolingWaterDesWaterInletTempSizingGauntlet)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 11 - Airloop Equipment - CurDuctType = Main
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    // Test 11 - Airloop Equipment - CurDuctType = DataHVACGlobals::AirDuctType::Main
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -284,7 +284,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesWaterInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 13 - Airloop Equipment - CurDuctType = Cooling
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -310,8 +310,8 @@ TEST_F(AutoSizingFixture, CoolingWaterDesWaterInletTempSizingGauntlet)
     EXPECT_NEAR(15.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 15 - Airloop Equipment - CurDuctType = Heating
-    state->dataSize->CurDuctType = DataHVACGlobals::Heating;
+    // Test 15 - Airloop Equipment - CurDuctType = DataHVACGlobals::AirDuctType::Heating
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Heating;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 

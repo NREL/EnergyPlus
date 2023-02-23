@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3913,6 +3913,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
+    state->dataSize->SysSizPeakDDNum.allocate(state->dataSize->NumSysSizInput);
     state->dataSize->CurSysNum = 1;    // primary air system
     state->dataSize->CurOASysNum = 0;  // no OA system
     state->dataSize->CurZoneEqNum = 0; // size it based on system
@@ -3935,7 +3936,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel = AutoSize;
 
     // initialize sizing variables
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
     state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
 
@@ -4259,7 +4260,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     state->dataSize->CurOASysNum = 1;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.20;
-    state->dataSize->CurDuctType = Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
 
     // test 1: the HX is in OA System, no economizer, no-bypass
     thisOAController.Econo = MixedAir::EconoOp::NoEconomizer;

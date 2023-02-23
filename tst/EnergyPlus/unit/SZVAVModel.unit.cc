@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,7 +80,7 @@
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 using namespace EnergyPlus;
-using namespace CurveManager;
+using namespace Curve;
 using namespace DataBranchNodeConnections;
 using namespace DataEnvironment;
 using namespace DataHeatBalance;
@@ -261,13 +261,13 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     state->dataBranchNodeConnections->NumCompSets = 2;
     state->dataBranchNodeConnections->CompSets.allocate(2);
-    state->dataBranchNodeConnections->CompSets(1).CType = "Coil:Cooling:DX:SingleSpeed";
+    state->dataBranchNodeConnections->CompSets(1).ComponentObjectType = DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed;
     state->dataBranchNodeConnections->CompSets(1).CName = "CoolingCoil";
-    state->dataBranchNodeConnections->CompSets(1).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
+    state->dataBranchNodeConnections->CompSets(1).ParentObjectType = DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalHeatPump;
     state->dataBranchNodeConnections->CompSets(1).ParentCName = "AirSystem";
-    state->dataBranchNodeConnections->CompSets(2).CType = "Coil:Heating:DX:SingleSpeed";
+    state->dataBranchNodeConnections->CompSets(2).ComponentObjectType = DataLoopNode::ConnectionObjectType::CoilHeatingDXSingleSpeed;
     state->dataBranchNodeConnections->CompSets(2).CName = "HeatingCoil";
-    state->dataBranchNodeConnections->CompSets(2).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
+    state->dataBranchNodeConnections->CompSets(2).ParentObjectType = DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalHeatPump;
     state->dataBranchNodeConnections->CompSets(2).ParentCName = "AirSystem";
 
     state->dataEnvrn->OutDryBulbTemp = 30.0;

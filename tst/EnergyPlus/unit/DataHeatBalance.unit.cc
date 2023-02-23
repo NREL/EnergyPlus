@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -813,8 +813,8 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound);                  // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);            // expect no errors
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     ErrorsFound = false;
     GetFrameAndDividerData(*state, ErrorsFound);
@@ -844,9 +844,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
     EXPECT_EQ(state->dataConstruction->Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
-    EXPECT_EQ(state->dataMaterial->Material(4).Name, "SINGLEPANE"); // single pane glass
-    EXPECT_EQ(state->dataMaterial->Material(5).Name, "WINGAS");     // air gap
-    EXPECT_EQ(state->dataMaterial->Material(6).Name, "BLIND");      // window blind
+    EXPECT_EQ(state->dataMaterial->Material(4)->Name, "SINGLEPANE"); // single pane glass
+    EXPECT_EQ(state->dataMaterial->Material(5)->Name, "WINGAS");     // air gap
+    EXPECT_EQ(state->dataMaterial->Material(6)->Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(1), 4); // glass, outer layer
@@ -1095,4 +1095,270 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setThicknessPerpendicularTest)
     expectedReturnValue = 0.1;
     actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
     EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_ComputeNominalUwithConvCoeffsTest)
+{
+    Real64 expectedAnswer;
+    Real64 actualAnswer;
+    Real64 allowableTolerance = 0.00001;
+    bool isWithConvCoefValid;
+
+    state->dataSurface->Surface.allocate(1);
+    state->dataHeatBal->NominalU.allocate(1);
+    auto &thisSurf(state->dataSurface->Surface(1));
+    auto &thisUval(state->dataHeatBal->NominalU(1));
+
+    // Test 1a: Exterior Wall Surface with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.869797;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 1b: Wall Surface in contact with Ground with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::Ground;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.893053;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 1c: Wall Surface in contact with OSC NoCalcExt with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::OtherSideCoefNoCalcExt;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.893053;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 1d: Wall Surface in contact with OSC CondModeledExt with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::OtherSideCondModeledExt;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.893053;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 1e: Wall Surface in contact with GroundFCfactorMethod with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::GroundFCfactorMethod;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.893053;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 1f: Wall Surface in contact with KivaFoundation with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::KivaFoundation;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.893053;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 1g: Surface is an interior wall with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.806771;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 1h: Surface is an interior wall using Other Side Coefficients (OSC)
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::OtherSideCoefCalcExt;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    thisSurf.OSCPtr = 1;
+    state->dataSurface->OSC.allocate(1);
+    state->dataSurface->OSC(1).SurfFilmCoef = 0.5;
+    expectedAnswer = 0.617377;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 1i: Surface is an interior wall with an invalid U-value
+    thisUval = -1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = -1.0;
+    isWithConvCoefValid = true;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_FALSE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 2: Surface is an interior floor with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Floor;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.755263;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 3: Surface is an interior ceiling (roof) with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Roof;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.823144;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 4: Surface is internal mass with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::IntMass;
+    thisSurf.Construction = 1;
+    expectedAnswer = 1.0;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 5: Surface is detached shading (B) with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Detached_B;
+    thisSurf.Construction = 1;
+    expectedAnswer = 1.0;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 6: Surface is detached shading (F) with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Detached_F;
+    thisSurf.Construction = 1;
+    expectedAnswer = 1.0;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 7: Surface is a window with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Window;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.806771;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 8: Surface is a glass door with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::GlassDoor;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.806771;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 9: Surface is a door with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Door;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.806771;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 10: Surface is shading with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Shading;
+    thisSurf.Construction = 1;
+    expectedAnswer = 1.0;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 11: Surface is an overhang with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Overhang;
+    thisSurf.Construction = 1;
+    expectedAnswer = 1.0;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 12: Surface is a fin with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Fin;
+    thisSurf.Construction = 1;
+    expectedAnswer = 1.0;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 13: Surface is a TDD dome with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::TDD_Dome;
+    thisSurf.Construction = 1;
+    expectedAnswer = 1.0;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 14: Surface is a TDD diffuser with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::TDD_Diffuser;
+    thisSurf.Construction = 1;
+    expectedAnswer = 1.0;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Check to see if there have been any additions to SurfaceClass--this will fail is something got added
+    // If something does get added to SurfaceClass, changes also need to be made to ComputeNominalUwithConvCoeffs
+    // in DataHeatBalance.cc
+    int numTypesSurfaceClass = static_cast<int>(DataSurfaces::SurfaceClass::Num);
+    bool surfClassOK = false;
+    if (numTypesSurfaceClass == 15) surfClassOK = true;
+    EXPECT_TRUE(surfClassOK);
 }

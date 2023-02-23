@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,8 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include <ObjexxFCL/Optional.hh>
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -71,6 +73,7 @@ struct CoilCoolingDXCurveFitSpeedInputSpecification
     Real64 active_fraction_of_coil_face_area;
     Real64 rated_evaporative_condenser_pump_power_fraction;
     Real64 rated_evaporator_fan_power_per_volume_flow_rate;
+    Real64 rated_evaporator_fan_power_per_volume_flow_rate_2023;
     Real64 evaporative_condenser_effectiveness;
     std::string total_cooling_capacity_function_of_temperature_curve_name;
     std::string total_cooling_capacity_function_of_air_flow_fraction_curve_name;
@@ -116,6 +119,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 ratedCOP = 0.0;
     Real64 rated_total_capacity = 0.0;
     Real64 rated_evap_fan_power_per_volume_flow_rate = 0.0;
+    Real64 rated_evap_fan_power_per_volume_flow_rate_2023 = 0.0;
     Real64 ratedWasteHeatFractionOfPowerInput = 0.0; // rated waste heat fraction of power input
     Real64 evap_condenser_pump_power_fraction = 0.0;
     Real64 evap_condenser_effectiveness = 0.0;
@@ -188,11 +192,8 @@ private:
                       std::vector<int> validDims,
                       std::string_view const routineName,
                       const std::string &fieldName,
-                      Real64 Var1,                     // required 1st independent variable
-                      Optional<Real64 const> Var2 = _, // 2nd independent variable
-                      Optional<Real64 const> Var3 = _, // 3rd independent variable
-                      Optional<Real64 const> Var4 = _, // 4th independent variable
-                      Optional<Real64 const> Var5 = _);
+                      Real64 Var1,                                 // required 1st independent variable
+                      ObjexxFCL::Optional<Real64 const> Var2 = _); // 2nd independent variable
 };
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,12 +52,15 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -67,6 +70,7 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::EcoRoofManager;
 using namespace EnergyPlus::SolarShading;
 using namespace EnergyPlus::DataEnvironment;
+using namespace EnergyPlus::DataHeatBalance;
 
 namespace EnergyPlus {
 
@@ -185,7 +189,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -221,6 +225,94 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
     EcoRoofManager::UpdateSoilProps(
         *state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
     ASSERT_EQ(state->dataWaterData->Irrigation.ActualAmount, state->dataEcoRoofMgr->CurrentIrrigation);
+}
+
+TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofFirstTimeTest)
+{
+    int surfNum = 1;
+    int constrNum = 1;
+    Real64 expectedAnswer;
+    Real64 allowableTolerance = 0.000001;
+
+    state->dataConstruction->Construct.allocate(constrNum);
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
+    state->dataMaterial->Material.push_back(mat);
+    state->dataSurface->Surface.allocate(surfNum);
+
+    auto &thisConstruct = state->dataConstruction->Construct(constrNum);
+    auto thisMat = state->dataMaterial->Material(1);
+    auto &thisEcoRoof = state->dataEcoRoofMgr;
+
+    thisConstruct.LayerPoint.allocate(1);
+    thisConstruct.LayerPoint(1) = 1;
+
+    state->dataSurface->Surface(surfNum).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
+
+    thisMat->LAI = 3.21;
+    thisMat->AbsorpSolar = 0.72;
+    thisEcoRoof->FirstEcoSurf = 0;
+    thisEcoRoof->EcoRoofbeginFlag = true;
+
+    initEcoRoofFirstTime(*state, surfNum, constrNum);
+
+    // Spot check some answers to test first time initialization routine
+    expectedAnswer = 3.21;
+    EXPECT_NEAR(thisEcoRoof->LAI, expectedAnswer, allowableTolerance);
+    expectedAnswer = 0.28;
+    EXPECT_NEAR(thisEcoRoof->Alphag, expectedAnswer, allowableTolerance);
+    EXPECT_EQ(thisEcoRoof->FirstEcoSurf, surfNum);
+    EXPECT_FALSE(thisEcoRoof->EcoRoofbeginFlag);
+}
+
+TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofTest)
+{
+    int surfNum = 1;
+    int constrNum = 1;
+    Real64 expectedAnswer;
+    Real64 allowableTolerance = 0.000001;
+
+    state->dataConstruction->Construct.allocate(constrNum);
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
+    state->dataMaterial->Material.push_back(mat);
+    state->dataSurface->Surface.allocate(surfNum);
+
+    auto &thisConstruct = state->dataConstruction->Construct(constrNum);
+    auto &thisMat = state->dataMaterial->Material(1);
+    auto &thisEcoRoof = state->dataEcoRoofMgr;
+
+    thisConstruct.LayerPoint.allocate(1);
+    thisConstruct.LayerPoint(1) = 1;
+
+    // Test 1: test of first IF block in routine
+    state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataGlobal->WarmupFlag = true;
+    thisEcoRoof->CalcEcoRoofMyEnvrnFlag = false;
+    thisMat->InitMoisture = 23.0;
+    thisMat->AbsorpSolar = 0.72;
+    thisEcoRoof->Moisture = 0.0;
+    thisEcoRoof->MeanRootMoisture = 0.0;
+    thisEcoRoof->Alphag = 0.0;
+
+    initEcoRoof(*state, surfNum, constrNum);
+    expectedAnswer = 23.0;
+    EXPECT_NEAR(thisEcoRoof->Moisture, expectedAnswer, allowableTolerance);
+    EXPECT_NEAR(thisEcoRoof->MeanRootMoisture, expectedAnswer, allowableTolerance);
+    expectedAnswer = 0.28;
+    EXPECT_NEAR(thisEcoRoof->Alphag, expectedAnswer, allowableTolerance);
+    EXPECT_TRUE(thisEcoRoof->CalcEcoRoofMyEnvrnFlag);
+
+    // Test 2: test of second IF block in routine (spot check)
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->WarmupFlag = false;
+    thisEcoRoof->CalcEcoRoofMyEnvrnFlag = true;
+    thisEcoRoof->Tg = 0.0;
+    thisEcoRoof->Tf = 0.0;
+    expectedAnswer = 10.0;
+
+    initEcoRoof(*state, surfNum, constrNum);
+    EXPECT_NEAR(thisEcoRoof->Tg, expectedAnswer, allowableTolerance);
+    EXPECT_NEAR(thisEcoRoof->Tf, expectedAnswer, allowableTolerance);
+    EXPECT_FALSE(thisEcoRoof->CalcEcoRoofMyEnvrnFlag);
 }
 
 } // namespace EnergyPlus

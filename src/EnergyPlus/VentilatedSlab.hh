@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -372,8 +372,6 @@ namespace VentilatedSlab {
                                     Real64 const CoreLength,   // Length of tubing in the radiant system, in m
                                     Real64 const CoreDiameter, // Inside diameter of the tubing in the radiant system, in m
                                     Real64 const CoreNumbers);
-
-    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
     void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 

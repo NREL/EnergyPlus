@@ -268,6 +268,7 @@ install(FILES "${PROJECT_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DES
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/Boilers.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/California_Title_24-2008.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/Chillers.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/CodeCompliantEquipment.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/CompositeWallConstructions.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/DXCoolingCoil.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/ElectricGenerators.idf" DESTINATION "./DataSets" COMPONENT Datasets)
@@ -357,20 +358,22 @@ install(
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
-set(RULES_XLS Rules22-1-0-to-22-2-0.md)
+set(RULES_XLS Rules22-2-0-to-22-3-0.md)
 install(FILES "${PROJECT_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
-install(FILES "${PROJECT_SOURCE_DIR}/release/readme.html" DESTINATION "./")
-install(FILES "${PROJECT_SOURCE_DIR}/release/Deprecation.html" DESTINATION "./")
+configure_file("${PROJECT_SOURCE_DIR}/release/readme.in.html" "${PROJECT_BINARY_DIR}/release/readme.html" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/release/readme.html" DESTINATION "./")
+configure_file("${PROJECT_SOURCE_DIR}/release/Deprecation.in.html" "${PROJECT_BINARY_DIR}/release/Deprecation.html" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/release/Deprecation.html" DESTINATION "./")
 if(LINK_WITH_PYTHON)
   install(FILES "${PROJECT_SOURCE_DIR}/release/PythonLicense.txt" DESTINATION "./")
 endif()
-set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/release/readme.html")
+set(CPACK_RESOURCE_FILE_README "${PROJECT_BINARY_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/CurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${PROJECT_SOURCE_DIR}/idd/V22-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V22-2-0-Energy+.idd")
+install(FILES "${PROJECT_SOURCE_DIR}/idd/V22-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V23-1-0-Energy+.idd")
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)
@@ -457,6 +460,12 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/src/Slab/SlabExample.idf" DESTINATION "PreProcess/GrndTempCalc/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Appearance Pakx64.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Cryptox64.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/GZipx64.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Internet Encodingsx64.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Shellx64.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/icudt65.dll"
@@ -474,6 +483,8 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/vccorlib140.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/vcruntime140.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/vcruntime140_1.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/XojoGUIFramework64.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/")
@@ -522,6 +533,7 @@ if(APPLE)
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
+  install(FILES "${PROJECT_SOURCE_DIR}/doc/man/energyplus.1" DESTINATION "./" COMPONENT Symlinks)
 
   # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
   set(CPACK_IFW_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/release/ep.icns")
@@ -564,11 +576,17 @@ elseif(UNIX)
 
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBAppearancePak64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBCrypto64.so"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBInternetEncodings64.so"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBShell64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/XojoGUIFramework64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libc++.so.1"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libGZip64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBRegEx64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
@@ -585,7 +603,7 @@ elseif(UNIX)
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
-  install(FILES doc/man/energyplus.1 DESTINATION "./")
+  install(FILES "${PROJECT_SOURCE_DIR}/doc/man/energyplus.1" DESTINATION "./" COMPONENT Symlinks)
 endif()
 
 # TODO: Unused now

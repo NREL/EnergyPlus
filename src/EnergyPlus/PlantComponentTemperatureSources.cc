@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -103,7 +103,8 @@ namespace PlantComponentTemperatureSources {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(state, "LocalTemperatureSourceFactory: Error getting inputs for temperature source named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state,
+                       format("LocalTemperatureSourceFactory: Error getting inputs for temperature source named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -314,8 +315,9 @@ namespace PlantComponentTemperatureSources {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state,
-                                                "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(
+                                        state,
+                                        format("SizePlantComponentTemperatureSource: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(state, format("User-Specified Design Fluid Flow Rate of {:.5R} [m3/s]", DesVolFlowRateUser));
                                     ShowContinueError(state,
                                                       format("differs from Design Size Design Fluid Flow Rate of {:.5R} [m3/s]", tmpVolFlowRate));
@@ -331,7 +333,7 @@ namespace PlantComponentTemperatureSources {
         } else {
             if (this->DesVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in PlantComponent:TemperatureSource object=" + this->Name);
+                ShowContinueError(state, format("Occurs in PlantComponent:TemperatureSource object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->DesVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -424,7 +426,7 @@ namespace PlantComponentTemperatureSources {
             PlantUtilities::ScanPlantLoopsForObject(
                 state, this->Name, DataPlant::PlantEquipmentType::WaterSource, this->plantLoc, errFlag, _, _, _, this->InletNodeNum, _);
             if (errFlag) {
-                ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
+                ShowFatalError(state, format("{}: Program terminated due to previous condition(s).", RoutineName));
             }
             this->MyFlag = false;
         }
@@ -465,7 +467,7 @@ namespace PlantComponentTemperatureSources {
         state.dataPlantCompTempSrc->NumSources = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataPlantCompTempSrc->NumSources <= 0) {
-            ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, format("No {} equipment specified in input file", cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -532,23 +534,24 @@ namespace PlantComponentTemperatureSources {
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                 if (state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum == 0) {
-                    ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Input error for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
-                                      "Invalid schedule name in field " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' +
-                                          state.dataIPShortCut->cAlphaArgs(5));
+                                      format("Invalid schedule name in field {}={}",
+                                             state.dataIPShortCut->cAlphaFieldNames(5),
+                                             state.dataIPShortCut->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Input error for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
-                                      state.dataIPShortCut->cAlphaArgs(4) + "\"");
+                                  format(R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered {})",
+                                         state.dataIPShortCut->cAlphaArgs(4)));
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", cCurrentModuleObject));
         }
     }
 

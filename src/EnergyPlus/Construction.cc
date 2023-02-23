@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -214,47 +214,49 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         // Obtain thermal properties from the Material derived type
 
-        dl(Layer) = state.dataMaterial->Material(CurrentLayer).Thickness;
-        rk(Layer) = state.dataMaterial->Material(CurrentLayer).Conductivity;
-        rho(Layer) = state.dataMaterial->Material(CurrentLayer).Density;
-        cp(Layer) = state.dataMaterial->Material(CurrentLayer).SpecHeat; // Must convert
+        auto *thisMaterial = state.dataMaterial->Material(CurrentLayer);
+
+        dl(Layer) = thisMaterial->Thickness;
+        rk(Layer) = thisMaterial->Conductivity;
+        rho(Layer) = thisMaterial->Density;
+        cp(Layer) = thisMaterial->SpecHeat; // Must convert
         // from kJ/kg-K to J/kg-k due to rk units
 
-        if (this->SourceSinkPresent && !state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity) {
+        if (this->SourceSinkPresent && !thisMaterial->WarnedForHighDiffusivity) {
             // check for materials that are too conductive or thin
             if ((rho(Layer) * cp(Layer)) > 0.0) {
                 Real64 Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                 if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
                     DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                     Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
-                    if (state.dataMaterial->Material(CurrentLayer).Thickness < ThicknessThreshold) {
-                        ShowSevereError(state,
-                                        "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
-                                        "material name = " +
-                                            state.dataMaterial->Material(CurrentLayer).Name);
+                    if (thisMaterial->Thickness < ThicknessThreshold) {
+                        ShowSevereError(
+                            state,
+                            format(
+                                "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, material name = {}",
+                                thisMaterial->Name));
                         ShowContinueError(state,
                                           format("High conductivity Material layers are not well supported for internal source constructions, "
                                                  "material conductivity = {:.3R} [W/m-K]",
-                                                 state.dataMaterial->Material(CurrentLayer).Conductivity));
+                                                 thisMaterial->Conductivity));
                         ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
                         ShowContinueError(state,
                                           format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
-                        if (state.dataMaterial->Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
+                        if (thisMaterial->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                             ShowContinueError(state,
-                                              format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
-                                                     state.dataMaterial->Material(CurrentLayer).Thickness));
+                                              format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterial->Thickness));
                             ShowContinueError(state,
                                               format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                      DataHeatBalance::ThinMaterialLayerThreshold));
                         }
-                        state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity = true;
+                        thisMaterial->WarnedForHighDiffusivity = true;
                     }
                 }
             }
         }
-        if (state.dataMaterial->Material(CurrentLayer).Thickness > 3.0) {
+        if (thisMaterial->Thickness > 3.0) {
             ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation");
-            ShowContinueError(state, "material name = " + state.dataMaterial->Material(CurrentLayer).Name);
+            ShowContinueError(state, format("material name = {}", thisMaterial->Name));
             ErrorsFound = true;
         }
 
@@ -269,16 +271,14 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
         // If not a resistive layer, nothing further is required
         // for this layer.
 
-        if (ResLayer(Layer)) {                                                 // Resistive layer-check for R-value, etc.
-            ++NumResLayers;                                                    // Increment number of resistive layers
-            lr(Layer) = state.dataMaterial->Material(CurrentLayer).Resistance; // User defined thermal resistivity
-            if (lr(Layer) < RValueLowLimit) {                                  // User didn't define enough
+        if (ResLayer(Layer)) {                    // Resistive layer-check for R-value, etc.
+            ++NumResLayers;                       // Increment number of resistive layers
+            lr(Layer) = thisMaterial->Resistance; // User defined thermal resistivity
+            if (lr(Layer) < RValueLowLimit) {     // User didn't define enough
                 // parameters to calculate CTFs for a building element
                 // containing this layer.
 
-                ShowSevereError(state,
-                                "InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer).Name +
-                                    "R Value below lowest allowed value");
+                ShowSevereError(state, format("InitConductionTransferFunctions: Material={}R Value below lowest allowed value", thisMaterial->Name));
                 ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                 ErrorsFound = true;
 
@@ -292,7 +292,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 // then use the "exact" approach to model a massless layer
                 // based on the node equations for the state space method.
 
-                if ((Layer == 1) || (Layer == this->TotLayers) || (!state.dataMaterial->Material(this->LayerPoint(Layer)).ROnly)) {
+                if ((Layer == 1) || (Layer == this->TotLayers) || (!state.dataMaterial->Material(this->LayerPoint(Layer))->ROnly)) {
                     cp(Layer) = 1.007;
                     rho(Layer) = 1.1614;
                     rk(Layer) = 0.0263;
@@ -362,7 +362,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                     --this->TempAfterLayer;
                 }
             } else { // These are not adjacent layers and there is a logic flaw here (should not happen)
-                ShowFatalError(state, "Combining resistance layers failed for " + this->Name);
+                ShowFatalError(state, format("Combining resistance layers failed for {}", this->Name));
                 ShowContinueError(state, "This should never happen.  Contact EnergyPlus Support for further assistance.");
             }
         }
@@ -921,7 +921,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                             CTFConvrg = false;
                         }
                     } else { // Something terribly wrong--the surface has no CTFs, not even an R-value
-                        ShowFatalError(state, "Illegal construction definition, no CTFs calculated for " + this->Name);
+                        ShowFatalError(state, format("Illegal construction definition, no CTFs calculated for {}", this->Name));
                     }
                 }
 
@@ -931,14 +931,14 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 // Thus, if the time step reaches a certain point, error out and let the
                 // user know that something needs to be checked in the input file.
                 if (this->CTFTimeStep >= MaxAllowedTimeStep) {
-                    ShowSevereError(state, "CTF calculation convergence problem for Construction=\"" + this->Name + "\".");
+                    ShowSevereError(state, format("CTF calculation convergence problem for Construction=\"{}\".", this->Name));
                     ShowContinueError(state, "...with Materials (outside layer to inside)");
-                    ShowContinueError(state, "(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1)).Name + "\"");
+                    ShowContinueError(state, format("(outside)=\"{}\"", state.dataMaterial->Material(this->LayerPoint(1))->Name));
                     for (int Layer = 2; Layer <= this->TotLayers; ++Layer) {
                         if (Layer != this->TotLayers) {
-                            ShowContinueError(state, "(next)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
+                            ShowContinueError(state, format("(next)=\"{}\"", state.dataMaterial->Material(this->LayerPoint(Layer))->Name));
                         } else {
-                            ShowContinueError(state, "(inside)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
+                            ShowContinueError(state, format("(inside)=\"{}\"", state.dataMaterial->Material(this->LayerPoint(Layer))->Name));
                         }
                     }
                     ShowContinueError(state,
@@ -991,7 +991,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
         this->e(1) = 0.0;       // zero.
 
         if (this->SourceSinkPresent) {
-            ShowSevereError(state, "Sources/sinks not allowed in purely resistive constructions --> " + this->Name);
+            ShowSevereError(state, format("Sources/sinks not allowed in purely resistive constructions --> {}", this->Name));
             ErrorsFound = true;
         }
 
@@ -1902,15 +1902,16 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint(I);
-        switch (state.dataMaterial->Material(Layer).Group) {
-        case DataHeatBalance::MaterialGroup::Air: {
+        auto const *thisMaterial = state.dataMaterial->Material(Layer);
+        switch (thisMaterial->Group) {
+        case Material::MaterialGroup::Air: {
             static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
-            print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
+            print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
         } break;
         default: {
             static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-            Material::MaterialProperties &mp = state.dataMaterial->Material(Layer);
-            print(state.files.eio, Format_701, mp.Name, mp.Thickness, mp.Conductivity, mp.Density, mp.SpecHeat, mp.Resistance);
+            Material::MaterialProperties const *mp = thisMaterial;
+            print(state.files.eio, Format_701, mp->Name, mp->Thickness, mp->Conductivity, mp->Density, mp->SpecHeat, mp->Resistance);
         } break;
         }
     }
@@ -1957,11 +1958,10 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // PURPOSE OF THIS SUBROUTINE:
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
-    auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1)).Group;
-    return BITF_TEST_ANY(BITF(MaterialGroup),
-                         BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::Shade) |
-                             BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
-                             BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
+    const Material::MaterialGroup MaterialGroup = state.dataMaterial->Material(LayerPoint(1))->Group;
+    return (MaterialGroup == Material::MaterialGroup::WindowGlass) || (MaterialGroup == Material::MaterialGroup::Shade) ||
+           (MaterialGroup == Material::MaterialGroup::Screen) || (MaterialGroup == Material::MaterialGroup::WindowBlind) ||
+           (MaterialGroup == Material::MaterialGroup::WindowSimpleGlazing);
 }
 
 Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue)
@@ -1974,16 +1974,17 @@ Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real6
     if (returnValue <= 0.001) {           // lowest reasonable value for "half" the tube spacing in meters
         ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is less than 2 mm.  This is not allowed.");
         ShowContinueError(
-            state, "Construction=" + this->Name + " has this problem.  The tube spacing has been reset to 0.15m (~6 inches) for this construction.");
+            state,
+            format("Construction={} has this problem.  The tube spacing has been reset to 0.15m (~6 inches) for this construction.", this->Name));
         ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
         returnValue = 0.075;          // default "half" tube spacing in meters (roughly equivalent to 15cm or 6 inches of tube spacing)
     } else if (returnValue < 0.005) { // below this value for "half" the tube spacing in meters throw a warning
         ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is less than 1 cm (0.4 inch).");
-        ShowContinueError(state, "Construction=" + this->Name + " has this concern.  Please check this construction to make sure it is correct.");
+        ShowContinueError(state, format("Construction={} has this concern.  Please check this construction to make sure it is correct.", this->Name));
         ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
     } else if (returnValue > 0.5) { // above this value for "half" the tube spacing in meters throw a warning
         ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is greater than 1 meter (39.4 inches).");
-        ShowContinueError(state, "Construction=" + this->Name + " has this concern.  Please check this construction to make sure it is correct.");
+        ShowContinueError(state, format("Construction={} has this concern.  Please check this construction to make sure it is correct.", this->Name));
         ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
     }
     return returnValue;
@@ -1993,12 +1994,12 @@ Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData
 {
     if (userValue < 0.0) {
         ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a perpendicular temperature location parameter that is less than zero.");
-        ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
+        ShowContinueError(state, format("Construction={} has this error.  The parameter has been reset to 0.", this->Name));
         return 0.0;
     } else if (userValue > 1.0) {
         ShowWarningError(state,
                          "ConstructionProperty:InternalHeatSource has a perpendicular temperature location parameter that is greater than one.");
-        ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
+        ShowContinueError(state, format("Construction={} has this error.  The parameter has been reset to 1.", this->Name));
         return 1.0;
     } else { // Valid value between 0 and 1
         return userValue;

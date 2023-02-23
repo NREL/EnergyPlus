@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -229,49 +229,49 @@ bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, b
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
-    auto const has_output = !state->files.eso.get_output().empty();
+    bool const has_output = !state->files.eso.get_output().empty();
     if (reset_stream) state->files.eso.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 {
-    auto const has_output = !state->files.eio.get_output().empty();
+    bool const has_output = !state->files.eio.get_output().empty();
     if (reset_stream) state->files.eio.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_mtr_output(bool reset_stream)
 {
-    auto const has_output = !state->files.mtr.get_output().empty();
+    bool const has_output = !state->files.mtr.get_output().empty();
     if (reset_stream) state->files.mtr.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_err_output(bool reset_stream)
 {
-    auto const has_output = this->err_stream->str().size() > 0;
+    bool const has_output = this->err_stream->str().size() > 0;
     if (reset_stream) this->err_stream->str(std::string());
     return has_output;
 }
 
 bool EnergyPlusFixture::has_cout_output(bool reset_stream)
 {
-    auto const has_output = this->m_cout_buffer->str().size() > 0;
+    bool const has_output = this->m_cout_buffer->str().size() > 0;
     if (reset_stream) this->m_cout_buffer->str(std::string());
     return has_output;
 }
 
 bool EnergyPlusFixture::has_cerr_output(bool reset_stream)
 {
-    auto const has_output = this->m_cerr_buffer->str().size() > 0;
+    bool const has_output = this->m_cerr_buffer->str().size() > 0;
     if (reset_stream) this->m_cerr_buffer->str(std::string());
     return has_output;
 }
 
 bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
 {
-    auto const has_output = !state->files.dfs.get_output().empty();
+    bool const has_output = !state->files.dfs.get_output().empty();
     if (reset_stream) state->files.dfs.open_as_stringstream();
     return has_output;
 }

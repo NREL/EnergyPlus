@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -366,7 +366,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
 
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
-    state->dataCurveManager->NumCurves = 2;
     state->dataHVACGlobal->MSHPMassFlowRateLow = 0.6;
     state->dataHVACGlobal->MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -379,7 +378,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilFanOpMode.allocate(1);
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(2);
 
     auto &Coil = state->dataDXCoils->DXCoil(1);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
@@ -427,34 +426,32 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     Coil.AirOutNode = 2;
     Coil.AirInNode = 1;
     // biquadratic curve
-    constantcurve1.Name = "constant biquadratic curve";
-    constantcurve1.curveType = CurveManager::CurveType::BiQuadratic;
-    constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    constantcurve1.Coeff1 = 1.0;
-    constantcurve1.Coeff2 = 0.0;
-    constantcurve1.Coeff3 = 0.0;
-    constantcurve1.Coeff4 = 0.0;
-    constantcurve1.Coeff5 = 0.0;
-    constantcurve1.Coeff6 = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1->Name = "constant biquadratic curve";
+    constantcurve1->curveType = Curve::CurveType::BiQuadratic;
+    constantcurve1->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    constantcurve1->coeff[0] = 1.0;
+    constantcurve1->coeff[1] = 0.0;
+    constantcurve1->coeff[2] = 0.0;
+    constantcurve1->coeff[3] = 0.0;
+    constantcurve1->coeff[4] = 0.0;
+    constantcurve1->coeff[5] = 0.0;
+    constantcurve1->inputLimits[0].min = 10.0;
+    constantcurve1->inputLimits[0].max = 25.0;
+    constantcurve1->inputLimits[1].min = 0.0;
+    constantcurve1->inputLimits[1].max = 100.0;
+    constantcurve1->outputLimits.min = 1.0;
+    constantcurve1->outputLimits.max = 1.0;
     // quadratic curve
-    constantcurve2.Name = "constant quadratic curve";
-    constantcurve2.curveType = CurveManager::CurveType::Quadratic;
-    constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    constantcurve2.Coeff1 = 1.0;
-    constantcurve2.Coeff2 = 0.0;
-    constantcurve2.Coeff3 = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2->Name = "constant quadratic curve";
+    constantcurve2->curveType = Curve::CurveType::Quadratic;
+    constantcurve2->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    constantcurve2->coeff[0] = 1.0;
+    constantcurve2->coeff[1] = 0.0;
+    constantcurve2->coeff[2] = 0.0;
+    constantcurve2->inputLimits[0].min = 0.0;
+    constantcurve2->inputLimits[0].max = 1.0;
+    constantcurve2->outputLimits.min = 1.0;
+    constantcurve2->outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -785,7 +782,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
 
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
-    state->dataCurveManager->NumCurves = 2;
     state->dataHVACGlobal->MSHPMassFlowRateLow = 0.6;
     state->dataHVACGlobal->MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -798,7 +794,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilFanOpMode.allocate(1);
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(2);
 
     auto &Coil = state->dataDXCoils->DXCoil(1);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
@@ -846,34 +842,32 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     Coil.AirOutNode = 2;
     Coil.AirInNode = 1;
     // biquadratic curve
-    constantcurve1.Name = "constant biquadratic curve";
-    constantcurve1.curveType = CurveManager::CurveType::BiQuadratic;
-    constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    constantcurve1.Coeff1 = 1.0;
-    constantcurve1.Coeff2 = 0.0;
-    constantcurve1.Coeff3 = 0.0;
-    constantcurve1.Coeff4 = 0.0;
-    constantcurve1.Coeff5 = 0.0;
-    constantcurve1.Coeff6 = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1->Name = "constant biquadratic curve";
+    constantcurve1->curveType = Curve::CurveType::BiQuadratic;
+    constantcurve1->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    constantcurve1->coeff[0] = 1.0;
+    constantcurve1->coeff[1] = 0.0;
+    constantcurve1->coeff[2] = 0.0;
+    constantcurve1->coeff[3] = 0.0;
+    constantcurve1->coeff[4] = 0.0;
+    constantcurve1->coeff[5] = 0.0;
+    constantcurve1->inputLimits[0].min = 10.0;
+    constantcurve1->inputLimits[0].max = 25.0;
+    constantcurve1->inputLimits[1].min = 0.0;
+    constantcurve1->inputLimits[1].max = 100.0;
+    constantcurve1->outputLimits.min = 1.0;
+    constantcurve1->outputLimits.max = 1.0;
     // quadratic curve
-    constantcurve2.Name = "constant quadratic curve";
-    constantcurve2.curveType = CurveManager::CurveType::Quadratic;
-    constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    constantcurve2.Coeff1 = 1.0;
-    constantcurve2.Coeff2 = 0.0;
-    constantcurve2.Coeff3 = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2->Name = "constant quadratic curve";
+    constantcurve2->curveType = Curve::CurveType::Quadratic;
+    constantcurve2->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    constantcurve2->coeff[0] = 1.0;
+    constantcurve2->coeff[1] = 0.0;
+    constantcurve2->coeff[2] = 0.0;
+    constantcurve2->inputLimits[0].min = 0.0;
+    constantcurve2->inputLimits[0].max = 1.0;
+    constantcurve2->outputLimits.min = 1.0;
+    constantcurve2->outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -1206,7 +1200,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
 
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
-    state->dataCurveManager->NumCurves = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
@@ -1217,7 +1210,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilFanOpMode.allocate(1);
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(2);
 
     auto &Coil = state->dataDXCoils->DXCoil(1);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
@@ -1265,34 +1258,32 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     Coil.AirOutNode = 2;
     Coil.AirInNode = 1;
     // biquadratic curve
-    constantcurve1.Name = "constant biquadratic curve";
-    constantcurve1.curveType = CurveManager::CurveType::BiQuadratic;
-    constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    constantcurve1.Coeff1 = 1.0;
-    constantcurve1.Coeff2 = 0.0;
-    constantcurve1.Coeff3 = 0.0;
-    constantcurve1.Coeff4 = 0.0;
-    constantcurve1.Coeff5 = 0.0;
-    constantcurve1.Coeff6 = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1->Name = "constant biquadratic curve";
+    constantcurve1->curveType = Curve::CurveType::BiQuadratic;
+    constantcurve1->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    constantcurve1->coeff[0] = 1.0;
+    constantcurve1->coeff[1] = 0.0;
+    constantcurve1->coeff[2] = 0.0;
+    constantcurve1->coeff[3] = 0.0;
+    constantcurve1->coeff[4] = 0.0;
+    constantcurve1->coeff[5] = 0.0;
+    constantcurve1->inputLimits[0].min = 10.0;
+    constantcurve1->inputLimits[0].max = 25.0;
+    constantcurve1->inputLimits[1].min = 0.0;
+    constantcurve1->inputLimits[1].max = 100.0;
+    constantcurve1->outputLimits.min = 1.0;
+    constantcurve1->outputLimits.max = 1.0;
     // quadratic curve
-    constantcurve2.Name = "constant quadratic curve";
-    constantcurve2.curveType = CurveManager::CurveType::Quadratic;
-    constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    constantcurve2.Coeff1 = 1.0;
-    constantcurve2.Coeff2 = 0.0;
-    constantcurve2.Coeff3 = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2->Name = "constant quadratic curve";
+    constantcurve2->curveType = Curve::CurveType::Quadratic;
+    constantcurve2->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    constantcurve2->coeff[0] = 1.0;
+    constantcurve2->coeff[1] = 0.0;
+    constantcurve2->coeff[2] = 0.0;
+    constantcurve2->inputLimits[0].min = 0.0;
+    constantcurve2->inputLimits[0].max = 1.0;
+    constantcurve2->outputLimits.min = 1.0;
+    constantcurve2->outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -1440,7 +1431,6 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
 
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
-    state->dataCurveManager->NumCurves = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
@@ -1451,7 +1441,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilFanOpMode.allocate(1);
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(2);
 
     auto &Coil = state->dataDXCoils->DXCoil(1);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
@@ -1499,34 +1489,32 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     Coil.AirOutNode = 2;
     Coil.AirInNode = 1;
     // biquadratic curve
-    constantcurve1.Name = "constant biquadratic curve";
-    constantcurve1.curveType = CurveManager::CurveType::BiQuadratic;
-    constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    constantcurve1.Coeff1 = 1.0;
-    constantcurve1.Coeff2 = 0.0;
-    constantcurve1.Coeff3 = 0.0;
-    constantcurve1.Coeff4 = 0.0;
-    constantcurve1.Coeff5 = 0.0;
-    constantcurve1.Coeff6 = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1->Name = "constant biquadratic curve";
+    constantcurve1->curveType = Curve::CurveType::BiQuadratic;
+    constantcurve1->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    constantcurve1->coeff[0] = 1.0;
+    constantcurve1->coeff[1] = 0.0;
+    constantcurve1->coeff[2] = 0.0;
+    constantcurve1->coeff[3] = 0.0;
+    constantcurve1->coeff[4] = 0.0;
+    constantcurve1->coeff[5] = 0.0;
+    constantcurve1->inputLimits[0].min = 10.0;
+    constantcurve1->inputLimits[0].max = 25.0;
+    constantcurve1->inputLimits[1].min = 0.0;
+    constantcurve1->inputLimits[1].max = 100.0;
+    constantcurve1->outputLimits.min = 1.0;
+    constantcurve1->outputLimits.max = 1.0;
     // quadratic curve
-    constantcurve2.Name = "constant quadratic curve";
-    constantcurve2.curveType = CurveManager::CurveType::Quadratic;
-    constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-    constantcurve2.Coeff1 = 1.0;
-    constantcurve2.Coeff2 = 0.0;
-    constantcurve2.Coeff3 = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2->Name = "constant quadratic curve";
+    constantcurve2->curveType = Curve::CurveType::Quadratic;
+    constantcurve2->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+    constantcurve2->coeff[0] = 1.0;
+    constantcurve2->coeff[1] = 0.0;
+    constantcurve2->coeff[2] = 0.0;
+    constantcurve2->inputLimits[0].min = 0.0;
+    constantcurve2->inputLimits[0].max = 1.0;
+    constantcurve2->outputLimits.min = 1.0;
+    constantcurve2->outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -1830,7 +1818,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->CurSysNum = 1;
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     state->dataSize->FinalSysSizing.allocate(1);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 12.0;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0085;

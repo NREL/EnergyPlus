@@ -4,6 +4,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include <typeinfo_205.h>
+#include <rs_instance_base.h>
 
 /// @note  This class has been auto-generated. Local changes will not be saved!
 
@@ -104,8 +105,9 @@ namespace tk205  {
 			{ConcentrationType::BY_MASS, {"BY_MASS", "By Mass", "Concentration is defined as a fraction of total liquid mixture mass"}},
 			{ConcentrationType::UNKNOWN, {"UNKNOWN", "None","None"}}
 		};
-		class Metadata  {
+		class Metadata  : public RSInstanceBase {
 		public:
+			void initialize (const nlohmann::json& j) override;
 			std::string data_model;
 			ashrae205_ns::SchemaType schema;
 			ashrae205_ns::Version schema_version;
@@ -157,8 +159,9 @@ namespace tk205  {
 			const static std::string_view disclaimer_name;
 			const static std::string_view notes_name;
 		};
-		class LiquidComponent  {
+		class LiquidComponent  : public RSInstanceBase {
 		public:
+			void initialize (const nlohmann::json& j) override;
 			ashrae205_ns::LiquidConstituent liquid_constituent;
 			double concentration;
 			bool liquid_constituent_is_set;
@@ -170,8 +173,9 @@ namespace tk205  {
 			const static std::string_view liquid_constituent_name;
 			const static std::string_view concentration_name;
 		};
-		class LiquidMixture  {
+		class LiquidMixture  : public RSInstanceBase {
 		public:
+			void initialize (const nlohmann::json& j) override;
 			std::vector<ashrae205_ns::LiquidComponent> liquid_components;
 			ashrae205_ns::ConcentrationType concentration_type;
 			bool liquid_components_is_set;

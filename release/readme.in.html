@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/jumbotron/">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <title>EnergyPlus README</title>
+    <style>
+        h2 {
+            margin-top: 6px;
+        }
+
+        .margin-bottom-6 {
+            margin-bottom: 6px;
+        }
+
+        .list-group {
+            padding-bottom: 6px;
+        }
+
+        .transition-object-name {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+    </style>
+</head>
+<body id="preview">
+
+<div class="jumbotron" style="padding-bottom: 32px; padding-top: 32px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8 text-center">
+                <h1><img src="favicon.png" alt="EnergyPlus Logo" width="98" height="98"> EnergyPlus</h1>
+                <p>
+                    Version @CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@.@CMAKE_VERSION_PATCH@<br>
+                    @CMAKE_PROJECTED_RELEASE_DATE@<br>
+                    <em>EnergyPlus is a trademark of the US Department of Energy.</em>
+                </p>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8 text-center">
+                EnergyPlus is a simulation program designed for modeling buildings with all their associated
+                heating, cooling, lighting, ventilating, and other energy flows. EnergyPlus is a stand-alone simulation
+                engine
+                without a ‘user friendly’ graphical interface. EnergyPlus reads input and writes output as text files,
+                although as of 9.3, EnergyPlus started becoming a library.
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12" style="text-align:center;">
+            <a class="btn btn-primary margin-bottom-6" href="https://energyplus.net" role="button">
+                <span class="fa fa-external-link"></span> Go to the EnergyPlus Website
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="text-align:center;">
+            <a class="btn btn-primary margin-bottom-6" href="https://energyplus.net/quickstart" role="button">
+                <span class="fa fa-external-link"></span> Go to the EnergyPlus Quick-Start Guide
+            </a>
+        </div>
+    </div>
+
+    <h2>Using EnergyPlus</h2>
+    <p>
+        Utilities and tools for creating, editing, and running input files that come with EnergyPlus include IDF Editor
+        and EP-Launch. Many graphical user interfaces for EnergyPlus are available or under development. For the latest
+        tools, please see
+        <a href="https://www.buildingenergysoftwaretools.com/?capabilities=Whole-building+Energy+Simulation&keywords=EnergyPlus">
+            this website for third party interfaces</a>. A completely new cross-platform version of EP-Launch has been
+        developed and is available separate from the EnergyPlus install; see the <a
+            href="https://ep-launch.readthedocs.io/en/latest/intro.html#ep-launch">documentation</a> for more
+        information. Some tools may produce out of date IDF files; you can then use the IDFVersionUpdater program to
+        convert older files to current EnergyPlus version (you may need to use the Multiple Version Conversions
+        set – see below).
+    </p>
+
+    <h2>* Version Numbers *</h2>
+    <p>
+        EnergyPlus historically used version numbers that varied the major number and sometimes the minor
+        number. Starting with the March 2022 release, we are moving forward with a more modern version numbering scheme.
+        The EnergyPlus version will be based on the year and the release number. The March 2022 release is
+        EnergyPlus 22.1 and the Fall release will be EnergyPlus 22.2. If additional major releases are created
+        for some reason, they would increment the release number further. Rare intermediate releases may be numbered
+        with a patch number such as 22.1.1.
+    </p>
+
+    <h2><a id="Whats_going_on"></a>What’s going on in V@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@?</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#cDifferent" role="button"
+               aria-expanded="false"
+               aria-controls="cDifferent">
+                Is @CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@ different from the last version?
+            </a>
+            <div class="collapse" id="cDifferent">
+                <div class="card card-body">
+                    <h5 class="card-title">Yes... and no.</h5>
+                    <p class="card-text">
+                        For a majority of users, EnergyPlus is still
+                        basically the same tool, but with some great new features, bug fixes, and runtime performance
+                        improvements. Running EnergyPlus can still be accomplished the same way, by creating an input
+                        file in IDF or EpJSON syntax, running the EnergyPlus(.exe) binary, and gathering results of
+                        interest. All this power is still available. &#128077; <br>
+                        As of EnergyPlus 9.3, EnergyPlus started becoming a bit more flexible thanks to the addition of
+                        a formal C API with Python Bindings, as well as the ability to execute user-defined Python
+                        "plugins" in lieu of writing user-defined Erl code. In the library mode, a
+                        client can make function calls to setup and execute a simulation, as well as interact with
+                        simulation results <b>during</b> a simulation. &#128077; &#128077; &#128077;<br>
+                        A key effort completed with 9.5 was making EnergyPlus "thread-safe" by removing all global and
+                        static data from the program. Now each running thread of EnergyPlus has a complete simulation
+                        state, and no data is shared, so multiple runs can happen within a single process, opening the
+                        door for interesting new workflows and applications. <br>
+                        See the full
+                        <a href="https://github.com/NREL/EnergyPlus/releases/latest" class="card-link">ChangeLog</a>
+                        for a complete list of new features added in this and previous versions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseIDDIDF" role="button"
+               aria-expanded="false"
+               aria-controls="collapseIDDIDF">
+                Are @CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@ and @PREV_VERSION_MAJOR@.@PREV_VERSION_MINOR@
+                IDD and IDF files the same?
+            </a>
+            <div class="collapse" id="collapseIDDIDF">
+                <div class="card card-body">
+                    <h5 class="card-title">No, they are different</h5>
+                    <p class="card-text">There are a few key changes in the V@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@
+                        IDD. For best results, use the transition program to
+                        transfer from the earlier V@PREV_VERSION_MAJOR@.@PREV_VERSION_MINOR@ files.
+                        Use the IDFVersionUpdater program for best results.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseCompatible" role="button"
+               aria-expanded="false"
+               aria-controls="collapseCompatible">
+                Is version @CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@ backward compatible?
+                Can I run v@PREV_VERSION_MAJOR@.@PREV_VERSION_MINOR@ file in v@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@?
+            </a>
+            <div class="collapse" id="collapseCompatible">
+                <div class="card card-body">
+                    <h5 class="card-title">Some objects require transition</h5>
+                    There have been changes in the following objects which require conversion. Either read and follow
+                    the Rules document or use the IDFVersionUpdater utility. The “Rules” document contains information
+                    on exact object changes that you can do by hand. The updater program is described more fully in the
+                    Auxiliary Programs document.
+                    <ul class="list-group">
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:CurveFit:Speed</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:SingleSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:MultiSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Heating:DX:SingleSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Heating:DX:MultiSpeed</li>
+                        <li class="list-group-item transition-object-name">FuelFactors</li>
+                        <li class="list-group-item transition-object-name">Space</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:EquationFit</li>
+                        <li class="list-group-item transition-object-name">Coil:Heating:WaterToAirHeatPump:EquationFit</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseInputCheck" role="button"
+               aria-expanded="false"
+               aria-controls="collapseInputCheck">
+                Will my updated file definitely work?
+            </a>
+            <div class="collapse" id="collapseInputCheck">
+                <div class="card card-body">
+                    <h5 class="card-title">No, not definitely</h5>
+                    With every EnergyPlus release, there are new checks on user input. Even if your file ran in an
+                    earlier version, it may not run in the newer version after conversion due to newer checks on the
+                    validity of input.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2><a id="Multiple_Version_Conversions_51"></a>Multiple Version Conversions</h2>
+    <p>
+        The install includes the IDFVersionUpdater program and the necessary programs to convert from the previous
+        version (including .rvi and .mvi files) to the current version. The install also includes the necessary programs
+        to convert from older versions back to v7.2.0. For versions older than v7.2.0, first we applaud your dedication
+        to EnergyPlus that stretches for quite some time, and second you will need to visit the
+        <a href="https://energyplushelp.freshdesk.com/support/solutions/folders/67000241428">Helpdesk</a> to request
+        multiple conversion set of programs.
+    </p>
+
+    <h2><a id="Documentation_55"></a>Documentation</h2>
+    <p>
+        The EnergyPlus documentation is included in pdf form in the installer. The pdfs are also available <a
+            href="https://energyplus.net/documentation">online</a>. For <strong>new users</strong> of EnergyPlus, a
+        guide called the EnergyPlus Essentials was developed and is available with the installed pdf documentation.
+        Big Ladder Software is also hosting html versions of the
+        EnergyPlus Documentation <a href="http://bigladdersoftware.com/epx/docs/">online</a>.
+    </p>
+    <p>There are some other documents of interest available on the EnergyPlus web site including:</p>
+    <div class="list-group">
+        <a href="https://energyplus.net/quickstart" class="list-group-item list-group-item-action">An EnergyPlus
+            QuickStart Guide</a>
+        <a href="https://energyplus.net/testing" class="list-group-item list-group-item-action">Testing and Validation
+            Reports</a>
+    </div>
+    <p>
+        In addition, we are working to make our API documentation dynamic and hosted on ReadTheDocs. The
+        <a href="https://github.com/NREL/EnergyPlus/blob/develop/README.md">README</a> on our Github Repo will be kept
+        up to date with links to our documentation sources as we get things settled there.
+    </p>
+
+    <h2><a id="Weather_Data_63"></a>Weather Data</h2>
+    <p>A small subset of weather files that are available on the web site are also installed in the WeatherData folder.
+        EnergyPlus uses these files directly for annual simulations. The Weather Converter program that is part of
+        EnergyPlus can read these weather files and provide .csv (comma separated variable) as well as statistics
+        reports
+        about the included (or other) files. Weather data for more than 3000 locations in more than 100 countries can be
+        downloaded on the <a href="https://energyplus.net/weather">EnergyPlus Weather Page</a>.</p>
+
+    <h2>Highlights of this release (V@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@.@CMAKE_VERSION_PATCH@)</h2>
+    <h3><a id="Highlights_of_this_release"></a>New Features</h3>
+    <table class="table table-striped table-bordered">
+        <tr>
+            <th>PR #</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9051">9051</a></td>
+            <td>Allow Coil:WaterHeating:Desuperheater to use Coil:Cooling:DX</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9156">9156</a></td>
+            <td>Enhancement to Resilience Metrics</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9392">9392</a></td>
+            <td>Add staging actuator to Coil:Heating:Electric:MultiStage</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9402">9402</a></td>
+            <td>Allow running just load calculations and no full simulations</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9404">9404</a></td>
+            <td>Enhancement to Simplified Shading</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9406">9406</a></td>
+            <td>New Feature - Latent Sizing</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9409">9409</a></td>
+            <td>New Feature Multiple Ground Temperature and Ground Reflectance</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9463">9463</a></td>
+            <td>Add ASHRAE Standard 205 Chiller object </td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9465">9465</a></td>
+            <td>AirflowNetwork Duct Autosizing</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9480">9480</a></td>
+            <td>7038 90.1 metric</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9564">9564</a></td>
+            <td>Support Space for Infiltration and Ventilation</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9571">9571</a></td>
+            <td>Luminance-based window shading control per 90.1 Appendix C requirements</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9595">9595</a></td>
+            <td>Support Space for Mixing and CrossMixing</td>
+        </tr>
+    </table>
+    <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
+    <table class="table table-striped table-bordered">
+        <tr>
+            <th>PR #</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9561">9561</a></td>
+            <td>9560 eliminate loop for surface heat transfer algorithm and replace with select reset</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9600">9600</a></td>
+            <td>Update MovingAvg function</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9634">9634</a></td>
+            <td>Use currDifSolarRad, currBeamSolarRad to hold adjusted solar and other cleanups in the incident solar multiplier feature</td>
+        </tr>
+    </table>
+    <h3><a id="RefactoringEfforts"></a>Targeted Refactoring Efforts</h3>
+    <table class="table table-striped table-bordered">
+        <tr>
+            <th>PR #</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9149">9149</a></td>
+            <td>Coil refactoring Heat Exchanger Assisted DX Cooling Coil</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9273">9273</a></td>
+            <td>ZoneHVAC:PackagedTerminalAirConditioner transition to UnitarySystem</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9323">9323</a></td>
+            <td>Enum Refactor & Remove `SELECT_CASE_var`</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9399">9399</a></td>
+            <td>Move DataHVACGlobals::SetPointType to enum and switch/case</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9413">9413</a></td>
+            <td>Remove `select_case_var`s & `enum` cleanup</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9429">9429</a></td>
+            <td>AirflowNetwork Refactor</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9449">9449</a></td>
+            <td>Switch AFN simulation control from ints to an enum</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9452">9452</a></td>
+            <td>Refactor and Cleanup OutputReports.cc</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9454">9454</a></td>
+            <td>Expose EPVector resize method, change allocation handling</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9535">9535</a></td>
+            <td>Update GHE Interpolation Routine </td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9537">9537</a></td>
+            <td>Implement 9418 ITE environment class addition and code specifications update</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9557">9557</a></td>
+            <td>Test SetupOutputVariable changes to accept std::string_view type for parameters</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9584">9584</a></td>
+            <td>Clean up array references in sizing code to speed up code execution</td>
+        </tr>
+    </table>
+
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <blockquote class="blockquote text-center">
+                <p class="mb-0">
+                    The full changelog is no longer packaged with EnergyPlus, but can be found on the <a
+                        href="https://github.com/NREL/EnergyPlus/releases/latest">release page</a>.
+                </p>
+            </blockquote>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    <h2><a id="Platforms_90"></a>Platforms</h2>
+    <p>
+        We test and develop on Windows 10 and 11, and currently produce 32 and 64 bit builds on Windows.  The 32-bit
+        build is likely to be removed at some point soon.  For Linux, we provide packages for
+        Ubuntu 20.04 and 22.04.  This release also includes an Ubuntu 18.04 build, but moving forward we will be
+        eliminating that.  On Mac, we are releasing an installer for OSX 10.15, 11, and 12, but the 10.15 will be
+        eliminated soon.
+    </p>
+    <ul class="list-group">
+        <li class="list-group-item">Windows 10 and 11</li>
+        <li class="list-group-item">
+            Linux (Ubuntu 18.04, 20.04, 22.04) 64 bit versions
+        </li>
+        <li class="list-group-item">Mac OSX 10.15, 11, and 12 64 bit versions</li>
+        <li class="list-group-item">
+            EnergyPlus V@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@ has been tested on all of these platforms
+        </li>
+        <li class="list-group-item"><em>EnergyPlus does intensive computations, and based on configuration, can write
+            massive amounts of data to
+            disk. For best performance, computers should have a substantial amount of memory and high speed hard
+            drives.</em>
+        </li>
+    </ul>
+
+    <h2><a id="Installation_contents_100"></a>Installation contents</h2>
+    <p>The installation creates a program folder with icons/shortcuts for the programs/files in EnergyPlus that can be
+        accessed from Windows menus, including removing EnergyPlus from your system. In Windows OS, these will be
+        available from the “Programs” area in the Start Menu. Note that only a few of the programs will store anything
+        in your Windows\System directory (IDFEditor, EPLaunch, WeatherConverter).</p>
+    <h2><a id="Known_problems_104"></a>Known problems</h2>
+    <p>While every effort has been made to clean up all the “defects” that have occurred during our testing, quite a few
+        known (and even more unknown) probably remain. Specifics on the remaining known problems can be found on the
+        GitHub repository <a href="https://github.com/NREL/EnergyPlus/issues">issues page</a>. If you are interested in
+        what has been addressed, the issues resolved in this release are installed similarly in the
+        <a href="https://github.com/NREL/EnergyPlus/releases/latest">release details</a>.
+    </p>
+
+    <h2>Additional steps you may want to consider:</h2>
+    <ol>
+        <li>
+            <p>Download additional <a href="https://energyplus.net/weather">Weather Data</a> for use in running example
+                files or your files.</p>
+        </li>
+        <li>
+            <p>The <a href="https://unmethours.com/questions/">UnmetHours</a> forum allows users to search for answers,
+                ask new questions about
+                their building simulation models to other users, and generally get quick feedback. Members of the
+                EnergyPlus
+                development team are also on the forum answering when possible.
+            </p>
+        </li>
+        <li>
+            <p>The EnergyPlus helpdesk (<a href="https://energyplushelp.freshdesk.com/">energyplushelp.freshdesk.com</a>)
+                requires a login via self-registration or via sending a problem/question to the
+                email address <a href="mailto:EnergyPlus-Support@gard.com">EnergyPlus-Support@gard.com</a>. In addition
+                to having support tickets and responses from helpdesk personnel, there are knowledgebase articles.</p>
+        </li>
+        <li>
+            <p>BLDG-SIM: A free e-mail list for all building energy simulation program users to ask general building
+                simulation questions to other
+                users and to post announcements (for events, training, job postings, etc.).
+                See <a href="http://lists.onebuilding.org/listinfo.cgi/bldg-sim-onebuilding.org">lists.onebuilding.org/listinfo.cgi/bldg-sim-onebuilding.org</a>
+                for information on joining this email list.</p>
+        </li>
+        <li>
+            <p>Open-Source License (or distribution license): Licenses for the source code and distribution are
+                available from the website: <a href="https://energyplus.net/licensing">Licensing Info</a></p>
+        </li>
+    </ol>
+
+    <p>If you have any other questions, contact <a href="mailto:energyplus-support@gard.com">EnergyPlus Support</a>.</p>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <blockquote class="blockquote text-center">
+                <p class="mb-0">
+                    Thanks for downloading EnergyPlus.
+                    Special thanks to our early testers for this release.
+                    If you did not download the previous version, we welcome you.
+                    If you are a returning customer, we hope you find the latest release exceeding your expectations.
+                    We look forward to serving you!
+                </p>
+                <footer class="blockquote-footer">EnergyPlus Development, Testing, and Support Team</footer>
+            </blockquote>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+
+    <hr>
+
+    <footer>
+        <p>Copyright © 1996-@CMAKE_YEAR@ The Board of Trustees of the University of Illinois, The Regents of the
+            University of California through Ernest Orlando Lawrence Berkeley National Laboratory, Oak Ridge National
+            Laboratory, managed by
+            UT-Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All rights reserved.</p>
+        <p>Other Notices and Acknowledgments are found in the <a
+                href="Documentation/Acknowledgments.pdf">Acknowledgments</a>
+            document.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+</div>
+</body>
+</html>

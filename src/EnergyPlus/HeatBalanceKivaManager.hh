@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -120,12 +120,12 @@ namespace HeatBalanceKivaManager {
         void
         setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions(EnergyPlusData &state);
-        void plotDomain();
         Real64 floorWeight;
         int constructionNum = 0;
         class KivaManager *kmPtr;
 
 #ifdef GROUND_PLOT
+        void plotDomain(EnergyPlusData &state);
         Kiva::SnapshotSettings ss;
         Kiva::GroundPlot gp;
         std::string debugDir;

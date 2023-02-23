@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,9 +48,6 @@
 #ifndef Pumps_hh_INCLUDED
 #define Pumps_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -93,12 +90,6 @@ namespace Pumps {
         Num
     };
 
-    extern std::string const cPump_VarSpeed;
-    extern std::string const cPump_ConSpeed;
-    extern std::string const cPump_Cond;
-    extern std::string const cPumpBank_VarSpeed;
-    extern std::string const cPumpBank_ConSpeed;
-
     enum class PumpType : int
     {
         Invalid = -1,
@@ -122,131 +113,93 @@ namespace Pumps {
     {
         // Members
         std::string Name;
-        std::string ManualRPMSchedName;
-        int ManualRPMSchedIndex;
-        std::string LowerPsetSchedName;
-        int LowerPsetSchedIndex;
-        std::string UpperPsetSchedName;
-        int UpperPsetSchedIndex;
-        std::string MinRPMSchedName;
-        int MinRPMSchedIndex;
-        std::string MaxRPMSchedName;
-        int MaxRPMSchedIndex;
-        ControlTypeVFD VFDControlType; // VFDControlType
-        Real64 MaxRPM;                 // Maximum RPM range value - schedule limit
-        Real64 MinRPM;                 // Minimum RPM range value - schedule limit
-        Real64 PumpActualRPM;          // RPM recalculated from final flow through the loop
-
-        // Default Constructor
-        PumpVFDControlData()
-            : ManualRPMSchedIndex(0), LowerPsetSchedIndex(0), UpperPsetSchedIndex(0), MinRPMSchedIndex(0), MaxRPMSchedIndex(0),
-              VFDControlType(ControlTypeVFD::Invalid), MaxRPM(0.0), MinRPM(0.0), PumpActualRPM(0.0)
-        {
-        }
+        int ManualRPMSchedIndex = 0;
+        int LowerPsetSchedIndex = 0;
+        int UpperPsetSchedIndex = 0;
+        int MinRPMSchedIndex = 0;
+        int MaxRPMSchedIndex = 0;
+        ControlTypeVFD VFDControlType = ControlTypeVFD::Invalid; // VFDControlType
+        Real64 MaxRPM = 0.0;                                     // Maximum RPM range value - schedule limit
+        Real64 MinRPM = 0.0;                                     // Minimum RPM range value - schedule limit
+        Real64 PumpActualRPM = 0.0;                              // RPM recalculated from final flow through the loop
     };
 
     struct PumpSpecs
     {
         // Members
-        std::string Name;               // user identifier
-        std::string PumpSchedule;       // Schedule to modify the design nominal capacity of the pump
-        std::string PressureCurve_Name; // - placeholder for pump curve name
-        PumpType pumpType;              // pump type enumerator, based on local parameter values, used to identify
+        std::string Name;                      // user identifier
+        PumpType pumpType = PumpType::Invalid; // pump type enumerator, based on local parameter values, used to identify
         // index in the cPumpTypes string array to do error reporting
-        DataPlant::PlantEquipmentType TypeOf_Num; // pump type of number in reference to the dataplant values
-        PlantLocation plantLoc;
-        PumpControlType PumpControl;                 // Integer equivalent of PumpControlType
-        int PumpScheduleIndex;                       // Schedule Pointer
-        int InletNodeNum;                            // Node number on the inlet side of the plant
-        int OutletNodeNum;                           // Node number on the outlet side of the plant
-        PumpBankControlSeq SequencingScheme;         // Optimal, Sequential, User-Defined
-        int FluidIndex;                              // Index for Fluid Properties
-        int NumPumpsInBank;                          // Node number on the inlet side of the plant
-        int PowerErrIndex1;                          // for recurring errors
-        int PowerErrIndex2;                          // for recurring errors
-        Real64 MinVolFlowRateFrac;                   // minimum schedule value fraction modifier
-        Real64 NomVolFlowRate;                       // design nominal capacity of Pump
-        bool NomVolFlowRateWasAutoSized;             // true if previous was autosize on input
-        Real64 MassFlowRateMax;                      // design nominal capacity of Pump
-        bool EMSMassFlowOverrideOn;                  // if true, then EMS is calling to override flow requests.
-        Real64 EMSMassFlowValue;                     // EMS value to use for mass flow rate [kg/s]
-        Real64 NomSteamVolFlowRate;                  // For Steam Pump
-        bool NomSteamVolFlowRateWasAutoSized;        // true if steam volume flow rate was autosize on input
-        Real64 MinVolFlowRate;                       // For a Variable Flow Pump this is the minimum capacity during operation.
-        bool minVolFlowRateWasAutosized;             // true if minimum flow rate was autosize on input
-        Real64 MassFlowRateMin;                      // For a Variable Flow Pump this is the minimum capacity during operation.
-        Real64 NomPumpHead;                          // design nominal head pressure of Pump, [Pa]
-        bool EMSPressureOverrideOn;                  // if true, EMS is calling to override pump pressure
-        Real64 EMSPressureOverrideValue;             // EMS value to use for pressure [Pa]
-        Real64 NomPowerUse;                          // design nominal capacity of Pump
-        bool NomPowerUseWasAutoSized;                // true if power was autosize on input
-        PowerSizingMethod powerSizingMethod;         // which method is used for sizing nominal power use
-        Real64 powerPerFlowScalingFactor;            // design electric power per unit flow rate
-        Real64 powerPerFlowPerPressureScalingFactor; // design shaft power per unit flow rate per unit head
-        Real64 MotorEffic;                           // efficiency of the motor
-        Real64 PumpEffic;                            // efficiency of the pump
-        Real64 FracMotorLossToFluid;                 // ?????
-        Real64 Energy;                               // Energy consumed
-        Real64 Power;                                // Power used
-        Array1D<Real64> PartLoadCoef;                // Pump Curve Coefficients
-        int PressureCurve_Index;                     // Pointer to a pump coefficient curve
-        Real64 PumpMassFlowRateMaxRPM;               // Mass flow rate calculated from maximum rpm
-        Real64 PumpMassFlowRateMinRPM;               // Mass flow rate calculated from minimum rpm
-        Real64 MinPhiValue;                          // Minimum value of Phi (from CurveManager)
-        Real64 MaxPhiValue;                          // Maximum value of Phi (from CurveManager)
-        Real64 ImpellerDiameter;                     // Pump Impeller Diameter [m]
-        Real64 RotSpeed_RPM;                         // Rotational speed used for input in revs/min
-        Real64 RotSpeed;                             // Rotational speed for calculations in revs/sec
-        bool PumpInitFlag;
-        bool PumpOneTimeFlag;
-        bool CheckEquipName;
-        bool HasVFD;
+        DataPlant::PlantEquipmentType TypeOf_Num = DataPlant::PlantEquipmentType::Invalid; // pump type of number in reference to the dataplant values
+        PlantLocation plantLoc = {0, DataPlant::LoopSideLocation::Invalid, 0, 0};
+        PumpControlType PumpControl = PumpControlType::Invalid;            // Integer equivalent of PumpControlType
+        int PumpScheduleIndex = 0;                                         // Schedule Pointer
+        int InletNodeNum = 0;                                              // Node number on the inlet side of the plant
+        int OutletNodeNum = 0;                                             // Node number on the outlet side of the plant
+        PumpBankControlSeq SequencingScheme = PumpBankControlSeq::Invalid; // Optimal, Sequential, User-Defined
+        int FluidIndex = 0;                                                // Index for Fluid Properties
+        int NumPumpsInBank = 0;                                            // Node number on the inlet side of the plant
+        int PowerErrIndex1 = 0;                                            // for recurring errors
+        int PowerErrIndex2 = 0;                                            // for recurring errors
+        Real64 MinVolFlowRateFrac = 0.0;                                   // minimum schedule value fraction modifier
+        Real64 NomVolFlowRate = 0.0;                                       // design nominal capacity of Pump
+        bool NomVolFlowRateWasAutoSized = false;                           // true if previous was autosize on input
+        Real64 MassFlowRateMax = 0.0;                                      // design nominal capacity of Pump
+        bool EMSMassFlowOverrideOn = false;                                // if true, then EMS is calling to override flow requests.
+        Real64 EMSMassFlowValue = 0.0;                                     // EMS value to use for mass flow rate [kg/s]
+        Real64 NomSteamVolFlowRate = 0.0;                                  // For Steam Pump
+        bool NomSteamVolFlowRateWasAutoSized = false;                      // true if steam volume flow rate was autosize on input
+        Real64 MinVolFlowRate = 0.0;                                       // For a Variable Flow Pump this is the minimum capacity during operation.
+        bool minVolFlowRateWasAutosized = false;                           // true if minimum flow rate was autosize on input
+        Real64 MassFlowRateMin = 0.0;                                      // For a Variable Flow Pump this is the minimum capacity during operation.
+        Real64 NomPumpHead = 0.0;                                          // design nominal head pressure of Pump, [Pa]
+        bool EMSPressureOverrideOn = false;                                // if true, EMS is calling to override pump pressure
+        Real64 EMSPressureOverrideValue = 0.0;                             // EMS value to use for pressure [Pa]
+        Real64 NomPowerUse = 0.0;                                          // design nominal capacity of Pump
+        bool NomPowerUseWasAutoSized = false;                              // true if power was autosize on input
+        PowerSizingMethod powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure; // which method is used for sizing nominal power use
+        Real64 powerPerFlowScalingFactor = 348701.1;                                          // design electric power per unit flow rate (22 W/gpm)
+        Real64 powerPerFlowPerPressureScalingFactor = (1 / .78);   // design shaft power per unit flow rate per unit head (legacy impeller efficiency)
+        Real64 MotorEffic = 0.0;                                   // efficiency of the motor
+        Real64 PumpEffic = 0.0;                                    // efficiency of the pump
+        Real64 FracMotorLossToFluid = 0.0;                         // ?????
+        Real64 Energy = 0.0;                                       // Energy consumed
+        Real64 Power = 0.0;                                        // Power used
+        std::array<Real64, 4> PartLoadCoef = {0.0, 0.0, 0.0, 0.0}; // Pump Curve Coefficients
+        int PressureCurve_Index = 0;                               // Pointer to a pump coefficient curve
+        Real64 PumpMassFlowRateMaxRPM = 0.0;                       // Mass flow rate calculated from maximum rpm
+        Real64 PumpMassFlowRateMinRPM = 0.0;                       // Mass flow rate calculated from minimum rpm
+        Real64 MinPhiValue = 0.0;                                  // Minimum value of Phi (from CurveManager)
+        Real64 MaxPhiValue = 0.0;                                  // Maximum value of Phi (from CurveManager)
+        Real64 ImpellerDiameter = 0.0;                             // Pump Impeller Diameter [m]
+        Real64 RotSpeed_RPM = 0.0;                                 // Rotational speed used for input in revs/min
+        Real64 RotSpeed = 0.0;                                     // Rotational speed for calculations in revs/sec
+        bool PumpInitFlag = true;
+        bool PumpOneTimeFlag = true;
+        bool CheckEquipName = true;
+        bool HasVFD = false;
         PumpVFDControlData VFD;
-        bool OneTimePressureWarning;
-        bool HeatLossesToZone;        // if true then pump losses added to surrounding zone
-        int ZoneNum;                  // index for zone surrounding pump
-        Real64 SkinLossRadFraction;   // radiative split for skin losses to zone
-        bool LoopSolverOverwriteFlag; // loop solver overwrite for determining pump minimum flow rate
+        bool OneTimePressureWarning = true;
+        bool HeatLossesToZone = false;        // if true then pump losses added to surrounding zone
+        int ZoneNum = 0;                      // index for zone surrounding pump
+        Real64 SkinLossRadFraction = 0.0;     // radiative split for skin losses to zone
+        bool LoopSolverOverwriteFlag = false; // loop solver overwrite for determining pump minimum flow rate
         std::string EndUseSubcategoryName;
-
-        // Default Constructor
-        PumpSpecs()
-            : pumpType(PumpType::Invalid), TypeOf_Num(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, PumpControl(PumpControlType::Invalid),
-              PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0), SequencingScheme(PumpBankControlSeq::Invalid), FluidIndex(0),
-              NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0), MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0),
-              NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false), EMSMassFlowValue(0.0), NomSteamVolFlowRate(0.0),
-              NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0), minVolFlowRateWasAutosized(false), MassFlowRateMin(0.0), NomPumpHead(0.0),
-              EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0), NomPowerUse(0.0), NomPowerUseWasAutoSized(false),
-              powerSizingMethod(PowerSizingMethod::SizePowerPerFlowPerPressure), powerPerFlowScalingFactor(348701.1), // 22 W/gpm
-              powerPerFlowPerPressureScalingFactor(1 / 0.78),                                                         // legacy impeller efficiency
-              MotorEffic(0.0), PumpEffic(0.0), FracMotorLossToFluid(0.0), Energy(0.0), Power(0.0), PartLoadCoef(4, 0.0), PressureCurve_Index(0),
-              PumpMassFlowRateMaxRPM(0.0), PumpMassFlowRateMinRPM(0.0), MinPhiValue(0.0), MaxPhiValue(0.0), ImpellerDiameter(0.0), RotSpeed_RPM(0.0),
-              RotSpeed(0.0), PumpInitFlag(true), PumpOneTimeFlag(true), CheckEquipName(true), HasVFD(false), OneTimePressureWarning(true),
-              HeatLossesToZone(false), ZoneNum(0), SkinLossRadFraction(0.0), LoopSolverOverwriteFlag(false)
-        {
-        }
     };
 
     struct ReportVars
     {
         // Members
-        int NumPumpsOperating;        // Used in pump bank. reports how many pumps are ON
-        Real64 PumpMassFlowRate;      // Mass flow rate of the pump
-        Real64 PumpHeattoFluid;       // Heat transfer from pump to fluid (W)
-        Real64 PumpHeattoFluidEnergy; // Pump Energy dissipated into fluid stream
-        Real64 OutletTemp;            // Pump outlet temperature
-        Real64 ShaftPower;            // Power input at the shaft
-        Real64 ZoneTotalGainRate;     // total pump skin losses to zone (W)
-        Real64 ZoneTotalGainEnergy;   // total pump skin losses to zone energy (J)
-        Real64 ZoneConvGainRate;      // pump skin losses convecting to zone air (W)
-        Real64 ZoneRadGainRate;       // pump skin losses radiating to inside of zone (W)
-
-        // Default Constructor
-        ReportVars()
-            : NumPumpsOperating(0), PumpMassFlowRate(0.0), PumpHeattoFluid(0.0), PumpHeattoFluidEnergy(0.0), OutletTemp(0.0), ShaftPower(0.0),
-              ZoneTotalGainRate(0.0), ZoneTotalGainEnergy(0.0), ZoneConvGainRate(0.0), ZoneRadGainRate(0.0)
-        {
-        }
+        int NumPumpsOperating = 0;          // Used in pump bank. reports how many pumps are ON
+        Real64 PumpMassFlowRate = 0.0;      // Mass flow rate of the pump
+        Real64 PumpHeattoFluid = 0.0;       // Heat transfer from pump to fluid (W)
+        Real64 PumpHeattoFluidEnergy = 0.0; // Pump Energy dissipated into fluid stream
+        Real64 OutletTemp = 0.0;            // Pump outlet temperature
+        Real64 ShaftPower = 0.0;            // Power input at the shaft
+        Real64 ZoneTotalGainRate = 0.0;     // total pump skin losses to zone (W)
+        Real64 ZoneTotalGainEnergy = 0.0;   // total pump skin losses to zone energy (J)
+        Real64 ZoneConvGainRate = 0.0;      // pump skin losses convecting to zone air (W)
+        Real64 ZoneRadGainRate = 0.0;       // pump skin losses radiating to inside of zone (W)
     };
 
     void SimPumps(EnergyPlusData &state,
@@ -292,8 +245,8 @@ struct PumpsData : BaseGlobalStruct
     Real64 PumpHeattoFluid = 0.0;  // Pump Power dissipated in fluid stream
     Real64 Power = 0.0;            // Pump Electric power
     Real64 ShaftPower = 0.0;       // Power passing through pump shaft
-    Array1D<Pumps::PumpSpecs> PumpEquip;
-    Array1D<Pumps::ReportVars> PumpEquipReport;
+    EPVector<Pumps::PumpSpecs> PumpEquip;
+    EPVector<Pumps::ReportVars> PumpEquipReport;
     std::unordered_map<std::string, std::string> PumpUniqueNames;
 
     void clear_state() override

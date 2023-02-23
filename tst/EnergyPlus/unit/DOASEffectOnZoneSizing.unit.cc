@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,6 +66,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace ZoneEquipmentManager;
@@ -83,13 +84,12 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
     // locals
     Real64 OutDB;        // outside air temperature [C]
     Real64 OutHR;        // outside humidity ratio [kg Water / kg Dry Air]
-    int DOASControl;     // dedicated outside air control strategy
     Real64 DOASLowTemp;  // DOAS low setpoint [C]
     Real64 DOASHighTemp; // DOAS high setpoint [C]
     Real64 DOASSupTemp;  // DOAS supply temperature [C]
     Real64 DOASSupHR;    // DOAS supply humidity ratio [kg H2O / kg dry air]
     // neutral supply air
-    DOASControl = 1;
+    DataSizing::DOASControl DOASControl = DataSizing::DOASControl::NeutralSup;
     DOASLowTemp = 21.1;
     DOASHighTemp = 23.9;
     OutDB = 10.0;
@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
     EXPECT_DOUBLE_EQ(22.3, DOASSupTemp);
     EXPECT_DOUBLE_EQ(0.0085, DOASSupHR);
     // neutral dehumidified supply air
-    DOASControl = 2;
+    DOASControl = DataSizing::DOASControl::NeutralDehumSup;
     DOASLowTemp = 14.4;
     DOASHighTemp = 22.2;
     OutDB = 11;
@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
     EXPECT_DOUBLE_EQ(22.2, DOASSupTemp);
     EXPECT_DOUBLE_EQ(0.0092, DOASSupHR);
     // cold supply air
-    DOASControl = 3;
+    DOASControl = DataSizing::DOASControl::CoolSup;
     DOASLowTemp = 12.2;
     DOASHighTemp = 14.4;
     OutDB = 11;
@@ -145,8 +145,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataHeatBal->Zone.allocate(2);
     state->dataSize->CalcZoneSizing.allocate(1, 2);
     state->dataSize->CalcFinalZoneSizing.allocate(2);
-    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(2);
-    state->dataHeatBalFanSys->SysDepZoneLoads.allocate(2);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig.allocate(2);
     state->dataHeatBalFanSys->TempControlType.allocate(2);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(2);
@@ -218,8 +217,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataEnvrn->StdBaroPress = 101325.;
     state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
     state->dataSize->CalcFinalZoneSizing(2).MinOA = 0.11;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = 3;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASControlStrategy = 3;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = DataSizing::DOASControl::CoolSup;
+    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASControlStrategy = DataSizing::DOASControl::CoolSup;
     state->dataEnvrn->OutDryBulbTemp = 28.;
     state->dataEnvrn->OutHumRat = 0.017;
     state->dataLoopNodes->Node(4).Temp = 22;
@@ -310,28 +309,6 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 2).HeatMassFlow);
     EXPECT_NEAR(1444.767, state->dataSize->CalcZoneSizing(1, 2).CoolLoad, .001);
     EXPECT_NEAR(.127528, state->dataSize->CalcZoneSizing(1, 2).CoolMassFlow, .000001);
-
-    state->dataLoopNodes->Node.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBal->Zone.deallocate();
-    state->dataSize->CalcZoneSizing.deallocate();
-    state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
-    state->dataHeatBalFanSys->SysDepZoneLoads.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataHeatBalFanSys->TempControlType.deallocate();
-    state->dataHeatBalFanSys->TempZoneThermostatSetPoint.deallocate();
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.deallocate();
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.deallocate();
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.deallocate();
-    state->dataZoneEnergyDemand->DeadBandOrSetback.deallocate();
-    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
-    state->dataHeatBalFanSys->ZoneMassBalanceFlag.deallocate();
-    state->dataHeatBal->MassConservation.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)
@@ -342,7 +319,7 @@ TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)
     state->dataSize->ZoneSizingInput(1).AccountForDOAS = false;
     state->dataSize->ZoneSizingInput(2).AccountForDOAS = true;
 
-    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DOANeutralSup;
+    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DOASControl::NeutralSup;
     state->dataSize->ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     state->dataSize->ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
     AutoCalcDOASControlStrategy(*state);
@@ -364,7 +341,7 @@ TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)
     EXPECT_DOUBLE_EQ(22.6, state->dataSize->ZoneSizingInput(2).DOASHighSetpoint);
     EXPECT_DOUBLE_EQ(21.5, state->dataSize->ZoneSizingInput(2).DOASLowSetpoint);
 
-    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DOANeutralDehumSup;
+    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DataSizing::DOASControl::NeutralDehumSup;
     state->dataSize->ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     state->dataSize->ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
     AutoCalcDOASControlStrategy(*state);
@@ -386,7 +363,7 @@ TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)
     EXPECT_DOUBLE_EQ(22.6, state->dataSize->ZoneSizingInput(2).DOASHighSetpoint);
     EXPECT_DOUBLE_EQ(13.9, state->dataSize->ZoneSizingInput(2).DOASLowSetpoint);
 
-    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DOACoolSup;
+    state->dataSize->ZoneSizingInput(2).DOASControlStrategy = DataSizing::DOASControl::CoolSup;
     state->dataSize->ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     state->dataSize->ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
     AutoCalcDOASControlStrategy(*state);

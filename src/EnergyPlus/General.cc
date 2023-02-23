@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -91,310 +92,223 @@ using DataHVACGlobals::Bisection;
 // MODULE PARAMETER DEFINITIONS
 static constexpr std::string_view BlankString;
 
-Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
-                     Array1S<Real64> const PropArray // Array of blind properties
-)
+enum class ReportType
 {
+    Invalid = -1,
+    DXF,
+    DXFWireFrame,
+    VRML,
+    Num
+};
 
+constexpr std::array<std::string_view, static_cast<int>(ReportType::Num)> ReportTypeNamesUC{"DXF", "DXF:WIREFRAME", "VRML"};
+
+enum class AvailRpt
+{
+    Invalid = -1,
+    None,
+    NotByUniqueKeyNames,
+    Verbose,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(AvailRpt::Num)> AvailRptNamesUC{"NONE", "NOTBYUNIQUEKEYNAMES", "VERBOSE"};
+
+enum class ERLdebugOutputLevel
+{
+    Invalid = -1,
+    None,
+    ErrorsOnly,
+    Verbose,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(ERLdebugOutputLevel::Num)> ERLdebugOutputLevelNamesUC{"NONE", "ERRORSONLY", "VERBOSE"};
+
+enum class ReportName
+{
+    Invalid = -1,
+    Constructions,
+    Viewfactorinfo,
+    Variabledictionary,
+    Surfaces,
+    Energymanagementsystem,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(ReportName::Num)> ReportNamesUC{
+    "CONSTRUCTIONS", "VIEWFACTORINFO", "VARIABLEDICTIONARY", "SURFACES", "ENERGYMANAGEMENTSYSTEM"};
+
+enum class RptKey
+{
+    Invalid = -1,
+    Costinfo,
+    DXF,
+    DXFwireframe,
+    VRML,
+    Vertices,
+    Details,
+    DetailsWithVertices,
+    Lines,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(RptKey::Num)> RptKeyNamesUC{
+    "COSTINFO", "DXF", "DXF:WIREFRAME", "VRML", "VERTICES", "DETAILS", "DETAILSWITHVERTICES", "LINES"};
+
+// A second version that does not require a payload -- use lambdas
+void SolveRoot(EnergyPlusData &state,
+               Real64 Eps,   // required absolute accuracy
+               int MaxIte,   // maximum number of allowed iterations
+               int &Flag,    // integer storing exit status
+               Real64 &XRes, // value of x that solves f(x,Par) = 0
+               const std::function<Real64(Real64)> &f,
+               Real64 X_0, // 1st bound of interval that contains the solution
+               Real64 X_1) // 2nd bound of interval that contains the solution
+{
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   May 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+    //       AUTHOR         Michael Wetter
+    //       DATE WRITTEN   March 1999
+    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+    //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Does profile-angle interpolation of window blind solar-thermal properties
+    // Find the value of x between x0 and x1 such that f(x,Par)
+    // is equal to zero.
 
     // METHODOLOGY EMPLOYED:
-    // Linear interpolation.
+    // Uses the Regula Falsi (false position) method (similar to secant method)
 
-    // Return value
-    Real64 InterpProfAng;
+    // REFERENCES:
+    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+    // 2nd edition, 1992. Page 347 ff.
 
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    // = -2: f(x0) and f(x1) have the same sign
+    // = -1: no convergence
+    // >  0: number of iterations performed
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 InterpFac; // Interpolation factor
-    int IAlpha;       // Profile angle index
+    Real64 constexpr SMALL(1.e-10);
+    Real64 X0 = X_0;   // present 1st bound
+    Real64 X1 = X_1;   // present 2nd bound
+    Real64 XTemp = X0; // new estimate
+    int NIte = 0;      // number of interations
+    int AltIte = 0;    // an accounter used for Alternation choice
 
-    // DeltaAng = Pi/36
-    if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-        InterpProfAng = 0.0;
-    } else {
-        IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
-        InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
-        InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
+    Real64 Y0 = f(X0); // f at X0
+    Real64 Y1 = f(X1); // f at X1
+    // check initial values
+    if (Y0 * Y1 > 0) {
+        Flag = -2;
+        XRes = X0;
+        return;
     }
-    return InterpProfAng;
-}
+    XRes = XTemp;
 
-Real64 InterpSlatAng(Real64 const SlatAng,           // Slat angle (rad)
-                     bool const VarSlats,            // True if slat angle is variable
-                     Array1S<Real64> const PropArray // Array of blind properties as function of slat angle
-)
-{
+    while (true) {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   Dec 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Does slat-angle interpolation of window blind solar-thermal properties that
-    // do not depend on profile angle
-
-    // METHODOLOGY EMPLOYED:
-    // Linear interpolation.
-
-    // Using/Aliasing
-    using DataSurfaces::MaxSlatAngs;
-
-    // Return value
-    Real64 InterpSlatAng;
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    static Real64 const DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
-    static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 InterpFac; // Interpolation factor
-    int IBeta;        // Slat angle index
-    Real64 SlatAng1;
-
-    if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
-        SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
-    } else {
-        SlatAng1 = SlatAng;
-    }
-
-    if (VarSlats) { // Variable-angle slats
-        IBeta = 1 + int(SlatAng1 * DeltaAng_inv);
-        InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv;
-        InterpSlatAng = PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
-    } else { // Fixed-angle slats or shade
-        InterpSlatAng = PropArray(1);
-    }
-
-    return InterpSlatAng;
-}
-
-Real64 InterpProfSlatAng(Real64 const ProfAng,           // Profile angle (rad)
-                         Real64 const SlatAng,           // Slat angle (rad)
-                         bool const VarSlats,            // True if variable-angle slats
-                         Array2A<Real64> const PropArray // Array of blind properties
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   Dec 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Does simultaneous profile-angle and slat-angle interpolation of window
-    // blind solar-thermal properties that depend on profile angle and slat angle
-
-    // METHODOLOGY EMPLOYED:
-    // Linear interpolation.
-
-    // Using/Aliasing
-    using DataSurfaces::MaxSlatAngs;
-
-    // Return value
-    Real64 InterpProfSlatAng;
-
-    // Argument array dimensioning
-    PropArray.dim(MaxSlatAngs, 37);
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const DeltaProfAng(DataGlobalConstants::Pi / 36.0);
-    Real64 const DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 ProfAngRatio; // Profile angle interpolation factor
-    Real64 SlatAngRatio; // Slat angle interpolation factor
-    int IAlpha;          // Profile angle index
-    int IBeta;           // Slat angle index
-    Real64 Val1;         // Property values at points enclosing the given ProfAngle and SlatAngle
-    Real64 Val2;
-    Real64 Val3;
-    Real64 Val4;
-    Real64 ValA; // Property values at given SlatAngle to be interpolated in profile angle
-    Real64 ValB;
-    Real64 SlatAng1;
-    Real64 ProfAng1;
-
-    if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
-        SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
-
-        // This is not correct, fixed 2/17/2010
-        // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-        ProfAng1 = min(max(ProfAng, -DataGlobalConstants::PiOvr2), DataGlobalConstants::PiOvr2);
-    } else {
-        SlatAng1 = SlatAng;
-        ProfAng1 = ProfAng;
-    }
-
-    IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1;
-    ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
-
-    if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
-        IBeta = int(SlatAng1 / DeltaSlatAng) + 1;
-        SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng;
-        Val1 = PropArray(IBeta, IAlpha);
-        Val2 = PropArray(min(MaxSlatAngs, IBeta + 1), IAlpha);
-        Val3 = PropArray(IBeta, min(37, IAlpha + 1));
-        Val4 = PropArray(min(MaxSlatAngs, IBeta + 1), min(37, IAlpha + 1));
-        ValA = Val1 + SlatAngRatio * (Val2 - Val1);
-        ValB = Val3 + SlatAngRatio * (Val4 - Val3);
-        InterpProfSlatAng = ValA + ProfAngRatio * (ValB - ValA);
-    } else { // Fixed-angle slats: interpolate only in profile angle
-        Val1 = PropArray(1, IAlpha);
-        Val2 = PropArray(1, min(37, IAlpha + 1));
-        InterpProfSlatAng = Val1 + ProfAngRatio * (Val2 - Val1);
-    }
-
-    return InterpProfSlatAng;
-}
-
-Real64 BlindBeamBeamTrans(Real64 const ProfAng,        // Solar profile angle (rad)
-                          Real64 const SlatAng,        // Slat angle (rad)
-                          Real64 const SlatWidth,      // Slat width (m)
-                          Real64 const SlatSeparation, // Slat separation (distance between surfaces of adjacent slats) (m)
-                          Real64 const SlatThickness   // Slat thickness (m)
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Winkelmann
-    //       DATE WRITTEN   Jan 2002
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Calculates beam-to-beam transmittance of a window blind
-
-    // METHODOLOGY EMPLOYED:
-    // Based on solar profile angle and slat geometry
-
-    // Return value
-    Real64 BlindBeamBeamTrans;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 fEdge;      // Slat edge correction factor
-    Real64 wbar;       // Intermediate variable
-    Real64 gamma;      // Intermediate variable
-    Real64 fEdge1;     // Intermediate variable
-    Real64 CosProfAng; // Cosine of profile angle
-
-    CosProfAng = std::cos(ProfAng);
-    gamma = SlatAng - ProfAng;
-    wbar = SlatSeparation;
-    if (CosProfAng != 0.0) wbar = SlatWidth * std::cos(gamma) / CosProfAng;
-    BlindBeamBeamTrans = max(0.0, 1.0 - std::abs(wbar / SlatSeparation));
-
-    if (BlindBeamBeamTrans > 0.0) {
-
-        // Correction factor that accounts for finite thickness of slats. It is used to modify the
-        // blind transmittance to account for reflection and absorption by the slat edges.
-        // fEdge is ratio of area subtended by edge of slat to area between tops of adjacent slats.
-
-        fEdge = 0.0;
-        fEdge1 = 0.0;
-        if (std::abs(std::sin(gamma)) > 0.01) {
-            if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2 && ProfAng <= SlatAng) ||
-                (SlatAng > DataGlobalConstants::PiOvr2 && SlatAng <= DataGlobalConstants::Pi && ProfAng > -(DataGlobalConstants::Pi - SlatAng)))
-                fEdge1 = SlatThickness * std::abs(std::sin(gamma)) / ((SlatSeparation + SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
-            fEdge = min(1.0, std::abs(fEdge1));
+        Real64 DY = Y0 - Y1;
+        if (std::abs(DY) < SMALL) DY = SMALL;
+        if (std::abs(X1 - X0) < SMALL) {
+            break;
         }
-        BlindBeamBeamTrans *= (1.0 - fEdge);
-    }
-
-    return BlindBeamBeamTrans;
-}
-
-std::string &strip_trailing_zeros(std::string &InputString)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Stuart Mentzer (in-place version of RemoveTrailingZeros by Linda Lawrie)
-    //       DATE WRITTEN   July 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Remove trailing fractional zeros from floating point representation strings in place.
-
-    static constexpr std::string_view ED("ED");
-    static constexpr std::string_view zero_string("0.");
-
-    assert(!has_any_of(InputString, "ed"));       // Pre Not using lowercase exponent letter
-    assert(InputString == stripped(InputString)); // Pre Already stripped surrounding spaces
-
-    if (has(InputString, '.') && (!has_any_of(InputString, ED))) { // Has decimal point and no exponent part
-        std::string::size_type const pos(InputString.find_last_not_of('0'));
-        if (pos + 1 < InputString.length()) {
-            switch (pos) { // Handle [+/-].000... format
-            case 0u:       // .0*
-                InputString = zero_string;
-                break;
-            case 1u:
-                if (InputString[1] == '.') {
-                    char const c0(InputString[0]);
-                    if ((c0 == '+') || (c0 == '-')) {
-                        InputString = zero_string;
-                        break;
-                    }
-                }
-                // fallthrough
-            default:
-                InputString.erase(pos + 1);
+        // new estimation
+        switch (state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver) {
+        case HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+            XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::Bisection: {
+            XTemp = (X1 + X0) / 2.0;
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+            if (NIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
             }
+            break;
         }
-    }
-    return InputString; // Allows chaining
+        case HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+            if (NIte <= state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::Alternation: {
+            if (AltIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+                if (AltIte >= 2 * state.dataRootFinder->HVACSystemRootFinding.NumOfIter) AltIte = 0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        default: {
+            XTemp = (Y0 * X1 - Y1 * X0) / DY;
+        }
+        }
+
+        Real64 const YTemp = f(XTemp);
+
+        ++NIte;
+        ++AltIte;
+
+        // check convergence
+        if (std::abs(YTemp) < Eps) {
+            Flag = NIte;
+            XRes = XTemp;
+            return;
+        };
+
+        // OK, so we didn't converge, lets check max iterations to see if we should break early
+        if (NIte > MaxIte) break;
+
+        // Finally, if we make it here, we have not converged, and we still have iterations left, so continue
+        // and reassign values (only if further iteration required)
+        if (Y0 < 0.0) {
+            if (YTemp < 0.0) {
+                X0 = XTemp;
+                Y0 = YTemp;
+            } else {
+                X1 = XTemp;
+                Y1 = YTemp;
+            }
+        } else {
+            if (YTemp < 0.0) {
+                X1 = XTemp;
+                Y1 = YTemp;
+            } else {
+                X0 = XTemp;
+                Y0 = YTemp;
+            }
+        } // ( Y0 < 0 )
+    }     // Cont
+
+    // if we make it here we haven't converged, so just set the flag and leave
+    Flag = -1;
+    XRes = XTemp;
 }
 
-void MovingAvg(Array1A<Real64> const DataIn, // input data that needs smoothing
-               int const NumDataItems,       // number of values in DataIn
-               int const NumItemsInAvg,      // number of items in the averaging window
-               Array1A<Real64> SmoothedData  // output data after smoothing
-)
+void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
+    if (NumItemsInAvg <= 1) return; // no need to average/smooth
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   January 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+    Array1D<Real64> TempData(2 * DataIn.size()); // a scratch array twice the size, bottom end duplicate of top end
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // Smooth the data in the 1-d array DataIn by averaging over a window NumItemsInAvg
-    // wide. Return the results in the 1-d array SmoothedData
-
-    // METHODOLOGY EMPLOYED:
-    // Note that DataIn and SmoothedData should have the same size. This is the reponsibility
-    // of the calling routine. NumItemsInAvg should be no bigger than the size of DataIn.
-
-    // Argument array dimensioning
-    DataIn.dim(NumDataItems);
-    SmoothedData.dim(NumDataItems);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D<Real64> TempData(3 * NumDataItems); // a scratch array
-
-    for (int i = 1; i <= NumDataItems; ++i) {
-        TempData(i) = TempData(NumDataItems + i) = TempData(2 * NumDataItems + i) = DataIn(i);
-        SmoothedData(i) = 0.0;
+    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
+        TempData(i) = TempData(DataIn.size() + i) = DataIn(i); // initialize both bottom and top end
+        DataIn(i) = 0.0;
     }
 
-    for (int i = 1; i <= NumDataItems; ++i) {
+    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
         for (int j = 1; j <= NumItemsInAvg; ++j) {
-            SmoothedData(i) += TempData(NumDataItems + i - NumItemsInAvg + j);
+            DataIn(i) += TempData(DataIn.size() - NumItemsInAvg + i + j); // sum top end including NumItemsInAvg history terms
         }
-        SmoothedData(i) /= double(NumItemsInAvg);
+        DataIn(i) /= NumItemsInAvg; // average to smooth over NumItemsInAvg window
     }
 }
 
@@ -405,7 +319,7 @@ void ProcessDateString(EnergyPlusData &state,
                        int &PWeekDay,
                        WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                        bool &ErrorsFound,
-                       Optional_int PYear)
+                       ObjexxFCL::Optional_int PYear)
 {
 
     // SUBROUTINE INFORMATION:
@@ -435,7 +349,7 @@ void ProcessDateString(EnergyPlusData &state,
             PDay = 0;
             DateType = WeatherManager::DateType::MonthDay;
         } else if (FstNum < 0 || FstNum > 366) {
-            ShowSevereError(state, "Invalid Julian date Entered=" + String);
+            ShowSevereError(state, format("Invalid Julian date Entered={}", String));
             ErrorsFound = true;
         } else {
             InvOrdinalDay(FstNum, PMonth, PDay, 0);
@@ -470,7 +384,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                          int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
                          WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                          bool &ErrorsFound,                  // Set to true if cannot process this string as a date
-                         Optional_int TokenYear              // Value of Year if one appears to be present and this argument is present
+                         ObjexxFCL::Optional_int TokenYear   // Value of Year if one appears to be present and this argument is present
 )
 {
 
@@ -535,7 +449,7 @@ void DetermineDateTokens(EnergyPlusData &state,
 
     strip(CurrentString);
     if (CurrentString == BlankString) {
-        ShowSevereError(state, "Invalid date field=" + String);
+        ShowSevereError(state, format("Invalid date field={}", String));
         ErrorsFound = true;
     } else {
         Loop = 0;
@@ -549,7 +463,7 @@ void DetermineDateTokens(EnergyPlusData &state,
             strip(CurrentString);
         }
         if (not_blank(CurrentString)) {
-            ShowSevereError(state, "Invalid date field=" + String);
+            ShowSevereError(state, format("Invalid date field={}", String));
             ErrorsFound = true;
         } else if (Loop == 2) {
             // Field must be Day Month or Month Day (if both numeric, mon / day)
@@ -559,7 +473,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                 // Month day, but first field is not numeric, 2nd must be
                 NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                 if (errFlag) {
-                    ShowSevereError(state, "Invalid date field=" + String);
+                    ShowSevereError(state, format("Invalid date field={}", String));
                     InternalError = true;
                 } else {
                     TokenDay = NumField2;
@@ -627,7 +541,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                             if (TokenMonth == 0) InternalError = true;
                         }
                     } else { // error....
-                        ShowSevereError(state, "First date field not numeric, field=" + String);
+                        ShowSevereError(state, format("First date field not numeric, field={}", String));
                     }
                 }
             } else { // mm/dd/yyyy or yyyy/mm/dd
@@ -652,7 +566,7 @@ void DetermineDateTokens(EnergyPlusData &state,
             }
         } else {
             // Not enough or too many fields
-            ShowSevereError(state, "Invalid date field=" + String);
+            ShowSevereError(state, format("Invalid date field={}", String));
             ErrorsFound = true;
         }
     }
@@ -692,7 +606,7 @@ void ValidateMonthDay(EnergyPlusData &state,
         if (Day < 1 || Day > EndMonthDay[Month - 1]) InternalError = true;
     }
     if (InternalError) {
-        ShowSevereError(state, "Invalid Month Day date format=" + String);
+        ShowSevereError(state, format("Invalid Month Day date format={}", String));
         ErrorsFound = true;
     } else {
         ErrorsFound = false;
@@ -876,7 +790,7 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
         ActualTimeMinS = 0;
     }
     const auto TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
-    auto minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
+    Real64 minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
 
     auto TimeStmpE = format("{:02}:{:2.0F}", static_cast<int>(ActualTimeE), minutes);
 
@@ -1070,49 +984,6 @@ void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, ho
     Minute = mod(TmpItem, DecHr);
 }
 
-int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   January 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // When reporting peaks, minutes are used but not necessarily easily calculated.
-
-    // METHODOLOGY EMPLOYED:
-    // Could use the access to the minute as OP (OutputProcessor) does but uses
-    // external calculation.
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    // Return value
-    int ActualTimeMin; // calculated Minute for reporting
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    Real64 constexpr FracToMin(60.0);
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 ActualTimeS; // Start of current interval (HVAC time step)
-    Real64 ActualTimeE; // End of current interval (HVAC time step)
-    int ActualTimeHrS;
-
-    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-        ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
-        ActualTimeE = ActualTimeS + TimeStepSys;
-        ActualTimeHrS = int(ActualTimeS);
-        ActualTimeMin = nint((ActualTimeE - ActualTimeHrS) * FracToMin);
-    } else {
-        ActualTimeMin = (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)) * FracToMin;
-    }
-
-    return ActualTimeMin;
-}
-
 void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, hour, minute
                        int const Month, // month in integer format (1:12)
                        int const Day,   // day in integer format (1:31)
@@ -1141,110 +1012,6 @@ void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, h
     Item = ((Month * 100 + Day) * 100 + Hour) * 100 + Minute;
 }
 
-int LogicalToInteger(bool const Flag)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This subroutine uses an input logical and makes
-    // an integer (true=1, false=0)
-
-    // Return value
-    int LogicalToInteger;
-
-    if (Flag) {
-        LogicalToInteger = 1;
-    } else {
-        LogicalToInteger = 0;
-    }
-
-    return LogicalToInteger;
-}
-
-Real64 GetCurrentHVACTime(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This routine returns the time in seconds at the end of the current HVAC step.
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    // Return value
-    Real64 GetCurrentHVACTime;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 CurrentHVACTime;
-
-    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
-    // erronously truncate all sub-minute system time steps down to the closest full minute.
-    // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
-    // as real.
-    CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed + TimeStepSys;
-    GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour;
-
-    return GetCurrentHVACTime;
-}
-
-Real64 GetPreviousHVACTime(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   November 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This routine returns the time in seconds at the beginning of the current HVAC step.
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-
-    // Return value
-    Real64 GetPreviousHVACTime;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 PreviousHVACTime;
-
-    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
-    // erronously truncate all sub-minute system time steps down to the closest full minute.
-    PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed;
-    GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour;
-
-    return GetPreviousHVACTime;
-}
-
-std::string CreateHVACTimeIntervalString(EnergyPlusData &state)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function creates the time stamp with the current time interval for the HVAC
-    // time step.
-
-    // Return value
-    std::string OutputString;
-
-    OutputString = CreateTimeIntervalString(GetPreviousHVACTime(state), GetCurrentHVACTime(state));
-
-    return OutputString;
-}
-
 std::string CreateTimeString(Real64 const Time) // Time in seconds
 {
 
@@ -1271,32 +1038,6 @@ std::string CreateTimeString(Real64 const Time) // Time in seconds
     // TimeStamp written with formatting
     // "hh:mm:ss.s"
     return fmt::format("{:02d}:{:02d}:{:04.1f}", Hours, Minutes, Seconds);
-}
-
-std::string CreateTimeIntervalString(Real64 const StartTime, // Start of current interval in seconds
-                                     Real64 const EndTime    // End of current interval in seconds
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Dimitri Curtil
-    //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function creates the time stamp with the current time interval from start and end
-    // time values specified in seconds.
-    // Inspired by similar function CreateSysTimeIntervalString() in General.cc
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    std::string TimeStmpS; // Character representation of start of interval
-    std::string TimeStmpE; // Character representation of end of interval
-
-    TimeStmpS = CreateTimeString(StartTime);
-    TimeStmpE = CreateTimeString(EndTime);
-
-    return TimeStmpS + " - " + TimeStmpE;
 }
 
 void ParseTime(Real64 const Time, // Time value in seconds
@@ -1341,9 +1082,9 @@ void ParseTime(Real64 const Time, // Time value in seconds
 void ScanForReports(EnergyPlusData &state,
                     std::string const &reportName,
                     bool &DoReport,
-                    Optional_string_const ReportKey,
-                    Optional_string Option1,
-                    Optional_string Option2)
+                    ObjexxFCL::Optional_string_const ReportKey,
+                    ObjexxFCL::Optional_string Option1,
+                    ObjexxFCL::Optional_string Option2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1368,16 +1109,6 @@ void ScanForReports(EnergyPlusData &state,
     int NumNames;
     int NumNumbers;
     int IOStat;
-    auto &DXFOption1 = state.dataGeneral->DXFOption1;
-    auto &DXFOption2 = state.dataGeneral->DXFOption2;
-    auto &DXFWFOption1 = state.dataGeneral->DXFWFOption1;
-    auto &DXFWFOption2 = state.dataGeneral->DXFWFOption2;
-    auto &VRMLOption1 = state.dataGeneral->VRMLOption1;
-    auto &VRMLOption2 = state.dataGeneral->VRMLOption2;
-    auto &ViewRptOption1 = state.dataGeneral->ViewRptOption1;
-    auto &LineRptOption1 = state.dataGeneral->LineRptOption1;
-    auto &VarDictOption1 = state.dataGeneral->VarDictOption1;
-    auto &VarDictOption2 = state.dataGeneral->VarDictOption2;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     if (state.dataGeneral->GetReportInput) {
@@ -1428,7 +1159,7 @@ void ScanForReports(EnergyPlusData &state,
                 switch (value) {
                 case LINES:
                     state.dataGeneral->LineRpt = true;
-                    LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                    state.dataGeneral->LineRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
                     break;
                 case VERTICES:
                     state.dataGeneral->SurfVert = true;
@@ -1445,21 +1176,23 @@ void ScanForReports(EnergyPlusData &state,
                     break;
                 case VIEWFACTORINFO: // actual reporting is in HeatBalanceIntRadExchange
                     state.dataGeneral->ViewFactorInfo = true;
-                    ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                    state.dataGeneral->ViewRptOption1 = state.dataIPShortCut->cAlphaArgs(2);
                     break;
                 case DECAYCURVESFROMCOMPONENTLOADSSUMMARY: // Should the Radiant to Convective Decay Curves from the
                                                            // load component report appear in the EIO file
                     state.dataGlobal->ShowDecayCurvesInEIO = true;
                     break;
                 default: // including empty
-                    ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
+                    ShowWarningError(state, format("{}: No {} supplied.", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1)));
                     ShowContinueError(state,
                                       R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
                 }
             } catch (int e) {
                 ShowWarningError(state,
-                                 cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                     state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
+                                 format("{}: Invalid {}=\"{}\" supplied.",
+                                        cCurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaFieldNames(1),
+                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   R"( Legal values are: "Lines", "Vertices", "Details", "DetailsWithVertices", "CostInfo", "ViewFactorIinfo".)");
             }
@@ -1482,42 +1215,35 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
+            ReportType checkReportType =
+                static_cast<ReportType>(getEnumerationValue(ReportTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
 
-                if (SELECT_CASE_var == "DXF") {
-                    state.dataGeneral->DXFReport = true;
-                    DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                    DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
-
-                } else if (SELECT_CASE_var == "DXF:WIREFRAME") {
-                    state.dataGeneral->DXFWFReport = true;
-                    DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                    DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
-
-                } else if (SELECT_CASE_var == "VRML") {
-                    state.dataGeneral->VRMLReport = true;
-                    VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                    VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
-
-                } else if (SELECT_CASE_var.empty()) {
-                    ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
-                    ShowContinueError(state, R"( Legal values are: "DXF", "DXF:WireFrame", "VRML".)");
-
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state, R"( Legal values are: "DXF", "DXF:WireFrame", "VRML".)");
-                }
+            switch (checkReportType) {
+            case ReportType::DXF: {
+                state.dataGeneral->DXFReport = true;
+                state.dataGeneral->DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
+            } break;
+            case ReportType::DXFWireFrame: {
+                state.dataGeneral->DXFWFReport = true;
+                state.dataGeneral->DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
+            } break;
+            case ReportType::VRML: {
+                state.dataGeneral->VRMLReport = true;
+                state.dataGeneral->VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                state.dataGeneral->VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
+            } break;
+            default:
+                break;
             }
         }
 
         RepNum = state.dataInputProcessing->inputProcessor->getNumSectionsFound("Report Variable Dictionary");
         if (RepNum > 0) {
             state.dataGeneral->VarDict = true;
-            VarDictOption1 = "REGULAR";
-            VarDictOption2 = "";
+            state.dataGeneral->VarDictOption1 = "REGULAR";
+            state.dataGeneral->VarDictOption2 = "";
         }
 
         cCurrentModuleObject = "Output:VariableDictionary";
@@ -1537,8 +1263,8 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataGeneral->VarDict = true;
-            VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
-            VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataGeneral->VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataGeneral->VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
         }
 
         cCurrentModuleObject = "Output:Constructions";
@@ -1588,87 +1314,21 @@ void ScanForReports(EnergyPlusData &state,
 
             state.dataGeneral->EMSoutput = true;
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
+            AvailRpt CheckAvailRpt =
+                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+            state.dataRuntimeLang->OutputEMSActuatorAvailSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
+            state.dataRuntimeLang->OutputEMSActuatorAvailFull = (CheckAvailRpt == AvailRpt::Verbose);
 
-                if (SELECT_CASE_var == "NONE") {
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-                } else if (SELECT_CASE_var == "NOTBYUNIQUEKEYNAMES") {
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = true;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-                } else if (SELECT_CASE_var == "VERBOSE") {
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
+            CheckAvailRpt =
+                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            state.dataRuntimeLang->OutputEMSInternalVarsSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
+            state.dataRuntimeLang->OutputEMSInternalVarsFull = (CheckAvailRpt == AvailRpt::Verbose);
 
-                } else if (SELECT_CASE_var.empty()) {
-                    ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-                }
-            }
-
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-
-                if (SELECT_CASE_var == "NONE") {
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                } else if (SELECT_CASE_var == "NOTBYUNIQUEKEYNAMES") {
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = true;
-                } else if (SELECT_CASE_var == "VERBOSE") {
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                } else if (SELECT_CASE_var.empty()) {
-                    ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(2) + " supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                }
-            }
-
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
-
-                if (SELECT_CASE_var == "NONE") {
-                    state.dataRuntimeLang->OutputEMSErrors = false;
-                    state.dataRuntimeLang->OutputFullEMSTrace = false;
-                } else if (SELECT_CASE_var == "ERRORSONLY") {
-                    state.dataRuntimeLang->OutputEMSErrors = true;
-                    state.dataRuntimeLang->OutputFullEMSTrace = false;
-                } else if (SELECT_CASE_var == "VERBOSE") {
-                    state.dataRuntimeLang->OutputFullEMSTrace = true;
-                    state.dataRuntimeLang->OutputEMSErrors = true;
-                } else if (SELECT_CASE_var.empty()) {
-                    ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(3) + " supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "ErrorsOnly", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSErrors = false;
-                    state.dataRuntimeLang->OutputFullEMSTrace = false;
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "ErrorsOnly", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSErrors = false;
-                    state.dataRuntimeLang->OutputFullEMSTrace = false;
-                }
-            }
+            ERLdebugOutputLevel CheckERLlevel = static_cast<ERLdebugOutputLevel>(
+                getEnumerationValue(ERLdebugOutputLevelNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+            state.dataRuntimeLang->OutputEMSErrors =
+                (CheckERLlevel == ERLdebugOutputLevel::ErrorsOnly || CheckERLlevel == ERLdebugOutputLevel::Verbose);
+            state.dataRuntimeLang->OutputFullEMSTrace = (CheckERLlevel == ERLdebugOutputLevel::Verbose);
         }
 
         state.dataGeneral->GetReportInput = false;
@@ -1677,56 +1337,70 @@ void ScanForReports(EnergyPlusData &state,
     // Process the Scan Request
     DoReport = false;
 
-    {
-        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(reportName));
-        if (SELECT_CASE_var == "CONSTRUCTIONS") {
-            if (present(ReportKey)) {
-                if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
-                if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
-            }
-        } else if (SELECT_CASE_var == "VIEWFACTORINFO") {
-            DoReport = state.dataGeneral->ViewFactorInfo;
-            if (present(Option1)) Option1 = ViewRptOption1;
-        } else if (SELECT_CASE_var == "VARIABLEDICTIONARY") {
-            DoReport = state.dataGeneral->VarDict;
-            if (present(Option1)) Option1 = VarDictOption1;
-            if (present(Option2)) Option2 = VarDictOption2;
-            //    CASE ('SCHEDULES')
-            //     DoReport=SchRpt
-            //      IF (PRESENT(Option1)) Option1=SchRptOption
-        } else if (SELECT_CASE_var == "SURFACES") {
-            {
-                auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey())); // Autodesk:OPTIONAL ReportKey used without PRESENT check
-                if (SELECT_CASE_var1 == "COSTINFO") {
-                    DoReport = state.dataGeneral->CostInfo;
-                } else if (SELECT_CASE_var1 == "DXF") {
-                    DoReport = state.dataGeneral->DXFReport;
-                    if (present(Option1)) Option1 = DXFOption1;
-                    if (present(Option2)) Option2 = DXFOption2;
-                } else if (SELECT_CASE_var1 == "DXF:WIREFRAME") {
-                    DoReport = state.dataGeneral->DXFWFReport;
-                    if (present(Option1)) Option1 = DXFWFOption1;
-                    if (present(Option2)) Option2 = DXFWFOption2;
-                } else if (SELECT_CASE_var1 == "VRML") {
-                    DoReport = state.dataGeneral->VRMLReport;
-                    if (present(Option1)) Option1 = VRMLOption1;
-                    if (present(Option2)) Option2 = VRMLOption2;
-                } else if (SELECT_CASE_var1 == "VERTICES") {
-                    DoReport = state.dataGeneral->SurfVert;
-                } else if (SELECT_CASE_var1 == "DETAILS") {
-                    DoReport = state.dataGeneral->SurfDet;
-                } else if (SELECT_CASE_var1 == "DETAILSWITHVERTICES") {
-                    DoReport = state.dataGeneral->SurfDetWVert;
-                } else if (SELECT_CASE_var1 == "LINES") {
-                    DoReport = state.dataGeneral->LineRpt;
-                    if (present(Option1)) Option1 = LineRptOption1;
-                } else {
-                }
-            }
-        } else if (SELECT_CASE_var == "ENERGYMANAGEMENTSYSTEM") {
-            DoReport = state.dataGeneral->EMSoutput;
-        } else {
+    ReportName rptName =
+        static_cast<ReportName>(getEnumerationValue(ReportNamesUC, UtilityRoutines::MakeUPPERCase(UtilityRoutines::MakeUPPERCase(reportName))));
+    switch (rptName) {
+    case ReportName::Constructions: {
+        if (present(ReportKey)) {
+            if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
+            if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
         }
+    } break;
+    case ReportName::Viewfactorinfo: {
+        DoReport = state.dataGeneral->ViewFactorInfo;
+        if (present(Option1)) Option1 = state.dataGeneral->ViewRptOption1;
+    } break;
+    case ReportName::Variabledictionary: {
+        DoReport = state.dataGeneral->VarDict;
+        if (present(Option1)) Option1 = state.dataGeneral->VarDictOption1;
+        if (present(Option2)) Option2 = state.dataGeneral->VarDictOption2;
+        //    CASE ('SCHEDULES')
+        //     DoReport=SchRpt
+        //      IF (PRESENT(Option1)) Option1=SchRptOption
+    } break;
+    case ReportName::Surfaces: {
+        RptKey rptKey = static_cast<RptKey>(getEnumerationValue(RptKeyNamesUC, UtilityRoutines::MakeUPPERCase(ReportKey())));
+        switch (rptKey) { // Autodesk:OPTIONAL ReportKey used without PRESENT check
+        case RptKey::Costinfo: {
+            DoReport = state.dataGeneral->CostInfo;
+        } break;
+        case RptKey::DXF: {
+            DoReport = state.dataGeneral->DXFReport;
+            if (present(Option1)) Option1 = state.dataGeneral->DXFOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->DXFOption2;
+        } break;
+        case RptKey::DXFwireframe: {
+            DoReport = state.dataGeneral->DXFWFReport;
+            if (present(Option1)) Option1 = state.dataGeneral->DXFWFOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->DXFWFOption2;
+        } break;
+        case RptKey::VRML: {
+            DoReport = state.dataGeneral->VRMLReport;
+            if (present(Option1)) Option1 = state.dataGeneral->VRMLOption1;
+            if (present(Option2)) Option2 = state.dataGeneral->VRMLOption2;
+        } break;
+        case RptKey::Vertices: {
+            DoReport = state.dataGeneral->SurfVert;
+        } break;
+        case RptKey::Details: {
+            DoReport = state.dataGeneral->SurfDet;
+        } break;
+        case RptKey::DetailsWithVertices: {
+            DoReport = state.dataGeneral->SurfDetWVert;
+        } break;
+        case RptKey::Lines: {
+            DoReport = state.dataGeneral->LineRpt;
+            if (present(Option1)) Option1 = state.dataGeneral->LineRptOption1;
+        } break;
+        default:
+            break;
+        }
+    } break;
+    case ReportName::Energymanagementsystem: {
+        DoReport = state.dataGeneral->EMSoutput;
+    } break;
+    default:
+        break;
     }
 }
 
@@ -1761,15 +1435,15 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     bool TooLong = false;
     if (ItemLength > DataGlobalConstants::MaxNameLength) {
         ShowWarningError(state, fmt::format("{}{} Combination of ZoneList and Object Name generate a name too long.", calledFrom, CurrentObject));
-        ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
-        ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
+        ShowContinueError(state, format("Object Name=\"{}\".", ItemName));
+        ShowContinueError(state, format("ZoneList/Zone Name=\"{}\".", ZoneName));
         ShowContinueError(
             state,
             format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.", ItemLength, DataGlobalConstants::MaxNameLength));
         ShowContinueError(state,
                           format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
                                  MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength));
-        ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
+        ShowContinueError(state, format("name that will be used (may be needed in reporting)=\"{}\".", ResultName));
         TooLong = true;
     }
 
@@ -1782,23 +1456,6 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
         ResultName = "xxxxxxx";
         errFlag = true;
     }
-}
-
-// This is from OpenStudio
-std::vector<std::string> splitString(const std::string &string, char delimiter)
-{
-    std::vector<std::string> results;
-    if (!string.empty()) { // Only do work if there is work to do
-        std::stringstream stream(string);
-        std::string substring;
-        while (std::getline(stream, substring, delimiter)) { // Loop and fill the results vector
-            results.push_back(substring);
-        }
-        if (*(string.end() - 1) == ',') { // Add an empty string if the last char is the delimiter
-            results.emplace_back();
-        }
-    }
-    return results;
 }
 
 bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx)

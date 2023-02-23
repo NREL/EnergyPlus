@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -361,25 +361,7 @@ namespace HVACMultiSpeedHeatPump {
                         Real64 &SupHeaterLoad                              // supplemental heater load (W)
     );
 
-    //******************************************************************************
-
-    Real64 MSHPCyclingResidual(EnergyPlusData &state,
-                               Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1D<Real64> const &Par // par(1) = MSHPNum
-    );
-
-    //******************************************************************************
-
-    Real64 MSHPVarSpeedResidual(EnergyPlusData &state,
-                                Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                Array1D<Real64> const &Par // par(1) = MSHPNum
-    );
-
-    //******************************************************************************
-
     void UpdateMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
-
-    //******************************************************************************
 
     void ReportMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
 
@@ -387,11 +369,11 @@ namespace HVACMultiSpeedHeatPump {
                           int const MSHeatPumpNum); // Number of the current electric MSHP being simulated
 
     void SetAverageAirFlow(EnergyPlusData &state,
-                           int const MSHeatPumpNum,              // Unit index
-                           Real64 const PartLoadRatio,           // unit part load ratio
-                           Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
-                           Optional_int_const SpeedNum = _,      // Speed number
-                           Optional<Real64 const> SpeedRatio = _ // Speed ratio
+                           int const MSHeatPumpNum,                         // Unit index
+                           Real64 const PartLoadRatio,                      // unit part load ratio
+                           Real64 &OnOffAirFlowRatio,                       // ratio of compressor ON airflow to average airflow over timestep
+                           ObjexxFCL::Optional_int_const SpeedNum = _,      // Speed number
+                           ObjexxFCL::Optional<Real64 const> SpeedRatio = _ // Speed ratio
     );
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
@@ -400,12 +382,7 @@ namespace HVACMultiSpeedHeatPump {
                                Real64 const HeatingLoad,      // supplemental coil load to be met by unit (watts)
                                int const FanMode,             // fan operation mode
                                Real64 &HeatCoilLoadmet,       // Heating Load Met
-                               Optional<Real64 const> PartLoadFrac = _);
-
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,       // hot water flow rate in kg/s
-                                Array1D<Real64> const &Par // Par(5) is the requested coil load
-    );
+                               ObjexxFCL::Optional<Real64 const> PartLoadFrac = _);
 
 } // namespace HVACMultiSpeedHeatPump
 

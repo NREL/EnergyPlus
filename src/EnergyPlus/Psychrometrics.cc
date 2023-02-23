@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -462,7 +462,7 @@ namespace Psychrometrics {
                         }
                         ShowContinueError(state, state.dataPsychrometrics->String);
                         state.dataPsychrometrics->String = format("Humidity Ratio= {:.4T}", W);
-                        ShowContinueError(state, state.dataPsychrometrics->String + " ... Humidity Ratio set to .00001");
+                        ShowContinueError(state, format("{} ... Humidity Ratio set to .00001", state.dataPsychrometrics->String));
                     }
                     ShowRecurringWarningErrorAtEnd(state,
                                                    "Entered Humidity Ratio invalid (PsyTwbFnTdbWPb)",
@@ -601,7 +601,7 @@ namespace Psychrometrics {
                     }
                     ShowContinueError(state, state.dataPsychrometrics->String);
                     state.dataPsychrometrics->String = format("Calculated Volume= {:.3T}", V);
-                    ShowContinueError(state, state.dataPsychrometrics->String + " ... Since Calculated Volume < 0.0, it is set to .83");
+                    ShowContinueError(state, format("{} ... Since Calculated Volume < 0.0, it is set to .83", state.dataPsychrometrics->String));
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                                                "Calculated Specific Volume out of range (PsyVFnTdbWPb)",
@@ -636,7 +636,7 @@ namespace Psychrometrics {
                     }
                     ShowContinueError(state, state.dataPsychrometrics->String);
                     state.dataPsychrometrics->String = format("Calculated Humidity Ratio= {:.4T}", W);
-                    ShowContinueError(state, state.dataPsychrometrics->String + " ... Humidity Ratio set to .00001");
+                    ShowContinueError(state, format("{} ... Humidity Ratio set to .00001", state.dataPsychrometrics->String));
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                                                "Calculated Humidity Ratio invalid (PsyWFnTdbH)",
@@ -816,7 +816,8 @@ namespace Psychrometrics {
                     }
                     ShowContinueError(state, state.dataPsychrometrics->String);
                     state.dataPsychrometrics->String = format("Calculated Wet-Bulb= {:.2T}", TWB);
-                    ShowContinueError(state, state.dataPsychrometrics->String + " ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb");
+                    ShowContinueError(state,
+                                      format("{} ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb", state.dataPsychrometrics->String));
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                                                "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)",
@@ -853,7 +854,8 @@ namespace Psychrometrics {
                     }
                     ShowContinueError(state, state.dataPsychrometrics->String);
                     state.dataPsychrometrics->String = format("Calculated Humidity Ratio= {:.4T}, will recalculate Humidity Ratio", W);
-                    ShowContinueError(state, state.dataPsychrometrics->String + " using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)");
+                    ShowContinueError(
+                        state, format("{} using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)", state.dataPsychrometrics->String));
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                                                "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)",
@@ -1217,7 +1219,7 @@ namespace Psychrometrics {
                 ShowContinueError(state, state.dataPsychrometrics->String);
                 state.dataPsychrometrics->String =
                     format("Instead, calculated Humidity Ratio at {:.1T} ({} degree less) = {:.4T}", TDP - DeltaT, static_cast<int>(DeltaT), W);
-                ShowContinueError(state, state.dataPsychrometrics->String + " will be used. Simulation continues.");
+                ShowContinueError(state, format("{} will be used. Simulation continues.", state.dataPsychrometrics->String));
             }
             ShowRecurringWarningErrorAtEnd(state,
                                            "Entered Humidity Ratio invalid (PsyWFnTdpPb)",
@@ -1253,7 +1255,7 @@ namespace Psychrometrics {
                     }
                     ShowContinueError(state, state.dataPsychrometrics->String);
                     state.dataPsychrometrics->String = format("Calculated Humidity Ratio= {:.4T}", W);
-                    ShowContinueError(state, state.dataPsychrometrics->String + " ... Humidity Ratio set to .00001");
+                    ShowContinueError(state, format("{} ... Humidity Ratio set to .00001", state.dataPsychrometrics->String));
                 }
                 ShowRecurringWarningErrorAtEnd(state,
                                                "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)",

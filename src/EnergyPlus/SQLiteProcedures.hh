@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -120,7 +120,7 @@ public:
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, Material::MaterialProperties const &materialData);
+    void addMaterialData(int const number, Material::MaterialProperties const *materialData);
     void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
@@ -173,25 +173,25 @@ public:
 
     void createSQLiteReportDataRecord(int const recordIndex,
                                       Real64 const value,
-                                      Optional_int_const reportingInterval = _,
-                                      Optional<Real64 const> minValue = _,
-                                      Optional_int_const minValueDate = _,
-                                      Optional<Real64 const> maxValue = _,
-                                      Optional_int_const maxValueDate = _,
-                                      Optional_int_const minutesPerTimeStep = _);
+                                      ObjexxFCL::Optional_int_const reportingInterval = _,
+                                      ObjexxFCL::Optional<Real64 const> minValue = _,
+                                      ObjexxFCL::Optional_int_const minValueDate = _,
+                                      ObjexxFCL::Optional<Real64 const> maxValue = _,
+                                      ObjexxFCL::Optional_int_const maxValueDate = _,
+                                      ObjexxFCL::Optional_int_const minutesPerTimeStep = _);
 
     void createSQLiteTimeIndexRecord(int const reportingInterval,
                                      int const recordIndex,
                                      int const CumlativeSimulationDays,
                                      int const curEnvirNum,
                                      int const simulationYear,
-                                     Optional_int_const Month = _,
-                                     Optional_int_const DayOfMonth = _,
-                                     Optional_int_const Hour = _,
-                                     Optional<Real64 const> EndMinute = _,
-                                     Optional<Real64 const> StartMinute = _,
-                                     Optional_int_const DST = _,
-                                     Optional_string_const DayType = _,
+                                     ObjexxFCL::Optional_int_const Month = _,
+                                     ObjexxFCL::Optional_int_const DayOfMonth = _,
+                                     ObjexxFCL::Optional_int_const Hour = _,
+                                     ObjexxFCL::Optional<Real64 const> EndMinute = _,
+                                     ObjexxFCL::Optional<Real64 const> StartMinute = _,
+                                     ObjexxFCL::Optional_int_const DST = _,
+                                     ObjexxFCL::Optional_string_const DayType = _,
                                      bool const warmupFlag = false);
 
     void createYearlyTimeIndexRecord(int const simulationYear, int const curEnvirNum);
@@ -210,14 +210,14 @@ public:
                                    Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
-    void addSQLiteSystemSizingRecord(std::string const &SysName,      // the name of the system
-                                     std::string const &LoadType,     // either "Cooling" or "Heating"
-                                     std::string const &PeakLoadType, // either "Sensible" or "Total"
-                                     Real64 const &UserDesCap,        // User  Design Capacity
-                                     Real64 const &CalcDesVolFlow,    // Calculated Cooling Design Air Flow Rate
-                                     Real64 const &UserDesVolFlow,    // User Cooling Design Air Flow Rate
-                                     std::string const &DesDayName,   // the name of the design day that produced the peak
-                                     std::string const &PeakHrMin     // time stamp of the peak
+    void addSQLiteSystemSizingRecord(std::string const &SysName,    // the name of the system
+                                     std::string_view LoadType,     // either "Cooling" or "Heating"
+                                     std::string_view PeakLoadType, // either "Sensible" or "Total"
+                                     Real64 const UserDesCap,       // User  Design Capacity
+                                     Real64 const CalcDesVolFlow,   // Calculated Cooling Design Air Flow Rate
+                                     Real64 const UserDesVolFlow,   // User Cooling Design Air Flow Rate
+                                     std::string const &DesDayName, // the name of the design day that produced the peak
+                                     std::string const &PeakHrMin   // time stamp of the peak
     );
 
     void addSQLiteComponentSizingRecord(std::string_view CompType, // the type of the component
@@ -562,12 +562,12 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 EnergyPlus::Material::MaterialProperties const &materialData)
-            : SQLiteData(errorStream, db), number(materialNumber), name(materialData.Name), group(materialData.Group),
-              roughness(materialData.Roughness), conductivity(materialData.Conductivity), density(materialData.Density),
-              isoMoistCap(materialData.IsoMoistCap), porosity(materialData.Porosity), resistance(materialData.Resistance), rOnly(materialData.ROnly),
-              specHeat(materialData.SpecHeat), thermGradCoef(materialData.ThermGradCoef), thickness(materialData.Thickness),
-              vaporDiffus(materialData.VaporDiffus)
+                 EnergyPlus::Material::MaterialProperties const *materialData)
+            : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->Group),
+              roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
+              isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance),
+              rOnly(materialData->ROnly), specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef),
+              thickness(materialData->Thickness), vaporDiffus(materialData->VaporDiffus)
         {
         }
 
@@ -576,7 +576,7 @@ private:
     private:
         int const number;
         std::string const &name;
-        DataHeatBalance::MaterialGroup const &group;
+        EnergyPlus::Material::MaterialGroup const &group;
         DataSurfaces::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;

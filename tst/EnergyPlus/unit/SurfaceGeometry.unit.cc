@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,6 +77,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::Material;
 
 TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 {
@@ -2476,7 +2477,9 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 6;
 
@@ -2612,7 +2615,9 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
@@ -2677,7 +2682,9 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
@@ -2741,7 +2748,9 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 4;
 
@@ -3282,7 +3291,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(1).Name = "WSC1";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
     state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
@@ -3292,7 +3301,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(2).Name = "WSC2";
     state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Sequential;
     state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
     state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
     state->dataSurface->WindowShadingControl(2).FenestrationName(1) = "Fene-04";
@@ -3303,7 +3312,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(3).Name = "WSC3";
     state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
-    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
     state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
     state->dataSurface->WindowShadingControl(3).FenestrationName(1) = "Fene-08";
@@ -3416,7 +3425,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     state->dataSurface->WindowShadingControl(1).Name = "WSC1";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
     state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
@@ -3426,7 +3435,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     state->dataSurface->WindowShadingControl(2).Name = "WSC2";
     state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Sequential;
     state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
     state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
     state->dataSurface->WindowShadingControl(2).FenestrationName(1) = "Fene-02";
@@ -3437,7 +3446,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     state->dataSurface->WindowShadingControl(3).Name = "WSC3";
     state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
-    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
     state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
     state->dataSurface->WindowShadingControl(3).FenestrationName(1) = "Fene-03";
@@ -3519,7 +3528,7 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(1).Name = "WSC1";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
     state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
@@ -3530,7 +3539,7 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(2).Name = "WSC2";
     state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Sequential;
     state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
     state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
     state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
@@ -3542,7 +3551,7 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(3).Name = "WSC3";
     state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
-    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
     state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
     state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
@@ -3615,17 +3624,17 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 3;
     state->dataSurface->WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
     state->dataSurface->WindowShadingControl(1).ShadingDevice = 17;
-    state->dataSurface->WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
+    state->dataSurface->WindowShadingControl(1).shadingControlType = WindowShadingControlType::OnIfScheduled;
     state->dataSurface->WindowShadingControl(1).Schedule = 83;
     state->dataSurface->WindowShadingControl(1).SetPoint = 200;
     state->dataSurface->WindowShadingControl(1).SetPoint2 = 170;
     state->dataSurface->WindowShadingControl(1).ShadingControlIsScheduled = true;
     state->dataSurface->WindowShadingControl(1).GlareControlIsActive = false;
     state->dataSurface->WindowShadingControl(1).SlatAngleSchedule = 84;
-    state->dataSurface->WindowShadingControl(1).SlatAngleControlForBlinds = WSC_SAC_BlockBeamSolar;
+    state->dataSurface->WindowShadingControl(1).slatAngleControl = SlatAngleControl::BlockBeamSolar;
     state->dataSurface->WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
     state->dataSurface->WindowShadingControl(1).DaylightControlIndex = 7;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Sequential;
 
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
@@ -3688,7 +3697,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).ShadingControlType = WindowShadingControlType::OffNight_OnDay_HiSolarWindow;
+    state->dataSurface->WindowShadingControl(2).shadingControlType = WindowShadingControlType::OffNight_OnDay_HiSolarWindow;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
@@ -3708,7 +3717,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).SlatAngleControlForBlinds = WSC_SAC_FixedSlatAngle;
+    state->dataSurface->WindowShadingControl(2).slatAngleControl = SlatAngleControl::Fixed;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
@@ -3720,7 +3729,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Group;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 }
@@ -3741,17 +3750,17 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 3;
     state->dataSurface->WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
     state->dataSurface->WindowShadingControl(1).ShadingDevice = 17;
-    state->dataSurface->WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
+    state->dataSurface->WindowShadingControl(1).shadingControlType = WindowShadingControlType::OnIfScheduled;
     state->dataSurface->WindowShadingControl(1).Schedule = 83;
     state->dataSurface->WindowShadingControl(1).SetPoint = 200;
     state->dataSurface->WindowShadingControl(1).SetPoint2 = 170;
     state->dataSurface->WindowShadingControl(1).ShadingControlIsScheduled = true;
     state->dataSurface->WindowShadingControl(1).GlareControlIsActive = false;
     state->dataSurface->WindowShadingControl(1).SlatAngleSchedule = 84;
-    state->dataSurface->WindowShadingControl(1).SlatAngleControlForBlinds = WSC_SAC_BlockBeamSolar;
+    state->dataSurface->WindowShadingControl(1).slatAngleControl = SlatAngleControl::BlockBeamSolar;
     state->dataSurface->WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
     state->dataSurface->WindowShadingControl(1).DaylightControlIndex = 7;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Sequential;
 
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
@@ -3778,21 +3787,21 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
-    state->dataHeatBal->TotMaterials = 0;
+    state->dataMaterial->TotMaterials = 0;
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    EXPECT_EQ(state->dataHeatBal->TotMaterials, 1);
-    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Name, "test_air_8MM");
-    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Thickness, 0.008);
-    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).GasCon(1, 1), 2.873e-3);
-    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).GasCon(2, 1), 7.760e-5);
+    EXPECT_EQ(state->dataMaterial->TotMaterials, 1);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataMaterial->TotMaterials)->Name, "test_air_8MM");
+    EXPECT_EQ(state->dataMaterial->Material(state->dataMaterial->TotMaterials)->Thickness, 0.008);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataMaterial->TotMaterials)->GasCon(1, 1), 2.873e-3);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataMaterial->TotMaterials)->GasCon(2, 1), 7.760e-5);
 
     createAirMaterialFromDistance(*state, 0.012, "test_air_");
-    EXPECT_EQ(state->dataHeatBal->TotMaterials, 2);
-    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Name, "test_air_12MM");
-    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Thickness, 0.012);
+    EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataMaterial->TotMaterials)->Name, "test_air_12MM");
+    EXPECT_EQ(state->dataMaterial->Material(state->dataMaterial->TotMaterials)->Thickness, 0.012);
 
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    EXPECT_EQ(state->dataHeatBal->TotMaterials, 2);
+    EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
@@ -3800,8 +3809,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
     state->dataHeatBal->TotConstructs = 1;
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
 
-    state->dataMaterial->Material.allocate(60);
-    state->dataMaterial->Material(47).AbsorpThermalFront = 0.11;
+    for (int i = 1; i <= 60; i++) {
+        Material::MaterialProperties *p = new Material::MaterialProperties;
+        state->dataMaterial->Material.push_back(p);
+    }
+    state->dataMaterial->Material(47)->AbsorpThermalFront = 0.11;
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
     state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).TotLayers = 3;
@@ -5017,7 +5029,10 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
 {
     bool RevLayerDiffs;
     state->dataConstruction->Construct.allocate(6);
-    state->dataMaterial->Material.allocate(7);
+    for (int i = 1; i <= 60; i++) {
+        Material::MaterialProperties *p = new Material::MaterialProperties;
+        state->dataMaterial->Material.push_back(p);
+    }
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
     state->dataConstruction->Construct(1).TotLayers = 3;
@@ -5036,9 +5051,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
     state->dataConstruction->Construct(2).LayerPoint(1) = 1;
     state->dataConstruction->Construct(2).LayerPoint(3) = 3;
-    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
-    state->dataMaterial->Material(2).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
-    state->dataMaterial->Material(3).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(2)->Group = Material::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(3)->Group = Material::MaterialGroup::RegularMaterial;
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 1, 2, 3);
@@ -5053,44 +5068,44 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(4).LayerPoint(1) = 4;
     state->dataConstruction->Construct(4).LayerPoint(2) = 2;
     state->dataConstruction->Construct(4).LayerPoint(3) = 5;
-    state->dataMaterial->Material(4).Group = DataHeatBalance::MaterialGroup::WindowGlass;
-    state->dataMaterial->Material(4).Thickness = 0.15;
-    state->dataMaterial->Material(4).ReflectSolBeamFront = 0.35;
-    state->dataMaterial->Material(4).ReflectSolBeamBack = 0.25;
-    state->dataMaterial->Material(4).TransVis = 0.45;
-    state->dataMaterial->Material(4).ReflectVisBeamFront = 0.34;
-    state->dataMaterial->Material(4).ReflectVisBeamBack = 0.24;
-    state->dataMaterial->Material(4).TransThermal = 0.44;
-    state->dataMaterial->Material(4).AbsorpThermalFront = 0.33;
-    state->dataMaterial->Material(4).AbsorpThermalBack = 0.23;
-    state->dataMaterial->Material(4).Conductivity = 0.43;
-    state->dataMaterial->Material(4).GlassTransDirtFactor = 0.67;
-    state->dataMaterial->Material(4).SolarDiffusing = true;
-    state->dataMaterial->Material(4).YoungModulus = 0.89;
-    state->dataMaterial->Material(4).PoissonsRatio = 1.11;
-    state->dataMaterial->Material(5).Group = DataHeatBalance::MaterialGroup::WindowGlass;
-    state->dataMaterial->Material(5).Thickness = 0.15;
-    state->dataMaterial->Material(5).ReflectSolBeamFront = 0.25;
-    state->dataMaterial->Material(5).ReflectSolBeamBack = 0.35;
-    state->dataMaterial->Material(5).TransVis = 0.45;
-    state->dataMaterial->Material(5).ReflectVisBeamFront = 0.24;
-    state->dataMaterial->Material(5).ReflectVisBeamBack = 0.34;
-    state->dataMaterial->Material(5).TransThermal = 0.44;
-    state->dataMaterial->Material(5).AbsorpThermalFront = 0.23;
-    state->dataMaterial->Material(5).AbsorpThermalBack = 0.33;
-    state->dataMaterial->Material(5).Conductivity = 0.43;
-    state->dataMaterial->Material(5).GlassTransDirtFactor = 0.67;
-    state->dataMaterial->Material(5).SolarDiffusing = true;
-    state->dataMaterial->Material(5).YoungModulus = 0.89;
-    state->dataMaterial->Material(5).PoissonsRatio = 1.11;
+    state->dataMaterial->Material(4)->Group = Material::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(4)->Thickness = 0.15;
+    state->dataMaterial->Material(4)->ReflectSolBeamFront = 0.35;
+    state->dataMaterial->Material(4)->ReflectSolBeamBack = 0.25;
+    state->dataMaterial->Material(4)->TransVis = 0.45;
+    state->dataMaterial->Material(4)->ReflectVisBeamFront = 0.34;
+    state->dataMaterial->Material(4)->ReflectVisBeamBack = 0.24;
+    state->dataMaterial->Material(4)->TransThermal = 0.44;
+    state->dataMaterial->Material(4)->AbsorpThermalFront = 0.33;
+    state->dataMaterial->Material(4)->AbsorpThermalBack = 0.23;
+    state->dataMaterial->Material(4)->Conductivity = 0.43;
+    state->dataMaterial->Material(4)->GlassTransDirtFactor = 0.67;
+    state->dataMaterial->Material(4)->SolarDiffusing = true;
+    state->dataMaterial->Material(4)->YoungModulus = 0.89;
+    state->dataMaterial->Material(4)->PoissonsRatio = 1.11;
+    state->dataMaterial->Material(5)->Group = Material::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(5)->Thickness = 0.15;
+    state->dataMaterial->Material(5)->ReflectSolBeamFront = 0.25;
+    state->dataMaterial->Material(5)->ReflectSolBeamBack = 0.35;
+    state->dataMaterial->Material(5)->TransVis = 0.45;
+    state->dataMaterial->Material(5)->ReflectVisBeamFront = 0.24;
+    state->dataMaterial->Material(5)->ReflectVisBeamBack = 0.34;
+    state->dataMaterial->Material(5)->TransThermal = 0.44;
+    state->dataMaterial->Material(5)->AbsorpThermalFront = 0.23;
+    state->dataMaterial->Material(5)->AbsorpThermalBack = 0.33;
+    state->dataMaterial->Material(5)->Conductivity = 0.43;
+    state->dataMaterial->Material(5)->GlassTransDirtFactor = 0.67;
+    state->dataMaterial->Material(5)->SolarDiffusing = true;
+    state->dataMaterial->Material(5)->YoungModulus = 0.89;
+    state->dataMaterial->Material(5)->PoissonsRatio = 1.11;
     RevLayerDiffs = true;
     // ExpectResult = false;
     CheckForReversedLayers(*state, RevLayerDiffs, 3, 4, 3);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 2b: Constructs are reverse of each other using WindowGlass, front/back properties NOT properly switched (should get a "true" answer)
-    state->dataMaterial->Material(5).ReflectVisBeamFront = 0.34; // correct would be 0.24
-    state->dataMaterial->Material(5).ReflectVisBeamBack = 0.24;  // correct would be 0.34
+    state->dataMaterial->Material(5)->ReflectVisBeamFront = 0.34; // correct would be 0.24
+    state->dataMaterial->Material(5)->ReflectVisBeamBack = 0.24;  // correct would be 0.34
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 3, 4, 3);
@@ -5101,67 +5116,67 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(5).LayerPoint(1) = 6;
     state->dataConstruction->Construct(6).TotLayers = 1;
     state->dataConstruction->Construct(6).LayerPoint(1) = 7;
-    state->dataMaterial->Material(6).Group = DataHeatBalance::MaterialGroup::GlassEquivalentLayer;
-    state->dataMaterial->Material(6).TausFrontBeamBeam = 0.39;
-    state->dataMaterial->Material(6).TausBackBeamBeam = 0.29;
-    state->dataMaterial->Material(6).ReflFrontBeamBeam = 0.38;
-    state->dataMaterial->Material(6).ReflBackBeamBeam = 0.28;
-    state->dataMaterial->Material(6).TausFrontBeamBeamVis = 0.37;
-    state->dataMaterial->Material(6).TausBackBeamBeamVis = 0.27;
-    state->dataMaterial->Material(6).ReflFrontBeamBeamVis = 0.36;
-    state->dataMaterial->Material(6).ReflBackBeamBeamVis = 0.26;
-    state->dataMaterial->Material(6).TausFrontBeamDiff = 0.35;
-    state->dataMaterial->Material(6).TausBackBeamDiff = 0.25;
-    state->dataMaterial->Material(6).ReflFrontBeamDiff = 0.34;
-    state->dataMaterial->Material(6).ReflBackBeamDiff = 0.24;
-    state->dataMaterial->Material(6).TausFrontBeamDiffVis = 0.33;
-    state->dataMaterial->Material(6).TausBackBeamDiffVis = 0.23;
-    state->dataMaterial->Material(6).ReflFrontBeamDiffVis = 0.32;
-    state->dataMaterial->Material(6).ReflBackBeamDiffVis = 0.22;
-    state->dataMaterial->Material(6).TausDiffDiff = 0.456;
-    state->dataMaterial->Material(6).ReflFrontDiffDiff = 0.31;
-    state->dataMaterial->Material(6).ReflBackDiffDiff = 0.21;
-    state->dataMaterial->Material(6).TausDiffDiffVis = 0.345;
-    state->dataMaterial->Material(6).ReflFrontDiffDiffVis = 0.30;
-    state->dataMaterial->Material(6).ReflBackDiffDiffVis = 0.20;
-    state->dataMaterial->Material(6).TausThermal = 0.234;
-    state->dataMaterial->Material(6).EmissThermalFront = 0.888;
-    state->dataMaterial->Material(6).EmissThermalBack = 0.777;
-    state->dataMaterial->Material(6).Resistance = 1.234;
-    state->dataMaterial->Material(7).Group = DataHeatBalance::MaterialGroup::GlassEquivalentLayer;
-    state->dataMaterial->Material(7).TausFrontBeamBeam = 0.29;
-    state->dataMaterial->Material(7).TausBackBeamBeam = 0.39;
-    state->dataMaterial->Material(7).ReflFrontBeamBeam = 0.28;
-    state->dataMaterial->Material(7).ReflBackBeamBeam = 0.38;
-    state->dataMaterial->Material(7).TausFrontBeamBeamVis = 0.27;
-    state->dataMaterial->Material(7).TausBackBeamBeamVis = 0.37;
-    state->dataMaterial->Material(7).ReflFrontBeamBeamVis = 0.26;
-    state->dataMaterial->Material(7).ReflBackBeamBeamVis = 0.36;
-    state->dataMaterial->Material(7).TausFrontBeamDiff = 0.25;
-    state->dataMaterial->Material(7).TausBackBeamDiff = 0.35;
-    state->dataMaterial->Material(7).ReflFrontBeamDiff = 0.24;
-    state->dataMaterial->Material(7).ReflBackBeamDiff = 0.34;
-    state->dataMaterial->Material(7).TausFrontBeamDiffVis = 0.23;
-    state->dataMaterial->Material(7).TausBackBeamDiffVis = 0.33;
-    state->dataMaterial->Material(7).ReflFrontBeamDiffVis = 0.22;
-    state->dataMaterial->Material(7).ReflBackBeamDiffVis = 0.32;
-    state->dataMaterial->Material(7).TausDiffDiff = 0.456;
-    state->dataMaterial->Material(7).ReflFrontDiffDiff = 0.21;
-    state->dataMaterial->Material(7).ReflBackDiffDiff = 0.31;
-    state->dataMaterial->Material(7).TausDiffDiffVis = 0.345;
-    state->dataMaterial->Material(7).ReflFrontDiffDiffVis = 0.20;
-    state->dataMaterial->Material(7).ReflBackDiffDiffVis = 0.30;
-    state->dataMaterial->Material(7).TausThermal = 0.234;
-    state->dataMaterial->Material(7).EmissThermalFront = 0.777;
-    state->dataMaterial->Material(7).EmissThermalBack = 0.888;
-    state->dataMaterial->Material(7).Resistance = 1.234;
+    state->dataMaterial->Material(6)->Group = Material::MaterialGroup::GlassEquivalentLayer;
+    state->dataMaterial->Material(6)->TausFrontBeamBeam = 0.39;
+    state->dataMaterial->Material(6)->TausBackBeamBeam = 0.29;
+    state->dataMaterial->Material(6)->ReflFrontBeamBeam = 0.38;
+    state->dataMaterial->Material(6)->ReflBackBeamBeam = 0.28;
+    state->dataMaterial->Material(6)->TausFrontBeamBeamVis = 0.37;
+    state->dataMaterial->Material(6)->TausBackBeamBeamVis = 0.27;
+    state->dataMaterial->Material(6)->ReflFrontBeamBeamVis = 0.36;
+    state->dataMaterial->Material(6)->ReflBackBeamBeamVis = 0.26;
+    state->dataMaterial->Material(6)->TausFrontBeamDiff = 0.35;
+    state->dataMaterial->Material(6)->TausBackBeamDiff = 0.25;
+    state->dataMaterial->Material(6)->ReflFrontBeamDiff = 0.34;
+    state->dataMaterial->Material(6)->ReflBackBeamDiff = 0.24;
+    state->dataMaterial->Material(6)->TausFrontBeamDiffVis = 0.33;
+    state->dataMaterial->Material(6)->TausBackBeamDiffVis = 0.23;
+    state->dataMaterial->Material(6)->ReflFrontBeamDiffVis = 0.32;
+    state->dataMaterial->Material(6)->ReflBackBeamDiffVis = 0.22;
+    state->dataMaterial->Material(6)->TausDiffDiff = 0.456;
+    state->dataMaterial->Material(6)->ReflFrontDiffDiff = 0.31;
+    state->dataMaterial->Material(6)->ReflBackDiffDiff = 0.21;
+    state->dataMaterial->Material(6)->TausDiffDiffVis = 0.345;
+    state->dataMaterial->Material(6)->ReflFrontDiffDiffVis = 0.30;
+    state->dataMaterial->Material(6)->ReflBackDiffDiffVis = 0.20;
+    state->dataMaterial->Material(6)->TausThermal = 0.234;
+    state->dataMaterial->Material(6)->EmissThermalFront = 0.888;
+    state->dataMaterial->Material(6)->EmissThermalBack = 0.777;
+    state->dataMaterial->Material(6)->Resistance = 1.234;
+    state->dataMaterial->Material(7)->Group = Material::MaterialGroup::GlassEquivalentLayer;
+    state->dataMaterial->Material(7)->TausFrontBeamBeam = 0.29;
+    state->dataMaterial->Material(7)->TausBackBeamBeam = 0.39;
+    state->dataMaterial->Material(7)->ReflFrontBeamBeam = 0.28;
+    state->dataMaterial->Material(7)->ReflBackBeamBeam = 0.38;
+    state->dataMaterial->Material(7)->TausFrontBeamBeamVis = 0.27;
+    state->dataMaterial->Material(7)->TausBackBeamBeamVis = 0.37;
+    state->dataMaterial->Material(7)->ReflFrontBeamBeamVis = 0.26;
+    state->dataMaterial->Material(7)->ReflBackBeamBeamVis = 0.36;
+    state->dataMaterial->Material(7)->TausFrontBeamDiff = 0.25;
+    state->dataMaterial->Material(7)->TausBackBeamDiff = 0.35;
+    state->dataMaterial->Material(7)->ReflFrontBeamDiff = 0.24;
+    state->dataMaterial->Material(7)->ReflBackBeamDiff = 0.34;
+    state->dataMaterial->Material(7)->TausFrontBeamDiffVis = 0.23;
+    state->dataMaterial->Material(7)->TausBackBeamDiffVis = 0.33;
+    state->dataMaterial->Material(7)->ReflFrontBeamDiffVis = 0.22;
+    state->dataMaterial->Material(7)->ReflBackBeamDiffVis = 0.32;
+    state->dataMaterial->Material(7)->TausDiffDiff = 0.456;
+    state->dataMaterial->Material(7)->ReflFrontDiffDiff = 0.21;
+    state->dataMaterial->Material(7)->ReflBackDiffDiff = 0.31;
+    state->dataMaterial->Material(7)->TausDiffDiffVis = 0.345;
+    state->dataMaterial->Material(7)->ReflFrontDiffDiffVis = 0.20;
+    state->dataMaterial->Material(7)->ReflBackDiffDiffVis = 0.30;
+    state->dataMaterial->Material(7)->TausThermal = 0.234;
+    state->dataMaterial->Material(7)->EmissThermalFront = 0.777;
+    state->dataMaterial->Material(7)->EmissThermalBack = 0.888;
+    state->dataMaterial->Material(7)->Resistance = 1.234;
     RevLayerDiffs = true;
     // ExpectResult = false;
     CheckForReversedLayers(*state, RevLayerDiffs, 5, 6, 1);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties NOT properly switched (should get a "true" answer)
-    state->dataMaterial->Material(7).EmissThermalFront = 0.888;
+    state->dataMaterial->Material(7)->EmissThermalFront = 0.888;
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 5, 6, 1);
@@ -5739,15 +5754,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceFirst, Zone2Surface1);     // no air boundary surfaces in Zone 2
     EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceFirst, Zone3Surface1);     // air boundary surface
-    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceFirst, Zone1Surface1);      // first non-air boundary surface
-    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceFirst, Zone2Surface1);      // first non-air boundary surface
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, Zone3Floor);         // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceFirst, Zone1Surface1);     // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceFirst, Zone2Surface1);     // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceFirst, Zone3Floor);        // first non-air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceLast, Zone1Floor);
     EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceLast, Zone2Floor);
     EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceLast, Zone3Floor);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceLast, Zone1Floor);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceLast, Zone2Floor);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, Zone3Floor);
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceLast, Zone1Floor);
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceLast, Zone2Floor);
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceLast, Zone3Floor);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries3)
@@ -8678,12 +8693,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(windowEastWindow, 16);
     EXPECT_EQ(windowSouthWindow, 17);
     EXPECT_EQ(windowWestWindow, 18);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceFirst, 7);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceLast, 19);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst, 7);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast, 14);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).WindowSurfaceFirst, 15);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).WindowSurfaceLast, 19);
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceFirst, 7);
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceLast, 19);
+    EXPECT_EQ(state->dataHeatBal->space(1).OpaqOrIntMassSurfaceFirst, 7);
+    EXPECT_EQ(state->dataHeatBal->space(1).OpaqOrIntMassSurfaceLast, 14);
+    EXPECT_EQ(state->dataHeatBal->space(1).WindowSurfaceFirst, 15);
+    EXPECT_EQ(state->dataHeatBal->space(1).WindowSurfaceLast, 19);
 
     //  GARAGE ZONE:
     int wallGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Interior"), state->dataSurface->Surface);
@@ -8701,12 +8716,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(floorGarageFloor, 24);
     EXPECT_EQ(ceilingGarageInterior, 25);
     EXPECT_EQ(intmassEVChargingStation, 26);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceFirst, 20);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceLast, 26);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).OpaqOrIntMassSurfaceFirst, 20);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).OpaqOrIntMassSurfaceLast, 26);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).WindowSurfaceFirst, 0);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).WindowSurfaceLast, -1);
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceFirst, 20);
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceLast, 26);
+    EXPECT_EQ(state->dataHeatBal->space(2).OpaqOrIntMassSurfaceFirst, 20);
+    EXPECT_EQ(state->dataHeatBal->space(2).OpaqOrIntMassSurfaceLast, 26);
+    EXPECT_EQ(state->dataHeatBal->space(2).WindowSurfaceFirst, 0);
+    EXPECT_EQ(state->dataHeatBal->space(2).WindowSurfaceLast, -1);
 
     //  ATTIC ZONE:
     int wallEastGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastGable"), state->dataSurface->Surface);
@@ -8739,15 +8754,15 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofWestRoof, 38);
     EXPECT_EQ(nonwindowTubularDaylightingDome1, 40);
     EXPECT_EQ(windowAtticSkylight, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, wallEastGable);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, nonwindowTubularDaylightingDome1);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceFirst, wallEastGable);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceLast, roofWestRoof);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceFirst, windowAtticSkylight);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceLast, windowAtticSkylight);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrWinSurfaceLast, windowAtticSkylight);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeFirst, nonwindowTubularDaylightingDome1);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeLast, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceFirst, wallEastGable);
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceLast, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->space(3).OpaqOrIntMassSurfaceFirst, wallEastGable);
+    EXPECT_EQ(state->dataHeatBal->space(3).OpaqOrIntMassSurfaceLast, roofWestRoof);
+    EXPECT_EQ(state->dataHeatBal->space(3).WindowSurfaceFirst, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->space(3).WindowSurfaceLast, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->space(3).OpaqOrWinSurfaceLast, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->space(3).TDDDomeFirst, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->space(3).TDDDomeLast, nonwindowTubularDaylightingDome1);
 
     // Reporting (legacy) Order (zero-based)
     //  SHADING SURFACES:
@@ -10013,7 +10028,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 
@@ -10170,4 +10185,108 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
 
     EXPECT_NEAR(11.80, sf_temps(1).Perimeter, 0.02);
     EXPECT_NEAR(11.80, sf_temps(2).Perimeter, 0.02);
+}
+
+TEST_F(EnergyPlusFixture, Wrong_Window_Construction)
+{
+    // Test for #9331 - Crash in debug when wrong construction name is used for a Window
+
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        " FenestrationSurface:Detailed,",
+        "    Surface 8 - TriangularWindow,    !- Name",
+        "    Window,                  !- Surface Type",
+        "    WRONG CONSTRUCTION,      !- Construction Name", // <------- HERE: doesn't exist
+        "    Surface 3 - Rectangle,   !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.0,                     !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    Autocalculate,           !- Number of Vertices",
+        "    0.05, 0.0, 0.05,         !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.15, 0.0, 0.05,         !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.10, 0.0, 0.15;         !- X,Y,Z ==> Vertex 3 {m}",
+
+        " BuildingSurface:Detailed,",
+        "    Surface 3 - Rectangle,   !- Name",
+        "    Wall,                    !- Surface Type",
+        "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+        "    Zone1,                   !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    ,                        !- Number of Vertices",
+        "    0.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+        "    1.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 2 {m}",
+        "    1.0, 0.0, 1.0,           !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.0, 0.0, 1.0;           !- X,Y,Z ==> Vertex 4 {m}",
+
+        " Zone,",
+        "    Zone1,                   !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0.0,                     !- X Origin {m}",
+        "    0.0,                     !- Y Origin {m}",
+        "    0.0,                     !- Z Origin {m}",
+        "    ,                        !- Type",
+        "    ,                        !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    ,                        !- Volume {m3}",
+        "    ,                        !- Floor Area {m2}",
+        "    ,                        !- Zone Inside Convection Algorithm",
+        "    ,                        !- Zone Outside Convection Algorithm",
+        "    No;                      !- Part of Total Floor Area",
+
+        " Construction,",
+        "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Name",
+        "    MAT-CC05 4 HW CONCRETE;  !- Outside Layer",
+
+        " Material,",
+        "    MAT-CC05 4 HW CONCRETE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1016,                  !- Thickness {m}",
+        "    1.311,                   !- Conductivity {W/m-K}",
+        "    2240,                    !- Density {kg/m3}",
+        "    836.800000000001,        !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.85,                    !- Solar Absorptance",
+        "    0.85;                    !- Visible Absorptance",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);                  // expect no errors
+
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
+
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
+
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
+
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+
+    EXPECT_THROW(GetSurfaceData(*state, ErrorsFound), std::runtime_error);
+    EXPECT_TRUE(ErrorsFound);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** FenestrationSurface:Detailed=\"SURFACE 8 - TRIANGULARWINDOW\", invalid Construction Name=\"WRONG CONSTRUCTION\".",
+        "   **  Fatal  ** GetSurfaceData: Errors discovered, program terminates.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=FenestrationSurface:Detailed=\"SURFACE 8 - TRIANGULARWINDOW\", invalid Construction Name=\"WRONG CONSTRUCTION\".",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }

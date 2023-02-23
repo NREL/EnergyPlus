@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -157,7 +157,7 @@ namespace WindowAC {
         if (CompIndex == 0) {
             WindACNum = UtilityRoutines::FindItemInList(CompName, state.dataWindowAC->WindAC);
             if (WindACNum == 0) {
-                ShowFatalError(state, "SimWindowAC: Unit not found=" + std::string{CompName});
+                ShowFatalError(state, format("SimWindowAC: Unit not found={}", CompName));
             }
             CompIndex = WindACNum;
         } else {
@@ -317,8 +317,8 @@ namespace WindowAC {
             } else {
                 state.dataWindowAC->WindAC(WindACNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataWindowAC->WindAC(WindACNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataWindowAC->WindAC(WindACNum).Name + "\" invalid data.");
-                    ShowContinueError(state, "invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
+                    ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
+                    ShowContinueError(state, format("invalid-not found {}=\"{}\".", cAlphaFields(2), Alphas(2)));
                     ErrorsFound = true;
                 }
             }
@@ -355,14 +355,14 @@ namespace WindowAC {
                               errFlag,
                               CurrentModuleObject);
             if (errFlag) {
-                ShowContinueError(state, "specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\".");
+                ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                 ErrorsFound = true;
             } else {
                 // Get outdoor air mixer node numbers
                 OANodeNums = GetOAMixerNodeNumbers(state, state.dataWindowAC->WindAC(WindACNum).OAMixName, errFlag);
                 if (errFlag) {
                     ShowContinueError(state,
-                                      "that was specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\"");
+                                      format("that was specified in {} = \"{}\"", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                     ShowContinueError(state, "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name.");
                     ErrorsFound = true;
                 } else {
@@ -379,7 +379,7 @@ namespace WindowAC {
             ValidateComponent(
                 state, state.dataWindowAC->WindAC(WindACNum).FanType, state.dataWindowAC->WindAC(WindACNum).FanName, FanErrFlag, CurrentModuleObject);
             if (FanErrFlag) {
-                ShowContinueError(state, "specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\".");
+                ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                 ErrorsFound = true;
             } else {
                 if (UtilityRoutines::SameString(state.dataWindowAC->WindAC(WindACNum).FanType, "Fan:SystemModel")) {
@@ -399,8 +399,8 @@ namespace WindowAC {
                                                     state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow,
                                                     CurrentModuleObject));
                             ShowContinueError(
-                                state, " The fan flow rate must be >= to the " + cNumericFields(1) + " in the " + CurrentModuleObject + " object.");
-                            ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                                state, format(" The fan flow rate must be >= to the {} in the {} object.", cNumericFields(1), CurrentModuleObject));
+                            ShowContinueError(state, format(" Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                             ErrorsFound = true;
                         }
                     }
@@ -424,7 +424,7 @@ namespace WindowAC {
                                     CurrentModuleObject);
                         if (FanErrFlag) {
                             ShowContinueError(state,
-                                              " specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\".");
+                                              format(" specified in {} = \"{}\".", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                             ErrorsFound = true;
                         } else {
                             GetFanVolFlow(state, state.dataWindowAC->WindAC(WindACNum).FanIndex, FanVolFlow);
@@ -437,17 +437,17 @@ namespace WindowAC {
                                                             state.dataWindowAC->WindAC(WindACNum).FanName,
                                                             state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow,
                                                             CurrentModuleObject));
+                                    ShowContinueError(
+                                        state,
+                                        format(" The fan flow rate must be >= to the {} in the {} object.", cNumericFields(1), CurrentModuleObject));
                                     ShowContinueError(state,
-                                                      " The fan flow rate must be >= to the " + cNumericFields(1) + " in the " + CurrentModuleObject +
-                                                          " object.");
-                                    ShowContinueError(state,
-                                                      " Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                                                      format(" Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                                     ErrorsFound = true;
                                 }
                             }
                         }
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + " = \"" + Alphas(1) + "\".");
+                        ShowSevereError(state, format("{} = \"{}\".", CurrentModuleObject, Alphas(1)));
                         ShowContinueError(state, "Fan Type must be Fan:OnOff, or Fan:ConstantVolume.");
                         ErrorsFound = true;
                     }
@@ -457,7 +457,7 @@ namespace WindowAC {
                         state, state.dataWindowAC->WindAC(WindACNum).FanType, state.dataWindowAC->WindAC(WindACNum).FanName, FanErrFlag);
                 }
                 if (FanErrFlag) {
-                    ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                    ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                     ErrorsFound = true;
                 }
             }
@@ -486,12 +486,12 @@ namespace WindowAC {
                 }
                 if (CoilNodeErrFlag) {
                     ShowContinueError(state,
-                                      " that was specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\".");
+                                      format(" that was specified in {} = \"{}\".", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                     ErrorsFound = true;
                 }
             } else {
-                ShowWarningError(state, "Invalid " + cAlphaFields(9) + " = " + Alphas(9));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                ShowWarningError(state, format("Invalid {} = {}", cAlphaFields(9), Alphas(9)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                 ErrorsFound = true;
             }
 
@@ -499,9 +499,10 @@ namespace WindowAC {
 
             // Default to cycling fan when fan mode schedule is not present
             if (!lAlphaBlanks(11) && state.dataWindowAC->WindAC(WindACNum).FanSchedPtr == 0) {
-                ShowSevereError(state,
-                                CurrentModuleObject + " \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\" " + cAlphaFields(11) +
-                                    " not found: " + Alphas(11));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{} \"{}\" {} not found: {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name, cAlphaFields(11), Alphas(11)));
                 ErrorsFound = true;
             } else if (lAlphaBlanks(11)) {
                 state.dataWindowAC->WindAC(WindACNum).OpMode = CycFanCycCoil;
@@ -510,8 +511,8 @@ namespace WindowAC {
             if (UtilityRoutines::SameString(Alphas(12), "BlowThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(Alphas(12), "DrawThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = DrawThru;
             if (state.dataWindowAC->WindAC(WindACNum).FanPlace == 0) {
-                ShowSevereError(state, "Invalid " + cAlphaFields(12) + " = " + Alphas(12));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                ShowSevereError(state, format("Invalid {} = {}", cAlphaFields(12), Alphas(12)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                 ErrorsFound = true;
             }
 
@@ -525,8 +526,8 @@ namespace WindowAC {
             if (!lAlphaBlanks(14)) {
                 state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(14), state.dataSize->ZoneHVACSizing);
                 if (state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex == 0) {
-                    ShowSevereError(state, cAlphaFields(14) + " = " + Alphas(14) + " not found.");
-                    ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                    ShowSevereError(state, format("{} = {} not found.", cAlphaFields(14), Alphas(14)));
+                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                     ErrorsFound = true;
                 }
             }
@@ -548,11 +549,13 @@ namespace WindowAC {
                 }
                 if (ZoneNodeNotFound) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                        "\". Window AC air inlet node name must be the same as a zone exhaust node name.");
+                                    format("{} = \"{}\". Window AC air inlet node name must be the same as a zone exhaust node name.",
+                                           CurrentModuleObject,
+                                           state.dataWindowAC->WindAC(WindACNum).Name));
                     ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError(
-                        state, "..Window AC air inlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirInNode));
+                        state,
+                        format("..Window AC air inlet node name = {}", state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirInNode)));
                     ErrorsFound = true;
                 }
                 // check that Window AC air outlet node is a zone inlet node.
@@ -569,11 +572,13 @@ namespace WindowAC {
                 }
                 if (ZoneNodeNotFound) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                        "\". Window AC air outlet node name must be the same as a zone inlet node name.");
+                                    format("{} = \"{}\". Window AC air outlet node name must be the same as a zone inlet node name.",
+                                           CurrentModuleObject,
+                                           state.dataWindowAC->WindAC(WindACNum).Name));
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(
-                        state, "..Window AC air outlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirOutNode));
+                    ShowContinueError(state,
+                                      format("..Window AC air outlet node name = {}",
+                                             state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirOutNode)));
                     ErrorsFound = true;
                 }
                 CompSetFanInlet = state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).MixedAirNode);
@@ -594,12 +599,13 @@ namespace WindowAC {
                 }
                 if (ZoneNodeNotFound) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                        "\"."
-                                        " Window AC air inlet node name must be the same as a zone exhaust node name.");
+                                    format("{} = \"{}\". Window AC air inlet node name must be the same as a zone exhaust node name.",
+                                           CurrentModuleObject,
+                                           state.dataWindowAC->WindAC(WindACNum).Name));
                     ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError(
-                        state, "..Window AC inlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirInNode));
+                        state,
+                        format("..Window AC inlet node name = {}", state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirInNode)));
                     ErrorsFound = true;
                 }
                 // check that Window AC air outlet node is the same as a zone inlet node.
@@ -616,11 +622,13 @@ namespace WindowAC {
                 }
                 if (ZoneNodeNotFound) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                        "\". Window AC air outlet node name must be the same as a zone inlet node name.");
+                                    format("{} = \"{}\". Window AC air outlet node name must be the same as a zone inlet node name.",
+                                           CurrentModuleObject,
+                                           state.dataWindowAC->WindAC(WindACNum).Name));
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError(
-                        state, "..Window AC outlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirOutNode));
+                        state,
+                        format("..Window AC outlet node name = {}", state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirOutNode)));
                     ErrorsFound = true;
                 }
                 CompSetFanInlet = state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).CoilOutletNodeNum);
@@ -665,8 +673,7 @@ namespace WindowAC {
 
         if (ErrorsFound) {
             ShowFatalError(state,
-                           std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
-                               " input.  Preceding condition causes termination.");
+                           format("{}Errors found in getting {} input.  Preceding condition causes termination.", RoutineName, CurrentModuleObject));
         }
 
         for (WindACNum = 1; WindACNum <= state.dataWindowAC->NumWindAC; ++WindACNum) {
@@ -845,9 +852,9 @@ namespace WindowAC {
                                            state.dataWindowAC->WindAC(Loop).Name))
                     continue;
                 ShowSevereError(state,
-                                "InitWindowAC: Window AC Unit=[" +
-                                    state.dataWindowAC->cWindowAC_UnitTypes(state.dataWindowAC->WindAC(Loop).UnitType) + ',' +
-                                    state.dataWindowAC->WindAC(Loop).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                                format("InitWindowAC: Window AC Unit=[{},{}] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.",
+                                       state.dataWindowAC->cWindowAC_UnitTypes(state.dataWindowAC->WindAC(Loop).UnitType),
+                                       state.dataWindowAC->WindAC(Loop).Name));
             }
         }
 
@@ -1344,7 +1351,6 @@ namespace WindowAC {
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using DXCoils::SimDXCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using MixedAir::SimOAMixer;
 
         int OutletNode;     // unit air outlet node
         int InletNode;      // unit air inlet node
@@ -1366,7 +1372,7 @@ namespace WindowAC {
             state.dataLoopNodes->Node(AirRelNode).MassFlowRate = state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
         }
         AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        SimOAMixer(state, state.dataWindowAC->WindAC(WindACNum).OAMixName, FirstHVACIteration, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
+        MixedAir::SimOAMixer(state, state.dataWindowAC->WindAC(WindACNum).OAMixName, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
 
         // if blow through, simulate fan then coil. For draw through, simulate coil then fan.
         if (state.dataWindowAC->WindAC(WindACNum).FanPlace == BlowThru) {
@@ -1557,9 +1563,9 @@ namespace WindowAC {
         if (Iter > MaxIter) {
             if (state.dataWindowAC->WindAC(WindACNum).MaxIterIndex1 == 0) {
                 ShowWarningMessage(state,
-                                   "ZoneHVAC:WindowAirConditioner=\"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                       "\" -- Exceeded max iterations while adjusting compressor sensible runtime to meet the zone load within the "
-                                       "cooling convergence tolerance.");
+                                   format("ZoneHVAC:WindowAirConditioner=\"{}\" -- Exceeded max iterations while adjusting compressor sensible "
+                                          "runtime to meet the zone load within the cooling convergence tolerance.",
+                                          state.dataWindowAC->WindAC(WindACNum).Name));
                 ShowContinueErrorTimeStamp(state, format("Iterations={}", MaxIter));
             }
             ShowRecurringWarningErrorAtEnd(state,
@@ -1606,9 +1612,9 @@ namespace WindowAC {
             if (Iter > MaxIter) {
                 if (state.dataWindowAC->WindAC(WindACNum).MaxIterIndex2 == 0) {
                     ShowWarningMessage(state,
-                                       "ZoneHVAC:WindowAirConditioner=\"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                           "\" -- Exceeded max iterations while adjusting compressor latent runtime to meet the zone load within the "
-                                           "cooling convergence tolerance.");
+                                       format("ZoneHVAC:WindowAirConditioner=\"{}\" -- Exceeded max iterations while adjusting compressor latent "
+                                              "runtime to meet the zone load within the cooling convergence tolerance.",
+                                              state.dataWindowAC->WindAC(WindACNum).Name));
                     ShowContinueErrorTimeStamp(state, format("Iterations={}", MaxIter));
                 }
                 ShowRecurringWarningErrorAtEnd(state,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,6 +64,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -546,6 +547,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = compName;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::DXSystem;
     OutputReportPredefined::SetPredefinedTables(*state);
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
@@ -566,7 +568,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
     EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
-    EXPECT_EQ(2, thisSys->m_SystemCoolControlNodeNum);
+    EXPECT_EQ(2, thisSys->CoolCtrlNode);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
@@ -730,6 +732,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = compName;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::DXSystem;
     OutputReportPredefined::SetPredefinedTables(*state);
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
@@ -1003,6 +1006,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = compName;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::DXSystem;
     OutputReportPredefined::SetPredefinedTables(*state);
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
@@ -1024,7 +1028,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
     EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::CoilDX_Cooling);
-    EXPECT_EQ(2, thisSys->m_SystemCoolControlNodeNum);
+    EXPECT_EQ(2, thisSys->CoolCtrlNode);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;

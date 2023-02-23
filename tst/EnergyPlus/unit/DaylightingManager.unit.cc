@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,6 +72,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -843,8 +844,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
@@ -1001,7 +1002,7 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     state->dataSurface->WindowShadingControl(1).Name = "WSC1";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
     state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
@@ -1011,7 +1012,7 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     state->dataSurface->WindowShadingControl(2).Name = "WSC2";
     state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Sequential;
     state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
     state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
     state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
@@ -1022,7 +1023,7 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     state->dataSurface->WindowShadingControl(3).Name = "WSC3";
     state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
-    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
     state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
     state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
@@ -1080,7 +1081,7 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     state->dataSurface->WindowShadingControl(1).Name = "WSC1";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
     state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
@@ -1090,7 +1091,7 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     state->dataSurface->WindowShadingControl(2).Name = "WSC2";
     state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Sequential;
     state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
     state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
     state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
@@ -1101,7 +1102,7 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     state->dataSurface->WindowShadingControl(3).Name = "WSC3";
     state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
-    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
     state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
     state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
@@ -1404,8 +1405,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
@@ -1424,7 +1425,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(*state);
 
-    int ISurf = state->dataHeatBal->Zone(ZoneNum).WindowSurfaceFirst;
+    int ISurf = state->dataHeatBal->space(state->dataHeatBal->Zone(ZoneNum).spaceIndexes[0]).WindowSurfaceFirst;
 
     // Set the following values to make thisDaylightControl.SourceLumFromWinAtRefPt much larger than
     // luminance threshold of 2000 (WindowShadingControl SetPoint2)
@@ -1705,8 +1706,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
@@ -1760,7 +1761,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
-    state->dataSurface->SurfWinWindowModelType(IWin) = Window5DetailedModel;
+    state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel::Detailed;
     state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
@@ -1773,7 +1774,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
     // BSDF does shading differently, it's integrated in the base state
-    state->dataSurface->SurfWinWindowModelType(IWin) = WindowBSDFModel;
+    state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel::BSDF;
     state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
@@ -2486,8 +2487,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
@@ -3265,8 +3266,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");

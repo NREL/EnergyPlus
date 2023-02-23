@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -330,11 +330,10 @@ namespace DataZoneEquipment {
         bool InWallActiveElement;       // Convection adapation, true if zone has in-wall HVAC
         bool InCeilingActiveElement;    // Convection adapation,
         // true when zone has in-ceiling HVAC
-        bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
-        bool ZoneHasAirLoopWithOASys;    // true if zone is served by one or more airloops with an outdoor air system
-        int ZoneAirDistributionIndex;    // index to DesignSpecification:ZoneAirDistribution object
-        int ZoneDesignSpecOAIndex;       // index to DesignSpecification:OutdoorAir object
-        Real64 AirLoopDesSupply;         // air lood design supply air flow rate [kg/s]
+        bool ZoneHasAirLoopWithOASys; // true if zone is served by one or more airloops with an outdoor air system
+        int ZoneAirDistributionIndex; // index to DesignSpecification:ZoneAirDistribution object
+        int ZoneDesignSpecOAIndex;    // index to DesignSpecification:OutdoorAir object
+        Real64 AirLoopDesSupply;      // air lood design supply air flow rate [kg/s]
 
         // Default Constructor
         EquipConfiguration()
@@ -342,8 +341,7 @@ namespace DataZoneEquipment {
               NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false), ZonalSystemOnly(false), IsControlled(false), ZoneExh(0.0),
               ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0), TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0),
               TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
-              ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0),
-              AirLoopDesSupply(0.0)
+              ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0), AirLoopDesSupply(0.0)
         {
         }
     };
@@ -479,7 +477,7 @@ namespace DataZoneEquipment {
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
                                 std::string_view ComponentName, // Name of component
-                                Optional_int CtrlZoneNum = _);
+                                ObjexxFCL::Optional_int CtrlZoneNum = _);
 
     int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
@@ -520,11 +518,6 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
     Array1D_int ZoneEquipAvail;
-    Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-    Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
-    Array1D<Real64> VentMCP;            // Product of mass rate and Cp for each Ventilation object
-    Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
-    Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
@@ -545,11 +538,6 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->ZoneEquipSimulatedOnce = false;
         this->NumOfZoneEquipLists = 0;
         this->ZoneEquipAvail.deallocate();
-        this->CrossMixingReportFlag.deallocate();
-        this->MixingReportFlag.deallocate();
-        this->VentMCP.deallocate();
-        this->ZMAT.deallocate();
-        this->ZHumRat.deallocate();
         this->ZoneEquipConfig.deallocate();
         this->UniqueZoneEquipListNames.clear();
         this->ZoneEquipList.deallocate();
