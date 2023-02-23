@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,38 +124,38 @@ struct ZoneEquipControllerProps
 };
 
 void ControlCompOutput(EnergyPlusData &state,
-                       std::string const &CompName,               // the component Name
-                       std::string const &CompType,               // Type of component
-                       int &CompNum,                              // Index of component in component array
-                       bool const FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
-                       Real64 const QZnReq,                       // zone load to be met
-                       int const ActuatedNode,                    // node that controls unit output
-                       Real64 const MaxFlow,                      // maximum water flow
-                       Real64 const MinFlow,                      // minimum water flow
-                       Real64 const ControlOffset,                // really the tolerance
-                       int &ControlCompTypeNum,                   // Internal type num for CompType
-                       int &CompErrIndex,                         // for Recurring error call
-                       Optional_int_const TempInNode = _,         // inlet node for output calculation
-                       Optional_int_const TempOutNode = _,        // outlet node for output calculation
-                       Optional<Real64 const> AirMassFlow = _,    // air mass flow rate
-                       Optional_int_const Action = _,             // 1=reverse; 2=normal
-                       Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
-                       PlantLocation const &plantLoc = {},        // for plant components, Location
-                       Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
+                       std::string const &CompName,                          // the component Name
+                       std::string const &CompType,                          // Type of component
+                       int &CompNum,                                         // Index of component in component array
+                       bool const FirstHVACIteration,                        // flag for 1st HVAV iteration in the time step
+                       Real64 const QZnReq,                                  // zone load to be met
+                       int const ActuatedNode,                               // node that controls unit output
+                       Real64 const MaxFlow,                                 // maximum water flow
+                       Real64 const MinFlow,                                 // minimum water flow
+                       Real64 const ControlOffset,                           // really the tolerance
+                       int &ControlCompTypeNum,                              // Internal type num for CompType
+                       int &CompErrIndex,                                    // for Recurring error call
+                       ObjexxFCL::Optional_int_const TempInNode = _,         // inlet node for output calculation
+                       ObjexxFCL::Optional_int_const TempOutNode = _,        // outlet node for output calculation
+                       ObjexxFCL::Optional<Real64 const> AirMassFlow = _,    // air mass flow rate
+                       ObjexxFCL::Optional_int_const Action = _,             // 1=reverse; 2=normal
+                       ObjexxFCL::Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
+                       PlantLocation const &plantLoc = {},                   // for plant components, Location
+                       ObjexxFCL::Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
 );
 
 bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const MinFlow);
 
 void CheckSysSizing(EnergyPlusData &state,
-                    std::string const &CompType, // Component Type (e.g. Chiller:Electric)
-                    std::string const &CompName  // Component Name (e.g. Big Chiller)
+                    std::string_view const CompType, // Component Type (e.g. Chiller:Electric)
+                    std::string const &CompName      // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bool &AirLoopWasSized);
 
 void CheckZoneSizing(EnergyPlusData &state,
-                     std::string const &CompType, // Component Type (e.g. Chiller:Electric)
-                     std::string const &CompName  // Component Name (e.g. Big Chiller)
+                     std::string_view const CompType, // Component Type (e.g. Chiller:Electric)
+                     std::string const &CompName      // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisZoneForSizing(EnergyPlusData &state,
@@ -192,12 +192,12 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
                                   Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
                                   Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
-                                  Optional<Real64> HcGapRpt = _,
-                                  Optional<Real64> HrGapRpt = _,
-                                  Optional<Real64> IscRpt = _,
-                                  Optional<Real64> MdotVentRpt = _,
-                                  Optional<Real64> VdotWindRpt = _,
-                                  Optional<Real64> VdotBuoyRpt = _);
+                                  ObjexxFCL::Optional<Real64> HcGapRpt = _,
+                                  ObjexxFCL::Optional<Real64> HrGapRpt = _,
+                                  ObjexxFCL::Optional<Real64> IscRpt = _,
+                                  ObjexxFCL::Optional<Real64> MdotVentRpt = _,
+                                  ObjexxFCL::Optional<Real64> VdotWindRpt = _,
+                                  ObjexxFCL::Optional<Real64> VdotBuoyRpt = _);
 
 //****************************************************************************
 
@@ -242,12 +242,10 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
                                   Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
 );
 
-void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
-                            Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
-                            Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
-                            Real64 const WZone,    // humidity ratio at zone air node
-                            Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
-);
+Real64 calcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
+                              Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
+                              Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+                              Real64 const WZone);
 
 struct GeneralRoutinesData : BaseGlobalStruct
 {

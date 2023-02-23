@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,6 +72,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -843,8 +844,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
@@ -1404,8 +1405,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
@@ -1424,7 +1425,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(*state);
 
-    int ISurf = state->dataHeatBal->Zone(ZoneNum).WindowSurfaceFirst;
+    int ISurf = state->dataHeatBal->space(state->dataHeatBal->Zone(ZoneNum).spaceIndexes[0]).WindowSurfaceFirst;
 
     // Set the following values to make thisDaylightControl.SourceLumFromWinAtRefPt much larger than
     // luminance threshold of 2000 (WindowShadingControl SetPoint2)
@@ -1705,8 +1706,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
@@ -2486,8 +2487,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
@@ -3265,8 +3266,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                                // expect no errors
+    Material::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");

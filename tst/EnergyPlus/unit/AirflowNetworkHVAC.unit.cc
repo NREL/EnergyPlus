@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,6 +73,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -82,6 +83,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -2118,7 +2120,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -2236,19 +2238,19 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_EQ(0.0, state->dataSurface->SurfWinVentingOpenFactorMultRep(14));
 
     // Test for #7162
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(4);
-    state->dataHeatBalFanSys->MAT.allocate(4);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
-
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBalFanSys->MAT(2) = 23.0;
-    state->dataHeatBalFanSys->MAT(3) = 23.0;
-    state->dataHeatBalFanSys->MAT(4) = 5.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0007;
-    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0011;
-    state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.0012;
-    state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.0008;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg = state->dataHeatBalFanSys->ZoneAirHumRat;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 5.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.0007;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.0012;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).ZoneAirHumRat = 0.0008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0007;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRatAvg = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRatAvg = 0.0012;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).ZoneAirHumRatAvg = 0.0008;
     state->dataZoneEquip->ZoneEquipConfig.allocate(4);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
@@ -2271,14 +2273,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_NEAR(38.1554377, state->afn->AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
     EXPECT_NEAR(91.8528571, state->afn->AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
 
-    Real64 hg = Psychrometrics::PsyHgAirFnWTdb(state->dataHeatBalFanSys->ZoneAirHumRat(1), state->dataHeatBalFanSys->MAT(1));
-    Real64 hzone = Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1));
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    Real64 hg = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.MAT);
+    Real64 hzone = Psychrometrics::PsyHFnTdbW(thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
     Real64 hamb = Psychrometrics::PsyHFnTdbW(0.0, state->dataEnvrn->OutHumRat);
     Real64 hdiff = state->afn->AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
     Real64 sum = state->afn->AirflowNetworkReportData(1).MultiZoneInfiSenLossW - state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
     // Existing code uses T_average to calculate hg, get close results
     EXPECT_NEAR(hdiff, sum, 0.4);
-    Real64 dhlatent = state->afn->AirflowNetworkLinkSimu(1).FLOW2 * hg * (state->dataHeatBalFanSys->ZoneAirHumRat(1) - state->dataEnvrn->OutHumRat);
+    Real64 dhlatent = state->afn->AirflowNetworkLinkSimu(1).FLOW2 * hg * (thisZoneHB.ZoneAirHumRat - state->dataEnvrn->OutHumRat);
     // when hg is calculated with indoor temperature, get exact results
     sum = state->afn->AirflowNetworkReportData(1).MultiZoneInfiSenLossW + dhlatent;
     EXPECT_NEAR(hdiff, sum, 0.001);
@@ -5924,7 +5927,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -6008,13 +6011,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->afn->AirflowNetworkFanActivated = false;
     // #7977
     state->afn->calculate_balance();
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
-    state->dataHeatBalFanSys->MAT.allocate(5);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(5);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(5);
     state->dataZoneEquip->ZoneEquipConfig.allocate(5);
-    state->dataHeatBalFanSys->MAT = 23.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg = state->dataHeatBalFanSys->ZoneAirHumRat;
+    for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
+        thisZoneHB.MAT = 23.0;
+        thisZoneHB.ZoneAirHumRat = 0.001;
+        thisZoneHB.ZoneAirHumRatAvg = 0.001;
+    }
     state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     state->dataHeatBal->Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     state->dataHeatBal->Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
@@ -10418,7 +10421,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -10468,18 +10471,17 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
 
     state->afn->AirflowNetworkFanActivated = false;
 
-    state->dataHeatBalFanSys->MAT.allocate(5);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBalFanSys->MAT(2) = 23.0;
-    state->dataHeatBalFanSys->MAT(3) = 23.0;
-    state->dataHeatBalFanSys->MAT(4) = 23.0;
-    state->dataHeatBalFanSys->MAT(5) = 23.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(5) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(5);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).ZoneAirHumRat = 0.001;
 
     DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -14036,7 +14038,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -14207,7 +14209,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestReferenceConditionsLeftBlank)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -16159,7 +16161,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -16227,14 +16229,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     state->afn->simulation_control.ductSizing.return_trunk_pressure_loss = 3.0;
     state->afn->simulation_control.ductSizing.return_branch_pressure_loss = 4.0;
 
-    state->dataHeatBalFanSys->MAT.allocate(3);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(3);
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBalFanSys->MAT(2) = 23.0;
-    state->dataHeatBalFanSys->MAT(3) = 23.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0008400;
-    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0008400;
-    state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.0008400;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(3);
+    for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
+        thisZoneHB.MAT = 23.0;
+        thisZoneHB.ZoneAirHumRat = 0.0008400;
+    }
 
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataDefineEquipment->AirDistUnit(1).MassFlowRateTU = 1.23;

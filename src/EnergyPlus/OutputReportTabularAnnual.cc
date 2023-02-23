@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CostEstimateManager.hh>
@@ -112,9 +111,11 @@ void GetInputTabularAnnual(EnergyPlusData &state)
 
         // if not a run period using weather do not create reports
         if (!state.dataGlobal->DoWeathSim) {
-            ShowWarningError(state,
-                             currentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
-                                 currentModuleObject + " will not be generated");
+            ShowWarningError(
+                state,
+                format("{} requested with SimulationControl Run Simulation for Weather File Run Periods set to No so {} will not be generated",
+                       currentModuleObject,
+                       currentModuleObject));
             return;
         }
     }
@@ -129,7 +130,7 @@ void GetInputTabularAnnual(EnergyPlusData &state)
             for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
                 curVarMtr = alphArray(jAlpha);
                 if (curVarMtr.empty()) {
-                    ShowFatalError(state, "Blank report name in Oputput:Table:Annual");
+                    ShowFatalError(state, "Blank report name in Output:Table:Annual");
                 }
                 if (jAlpha <= numAlphas) {
                     std::string aggregationString = alphArray(jAlpha + 1);
@@ -147,7 +148,7 @@ void GetInputTabularAnnual(EnergyPlusData &state)
             }
             annualTables.back().setupGathering(state);
         } else {
-            ShowSevereError(state, currentModuleObject + ": Must enter at least the first six fields.");
+            ShowSevereError(state, format("{}: Must enter at least the first six fields.", currentModuleObject));
         }
     }
 }
@@ -295,15 +296,15 @@ bool AnnualTable::invalidAggregationOrder(EnergyPlusData &state)
     }
     if (missingMaxOrMinError) {
         ShowSevereError(state,
-                        "The Output:Table:Annual report named=\"" + m_name +
-                            "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or "
-                            "maximum aggregation types. The report will not be generated.");
+                        format("The Output:Table:Annual report named=\"{}\" has a valueWhenMaxMin aggregation type for a column without a previous "
+                               "column that uses either the minimum or maximum aggregation types. The report will not be generated.",
+                               m_name));
     }
     if (missingHourAggError) {
         ShowSevereError(state,
-                        "The Output:Table:Annual report named=\"" + m_name +
-                            "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- "
-                            "aggregation types. The report will not be generated.");
+                        format("The Output:Table:Annual report named=\"{}\" has a --DuringHoursShown aggregation type for a column without a "
+                               "previous field that uses one of the Hour-- aggregation types. The report will not be generated.",
+                               m_name));
     }
     return (missingHourAggError || missingMaxOrMinError);
 }
@@ -358,7 +359,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                     Real64 newDuration = 0.0;
                     bool activeNewValue = false;
                     // the current timestamp
-                    int minuteCalculated = General::DetermineMinuteForReporting(state, kindOfTimeStep);
+                    int minuteCalculated = OutputProcessor::DetermineMinuteForReporting(state);
                     General::EncodeMonDayHrMin(
                         timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
@@ -1130,7 +1131,7 @@ AnnualFieldSet::AggregationKind stringToAggKind(EnergyPlusData &state, std::stri
         outAggType = AnnualFieldSet::AggregationKind::minimumDuringHoursShown;
     } else {
         outAggType = AnnualFieldSet::AggregationKind::sumOrAvg;
-        ShowWarningError(state, "Invalid aggregation type=\"" + inString + "\"  Defaulting to SumOrAverage.");
+        ShowWarningError(state, format("Invalid aggregation type=\"{}\"  Defaulting to SumOrAverage.", inString));
     }
     return outAggType;
 }

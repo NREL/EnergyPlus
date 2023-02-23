@@ -2,7 +2,7 @@
 macro( CREATE_DOC_TARGET SOURCE_FILENAME OUTPUT_FILENAME )
   if (NOT UNIX)
     # Avoid issue #8568 - main memory size exceeded for I/O ref on Windows with a recent MikTex (eg 4.1)
-    set(XELATEX_MEM_FLAGS "-extra-mem-top=2000000 -extra-mem-bot=4000000")
+    set(XELATEX_MEM_FLAGS ON)
   endif()
   add_custom_command( OUTPUT ${PROJECT_BINARY_DIR}/pdf/${OUTPUT_FILENAME}.pdf
     COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME}

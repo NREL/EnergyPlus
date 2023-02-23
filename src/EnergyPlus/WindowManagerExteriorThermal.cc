@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,7 +50,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -170,34 +169,34 @@ namespace WindowManager {
             // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
             // through shade (consider case when openings are zero) is different from heat flow obtained by these equations. Will keep
             // these calculations just to confirm that current exterior engine is giving close results to what is in here. (Simon)
-            auto totLayers = aLayers.size();
+            int totLayers = aLayers.size();
             state.dataWindowManager->nglface = 2 * totLayers - 2;
             state.dataWindowManager->nglfacep = state.dataWindowManager->nglface + 2;
             auto aShadeLayer = aLayers[totLayers - 1];
             auto aGlassLayer = aLayers[totLayers - 2];
-            auto ShadeArea = state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
+            Real64 ShadeArea = state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
             auto frontSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Front);
             auto backSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Back);
-            auto EpsShIR1 = frontSurface->getEmissivity();
-            auto EpsShIR2 = backSurface->getEmissivity();
-            auto TauShIR = frontSurface->getTransmittance();
-            auto RhoShIR1 = max(0.0, 1.0 - TauShIR - EpsShIR1);
-            auto RhoShIR2 = max(0.0, 1.0 - TauShIR - EpsShIR2);
-            auto glassEmiss = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
-            auto RhoGlIR2 = 1.0 - glassEmiss;
-            auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
-            auto NetIRHeatGainShade =
+            Real64 EpsShIR1 = frontSurface->getEmissivity();
+            Real64 EpsShIR2 = backSurface->getEmissivity();
+            Real64 TauShIR = frontSurface->getTransmittance();
+            Real64 RhoShIR1 = max(0.0, 1.0 - TauShIR - EpsShIR1);
+            Real64 RhoShIR2 = max(0.0, 1.0 - TauShIR - EpsShIR2);
+            Real64 glassEmiss = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
+            Real64 RhoGlIR2 = 1.0 - glassEmiss;
+            Real64 ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
+            Real64 rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
+            Real64 NetIRHeatGainShade =
                 ShadeArea * EpsShIR2 *
                     (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1], 4) - rmir) +
                 EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 2], 4) - rmir) *
                     RhoGlIR2 * TauShIR / ShGlReflFacIR;
-            auto NetIRHeatGainGlass =
+            Real64 NetIRHeatGainGlass =
                 ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) *
                 (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglface - 1], 4) - rmir);
-            auto tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv;
-            auto ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) *
-                                                 (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1] - tind);
+            Real64 tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv;
+            Real64 ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) *
+                                                   (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1] - tind);
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
 
@@ -205,13 +204,13 @@ namespace WindowManager {
 
             // Effective shade and glass emissivities that are used later for energy calculations.
             // This needs to be checked as well. (Simon)
-            auto EffShBlEmiss = EpsShIR1 * (1.0 + RhoGlIR2 * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2));
+            Real64 EffShBlEmiss = EpsShIR1 * (1.0 + RhoGlIR2 * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2));
             state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss = EffShBlEmiss;
 
-            auto EffGlEmiss = glassEmiss * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2);
+            Real64 EffGlEmiss = glassEmiss * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2);
             state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss = EffGlEmiss;
 
-            auto glassTemperature = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getTemperature();
+            Real64 glassTemperature = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getTemperature();
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                 (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (glassTemperature - DataGlobalConstants::KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
 
@@ -220,16 +219,16 @@ namespace WindowManager {
             // window is actually matching these values. (Simon)
 
             //
-            auto totLayers = aLayers.size();
+            int totLayers = aLayers.size();
             auto aGlassLayer = aLayers[totLayers - 1];
             auto backSurface = aGlassLayer->getSurface(FenestrationCommon::Side::Back);
 
-            auto h_cin = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
-            auto ConvHeatGainFrZoneSideOfGlass =
+            Real64 h_cin = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
+            Real64 ConvHeatGainFrZoneSideOfGlass =
                 surface.Area * h_cin * (backSurface->getTemperature() - aSystem->getAirTemperature(Tarcog::ISO15099::Environment::Indoor));
 
-            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
-            auto NetIRHeatGainGlass =
+            Real64 rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
+            Real64 NetIRHeatGainGlass =
                 surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
@@ -243,12 +242,12 @@ namespace WindowManager {
             state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
         }
 
-        auto TransDiff = construction.TransDiff;
+        Real64 TransDiff = construction.TransDiff;
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
             state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
         state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
-        for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
+        for (int k = 1; k <= surface.getTotLayers(state); ++k) {
             state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas[2 * k - 2];
             state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas[2 * k - 1];
 
@@ -436,7 +435,7 @@ namespace WindowManager {
         auto aIGU = getIGU();
 
         // pick-up all layers and put them in IGU (this includes gap layers as well)
-        for (auto i = 0; i < m_TotLay; ++i) {
+        for (int i = 0; i < m_TotLay; ++i) {
             auto aLayer = getIGULayer(state, i + 1);
             assert(aLayer != nullptr);
             // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
@@ -466,7 +465,7 @@ namespace WindowManager {
 
         m_SolidLayerIndex = 0;
         // pick-up all layers and put them in IGU (this includes gap layers as well)
-        for (auto i = 0; i < m_TotLay; ++i) {
+        for (int i = 0; i < m_TotLay; ++i) {
             auto aLayer = getIGULayer(state, i + 1);
             assert(aLayer != nullptr);
             // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
@@ -500,7 +499,7 @@ namespace WindowManager {
 
         auto &construction(state.dataConstruction->Construct(ConstrNum));
         const auto LayPtr = construction.LayerPoint(t_Index);
-        return &state.dataMaterial->Material(LayPtr);
+        return state.dataMaterial->Material(LayPtr);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -508,20 +507,19 @@ namespace WindowManager {
     {
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = nullptr;
 
-        auto material = getLayerMaterial(state, t_Index);
+        auto *material = getLayerMaterial(state, t_Index);
 
-        auto matGroup = material->Group;
+        Material::MaterialGroup matGroup = material->Group;
 
-        if (BITF_TEST_ANY(BITF(matGroup),
-                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
-                              BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
-                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade))) {
+        if ((matGroup == Material::MaterialGroup::WindowGlass) || (matGroup == Material::MaterialGroup::WindowSimpleGlazing) ||
+            (matGroup == Material::MaterialGroup::WindowBlind) || (matGroup == Material::MaterialGroup::Shade) ||
+            (matGroup == Material::MaterialGroup::Screen) || (matGroup == Material::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
-            aLayer = getSolidLayer(state, *material, m_SolidLayerIndex);
-        } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
-            aLayer = getGapLayer(*material);
-        } else if (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
-            aLayer = getComplexGapLayer(state, *material);
+            aLayer = getSolidLayer(state, material, m_SolidLayerIndex);
+        } else if (matGroup == Material::MaterialGroup::WindowGas || matGroup == Material::MaterialGroup::WindowGasMixture) {
+            aLayer = getGapLayer(material);
+        } else if (matGroup == Material::MaterialGroup::ComplexWindowGap) {
+            aLayer = getComplexGapLayer(state, material);
         }
 
         return aLayer;
@@ -535,7 +533,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer>
-    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const &material, int const t_Index)
+    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const *material, int const t_Index)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -545,29 +543,29 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates solid layer object from material properties in EnergyPlus
-        auto emissFront = 0.0;
-        auto emissBack = 0.0;
-        auto transThermalFront = 0.0;
-        auto transThermalBack = 0.0;
-        auto thickness = 0.0;
-        auto conductivity = 0.0;
-        auto createOpenness = false;
-        auto Atop = 0.0;
-        auto Abot = 0.0;
-        auto Aleft = 0.0;
-        auto Aright = 0.0;
-        auto Afront = 0.0;
+        Real64 emissFront = 0.0;
+        Real64 emissBack = 0.0;
+        Real64 transThermalFront = 0.0;
+        Real64 transThermalBack = 0.0;
+        Real64 thickness = 0.0;
+        Real64 conductivity = 0.0;
+        Real64 createOpenness = false;
+        Real64 Atop = 0.0;
+        Real64 Abot = 0.0;
+        Real64 Aleft = 0.0;
+        Real64 Aright = 0.0;
+        Real64 Afront = 0.0;
 
-        if (material.Group == DataHeatBalance::MaterialGroup::WindowGlass || material.Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) {
-            emissFront = material.AbsorpThermalFront;
-            emissBack = material.AbsorpThermalBack;
-            transThermalFront = material.TransThermal;
-            transThermalBack = material.TransThermal;
-            thickness = material.Thickness;
-            conductivity = material.Conductivity;
+        if (material->Group == Material::MaterialGroup::WindowGlass || material->Group == Material::MaterialGroup::WindowSimpleGlazing) {
+            emissFront = material->AbsorpThermalFront;
+            emissBack = material->AbsorpThermalBack;
+            transThermalFront = material->TransThermal;
+            transThermalBack = material->TransThermal;
+            thickness = material->Thickness;
+            conductivity = material->Conductivity;
         }
-        if (material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
-            auto blNum = state.dataSurface->SurfWinBlindNumber(m_SurfNum);
+        if (material->Group == Material::MaterialGroup::WindowBlind) {
+            int blNum = state.dataSurface->SurfWinBlindNumber(m_SurfNum);
             auto blind = state.dataHeatBal->Blind(blNum);
             thickness = blind.SlatThickness;
             conductivity = blind.SlatConductivity;
@@ -588,42 +586,42 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == DataHeatBalance::MaterialGroup::Shade) {
-            emissFront = material.AbsorpThermal;
-            emissBack = material.AbsorpThermal;
-            transThermalFront = material.TransThermal;
-            transThermalBack = material.TransThermal;
-            thickness = material.Thickness;
-            conductivity = material.Conductivity;
-            Atop = material.WinShadeTopOpeningMult;
-            Abot = material.WinShadeBottomOpeningMult;
-            Aleft = material.WinShadeLeftOpeningMult;
-            Aright = material.WinShadeRightOpeningMult;
-            Afront = material.WinShadeAirFlowPermeability;
+        if (material->Group == Material::MaterialGroup::Shade) {
+            emissFront = material->AbsorpThermal;
+            emissBack = material->AbsorpThermal;
+            transThermalFront = material->TransThermal;
+            transThermalBack = material->TransThermal;
+            thickness = material->Thickness;
+            conductivity = material->Conductivity;
+            Atop = material->WinShadeTopOpeningMult;
+            Abot = material->WinShadeBottomOpeningMult;
+            Aleft = material->WinShadeLeftOpeningMult;
+            Aright = material->WinShadeRightOpeningMult;
+            Afront = material->WinShadeAirFlowPermeability;
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == DataHeatBalance::MaterialGroup::Screen) {
+        if (material->Group == Material::MaterialGroup::Screen) {
             // Simon: Existing code already takes into account geometry of Woven and scales down
             // emissivity for openning area.
-            emissFront = material.AbsorpThermal;
-            emissBack = material.AbsorpThermal;
-            transThermalFront = material.TransThermal;
-            transThermalBack = material.TransThermal;
-            thickness = material.Thickness;
-            conductivity = material.Conductivity;
-            Atop = material.WinShadeTopOpeningMult;
-            Abot = material.WinShadeBottomOpeningMult;
-            Aleft = material.WinShadeLeftOpeningMult;
-            Aright = material.WinShadeRightOpeningMult;
-            Afront = material.WinShadeAirFlowPermeability;
+            emissFront = material->AbsorpThermal;
+            emissBack = material->AbsorpThermal;
+            transThermalFront = material->TransThermal;
+            transThermalBack = material->TransThermal;
+            thickness = material->Thickness;
+            conductivity = material->Conductivity;
+            Atop = material->WinShadeTopOpeningMult;
+            Abot = material->WinShadeBottomOpeningMult;
+            Aleft = material->WinShadeLeftOpeningMult;
+            Aright = material->WinShadeRightOpeningMult;
+            Afront = material->WinShadeAirFlowPermeability;
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
-            auto shdPtr = material.ComplexShadePtr;
+        if (material->Group == Material::MaterialGroup::ComplexWindowShade) {
+            auto shdPtr = material->ComplexShadePtr;
             auto &shade(state.dataHeatBal->ComplexShade(shdPtr));
             thickness = shade.Thickness;
             conductivity = shade.Conductivity;
@@ -655,20 +653,20 @@ namespace WindowManager {
                 CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
 
             // Report is done for normal incidence
-            const auto Theta{0.0};
-            const auto Phi{0.0};
-            const auto absCoeff =
+            constexpr Real64 Theta{0.0};
+            constexpr Real64 Phi{0.0};
+            const Real64 absCoeff =
                 aLayer->getAbsorptanceLayer(t_Index, FenestrationCommon::Side::Front, FenestrationCommon::ScatteringSimple::Diffuse, Theta, Phi);
             aSolidLayer->setSolarAbsorptance(absCoeff, standardizedRadiationIntensity);
         } else {
-            const auto absCoeff{state.dataConstruction->Construct(state.dataSurface->Surface(m_SurfNum).Construction).AbsDiff(t_Index)};
+            const Real64 absCoeff{state.dataConstruction->Construct(state.dataSurface->Surface(m_SurfNum).Construction).AbsDiff(t_Index)};
             aSolidLayer->setSolarAbsorptance(absCoeff, standardizedRadiationIntensity);
         }
         return aSolidLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const &material) const
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const *material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -678,8 +676,8 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        auto const pres = 1e5; // Old code uses this constant pressure
-        auto thickness = material.Thickness;
+        Real64 constexpr pres = 1e5; // Old code uses this constant pressure
+        Real64 thickness = material->Thickness;
         auto aGas = getGas(material);
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;
@@ -696,9 +694,9 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        auto const pres = 1e5; // Old code uses this constant pressure
+        Real64 constexpr pres = 1e5; // Old code uses this constant pressure
         auto aGas = getAir();
-        auto thickness = 0.0;
+        Real64 thickness = 0.0;
 
         const auto ShadeFlag{getShadeType(state, m_ConstructionNumber)};
 
@@ -706,7 +704,7 @@ namespace WindowManager {
             thickness = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
         if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
-            const auto material = getLayerMaterial(state, t_Index);
+            const auto *material = getLayerMaterial(state, t_Index);
             thickness = material->WinShadeToGlassDist;
         }
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
@@ -715,7 +713,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(EnergyPlusData &state,
-                                                                                                 Material::MaterialProperties const &material) const
+                                                                                                 Material::MaterialProperties const *material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -725,17 +723,17 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        auto const pres = 1e5; // Old code uses this constant pressure
-        auto thickness = material.Thickness;
-        auto gasPointer = material.GasPointer;
-        auto &gasMaterial(state.dataMaterial->Material(gasPointer));
+        Real64 constexpr pres = 1e5; // Old code uses this constant pressure
+        Real64 thickness = material->Thickness;
+        Real64 gasPointer = material->GasPointer;
+        auto *gasMaterial(state.dataMaterial->Material(gasPointer));
         auto aGas = getGas(gasMaterial);
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialProperties const &material) const
+    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialProperties const *material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -746,20 +744,20 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        const auto numGases = material.NumberOfGasesInMixture;
-        auto const vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
-        const auto gasName = material.Name;
+        const int numGases = material->NumberOfGasesInMixture;
+        double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
+        std::string const &gasName = material->Name;
         Gases::CGas aGas;
-        for (auto i = 1; i <= numGases; ++i) {
-            auto wght = material.GasWght(i);
-            auto fract = material.GasFract(i);
+        for (int i = 1; i <= numGases; ++i) {
+            auto wght = material->GasWght(i);
+            auto fract = material->GasFract(i);
             std::vector<double> gcon;
             std::vector<double> gvis;
             std::vector<double> gcp;
             for (auto j = 1; j <= 3; ++j) {
-                gcon.push_back(material.GasCon(j, i));
-                gvis.push_back(material.GasVis(j, i));
-                gcp.push_back(material.GasCp(j, i));
+                gcon.push_back(material->GasCon(j, i));
+                gvis.push_back(material->GasVis(j, i));
+                gcp.push_back(material->GasCp(j, i));
             }
             auto aCon = Gases::CIntCoeff(gcon[0], gcon[1], gcon[2]);
             auto aCp = Gases::CIntCoeff(gcp[0], gcp[1], gcp[2]);
@@ -796,10 +794,10 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates indoor environment object from surface properties in EnergyPlus
-        auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
-        auto hcin = state.dataHeatBalSurf->SurfHConvInt(m_SurfNum);
+        Real64 tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
+        Real64 hcin = state.dataHeatBalSurf->SurfHConvInt(m_SurfNum);
 
-        auto IR = state.dataSurface->SurfWinIRfromParentZone(m_SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(m_SurfNum);
+        Real64 IR = state.dataSurface->SurfWinIRfromParentZone(m_SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(m_SurfNum);
 
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> Indoor =
             std::make_shared<Tarcog::ISO15099::CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
@@ -890,10 +888,10 @@ namespace WindowManager {
     std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoorNfrc(bool const useSummerConditions)
     {
         // NFRC 100 Section 4.3.1
-        auto airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
-        auto airSpeed{5.5};                                           // meters per second
-        auto tSky{-18.0 + DataGlobalConstants::KelvinConv};           // Kelvins
-        auto solarRadiation{0.};                                      // W/m2
+        Real64 airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
+        Real64 airSpeed{5.5};                                           // meters per second
+        Real64 tSky{-18.0 + DataGlobalConstants::KelvinConv};           // Kelvins
+        Real64 solarRadiation{0.};                                      // W/m2
         if (useSummerConditions) {
             // NFRC 200 Section 4.3.1
             airTemperature = 32.0 + DataGlobalConstants::KelvinConv;
@@ -928,32 +926,30 @@ namespace WindowManager {
         const auto MatOutside = state.dataConstruction->Construct(ConstrNum).LayerPoint(1);
         const auto MatInside = state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay);
 
-        if (state.dataMaterial->Material(MatOutside).Group == DataHeatBalance::MaterialGroup::Shade) { // Exterior shade present
+        if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Shade) { // Exterior shade present
             ShadeFlag = WinShadingType::ExtShade;
-        } else if (state.dataMaterial->Material(MatOutside).Group == DataHeatBalance::MaterialGroup::Screen) { // Exterior screen present
+        } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Screen) { // Exterior screen present
             const auto MatShade = MatOutside;
-            const auto ScNum = state.dataMaterial->Material(MatShade).ScreenDataPtr;
+            const auto ScNum = state.dataMaterial->Material(MatShade)->ScreenDataPtr;
             // Orphaned constructs with exterior screen are ignored
             if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
-        } else if (state.dataMaterial->Material(MatOutside).Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Exterior blind present
+        } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::WindowBlind) { // Exterior blind present
             ShadeFlag = WinShadingType::ExtBlind;
-        } else if (state.dataMaterial->Material(MatInside).Group == DataHeatBalance::MaterialGroup::Shade) { // Interior shade present
+        } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::Shade) { // Interior shade present
             ShadeFlag = WinShadingType::IntShade;
-        } else if (state.dataMaterial->Material(MatInside).Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Interior blind present
+        } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::WindowBlind) { // Interior blind present
             ShadeFlag = WinShadingType::IntBlind;
         } else if (TotGlassLay == 2) {
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group ==
-                DataHeatBalance::MaterialGroup::Shade)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group == Material::MaterialGroup::Shade)
                 ShadeFlag = WinShadingType::BGShade;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group ==
+                Material::MaterialGroup::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         } else if (TotGlassLay == 3) {
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group ==
-                DataHeatBalance::MaterialGroup::Shade)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group == Material::MaterialGroup::Shade)
                 ShadeFlag = WinShadingType::BGShade;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group ==
+                Material::MaterialGroup::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         }
 

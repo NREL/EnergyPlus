@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -129,8 +129,12 @@ namespace HeatBalanceHAMTManager {
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid);
 
-    void interp(
-        int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
+    void interp(int const ndata,
+                const Array1D<Real64> &xx,
+                const Array1D<Real64> &yy,
+                Real64 const invalue,
+                Real64 &outvalue,
+                ObjexxFCL::Optional<Real64> outgrad = _);
 
     Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature);
 

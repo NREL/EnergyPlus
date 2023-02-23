@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -86,6 +85,7 @@
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::SystemReports {
 
@@ -2335,7 +2335,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 NumLeft = GetNumChildren(state, SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                 if (NumLeft > 0) {
                                     ShowSevereError(
-                                        state, "Hanging Children for component=" + thisSubSubComponent.TypeOf + ':' + SubCompNames(SubSubCompNum));
+                                        state,
+                                        format("Hanging Children for component={}:{}", thisSubSubComponent.TypeOf, SubCompNames(SubSubCompNum)));
                                 }
                             }
                         }
@@ -4516,8 +4517,11 @@ void ReportVentilationLoads(EnergyPlusData &state)
         }
 
         // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-        Real64 currentZoneAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-            state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(CtrlZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatAvg(CtrlZoneNum));
+        Real64 currentZoneAirDensity =
+            Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                              state.dataEnvrn->OutBaroPress,
+                                              state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).MAT,
+                                              state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).ZoneAirHumRatAvg);
         if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.OAVolFlowCrntRho = thisZoneVentRepVars.OAMassFlow / currentZoneAirDensity;
         thisZoneVentRepVars.OAVolCrntRho = thisZoneVentRepVars.OAVolFlowCrntRho * TimeStepSys * DataGlobalConstants::SecInHour;
         if (ZoneVolume > 0.0) thisZoneVentRepVars.MechACH = (thisZoneVentRepVars.OAVolCrntRho / TimeStepSys) / ZoneVolume;

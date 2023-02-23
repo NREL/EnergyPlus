@@ -23101,7 +23101,7 @@ DO iSys = 1, numCompactSysVRF
    ' HeatingEIRHiPLR')
   CALL AddToObjFld('Heating Combination Ratio Correction Factor Curve Name', base + vrfsNameOff,' HeatingCombRatio')
   CALL AddToObjFld('Heating Part-Load Fraction Correlation Curve Name', base + vrfsNameOff,' VRFCPLFFPLR')
-  CALL AddToObjStr('Minimum Heat Pump Part-Load Ratio','0.25')
+  CALL AddToObjFld('Minimum Heat Pump Part-Load Ratio', base + vrfsHPMinPLROff,'')
   CALL AddToObjFld('Zone Name for Master Thermostat Location', base + vrfsTstatZoneNameOff,'')
   CALL AddToObjFld('Master Thermostat Priority Control Type', base + vrfsTstatPriorityCtrlTypeOff,'')
   CALL AddToObjFld('Thermostat Priority Schedule Name', base + vrfsTstatPrioritySchedNameOff,'')
@@ -23863,7 +23863,9 @@ IF (.NOT. isBaseboardNone) THEN
   CALL AddToObjFld('Air Inlet Node Name', base + fczNameOff,' Mixed Air Outlet')
   CALL AddToObjFld('Air Outlet Node Name', base + fczNameOff,' Supply Fan Outlet')
   CALL AddToObjStr('Design Maximum Air Flow Rate {m3/s}','autosize')
-  IF (capacityControlKind == capctrlVarFanConstFlow) THEN
+  IF ((capacityControlKind == capctrlVarFanConstFlow) .or. & 
+        (capacityControlKind == capctrlVarFanVarFlow) .or. &
+        (capacityControlKind == capctrlASHRAE90VarFan)) THEN
     CALL AddToObjStr('Speed Control Method', 'Continuous')
   ELSE
     CALL AddToObjStr('Speed Control Method', 'Discrete')

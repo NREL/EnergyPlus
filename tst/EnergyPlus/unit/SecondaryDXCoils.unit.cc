@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,9 +61,9 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -86,6 +86,8 @@ TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilSingleSpeed_Test1)
     state->dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate = 5000.0;
     state->dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(5500.0, state->dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
@@ -107,6 +109,8 @@ TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilTwoSpeed_Test2)
     state->dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate = 5000.0;
     state->dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(5500.0, state->dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
@@ -128,6 +132,8 @@ TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilMultiSpeed_Test3)
     state->dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate = 5000.0;
     state->dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
 
     CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(5500.0, state->dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
@@ -154,10 +160,9 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
     state->dataLoopNodes->Node.allocate(2);
-    state->dataHeatBalFanSys->ZT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZT(1) = 10.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.003;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 10.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.003;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilAirFlow = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).CompressorPartLoadRatio = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilRatedSHR = 1.0;
@@ -236,10 +241,9 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
     state->dataLoopNodes->Node.allocate(2);
-    state->dataHeatBalFanSys->ZT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZT(1) = 10.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.003;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 10.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.003;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(1) = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(2) = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFT(1) = 0;

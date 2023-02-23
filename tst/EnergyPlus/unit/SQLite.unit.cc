@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -618,10 +618,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
 
     auto const &materialData0 = std::make_unique<Material::MaterialProperties>();
     materialData0->Name = "test material 1";
-    materialData0->Group = DataHeatBalance::MaterialGroup::Air;
+    materialData0->Group = Material::MaterialGroup::Air;
     auto const &materialData1 = std::make_unique<Material::MaterialProperties>();
     materialData1->Name = "test material 2";
-    materialData1->Group = DataHeatBalance::MaterialGroup::Shade;
+    materialData1->Group = Material::MaterialGroup::Shade;
     materialData1->Roughness = DataSurfaces::SurfaceRoughness::Rough; // 1
     materialData1->Conductivity = 2;
     materialData1->Density = 2;
@@ -832,8 +832,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     state->dataSQLiteProcedures->sqlite->addZoneListData(2, *zoneListData1);
     state->dataSQLiteProcedures->sqlite->addZoneGroupData(1, *zoneGroupData0);
     state->dataSQLiteProcedures->sqlite->addZoneGroupData(2, *zoneGroupData1);
-    state->dataSQLiteProcedures->sqlite->addMaterialData(1, *materialData0);
-    state->dataSQLiteProcedures->sqlite->addMaterialData(2, *materialData1);
+    state->dataSQLiteProcedures->sqlite->addMaterialData(1, &*materialData0);
+    state->dataSQLiteProcedures->sqlite->addMaterialData(2, &*materialData1);
     state->dataSQLiteProcedures->sqlite->addConstructionData(1, *constructData0, zero);
     state->dataSQLiteProcedures->sqlite->addConstructionData(2, *constructData1, two);
     state->dataSQLiteProcedures->sqlite->addSurfaceData(1, *surfaceData0, window);

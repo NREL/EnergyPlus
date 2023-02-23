@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -141,7 +141,7 @@ void ReportSurfaces(EnergyPlusData &state)
             DXFOut(state, Option1, Option2);
             DXFDone = true;
         } else {
-            ShowWarningError(state, "ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, format("ReportSurfaces: DXF output already generated.  DXF with option=[{}] will not be generated.", Option1));
         }
     }
 
@@ -164,7 +164,7 @@ void ReportSurfaces(EnergyPlusData &state)
             VRMLOut(state, Option1, Option2);
             VRMLDone = true;
         } else {
-            ShowWarningError(state, "ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, format("ReportSurfaces: VRML output already generated.  VRML with option=[{}] will not be generated.", Option1));
         }
     }
 
@@ -201,8 +201,9 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     }
 
     if (state.dataOutputReports->optiondone) {
-        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + state.dataOutputReports->lastoption);
-        ShowContinueError(state, "..option=\"" + option + "\" will not be done this time.");
+        ShowWarningError(state,
+                         format("Report of Surfaces/Lines Option has already been completed with option={}", state.dataOutputReports->lastoption));
+        ShowContinueError(state, format("..option=\"{}\" will not be done this time.", option));
         return;
     }
 
@@ -505,7 +506,7 @@ void DXFOut(EnergyPlusData &state,
         ThickPolyline = false;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError(state, "DXFOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowWarningError(state, format("DXFOut: Illegal key specified for Surfaces with > 4 sides={}", PolygonAction));
         ShowContinueError(state, R"(...Valid keys are: "ThickPolyline", "RegularPolyline", "Triangulate3DFace".)");
         ShowContinueError(state, "\"Triangulate3DFace\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
@@ -1454,7 +1455,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         RegularPolyline = true;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError(state, "VRMLOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowWarningError(state, format("VRMLOut: Illegal key specified for Surfaces with > 4 sides={}", PolygonAction));
         ShowContinueError(state, "\"TRIANGULATE 3DFACE\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
     }

@@ -45,7 +45,7 @@ ratioTWB = (MixWetBulb + 273.15) / 283.15;
 [...]
 ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
 [...]
-TotCapTempModFac = CurveManager::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
+TotCapTempModFac = Curve::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
 [...]
 RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac
 [...]

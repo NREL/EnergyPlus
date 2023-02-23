@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     // create local variables to calculate and call the new worker function
     Real64 newSpecificHeat, newDensity, newThermalConductivity;
     adjustPropertiesForPhaseChange(
-        *state, finiteDiffLayerIndex, surfaceIndex, material, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity);
+        *state, finiteDiffLayerIndex, surfaceIndex, &material, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity);
 
     // check the values are correct
     EXPECT_NEAR(10187.3, newSpecificHeat, 0.1);
@@ -310,8 +310,8 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalFiniteDiffManager_skipNotUsedConstruct
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     ErrorsFound = false;
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
@@ -394,8 +394,8 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     ErrorsFound = false;
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -82,6 +82,8 @@ namespace DataStringGlobals {
     char constexpr CharSemicolon(';'); // semicolon
     char constexpr CharTab('\t');      // tab
     char constexpr CharSpace(' ');     // space
+    constexpr std::string_view zonePrefix = "Zone";
+    constexpr std::string_view spacePrefix = "Space";
 
     extern std::string const VerString;        // String that represents version information
     extern std::string const MatchVersion;     // String to be matched by Version object

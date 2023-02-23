@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -176,19 +176,26 @@ void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, std
             if (lNumericBlanks(numargs)) {
                 if (!lAlphaBlanks(numargs + 1)) {
                     ShowWarningError(state,
-                                     "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
-                                         cAlphas(numargs + 1) + ", " + cNumericFields(numargs) + " was blank.  Default color retained.");
+                                     format("SetUpSchemeColors: {}={}, {}={}, {} was blank.  Default color retained.",
+                                            cAlphaFields(1),
+                                            SchemeName,
+                                            cAlphaFields(numargs + 1),
+                                            cAlphas(numargs + 1),
+                                            cNumericFields(numargs)));
                 }
                 continue;
             }
             if (!MatchAndSetColorTextString(state, cAlphas(numargs + 1), numptr, ColorType)) {
                 ShowWarningError(state,
-                                 "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
-                                     cAlphas(numargs + 1) + ", is invalid.  No color set.");
+                                 format("SetUpSchemeColors: {}={}, {}={}, is invalid.  No color set.",
+                                        cAlphaFields(1),
+                                        SchemeName,
+                                        cAlphaFields(numargs + 1),
+                                        cAlphas(numargs + 1)));
             }
         }
     } else {
-        ShowWarningError(state, "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
+        ShowWarningError(state, format("SetUpSchemeColors: Name={} not on input file. Default colors will be used.", SchemeName));
     }
 }
 

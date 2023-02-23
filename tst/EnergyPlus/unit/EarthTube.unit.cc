@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/EarthTube.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EarthTube;
@@ -86,12 +87,9 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     state->dataEarthTube->EarthTubeSys(ETnum).FanPower = 0.05;
 
     // Allocate and set any zone variables necessary to run the tests
-    state->dataHeatBalFanSys->MCPE.allocate(ZNnum);
-    state->dataHeatBalFanSys->MCPTE.allocate(ZNnum);
-    state->dataHeatBalFanSys->EAMFL.allocate(ZNnum);
-    state->dataHeatBalFanSys->EAMFLxHumRat.allocate(ZNnum);
-    state->dataHeatBalFanSys->MCPE(ZNnum) = 0.05;
-    state->dataHeatBalFanSys->EAMFL(ZNnum) = 0.05;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(ZNnum);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZNnum).MCPE = 0.05;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZNnum).EAMFL = 0.05;
 
     // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
     state->dataEarthTube->EarthTubeSys(ETnum).CalcEarthTubeHumRat(*state, ZNnum);

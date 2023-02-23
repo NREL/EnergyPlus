@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     std::string fanName = "TEST FAN";
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     state->dataSize->CurZoneEqNum = 0;
@@ -412,7 +412,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput(*state);
+    Curve::GetCurveInput(*state);
     std::string fanName = "TEST FAN";
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     state->dataSize->CurZoneEqNum = 0;

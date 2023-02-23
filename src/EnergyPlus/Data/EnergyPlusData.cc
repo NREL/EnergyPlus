@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,6 +99,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataDesiccantDehumidifiers = std::make_unique<DesiccantDehumidifiersData>();
     this->dataDispVentMgr = std::make_unique<DisplacementVentMgrData>();
     this->dataDualDuct = std::make_unique<DualDuctData>();
+    this->dataEIRFuelFiredHeatPump = std::make_unique<EIRFuelFiredHeatPumpsData>();
     this->dataEIRPlantLoopHeatPump = std::make_unique<EIRPlantLoopHeatPumpsData>();
     this->dataEMSMgr = std::make_unique<EMSManagerData>();
     this->dataEarthTube = std::make_unique<EarthTubeData>();
@@ -356,6 +357,7 @@ void EnergyPlusData::clear_state()
     this->dataDesiccantDehumidifiers->clear_state();
     this->dataDispVentMgr->clear_state();
     this->dataDualDuct->clear_state();
+    this->dataEIRFuelFiredHeatPump->clear_state();
     this->dataEIRPlantLoopHeatPump->clear_state();
     this->dataEMSMgr->clear_state();
     this->dataEarthTube->clear_state();

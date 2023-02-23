@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EarthTube.hh>
@@ -65,6 +64,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::EarthTube {
 // Module containing the data for Earth Tube system
@@ -156,7 +156,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
     // Following used for reporting
     state.dataEarthTube->ZnRptET.allocate(state.dataGlobal->NumOfZones);
 
-    std::string cCurrentModuleObject = "ZoneEarthtube";
+    constexpr std::string_view cCurrentModuleObject = "ZoneEarthtube";
     int TotEarthTube = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     state.dataEarthTube->EarthTubeSys.allocate(TotEarthTube);
@@ -180,7 +180,8 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         thisEarthTube.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), Zone);
         if (thisEarthTube.ZonePtr == 0) {
             ShowSevereError(
-                state, cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + " not found=" + state.dataIPShortCut->cAlphaArgs(1));
+                state,
+                format("{}: {} not found={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         }
 
@@ -189,13 +190,19 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         if (thisEarthTube.SchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(2) + " is required, missing for " +
-                                    state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: {} is required, missing for {}={}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                    " entered=" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                    state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: invalid {} entered={} for {}={}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2),
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
             }
             ErrorsFound = true;
         }
@@ -238,8 +245,12 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             thisEarthTube.FanType = static_cast<Ventilation>(getEnumerationValue(ventilationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             if (thisEarthTube.FanType == Ventilation::Invalid) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", " + state.dataIPShortCut->cAlphaFieldNames(3) + " invalid=" + state.dataIPShortCut->cAlphaArgs(3));
+                                format("{}: {}={}, {} invalid={}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(3),
+                                       state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
         }
@@ -348,8 +359,12 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         constexpr std::array<Real64, static_cast<int>(SoilType::Num)> thermalConductivity = {2.42, 1.3, 0.865, 0.346};
         if (soilType == SoilType::Invalid) {
             ShowSevereError(state,
-                            cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
-                                ", " + state.dataIPShortCut->cAlphaFieldNames(4) + " invalid=" + state.dataIPShortCut->cAlphaArgs(4));
+                            format("{}: {}={}, {} invalid={}",
+                                   cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaFieldNames(1),
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaFieldNames(4),
+                                   state.dataIPShortCut->cAlphaArgs(4)));
             ErrorsFound = true;
         } else {
             thisEarthTube.SoilThermDiff = thermalDiffusivity[static_cast<int>(soilType)];
@@ -505,7 +520,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
     CheckEarthTubesInZones(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
     if (ErrorsFound) {
-        ShowFatalError(state, cCurrentModuleObject + ": Errors getting input.  Program terminates.");
+        ShowFatalError(state, format("{}: Errors getting input.  Program terminates.", cCurrentModuleObject));
     }
 }
 
@@ -520,9 +535,8 @@ void CheckEarthTubesInZones(EnergyPlusData &state,
     for (int Loop = 1; Loop <= numEarthTubes - 1; ++Loop) {
         for (int Loop1 = Loop + 1; Loop1 <= numEarthTubes; ++Loop1) {
             if (state.dataEarthTube->EarthTubeSys(Loop).ZonePtr == state.dataEarthTube->EarthTubeSys(Loop1).ZonePtr) {
-                ShowSevereError(state, ZoneName + " has more than one " + std::string{FieldName} + " associated with it.");
-                ShowContinueError(state,
-                                  "Only one " + std::string{FieldName} + " is allowed per zone.  Check the definitions of " + std::string{FieldName});
+                ShowSevereError(state, format("{} has more than one {} associated with it.", ZoneName, FieldName));
+                ShowContinueError(state, format("Only one {} is allowed per zone.  Check the definitions of {}", FieldName, FieldName));
                 ShowContinueError(state, "in your input file and make sure that there is only one defined for each zone.");
                 ErrorsFound = true;
             }
@@ -542,7 +556,6 @@ void CalcEarthTube(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
-    int NZ;
     Real64 Process1;        // Variable Used in the Middle of the Calculation
     Real64 GroundTempz1z2t; // Average Ground Temperature between Depth z1 and z2 at time t
 
@@ -563,38 +576,41 @@ void CalcEarthTube(EnergyPlusData &state)
     Real64 AirMassFlowRate;      // Actual Mass Flow Rate of Air inside Pipe
     Real64 AirSpecHeat;          // Specific Heat of Air
     Real64 AirDensity;           // Density of Air
-
     Real64 EVF;
-    state.dataHeatBalFanSys->MCPTE = 0.0;
-    state.dataHeatBalFanSys->MCPE = 0.0;
-    state.dataHeatBalFanSys->EAMFL = 0.0;
-    state.dataHeatBalFanSys->EAMFLxHumRat = 0.0;
 
     int numEarthTubes = (int)state.dataEarthTube->EarthTubeSys.size();
     for (Loop = 1; Loop <= numEarthTubes; ++Loop) {
         auto &thisEarthTube = state.dataEarthTube->EarthTubeSys(Loop);
-        NZ = thisEarthTube.ZonePtr;
+        int NZ = thisEarthTube.ZonePtr;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
+        thisZoneHB.MCPTE = 0.0;
+        thisZoneHB.MCPE = 0.0;
+        thisZoneHB.EAMFL = 0.0;
+        thisZoneHB.EAMFLxHumRat = 0.0;
         thisEarthTube.FanPower = 0.0;
+
         // Skip this if the zone is below the minimum temperature limit
-        if (state.dataHeatBalFanSys->MAT(NZ) < thisEarthTube.MinTemperature) continue;
+        if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT < thisEarthTube.MinTemperature) continue;
         // Skip this if the zone is above the maximum temperature limit
-        if (state.dataHeatBalFanSys->MAT(NZ) > thisEarthTube.MaxTemperature) continue;
+        if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT > thisEarthTube.MaxTemperature) continue;
         // Skip if below the temperature difference limit
-        if (std::abs(state.dataHeatBalFanSys->MAT(NZ) - state.dataEnvrn->OutDryBulbTemp) < thisEarthTube.DelTemperature) continue;
+        if (std::abs(state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT - state.dataEnvrn->OutDryBulbTemp) < thisEarthTube.DelTemperature)
+            continue;
 
         AirDensity =
             Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
         AirSpecHeat = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         EVF = thisEarthTube.DesignLevel * ScheduleManager::GetCurrentScheduleValue(state, thisEarthTube.SchedPtr);
-        state.dataHeatBalFanSys->MCPE(NZ) =
+        thisZoneHB.MCPE =
             EVF * AirDensity * AirSpecHeat *
             (thisEarthTube.ConstantTermCoef +
-             std::abs(state.dataEnvrn->OutDryBulbTemp - state.dataHeatBalFanSys->MAT(NZ)) * thisEarthTube.TemperatureTermCoef +
+             std::abs(state.dataEnvrn->OutDryBulbTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT) *
+                 thisEarthTube.TemperatureTermCoef +
              state.dataEnvrn->WindSpeed * (thisEarthTube.VelocityTermCoef + state.dataEnvrn->WindSpeed * thisEarthTube.VelocitySQTermCoef));
 
-        state.dataHeatBalFanSys->EAMFL(NZ) = state.dataHeatBalFanSys->MCPE(NZ) / AirSpecHeat;
+        thisZoneHB.EAMFL = thisZoneHB.MCPE / AirSpecHeat;
         if (thisEarthTube.FanEfficiency > 0.0) {
-            thisEarthTube.FanPower = state.dataHeatBalFanSys->EAMFL(NZ) * thisEarthTube.FanPressure / (thisEarthTube.FanEfficiency * AirDensity);
+            thisEarthTube.FanPower = thisZoneHB.EAMFL * thisEarthTube.FanPressure / (thisEarthTube.FanEfficiency * AirDensity);
         }
 
         AverPipeAirVel = EVF / DataGlobalConstants::Pi / pow_2(thisEarthTube.r1);
@@ -673,7 +689,8 @@ void EarthTubeData::CalcEarthTubeHumRat(EnergyPlusData &state, int const NZ)
     // and calculates parameters associated with humidity ratio.
 
     Real64 InsideDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
-    Real64 InsideHumRat;
+    Real64 InsideHumRat = 0.0;
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
 
     if (this->InsideAirTemp >= InsideDewPointTemp) {
         InsideHumRat = state.dataEnvrn->OutHumRat;
@@ -681,16 +698,16 @@ void EarthTubeData::CalcEarthTubeHumRat(EnergyPlusData &state, int const NZ)
         // Intake fans will add some heat to the air, raising the temperature for an intake fan...
         if (this->FanType == Ventilation::Intake) {
             Real64 OutletAirEnthalpy;
-            if (state.dataHeatBalFanSys->EAMFL(NZ) == 0.0) {
+            if (thisZoneHB.EAMFL == 0.0) {
                 OutletAirEnthalpy = InsideEnthalpy;
             } else {
-                OutletAirEnthalpy = InsideEnthalpy + this->FanPower / state.dataHeatBalFanSys->EAMFL(NZ);
+                OutletAirEnthalpy = InsideEnthalpy + this->FanPower / thisZoneHB.EAMFL;
             }
             this->AirTemp = Psychrometrics::PsyTdbFnHW(OutletAirEnthalpy, state.dataEnvrn->OutHumRat);
         } else {
             this->AirTemp = this->InsideAirTemp;
         }
-        state.dataHeatBalFanSys->MCPTE(NZ) = state.dataHeatBalFanSys->MCPE(NZ) * this->AirTemp;
+        thisZoneHB.MCPTE = thisZoneHB.MCPE * this->AirTemp;
 
     } else {
         InsideHumRat = Psychrometrics::PsyWFnTdpPb(state, this->InsideAirTemp, state.dataEnvrn->OutBaroPress);
@@ -698,21 +715,21 @@ void EarthTubeData::CalcEarthTubeHumRat(EnergyPlusData &state, int const NZ)
         // Intake fans will add some heat to the air, raising the temperature for an intake fan...
         if (this->FanType == Ventilation::Intake) {
             Real64 OutletAirEnthalpy;
-            if (state.dataHeatBalFanSys->EAMFL(NZ) == 0.0) {
+            if (thisZoneHB.EAMFL == 0.0) {
                 OutletAirEnthalpy = InsideEnthalpy;
             } else {
-                OutletAirEnthalpy = InsideEnthalpy + this->FanPower / state.dataHeatBalFanSys->EAMFL(NZ);
+                OutletAirEnthalpy = InsideEnthalpy + this->FanPower / thisZoneHB.EAMFL;
             }
             this->AirTemp = Psychrometrics::PsyTdbFnHW(OutletAirEnthalpy, InsideHumRat);
         } else {
             this->AirTemp = this->InsideAirTemp;
         }
-        state.dataHeatBalFanSys->MCPTE(NZ) = state.dataHeatBalFanSys->MCPE(NZ) * this->AirTemp;
+        thisZoneHB.MCPTE = thisZoneHB.MCPE * this->AirTemp;
     }
 
     this->HumRat = InsideHumRat;
     this->WetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, this->InsideAirTemp, InsideHumRat, state.dataEnvrn->OutBaroPress);
-    state.dataHeatBalFanSys->EAMFLxHumRat(NZ) = state.dataHeatBalFanSys->EAMFL(NZ) * InsideHumRat;
+    thisZoneHB.EAMFLxHumRat = thisZoneHB.EAMFL * InsideHumRat;
 }
 
 void ReportEarthTube(EnergyPlusData &state)
@@ -729,19 +746,18 @@ void ReportEarthTube(EnergyPlusData &state)
 
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         auto &thisZone = state.dataEarthTube->ZnRptET(ZoneLoop);
-        auto &zoneMCPE = state.dataHeatBalFanSys->MCPE(ZoneLoop);
-        auto &zoneTemp = state.dataHeatBalFanSys->ZT(ZoneLoop);
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
 
         // Break the infiltration load into heat gain and loss components.
         Real64 const AirDensity =
             Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
         Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-        thisZone.EarthTubeVolume = (zoneMCPE / CpAir / AirDensity) * ReportingConstant;
-        thisZone.EarthTubeMass = (zoneMCPE / CpAir) * ReportingConstant;
-        thisZone.EarthTubeVolFlowRate = zoneMCPE / CpAir / AirDensity;
-        thisZone.EarthTubeVolFlowRateStd = zoneMCPE / CpAir / state.dataEnvrn->StdRhoAir;
-        thisZone.EarthTubeMassFlowRate = zoneMCPE / CpAir;
-        thisZone.EarthTubeWaterMassFlowRate = state.dataHeatBalFanSys->EAMFLxHumRat(ZoneLoop);
+        thisZone.EarthTubeVolume = (thisZoneHB.MCPE / CpAir / AirDensity) * ReportingConstant;
+        thisZone.EarthTubeMass = (thisZoneHB.MCPE / CpAir) * ReportingConstant;
+        thisZone.EarthTubeVolFlowRate = thisZoneHB.MCPE / CpAir / AirDensity;
+        thisZone.EarthTubeVolFlowRateStd = thisZoneHB.MCPE / CpAir / state.dataEnvrn->StdRhoAir;
+        thisZone.EarthTubeMassFlowRate = thisZoneHB.MCPE / CpAir;
+        thisZone.EarthTubeWaterMassFlowRate = thisZoneHB.EAMFLxHumRat;
 
         thisZone.EarthTubeFanElec = 0.0;
         thisZone.EarthTubeAirTemp = 0.0;
@@ -751,14 +767,14 @@ void ReportEarthTube(EnergyPlusData &state)
                 thisZone.EarthTubeFanElecPower = thisEarthTube.FanPower;
 
                 // Break the EarthTube load into heat gain and loss components.
-                if (zoneTemp > thisEarthTube.AirTemp) {
-                    thisZone.EarthTubeHeatLoss = zoneMCPE * (zoneTemp - thisEarthTube.AirTemp) * ReportingConstant;
-                    thisZone.EarthTubeHeatLossRate = zoneMCPE * (zoneTemp - thisEarthTube.AirTemp);
+                if (thisZoneHB.ZT > thisEarthTube.AirTemp) {
+                    thisZone.EarthTubeHeatLoss = thisZoneHB.MCPE * (thisZoneHB.ZT - thisEarthTube.AirTemp) * ReportingConstant;
+                    thisZone.EarthTubeHeatLossRate = thisZoneHB.MCPE * (thisZoneHB.ZT - thisEarthTube.AirTemp);
                     thisZone.EarthTubeHeatGain = 0.0;
                     thisZone.EarthTubeHeatGainRate = 0.0;
-                } else if (zoneTemp <= thisEarthTube.AirTemp) {
-                    thisZone.EarthTubeHeatGain = zoneMCPE * (thisEarthTube.AirTemp - zoneTemp) * ReportingConstant;
-                    thisZone.EarthTubeHeatGainRate = zoneMCPE * (thisEarthTube.AirTemp - zoneTemp);
+                } else if (thisZoneHB.ZT <= thisEarthTube.AirTemp) {
+                    thisZone.EarthTubeHeatGain = thisZoneHB.MCPE * (thisEarthTube.AirTemp - thisZoneHB.ZT) * ReportingConstant;
+                    thisZone.EarthTubeHeatGainRate = thisZoneHB.MCPE * (thisEarthTube.AirTemp - thisZoneHB.ZT);
                     thisZone.EarthTubeHeatLoss = 0.0;
                     thisZone.EarthTubeHeatLossRate = 0.0;
                 }
@@ -766,7 +782,7 @@ void ReportEarthTube(EnergyPlusData &state)
                 thisZone.EarthTubeAirTemp = thisEarthTube.AirTemp;
                 thisZone.EarthTubeWetBulbTemp = thisEarthTube.WetBulbTemp;
                 thisZone.EarthTubeHumRat = thisEarthTube.HumRat;
-                thisZone.EarthTubeOATreatmentPower = zoneMCPE * (thisEarthTube.AirTemp - state.dataEnvrn->OutDryBulbTemp);
+                thisZone.EarthTubeOATreatmentPower = thisZoneHB.MCPE * (thisEarthTube.AirTemp - state.dataEnvrn->OutDryBulbTemp);
                 break; // DO loop
             }
         }

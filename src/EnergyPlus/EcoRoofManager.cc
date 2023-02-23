@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -68,6 +67,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -129,7 +129,6 @@ namespace EcoRoofManager {
         // The Atmospheric Boundary Layer - by J.R. Garratt (Cambridge Atmos. & Space Science Series), 316pp.
         // Using/Aliasing
         using namespace DataEnvironment;
-        using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
         using namespace DataSurfaces;
@@ -223,8 +222,10 @@ namespace EcoRoofManager {
                         // consistent with FASST TR-04-25 p. x (W' = 2.0)
         }
 
-        RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
-        AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+        RoughSurf = thisMaterial->Roughness;
+        AbsThermSurf = thisMaterial->AbsorpThermal;
         HMovInsul = 0.0;
 
         if (state.dataSurface->Surface(SurfNum).ExtWind) {
@@ -270,24 +271,23 @@ namespace EcoRoofManager {
             state.dataEcoRoofMgr->Tg = state.dataEcoRoofMgr->Tgold;
             state.dataEcoRoofMgr->Tf = state.dataEcoRoofMgr->Tfold;
 
-            if (state.dataConstruction->Construct(ConstrNum).CTFCross(0) > 0.01) {
+            if (thisConstruct.CTFCross(0) > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
-                F1temp = state.dataConstruction->Construct(ConstrNum).CTFCross(0) /
-                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
-                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
-                             F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
-                                       state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
-                                       state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
-                                       state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
-                                       state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
+                F1temp = thisConstruct.CTFCross(0) / (thisConstruct.CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
+                Qsoilpart1 =
+                    -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
+                    F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
+                              state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
+                              state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
+                              state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
+                              state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
-                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
-                             state.dataConstruction->Construct(ConstrNum).CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                Qsoilpart1 =
+                    -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + thisConstruct.CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
                 F1temp = 0.0;
             }
 
-            Qsoilpart2 =
-                state.dataConstruction->Construct(ConstrNum).CTFOutside(0) - F1temp * state.dataConstruction->Construct(ConstrNum).CTFCross(0);
+            Qsoilpart2 = thisConstruct.CTFOutside(0) - F1temp * thisConstruct.CTFCross(0);
 
             state.dataEcoRoofMgr->Pa = state.dataEnvrn->StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
             Tgk = state.dataEcoRoofMgr->Tg + DataGlobalConstants::KelvinConv;
@@ -542,7 +542,7 @@ namespace EcoRoofManager {
 
     void initEcoRoofFirstTime(EnergyPlusData &state, int const SurfNum, int const ConstrNum)
     {
-        auto &thisMat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        auto const *thisMat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
         auto &thisEcoRoof = state.dataEcoRoofMgr;
 
         thisEcoRoof->EcoRoofbeginFlag = false;
@@ -553,19 +553,19 @@ namespace EcoRoofManager {
                             "currently works only with CTF heat balance solution algorithm.");
 
         // ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
-        thisEcoRoof->Zf = thisMat.HeightOfPlants;              // Plant height (m)
-        thisEcoRoof->LAI = thisMat.LAI;                        // Leaf Area Index
-        thisEcoRoof->Alphag = 1.0 - thisMat.AbsorpSolar;       // albedo rather than absorptivity
-        thisEcoRoof->Alphaf = thisMat.Lreflectivity;           // Leaf Reflectivity
-        thisEcoRoof->epsilonf = thisMat.LEmissitivity;         // Leaf Emisivity
-        thisEcoRoof->StomatalResistanceMin = thisMat.RStomata; // Leaf min stomatal resistance
-        thisEcoRoof->epsilong = thisMat.AbsorpThermal;         // Soil Emisivity
-        thisEcoRoof->MoistureMax = thisMat.Porosity;           // Max moisture content in soil
-        thisEcoRoof->MoistureResidual = thisMat.MinMoisture;   // Min moisture content in soil
-        thisEcoRoof->Moisture = thisMat.InitMoisture;          // Initial moisture content in soil
-        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
+        thisEcoRoof->Zf = thisMat->HeightOfPlants;              // Plant height (m)
+        thisEcoRoof->LAI = thisMat->LAI;                        // Leaf Area Index
+        thisEcoRoof->Alphag = 1.0 - thisMat->AbsorpSolar;       // albedo rather than absorptivity
+        thisEcoRoof->Alphaf = thisMat->Lreflectivity;           // Leaf Reflectivity
+        thisEcoRoof->epsilonf = thisMat->LEmissitivity;         // Leaf Emisivity
+        thisEcoRoof->StomatalResistanceMin = thisMat->RStomata; // Leaf min stomatal resistance
+        thisEcoRoof->epsilong = thisMat->AbsorpThermal;         // Soil Emisivity
+        thisEcoRoof->MoistureMax = thisMat->Porosity;           // Max moisture content in soil
+        thisEcoRoof->MoistureResidual = thisMat->MinMoisture;   // Min moisture content in soil
+        thisEcoRoof->Moisture = thisMat->InitMoisture;          // Initial moisture content in soil
+        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture;  // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
 
-        thisEcoRoof->SoilThickness = thisMat.Thickness; // Total thickness of soil layer (m)
+        thisEcoRoof->SoilThickness = thisMat->Thickness; // Total thickness of soil layer (m)
 
         thisEcoRoof->FirstEcoSurf = SurfNum; // this determines WHEN to updatesoilProps
 
@@ -704,7 +704,7 @@ namespace EcoRoofManager {
         // Using/Aliasing
         using namespace DataEnvironment;
 
-        auto &thisMat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        auto const *thisMat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
         auto &thisEcoRoof = state.dataEcoRoofMgr;
         auto &thisSurf = state.dataSurface->Surface(SurfNum);
 
@@ -712,9 +712,9 @@ namespace EcoRoofManager {
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
         if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
-            thisEcoRoof->Moisture = thisMat.InitMoisture;          // Initial moisture content in soil
+            thisEcoRoof->Moisture = thisMat->InitMoisture;         // Initial moisture content in soil
             thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // Start the root zone moisture at the same value as the surface.
-            thisEcoRoof->Alphag = 1.0 - thisMat.AbsorpSolar;       // albedo rather than absorptivity
+            thisEcoRoof->Alphag = 1.0 - thisMat->AbsorpSolar;      // albedo rather than absorptivity
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && thisEcoRoof->CalcEcoRoofMyEnvrnFlag) {
@@ -823,13 +823,14 @@ namespace EcoRoofManager {
         RatioMax = 1.0 + 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
         RatioMin = 1.0 - 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
 
+        auto *thisMaterial = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
         if (state.dataEcoRoofMgr->UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE
-            state.dataEcoRoofMgr->DryCond = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
-            state.dataEcoRoofMgr->DryDens = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
-            state.dataEcoRoofMgr->DryAbsorp = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
-            state.dataEcoRoofMgr->DrySpecHeat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+            state.dataEcoRoofMgr->DryCond = thisMaterial->Conductivity;
+            state.dataEcoRoofMgr->DryDens = thisMaterial->Density;
+            state.dataEcoRoofMgr->DryAbsorp = thisMaterial->AbsorpSolar;
+            state.dataEcoRoofMgr->DrySpecHeat = thisMaterial->SpecHeat;
 
             // DETERMINE RELATIVE THICKNESS OF TWO LAYERS OF SOIL (also unchanging)
             if (SoilThickness > 0.12) {
@@ -839,7 +840,7 @@ namespace EcoRoofManager {
             }
             // This loop outputs the minimum number of time steps needed to keep the solution stable
             // The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 2) {
+            if (thisMaterial->EcoRoofCalculationMethod == 2) {
                 Real64 const depth_limit(depth_fac * std::pow(state.dataEcoRoofMgr->TopDepth + state.dataEcoRoofMgr->RootDepth, 2.07));
                 for (index1 = 1; index1 <= 20; ++index1) {
                     if (double(state.dataGlobal->MinutesPerTimeStep / index1) <= depth_limit) break;
@@ -952,7 +953,7 @@ namespace EcoRoofManager {
             Moisture = MoistureMax;
         }
 
-        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 1) {
+        if (thisMaterial->EcoRoofCalculationMethod == 1) {
 
             // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
             // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurected in the future.
@@ -1154,23 +1155,23 @@ namespace EcoRoofManager {
         // TestRatio variable is available just in case there are stability issues. If so, we can limit the amount
         // by which soil properties are allowed to vary in one time step (10% in example below).
 
-        TestRatio = SoilConductivity / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
+        TestRatio = SoilConductivity / thisMaterial->Conductivity;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity *= TestRatio;
-        SoilConductivity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
+        thisMaterial->Conductivity *= TestRatio;
+        SoilConductivity = thisMaterial->Conductivity;
 
-        TestRatio = SoilDensity / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
+        TestRatio = SoilDensity / thisMaterial->Density;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density *= TestRatio;
-        SoilDensity = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
+        thisMaterial->Density *= TestRatio;
+        SoilDensity = thisMaterial->Density;
 
-        TestRatio = SoilSpecHeat / state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+        TestRatio = SoilSpecHeat / thisMaterial->SpecHeat;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat *= TestRatio;
-        SoilSpecHeat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+        thisMaterial->SpecHeat *= TestRatio;
+        SoilSpecHeat = thisMaterial->SpecHeat;
 
         // Now call InitConductionTransferFunction with the ConstrNum as the argument. As long as the argument is
         // non-zero InitConductionTransferFunction will ONLY update this construction. If the argument is 0 it will

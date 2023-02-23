@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -138,7 +138,7 @@ namespace WindTurbine {
         if (GeneratorIndex == 0) {
             WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, state.dataWindTurbine->WindTurbineSys);
             if (WindTurbineNum == 0) {
-                ShowFatalError(state, "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName);
+                ShowFatalError(state, format("SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators {}", GeneratorName));
             }
             GeneratorIndex = WindTurbineNum;
         } else {
@@ -272,8 +272,11 @@ namespace WindTurbine {
                 windTurbine.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (windTurbine.SchedPtr == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(2) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(2) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(2),
+                                           state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 }
             }
@@ -285,8 +288,11 @@ namespace WindTurbine {
                     windTurbine.rotorType = RotorType::HorizontalAxis;
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                                    format("{}=\"{}\" invalid {}=\"{}\".",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(3),
+                                           state.dataIPShortCut->cAlphaArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -299,8 +305,11 @@ namespace WindTurbine {
                     windTurbine.controlType = ControlType::VariableSpeedVariablePitch;
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(4) + "\".");
+                                    format("{}=\"{}\" invalid {}=\"{}\".",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(4),
+                                           state.dataIPShortCut->cAlphaArgs(4)));
                     ErrorsFound = true;
                 }
             }
@@ -309,8 +318,10 @@ namespace WindTurbine {
             if (windTurbine.RatedRotorSpeed <= 0.0) {
                 if (lNumericBlanks(1)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(1) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(1)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -326,8 +337,10 @@ namespace WindTurbine {
             if (windTurbine.RotorDiameter <= 0.0) {
                 if (lNumericBlanks(2)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(2) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(2)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.1R}] must be greater than zero.",
@@ -343,8 +356,10 @@ namespace WindTurbine {
             if (windTurbine.RotorHeight <= 0.0) {
                 if (lNumericBlanks(3)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(3) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(3)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.1R}] must be greater than zero.",
@@ -371,8 +386,10 @@ namespace WindTurbine {
             if (windTurbine.RatedPower == 0.0) {
                 if (lNumericBlanks(5)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(5) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(5)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -388,8 +405,10 @@ namespace WindTurbine {
             if (windTurbine.RatedWindSpeed == 0.0) {
                 if (lNumericBlanks(6)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(6) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(6)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -405,8 +424,10 @@ namespace WindTurbine {
             if (windTurbine.CutInSpeed == 0.0) {
                 if (lNumericBlanks(7)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(7) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(7)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -422,8 +443,10 @@ namespace WindTurbine {
             if (windTurbine.CutOutSpeed == 0.0) {
                 if (lNumericBlanks(8)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(8) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(8)));
                 } else if (windTurbine.CutOutSpeed <= windTurbine.RatedWindSpeed) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than {}=[{:.2R}].",
@@ -460,8 +483,10 @@ namespace WindTurbine {
             if (windTurbine.MaxTipSpeedRatio == 0.0) {
                 if (lNumericBlanks(10)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(10) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(10)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -487,8 +512,10 @@ namespace WindTurbine {
             if (windTurbine.rotorType == RotorType::HorizontalAxis && windTurbine.MaxPowerCoeff == 0.0) {
                 if (lNumericBlanks(11)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(11) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(11)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -514,8 +541,10 @@ namespace WindTurbine {
             if (windTurbine.LocalAnnualAvgWS == 0.0) {
                 if (lNumericBlanks(12)) {
                     ShowWarningError(state,
-                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(12) +
-                                         " is necessary for accurate prediction but input is blank.");
+                                     format("{}=\"{}\" invalid {} is necessary for accurate prediction but input is blank.",
+                                            CurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(1),
+                                            cNumericFields(12)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -535,8 +564,10 @@ namespace WindTurbine {
                     windTurbine.HeightForLocalWS = DefaultH;
                     if (lNumericBlanks(13)) {
                         ShowWarningError(state,
-                                         CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(13) +
-                                             " is necessary for accurate prediction but input is blank.");
+                                         format("{}=\"{}\" invalid {} is necessary for accurate prediction but input is blank.",
+                                                CurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                cNumericFields(13)));
                         ShowContinueError(state, format("...The default value of {:.2R} will be used. for {}", DefaultH, cNumericFields(13)));
                     } else {
                         ShowSevereError(state,
@@ -554,8 +585,10 @@ namespace WindTurbine {
             if (windTurbine.rotorType == RotorType::VerticalAxis && windTurbine.ChordArea == 0.0) {
                 if (lNumericBlanks(14)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(14) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(14)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -571,8 +604,10 @@ namespace WindTurbine {
             if (windTurbine.rotorType == RotorType::VerticalAxis && windTurbine.DragCoeff == 0.0) {
                 if (lNumericBlanks(15)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(15) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(15)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -588,8 +623,10 @@ namespace WindTurbine {
             if (windTurbine.rotorType == RotorType::VerticalAxis && windTurbine.LiftCoeff == 0.0) {
                 if (lNumericBlanks(16)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(16) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cNumericFields(16)));
                 } else {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
@@ -634,7 +671,7 @@ namespace WindTurbine {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(state, CurrentModuleObject + " errors occurred in input.  Program terminates.");
+        if (ErrorsFound) ShowFatalError(state, format("{} errors occurred in input.  Program terminates.", CurrentModuleObject));
 
         for (WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum) {
             auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
@@ -787,10 +824,10 @@ namespace WindTurbine {
                                     }
                                 } else { // blank field
                                     if (!warningShown) {
-                                        ShowWarningError(
-                                            state,
-                                            "InitWindTurbine: read from " + state.files.inStatFilePath.filePath.string() +
-                                                " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
+                                        ShowWarningError(state,
+                                                         format("InitWindTurbine: read from {} file shows <365 days in weather file. Annual average "
+                                                                "wind speed used will be inaccurate.",
+                                                                state.files.inStatFilePath.filePath.string()));
                                         lineIn.data.erase(0, lnPtr + 1);
                                         warningShown = true;
                                     }
@@ -798,8 +835,9 @@ namespace WindTurbine {
                             } else { // two tabs in succession
                                 if (!warningShown) {
                                     ShowWarningError(state,
-                                                     "InitWindTurbine: read from " + state.files.inStatFilePath.filePath.string() +
-                                                         " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
+                                                     format("InitWindTurbine: read from {} file shows <365 days in weather file. Annual average wind "
+                                                            "speed used will be inaccurate.",
+                                                            state.files.inStatFilePath.filePath.string()));
                                     lineIn.data.erase(0, lnPtr + 1);
                                     warningShown = true;
                                 }
