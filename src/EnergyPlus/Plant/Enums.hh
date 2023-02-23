@@ -204,6 +204,8 @@ enum class PlantEquipmentType
     CoolingPanel_Simple,
     HeatPumpEIRCooling,
     HeatPumpEIRHeating,
+    HeatPumpFuelFiredCooling,
+    HeatPumpFuelFiredHeating,
     Num
 };
 

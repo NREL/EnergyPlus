@@ -645,7 +645,6 @@ set(SRC
     WaterToAirHeatPump.hh
     WaterToAirHeatPumpSimple.cc
     WaterToAirHeatPumpSimple.hh
-    WaterToWaterHeatPumps.hh
     WaterUse.cc
     WaterUse.hh
     WeatherManager.cc
@@ -1062,4 +1061,18 @@ if(UNIX AND NOT APPLE)
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
     COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${PROJECT_BINARY_DIR}/Products/EnergyPlus")
+
+  if (BUILD_PERFORMANCE_TESTS)
+    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/performance_tests")
+    add_custom_command(
+      TARGET energyplus
+      POST_BUILD
+      COMMAND size $<TARGET_FILE:energyplus> > "${PROJECT_BINARY_DIR}/performance_tests/size.energyplus"
+      )
+    add_custom_command(
+      TARGET energyplusapi
+      POST_BUILD
+      COMMAND size $<TARGET_FILE:energyplusapi> > "${PROJECT_BINARY_DIR}/performance_tests/size.energyplusapi"
+      )
+  endif()
 endif()
