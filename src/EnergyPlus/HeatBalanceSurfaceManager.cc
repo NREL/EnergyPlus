@@ -3311,7 +3311,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             Real64 Phi = incomingAngle.second;
 
                             std::shared_ptr<CMultiLayerScattered> aLayer =
-                                CWindowConstructionsSimplified::instance().getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum);
+                                CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum);
 
                             size_t totLayers = aLayer->getNumOfLayers();
                             for (size_t Lay = 1; Lay <= totLayers; ++Lay) {

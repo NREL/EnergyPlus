@@ -202,17 +202,12 @@ namespace WindowManager {
         return aSampleData;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWindowConstructionsSimplified
-    ///////////////////////////////////////////////////////////////////////////////
-    std::unique_ptr<CWindowConstructionsSimplified> CWindowConstructionsSimplified::p_inst = nullptr;
-
-    CWindowConstructionsSimplified &CWindowConstructionsSimplified::instance()
+    CWindowConstructionsSimplified &CWindowConstructionsSimplified::instance(EnergyPlusData &state)
     {
-        if (p_inst == nullptr) {
-            p_inst = std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
+        if (state.dataWindowManagerExterior->p_inst == nullptr) {
+            state.dataWindowManagerExterior->p_inst = std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
         }
-        return *p_inst;
+        return *state.dataWindowManagerExterior->p_inst;
     }
 
     CWindowConstructionsSimplified::CWindowConstructionsSimplified()
@@ -254,7 +249,6 @@ namespace WindowManager {
 
     void CWindowConstructionsSimplified::clearState()
     {
-        p_inst = nullptr;
     }
 
     IGU_Layers CWindowConstructionsSimplified::getLayers(EnergyPlusData &state, WavelengthRange const t_Range, int const t_ConstrNum) const
