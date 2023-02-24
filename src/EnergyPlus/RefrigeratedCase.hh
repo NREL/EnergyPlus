@@ -1547,7 +1547,7 @@ struct RefrigeratedCaseData : BaseGlobalStruct
     bool MyReferPlantScanFlag = true;
 
     // Refrigerated case variables
-    Real64 CaseRAFactor = 0.0;        // Factor determining case credit allocation (e.g. % to zone or HVAC)
+    Real64 CaseRAFactor = 0.0; // Factor determining case credit allocation (e.g. % to zone or HVAC)
 
     // Refrigeration compressor rack variables
     Real64 TotalRackDeliveredCapacity = 0.0; // Total capacity of all refrigerated cases attached to rack (W)

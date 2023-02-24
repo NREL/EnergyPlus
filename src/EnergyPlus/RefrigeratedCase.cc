@@ -7451,7 +7451,7 @@ void SetupReportInput(EnergyPlusData &state)
         // Setup Report Variables for simulated Refrigerated Case (do not report unused cases)
         // CurrentModuleObject='Refrigeration:Case'
         for (int caseNum = 1; caseNum <= state.dataRefrigCase->NumSimulationCases; ++caseNum) {
-            auto & thisCase = RefrigCase(caseNum);
+            auto &thisCase = RefrigCase(caseNum);
             if (thisCase.NumSysAttach == 1) {
                 SetupOutputVariable(state,
                                     "Refrigeration Case Evaporator Total Cooling Rate",
@@ -7632,8 +7632,7 @@ void SetupReportInput(EnergyPlusData &state)
                                     thisCase.ZoneName);
 
                 // Report defrost energy curve value only for cases having electric or hot-gas defrost with temperature termination
-                if (thisCase.defrostType == RefCaseDefrostType::ElectricTerm ||
-                    thisCase.defrostType == RefCaseDefrostType::HotFluidTerm) {
+                if (thisCase.defrostType == RefCaseDefrostType::ElectricTerm || thisCase.defrostType == RefCaseDefrostType::HotFluidTerm) {
                     SetupOutputVariable(state,
                                         "Refrigeration Case Defrost Energy Correction Curve Value",
                                         OutputProcessor::Unit::None,
@@ -7677,8 +7676,7 @@ void SetupReportInput(EnergyPlusData &state)
 
                 // Report only for cases using electric defrost
 
-                if (thisCase.defrostType == RefCaseDefrostType::Electric ||
-                    thisCase.defrostType == RefCaseDefrostType::ElectricOnDemand ||
+                if (thisCase.defrostType == RefCaseDefrostType::Electric || thisCase.defrostType == RefCaseDefrostType::ElectricOnDemand ||
                     thisCase.defrostType == RefCaseDefrostType::ElectricTerm) {
                     SetupOutputVariable(state,
                                         "Refrigeration Case Defrost Electricity Rate",
@@ -7725,7 +7723,7 @@ void SetupReportInput(EnergyPlusData &state)
         // Setup Report Variables for simulated  Walk In (do not report unused WalkIns)
         // CurrentModuleObject='Refrigeration:WalkIn'
         for (int walkInNum = 1; walkInNum <= state.dataRefrigCase->NumSimulationWalkIns; ++walkInNum) {
-            auto & walkin = WalkIn(walkInNum);
+            auto &walkin = WalkIn(walkInNum);
             if (walkin.NumSysAttach == 1) { // ensure no unuseds reported
                 SetupOutputVariable(state,
                                     "Refrigeration Walk In Evaporator Total Cooling Rate",
@@ -7934,7 +7932,7 @@ void SetupReportInput(EnergyPlusData &state)
         // Setup Report Variables for simulated Warehouse coils (do not report unused warehouse coils)
         // CurrentModuleObject='Refrigeration:AirChiller'
         for (int coilNum = 1; coilNum <= state.dataRefrigCase->NumSimulationRefrigAirChillers; ++coilNum) {
-            auto & coil = WarehouseCoil(coilNum);
+            auto &coil = WarehouseCoil(coilNum);
             if (coil.NumSysAttach == 1) { // ensure no unuseds reported
                 SetupOutputVariable(state,
                                     "Refrigeration Zone Air Chiller Total Cooling Rate",
@@ -8300,7 +8298,7 @@ void SetupReportInput(EnergyPlusData &state)
     if (state.dataRefrigCase->NumSimulationSecondarySystems > 0) {
         // CurrentModuleObject='Refrigeration:SecondarySystem'
         for (int secondNum = 1; secondNum <= state.dataRefrigCase->NumSimulationSecondarySystems; ++secondNum) {
-            auto & secondary = Secondary(secondNum);
+            auto &secondary = Secondary(secondNum);
             if (secondary.NumSysAttach == 1) {
                 if (secondary.CoilFlag) { // secondary system serves chillers and is solved on HVAC time step
                     SetupOutputVariable(state,
@@ -8505,7 +8503,7 @@ void SetupReportInput(EnergyPlusData &state)
     if (state.dataRefrigCase->NumRefrigeratedRacks > 0) {
         // CurrentModuleObject='Refrigeration:CompressorRack'
         for (int rackNum = 1; rackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++rackNum) {
-            auto & rack = RefrigRack(rackNum);
+            auto &rack = RefrigRack(rackNum);
             if (rack.CoilFlag) { // rack serves chillers and is solved on HVAC time step
                 SetupOutputVariable(state,
                                     "Refrigeration Air Chiller Compressor Rack Electricity Rate",
@@ -8876,7 +8874,7 @@ void SetupReportInput(EnergyPlusData &state)
     if (state.dataRefrigCase->NumRefrigSystems > 0) {
         // CurrentModuleObject='Refrigeration:System'
         for (int refrigSysNum = 1; refrigSysNum <= state.dataRefrigCase->NumRefrigSystems; ++refrigSysNum) {
-            auto & sys = System(refrigSysNum);
+            auto &sys = System(refrigSysNum);
             if (sys.CoilFlag) { // system serves chillers and is solved on HVAC time step
                 if (sys.NumStages == 1) {
                     SetupOutputVariable(state,
@@ -9023,7 +9021,7 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Summed,
                                         sys.Name); // indiv compressors go to meter, not system sum
-                }                                                   // NumStages
+                }                                  // NumStages
                 SetupOutputVariable(state,
                                     "Refrigeration Air Chiller System Net Rejected Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
@@ -9273,7 +9271,7 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Summed,
                                         sys.Name); // indiv compressors go to meter, not system sum
-                }                                                   // NumStages
+                }                                  // NumStages
                 SetupOutputVariable(state,
                                     "Refrigeration System Net Rejected Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
@@ -9398,7 +9396,7 @@ void SetupReportInput(EnergyPlusData &state)
 
         // Report Compressor ENERGY here, not on system level for meters.
         for (int compNum = 1; compNum <= state.dataRefrigCase->NumSimulationCompressors; ++compNum) {
-            auto & comp = Compressor(compNum);
+            auto &comp = Compressor(compNum);
             // CurrentModuleObject='Refrigeration:Compressor'
             if (comp.NumSysAttach == 1) { // only set up reports for compressors that are used once and only once
                 if (comp.CoilFlag) {      // Compressor serving system with chillers on HVAC time step
@@ -9489,7 +9487,7 @@ void SetupReportInput(EnergyPlusData &state)
 
         // Report Variables for Refrigeration Condensers
         for (int condNum = 1; condNum <= state.dataRefrigCase->NumRefrigCondensers; ++condNum) {
-            auto & cond = Condenser(condNum);
+            auto &cond = Condenser(condNum);
             // CurrentModuleObject='Refrigeration:Condenser:*'
             if (cond.CoilFlag) { // Condenser serving system with chillers on HVAC time step
                 SetupOutputVariable(state,
@@ -9842,7 +9840,7 @@ void SetupReportInput(EnergyPlusData &state)
 
         if (state.dataRefrigCase->NumSimulationSubcoolers > 0) {
             for (int subcoolNum = 1; subcoolNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++subcoolNum) {
-                auto & cooler = Subcooler(subcoolNum);
+                auto &cooler = Subcooler(subcoolNum);
                 // CurrentModuleObject='Refrigeration:Subcooler'
                 if (cooler.CoilFlag) { // Subcooler serving system with chillers on HVAC time step
                     if (cooler.subcoolerType == SubcoolerType::Mechanical) {
@@ -9887,7 +9885,7 @@ void SetupReportInput(EnergyPlusData &state)
     if (state.dataRefrigCase->NumTransRefrigSystems > 0) {
         // CurrentModuleObject='Refrigeration:TranscriticalSystem'
         for (int refrigSysNum = 1; refrigSysNum <= state.dataRefrigCase->NumTransRefrigSystems; ++refrigSysNum) {
-            auto & sys = TransSystem(refrigSysNum);
+            auto &sys = TransSystem(refrigSysNum);
             // for both SingleStage and TwoStage systems (medium temperature loads present)
             SetupOutputVariable(state,
                                 "Refrigeration Transcritical System Total High Pressure Compressor Electricity Rate",
@@ -10206,7 +10204,7 @@ void SetupReportInput(EnergyPlusData &state)
 
     if (state.dataRefrigCase->NumSimulationGasCooler > 0) {
         for (int GCNum = 1; GCNum <= state.dataRefrigCase->NumSimulationGasCooler; ++GCNum) {
-            auto & cooler = GasCooler(GCNum);
+            auto &cooler = GasCooler(GCNum);
             // CurrentModuleObject='Refrigeration:GasCooler:AirCooled'
             SetupOutputVariable(state,
                                 "Refrigeration Transcritical System Gas Cooler Heat Transfer Rate",
