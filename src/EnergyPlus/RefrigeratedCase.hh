@@ -1548,7 +1548,6 @@ struct RefrigeratedCaseData : BaseGlobalStruct
 
     // Refrigerated case variables
     Real64 CaseRAFactor = 0.0;        // Factor determining case credit allocation (e.g. % to zone or HVAC)
-    Array1D_bool ShowStockingWarning; // Used for one-time warning message for possible case input error regarding stocking
 
     // Refrigeration compressor rack variables
     Real64 TotalRackDeliveredCapacity = 0.0; // Total capacity of all refrigerated cases attached to rack (W)
@@ -1618,7 +1617,7 @@ struct RefrigeratedCaseData : BaseGlobalStruct
     Array1D<RefrigeratedCase::CoilCreditData> CoilSysCredit;
     Array1D<RefrigeratedCase::CaseWIZoneReportData> CaseWIZoneReport;
 
-    bool MyOneTimeFlag = true; // flag to skip first pass on next begin environment flag
+    bool MyEnvrnFlag = true; // flag to skip first pass on next begin environment flag
     bool InitRefrigerationMyBeginEnvrnFlag = true;
     bool InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
     bool FigureRefrigerationZoneGainsMyEnvrnFlag = true;
