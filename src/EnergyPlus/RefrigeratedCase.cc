@@ -12066,12 +12066,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                 for (int CoilIndex = 1; CoilIndex <= thisSys.NumCoils; ++CoilIndex) {
                     int CoilID = thisSys.CoilNum(CoilIndex);
                     // already CALLed CalculateCoil(CoilID) in CoilSet specified order
-                    if (thisSys.CompSuctControl == CompressorSuctionPressureCtrl::ConstantSuctionTemperature) {
-                        thisSys.TEvapNeeded = thisSys.TEvapDesign;
-                    } else { // calculate floating T evap
-                        // for now, override floating Tevap if coils on system, warning was printed in input to let user know
-                        thisSys.TEvapNeeded = thisSys.TEvapDesign;
-                    } // floating or constant evap temperature
+                    thisSys.TEvapNeeded = thisSys.TEvapDesign; // floating or constant evap temperature
                     // increment TotalCoolingLoad for Compressors/condenser on each system
                     thisSys.TotalCoolingLoad += WarehouseCoil(CoilID).TotalCoolingLoad;
                     thisSys.TotalCondDefrostCredit += WarehouseCoil(CoilID).HotDefrostCondCredit;
@@ -12407,7 +12402,7 @@ void SimulateDetailedTransRefrigSystems(EnergyPlusData &state)
     auto &GasCooler(state.dataRefrigCase->GasCooler);
     auto &WalkIn(state.dataRefrigCase->WalkIn);
 
-    int LocalTimeStep = state.dataGlobal->TimeStepZone;
+    Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
     if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
 
     //  Do transcritical CO2 refrigeration system loop outside of iterative solution to initialize time step and
