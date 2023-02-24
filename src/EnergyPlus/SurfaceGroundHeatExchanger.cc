@@ -494,11 +494,15 @@ namespace SurfaceGroundHeatExchanger {
                     this->CTFTSourceQ = state.dataConstruction->Construct(Cons).CTFTSourceQ;     // w coefficents
                     this->ConstructionNum = Cons;
                     // surface properties
-                    this->BtmRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum))->Roughness;
-                    this->TopThermAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum))->AbsorpThermal;
-                    this->TopRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->Roughness;
-                    this->TopThermAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->AbsorpThermal;
-                    this->TopSolarAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->AbsorpSolar;
+                    auto const *thisMaterialLayer = dynamic_cast<Material::MaterialChild *>(
+                        state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum)));
+                    this->BtmRoughness = thisMaterialLayer->Roughness;
+                    this->TopThermAbs = thisMaterialLayer->AbsorpThermal;
+                    auto const *thisMaterial1 =
+                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1)));
+                    this->TopRoughness = thisMaterial1->Roughness;
+                    this->TopThermAbs = thisMaterial1->AbsorpThermal;
+                    this->TopSolarAbs = thisMaterial1->AbsorpSolar;
                 }
             }
             // set one-time flag

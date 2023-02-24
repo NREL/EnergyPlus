@@ -214,7 +214,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         // Obtain thermal properties from the Material derived type
 
-        auto *thisMaterial = state.dataMaterial->Material(CurrentLayer);
+        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
 
         dl(Layer) = thisMaterial->Thickness;
         rk(Layer) = thisMaterial->Conductivity;
@@ -1910,7 +1910,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         } break;
         default: {
             static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-            Material::MaterialProperties const *mp = thisMaterial;
+            Material::MaterialBase const *mp = thisMaterial;
             print(state.files.eio, Format_701, mp->Name, mp->Thickness, mp->Conductivity, mp->Density, mp->SpecHeat, mp->Resistance);
         } break;
         }

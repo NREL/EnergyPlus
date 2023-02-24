@@ -658,14 +658,15 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             ShowContinueError(state, format("Found in {}={}", cCurrentModuleObject, state.dataPipeHT->PipeHT(Item).Name));
             ErrorsFound = true;
         } else {
-            state.dataPipeHT->PipeHT(Item).SoilDensity = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->Density;
-            state.dataPipeHT->PipeHT(Item).SoilDepth = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->Thickness;
-            state.dataPipeHT->PipeHT(Item).SoilCp = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->SpecHeat;
-            state.dataPipeHT->PipeHT(Item).SoilConductivity =
-                state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->Conductivity;
-            state.dataPipeHT->PipeHT(Item).SoilThermAbs = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->AbsorpThermal;
-            state.dataPipeHT->PipeHT(Item).SoilSolarAbs = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->AbsorpSolar;
-            state.dataPipeHT->PipeHT(Item).SoilRoughness = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->Roughness;
+            auto const *thisMaterialSoil =
+                dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum));
+            state.dataPipeHT->PipeHT(Item).SoilDensity = thisMaterialSoil->Density;
+            state.dataPipeHT->PipeHT(Item).SoilDepth = thisMaterialSoil->Thickness;
+            state.dataPipeHT->PipeHT(Item).SoilCp = thisMaterialSoil->SpecHeat;
+            state.dataPipeHT->PipeHT(Item).SoilConductivity = thisMaterialSoil->Conductivity;
+            state.dataPipeHT->PipeHT(Item).SoilThermAbs = thisMaterialSoil->AbsorpThermal;
+            state.dataPipeHT->PipeHT(Item).SoilSolarAbs = thisMaterialSoil->AbsorpSolar;
+            state.dataPipeHT->PipeHT(Item).SoilRoughness = thisMaterialSoil->Roughness;
             state.dataPipeHT->PipeHT(Item).PipeDepth = state.dataPipeHT->PipeHT(Item).SoilDepth + state.dataPipeHT->PipeHT(Item).PipeID / 2.0;
             state.dataPipeHT->PipeHT(Item).DomainDepth = state.dataPipeHT->PipeHT(Item).PipeDepth * 2.0;
             state.dataPipeHT->PipeHT(Item).SoilDiffusivity = state.dataPipeHT->PipeHT(Item).SoilConductivity /

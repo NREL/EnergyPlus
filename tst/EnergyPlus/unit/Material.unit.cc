@@ -110,16 +110,16 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     for (int i = 0; i < 3; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
+        Material::MaterialBase *p = new Material::MaterialChild;
         state->dataMaterial->Material.push_back(p);
     }
-    auto *thisMaterial_1 = state->dataMaterial->Material(1);
-    auto *thisMaterial_2 = state->dataMaterial->Material(2);
-    auto *thisMaterial_3 = state->dataMaterial->Material(3);
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
     thisMaterial_1->Name = "WALL_1";
     thisMaterial_1->Group = Material::MaterialGroup::RegularMaterial;
+    auto *thisMaterial_2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
     thisMaterial_2->Name = "WALL_2";
     thisMaterial_2->Group = Material::MaterialGroup::RegularMaterial;
+    auto *thisMaterial_3 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(3));
     thisMaterial_3->Name = "WALL_3";
     thisMaterial_3->Group = Material::MaterialGroup::RegularMaterial;
     state->dataCurveManager->allocateCurveVector(2);
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
         ";                        !- Solar Absorptance Schedule Name",
     });
     ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
-    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::WindowGlass;
+    thisMaterial_1->Group = Material::MaterialGroup::WindowGlass;
     Material::GetVariableAbsorptanceInput(*state, errors_found);
     compare_err_stream(
         "   ** Severe  ** MaterialProperty:VariableAbsorptance: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, "

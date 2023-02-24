@@ -2645,8 +2645,9 @@ namespace SurfaceGeometry {
                         // Use the new generic code (assuming only one blind) as follows
                         for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                             iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
-                            if (state.dataMaterial->Material(iTmp2)->Group == Material::MaterialGroup::WindowBlind) {
-                                BlNum = state.dataMaterial->Material(iTmp2)->BlindDataPtr;
+                            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iTmp2));
+                            if (thisMaterial->Group == Material::MaterialGroup::WindowBlind) {
+                                BlNum = thisMaterial->BlindDataPtr;
                                 state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
                                 // TH 2/18/2010. CR 8010
                                 // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
@@ -2656,7 +2657,7 @@ namespace SurfaceGeometry {
                                     errFlag = false;
                                     AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
                                     // point to the new blind
-                                    state.dataMaterial->Material(iTmp2)->BlindDataPtr = BlNumNew;
+                                    thisMaterial->BlindDataPtr = BlNumNew;
                                     // window surface points to new blind
                                     state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNumNew;
                                 }
@@ -6268,8 +6269,8 @@ namespace SurfaceGeometry {
             if (ConstrNum > 0) {
                 for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-                    if (state.dataMaterial->Material(LayerPtr)->Group == Material::MaterialGroup::WindowGlass &&
-                        state.dataMaterial->Material(LayerPtr)->GlassTransDirtFactor < 1.0) {
+                    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(LayerPtr));
+                    if (thisMaterial->Group == Material::MaterialGroup::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, format("{}: Interior Window or GlassDoor {} has a glass layer with", cRoutineName, SubSurfaceName));
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError(state, "A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
@@ -11079,7 +11080,7 @@ namespace SurfaceGeometry {
                     MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(2);
                     if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers == 3)
                         MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(4);
-                    if (state.dataMaterial->Material(MatGapFlow)->gasTypes(1) != Material::GasType::Air) {
+                    if (dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow))->gasTypes(1) != Material::GasType::Air) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", Gas type not air in airflow gap of construction {}",
@@ -11101,8 +11102,10 @@ namespace SurfaceGeometry {
                                     MatGapFlow1 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(4);
                                     MatGapFlow2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(6);
                                 }
-                                if (state.dataMaterial->Material(MatGapFlow1)->gasTypes(1) != Material::GasType::Air ||
-                                    state.dataMaterial->Material(MatGapFlow2)->gasTypes(1) != Material::GasType::Air) {
+                                if (dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow1))->gasTypes(1) !=
+                                        Material::GasType::Air ||
+                                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow2))->gasTypes(1) !=
+                                        Material::GasType::Air) {
                                     ErrorsFound = true;
                                     ShowSevereError(state,
                                                     format("{}=\"{}\", gas type must be air on either side of the shade/blind",
@@ -13969,84 +13972,87 @@ namespace SurfaceGeometry {
 
             state.dataConstruction->Construct(ConstrNewSh).LayerPoint = 0;
 
+            auto const *thisMaterialSh = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShDevNum));
+            auto &thisConstructNewSh = state.dataConstruction->Construct(ConstrNewSh);
             if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntShade ||
                 state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntBlind) {
                 // Interior shading device
-                state.dataConstruction->Construct(ConstrNewSh).LayerPoint({1, TotLayersOld}) =
-                    state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
-                state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew) = ShDevNum;
-                state.dataConstruction->Construct(ConstrNewSh).InsideAbsorpSolar = state.dataMaterial->Material(ShDevNum)->AbsorpSolar;
-                state.dataConstruction->Construct(ConstrNewSh).OutsideAbsorpSolar =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1))->AbsorpSolar;
-                state.dataConstruction->Construct(ConstrNewSh).OutsideAbsorpThermal =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1))->AbsorpThermalFront;
+                thisConstructNewSh.LayerPoint({1, TotLayersOld}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
+                thisConstructNewSh.LayerPoint(TotLayersNew) = ShDevNum;
+                thisConstructNewSh.InsideAbsorpSolar = thisMaterialSh->AbsorpSolar;
+                auto const *thisMaterialShLayer1 = dynamic_cast<const Material::MaterialChild *>(
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1)));
+                thisConstructNewSh.OutsideAbsorpSolar = thisMaterialShLayer1->AbsorpSolar;
+                thisConstructNewSh.OutsideAbsorpThermal = thisMaterialShLayer1->AbsorpThermalFront;
             } else {
                 // Exterior shading device
-                state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1) = ShDevNum;
-                state.dataConstruction->Construct(ConstrNewSh).LayerPoint({2, TotLayersNew}) =
-                    state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
-                state.dataConstruction->Construct(ConstrNewSh).InsideAbsorpSolar =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew))->AbsorpSolar;
-                state.dataConstruction->Construct(ConstrNewSh).OutsideAbsorpSolar = state.dataMaterial->Material(ShDevNum)->AbsorpSolar;
-                state.dataConstruction->Construct(ConstrNewSh).OutsideAbsorpThermal = state.dataMaterial->Material(ShDevNum)->AbsorpThermalFront;
+                thisConstructNewSh.LayerPoint(1) = ShDevNum;
+                thisConstructNewSh.LayerPoint({2, TotLayersNew}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
+                auto const *thisMaterialShInside = dynamic_cast<const Material::MaterialChild *>(
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew)));
+                thisConstructNewSh.InsideAbsorpSolar = thisMaterialShInside->AbsorpSolar;
+                thisConstructNewSh.OutsideAbsorpSolar = thisMaterialSh->AbsorpSolar;
+                thisConstructNewSh.OutsideAbsorpThermal = thisMaterialSh->AbsorpThermalFront;
             }
             // The following InsideAbsorpThermal applies only to inside glass; it is corrected
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
-            state.dataConstruction->Construct(ConstrNewSh).InsideAbsorpThermal =
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld))->AbsorpThermalBack;
-            state.dataConstruction->Construct(ConstrNewSh).OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-            state.dataConstruction->Construct(ConstrNewSh).DayltPropPtr = 0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFCross = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFFlux = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFInside = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFOutside = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFSourceIn = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFSourceOut = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTimeStep = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTSourceOut = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTSourceIn = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTSourceQ = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTUserOut = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTUserIn = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTUserSource = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).NumHistories = 0;
-            state.dataConstruction->Construct(ConstrNewSh).NumCTFTerms = 0;
-            state.dataConstruction->Construct(ConstrNewSh).UValue = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).SourceSinkPresent = false;
-            state.dataConstruction->Construct(ConstrNewSh).SolutionDimensions = 0;
-            state.dataConstruction->Construct(ConstrNewSh).SourceAfterLayer = 0;
-            state.dataConstruction->Construct(ConstrNewSh).TempAfterLayer = 0;
-            state.dataConstruction->Construct(ConstrNewSh).ThicknessPerpend = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsDiff = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsDiffBack = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsDiffShade = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsDiffBackShade = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ShadeAbsorpThermal = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsBeamShadeCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).TransDiff = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).TransDiffVis = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflectSolDiffBack = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflectSolDiffFront = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflectVisDiffBack = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflectVisDiffFront = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).TransSolBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).TransVisBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflSolBeamFrontCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflSolBeamBackCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).W5FrameDivider = 0;
-            state.dataConstruction->Construct(ConstrNewSh).FromWindow5DataFile = false;
+            thisConstructNewSh.InsideAbsorpThermal =
+                dynamic_cast<Material::MaterialChild *>(
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld)))
+                    ->AbsorpThermalBack;
+            thisConstructNewSh.OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+            thisConstructNewSh.DayltPropPtr = 0;
+            thisConstructNewSh.CTFCross = 0.0;
+            thisConstructNewSh.CTFFlux = 0.0;
+            thisConstructNewSh.CTFInside = 0.0;
+            thisConstructNewSh.CTFOutside = 0.0;
+            thisConstructNewSh.CTFSourceIn = 0.0;
+            thisConstructNewSh.CTFSourceOut = 0.0;
+            thisConstructNewSh.CTFTimeStep = 0.0;
+            thisConstructNewSh.CTFTSourceOut = 0.0;
+            thisConstructNewSh.CTFTSourceIn = 0.0;
+            thisConstructNewSh.CTFTSourceQ = 0.0;
+            thisConstructNewSh.CTFTUserOut = 0.0;
+            thisConstructNewSh.CTFTUserIn = 0.0;
+            thisConstructNewSh.CTFTUserSource = 0.0;
+            thisConstructNewSh.NumHistories = 0;
+            thisConstructNewSh.NumCTFTerms = 0;
+            thisConstructNewSh.UValue = 0.0;
+            thisConstructNewSh.SourceSinkPresent = false;
+            thisConstructNewSh.SolutionDimensions = 0;
+            thisConstructNewSh.SourceAfterLayer = 0;
+            thisConstructNewSh.TempAfterLayer = 0;
+            thisConstructNewSh.ThicknessPerpend = 0.0;
+            thisConstructNewSh.AbsDiff = 0.0;
+            thisConstructNewSh.AbsDiffBack = 0.0;
+            thisConstructNewSh.AbsDiffShade = 0.0;
+            thisConstructNewSh.AbsDiffBackShade = 0.0;
+            thisConstructNewSh.ShadeAbsorpThermal = 0.0;
+            thisConstructNewSh.AbsBeamShadeCoef = 0.0;
+            thisConstructNewSh.TransDiff = 0.0;
+            thisConstructNewSh.TransDiffVis = 0.0;
+            thisConstructNewSh.ReflectSolDiffBack = 0.0;
+            thisConstructNewSh.ReflectSolDiffFront = 0.0;
+            thisConstructNewSh.ReflectVisDiffBack = 0.0;
+            thisConstructNewSh.ReflectVisDiffFront = 0.0;
+            thisConstructNewSh.TransSolBeamCoef = 0.0;
+            thisConstructNewSh.TransVisBeamCoef = 0.0;
+            thisConstructNewSh.ReflSolBeamFrontCoef = 0.0;
+            thisConstructNewSh.ReflSolBeamBackCoef = 0.0;
+            thisConstructNewSh.W5FrameDivider = 0;
+            thisConstructNewSh.FromWindow5DataFile = false;
 
-            state.dataConstruction->Construct(ConstrNewSh).Name = ConstrNameSh;
-            state.dataConstruction->Construct(ConstrNewSh).TotLayers = TotLayersNew;
-            state.dataConstruction->Construct(ConstrNewSh).TotSolidLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers + 1;
-            state.dataConstruction->Construct(ConstrNewSh).TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
-            state.dataConstruction->Construct(ConstrNewSh).TypeIsWindow = true;
-            state.dataConstruction->Construct(ConstrNewSh).IsUsed = true;
+            thisConstructNewSh.Name = ConstrNameSh;
+            thisConstructNewSh.TotLayers = TotLayersNew;
+            thisConstructNewSh.TotSolidLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers + 1;
+            thisConstructNewSh.TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
+            thisConstructNewSh.TypeIsWindow = true;
+            thisConstructNewSh.IsUsed = true;
 
             for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
                 for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
-                    state.dataConstruction->Construct(ConstrNewSh).AbsBeamCoef(Layer)(index) = 0.0;
-                    state.dataConstruction->Construct(ConstrNewSh).AbsBeamBackCoef(Layer)(index) = 0.0;
+                    thisConstructNewSh.AbsBeamCoef(Layer)(index) = 0.0;
+                    thisConstructNewSh.AbsBeamBackCoef(Layer)(index) = 0.0;
                 }
             }
         }
@@ -14140,9 +14146,8 @@ namespace SurfaceGeometry {
             // Create new material
             state.dataMaterial->TotMaterials = state.dataMaterial->TotMaterials + 1;
             newAirMaterial = state.dataMaterial->TotMaterials;
-            Material::MaterialProperties *p = new Material::MaterialProperties;
-            state.dataMaterial->Material.push_back(p);
-            auto *thisMaterial = state.dataMaterial->Material(state.dataMaterial->TotMaterials);
+            auto *thisMaterial = new Material::MaterialChild;
+            state.dataMaterial->Material.push_back(thisMaterial);
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
             thisMaterial->Group = Material::MaterialGroup::WindowGas;
@@ -14221,82 +14226,78 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
+            auto &thisConstruct = state.dataConstruction->Construct(state.dataHeatBal->TotConstructs);
             // these Construct arrays dimensioned based on MaxSolidWinLayers
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
+            thisConstruct.setArraysBasedOnMaxSolidWinLayers(state);
 
             int TotLayersOld = state.dataConstruction->Construct(oldConstruction).TotLayers;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint({1, Construction::MaxLayersInConstruct}) = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(1) = stormMaterial;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(2) = gapMaterial;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint({3, TotLayersOld + 2}) =
-                state.dataConstruction->Construct(oldConstruction).LayerPoint({1, TotLayersOld});
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).Name = name;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotLayers = TotLayersOld + 2;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotSolidLayers =
-                state.dataConstruction->Construct(oldConstruction).TotSolidLayers + 1;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotGlassLayers =
-                state.dataConstruction->Construct(oldConstruction).TotGlassLayers + 1;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TypeIsWindow = true;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).InsideAbsorpVis = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideAbsorpVis = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).InsideAbsorpSolar = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideAbsorpSolar = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).InsideAbsorpThermal =
-                state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideAbsorpThermal =
-                state.dataMaterial->Material(stormMaterial)->AbsorpThermalFront;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).DayltPropPtr = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFCross = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFFlux = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFInside = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFOutside = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFSourceIn = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFSourceOut = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTimeStep = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTSourceOut = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTSourceIn = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTSourceQ = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTUserOut = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTUserIn = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTUserSource = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).NumHistories = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).NumCTFTerms = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).UValue = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).SourceSinkPresent = false;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).SolutionDimensions = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).SourceAfterLayer = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TempAfterLayer = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ThicknessPerpend = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffIn = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffOut = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiff = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffBack = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffShade = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffBackShade = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ShadeAbsorpThermal = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamShadeCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransDiff = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransDiffVis = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflectSolDiffBack = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflectSolDiffFront = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflectVisDiffBack = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflectVisDiffFront = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransSolBeamCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransVisBeamCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflSolBeamFrontCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflSolBeamBackCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FrameDivider = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).FromWindow5DataFile = false;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionWidth = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionOrientation =
-                DataWindowEquivalentLayer::Orientation::Invalid;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysWidth = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysHeight = 0.0;
+            thisConstruct.LayerPoint({1, Construction::MaxLayersInConstruct}) = 0;
+            thisConstruct.LayerPoint(1) = stormMaterial;
+            thisConstruct.LayerPoint(2) = gapMaterial;
+            thisConstruct.LayerPoint({3, TotLayersOld + 2}) = state.dataConstruction->Construct(oldConstruction).LayerPoint({1, TotLayersOld});
+            thisConstruct.Name = name;
+            thisConstruct.TotLayers = TotLayersOld + 2;
+            thisConstruct.TotSolidLayers = state.dataConstruction->Construct(oldConstruction).TotSolidLayers + 1;
+            thisConstruct.TotGlassLayers = state.dataConstruction->Construct(oldConstruction).TotGlassLayers + 1;
+            thisConstruct.TypeIsWindow = true;
+            thisConstruct.InsideAbsorpVis = 0.0;
+            thisConstruct.OutsideAbsorpVis = 0.0;
+            thisConstruct.InsideAbsorpSolar = 0.0;
+            thisConstruct.OutsideAbsorpSolar = 0.0;
+            thisConstruct.InsideAbsorpThermal = state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
+            thisConstruct.OutsideAbsorpThermal =
+                dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(stormMaterial))->AbsorpThermalFront;
+            thisConstruct.OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+            thisConstruct.DayltPropPtr = 0;
+            thisConstruct.CTFCross = 0.0;
+            thisConstruct.CTFFlux = 0.0;
+            thisConstruct.CTFInside = 0.0;
+            thisConstruct.CTFOutside = 0.0;
+            thisConstruct.CTFSourceIn = 0.0;
+            thisConstruct.CTFSourceOut = 0.0;
+            thisConstruct.CTFTimeStep = 0.0;
+            thisConstruct.CTFTSourceOut = 0.0;
+            thisConstruct.CTFTSourceIn = 0.0;
+            thisConstruct.CTFTSourceQ = 0.0;
+            thisConstruct.CTFTUserOut = 0.0;
+            thisConstruct.CTFTUserIn = 0.0;
+            thisConstruct.CTFTUserSource = 0.0;
+            thisConstruct.NumHistories = 0;
+            thisConstruct.NumCTFTerms = 0;
+            thisConstruct.UValue = 0.0;
+            thisConstruct.SourceSinkPresent = false;
+            thisConstruct.SolutionDimensions = 0;
+            thisConstruct.SourceAfterLayer = 0;
+            thisConstruct.TempAfterLayer = 0;
+            thisConstruct.ThicknessPerpend = 0.0;
+            thisConstruct.AbsDiffIn = 0.0;
+            thisConstruct.AbsDiffOut = 0.0;
+            thisConstruct.AbsDiff = 0.0;
+            thisConstruct.AbsDiffBack = 0.0;
+            thisConstruct.AbsDiffShade = 0.0;
+            thisConstruct.AbsDiffBackShade = 0.0;
+            thisConstruct.ShadeAbsorpThermal = 0.0;
+            thisConstruct.AbsBeamShadeCoef = 0.0;
+            thisConstruct.TransDiff = 0.0;
+            thisConstruct.TransDiffVis = 0.0;
+            thisConstruct.ReflectSolDiffBack = 0.0;
+            thisConstruct.ReflectSolDiffFront = 0.0;
+            thisConstruct.ReflectVisDiffBack = 0.0;
+            thisConstruct.ReflectVisDiffFront = 0.0;
+            thisConstruct.TransSolBeamCoef = 0.0;
+            thisConstruct.TransVisBeamCoef = 0.0;
+            thisConstruct.ReflSolBeamFrontCoef = 0.0;
+            thisConstruct.ReflSolBeamBackCoef = 0.0;
+            thisConstruct.W5FrameDivider = 0;
+            thisConstruct.FromWindow5DataFile = false;
+            thisConstruct.W5FileMullionWidth = 0.0;
+            thisConstruct.W5FileMullionOrientation = DataWindowEquivalentLayer::Orientation::Invalid;
+            thisConstruct.W5FileGlazingSysWidth = 0.0;
+            thisConstruct.W5FileGlazingSysHeight = 0.0;
             for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
                 for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
-                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamCoef(Layer)(index) = 0.0;
-                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamBackCoef(Layer)(index) = 0.0;
+                    thisConstruct.AbsBeamCoef(Layer)(index) = 0.0;
+                    thisConstruct.AbsBeamBackCoef(Layer)(index) = 0.0;
                 }
             }
         }
@@ -16072,8 +16073,8 @@ namespace SurfaceGeometry {
         for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
             auto &thisConstLayer(state.dataConstruction->Construct(ConstrNum).LayerPoint(LayerNo));
             auto &revConstLayer(state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
-            auto *thisMatLay(state.dataMaterial->Material(thisConstLayer));
-            auto *revMatLay(state.dataMaterial->Material(revConstLayer));
+            auto *thisMatLay(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstLayer)));
+            auto *revMatLay(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(revConstLayer)));
             if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
                 (thisMatLay->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
                 (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||  // to have certain properties flipped from front to back

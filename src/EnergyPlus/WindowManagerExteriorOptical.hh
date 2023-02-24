@@ -81,10 +81,10 @@ namespace WindowManager {
     Real64 GetVisibleTransDirectHemispherical(EnergyPlusData &state, int ConstrNum);
 
     std::shared_ptr<SingleLayerOptics::CBSDFLayer>
-    getBSDFLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+    getBSDFLayer(EnergyPlusData &state, const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     SingleLayerOptics::CScatteringLayer
-    getScatteringLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+    getScatteringLayer(EnergyPlusData &state, const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEMaterialFactory
@@ -93,14 +93,14 @@ namespace WindowManager {
     {
     public:
         virtual ~CWCEMaterialFactory() = default;
-        CWCEMaterialFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCEMaterialFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
         std::shared_ptr<SingleLayerOptics::CMaterial> getMaterial(EnergyPlusData &state);
 
     protected:
         virtual void init(EnergyPlusData &state) = 0;
         std::shared_ptr<SingleLayerOptics::CMaterial> m_Material;
-        Material::MaterialProperties m_MaterialProperties;
+        Material::MaterialBase m_MaterialPropertiesBase;
         FenestrationCommon::WavelengthRange m_Range;
         bool m_Initialized;
     };
@@ -111,7 +111,7 @@ namespace WindowManager {
     class CWCESpecularMaterialsFactory : public CWCEMaterialFactory
     {
     public:
-        CWCESpecularMaterialsFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCESpecularMaterialsFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     private:
         void init(EnergyPlusData &state) override;
@@ -125,7 +125,7 @@ namespace WindowManager {
         // Common interface class for devices with materials defined over visible and solar range.
         // It is mainly intended from shading devices.
     public:
-        CWCEMaterialDualBandFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCEMaterialDualBandFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     protected:
         void init([[maybe_unused]] EnergyPlusData &state) override;
@@ -139,7 +139,7 @@ namespace WindowManager {
     class CWCEVenetianBlindMaterialsFactory : public CWCEMaterialDualBandFactory
     {
     public:
-        CWCEVenetianBlindMaterialsFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCEVenetianBlindMaterialsFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     private:
         std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createVisibleRangeMaterial(EnergyPlusData &state) override;
@@ -152,7 +152,7 @@ namespace WindowManager {
     class CWCEScreenMaterialsFactory : public CWCEMaterialDualBandFactory
     {
     public:
-        CWCEScreenMaterialsFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCEScreenMaterialsFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     private:
         std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createVisibleRangeMaterial(EnergyPlusData &state) override;
@@ -165,7 +165,7 @@ namespace WindowManager {
     class CWCEDiffuseShadeMaterialsFactory : public CWCEMaterialDualBandFactory
     {
     public:
-        CWCEDiffuseShadeMaterialsFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCEDiffuseShadeMaterialsFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     private:
         std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createVisibleRangeMaterial(EnergyPlusData &state) override;
@@ -179,12 +179,12 @@ namespace WindowManager {
     {
     public:
         virtual ~IWCECellDescriptionFactory() = default;
-        IWCECellDescriptionFactory(const Material::MaterialProperties &t_Material);
+        IWCECellDescriptionFactory(const Material::MaterialBase &t_Material);
 
         virtual std::shared_ptr<SingleLayerOptics::ICellDescription> getCellDescription(EnergyPlusData &state) = 0;
 
     protected:
-        Material::MaterialProperties m_Material;
+        Material::MaterialBase m_MaterialBase;
     };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -193,7 +193,7 @@ namespace WindowManager {
     class CWCESpecularCellFactory : public IWCECellDescriptionFactory
     {
     public:
-        explicit CWCESpecularCellFactory(const Material::MaterialProperties &t_Material);
+        explicit CWCESpecularCellFactory(const Material::MaterialBase &t_Material);
 
         std::shared_ptr<SingleLayerOptics::ICellDescription> getCellDescription(EnergyPlusData &state) override;
     };
@@ -204,7 +204,7 @@ namespace WindowManager {
     class CWCEVenetianBlindCellFactory : public IWCECellDescriptionFactory
     {
     public:
-        CWCEVenetianBlindCellFactory(const Material::MaterialProperties &t_Material);
+        CWCEVenetianBlindCellFactory(const Material::MaterialBase &t_Material);
 
         std::shared_ptr<SingleLayerOptics::ICellDescription> getCellDescription(EnergyPlusData &state) override;
     };
@@ -215,7 +215,7 @@ namespace WindowManager {
     class CWCEScreenCellFactory : public IWCECellDescriptionFactory
     {
     public:
-        CWCEScreenCellFactory(const Material::MaterialProperties &t_Material);
+        CWCEScreenCellFactory(const Material::MaterialBase &t_Material);
 
         std::shared_ptr<SingleLayerOptics::ICellDescription> getCellDescription(EnergyPlusData &state) override;
     };
@@ -226,7 +226,7 @@ namespace WindowManager {
     class CWCEDiffuseShadeCellFactory : public IWCECellDescriptionFactory
     {
     public:
-        CWCEDiffuseShadeCellFactory(const Material::MaterialProperties &t_Material);
+        CWCEDiffuseShadeCellFactory(const Material::MaterialBase &t_Material);
 
         std::shared_ptr<SingleLayerOptics::ICellDescription> getCellDescription(EnergyPlusData &state) override;
     };
@@ -238,7 +238,7 @@ namespace WindowManager {
     {
     public:
         virtual ~CWCELayerFactory() = default;
-        CWCELayerFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCELayerFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
         std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer(EnergyPlusData &state);
         SingleLayerOptics::CScatteringLayer getLayer(EnergyPlusData &state);
@@ -250,7 +250,7 @@ namespace WindowManager {
         virtual void createMaterialFactory() = 0;
         std::shared_ptr<SingleLayerOptics::ICellDescription> getCellDescription(EnergyPlusData &state) const;
 
-        const Material::MaterialProperties m_Material;
+        const Material::MaterialBase m_MaterialBase;
         const FenestrationCommon::WavelengthRange m_Range;
         bool m_BSDFInitialized;
         bool m_SimpleInitialized;
@@ -267,7 +267,7 @@ namespace WindowManager {
     class CWCESpecularLayerFactory : public CWCELayerFactory
     {
     public:
-        CWCESpecularLayerFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCESpecularLayerFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     private:
         void createMaterialFactory() override;
@@ -279,7 +279,7 @@ namespace WindowManager {
     class CWCEVenetianBlindLayerFactory : public CWCELayerFactory
     {
     public:
-        CWCEVenetianBlindLayerFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCEVenetianBlindLayerFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     private:
         void createMaterialFactory() override;
@@ -291,7 +291,7 @@ namespace WindowManager {
     class CWCEScreenLayerFactory : public CWCELayerFactory
     {
     public:
-        CWCEScreenLayerFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCEScreenLayerFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     private:
         void createMaterialFactory() override;
@@ -303,7 +303,7 @@ namespace WindowManager {
     class CWCEDiffuseShadeLayerFactory : public CWCELayerFactory
     {
     public:
-        CWCEDiffuseShadeLayerFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
+        CWCEDiffuseShadeLayerFactory(const Material::MaterialBase &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     private:
         void createMaterialFactory() override;

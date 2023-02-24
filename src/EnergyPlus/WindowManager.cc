@@ -350,7 +350,7 @@ namespace WindowManager {
 
             TotLay = thisConstruct.TotLayers;
 
-            auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+            auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)));
 
             // First layer must be glass, shade, screen or blind to be a glazing construction
             if (thisMaterial->Group != Material::MaterialGroup::WindowGlass && thisMaterial->Group != Material::MaterialGroup::Shade &&
@@ -401,28 +401,30 @@ namespace WindowManager {
             if (thisMaterial->Group == Material::MaterialGroup::WindowBlind) {
                 ExtBlind = true;
                 ShadeLayNum = 1;
-                BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
+                BlNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum)))->BlindDataPtr;
             } else if (state.dataMaterial->Material(thisConstruct.LayerPoint(TotLay))->Group == Material::MaterialGroup::WindowBlind) {
                 IntBlind = true;
                 ShadeLayNum = TotLay;
-                BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
+                BlNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum)))->BlindDataPtr;
             } else if (thisConstruct.TotLayers == 5) {
                 if (state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group == Material::MaterialGroup::WindowBlind) {
                     BGBlind = true;
                     ShadeLayNum = 3;
-                    BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
+                    BlNum =
+                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum)))->BlindDataPtr;
                 }
             } else if (thisConstruct.TotLayers == 7) {
                 if (state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group == Material::MaterialGroup::WindowBlind) {
                     BGBlind = true;
                     ShadeLayNum = 5;
-                    BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
+                    BlNum =
+                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum)))->BlindDataPtr;
                 }
             }
 
             if (thisMaterial->Group == Material::MaterialGroup::Screen) {
                 ShadeLayNum = 1;
-                ScNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->ScreenDataPtr;
+                ScNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum)))->ScreenDataPtr;
                 //   Disregard orphaned constructs with exterior screen
                 if (ScNum == 0) continue;
                 ExtScreen = true;
@@ -439,7 +441,7 @@ namespace WindowManager {
 
             if (IntShade || ExtShade || ExtScreen) {
                 ShadeLayPtr = thisConstruct.LayerPoint(ShadeLayNum);
-                auto const *thisMaterialShade = state.dataMaterial->Material(ShadeLayPtr);
+                auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr));
                 if (ExtScreen) {
                     TauShIR = state.dataHeatBal->SurfaceScreens(ScNum).DifDifTrans;
                 } else {
@@ -448,9 +450,11 @@ namespace WindowManager {
                 EpsShIR = thisMaterialShade->AbsorpThermal;
                 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                 if (ExtShade || ExtScreen) { // Exterior shade or screen
-                    EpsGlIR = state.dataMaterial->Material(thisConstruct.LayerPoint(2))->AbsorpThermalFront;
+                    EpsGlIR =
+                        dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(2)))->AbsorpThermalFront;
                 } else { // Interior shade
-                    EpsGlIR = state.dataMaterial->Material(thisConstruct.LayerPoint(TotLay - 1))->AbsorpThermalBack;
+                    EpsGlIR = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(TotLay - 1)))
+                                  ->AbsorpThermalBack;
                 }
                 RhoGlIR = max(0.0, 1.0 - EpsGlIR);
                 thisConstruct.ShadeAbsorpThermal = EpsShIR * (1.0 + TauShIR * RhoGlIR / (1.0 - RhoShIR * RhoGlIR));
@@ -494,7 +498,7 @@ namespace WindowManager {
 
                 state.dataWindowManager->LayerNum[IGlass - 1] = LayNum;
                 LayPtr = thisConstruct.LayerPoint(LayNum);
-                auto *thisMaterial = state.dataMaterial->Material(LayPtr);
+                auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
                 SpecDataNum = thisMaterial->GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
                     if (!state.dataWindowManager->BGFlag) AllGlassIsSpectralAverage = false;
@@ -647,7 +651,7 @@ namespace WindowManager {
                 // from properties at normal incidence
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     LayPtr = thisConstruct.LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
-                    auto *thisMaterial = state.dataMaterial->Material(LayPtr);
+                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
                     if (!thisMaterial->GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass - 1]; ++ILam) {
                             TransAndReflAtPhi(CosPhi,
@@ -787,7 +791,7 @@ namespace WindowManager {
                 }
                 state.dataWindowManager->LayerNum[IGlass - 1] = LayNum;
                 LayPtr = thisConstruct.LayerPoint(LayNum);
-                auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
+                auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
 
                 SpecDataNum = thisMaterial->GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
@@ -845,7 +849,7 @@ namespace WindowManager {
                 // from properties at normal incidence
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     LayPtr = thisConstruct.LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
-                    auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
+                    auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
                     if (!thisMaterial->GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass - 1]; ++ILam) {
 
@@ -914,11 +918,13 @@ namespace WindowManager {
                 for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
 
                     if (ShadeOn) {
-                        ShadeAbs = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->AbsorpSolar;
-                        ShadeTrans = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->Trans;
-                        ShadeTransVis = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->TransVis;
-                        ShadeRefl = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->ReflectShade;
-                        ShadeReflVis = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->ReflectShadeVis;
+                        auto const *thisMaterialSh =
+                            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum)));
+                        ShadeAbs = thisMaterialSh->AbsorpSolar;
+                        ShadeTrans = thisMaterialSh->Trans;
+                        ShadeTransVis = thisMaterialSh->TransVis;
+                        ShadeRefl = thisMaterialSh->ReflectShade;
+                        ShadeReflVis = thisMaterialSh->ReflectShadeVis;
                         rsh = ShadeRefl;
                         rshv = ShadeReflVis;
                         tsh = ShadeTrans;
@@ -1462,26 +1468,27 @@ namespace WindowManager {
             TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
             IntShade = false;
             IntBlind = false;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
-                Material::MaterialGroup::Shade) {
+            auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)));
+            if (thisMaterial->Group == Material::MaterialGroup::Shade) {
                 IntShade = true;
                 ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
-                Material::MaterialGroup::WindowBlind) {
+            if (thisMaterial->Group == Material::MaterialGroup::WindowBlind) {
                 IntBlind = true;
-                BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->BlindDataPtr;
+                BlNum = thisMaterial->BlindDataPtr;
             }
 
             if (IntShade || IntBlind) {
                 for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
                     if (IntShade || IntBlind) {
-                        EpsGlIR =
-                            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
+                        EpsGlIR = dynamic_cast<const Material::MaterialChild *>(
+                                      state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1)))
+                                      ->AbsorpThermalBack;
                         RhoGlIR = 1 - EpsGlIR;
                     }
                     if (IntShade) {
-                        auto const *thisMaterialShade = state.dataMaterial->Material(ShadeLayPtr);
+                        auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr));
                         TauShIR = thisMaterialShade->TransThermal;
                         EpsShIR = thisMaterialShade->AbsorpThermal;
                         RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
@@ -1680,7 +1687,7 @@ namespace WindowManager {
                 state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment && state.dataSurface->SurfWinStormWinConstr(SurfNum) == 0) {
                 ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-                auto const *thisMaterial = state.dataMaterial->Material(MatNum);
+                auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
                 if (thisMaterial->SolarDiffusing) {
                     if (!state.dataSurface->Surface(SurfNum).HasShadeControl) {
                         state.dataSurface->SurfWinSolarDiffusing(SurfNum) = true;
@@ -2216,7 +2223,9 @@ namespace WindowManager {
             state.dataWindowManager->locTCFlag = (state.dataConstruction->Construct(ConstrNum).TCFlag == 1);
 
             if (state.dataWindowManager->locTCFlag) {
-                locTCSpecTemp = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).TCLayer)->SpecTemp;
+                auto const *thisMaterial =
+                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).TCLayer));
+                locTCSpecTemp = thisMaterial->SpecTemp;
                 state.dataSurface->SurfWinSpecTemp(SurfNum) = locTCSpecTemp;
                 // Check to see whether needs to switch to a new TC window construction
                 locTCLayerTemp = state.dataSurface->SurfWinTCLayerTemp(SurfNum);
@@ -2228,7 +2237,9 @@ namespace WindowManager {
                     IDConst = 0;
                     for (k = 1; k <= state.dataHeatBal->TotConstructs; ++k) {
                         if (state.dataConstruction->Construct(k).TCMasterConst == state.dataConstruction->Construct(ConstrNum).TCMasterConst) {
-                            dT1 = std::abs(locTCLayerTemp - state.dataMaterial->Material(state.dataConstruction->Construct(k).TCLayer)->SpecTemp);
+                            dT1 = std::abs(locTCLayerTemp - dynamic_cast<Material::MaterialChild *>(
+                                                                state.dataMaterial->Material(state.dataConstruction->Construct(k).TCLayer))
+                                                                ->SpecTemp);
                             if (dT1 < dT0) {
                                 ++i;
                                 deltaTemp(i) = dT1;
@@ -2244,7 +2255,9 @@ namespace WindowManager {
                         surface.Construction = ConstrNum;
                         state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
                         state.dataSurface->SurfWinSpecTemp(SurfNum) =
-                            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).TCLayer)->SpecTemp;
+                            dynamic_cast<Material::MaterialChild *>(
+                                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).TCLayer))
+                                ->SpecTemp;
                     }
                 }
             }
@@ -2332,7 +2345,7 @@ namespace WindowManager {
             for (Lay = 1; Lay <= TotLay; ++Lay) {
                 LayPtr = state.dataConstruction->Construct(IConst).LayerPoint(Lay);
 
-                auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
+                auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
                 if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
                     (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
                     ++IGlass;
@@ -2353,7 +2366,7 @@ namespace WindowManager {
                         ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(3);
                         if (TotGlassLay == 3) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(5);
                     }
-                    auto const *thisMaterialShade = state.dataMaterial->Material(ShadeLayPtr);
+                    auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr));
                     if (ANY_SHADE_SCREEN(ShadeFlag)) {
                         // Shade or screen on
                         if (state.dataGlobal
@@ -2450,7 +2463,8 @@ namespace WindowManager {
                 ++IGap;
                 if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade ||
                     ShadeFlag == WinShadingType::ExtScreen) { // Interior or exterior shade
-                    state.dataWindowManager->gap[IGap - 1] = state.dataMaterial->Material(ShadeLayPtr)->WinShadeToGlassDist;
+                    state.dataWindowManager->gap[IGap - 1] =
+                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr))->WinShadeToGlassDist;
                 } else { // Interior or exterior blind
                     state.dataWindowManager->gap[IGap - 1] =
                         state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
@@ -4006,7 +4020,6 @@ namespace WindowManager {
             TGlassFace = state.dataWindowManager->thetas[0];
             TShadeFace = state.dataWindowManager->thetas[nglassfaces + 1];
         }
-        auto const *thisMaterialShade = state.dataMaterial->Material(MatNumSh);
         TAve = 0.5 * (TGlassFace + TShadeFace);
 
         if (iter == 0) {
@@ -4034,6 +4047,7 @@ namespace WindowManager {
 
         GapHeight = state.dataSurface->Surface(SurfNum).Height;
 
+        auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNumSh));
         if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
             // Shade or Screen on
             GapDepth = thisMaterialShade->WinShadeToGlassDist;
@@ -4208,7 +4222,7 @@ namespace WindowManager {
                 TShadeFace(IGap) = state.dataWindowManager->thetas[IGap + 5];
             }
         }
-        auto const *thisMaterialShade = state.dataMaterial->Material(MatNumSh);
+        auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNumSh));
 
         for (IGap = 1; IGap <= 2; ++IGap) {
             TAve(IGap) = 0.5 * (TGlassFace(IGap) + TShadeFace(IGap));
@@ -6145,10 +6159,12 @@ namespace WindowManager {
         TOutRad = root_4(Outir / state.dataWindowManager->sigma);
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
         FrDivNum = state.dataSurface->Surface(SurfNum).FrameDivider;
-        TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
-        TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
-        EmisGlassOut = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermalFront;
-        EmisGlassIn = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers))->AbsorpThermalBack;
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        TotLayers = thisConstruct.TotLayers;
+        TotGlassLayers = thisConstruct.TotSolidLayers;
+        EmisGlassOut = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)))->AbsorpThermalFront;
+        EmisGlassIn =
+            dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(TotLayers)))->AbsorpThermalBack;
         FrameHeatGain = 0.0;
         DividerHeatGain = 0.0;
         state.dataSurface->SurfWinFrameHeatGain(SurfNum) = 0.0;
@@ -6221,10 +6237,10 @@ namespace WindowManager {
                 DivEmisIn = state.dataSurface->SurfWinDividerEmis(SurfNum);
                 DivEmisOut = DivEmisIn;
             } else { // Suspended (between-glass) divider
-                DivEmisOut = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermalFront;
+                DivEmisOut =
+                    dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)))->AbsorpThermalFront;
                 DivEmisIn =
-                    state.dataMaterial
-                        ->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers))
+                    dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(thisConstruct.TotLayers)))
                         ->AbsorpThermalBack;
             }
 
@@ -6508,21 +6524,21 @@ namespace WindowManager {
             state.dataWindowManager->hcout = 12.25;
         } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Screen) { // Exterior screen present
             MatShade = MatOutside;
-            ScNum = state.dataMaterial->Material(MatShade)->ScreenDataPtr;
+            ScNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatShade))->ScreenDataPtr;
             // Orphaned constructs with exterior screen are ignored
             if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
             state.dataWindowManager->hcout = 12.25;
         } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::WindowBlind) { // Exterior blind present
             MatShade = MatOutside;
             ShadeFlag = WinShadingType::ExtBlind;
-            BlNum = state.dataMaterial->Material(MatShade)->BlindDataPtr;
+            BlNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatShade))->BlindDataPtr;
             state.dataWindowManager->hcout = 12.25;
         } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::Shade) { // Interior shade present
             MatShade = MatInside;
             ShadeFlag = WinShadingType::IntShade;
         } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::WindowBlind) { // Interior blind present
             MatShade = MatInside;
-            BlNum = state.dataMaterial->Material(MatShade)->BlindDataPtr;
+            BlNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatShade))->BlindDataPtr;
             ShadeFlag = WinShadingType::IntBlind;
         } else if (TotGlassLay == 2) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group == Material::MaterialGroup::Shade)
@@ -6678,7 +6694,7 @@ namespace WindowManager {
 
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-            auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
             if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
                 (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
@@ -6714,7 +6730,7 @@ namespace WindowManager {
                 if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) {
                     LayPtr = thisMaterial->GasPointer;
                 }
-                auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
+                auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
                 state.dataWindowManager->gap[IGap - 1] = thisMaterial->Thickness;
                 state.dataWindowManager->gnmix[IGap - 1] = thisMaterial->NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= state.dataWindowManager->gnmix[IGap - 1]; ++IMix) {
@@ -6762,7 +6778,9 @@ namespace WindowManager {
 
         // Get center-of-glass conductance and solar heat gain coefficient
         // including inside and outside air films
-        Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->SimpleWindowUfactor;
+        Real64 inputU =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
+                ->SimpleWindowUfactor;
 
         // Calculate the NominalConductance glazing only (before adjusted)
         EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
@@ -7376,7 +7394,7 @@ namespace WindowManager {
 
                     for (i = 1; i <= state.dataConstruction->Construct(ThisNum).TotLayers; ++i) {
                         Layer = state.dataConstruction->Construct(ThisNum).LayerPoint(i);
-                        auto const *thisMaterial = state.dataMaterial->Material(Layer);
+                        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(Layer));
                         switch (thisMaterial->Group) {
                         case Material::MaterialGroup::WindowGas: {
                             static constexpr std::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
@@ -7891,7 +7909,7 @@ namespace WindowManager {
             if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
                 MatNum = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1);
-                auto *thisMaterial = state.dataMaterial->Material(MatNum);
+                auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
                 WinShadingType ShadingType =
                     state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).ShadingType;
                 if (ShadingType == WinShadingType::ExtScreen) {
@@ -7980,7 +7998,7 @@ namespace WindowManager {
             //  WRITE(ScreenTransUnitNo,*)' '
             for (ScreenNum = 1; ScreenNum <= state.dataHeatBal->NumSurfaceScreens; ++ScreenNum) {
                 MatNum = state.dataHeatBal->SurfaceScreens(ScreenNum).MaterialNumber;
-                auto const *thisMaterial = state.dataMaterial->Material(MatNum);
+                auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
                 //   Do not print transmittance map if angle increment is equal to 0
                 if (thisMaterial->ScreenMapResolution == 0) continue;
                 FoundMaterial = false;

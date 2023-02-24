@@ -223,7 +223,7 @@ namespace EcoRoofManager {
         }
 
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-        auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)));
         RoughSurf = thisMaterial->Roughness;
         AbsThermSurf = thisMaterial->AbsorpThermal;
         HMovInsul = 0.0;
@@ -542,7 +542,8 @@ namespace EcoRoofManager {
 
     void initEcoRoofFirstTime(EnergyPlusData &state, int const SurfNum, int const ConstrNum)
     {
-        auto const *thisMat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        auto const *thisMat =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
         auto &thisEcoRoof = state.dataEcoRoofMgr;
 
         thisEcoRoof->EcoRoofbeginFlag = false;
@@ -704,7 +705,8 @@ namespace EcoRoofManager {
         // Using/Aliasing
         using namespace DataEnvironment;
 
-        auto const *thisMat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        auto const *thisMat =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
         auto &thisEcoRoof = state.dataEcoRoofMgr;
         auto &thisSurf = state.dataSurface->Surface(SurfNum);
 
@@ -823,7 +825,8 @@ namespace EcoRoofManager {
         RatioMax = 1.0 + 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
         RatioMin = 1.0 - 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
 
-        auto *thisMaterial = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        auto *thisMaterial =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
         if (state.dataEcoRoofMgr->UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE

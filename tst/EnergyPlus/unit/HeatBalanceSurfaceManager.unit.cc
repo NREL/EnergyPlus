@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataConstruction->Construct(ConstrNum).CTFCross(0) = 0.0;
     state->dataConstruction->Construct(ConstrNum).CTFOutside(0) = 1.0;
     state->dataConstruction->Construct(ConstrNum).SourceSinkPresent = true;
-    Material::MaterialProperties *p = new Material::MaterialProperties;
+    Material::MaterialBase *p = new Material::MaterialBase;
     state->dataMaterial->Material.push_back(p);
     state->dataMaterial->Material(1)->Name = "TestMaterial";
 
@@ -299,7 +299,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        Material::MaterialProperties *p = new Material::MaterialProperties;
+        Material::MaterialBase *p = new Material::MaterialBase;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataSurface->SurfaceWindow(1).EffShBlindEmiss(1) = 0.1;
@@ -8508,16 +8508,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestUpdateVariableAbsorptanc
     state->dataConstruction->Construct(2).LayerPoint.allocate(1);
     state->dataConstruction->Construct(2).LayerPoint(1) = 2;
     for (int i = 0; i < 2; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
+        Material::MaterialBase *p = new Material::MaterialChild;
         state->dataMaterial->Material.push_back(p);
     }
-    auto *thisMaterial_1 = state->dataMaterial->Material(1);
-    auto *thisMaterial_2 = state->dataMaterial->Material(2);
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
     thisMaterial_1->Name = "WALL_1";
     thisMaterial_1->Group = Material::MaterialGroup::RegularMaterial;
     thisMaterial_1->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature;
     thisMaterial_1->absorpThermalVarFuncIdx = 2;
     thisMaterial_1->absorpSolarVarFuncIdx = 1;
+    auto *thisMaterial_2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
     thisMaterial_2->Name = "WALL_2";
     thisMaterial_2->Group = Material::MaterialGroup::RegularMaterial;
     thisMaterial_2->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::Scheduled;

@@ -207,7 +207,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     for (Layer = 1; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Layer) {
 
         MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
+        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
 
         if (BITF_TEST_NONE(BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group),
                            BITF(Material::MaterialGroup::GlassEquivalentLayer) | BITF(Material::MaterialGroup::ShadeEquivalentLayer) |

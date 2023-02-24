@@ -145,7 +145,7 @@ namespace Material {
     constexpr std::array<std::string_view, static_cast<int>(VariableAbsCtrlSignal::Num)> VariableAbsCtrlSignalUC = {
         "SURFACETEMPERATURE", "SURFACERECEIVEDSOLARRADIATION", "SPACEHEATINGCOOLINGMODE", "SCHEDULED"};
 
-  struct MaterialProperties
+    struct MaterialBase
     {
 
         // Members
@@ -160,15 +160,24 @@ namespace Material {
         // Thermo-physical material properties
         Real64 Conductivity = 0.0; // Thermal conductivity of layer (W/m2K)
         Real64 Density = 0.0;      // Layer density (kg/m3)
-        Real64 IsoMoistCap = 0.0;  // Isothermal moisture capacity on water vapor density (m3/kg)
-        Real64 Porosity = 0.0;     // Layer porosity
         Real64 Resistance = 0.0;   // Layer thermal resistance (alternative to Density,
         // Conductivity, Thickness, and Specific Heat; K/W)
-        bool ROnly = false;         // Material defined with "R" only
-        Real64 SpecHeat = 0.0;      // Layer specific heat (J/kgK)
+        bool ROnly = false;     // Material defined with "R" only
+        Real64 SpecHeat = 0.0;  // Layer specific heat (J/kgK)
+        Real64 Thickness = 0.0; // Layer thickness (m)
+
+        virtual bool dummy()
+        {
+            return true;
+        }
+    };
+
+    struct MaterialChild : public MaterialBase
+    {
+        Real64 IsoMoistCap = 0.0;   // Isothermal moisture capacity on water vapor density (m3/kg)
+        Real64 Porosity = 0.0;      // Layer porosity
         Real64 ThermGradCoef = 0.0; // Thermal-gradient coefficient for moisture capacity
         // based on the water vapor density (kg/kgK)
-        Real64 Thickness = 0.0;                                           // Layer thickness (m)
         Real64 VaporDiffus = 0.0;                                         // Layer vapor diffusivity
         Array1D<GasType> gasTypes = Array1D<GasType>(5, GasType::Custom); // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
         //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
@@ -199,6 +208,7 @@ namespace Material {
         Real64 AbsorpVisibleInput = 0.0;         // Layer Visible Absorptance input by user
         bool AbsorpVisibleEMSOverrideOn = false; // if true, then EMS calling to override value for visible absorptance
         Real64 AbsorpVisibleEMSOverride = 0.0;   // value to use when EMS calling to override value for visible absorptance
+
         // Window-related radiation parameters
         Real64 Trans = 0.0;                   // Transmittance of layer (glass, shade)
         Real64 TransVis = 0.0;                // Visible transmittance (at normal incidence)
@@ -223,6 +233,7 @@ namespace Material {
         int BlindDataPtr = 0;                 // Pointer to window blind data
         int ScreenDataPtr = 0;                // Pointer to window screen data
         int ScreenMapResolution = 0;          // Resolution of azimuth and altitude angles to print in transmittance map
+
         // Complex fenestration parameters
         Real64 YoungModulus = 0.0;       // Young's modulus (Pa) - used in window deflection calculations
         Real64 PoissonsRatio = 0.0;      // Poisson's ratio - used in window deflection calculations
@@ -342,10 +353,9 @@ namespace Material {
         // material
         int GlassSpecAngBRefleDataPtr = 0; // Data set index of back reflectance as a function of spectral and angle associated with a window glass
         // material
-
-        bool dummy()
+        virtual bool dummy()
         {
-            return false;
+            return true;
         }
     };
 
@@ -356,7 +366,7 @@ namespace Material {
 
 struct MaterialData : BaseGlobalStruct
 {
-    EPVector<Material::MaterialProperties *> Material;
+    EPVector<Material::MaterialBase *> Material;
     int TotMaterials = 0; // Total number of unique materials (layers) in this simulation
 
     void clear_state() override

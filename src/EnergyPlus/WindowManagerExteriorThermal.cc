@@ -485,7 +485,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    Material::MaterialProperties *CWCEHeatTransferFactory::getLayerMaterial(EnergyPlusData &state, int const t_Index) const
+    Material::MaterialBase *CWCEHeatTransferFactory::getLayerMaterial(EnergyPlusData &state, int const t_Index) const
     {
         auto ConstrNum = m_ConstructionNumber;
 
@@ -534,7 +534,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer>
-    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const *material, int const t_Index)
+    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, Material::MaterialBase const *materialBase, int const t_Index)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -557,6 +557,7 @@ namespace WindowManager {
         Real64 Aright = 0.0;
         Real64 Afront = 0.0;
 
+        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
         if (material->Group == Material::MaterialGroup::WindowGlass || material->Group == Material::MaterialGroup::WindowSimpleGlazing) {
             emissFront = material->AbsorpThermalFront;
             emissBack = material->AbsorpThermalBack;
@@ -667,7 +668,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const *material) const
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialBase const *material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -705,7 +706,7 @@ namespace WindowManager {
             thickness = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
         if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
-            const auto *material = getLayerMaterial(state, t_Index);
+            const auto *material = dynamic_cast<Material::MaterialChild *>(getLayerMaterial(state, t_Index));
             thickness = material->WinShadeToGlassDist;
         }
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
@@ -714,7 +715,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(EnergyPlusData &state,
-                                                                                                 Material::MaterialProperties const *material) const
+                                                                                                 Material::MaterialBase const *materialBase) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -725,6 +726,7 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
         Real64 constexpr pres = 1e5; // Old code uses this constant pressure
+        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
         Real64 thickness = material->Thickness;
         Real64 gasPointer = material->GasPointer;
         auto *gasMaterial(state.dataMaterial->Material(gasPointer));
@@ -734,7 +736,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialProperties const *material) const
+    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialBase const *materialBase) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -745,6 +747,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
+        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
         const int numGases = material->NumberOfGasesInMixture;
         double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
         std::string const &gasName = material->Name;
@@ -931,7 +934,7 @@ namespace WindowManager {
             ShadeFlag = WinShadingType::ExtShade;
         } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Screen) { // Exterior screen present
             const auto MatShade = MatOutside;
-            const auto ScNum = state.dataMaterial->Material(MatShade)->ScreenDataPtr;
+            const auto ScNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatShade))->ScreenDataPtr;
             // Orphaned constructs with exterior screen are ignored
             if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
         } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::WindowBlind) { // Exterior blind present
