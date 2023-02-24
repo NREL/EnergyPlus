@@ -239,8 +239,6 @@ namespace FanCoilUnits {
 
         using NodeInputManager::GetOnlySingleNode;
         using WaterCoils::GetCoilWaterInletNode;
-        auto &GetHXCoilWaterInletNode(HVACHXAssistedCoolingCoil::GetCoilWaterInletNode);
-        auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
@@ -273,7 +271,7 @@ namespace FanCoilUnits {
 
         auto &FanCoil(state.dataFanCoilUnits->FanCoil);
         auto &ErrorsFound(state.dataFanCoilUnits->ErrorsFound);
-        auto errFlag(state.dataFanCoilUnits->errFlag);
+        bool errFlag(state.dataFanCoilUnits->errFlag); // What is this trying to do?
 
         // find the number of each type of fan coil unit
 
@@ -484,7 +482,7 @@ namespace FanCoilUnits {
                             WaterCoils::GetCoilOutletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                     } else {
                         FanCoil(FanCoilNum).CoolCoilFluidInletNode =
-                            GetHXCoilWaterInletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
+			    HVACHXAssistedCoolingCoil::GetCoilWaterInletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                         FanCoil(FanCoilNum).CoolCoilInletNodeNum =
                             HVACHXAssistedCoolingCoil::GetCoilInletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                         FanCoil(FanCoilNum).CoolCoilOutletNodeNum = HVACHXAssistedCoolingCoil::GetCoilOutletNode(
@@ -532,7 +530,7 @@ namespace FanCoilUnits {
                     ErrorsFound = true;
                 } else {
                     FanCoil(FanCoilNum).DesignHeatingCapacity =
-                        GetHeatingCoilCapacity(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, errFlag);
+			HeatingCoils::GetCoilCapacity(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, errFlag);
                     FanCoil(FanCoilNum).HeatCoilInletNodeNum =
                         HeatingCoils::GetCoilInletNode(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, errFlag);
                     FanCoil(FanCoilNum).HeatCoilOutletNodeNum =
@@ -4682,7 +4680,7 @@ namespace FanCoilUnits {
         // na
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;

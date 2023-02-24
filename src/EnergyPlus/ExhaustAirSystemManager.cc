@@ -603,7 +603,7 @@ namespace ExhaustAirSystemManager {
                     }
                 }
 
-                // Deal with design exhaust auto size here;
+                // Deal with design exhaust autosize here;
                 if (thisExhCtrl.DesignExhaustFlowRate == DataSizing::AutoSize) {
                     SizeExhaustControlFlow(state, exhCtrlNum, thisExhCtrl.SuppNodeNums);
                 }

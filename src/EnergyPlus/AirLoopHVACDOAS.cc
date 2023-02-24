@@ -242,10 +242,10 @@ namespace AirLoopHVACDOAS {
 
                 auto NodeNames = fields.find("nodes");
                 if (NodeNames != fields.end()) {
-                    auto NodeArray = NodeNames.value();
+                    auto const &NodeArray = NodeNames.value();
                     thisMixer.numOfInletNodes = NodeArray.size();
                     int num = 0;
-                    for (nlohmann::json &NodeDOASName : NodeArray) {
+                    for (auto const &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("inlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
@@ -391,10 +391,10 @@ namespace AirLoopHVACDOAS {
 
                 auto NodeNames = fields.find("nodes");
                 if (NodeNames != fields.end()) {
-                    auto NodeArray = NodeNames.value();
+                    auto const &NodeArray = NodeNames.value();
                     thisSplitter.numOfOutletNodes = NodeArray.size();
                     int num = 0;
-                    for (nlohmann::json &NodeDOASName : NodeArray) {
+                    for (auto const &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("outlet_node_name").get<std::string>());
                         int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
@@ -470,17 +470,17 @@ namespace AirLoopHVACDOAS {
                 int CoolingCoilOrder = 0;
                 int FanOrder = 0;
                 for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents; ++CompNum) {
-                    auto &CompType = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum);
-                    auto &CompName = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum);
-                    auto &thisInletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum);
-                    auto &thisOutletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum);
+		    std::string &CompType = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum);
+		    std::string &CompName = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum);
+                    int thisInletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum);
+                    int thisOutletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum);
 
                     bool InletNodeErrFlag = false;
                     bool OutletNodeErrFlag = false;
 
                     const std::string typeNameUC =
                         UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum));
-                    auto foundType = static_cast<ValidEquipListType>(getEnumerationValue(validEquipNamesUC, typeNameUC));
+                    ValidEquipListType foundType = static_cast<ValidEquipListType>(getEnumerationValue(validEquipNamesUC, typeNameUC));
 
                     switch (foundType) {
                     case ValidEquipListType::OutdoorAirMixer:
@@ -771,9 +771,9 @@ namespace AirLoopHVACDOAS {
 
                 auto AirLoopNames = fields.find("airloophvacs");
                 if (AirLoopNames != fields.end()) {
-                    auto AirLoopArray = AirLoopNames.value();
+                    auto const &AirLoopArray = AirLoopNames.value();
                     int num = 0;
-                    for (auto AirLoopHVACName : AirLoopArray) {
+                    for (auto const &AirLoopHVACName : AirLoopArray) {
                         std::string name = UtilityRoutines::MakeUPPERCase(AirLoopHVACName.at("airloophvac_name").get<std::string>());
                         int LoopNum = UtilityRoutines::FindItemInList(name, state.dataAirSystemsData->PrimaryAirSystems);
                         num += 1;
