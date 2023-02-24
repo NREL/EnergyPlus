@@ -731,7 +731,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).LatentEnergyCurveType = EnergyEqnForm::DPCubic;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                format(R"({}{}="{}", invalid  {}="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        RefrigCase(CaseNum).Name,
@@ -904,7 +904,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).AntiSweatControlType = ASHtrCtrlType::HeatBalance;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                format(R"({}{}="{}", invalid  {}="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        RefrigCase(CaseNum).Name,
@@ -1025,7 +1025,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 //     RefrigCase(CaseNum)%DefrostType = DefElectricOnDemand
             } else {
                 ShowWarningError(
-                    state, format("{}=\"{}\", invalid  {}=\"{}\".", CurrentModuleObject, RefrigCase(CaseNum).Name, cAlphaFieldNames(8), Alphas(8)));
+                    state, format(R"({}="{}", invalid  {}="{}".)", CurrentModuleObject, RefrigCase(CaseNum).Name, cAlphaFieldNames(8), Alphas(8)));
                 ShowContinueError(state, format("Simulation will default to {}=\"None\" and continue.", cAlphaFieldNames(8)));
                 RefrigCase(CaseNum).defrostType = RefCaseDefrostType::None;
             }
@@ -1162,7 +1162,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).DefrostEnergyCurveType = EnergyEqnForm::None;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                format(R"({}{}="{}", invalid  {}="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        RefrigCase(CaseNum).Name,
@@ -1576,7 +1576,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WalkIn(WalkInID).defrostType = WalkinClrDefrostType::OffCycle;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                format(R"({}{}="{}", invalid  {}="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        WalkIn(WalkInID).Name,
@@ -1819,7 +1819,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     WalkIn(WalkInID).UValue(ZoneID) = Numbers(NStart + 1);
                     if (Numbers(NStart + 1) <= 0.0) {
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\", Zone=\"{}\", {} must be > 0.",
+                                        format(R"({}{}="{}", Zone="{}", {} must be > 0.)",
                                                RoutineName,
                                                CurrentModuleObject,
                                                WalkIn(WalkInID).Name,
@@ -1849,7 +1849,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WalkIn(WalkInID).GlassDoorOpenSchedPtr(ZoneID) = ScheduleManager::GetScheduleIndex(state, Alphas(AStart + 1));
                         if (WalkIn(WalkInID).GlassDoorOpenSchedPtr(ZoneID) == 0) {
                             ShowSevereError(state,
-                                            format("{}{}=\"{}\", Zone=\"{}\", invalid  {} not found: {}",
+                                            format(R"({}{}="{}", Zone="{}", invalid  {} not found: {})",
                                                    RoutineName,
                                                    CurrentModuleObject,
                                                    WalkIn(WalkInID).Name,
@@ -1862,7 +1862,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                             if (!ScheduleManager::CheckScheduleValueMinMax(
                                     state, WalkIn(WalkInID).GlassDoorOpenSchedPtr(ZoneID), ">=", 0.0, "<=", 1.0)) {
                                 ShowSevereError(state,
-                                                format("{}{}=\"{}\", Zone=\"{}\"",
+                                                format(R"({}{}="{}", Zone="{}")",
                                                        RoutineName,
                                                        CurrentModuleObject,
                                                        WalkIn(WalkInID).Name,
@@ -1895,7 +1895,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WalkIn(WalkInID).StockDoorOpenSchedPtr(ZoneID) = ScheduleManager::GetScheduleIndex(state, Alphas(AStart + 2));
                         if (WalkIn(WalkInID).StockDoorOpenSchedPtr(ZoneID) == 0) {
                             ShowSevereError(state,
-                                            format("{}{}=\"{}\", Zone=\"{}\", invalid  {} not found: {}",
+                                            format(R"({}{}="{}", Zone="{}", invalid  {} not found: {})",
                                                    RoutineName,
                                                    CurrentModuleObject,
                                                    WalkIn(WalkInID).Name,
@@ -1908,7 +1908,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                             if (!ScheduleManager::CheckScheduleValueMinMax(
                                     state, WalkIn(WalkInID).StockDoorOpenSchedPtr(ZoneID), ">=", 0.0, "<=", 1.0)) {
                                 ShowSevereError(state,
-                                                format("{}{}=\"{}\", Zone=\"{}\"",
+                                                format(R"({}{}="{}", Zone="{}")",
                                                        RoutineName,
                                                        CurrentModuleObject,
                                                        WalkIn(WalkInID).Name,
@@ -1929,7 +1929,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoor::StripCurtain;
                     } else {
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                        format(R"({}{}="{}", invalid  {}="{}".)",
                                                RoutineName,
                                                CurrentModuleObject,
                                                WalkIn(WalkInID).Name,
@@ -2040,7 +2040,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).ratingType = RatingType::EuropeanSC5Nom;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                format(R"({}{}="{}", invalid  {}="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        WarehouseCoil(CoilID).Name,
@@ -2340,7 +2340,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).SHRCorrType = SHRCorrectionType::TabularRH_DT1_TRoom;
                 if (!(UtilityRoutines::SameString(Alphas(AlphaNum), "TabularRHxDT1xTRoom"))) {
                     ShowWarningError(state,
-                                     format("{}{}=\"{}\", invalid {}=\"{}\".",
+                                     format(R"({}{}="{}", invalid {}="{}".)",
                                             RoutineName,
                                             CurrentModuleObject,
                                             WarehouseCoil(CoilID).Name,
@@ -2365,7 +2365,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).SHRCorrType = SHRCorrectionType::TabularRH_DT1_TRoom;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                format(R"({}{}="{}", invalid  {}="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        WarehouseCoil(CoilID).Name,
@@ -2507,7 +2507,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).FanType = FanSpeedCtrlType::TwoSpeed;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                format(R"({}{}="{}", invalid  {}="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        WarehouseCoil(CoilID).Name,
@@ -2557,7 +2557,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).defrostType = DefrostType::OffCycle;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", invalid  {}=\"{}\".",
+                                format(R"({}{}="{}", invalid  {}="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        WarehouseCoil(CoilID).Name,
@@ -3366,7 +3366,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     for (int caseIndex = 2; caseIndex <= RefrigRack(RackNum).NumCases; ++caseIndex) {
                         if (RefrigCase(RefrigRack(RackNum).CaseNum(caseIndex)).ActualZoneNum == ZoneNum) continue;
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\" : All cases attached to a rack must be in the same zone when {} equals \"Zone\".",
+                                        format(R"({}{}="{}" : All cases attached to a rack must be in the same zone when {} equals "Zone".)",
                                                RoutineName,
                                                CurrentModuleObject,
                                                RefrigRack(RackNum).Name,
@@ -4701,7 +4701,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         Secondary(SecondaryNum).CoolingLoadRated = FlowMassRated * CpBrineRated * Secondary(SecondaryNum).TRangeDifRated;
                     } else {
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\", Either \"{}\" OR \"{}\" must be input.",
+                                        format(R"({}{}="{}", Either "{}" OR "{}" must be input.)",
                                                RoutineName,
                                                CurrentModuleObject,
                                                Secondary(SecondaryNum).Name,
@@ -4822,7 +4822,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         PumpTotRatedFlowVol * PumpTotRatedHead / (PumpImpellerEfficiency * PumpMotorEfficiency);
                 } else {
                     ShowSevereError(state,
-                                    format("{}{}=\"{}\", Either \"{}\" OR \"{}\" must be input.",
+                                    format(R"({}{}="{}", Either "{}" OR "{}" must be input.)",
                                            RoutineName,
                                            CurrentModuleObject,
                                            Secondary(SecondaryNum).Name,
@@ -4855,7 +4855,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 //  Print warning if Pump Control = Constant and Variable Speed Curve is specified.
                 if ((Secondary(SecondaryNum).PumpControlType == SecPumpCtrl::Constant) && (!lAlphaBlanks(AlphaNum + 1))) {
                     ShowWarningError(state,
-                                     format("{}{}=\"{}\", A {} is specified even though {} is \"CONSTANT\".",
+                                     format(R"({}{}="{}", A {} is specified even though {} is "CONSTANT".)",
                                             RoutineName,
                                             CurrentModuleObject,
                                             Secondary(SecondaryNum).Name,
@@ -6031,7 +6031,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Refrigeration:Subcooler", Alphas(AlphaNum));
                     if (System(RefrigSysNum).SubcoolerNum(NumSubcooler) <= 0) {
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\", has an invalid {} defined as \"{}\".",
+                                        format(R"({}{}="{}", has an invalid {} defined as "{}".)",
                                                RoutineName,
                                                CurrentModuleObject,
                                                System(RefrigSysNum).Name,
@@ -6048,7 +6048,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Refrigeration:Subcooler", Alphas(AlphaNum + 1));
                     if (System(RefrigSysNum).SubcoolerNum(NumSubcooler) <= 0) {
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\", has an invalid {} defined as \"{}\".",
+                                        format(R"({}{}="{}", has an invalid {} defined as "{}".)",
                                                RoutineName,
                                                CurrentModuleObject,
                                                System(RefrigSysNum).Name,
@@ -6201,7 +6201,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     int CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
                     if ((ListNum == 0) && (CompNum == 0)) { // name doesn't match either a compressor or a compressor list
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\", {} has an invalid or undefined value=\"{}\".",
+                                        format(R"({}{}="{}", {} has an invalid or undefined value="{}".)",
                                                RoutineName,
                                                CurrentModuleObject,
                                                System(RefrigSysNum).Name,
@@ -6210,7 +6210,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     } else if ((ListNum != 0) && (CompNum != 0)) { // have compressor list and compressor with same name
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\", {} has a non-unique name used for both Compressor and CompressorList name: \"{}\".",
+                                        format(R"({}{}="{}", {} has a non-unique name used for both Compressor and CompressorList name: "{}".)",
                                                RoutineName,
                                                CurrentModuleObject,
                                                System(RefrigSysNum).Name,
@@ -6417,7 +6417,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Refrigeration:System", Subcooler(SubcoolerNum).MechSourceSys);
             if (Subcooler(SubcoolerNum).MechSourceSysID == 0) {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", Mechanical Subcooler has an invalid Source Refrigeration:System=\"{}\".",
+                                format(R"({}{}="{}", Mechanical Subcooler has an invalid Source Refrigeration:System="{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        Subcooler(SubcoolerNum).Name,
@@ -6492,7 +6492,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 TransSystem(TransRefrigSysNum).TransSysType = 2;
             } else {
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", has an incorrect System Type specified as \"{}\".",
+                                format(R"({}{}="{}", has an incorrect System Type specified as "{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        TransSystem(TransRefrigSysNum).Name,
@@ -6787,7 +6787,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             if (GCNum == 0) { //  Invalid Gas Cooler attached to Transcritical Refrigeration System
                 ShowSevereError(state,
-                                format("{}{}=\"{}\", has an invalid {} defined as \"{}\".",
+                                format(R"({}{}="{}", has an invalid {} defined as "{}".)",
                                        RoutineName,
                                        CurrentModuleObject,
                                        TransSystem(TransRefrigSysNum).Name,
@@ -6817,7 +6817,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 int CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
                 if ((ListNum == 0) && (CompNum == 0)) { // name doesn't match either a compressor or a compressor list
                     ShowSevereError(state,
-                                    format("{}{}, \"{}\", has an invalid or undefined value=\"{}\".",
+                                    format(R"({}{}, "{}", has an invalid or undefined value="{}".)",
                                            RoutineName,
                                            CurrentModuleObject,
                                            cAlphaFieldNames(AlphaNum),
@@ -6903,7 +6903,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 int CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
                 if ((ListNum == 0) && (CompNum == 0)) { // name doesn't match either a compressor or a compressor list
                     ShowSevereError(state,
-                                    format("{}{}, \"{}\", has an invalid or undefined value=\"{}\".",
+                                    format(R"({}{}, "{}", has an invalid or undefined value="{}".)",
                                            RoutineName,
                                            CurrentModuleObject,
                                            cAlphaFieldNames(AlphaNum),
@@ -7038,7 +7038,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     DataZoneEquipment::GetSystemNodeNumberForZone(state, TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT);
                 if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT == 0) {
                     ShowSevereError(state,
-                                    format("{}{}=\"{}\", System Node Number not found for {} = \"{}\" even though {} is greater than zero.",
+                                    format(R"({}{}="{}", System Node Number not found for {} = "{}" even though {} is greater than zero.)",
                                            RoutineName,
                                            CurrentModuleObject,
                                            TransSystem(TransRefrigSysNum).Name,
@@ -7083,7 +7083,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     DataZoneEquipment::GetSystemNodeNumberForZone(state, TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT);
                 if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT == 0) {
                     ShowSevereError(state,
-                                    format("{}{}=\"{}\", System Node Number not found for {} = \"{}\" even though {} is greater than zero.",
+                                    format(R"({}{}="{}", System Node Number not found for {} = "{}" even though {} is greater than zero.)",
                                            RoutineName,
                                            CurrentModuleObject,
                                            TransSystem(TransRefrigSysNum).Name,
@@ -11727,7 +11727,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
             state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues", this->HighTempWarnIndex);
     }
 
-    this->UpdateCondenser(state);
+    this->UpdateCondenserOutletNode(state);
 }
 
 PlantComponent *RefrigRackData::factory(EnergyPlusData &state, std::string const &objectName)
@@ -11886,10 +11886,10 @@ void RefrigRackData::simulate(EnergyPlusData &state,
             state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues", HighTempWarnIndex);
     }
 
-    this->UpdateCondenser(state);
+    this->UpdateCondenserOutletNode(state);
 }
 
-void RefrigCondenserData::UpdateCondenser(EnergyPlusData &state)
+void RefrigCondenserData::UpdateCondenserOutletNode(EnergyPlusData &state) const
 {
 
     // SUBROUTINE INFORMATION:
@@ -11914,7 +11914,7 @@ void RefrigCondenserData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state
 {
 }
 
-void RefrigRackData::UpdateCondenser(EnergyPlusData &state)
+void RefrigRackData::UpdateCondenserOutletNode(EnergyPlusData &state) const
 {
 
     // SUBROUTINE INFORMATION:
@@ -12687,9 +12687,7 @@ void RefrigSystemData::CalcDetailedSystem(EnergyPlusData &state, int const SysNu
         } // denominator zero check
         if (NumIter > 20) break;
         if (ErrorMassFlowComps < ErrorTol) {
-            if (this->NumStages == 1) {
-                NotBalanced = false;
-            } else if (this->NumStages == 2 && ErrorMassFlowHiStageComps < ErrorTol) {
+            if (this->NumStages == 1 || (this->NumStages == 2 && ErrorMassFlowHiStageComps < ErrorTol)) {
                 NotBalanced = false;
             }
         }

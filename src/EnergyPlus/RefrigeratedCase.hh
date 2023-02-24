@@ -531,7 +531,7 @@ namespace RefrigeratedCase {
             ActualEvapPumpPower = 0.0;
         }
 
-        void UpdateCondenser(EnergyPlusData &state);
+        void UpdateCondenserOutletNode(EnergyPlusData &state) const;
 
         void CalcRackSystem(EnergyPlusData &state);
 
@@ -958,7 +958,7 @@ namespace RefrigeratedCase {
             TotalHeatRecoveredEnergy = 0.0;
         }
 
-        void UpdateCondenser(EnergyPlusData &state);
+        void UpdateCondenserOutletNode(EnergyPlusData &state) const;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
