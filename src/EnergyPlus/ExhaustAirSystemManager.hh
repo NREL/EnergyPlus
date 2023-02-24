@@ -150,12 +150,12 @@ namespace ExhaustAirSystemManager {
 
 struct ExhaustAirSystemMgr : BaseGlobalStruct
 {
-
     bool GetInputFlag = true;
-
+    std::map<int, int> mixerIndexMap;
+    bool mappingDone = false;
     void clear_state() override
     {
-        this->GetInputFlag = true;
+        new (this) ExhaustAirSystemMgr();
     }
 };
 
@@ -166,7 +166,7 @@ struct ExhaustControlSystemMgr : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->GetInputFlag = true;
+        new (this) ExhaustControlSystemMgr();
     }
 };
 
