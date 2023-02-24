@@ -2472,9 +2472,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_VeryFlatShap
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 {
-    Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
-    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
     state->dataHeatBal->space.allocate(1);
@@ -2539,15 +2537,13 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     state->dataSurface->Surface(6).Vertex(3) = Vector(10., 0., 3.);
     state->dataSurface->Surface(6).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(*state, enteredCeilingHeight);
+    CalculateZoneVolume(*state);
     EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 {
-    Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
-    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
     //    Zone(1).HTSurfaceFirst = 1;
@@ -2604,15 +2600,13 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     state->dataHeatBal->Zone(1).FloorArea = 80.;
     state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(*state, enteredCeilingHeight);
+    CalculateZoneVolume(*state);
     EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 {
-    Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
-    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
     state->dataHeatBal->space.allocate(1);
@@ -2671,15 +2665,13 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     state->dataHeatBal->Zone(1).FloorArea = 80.;
     state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(*state, enteredCeilingHeight);
+    CalculateZoneVolume(*state);
     EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 {
-    Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
-    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
     state->dataHeatBal->space.allocate(1);
@@ -2738,15 +2730,13 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     state->dataHeatBal->Zone(1).CeilingArea = 80.;
     state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(*state, enteredCeilingHeight);
+    CalculateZoneVolume(*state);
     EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
 {
-    Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
-    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->space.allocate(1);
     state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
@@ -2800,7 +2790,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     state->dataSurface->Surface(4).Vertex(3) = Vector(10., 8., 0.);
     state->dataSurface->Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(*state, enteredCeilingHeight);
+    CalculateZoneVolume(*state);
     EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 

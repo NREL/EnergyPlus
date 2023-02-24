@@ -293,34 +293,7 @@ namespace SurfaceGeometry {
         // This subroutine controls the processing of detached shadowing and
         // zone surfaces for computing their vertices.
 
-        using namespace DataVectorTypes;
-        using namespace OutputReportPredefined;
-
         static constexpr std::string_view RoutineName("SetUpZoneGeometry: ");
-
-        Real64 AverageHeight; // Used to keep track of average height of a surface/zone
-        Real64 ZMax;          // Maximum Z of a surface (detailed outside coefficient calculation)
-        Real64 ZMin;          // Minimum Z of a surface (detailed outside coefficient calculation)
-        Real64 ZCeilAvg;
-        Real64 CeilCount;
-        Real64 ZFlrAvg;
-        Real64 FloorCount;
-        Real64 TotSurfArea;
-        Real64 Z1;
-        Real64 Z2;
-        std::string String1;
-        std::string String2;
-        std::string String3;
-        int Count; // To count wall surfaces for ceiling height calculation
-        Array1D_bool ZoneCeilingHeightEntered;
-        Array1D<Real64> ZoneCeilingArea;
-        auto &ErrCount = state.dataSurfaceGeometry->ErrCount;
-        Real64 NominalUwithConvCoeffs;
-        std::string cNominalU;
-        std::string cNominalUwithConvCoeffs;
-        bool isWithConvCoefValid;
-        bool nonInternalMassSurfacesPresent;
-        bool DetailedWWR;
 
         // Zones must have been "gotten" before this call
         // The RelNorth variables are used if "relative" coordinates are input as well
@@ -338,9 +311,6 @@ namespace SurfaceGeometry {
 
         state.dataSurfaceGeometry->CosZoneRelNorth.allocate(state.dataGlobal->NumOfZones);
         state.dataSurfaceGeometry->SinZoneRelNorth.allocate(state.dataGlobal->NumOfZones);
-
-        ZoneCeilingHeightEntered.dimension(state.dataGlobal->NumOfZones, false);
-        ZoneCeilingArea.dimension(state.dataGlobal->NumOfZones, 0.0);
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
@@ -415,7 +385,7 @@ namespace SurfaceGeometry {
             s.extWindowArea = 0.0;
             s.totalSurfArea = 0.0;
         }
-        DetailedWWR = (state.dataInputProcessing->inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
+        bool DetailedWWR = (state.dataInputProcessing->inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
         if (DetailedWWR) {
             print(state.files.debug, "{}", "=======User Entered Classification =================");
             print(state.files.debug, "{}", "Surface,Class,Area,Tilt");
@@ -435,7 +405,8 @@ namespace SurfaceGeometry {
                 thisZone.HasWindow = true;
                 thisSpace.totalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
             }
-            if (thisSurface.Class == SurfaceClass::Roof) ZoneCeilingArea(thisSurface.Zone) += thisSurface.GrossArea;
+            if (thisSurface.Class == SurfaceClass::Roof) thisZone.geometricCeilingArea += thisSurface.GrossArea;
+            if (thisSurface.Class == SurfaceClass::Floor) thisZone.geometricFloorArea += thisSurface.GrossArea;
             if (!state.dataConstruction->Construct(thisSurface.Construction).TypeIsWindow) {
                 if (thisSurface.ExtBoundCond == ExternalEnvironment || thisSurface.ExtBoundCond == OtherSideCondModeledExt) {
                     thisZone.ExteriorTotalSurfArea += thisSurface.GrossArea;
@@ -496,19 +467,19 @@ namespace SurfaceGeometry {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
+            int CeilCount = 0.0;
+            int FloorCount = 0.0;
+            int WallCount = 0;
+            Real64 AverageHeight = 0.0; // Used to keep track of average height of a surface/zone
+            Real64 ZMax = -99999.0;     // Maximum Z of a surface (detailed outside coefficient calculation)
+            Real64 ZMin = 99999.0;      // Minimum Z of a surface (detailed outside coefficient calculation)
+            Real64 ZCeilAvg = 0.0;
+            Real64 ZFlrAvg = 0.0;
+            if (DetailedWWR) {
+                print(state.files.debug, "{},{:.2R},{:.2R}\n", thisZone.Name, thisZone.ExtGrossWallArea, thisZone.ExtWindowArea);
+            }
             for (int spaceNum : thisZone.spaceIndexes) {
                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                CeilCount = 0.0;
-                FloorCount = 0.0;
-                Count = 0;
-                AverageHeight = 0.0;
-                ZCeilAvg = 0.0;
-                ZFlrAvg = 0.0;
-                ZMax = -99999.0;
-                ZMin = 99999.0;
-                if (DetailedWWR) {
-                    print(state.files.debug, "{},{:.2R},{:.2R}\n", thisZone.Name, thisZone.ExtGrossWallArea, thisZone.ExtWindowArea);
-                }
                 // Use AllSurfaceFirst which includes air boundaries
                 for (int SurfNum = thisSpace.AllSurfaceFirst; SurfNum <= thisSpace.AllSurfaceLast; ++SurfNum) {
                     auto &thisSurface = state.dataSurface->Surface(SurfNum);
@@ -516,23 +487,23 @@ namespace SurfaceGeometry {
                     if (thisSurface.Class == SurfaceClass::Roof) {
                         // Use Average Z for surface, more important for roofs than floors...
                         ++CeilCount;
-                        Z1 = minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
-                        Z2 = maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
+                        Real64 Z1 = minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
+                        Real64 Z2 = maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
                         //        ZCeilAvg=ZCeilAvg+(Z1+Z2)/2.d0
-                        ZCeilAvg += ((Z1 + Z2) / 2.0) * (thisSurface.GrossArea / ZoneCeilingArea(ZoneNum));
+                        ZCeilAvg += ((Z1 + Z2) / 2.0) * (thisSurface.GrossArea / thisZone.geometricCeilingArea);
                     }
                     if (thisSurface.Class == SurfaceClass::Floor) {
                         // Use Average Z for surface, more important for roofs than floors...
                         ++FloorCount;
-                        Z1 = minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
-                        Z2 = maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
+                        Real64 Z1 = minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
+                        Real64 Z2 = maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
                         //        ZFlrAvg=ZFlrAvg+(Z1+Z2)/2.d0
-                        ZFlrAvg += ((Z1 + Z2) / 2.0) * (thisSurface.Area / thisZone.FloorArea);
+                        ZFlrAvg += ((Z1 + Z2) / 2.0) * (thisSurface.GrossArea / thisZone.geometricFloorArea);
                     }
                     if (thisSurface.Class == SurfaceClass::Wall) {
                         // Use Wall calculation in case no roof & floor in zone
-                        ++Count;
-                        if (Count == 1) {
+                        ++WallCount;
+                        if (WallCount == 1) {
                             ZMax = thisSurface.Vertex(1).z;
                             ZMin = ZMax;
                         }
@@ -540,59 +511,58 @@ namespace SurfaceGeometry {
                         ZMin = min(ZMin, minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z));
                     }
                 }
-                if (CeilCount > 0.0 && FloorCount > 0.0) {
-                    AverageHeight = ZCeilAvg - ZFlrAvg;
-                } else {
-                    AverageHeight = (ZMax - ZMin);
-                }
-                if (AverageHeight <= 0.0) {
-                    AverageHeight = (ZMax - ZMin);
-                }
+            }
+            if (CeilCount > 0.0 && FloorCount > 0.0) {
+                AverageHeight = ZCeilAvg - ZFlrAvg;
+            } else {
+                AverageHeight = (ZMax - ZMin);
+            }
+            if (AverageHeight <= 0.0) {
+                AverageHeight = (ZMax - ZMin);
+            }
 
-                if (thisZone.CeilingHeight > 0.0) {
-                    ZoneCeilingHeightEntered(ZoneNum) = true;
-                    if (AverageHeight > 0.0) {
-                        if (std::abs(AverageHeight - thisZone.CeilingHeight) / thisZone.CeilingHeight > 0.05) {
-                            if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                ShowWarningError(
-                                    state,
-                                    format("{}Entered Ceiling Height for some zone(s) significantly different from calculated Ceiling Height",
-                                           RoutineName));
-                                ShowContinueError(
-                                    state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded.");
-                            }
-                            if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowWarningError(
-                                    state,
-                                    format("{}Entered Ceiling Height for Zone=\"{}\" significantly different from calculated Ceiling Height",
-                                           RoutineName,
-                                           thisZone.Name));
-                                static constexpr std::string_view ValFmt("{:.2F}");
-                                String1 = format(ValFmt, thisZone.CeilingHeight);
-                                String2 = format(ValFmt, AverageHeight);
-                                ShowContinueError(
-                                    state,
-                                    format("{}Entered Ceiling Height={}, Calculated Ceiling Height={}, entered height will be used in calculations.",
-                                           RoutineName,
-                                           String1,
-                                           String2));
-                            }
+            if (thisZone.CeilingHeight > 0.0) {
+                thisZone.ceilingHeightEntered = true;
+                if (AverageHeight > 0.0) {
+                    if (std::abs(AverageHeight - thisZone.CeilingHeight) / thisZone.CeilingHeight > 0.05) {
+                        if (state.dataSurfaceGeometry->ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                            ShowWarningError(
+                                state,
+                                format("{}Entered Ceiling Height for some zone(s) significantly different from calculated Ceiling Height",
+                                       RoutineName));
+                            ShowContinueError(state,
+                                              "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded.");
+                        }
+                        if (state.dataGlobal->DisplayExtraWarnings) {
+                            ShowWarningError(state,
+                                             format("{}Entered Ceiling Height for Zone=\"{}\" significantly different from calculated Ceiling Height",
+                                                    RoutineName,
+                                                    thisZone.Name));
+                            static constexpr std::string_view ValFmt("{:.2F}");
+                            std::string String1 = format(ValFmt, thisZone.CeilingHeight);
+                            std::string String2 = format(ValFmt, AverageHeight);
+                            ShowContinueError(
+                                state,
+                                format("{}Entered Ceiling Height={}, Calculated Ceiling Height={}, entered height will be used in calculations.",
+                                       RoutineName,
+                                       String1,
+                                       String2));
                         }
                     }
                 }
-                if ((thisZone.CeilingHeight <= 0.0) && (AverageHeight > 0.0)) thisZone.CeilingHeight = AverageHeight;
-                // Need to add check here - don't touch if already user-specified
             }
+            if ((thisZone.CeilingHeight <= 0.0) && (AverageHeight > 0.0)) thisZone.CeilingHeight = AverageHeight;
+            // Need to add check here - don't touch if already user-specified
         }
 
-        CalculateZoneVolume(state, ZoneCeilingHeightEntered); // Calculate Zone Volumes
+        CalculateZoneVolume(state); // Calculate Zone Volumes
 
         // Calculate zone centroid (and min/max x,y,z for zone)
         // Use AllSurfaceFirst which includes air boundaries
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
-            nonInternalMassSurfacesPresent = false;
-            TotSurfArea = 0.0;
+            bool nonInternalMassSurfacesPresent = false;
+            Real64 TotSurfArea = 0.0;
             thisZone.Centroid = Vector(0.0, 0.0, 0.0);
             if (state.dataSurface->Surface(thisZone.AllSurfaceFirst).Sides > 0) {
                 thisZone.MinimumX = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).x;
@@ -637,9 +607,6 @@ namespace SurfaceGeometry {
             }
         }
 
-        ZoneCeilingHeightEntered.deallocate();
-        ZoneCeilingArea.deallocate();
-
         state.dataSurface->SurfAdjacentZone.dimension(state.dataSurface->TotSurfaces, 0);
         // note -- adiabatic surfaces will show same zone as surface
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -669,6 +636,10 @@ namespace SurfaceGeometry {
 
         for (int const SurfNum : state.dataSurface->AllSurfaceListReportOrder) {
             auto &thisSurface = state.dataSurface->Surface(SurfNum);
+            bool isWithConvCoefValid = false;
+            Real64 NominalUwithConvCoeffs = 0.0;
+            std::string cNominalUwithConvCoeffs;
+            std::string cNominalU;
             if (thisSurface.Construction > 0 && thisSurface.Construction <= state.dataHeatBal->TotConstructs) {
                 NominalUwithConvCoeffs = ComputeNominalUwithConvCoeffs(state, SurfNum, isWithConvCoefValid);
                 if (isWithConvCoefValid) {
@@ -693,15 +664,19 @@ namespace SurfaceGeometry {
             if ((thisSurface.ExtBoundCond == ExternalEnvironment) || (thisSurface.ExtBoundCond == Ground) ||
                 (thisSurface.ExtBoundCond == KivaFoundation) || (thisSurface.ExtBoundCond == GroundFCfactorMethod)) {
                 if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpUfactFilm, thisSurface.Name, NominalUwithConvCoeffs, 3);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchOpUfactFilm, thisSurface.Name, NominalUwithConvCoeffs, 3);
                 } else if (SurfaceClass == SurfaceClass::Door) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrUfactFilm, thisSurface.Name, NominalUwithConvCoeffs, 3);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchDrUfactFilm, thisSurface.Name, NominalUwithConvCoeffs, 3);
                 }
             } else {
                 if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpUfactFilm, thisSurface.Name, NominalUwithConvCoeffs, 3);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchIntOpUfactFilm, thisSurface.Name, NominalUwithConvCoeffs, 3);
                 } else if (SurfaceClass == SurfaceClass::Door) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrUfactFilm, thisSurface.Name, NominalUwithConvCoeffs, 3);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchIntDrUfactFilm, thisSurface.Name, NominalUwithConvCoeffs, 3);
                 }
             }
         } // surfaces
@@ -739,7 +714,9 @@ namespace SurfaceGeometry {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Write Zone Information to the initialization output file
-
+            std::string String1;
+            std::string String2;
+            std::string String3;
             {
                 auto const SELECT_CASE_var(state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo);
                 if (SELECT_CASE_var == ConvectionConstants::HcInt_ASHRAESimple) {
@@ -2444,6 +2421,7 @@ namespace SurfaceGeometry {
                         auto &thisSurf = state.dataSurface->Surface(SurfNum);
                         if (thisSurf.Class == SurfaceClass::Floor) {
                             thisZone.HasFloor = true;
+                            thisSpace.hasFloor = true;
                             state.dataHeatBal->space(spaceNum).calcFloorArea += thisSurf.Area;
                         }
                         if (thisSurf.Class == SurfaceClass::Roof) {
@@ -2454,15 +2432,13 @@ namespace SurfaceGeometry {
                 }
             }
             ErrCount = 0;
-            for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-                if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+            for (auto &thisSpace : state.dataHeatBal->space) {
+                if (thisSpace.userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
                     // Check entered vs calculated
-                    if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea > 0.0) { // User entered Space floor area,
+                    if (thisSpace.userEnteredFloorArea > 0.0) { // User entered Space floor area,
                         // produce message if not near calculated
-                        if (state.dataHeatBal->space(spaceNum).calcFloorArea > 0.0) {
-                            Real64 diffp =
-                                std::abs(state.dataHeatBal->space(spaceNum).calcFloorArea - state.dataHeatBal->space(spaceNum).userEnteredFloorArea) /
-                                state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
+                        if (thisSpace.calcFloorArea > 0.0) {
+                            Real64 diffp = std::abs(thisSpace.calcFloorArea - thisSpace.userEnteredFloorArea) / thisSpace.userEnteredFloorArea;
                             if (diffp > floorAreaTolerance) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -2480,37 +2456,36 @@ namespace SurfaceGeometry {
                                         state,
                                         format("{}Entered Floor Area for Space=\"{}\" is {:.1R}% different from the calculated Floor Area.",
                                                std::string(RoutineName),
-                                               state.dataHeatBal->space(spaceNum).Name,
+                                               thisSpace.Name,
                                                diffp * 100.0));
                                     ShowContinueError(state,
                                                       format("Entered Space Floor Area={:.2R}, Calculated Space Floor Area={:.2R}, entered "
                                                              "Floor Area will be used.",
-                                                             state.dataHeatBal->space(spaceNum).userEnteredFloorArea,
-                                                             state.dataHeatBal->space(spaceNum).calcFloorArea));
+                                                             thisSpace.userEnteredFloorArea,
+                                                             thisSpace.calcFloorArea));
                                 }
                             }
                         }
-                        state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
-                        state.dataHeatBal->space(spaceNum).hasFloor = true;
+                        thisSpace.floorArea = thisSpace.userEnteredFloorArea;
+                        thisSpace.hasFloor = true;
                     }
                 } else {
-                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea;
+                    thisSpace.floorArea = thisSpace.calcFloorArea;
                 }
             }
             ErrCount = 0;
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (auto &thisZone : state.dataHeatBal->Zone) {
                 // Calculate zone floor area as sum of space floor areas
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                    state.dataHeatBal->Zone(ZoneNum).CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                for (int spaceNum : thisZone.spaceIndexes) {
+                    thisZone.CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                    thisZone.HasFloor |= state.dataHeatBal->space(spaceNum).hasFloor;
                 }
-                if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                if (thisZone.UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
                     // Check entered vs calculated
-                    if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
+                    if (thisZone.UserEnteredFloorArea > 0.0) { // User entered zone floor area,
                         // produce message if not near calculated
-                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
-                            Real64 diffp =
-                                std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea - state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
-                                state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                        if (thisZone.CalcFloorArea > 0.0) {
+                            Real64 diffp = std::abs(thisZone.CalcFloorArea - thisZone.UserEnteredFloorArea) / thisZone.UserEnteredFloorArea;
                             if (diffp > 0.05) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -2528,29 +2503,29 @@ namespace SurfaceGeometry {
                                                      format("{}Entered Floor Area for Zone=\"{}\" is {:.1R}% different from the sum of the "
                                                             "Space Floor Area(s).",
                                                             std::string(RoutineName),
-                                                            state.dataHeatBal->Zone(ZoneNum).Name,
+                                                            thisZone.Name,
                                                             diffp * 100.0));
                                     ShowContinueError(state,
                                                       format("Entered Zone Floor Area={:.2R}, Sum of Space Floor Area(s)={:.2R}",
-                                                             state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
-                                                             state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
+                                                             thisZone.UserEnteredFloorArea,
+                                                             thisZone.CalcFloorArea));
                                     ShowContinueError(
                                         state, "Entered Zone Floor Area will be used and Space Floor Area(s) will be adjusted proportionately.");
                                 }
                             }
                         }
-                        state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                        state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
+                        thisZone.FloorArea = thisZone.UserEnteredFloorArea;
+                        thisZone.HasFloor = true;
 
                         // Adjust space floor areas to match zone floor area
-                        if (state.dataHeatBal->Zone(ZoneNum).numSpaces == 1) {
+                        if (thisZone.numSpaces == 1) {
                             // If the zone contains only one space, then set the Space area to the Zone area
-                            int spaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
-                            state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
-                        } else if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            int spaceNum = thisZone.spaceIndexes(1);
+                            state.dataHeatBal->space(spaceNum).floorArea = thisZone.FloorArea;
+                        } else if (thisZone.CalcFloorArea > 0.0) {
                             // Adjust space areas proportionately
-                            Real64 areaRatio = state.dataHeatBal->Zone(ZoneNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
-                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                            Real64 areaRatio = thisZone.FloorArea / thisZone.CalcFloorArea;
+                            for (int spaceNum : thisZone.spaceIndexes) {
                                 state.dataHeatBal->space(spaceNum).floorArea *= areaRatio;
                             }
                         } else {
@@ -2560,25 +2535,24 @@ namespace SurfaceGeometry {
                                     state,
                                     format("{}Entered Floor Area entered for Zone=\"{}\" significantly different from sum of Space Floor Areas",
                                            RoutineName,
-                                           state.dataHeatBal->Zone(ZoneNum).Name));
+                                           thisZone.Name));
                                 ShowContinueError(state,
                                                   "But the sum of the Space Floor Areas is zero and there is more than one Space in the zone."
                                                   "Unable to apportion the zone floor area. Space Floor Areas are zero.");
                             }
                         }
                     } else {
-                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0)
-                            state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
+                        if (thisZone.CalcFloorArea > 0.0) thisZone.FloorArea = thisZone.CalcFloorArea;
                     }
                 } else {
-                    state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
+                    thisZone.FloorArea = thisZone.CalcFloorArea;
                 }
                 Real64 totSpacesFloorArea = 0.0;
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                for (int spaceNum : thisZone.spaceIndexes) {
                     totSpacesFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
                 }
                 if (totSpacesFloorArea > 0.0) {
-                    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    for (int spaceNum : thisZone.spaceIndexes) {
                         state.dataHeatBal->space(spaceNum).fracZoneFloorArea = state.dataHeatBal->space(spaceNum).floorArea / totSpacesFloorArea;
                     }
                 } // else leave fractions at zero
@@ -2979,6 +2953,10 @@ namespace SurfaceGeometry {
                     state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
                 }
             }
+        }
+        if (SurfError || ErrorsFound) {
+            ErrorsFound = true;
+            ShowFatalError(state, format("{}Errors discovered, program terminates.", RoutineName));
         }
     }
 
@@ -12399,9 +12377,8 @@ namespace SurfaceGeometry {
     }
 
     // Calculates the volume (m3) of a zone using the surfaces as possible.
-    void CalculateZoneVolume(EnergyPlusData &state, const Array1D_bool &CeilingHeightEntered)
+    void CalculateZoneVolume(EnergyPlusData &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN   1992-1994
@@ -12631,7 +12608,7 @@ namespace SurfaceGeometry {
                         }
                     }
                 }
-            } else if (CeilingHeightEntered(ZoneNum)) { // User did not enter zone volume, but entered ceiling height
+            } else if (state.dataHeatBal->Zone(ZoneNum).ceilingHeightEntered) { // User did not enter zone volume, but entered ceiling height
                 if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0) {
                     state.dataHeatBal->Zone(ZoneNum).Volume =
                         state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
@@ -12656,8 +12633,8 @@ namespace SurfaceGeometry {
                 if (thisSpace.Volume > 0.0) continue;
                 if (thisZone.numSpaces == 1) {
                     thisSpace.Volume = thisZone.Volume;
-                } else if (thisZone.FloorArea > 0.0) {
-                    thisSpace.Volume = thisZone.Volume * thisSpace.floorArea / thisZone.FloorArea;
+                } else if (thisZone.geometricFloorArea > 0.0) {
+                    thisSpace.Volume = thisZone.Volume * thisSpace.floorArea / thisZone.geometricFloorArea;
                 }
             }
             Real64 totSpacesVolume = 0.0;
@@ -13269,7 +13246,6 @@ namespace SurfaceGeometry {
 
     void ProcessSurfaceVertices(EnergyPlusData &state, int const ThisSurf, bool &ErrorsFound)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code (Walton)
         //       DATE WRITTEN   1976
@@ -13848,7 +13824,6 @@ namespace SurfaceGeometry {
                                       Vector &CompCoordTranslVector // Coordinate Translation Vector
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton, BLAST
         //       DATE WRITTEN   August 1976
@@ -13911,7 +13886,6 @@ namespace SurfaceGeometry {
                                                                     // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Nov 2001
@@ -14311,7 +14285,6 @@ namespace SurfaceGeometry {
                       int &AddedSubSurfaces // Subsurfaces added when window references a
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Feb 2002
@@ -14492,7 +14465,6 @@ namespace SurfaceGeometry {
                    int &AddedSubSurfaces // Subsurfaces added when window references a
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Nov 2008
@@ -15046,7 +15018,6 @@ namespace SurfaceGeometry {
 
     void CalcSurfaceCentroid(EnergyPlusData &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Feb. 2004
@@ -15694,7 +15665,6 @@ namespace SurfaceGeometry {
                         int const NSides   // Number of sides to figure
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tyler Hoyt
         //       DATE WRITTEN   December 2010
@@ -15938,7 +15908,6 @@ namespace SurfaceGeometry {
     bool isRectangle(EnergyPlusData &state, int const ThisSurf // Surface number
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
         //       DATE WRITTEN   October 2015
@@ -16068,7 +16037,6 @@ namespace SurfaceGeometry {
                                 int const TotalLayers   // total layers for construction definition
     )
     {
-
         RevLayerDiffs = false;
 
         for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
