@@ -2388,23 +2388,19 @@ namespace SurfaceGeometry {
                     thisSpace.WindowSurfaceLast = -1;
                     thisSpace.OpaqOrIntMassSurfaceLast = thisSpace.AllSurfaceLast;
                 }
-                thisSpace.OpaqOrWinSurfaceFirst = thisSpace.HTSurfaceFirst;
-                thisSpace.OpaqOrWinSurfaceLast = std::max(thisSpace.OpaqOrIntMassSurfaceLast, thisSpace.WindowSurfaceLast);
-                thisSpace.HTSurfaceLast = thisSpace.AllSurfaceLast;
-            }
-        }
-
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            int zoneSurfCount = 0;
-            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
                 if (thisSpace.HTSurfaceFirst > 0) {
-                    zoneSurfCount += (thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1);
-                }
-                if (zoneSurfCount == 0) {
-                    ShowSevereError(state,
-                                    format("{}Zone has no heat transfer surfaces, Zone={}", RoutineName, state.dataHeatBal->Zone(ZoneNum).Name));
-                    SurfError = true;
+                    thisSpace.OpaqOrWinSurfaceFirst = thisSpace.HTSurfaceFirst;
+                    thisSpace.OpaqOrWinSurfaceLast = std::max(thisSpace.OpaqOrIntMassSurfaceLast, thisSpace.WindowSurfaceLast);
+                    thisSpace.HTSurfaceLast = thisSpace.AllSurfaceLast;
+                } else {
+                    // If no heat transfer surfaces, make sure all others are set correctly
+                    thisSpace.HTSurfaceLast = -1;
+                    thisSpace.WindowSurfaceFirst = 0;
+                    thisSpace.WindowSurfaceLast = -1;
+                    thisSpace.OpaqOrWinSurfaceFirst = 0;
+                    thisSpace.OpaqOrWinSurfaceLast = -1;
+                    thisSpace.OpaqOrIntMassSurfaceFirst = 0;
+                    thisSpace.OpaqOrIntMassSurfaceLast = -1;
                 }
             }
         }
@@ -2413,8 +2409,7 @@ namespace SurfaceGeometry {
         Real64 constexpr floorAreaTolerance(0.05);
         Real64 constexpr floorAreaPercentTolerance(floorAreaTolerance * 100.0);
         if (!SurfError) {
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
+            for (auto &thisZone : state.dataHeatBal->Zone) {
                 for (int spaceNum : thisZone.spaceIndexes) {
                     auto &thisSpace = state.dataHeatBal->space(spaceNum);
                     for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
@@ -2653,13 +2648,13 @@ namespace SurfaceGeometry {
             }
 
             // Check for zones with not enough surfaces
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (auto &thisZone : state.dataHeatBal->Zone) {
                 int OpaqueHTSurfs = 0;        // Number of floors, walls and roofs in a zone
                 int OpaqueHTSurfsWithWin = 0; // Number of floors, walls and roofs with windows in a zone
                 int InternalMassSurfs = 0;    // Number of internal mass surfaces in a zone
                 int priorBaseSurfNum = 0;
 
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                for (int spaceNum : thisZone.spaceIndexes) {
                     auto &thisSpace = state.dataHeatBal->space(spaceNum);
                     if (thisSpace.HTSurfaceFirst == 0) continue; // Zone with no surfaces
                     for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
@@ -2680,9 +2675,7 @@ namespace SurfaceGeometry {
                 if (OpaqueHTSurfsWithWin == 1 && OpaqueHTSurfs == 1 && InternalMassSurfs == 0) {
                     SurfError = true;
                     ShowSevereError(state,
-                                    format("{}Zone {} has only one floor, wall or roof, and this surface has a window.",
-                                           RoutineName,
-                                           state.dataHeatBal->Zone(ZoneNum).Name));
+                                    format("{}Zone {} has only one floor, wall or roof, and this surface has a window.", RoutineName, thisZone.Name));
                     ShowContinueError(state, "Add more floors, walls or roofs, or an internal mass surface.");
                 }
             }
