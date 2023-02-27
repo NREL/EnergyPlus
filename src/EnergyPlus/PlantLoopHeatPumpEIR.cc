@@ -1933,8 +1933,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A4
             std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
             // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
-            srand(time(NULL));
-            std::string sourceSideOutletNodeName = format("DUMMY_CONDENSER_{}_{}", rand(), rand());
+            // srand(time(NULL));
+            // std::string sourceSideOutletNodeName = format("DUMMY_CONDENSER_{}_{}", rand(), rand());
 
             // A5
             auto compCoilFound = fields.find(companionCoilFieldTag);
@@ -2281,15 +2281,16 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                  DataLoopNode::ConnectionType::OutsideAir,
                                                                                  NodeInputManager::CompFluidStream::Secondary,
                                                                                  DataLoopNode::ObjectIsNotParent);
-            thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
-                                                                                  sourceSideOutletNodeName,
-                                                                                  nodeErrorsFound,
-                                                                                  objType,
-                                                                                  thisPLHP.name,
-                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::ConnectionType::OutsideAir,
-                                                                                  NodeInputManager::CompFluidStream::Secondary,
-                                                                                  DataLoopNode::ObjectIsNotParent);
+            // thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
+            //                                                                       sourceSideOutletNodeName,
+            //                                                                       nodeErrorsFound,
+            //                                                                       objType,
+            //                                                                       thisPLHP.name,
+            //                                                                       DataLoopNode::NodeFluidType::Air,
+            //                                                                       DataLoopNode::ConnectionType::OutsideAir,
+            //                                                                       NodeInputManager::CompFluidStream::Secondary,
+            //                                                                       DataLoopNode::ObjectIsNotParent);
+
             if (nodeErrorsFound) errorsFound = true;
             BranchNodeConnections::TestCompSet(
                 state, cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName, classToInput.nodesType);
