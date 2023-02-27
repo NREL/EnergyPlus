@@ -12383,27 +12383,10 @@ namespace SurfaceGeometry {
         // REFERENCES:
         // Legacy Code (IBLAST)
 
-        using namespace Vectors;
-
-        Real64 SumAreas;  // Sum of the Zone surface areas that are not "internal mass"
-        Real64 SurfCount; // Surface Count
-        int SurfNum;      // Loop counter for surfaces
-        int ZoneNum;      // Loop counter for Zones
-        Array1D_int surfacenotused;
-        int notused;
-        int NFaces;
-        int NActFaces;
-        Real64 CalcVolume;
-        bool initmsg;
-        int iside;
-        auto &ShowZoneSurfaceHeaders = state.dataSurfaceGeometry->ShowZoneSurfaceHeaders;
-        auto &ErrCount5 = state.dataSurfaceGeometry->ErrCount5;
-
-        // Object Data
-        Polyhedron ZoneStruct;
-
-        initmsg = true;
+        Vectors::Polyhedron ZoneStruct;
+        bool initmsg = true;
         bool ShowZoneSurfaces = (state.dataInputProcessing->inputProcessor->getNumSectionsFound("SHOWZONESURFACES_DEBUG") > 0);
+        EPVector<int> surfacenotused;
 
         enum class ZoneVolumeCalcMethod
         {
@@ -12418,57 +12401,53 @@ namespace SurfaceGeometry {
         };
 
         int countNotFullyEnclosedZones = 0;
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
-            if (!state.dataHeatBal->Zone(ZoneNum).HasFloor) {
+        for (auto &thisZone : state.dataHeatBal->Zone) {
+            if (!thisZone.HasFloor) {
                 ShowWarningError(state,
                                  format("No floor exists in Zone=\"{}\", zone floor area is zero. All values for this zone that are entered per "
                                         "floor area will be zero.",
-                                        state.dataHeatBal->Zone(ZoneNum).Name));
+                                        thisZone.Name));
             }
 
-            SumAreas = 0.0;
-            SurfCount = 0.0;
+            Real64 SumAreas = 0.0;
+            Real64 CalcVolume = 0.0;
             // Use AllSurfaceFirst which includes air boundaries
-            NFaces = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast - state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst + 1;
-            notused = 0;
+            int NFaces = thisZone.AllSurfaceLast - thisZone.AllSurfaceFirst + 1;
+            int notused = 0;
             ZoneStruct.NumSurfaceFaces = NFaces;
             ZoneStruct.SurfaceFace.allocate(NFaces);
-            NActFaces = 0;
+            int NActFaces = 0;
             surfacenotused.dimension(NFaces, 0);
 
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast; ++SurfNum) {
+            for (int SurfNum = thisZone.AllSurfaceFirst; SurfNum <= thisZone.AllSurfaceLast; ++SurfNum) {
+                auto &thisSurface = state.dataSurface->Surface(SurfNum);
 
                 // Only include Base Surfaces in Calc.
 
-                if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Wall &&
-                    state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Floor &&
-                    state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Roof) {
+                if (thisSurface.Class != SurfaceClass::Wall && thisSurface.Class != SurfaceClass::Floor && thisSurface.Class != SurfaceClass::Roof) {
                     ++notused;
                     surfacenotused(notused) = SurfNum;
                     continue;
                 }
 
                 ++NActFaces;
-                ZoneStruct.SurfaceFace(NActFaces).FacePoints.allocate(state.dataSurface->Surface(SurfNum).Sides);
-                ZoneStruct.SurfaceFace(NActFaces).NSides = state.dataSurface->Surface(SurfNum).Sides;
+                ZoneStruct.SurfaceFace(NActFaces).FacePoints.allocate(thisSurface.Sides);
+                ZoneStruct.SurfaceFace(NActFaces).NSides = thisSurface.Sides;
                 ZoneStruct.SurfaceFace(NActFaces).SurfNum = SurfNum;
-                ZoneStruct.SurfaceFace(NActFaces).FacePoints({1, state.dataSurface->Surface(SurfNum).Sides}) =
-                    state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides});
-                CreateNewellAreaVector(ZoneStruct.SurfaceFace(NActFaces).FacePoints,
-                                       ZoneStruct.SurfaceFace(NActFaces).NSides,
-                                       ZoneStruct.SurfaceFace(NActFaces).NewellAreaVector);
-                SumAreas += VecLength(ZoneStruct.SurfaceFace(NActFaces).NewellAreaVector);
+                ZoneStruct.SurfaceFace(NActFaces).FacePoints({1, thisSurface.Sides}) = thisSurface.Vertex({1, thisSurface.Sides});
+                Vectors::CreateNewellAreaVector(ZoneStruct.SurfaceFace(NActFaces).FacePoints,
+                                                ZoneStruct.SurfaceFace(NActFaces).NSides,
+                                                ZoneStruct.SurfaceFace(NActFaces).NewellAreaVector);
+                SumAreas += Vectors::VecLength(ZoneStruct.SurfaceFace(NActFaces).NewellAreaVector);
             }
             ZoneStruct.NumSurfaceFaces = NActFaces;
-            SurfCount = double(NActFaces);
 
-            bool isFloorHorizontal;
-            bool isCeilingHorizontal;
-            bool areWallsVertical;
+            bool isFloorHorizontal = false;
+            bool isCeilingHorizontal = false;
+            bool areWallsVertical = false;
             std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(state, ZoneStruct);
-            Real64 oppositeWallArea;
-            Real64 distanceBetweenOppositeWalls;
+            Real64 oppositeWallArea = 0.0;
+            Real64 distanceBetweenOppositeWalls = 0.0;
 
             bool areWallsSameHeight = areWallHeightSame(state, ZoneStruct);
 
@@ -12477,28 +12456,25 @@ namespace SurfaceGeometry {
             ZoneVolumeCalcMethod volCalcMethod;
 
             if (isZoneEnclosed) {
-                CalcVolume = CalcPolyhedronVolume(state, ZoneStruct);
+                CalcVolume = Vectors::CalcPolyhedronVolume(state, ZoneStruct);
                 volCalcMethod = ZoneVolumeCalcMethod::Enclosed;
-            } else if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0 && state.dataHeatBal->Zone(ZoneNum).CeilingHeight > 0.0 &&
-                       areFloorAndCeilingSame(state, ZoneStruct)) {
-                CalcVolume = state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
+            } else if (thisZone.FloorArea > 0.0 && thisZone.CeilingHeight > 0.0 && areFloorAndCeilingSame(state, ZoneStruct)) {
+                CalcVolume = thisZone.FloorArea * thisZone.CeilingHeight;
                 volCalcMethod = ZoneVolumeCalcMethod::FloorAreaTimesHeight1;
-            } else if (isFloorHorizontal && areWallsVertical && areWallsSameHeight && state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0 &&
-                       state.dataHeatBal->Zone(ZoneNum).CeilingHeight > 0.0) {
-                CalcVolume = state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
+            } else if (isFloorHorizontal && areWallsVertical && areWallsSameHeight && thisZone.FloorArea > 0.0 && thisZone.CeilingHeight > 0.0) {
+                CalcVolume = thisZone.FloorArea * thisZone.CeilingHeight;
                 volCalcMethod = ZoneVolumeCalcMethod::FloorAreaTimesHeight2;
-            } else if (isCeilingHorizontal && areWallsVertical && areWallsSameHeight && state.dataHeatBal->Zone(ZoneNum).CeilingArea > 0.0 &&
-                       state.dataHeatBal->Zone(ZoneNum).CeilingHeight > 0.0) {
-                CalcVolume = state.dataHeatBal->Zone(ZoneNum).CeilingArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
+            } else if (isCeilingHorizontal && areWallsVertical && areWallsSameHeight && thisZone.CeilingArea > 0.0 && thisZone.CeilingHeight > 0.0) {
+                CalcVolume = thisZone.CeilingArea * thisZone.CeilingHeight;
                 volCalcMethod = ZoneVolumeCalcMethod::CeilingAreaTimesHeight;
             } else if (areOppositeWallsSame(state, ZoneStruct, oppositeWallArea, distanceBetweenOppositeWalls)) {
                 CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
                 volCalcMethod = ZoneVolumeCalcMethod::OpWallAreaTimesDistance;
-            } else if (state.dataHeatBal->Zone(ZoneNum).Volume == DataGlobalConstants::AutoCalculate) { // no user entered zone volume
+            } else if (thisZone.Volume == DataGlobalConstants::AutoCalculate) { // no user entered zone volume
                 ShowSevereError(state,
                                 format("For zone: {} it is not possible to calculate the volume from the surrounding surfaces so either provide the "
                                        "volume value or define all the surfaces to fully enclose the zone.",
-                                       state.dataHeatBal->Zone(ZoneNum).Name));
+                                       thisZone.Name));
                 CalcVolume = 0.;
                 volCalcMethod = ZoneVolumeCalcMethod::Invalid;
             } else {
@@ -12511,7 +12487,7 @@ namespace SurfaceGeometry {
                     ShowWarningError(state,
                                      format("CalculateZoneVolume: The Zone=\"{}\" is not fully enclosed. To be fully enclosed, each edge of a "
                                             "surface must also be an edge on one other surface.",
-                                            state.dataHeatBal->Zone(ZoneNum).Name));
+                                            thisZone.Name));
                     switch (volCalcMethod) {
                     case ZoneVolumeCalcMethod::FloorAreaTimesHeight1:
                         ShowContinueError(state,
@@ -12568,11 +12544,11 @@ namespace SurfaceGeometry {
                     }
                 }
             }
-            if (state.dataHeatBal->Zone(ZoneNum).Volume > 0.0) { // User entered zone volume, produce message if not near calculated
+            if (thisZone.Volume > 0.0) { // User entered zone volume, produce message if not near calculated
                 if (CalcVolume > 0.0) {
-                    if (std::abs(CalcVolume - state.dataHeatBal->Zone(ZoneNum).Volume) / state.dataHeatBal->Zone(ZoneNum).Volume > 0.05) {
-                        ++ErrCount5;
-                        if (ErrCount5 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                    if (std::abs(CalcVolume - thisZone.Volume) / thisZone.Volume > 0.05) {
+                        ++state.dataSurfaceGeometry->ErrCount5;
+                        if (state.dataSurfaceGeometry->ErrCount5 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                             if (initmsg) {
                                 ShowMessage(state,
                                             "Note that the following warning(s) may/will occur if you have not enclosed your zone completely.");
@@ -12588,34 +12564,33 @@ namespace SurfaceGeometry {
                                 initmsg = false;
                             }
                             // Warn user of using specified Zone Volume
-                            ShowWarningError(state,
-                                             format("Entered Volume entered for Zone=\"{}\" significantly different from calculated Volume",
-                                                    state.dataHeatBal->Zone(ZoneNum).Name));
+                            ShowWarningError(
+                                state,
+                                format("Entered Volume entered for Zone=\"{}\" significantly different from calculated Volume", thisZone.Name));
                             ShowContinueError(state,
                                               format("Entered Zone Volume value={:.2R}, Calculated Zone Volume value={:.2R}, entered volume will be "
                                                      "used in calculations.",
-                                                     state.dataHeatBal->Zone(ZoneNum).Volume,
+                                                     thisZone.Volume,
                                                      CalcVolume));
                         }
                     }
                 }
-            } else if (state.dataHeatBal->Zone(ZoneNum).ceilingHeightEntered) { // User did not enter zone volume, but entered ceiling height
-                if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0) {
-                    state.dataHeatBal->Zone(ZoneNum).Volume =
-                        state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
+            } else if (thisZone.ceilingHeightEntered) { // User did not enter zone volume, but entered ceiling height
+                if (thisZone.FloorArea > 0.0) {
+                    thisZone.Volume = thisZone.FloorArea * thisZone.CeilingHeight;
                 } else { // ceiling height entered but floor area zero
-                    state.dataHeatBal->Zone(ZoneNum).Volume = CalcVolume;
+                    thisZone.Volume = CalcVolume;
                 }
             } else { // Neither ceiling height nor volume entered
-                state.dataHeatBal->Zone(ZoneNum).Volume = CalcVolume;
+                thisZone.Volume = CalcVolume;
             }
 
-            if (state.dataHeatBal->Zone(ZoneNum).Volume <= 0.0) {
-                ShowWarningError(state, format("Indicated Zone Volume <= 0.0 for Zone={}", state.dataHeatBal->Zone(ZoneNum).Name));
-                ShowContinueError(state, format("The calculated Zone Volume was={:.2R}", state.dataHeatBal->Zone(ZoneNum).Volume));
+            if (thisZone.Volume <= 0.0) {
+                ShowWarningError(state, format("Indicated Zone Volume <= 0.0 for Zone={}", thisZone.Name));
+                ShowContinueError(state, format("The calculated Zone Volume was={:.2R}", thisZone.Volume));
                 ShowContinueError(state, "The simulation will continue with the Zone Volume set to 10.0 m3. ");
                 ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
-                state.dataHeatBal->Zone(ZoneNum).Volume = 10.;
+                thisZone.Volume = 10.;
             }
             // For now - pro-rate space volumes by floor area, if not entered
             for (int spaceNum : thisZone.spaceIndexes) {
@@ -12629,17 +12604,17 @@ namespace SurfaceGeometry {
                 }
             }
             Real64 totSpacesVolume = 0.0;
-            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            for (int spaceNum : thisZone.spaceIndexes) {
                 totSpacesVolume += state.dataHeatBal->space(spaceNum).Volume;
             }
             if (totSpacesVolume > 0.0) {
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                for (int spaceNum : thisZone.spaceIndexes) {
                     state.dataHeatBal->space(spaceNum).fracZoneVolume = state.dataHeatBal->space(spaceNum).Volume / totSpacesVolume;
                 }
             } // else leave fractions at zero
 
             if (ShowZoneSurfaces) {
-                if (ShowZoneSurfaceHeaders) {
+                if (state.dataSurfaceGeometry->ShowZoneSurfaceHeaders) {
                     print(state.files.debug, "{}\n", "===================================");
                     print(state.files.debug, "{}\n", "showing zone surfaces used and not used in volume calculation");
                     print(state.files.debug, "{}\n", "for volume calculation, only floors, walls and roofs/ceilings are used");
@@ -12647,13 +12622,13 @@ namespace SurfaceGeometry {
                     print(state.files.debug, "{}\n", "unused surface class(es), 5=internal mass, 11=window, 12=glass door");
                     print(state.files.debug, "{}\n", "                          13=door, 14=shading, 15=overhang, 16=fin");
                     print(state.files.debug, "{}\n", "                          17=TDD Dome, 18=TDD Diffuser");
-                    ShowZoneSurfaceHeaders = false;
+                    state.dataSurfaceGeometry->ShowZoneSurfaceHeaders = false;
                 }
                 print(state.files.debug, "{}\n", "===================================");
-                print(state.files.debug, "zone={} calc volume={}\n", state.dataHeatBal->Zone(ZoneNum).Name, CalcVolume);
+                print(state.files.debug, "zone={} calc volume={}\n", thisZone.Name, CalcVolume);
                 print(state.files.debug, " nsurfaces={} nactual={}\n", NFaces, NActFaces);
             }
-            for (SurfNum = 1; SurfNum <= ZoneStruct.NumSurfaceFaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= ZoneStruct.NumSurfaceFaces; ++SurfNum) {
                 if (ShowZoneSurfaces) {
                     if (SurfNum <= NActFaces) {
                         print(state.files.debug,
@@ -12665,7 +12640,7 @@ namespace SurfaceGeometry {
                               state.dataSurface->Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).Name,
                               state.dataSurface->Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).Class);
                         print(state.files.debug, "area={}\n", state.dataSurface->Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).GrossArea);
-                        for (iside = 1; iside <= ZoneStruct.SurfaceFace(SurfNum).NSides; ++iside) {
+                        for (int iside = 1; iside <= ZoneStruct.SurfaceFace(SurfNum).NSides; ++iside) {
                             auto const &FacePoint(ZoneStruct.SurfaceFace(SurfNum).FacePoints(iside));
                             print(state.files.debug, "{} {} {}\n", FacePoint.x, FacePoint.y, FacePoint.z);
                         }
@@ -12674,7 +12649,7 @@ namespace SurfaceGeometry {
                 ZoneStruct.SurfaceFace(SurfNum).FacePoints.deallocate();
             }
             if (ShowZoneSurfaces) {
-                for (SurfNum = 1; SurfNum <= notused; ++SurfNum) {
+                for (int SurfNum = 1; SurfNum <= notused; ++SurfNum) {
                     print(state.files.debug,
                           "notused:surface={} name={} class={}\n",
                           surfacenotused(SurfNum),
