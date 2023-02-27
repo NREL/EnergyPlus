@@ -3685,7 +3685,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.63,                           !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
-)IDF" R"IDF(
+)IDF"
+                                             R"IDF(
   Quadratic,                      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
   Quadratic,                      !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
@@ -6353,7 +6354,8 @@ Coil:Heating:DX:VariableSpeed,
       Temperature,             !- Input Unit Type for X
       Temperature,             !- Input Unit Type for Y
       Dimensionless;           !- Output Unit Type
-)IDF"  R"IDF(
+)IDF"
+                                             R"IDF(
 
     Curve:Biquadratic,
       HPACHeatEIRFT,           !- Name
@@ -6757,7 +6759,8 @@ Curve:Quadratic,
   0.0,                    !- Coefficient3 x**2
   0.0,                    !- Minimum Value of x
   1.0;                    !- Maximum Value of x
-)IDF"  R"IDF(
+)IDF"
+                                             R"IDF(
 
 Curve:Biquadratic,
   CoolCapFT,        !- Name
@@ -7227,7 +7230,8 @@ Curve:Quadratic,
   0.0,                    !- Coefficient3 x**2
   0.0,                    !- Minimum Value of x
   1.0;                    !- Maximum Value of x
-)IDF"  R"IDF(
+)IDF"
+                                             R"IDF(
 
 Curve:Biquadratic,
   CoolCapFT,              !- Name
@@ -8028,7 +8032,8 @@ UnitarySystemPerformance:Multispeed,
   0.666,                                                   !- Cooling Speed 2 Supply Air Flow Ratio
   1.0,                                                     !- Heating Speed 3 Supply Air Flow Ratio
   1.0;                                                     !- Cooling Speed 3 Supply Air Flow Ratio
-)IDF"    R"IDF(
+)IDF"
+                                             R"IDF(
 
 Coil:Cooling:DX:MultiSpeed,
   Sys 2 Furnace DX Cool MultiSpd Cooling Coil,             !- Name
@@ -8531,7 +8536,8 @@ Coil:Cooling:DX:MultiSpeed,
   ,                        !- Speed 3 Evaporative Condenser Effectiveness {dimensionless}
   ,                        !- Speed 3 Evaporative Condenser Air Flow Rate {m3/s}
   ;                        !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}
-)IDF" R"IDF(
+)IDF"
+                                             R"IDF(
 
 Coil:Heating:DX:VariableSpeed,
   VS Heating Coil 1,       !- Name
