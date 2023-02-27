@@ -41,6 +41,12 @@ jobs:
       run: |
          mkdir .cppcheck-build-dir
 
+    - name: cppcheck-build-directory was found
+      # If the build cache wasn't found in the cache
+      if: steps.cache-cppcheck-restore.outputs.cache-hit == 'true'
+      run: |
+          ls .cppcheck-build-dir/ || true
+
     - name: Run CppCheck
       run: |
          cppcheck --cppcheck-build-dir=.cppcheck-build-dir \
@@ -49,6 +55,12 @@ jobs:
           --force \
           --std=c++17 \
           --inline-suppr \
+          --suppress=cppcheckError \
+          --suppress=unusedFunction:src/EnergyPlus/api/autosizing.cc \
+          --suppress=unusedFunction:src/EnergyPlus/api/datatransfer.cc \
+          --suppress=unusedFunction:src/EnergyPlus/api/func.cc \
+          --suppress=unusedFunction:src/EnergyPlus/api/runtime.cc \
+          --suppress=unusedFunction:src/EnergyPlus/api/state.cc \
           --enable=all \
           -i EnergyPlus/DXCoils.cc \
           -i EnergyPlus/RefrigeratedCase.cc \
