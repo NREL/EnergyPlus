@@ -400,14 +400,30 @@ namespace SurfaceGeometry {
 
             thisZone.TotalSurfArea += thisSurface.Area;
             thisSpace.totalSurfArea += thisSurface.Area;
+            if (thisSurface.Class == SurfaceClass::Roof) {
+                thisZone.geometricCeilingArea += thisSurface.GrossArea;
+            } else if (thisSurface.Class == SurfaceClass::Floor) {
+                thisZone.geometricFloorArea += thisSurface.GrossArea;
+            }
             if (state.dataConstruction->Construct(thisSurface.Construction).TypeIsWindow) {
                 thisZone.TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
                 thisZone.HasWindow = true;
                 thisSpace.totalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
-            }
-            if (thisSurface.Class == SurfaceClass::Roof) thisZone.geometricCeilingArea += thisSurface.GrossArea;
-            if (thisSurface.Class == SurfaceClass::Floor) thisZone.geometricFloorArea += thisSurface.GrossArea;
-            if (!state.dataConstruction->Construct(thisSurface.Construction).TypeIsWindow) {
+                if (((thisSurface.ExtBoundCond == ExternalEnvironment) || (thisSurface.ExtBoundCond == OtherSideCondModeledExt)) &&
+                    (thisSurface.Class != SurfaceClass::TDD_Dome)) {
+                    thisZone.ExtWindowArea += thisSurface.GrossArea;
+                    thisSpace.extWindowArea += thisSurface.GrossArea;
+                    thisZone.ExtWindowArea_Multiplied =
+                        thisZone.ExtWindowArea + thisSurface.GrossArea * thisSurface.Multiplier * thisZone.Multiplier * thisZone.ListMultiplier;
+                    if (DetailedWWR) {
+                        print(state.files.debug,
+                              "{},Window,{:.2R},{:.1R}\n",
+                              thisSurface.Name,
+                              thisSurface.GrossArea * thisSurface.Multiplier * thisZone.Multiplier * thisZone.ListMultiplier,
+                              thisSurface.Tilt);
+                    }
+                }
+            } else {
                 if (thisSurface.ExtBoundCond == ExternalEnvironment || thisSurface.ExtBoundCond == OtherSideCondModeledExt) {
                     thisZone.ExteriorTotalSurfArea += thisSurface.GrossArea;
                     thisSpace.ExteriorTotalSurfArea += thisSurface.GrossArea;
@@ -439,23 +455,6 @@ namespace SurfaceGeometry {
                         }
                     }
                 }
-
-            } else { // For Windows
-
-                if (((thisSurface.ExtBoundCond == ExternalEnvironment) || (thisSurface.ExtBoundCond == OtherSideCondModeledExt)) &&
-                    (thisSurface.Class != SurfaceClass::TDD_Dome)) {
-                    thisZone.ExtWindowArea += thisSurface.GrossArea;
-                    thisSpace.extWindowArea += thisSurface.GrossArea;
-                    thisZone.ExtWindowArea_Multiplied =
-                        thisZone.ExtWindowArea + thisSurface.GrossArea * thisSurface.Multiplier * thisZone.Multiplier * thisZone.ListMultiplier;
-                    if (DetailedWWR) {
-                        print(state.files.debug,
-                              "{},Window,{:.2R},{:.1R}\n",
-                              thisSurface.Name,
-                              thisSurface.GrossArea * thisSurface.Multiplier * thisZone.Multiplier * thisZone.ListMultiplier,
-                              thisSurface.Tilt);
-                    }
-                }
             }
 
         } // ...end of surfaces windows DO loop
@@ -465,8 +464,7 @@ namespace SurfaceGeometry {
             print(state.files.debug, "{}\n", "Zone,ExtWallArea,ExtWindowArea");
         }
 
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
+        for (auto &thisZone : state.dataHeatBal->Zone) {
             int CeilCount = 0.0;
             int FloorCount = 0.0;
             int WallCount = 0;
