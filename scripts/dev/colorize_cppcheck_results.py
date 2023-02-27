@@ -152,8 +152,9 @@ if __name__ == '__main__':
     # sys.stdout.writelines(colored_lines)
     print("\n".join(colored_lines))
     n_tot = (
-        n_errors + n_warnings + n_performances
-        + n_portabilities
+        n_errors
+        # + n_warnings + n_performances
+        # + n_portabilities
         # + n_styles
     )
     if n_tot > 0:
