@@ -2,6 +2,9 @@ name: CppCheck
 
 on: [push]
 
+env:
+  CPPCHECK_VERSION: 2.10
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,15 +13,42 @@ jobs:
     - name: Checkout EnergyPlus
       uses: actions/checkout@v3
 
-    - name: Install CppCheck
-      run: sudo apt-get install cppcheck
+    - name: Install cppcheck
+      shell: bash
+      run: |
+          mkdir cppcheck
+          cd cppcheck
+          wget https://github.com/danmar/cppcheck/archive/$CPPCHECK_VERSION.tar.gz
+          tar xfz $CPPCHECK_VERSION.tar.gz
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release ../cppcheck-$CPPCHECK_VERSION/
+          make -j $(nproc)
+          sudo make install
+          cd ..
+          rm -Rf cppcheck
+
+    - name: Cache cppcheck-build-directory
+      id: cppcheckcache
+      uses: actions/cache@v3
+      with:
+        path: .cppcheck-build-dir/
+        key: cppcheckcache
+
+    - name: cppcheck-build-directory not found
+      # If the build cache wasn't found in the cache
+      if: steps.cppcheckcache.outputs.cache-hit != 'true'
+      run: |
+         mkdir .cppcheck-build-dir
 
     - name: Run CppCheck
       run: |
-         cppcheck -UEP_Count_Calls -DEP_NO_OPENGL -UGROUND_PLOT -DLINK_WITH_PYTHON -DMSVC_DEBUG -DSKYLINE_MATRIX_REMOVE_ZERO_COLUMNS -U_OPENMP -Ugeneratetestdata \
+         cppcheck --cppcheck-build-dir=.cppcheck-build-dir \
+          -D__cppcheck__ -UEP_Count_Calls -DEP_NO_OPENGL -UGROUND_PLOT -DLINK_WITH_PYTHON -DMSVC_DEBUG -DSKYLINE_MATRIX_REMOVE_ZERO_COLUMNS -U_OPENMP -Ugeneratetestdata \
           -DEP_cache_GlycolSpecificHeat -DEP_cache_PsyTsatFnPb -UEP_nocache_Psychrometrics -UEP_psych_errors -UEP_psych_stats  \
           --force \
           --std=c++17 \
+          --inline-suppr \
           --enable=all \
           -i EnergyPlus/DXCoils.cc \
           -i EnergyPlus/RefrigeratedCase.cc \
