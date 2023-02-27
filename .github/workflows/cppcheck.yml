@@ -3,7 +3,7 @@ name: CppCheck
 on: [push]
 
 env:
-  CPPCHECK_VERSION: 2.10
+  CPPCHECK_VERSION: '2.10'
 
 jobs:
   build:
