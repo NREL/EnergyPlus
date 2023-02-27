@@ -3685,6 +3685,7 @@ Coil:Cooling:DX:VariableSpeed,
   0.63,                           !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+)IDF" R"IDF(
   Quadratic,                      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
   Quadratic,                      !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
@@ -6352,6 +6353,7 @@ Coil:Heating:DX:VariableSpeed,
       Temperature,             !- Input Unit Type for X
       Temperature,             !- Input Unit Type for Y
       Dimensionless;           !- Output Unit Type
+)IDF"  R"IDF(
 
     Curve:Biquadratic,
       HPACHeatEIRFT,           !- Name
@@ -6755,6 +6757,7 @@ Curve:Quadratic,
   0.0,                    !- Coefficient3 x**2
   0.0,                    !- Minimum Value of x
   1.0;                    !- Maximum Value of x
+)IDF"  R"IDF(
 
 Curve:Biquadratic,
   CoolCapFT,        !- Name
@@ -7224,6 +7227,7 @@ Curve:Quadratic,
   0.0,                    !- Coefficient3 x**2
   0.0,                    !- Minimum Value of x
   1.0;                    !- Maximum Value of x
+)IDF"  R"IDF(
 
 Curve:Biquadratic,
   CoolCapFT,              !- Name
@@ -8024,6 +8028,7 @@ UnitarySystemPerformance:Multispeed,
   0.666,                                                   !- Cooling Speed 2 Supply Air Flow Ratio
   1.0,                                                     !- Heating Speed 3 Supply Air Flow Ratio
   1.0;                                                     !- Cooling Speed 3 Supply Air Flow Ratio
+)IDF"    R"IDF(
 
 Coil:Cooling:DX:MultiSpeed,
   Sys 2 Furnace DX Cool MultiSpd Cooling Coil,             !- Name
@@ -8197,6 +8202,8 @@ Coil:Heating:Electric,
   Sys 2 Furnace DX Cool MultiSpd Cooling Coil Outlet,      !- Air Inlet Node Name
   Sys 2 Furnace DX Cool MultiSpd Heating Coil Outlet,      !- Air Outlet Node Name
   ;                                                        !- Coil Temp Setpoint Node
+)IDF"
+                                             R"IDF(
 
 Fan:VariableVolume,
   Sys 2 Furnace DX Cool MultiSpd Supply Fan,               !- Name
@@ -8524,6 +8531,7 @@ Coil:Cooling:DX:MultiSpeed,
   ,                        !- Speed 3 Evaporative Condenser Effectiveness {dimensionless}
   ,                        !- Speed 3 Evaporative Condenser Air Flow Rate {m3/s}
   ;                        !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}
+)IDF" R"IDF(
 
 Coil:Heating:DX:VariableSpeed,
   VS Heating Coil 1,       !- Name
@@ -8807,6 +8815,8 @@ Curve:Biquadratic,
     0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
     15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+)IDF"
+                                             R"IDF(
 
   BuildingSurface:Detailed,
     Zn001:Wall002,           !- Name
@@ -10579,6 +10589,8 @@ Coil:Heating:DX:MultiSpeed,
       Temperature,             !- Input Unit Type for X
       Temperature,             !- Input Unit Type for Y
       Dimensionless;           !- Output Unit Type
+)IDF"
+                                             R"IDF(
 
     Curve:Biquadratic,
       HPACHeatEIRFT,           !- Name
@@ -11233,6 +11245,8 @@ Curve:Cubic,
   , !- Maximum Curve Output
   Temperature, !- Input Unit Type for X
   Dimensionless;           !- Output Unit Type
+)IDF"
+                                             R"IDF(
 
 Curve:Cubic,
   HPACHeatEIRFT Speed 4, !- Name
@@ -12170,6 +12184,8 @@ Coil:Cooling:DX:MultiSpeed,
   ,                        !- Speed 3 Evaporative Condenser Effectiveness {dimensionless}
   ,                        !- Speed 3 Evaporative Condenser Air Flow Rate {m3/s}
   ;                        !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}
+)IDF"
+                                             R"IDF(
 
 Coil:Heating:DX:MultiSpeed,
   Heat Pump DX Heating Coil, !- Name
@@ -12619,6 +12635,8 @@ Curve:Biquadratic,
   Temperature,            !- Input Unit Type for X
   Temperature,            !- Input Unit Type for Y
   Dimensionless;          !- Output Unit Type
+)IDF"
+                                             R"IDF(
 
   Sizing:Zone,
     EAST ZONE,      !- Zone or ZoneList Name
@@ -14932,7 +14950,8 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
 
   Schedule:Compact,
     ActSchd,                 !- Name
-    Any Number,              !- Schedule Type Limits Name
+    Any Number,              !- Schedule Type Limits Name   " )IDF"
+                                             R"IDF(" // split line for MSVC long string C2026
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,117.239997864; !- Field 3
@@ -15214,7 +15233,8 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     ,                        !- Unit Internal Static Air Pressure {Pa}
     ,                        !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}   " )IDF"
+                                             R"IDF(" // split line for MSVC long string C2026
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
     Sys 1 Furnace DX Cool Cooling Coil Operating Mode,  !- Base Operating Mode
@@ -15258,7 +15278,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     NormalSHRTempCoolingFFF,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     NormalSHRFlowCoolingFFF;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-  Curve:Biquadratic,
+  Curve:Biquadratic,  
   NormalTempCoolingCAPFTemp,  !- Name
   1.2047763641,  !- Coefficient1 Constant
   -0.0319503564,  !- Coefficient2 x
@@ -15276,7 +15296,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,
+  Curve:Biquadratic,  
   NormalTempCoolingEIRFTemp,  !- Name
   -0.0439174307,  !- Coefficient1 Constant
   0.0620812106,  !- Coefficient2 x
@@ -15294,7 +15314,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,
+  Curve:Quadratic,  
   NormalFlowCoolingCAPFFF,  !- Name
   0.7333333334,  !- Coefficient1 Constant
   0.3733333333,  !- Coefficient2 x
@@ -15306,7 +15326,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,
+  Curve:Quadratic,  
   NormalFlowCoolingEIRFFF,  !- Name
   1.1970044563,  !- Coefficient1 Constant
   -0.2513822149,  !- Coefficient2 x
@@ -15318,7 +15338,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-Curve:Biquadratic,
+Curve:Biquadratic,	
 NormalSHRTempCoolingFFF,	!- Name
 1.0,	!- Coefficient1 Constant
 0.0,	!- Coefficient2 x
@@ -15336,7 +15356,7 @@ Temperature,	!- Input Unit Type for X
 Temperature,	!- Input Unit Type for Y
 Dimensionless;	!- Output Unit Type
 
-Curve:Quadratic,
+Curve:Quadratic,	
 NormalSHRFlowCoolingFFF,	!- Name
 0.5620186265,	!- Coefficient1 Constant
 0.4708409870,	!- Coefficient2 x
@@ -15385,7 +15405,7 @@ Dimensionless;	!- Output Unit Type
     SubcoolSHRTempCoolingCAPFTemp,   !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     SubcoolSHRFlowCoolingCAPFFF;     !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-  Curve:Biquadratic,
+  Curve:Biquadratic,  
   SubcoolTempCoolingCAPFTemp,  !- Name
   1.0162460317,  !- Coefficient1 Constant
   -0.0108091429,  !- Coefficient2 x
@@ -15403,7 +15423,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,
+  Curve:Biquadratic,  
   SubcoolTempCoolingEIRFTemp,  !- Name
   0.2634289781,  !- Coefficient1 Constant
   0.0311157806,  !- Coefficient2 x
@@ -15421,7 +15441,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,
+  Curve:Quadratic,  
   SubcoolFlowCoolingCAPFFF,  !- Name
   0.6,  !- Coefficient1 Constant
   0.6285714286,  !- Coefficient2 x
@@ -15433,7 +15453,7 @@ Dimensionless;	!- Output Unit Type
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,
+  Curve:Quadratic,  
   SubcoolFlowCoolingEIRFFF,  !- Name
   1.2856060606,  !- Coefficient1 Constant
   -0.4563131313,  !- Coefficient2 x
@@ -15445,7 +15465,7 @@ Dimensionless;	!- Output Unit Type
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,
+  Curve:Biquadratic,  
   SubcoolSHRTempCoolingCAPFTemp,  !- Name
   3.9903739056,  !- Coefficient1 Constant
   -0.2158168778,  !- Coefficient2 x
@@ -15463,7 +15483,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,
+  Curve:Quadratic,  
   SubcoolSHRFlowCoolingCAPFFF,  !- Name
   0.4306934378,  !- Coefficient1 Constant
   0.606484437,  !- Coefficient2 x
@@ -15512,7 +15532,7 @@ Dimensionless;	!- Output Unit Type
     ReheatSHRTempCoolingCAPFTemp,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ReheatSHRFlowCoolingCAPFFF;    !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-  Curve:Biquadratic,
+  Curve:Biquadratic,  
   ReheatTempCoolingCAPFTemp,  !- Name
   1.5813223182,  !- Coefficient1 Constant
   -0.0633198089,  !- Coefficient2 x
@@ -15530,7 +15550,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,
+  Curve:Biquadratic,  
   ReheatTempCoolingEIRFTemp,  !- Name
   0.4050271551,  !- Coefficient1 Constant
   0.0140945368,  !- Coefficient2 x
@@ -15538,7 +15558,8 @@ Dimensionless;	!- Output Unit Type
   0.0093711466,  !- Coefficient4 y
   0.0004496998,  !- Coefficient5 y**2
   -0.0000795439,  !- Coefficient6 x*y
-  16.94,  !- Minimum Value of x
+  16.94,  !- Minimum Value of x   " )IDF"
+                                             R"IDF(" // split line for MSVC long string C2026
   18.5,  !- Maximum Value of x
   4.44,  !- Minimum Value of y
   26.67,  !- Maximum Value of y
@@ -15548,7 +15569,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,
+  Curve:Quadratic,  
   ReheatFlowCoolingCAPFFF,  !- Name
   0.7454545455,  !- Coefficient1 Constant
   0.4,  !- Coefficient2 x
@@ -15560,7 +15581,7 @@ Dimensionless;	!- Output Unit Type
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,
+  Curve:Quadratic,  
   ReheatFlowCoolingEIRFFF,  !- Name
   1.3219073627,  !- Coefficient1 Constant
   -0.5498593181,  !- Coefficient2 x
@@ -15572,7 +15593,7 @@ Dimensionless;	!- Output Unit Type
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,
+  Curve:Biquadratic,  
   ReheatSHRTempCoolingCAPFTemp,  !- Name
   3.9903739056,  !- Coefficient1 Constant
   -0.2158168778,  !- Coefficient2 x
@@ -15590,7 +15611,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,
+  Curve:Quadratic,  
   ReheatSHRFlowCoolingCAPFFF,  !- Name
   -1.4384495222,  !- Coefficient1 Constant
   0.9171312178,  !- Coefficient2 x
@@ -15852,7 +15873,8 @@ Dimensionless;	!- Output Unit Type
     Until: 6:00,13.0,        !- Field 3
     Until: 7:00,18.0,        !- Field 5
     Until: 21:00,23.0,       !- Field 7
-    Until: 24:00,13.0,       !- Field 9
+    Until: 24:00,13.0,       !- Field 9   " )IDF"
+                                             R"IDF(" // split line for MSVC long string C2026
     For: WeekEnds Holiday,   !- Field 11
     Until: 24:00,13.0,       !- Field 12
     For: SummerDesignDay,    !- Field 14
@@ -16662,6 +16684,8 @@ Coil:Heating:DX:VariableSpeed,
   Quadratic,                      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
   Quadratic;                      !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+)IDF"
+                                             R"IDF(
 
 Curve:Quadratic,
   Quadratic,                      !- Name
@@ -17297,6 +17321,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
       0,                       !- Coefficient4 x**3
       0,                       !- Minimum Value of x
       1;                       !- Maximum Value of x
+)IDF"
+                                             R"IDF(
 
     Fan:OnOff,
       Furnace DX Cool Supply Fan,  !- Name
