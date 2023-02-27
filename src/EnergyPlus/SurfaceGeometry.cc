@@ -485,16 +485,16 @@ namespace SurfaceGeometry {
                     if (thisSurface.Class == SurfaceClass::Roof) {
                         // Use Average Z for surface, more important for roofs than floors...
                         ++CeilCount;
-                        Real64 Z1 = minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
-                        Real64 Z2 = maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
+                        Real64 Z1 = minval(thisSurface.Vertex, &Vector::z);
+                        Real64 Z2 = maxval(thisSurface.Vertex, &Vector::z);
                         //        ZCeilAvg=ZCeilAvg+(Z1+Z2)/2.d0
                         ZCeilAvg += ((Z1 + Z2) / 2.0) * (thisSurface.GrossArea / thisZone.geometricCeilingArea);
                     }
                     if (thisSurface.Class == SurfaceClass::Floor) {
                         // Use Average Z for surface, more important for roofs than floors...
                         ++FloorCount;
-                        Real64 Z1 = minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
-                        Real64 Z2 = maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z);
+                        Real64 Z1 = minval(thisSurface.Vertex, &Vector::z);
+                        Real64 Z2 = maxval(thisSurface.Vertex, &Vector::z);
                         //        ZFlrAvg=ZFlrAvg+(Z1+Z2)/2.d0
                         ZFlrAvg += ((Z1 + Z2) / 2.0) * (thisSurface.GrossArea / thisZone.geometricFloorArea);
                     }
@@ -505,8 +505,8 @@ namespace SurfaceGeometry {
                             ZMax = thisSurface.Vertex(1).z;
                             ZMin = ZMax;
                         }
-                        ZMax = max(ZMax, maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z));
-                        ZMin = min(ZMin, minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z));
+                        ZMax = max(ZMax, maxval(thisSurface.Vertex, &Vector::z));
+                        ZMin = min(ZMin, minval(thisSurface.Vertex, &Vector::z));
                     }
                 }
             }
@@ -585,12 +585,12 @@ namespace SurfaceGeometry {
                         thisZone.Centroid.z += thisSurface.Centroid.z * thisSurface.GrossArea;
                         TotSurfArea += thisSurface.GrossArea;
                     }
-                    thisZone.MinimumX = min(thisZone.MinimumX, minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::x));
-                    thisZone.MaximumX = max(thisZone.MaximumX, maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::x));
-                    thisZone.MinimumY = min(thisZone.MinimumY, minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::y));
-                    thisZone.MaximumY = max(thisZone.MaximumY, maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::y));
-                    thisZone.MinimumZ = min(thisZone.MinimumZ, minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z));
-                    thisZone.MaximumZ = max(thisZone.MaximumZ, maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z));
+                    thisZone.MinimumX = min(thisZone.MinimumX, minval(thisSurface.Vertex, &Vector::x));
+                    thisZone.MaximumX = max(thisZone.MaximumX, maxval(thisSurface.Vertex, &Vector::x));
+                    thisZone.MinimumY = min(thisZone.MinimumY, minval(thisSurface.Vertex, &Vector::y));
+                    thisZone.MaximumY = max(thisZone.MaximumY, maxval(thisSurface.Vertex, &Vector::y));
+                    thisZone.MinimumZ = min(thisZone.MinimumZ, minval(thisSurface.Vertex, &Vector::z));
+                    thisZone.MaximumZ = max(thisZone.MaximumZ, maxval(thisSurface.Vertex, &Vector::z));
                 }
             }
             if (TotSurfArea > 0.0) {
