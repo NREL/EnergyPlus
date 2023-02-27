@@ -12431,14 +12431,13 @@ namespace SurfaceGeometry {
                 }
 
                 ++NActFaces;
-                ZoneStruct.SurfaceFace(NActFaces).FacePoints.allocate(thisSurface.Sides);
-                ZoneStruct.SurfaceFace(NActFaces).NSides = thisSurface.Sides;
-                ZoneStruct.SurfaceFace(NActFaces).SurfNum = SurfNum;
-                ZoneStruct.SurfaceFace(NActFaces).FacePoints({1, thisSurface.Sides}) = thisSurface.Vertex({1, thisSurface.Sides});
-                Vectors::CreateNewellAreaVector(ZoneStruct.SurfaceFace(NActFaces).FacePoints,
-                                                ZoneStruct.SurfaceFace(NActFaces).NSides,
-                                                ZoneStruct.SurfaceFace(NActFaces).NewellAreaVector);
-                SumAreas += Vectors::VecLength(ZoneStruct.SurfaceFace(NActFaces).NewellAreaVector);
+                auto &thisFace = ZoneStruct.SurfaceFace(NActFaces);
+                thisFace.FacePoints.allocate(thisSurface.Sides);
+                thisFace.NSides = thisSurface.Sides;
+                thisFace.SurfNum = SurfNum;
+                thisFace.FacePoints({1, thisSurface.Sides}) = thisSurface.Vertex({1, thisSurface.Sides});
+                Vectors::CreateNewellAreaVector(thisFace.FacePoints, thisFace.NSides, thisFace.NewellAreaVector);
+                SumAreas += Vectors::VecLength(thisFace.NewellAreaVector);
             }
             ZoneStruct.NumSurfaceFaces = NActFaces;
 
@@ -12628,25 +12627,21 @@ namespace SurfaceGeometry {
                 print(state.files.debug, "zone={} calc volume={}\n", thisZone.Name, CalcVolume);
                 print(state.files.debug, " nsurfaces={} nactual={}\n", NFaces, NActFaces);
             }
-            for (int SurfNum = 1; SurfNum <= ZoneStruct.NumSurfaceFaces; ++SurfNum) {
+            for (int faceNum = 1; faceNum <= ZoneStruct.NumSurfaceFaces; ++faceNum) {
+                auto &thisFace = ZoneStruct.SurfaceFace(faceNum);
                 if (ShowZoneSurfaces) {
-                    if (SurfNum <= NActFaces) {
-                        print(state.files.debug,
-                              "surface={} nsides={}\n",
-                              ZoneStruct.SurfaceFace(SurfNum).SurfNum,
-                              ZoneStruct.SurfaceFace(SurfNum).NSides);
-                        print(state.files.debug,
-                              "surface name={} class={}\n",
-                              state.dataSurface->Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).Name,
-                              state.dataSurface->Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).Class);
-                        print(state.files.debug, "area={}\n", state.dataSurface->Surface(ZoneStruct.SurfaceFace(SurfNum).SurfNum).GrossArea);
-                        for (int iside = 1; iside <= ZoneStruct.SurfaceFace(SurfNum).NSides; ++iside) {
-                            auto const &FacePoint(ZoneStruct.SurfaceFace(SurfNum).FacePoints(iside));
+                    if (faceNum <= NActFaces) {
+                        auto &thisSurface = state.dataSurface->Surface(thisFace.SurfNum);
+                        print(state.files.debug, "surface={} nsides={}\n", thisFace.SurfNum, thisFace.NSides);
+                        print(state.files.debug, "surface name={} class={}\n", thisSurface.Name, thisSurface.Class);
+                        print(state.files.debug, "area={}\n", thisSurface.GrossArea);
+                        for (int iside = 1; iside <= thisFace.NSides; ++iside) {
+                            auto const &FacePoint(thisFace.FacePoints(iside));
                             print(state.files.debug, "{} {} {}\n", FacePoint.x, FacePoint.y, FacePoint.z);
                         }
                     }
                 }
-                ZoneStruct.SurfaceFace(SurfNum).FacePoints.deallocate();
+                thisFace.FacePoints.deallocate();
             }
             if (ShowZoneSurfaces) {
                 for (int SurfNum = 1; SurfNum <= notused; ++SurfNum) {
