@@ -115,15 +115,15 @@ namespace EMSManager {
                                                                                                   "BEGINZONETIMESTEPAFTERINITHEATBALANCE",
                                                                                                   "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER"};
 
-    std::array<std::string_view, static_cast<int>(SPControlType::Num)> controlTypeName{"Temperature Setpoint",
-                                                                                       "Temperature Minimum Setpoint",
-                                                                                       "Temperature Maximum Setpoint",
-                                                                                       "Humidity Ratio Setpoint",
-                                                                                       "Humidity Ratio Minimum Setpoint",
-                                                                                       "Humidity Ratio Maximum Setpoint",
-                                                                                       "Mass Flow Rate Setpoint",
-                                                                                       "Mass Flow Rate Minimum Available Setpoint",
-                                                                                       "Mass Flow Rate Maximum Available Setpoint"};
+    constexpr std::array<std::string_view, static_cast<int>(SPControlType::Num)> controlTypeName{"Temperature Setpoint",
+                                                                                                 "Temperature Minimum Setpoint",
+                                                                                                 "Temperature Maximum Setpoint",
+                                                                                                 "Humidity Ratio Setpoint",
+                                                                                                 "Humidity Ratio Minimum Setpoint",
+                                                                                                 "Humidity Ratio Maximum Setpoint",
+                                                                                                 "Mass Flow Rate Setpoint",
+                                                                                                 "Mass Flow Rate Minimum Available Setpoint",
+                                                                                                 "Mass Flow Rate Maximum Available Setpoint"};
 
     void CheckIfAnyEMS(EnergyPlusData &state)
     {

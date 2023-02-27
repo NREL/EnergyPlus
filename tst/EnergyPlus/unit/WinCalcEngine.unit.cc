@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEClear)
     WindowManager::InitWindowOpticalCalculations(*state);
     HeatBalanceManager::InitHeatBalance(*state);
 
-    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
+    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance(*state);
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
     constexpr Real64 minLambda{0.3};
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEVenetian)
     WindowManager::InitWindowOpticalCalculations(*state);
     HeatBalanceManager::InitHeatBalance(*state);
 
-    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
+    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance(*state);
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
     constexpr Real64 minLambda{0.3};
@@ -276,7 +276,7 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEShade)
     WindowManager::InitWindowOpticalCalculations(*state);
     HeatBalanceManager::InitHeatBalance(*state);
 
-    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
+    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance(*state);
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
     constexpr Real64 minLambda{0.3};
