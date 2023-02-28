@@ -1721,16 +1721,16 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
     // calculate source side outlet conditions
-    Real64 CpSrc = 0.0;
-    if (this->waterSource) {
-        CpSrc = FluidProperties::GetSpecificHeatGlycol(
-            state, thisLoadPlantLoop.FluidName, thisInletNode.Temp, thisLoadPlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
-    } else if (this->airSource) {
-        CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-    }
+    // Real64 CpSrc = 0.0;
+    // if (this->waterSource) {
+    //    CpSrc = FluidProperties::GetSpecificHeatGlycol(
+    //        state, thisLoadPlantLoop.FluidName, thisInletNode.Temp, thisLoadPlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
+    // } else if (this->airSource) {
+    //    CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+    // }
     // Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
-    Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate) * CpSrc;
-    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+    // Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate) * CpSrc;
+    // this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 }
 
 void EIRFuelFiredHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
