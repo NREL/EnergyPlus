@@ -22902,8 +22902,7 @@ TEST_F(EnergyPlusFixture, VRFHP_CondenserCalc_PLR_Issue_Test)
     EXPECT_FALSE(vrf.ModeChange);
     EXPECT_FALSE(vrf.HRModeChange);
     // This is a little bit out of expectation for the new test
-    EXPECT_EQ(vrf.ElecCoolingPower,
-              vrf.RatedCoolingPower * vrf.VRFCondPLR * Curve::CurveValue(*state, vrf.CoolEIRFPLR1, max(vrf.MinPLR, vrf.VRFCondPLR)));
+    EXPECT_EQ(vrf.ElecCoolingPower, vrf.RatedCoolingPower * Curve::CurveValue(*state, vrf.CoolEIRFPLR1, max(vrf.MinPLR, vrf.VRFCondPLR)));
     EXPECT_EQ(vrf.ElecHeatingPower, 0.0);
 
     // TU's are in heating mode only
@@ -22936,8 +22935,7 @@ TEST_F(EnergyPlusFixture, VRFHP_CondenserCalc_PLR_Issue_Test)
     EXPECT_FALSE(vrf.HRModeChange);
     EXPECT_EQ(vrf.ElecCoolingPower, 0.0);
     // Here also need to do furthe check to see if it is expected:
-    EXPECT_EQ(vrf.ElecHeatingPower,
-              vrf.RatedHeatingPower * vrf.VRFCondPLR * Curve::CurveValue(*state, vrf.HeatEIRFPLR1, max(vrf.MinPLR, vrf.VRFCondPLR)));
+    EXPECT_EQ(vrf.ElecHeatingPower, vrf.RatedHeatingPower * Curve::CurveValue(*state, vrf.HeatEIRFPLR1, max(vrf.MinPLR, vrf.VRFCondPLR)));
 }
 
 } // end of namespace EnergyPlus
