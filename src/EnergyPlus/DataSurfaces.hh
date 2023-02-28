@@ -1319,6 +1319,8 @@ namespace DataSurfaces {
 
     Real64 AbsBackSide(EnergyPlusData &state, int SurfNum);
 
+    void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state);
+
     std::string cSurfaceClass(SurfaceClass ClassNo);
 
 } // namespace DataSurfaces
@@ -1382,6 +1384,7 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllExtSolWinWithFrameSurfaceList; // List of all exterior solar window surfaces with a frame and divider
     std::vector<int> AllHTKivaSurfaceList;             // List of all Kiva foundation surfaces
     std::vector<int> AllSurfaceListReportOrder;        // List of all surfaces - output reporting order
+    std::vector<int> AllVaryAbsOpaqSurfaceList;        // List of all opaque exterior surfaces with dynamic coating
 
     // Surface HB arrays
     Array1D<Real64> SurfOutDryBulbTemp; // Surface outside dry bulb air temperature, for surface heat balance (C)
@@ -1784,6 +1787,7 @@ struct SurfacesData : BaseGlobalStruct
         this->AllExtSolWinWithFrameSurfaceList.clear();
         this->AllHTKivaSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
+        this->AllVaryAbsOpaqSurfaceList.clear();
 
         this->SurfOutDryBulbTemp.deallocate();
         this->SurfOutWetBulbTemp.deallocate();

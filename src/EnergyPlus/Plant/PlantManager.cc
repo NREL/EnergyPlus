@@ -1176,6 +1176,18 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
+                    case PlantEquipmentType::HeatPumpFuelFiredHeating: {
+                        this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
+                            state, PlantEquipmentType::HeatPumpFuelFiredHeating, CompNames(CompNum));
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        break;
+                    }
+                    case PlantEquipmentType::HeatPumpFuelFiredCooling: {
+                        this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
+                            state, PlantEquipmentType::HeatPumpFuelFiredCooling, CompNames(CompNum));
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        break;
+                    }
                     case PlantEquipmentType::HeatPumpVRF: {
                         if (LoopSideNum == LoopSideLocation::Demand) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -4199,6 +4211,17 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                     } break;
                     case DataPlant::PlantEquipmentType::HeatPumpEIRCooling:
                     case PlantEquipmentType::HeatPumpEIRHeating: { // 95, 96
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                        if (LoopSideCtr == LoopSideLocation::Demand) {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
+                        } else {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
+                        }
+                    } break;
+                    case DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling:
+                    case PlantEquipmentType::HeatPumpFuelFiredHeating: {
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         if (LoopSideCtr == LoopSideLocation::Demand) {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;

@@ -759,6 +759,62 @@ This will output heat flux at each node in surfaces being simulated with Conduct
 
 These will output the half-node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness. Zero is reported for R-layer half-nodes and for undefined half-nodes. There is no outer half-node for Node 1 which is the outside face of the surface, and there is no inner half-node for Node N which is the inside face of the surface. CondFD Surface Heat Capacitance is only available when the user includes a Output:Diagnostics, DisplayAdvancedReportVariables designation in the input file.
 
+\subsection{MaterialProperty:VariableAbsorptance}\label{materialpropertyvariableabsorptance}
+
+This object is used to describe a dynamic coating material applied on the
+outside of opaque exterior walls or roofs. The object will modify the thermal
+or solar absorptance of the outside surface of an existing material defined in
+the field ``Reference Material Name''. The variation of the thermal or solar
+absorptance of the coating can be driven by any of the following four control
+variables: surface temperature, surface received solar radiation, zone
+heating/cooling mode, or a schedule. If both the thermal and the solar
+absorptance are varying, the control signals are assumed to be the same, but
+different functions/schedules are allowed. The material can have a variable
+thermal absorptance and a constant solar absorptance, or a constant thermal
+absorptance and a variable solar absorptance. Note that the variable-absorptance
+coatings modeled with this object are not exactly equivalent to those modeled
+with EMS. This object only adjusts the thermal or solar absorptance of the
+exterior surfaces, while the EMS approach overwrites the absorptance of both the
+interior and exterior surfaces.
+
+\subsubsection{Inputs}\label{inputs-materialpropertyvariableabsorptance}
+
+\paragraph{Field: Name}\label{field-name-materialpropertyvariableabsorptance}
+
+The name of the variable absorptance material property object.
+
+\paragraph{Field: Reference Material Name}\label{field-reference-material-name-materialpropertyvariableabsorptance}
+
+This field is a regular material name specifying the material with which this additional
+variable absorptance property information will be associated.
+
+\paragraph{Field: Control Signal}\label{field-control-signal}
+
+It can be one of the following: surface temperature, surface received solar radiation, zone heating/cooling mode, or a schedule.
+If the control signal is ``Scheduled'', then a schedule needs to be specified in ``Thermal Absorptance Schedule Name'' or
+``Solar Absorptance Schedule Name''. The schedule value will override the material absorptance value. If the control signal
+is not ``Scheduled'', then the control signal value at the target surface or zone will decide the absorptance, based on
+the function referenced in ``Thermal Absorptance Function Name'' or ``Solar Absorptance Function Name''. If not specified,
+the control signal will assumed to be surface temperature.
+
+\paragraph{Field: Thermal Absorptance Function Name}\label{field-thermal-absorptance-function-name}
+
+The name of a Curve or a Table:Lookup object describing the relationship between the control signal and the thermal absorptance.
+
+\paragraph{Field: Thermal Absorptance Schedule Name}\label{field-thermal-absorptance-schedule-name}
+
+The name of a Schedule object that overwrites the material thermal absorptance.
+If neither this field or the previous field are defined, then the thermal absorptance is assumed to be constant
+
+\paragraph{Field: Solar Absorptance Function Name}\label{field-solar-absorptance-function-name}
+
+The name of a Curve or a Table:Lookup object describing the relationship between the control signal and the solar absorptance.
+
+\paragraph{Field: Solar Absorptance Schedule Name}\label{field-solar-absorptance-schedule-name}
+
+The name of a Schedule object that overwrites the material solar absorptance.
+If neither this field or the previous field are defined, then the solar absorptance is assumed to be constant
+
 \subsection{MaterialProperty:HeatAndMoistureTransfer:Settings}\label{materialpropertyheatandmoisturetransfersettings}
 
 \textbf{Advanced/Research Usage:} This object is used to describe two of the seven additional material properties needed for the CombinedHeatAndMoistureFiniteElement heat balance solution algorithm. The settings object is used when the solutions algorithm is set to CombinedHeatAndMoistureFiniteElement and the appropriate material properties are assigned to each material. This permits the simulation of the moisture dependent thermal properties of the material as well as the transfer of moisture through, into and out of the material into the zone or exterior.

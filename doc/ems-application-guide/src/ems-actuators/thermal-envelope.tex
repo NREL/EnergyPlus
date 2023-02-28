@@ -43,7 +43,17 @@ This actuator controls the heat transfer modeling. Changes in air distribution s
 
 \subsection{Material Surface Properties}\label{material-surface-properties}
 
-Three actuators are available for controlling the surface properties material related to absorptance. Those material layers used in a Construction object that lie at the outside and the inside of the assembly determine the surface properties of a heat transfer surface.~ Actuators called ``Material'' are available with the control types ``Surface Property Solar Absorptance,'' ``Surface Property Thermal Absorptance,'' and ``Surface Property Visible Absorptance.''~ These are dimensionless parameters between 0.0 and 1.0.~ These actuators are useful for modeling switchable coatings such as thermochromic paints.
+Three actuators are available for controlling the surface properties material
+related to absorptance. Those material layers used in a Construction object that
+lie at the outside and the inside of the assembly determine the surface
+properties of a heat transfer surface.~ Actuators called ``Material'' are
+available with the control types ``Surface Property Solar Absorptance,''
+``Surface Property Thermal Absorptance,'' and ``Surface Property Visible
+Absorptance.''~ These are dimensionless parameters between 0.0 and 1.0.~ These
+actuators are useful for modeling switchable coatings such as thermochromic
+paints. Note that for a single-layer construction, both the inside and outside
+properties will be overwritten. For overwriting outside properties alone, please
+use ``MaterialProperty:VariableAbsorptance'' (see InputOutputReference).
 
 \subsection{Surface Construction State}\label{surface-construction-state}
 
