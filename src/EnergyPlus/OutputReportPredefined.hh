@@ -167,8 +167,11 @@ namespace OutputReportPredefined {
     // Creates an entry for predefined tables when the entry
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
     // Internally it uses a Fortran-Style write statement, meaning numbers are rounded rather than trimmed
-    void PreDefTableEntry(
-        EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
+    void PreDefTableEntry(EnergyPlusData &state,
+                          int const columnIndex,
+                          std::string_view objName,
+                          Real64 const tableEntryReal,
+                          ObjexxFCL::Optional_int_const numSigDigits = _);
 
     void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName, std::string_view tableEntryChar);
 

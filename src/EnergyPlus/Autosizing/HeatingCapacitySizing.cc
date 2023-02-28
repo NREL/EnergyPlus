@@ -252,7 +252,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 // get the outside air fraction
                 if (this->curOASysNum > 0) {
                     OutAirFrac = 1.0;
-                } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::MinOA) {
+                } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::OAControl::MinOA) {
                     if (DesVolFlow > 0.0) {
                         OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / DesVolFlow;
                     } else {

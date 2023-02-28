@@ -202,8 +202,8 @@ namespace CoolTower {
             } else {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-                    ShowContinueError(state, "Invalid-Schedule not found " + cAlphaFields(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                    ShowSevereError(state, format("{}=\"{}\" invalid data", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid-Schedule not found {}=\"{}\".", cAlphaFields(2), state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 }
             }
@@ -213,12 +213,17 @@ namespace CoolTower {
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(3)));
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(3),
+                                           state.dataIPShortCut->cAlphaArgs(3)));
                 }
                 ErrorsFound = true;
             }
@@ -241,8 +246,11 @@ namespace CoolTower {
                     static_cast<FlowCtrl>(getEnumerationValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::Invalid) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(5) + "\".");
+                                    format("{}=\"{}\" invalid {}=\"{}\".",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(5),
+                                           state.dataIPShortCut->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
             }
@@ -251,12 +259,17 @@ namespace CoolTower {
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) +
-                                        " is required but input is blank.");
+                                    format("{}=\"{}\" invalid {} is required but input is blank.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(6)));
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(6) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           cAlphaFields(6),
+                                           state.dataIPShortCut->cAlphaArgs(6)));
                 }
                 ErrorsFound = true;
             }
@@ -427,7 +440,7 @@ namespace CoolTower {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(state, CurrentModuleObject + " errors occurred in input.  Program terminates.");
+        if (ErrorsFound) ShowFatalError(state, format("{} errors occurred in input.  Program terminates.", CurrentModuleObject));
 
         for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
             SetupOutputVariable(state,
@@ -679,7 +692,7 @@ namespace CoolTower {
 
                 if (OutletTemp < state.dataEnvrn->OutWetBulbTemp) {
                     ShowSevereError(state, "Cooltower outlet temperature exceed the outdoor wet bulb temperature reset to input values");
-                    ShowContinueError(state, "Occurs in Cooltower =" + state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name);
+                    ShowContinueError(state, format("Occurs in Cooltower ={}", state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name));
                 }
 
                 WaterFlowRate /= UCFactor;

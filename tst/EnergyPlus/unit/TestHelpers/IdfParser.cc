@@ -68,8 +68,8 @@ std::string IdfParser::encode(std::vector<std::vector<std::string>> const &idf_l
 {
     std::string idf;
     for (auto const &object : idf_list) {
-        int const size = object.size();
-        for (int i = 0; i < size - 1; ++i) {
+        size_t const size = object.size();
+        for (size_t i = 0; i < size - 1; ++i) {
             idf += object[i] + ',';
         }
         idf += object[size - 1] + ';' + '\n';

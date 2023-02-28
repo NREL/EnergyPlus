@@ -9,6 +9,8 @@
 # ENERGYPLUS_FLAGS
 # RUN_CALLGRIND
 # VALGRIND
+# RUN_PERF_STAT
+# PERF
 
 get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
 get_filename_component(IDF_EXT "${IDF_FILE}" EXT)
@@ -157,20 +159,59 @@ else()
 endif()
 
 if(RUN_CALLGRIND)
-  set(VALGRIND_COMMAND ${VALGRIND} --tool=callgrind --callgrind-out-file=callgrind.performance.${IDF_NAME})
+  set(VALGRIND_COMMAND ${VALGRIND} --tool=callgrind --branch-sim=yes --callgrind-out-file=callgrind.performance.${IDF_NAME})
 else()
   set(VALGRIND_COMMAND "")
 endif()
 
-# message(${VALGRIND_COMMAND} "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}")
-execute_process(
-  COMMAND ${ECHO_CMD}
-  COMMAND ${VALGRIND_COMMAND} "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
-  WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
-  RESULT_VARIABLE RESULT)
-
-if(RESULT EQUAL 0)
-  message("Test Passed")
+if(RUN_PERF_STAT)
+  set(PERF_STAT_COMMAND ${PERF} stat -d -d -d -x , -r 3  -o perf.performance.${IDF_NAME})
 else()
-  message("Test Failed")
+  set(PERF_STAT_COMMAND "")
 endif()
+
+
+if (RUN_CALLGRIND)
+  execute_process(
+    COMMAND ${ECHO_CMD}
+    COMMAND ${VALGRIND_COMMAND} "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
+    WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
+    RESULT_VARIABLE RESULT)
+
+  if(NOT RESULT EQUAL 0)
+    message("Test Failed")
+    return()
+  endif()
+endif()
+
+if (RUN_PERF_STAT)
+  execute_process(
+    COMMAND ${ECHO_CMD}
+    COMMAND ${PERF_STAT_COMMAND} "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
+    WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
+    RESULT_VARIABLE RESULT)
+
+  if(NOT RESULT EQUAL 0)
+    message("Test Failed")
+    return()
+  endif()
+endif()
+
+
+# Run without perf stat or callgrind, if neither is requested
+if (NOT RUN_PERF_STAT AND NOT RUN_CALLGRIND)
+  execute_process(
+    COMMAND ${ECHO_CMD}
+    COMMAND "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
+    WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
+    RESULT_VARIABLE RESULT)
+
+  if(NOT RESULT EQUAL 0)
+    message("Test Failed")
+    return()
+  endif()
+endif()
+
+# if we get here, then none of the required tests failed
+message("Test Passed")
+

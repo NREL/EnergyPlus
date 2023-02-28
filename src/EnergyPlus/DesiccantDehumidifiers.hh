@@ -279,10 +279,10 @@ namespace DesiccantDehumidifiers {
     void ReportDesiccantDehumidifier(EnergyPlusData &state, int DesicDehumNum); // number of the current dehumidifier being simulated
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
-                               int DesicDehumNum,                    // Desiccant dehumidifier unit index
-                               bool FirstHVACIteration,              // flag for first HVAC iteration in the time step
-                               Real64 RegenCoilLoad,                 // heating coil load to be met (Watts)
-                               Optional<Real64> RegenCoilLoadmet = _ // heating load met
+                               int DesicDehumNum,                               // Desiccant dehumidifier unit index
+                               bool FirstHVACIteration,                         // flag for first HVAC iteration in the time step
+                               Real64 RegenCoilLoad,                            // heating coil load to be met (Watts)
+                               ObjexxFCL::Optional<Real64> RegenCoilLoadmet = _ // heating load met
     );
 
     int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);

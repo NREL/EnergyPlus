@@ -229,49 +229,49 @@ bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, b
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
-    auto const has_output = !state->files.eso.get_output().empty();
+    bool const has_output = !state->files.eso.get_output().empty();
     if (reset_stream) state->files.eso.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 {
-    auto const has_output = !state->files.eio.get_output().empty();
+    bool const has_output = !state->files.eio.get_output().empty();
     if (reset_stream) state->files.eio.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_mtr_output(bool reset_stream)
 {
-    auto const has_output = !state->files.mtr.get_output().empty();
+    bool const has_output = !state->files.mtr.get_output().empty();
     if (reset_stream) state->files.mtr.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_err_output(bool reset_stream)
 {
-    auto const has_output = this->err_stream->str().size() > 0;
+    bool const has_output = this->err_stream->str().size() > 0;
     if (reset_stream) this->err_stream->str(std::string());
     return has_output;
 }
 
 bool EnergyPlusFixture::has_cout_output(bool reset_stream)
 {
-    auto const has_output = this->m_cout_buffer->str().size() > 0;
+    bool const has_output = this->m_cout_buffer->str().size() > 0;
     if (reset_stream) this->m_cout_buffer->str(std::string());
     return has_output;
 }
 
 bool EnergyPlusFixture::has_cerr_output(bool reset_stream)
 {
-    auto const has_output = this->m_cerr_buffer->str().size() > 0;
+    bool const has_output = this->m_cerr_buffer->str().size() > 0;
     if (reset_stream) this->m_cerr_buffer->str(std::string());
     return has_output;
 }
 
 bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
 {
-    auto const has_output = !state->files.dfs.get_output().empty();
+    bool const has_output = !state->files.dfs.get_output().empty();
     if (reset_stream) state->files.dfs.open_as_stringstream();
     return has_output;
 }
@@ -290,6 +290,69 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
 }
 
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
+{
+    bool success = true;
+    auto &inputProcessor = state->dataInputProcessing->inputProcessor;
+    inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema(), success);
+
+    // Add common objects that will trigger a warning if not present
+    if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
+        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", DataStringGlobals::MatchVersion}}}};
+    }
+    if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
+        inputProcessor->epJSON["Building"] = {{"Bldg",
+                                               {{"idf_order", 0},
+                                                {"north_axis", 0.0},
+                                                {"terrain", "Suburbs"},
+                                                {"loads_convergence_tolerance_value", 0.04},
+                                                {"temperature_convergence_tolerance_value", 0.4000},
+                                                {"solar_distribution", "FullExterior"},
+                                                {"maximum_number_of_warmup_days", 25},
+                                                {"minimum_number_of_warmup_days", 6}}}};
+    }
+    if (inputProcessor->epJSON.find("GlobalGeometryRules") == inputProcessor->epJSON.end()) {
+        inputProcessor->epJSON["GlobalGeometryRules"] = {{"",
+                                                          {{"idf_order", 0},
+                                                           {"starting_vertex_position", "UpperLeftCorner"},
+                                                           {"vertex_entry_direction", "Counterclockwise"},
+                                                           {"coordinate_system", "Relative"},
+                                                           {"daylighting_reference_point_coordinate_system", "Relative"},
+                                                           {"rectangular_surface_coordinate_system", "Relative"}}}};
+    }
+
+    int MaxArgs = 0;
+    int MaxAlpha = 0;
+    int MaxNumeric = 0;
+    inputProcessor->getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
+
+    state->dataIPShortCut->cAlphaFieldNames.allocate(MaxAlpha);
+    state->dataIPShortCut->cAlphaArgs.allocate(MaxAlpha);
+    state->dataIPShortCut->lAlphaFieldBlanks.dimension(MaxAlpha, false);
+    state->dataIPShortCut->cNumericFieldNames.allocate(MaxNumeric);
+    state->dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
+    state->dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
+
+    bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
+    bool hasErrors = inputProcessor->processErrors(*state);
+
+    inputProcessor->initializeMaps();
+    SimulationManager::PostIPProcessing(*state);
+
+    FluidProperties::GetFluidPropertiesData(*state);
+    state->dataFluidProps->GetInput = false;
+
+    // inputProcessor->state->printErrors();
+
+    bool successful_processing = success && is_valid && !hasErrors;
+
+    if (!successful_processing && use_assertions) {
+        EXPECT_TRUE(compare_err_stream(""));
+    }
+
+    return successful_processing;
+}
+
+bool EnergyPlusFixture::process_idf(std::string_view const idf_snippet, bool use_assertions)
 {
     bool success = true;
     auto &inputProcessor = state->dataInputProcessing->inputProcessor;

@@ -52,7 +52,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
+// #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -261,6 +261,7 @@ protected:
     // This will add the required objects if not specified: Version, Building, GlobalGeometryRules
     // Will return false if no errors found and true if errors found
     bool process_idf(std::string const &idf_snippet, bool use_assertions = true);
+    bool process_idf(std::string_view const idf_snippet, bool use_assertions = true);
 
     // Opens output files as stringstreams
     void openOutputFiles(EnergyPlusData &state);

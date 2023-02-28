@@ -82,7 +82,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     // This test was added to test bug issue #4893 fix, a defect that resulted in SHR greater than 1.0.
 
     int HPNum(1);
-    int CurveNum;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
@@ -115,62 +114,61 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.0045;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
 
-    state->dataCurveManager->NumCurves = 3;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(3);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -9.149069561;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 10.878140260;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -1.718780157;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.746414818;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 80.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 2.0;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::QuadLinear;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = -9.149069561;
+    curve1->coeff[1] = 10.878140260;
+    curve1->coeff[2] = -1.718780157;
+    curve1->coeff[3] = 0.746414818;
+    curve1->coeff[4] = 0.0;
+    curve1->inputLimits[0].min = 0.0;
+    curve1->inputLimits[0].max = 80.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 100.0;
+    curve1->inputLimits[2].min = 0.0;
+    curve1->inputLimits[2].max = 2.0;
+    curve1->inputLimits[3].min = 0.0;
+    curve1->inputLimits[3].max = 2.0;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -5.462690012;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 17.95968138;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -11.87818402;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.980163419;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.767285761;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[4].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[4].max = 1.0;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::QuintLinear;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = -5.462690012;
+    curve2->coeff[1] = 17.95968138;
+    curve2->coeff[2] = -11.87818402;
+    curve2->coeff[3] = -0.980163419;
+    curve2->coeff[4] = 0.767285761;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 0.0;
+    curve2->inputLimits[0].max = 100.0;
+    curve2->inputLimits[1].min = 0.0;
+    curve2->inputLimits[1].max = 100.0;
+    curve2->inputLimits[2].min = 0.0;
+    curve2->inputLimits[2].max = 100.0;
+    curve2->inputLimits[3].min = 0.0;
+    curve2->inputLimits[3].max = 1.0;
+    curve2->inputLimits[4].min = 0.0;
+    curve2->inputLimits[4].max = 1.0;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -3.205409884;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.976409399;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 3.97892546;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.938181818;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 38;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::QuadLinear;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = -3.205409884;
+    curve3->coeff[1] = -0.976409399;
+    curve3->coeff[2] = 3.97892546;
+    curve3->coeff[3] = 0.938181818;
+    curve3->coeff[4] = 0.0;
+    curve3->inputLimits[0].min = -100;
+    curve3->inputLimits[0].max = 100;
+    curve3->inputLimits[1].min = -100;
+    curve3->inputLimits[1].max = 100;
+    curve3->inputLimits[2].min = 0;
+    curve3->inputLimits[2].max = 100;
+    curve3->inputLimits[3].min = 0;
+    curve3->inputLimits[3].max = 38;
 
     // performance curve coefficients
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex = 1;
@@ -1122,65 +1120,63 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirWetbulbTemp = 19.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirDrybulbTemp = 27.0;
 
-    state->dataCurveManager->NumCurves = 6;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(6);
 
-    int CurveNum;
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -9.32564313298629;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 11.088084240584;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -1.75195196204063;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.760820340847872;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 80.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 2.0;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::QuadLinear;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = -9.32564313298629;
+    curve1->coeff[1] = 11.088084240584;
+    curve1->coeff[2] = -1.75195196204063;
+    curve1->coeff[3] = 0.760820340847872;
+    curve1->coeff[4] = 0.0;
+    curve1->inputLimits[0].min = 0.0;
+    curve1->inputLimits[0].max = 80.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 100.0;
+    curve1->inputLimits[2].min = 0.0;
+    curve1->inputLimits[2].max = 2.0;
+    curve1->inputLimits[3].min = 0.0;
+    curve1->inputLimits[3].max = 2.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).TotalCoolCapCurveIndex = 1;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -5.26562830117273;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 17.3118017582604;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -11.4496890368762;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.944804890543481;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.739606605780884;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[4].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[4].max = 1.0;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::QuintLinear;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = -5.26562830117273;
+    curve2->coeff[1] = 17.3118017582604;
+    curve2->coeff[2] = -11.4496890368762;
+    curve2->coeff[3] = -0.944804890543481;
+    curve2->coeff[4] = 0.739606605780884;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 0.0;
+    curve2->inputLimits[0].max = 100.0;
+    curve2->inputLimits[1].min = 0.0;
+    curve2->inputLimits[1].max = 100.0;
+    curve2->inputLimits[2].min = 0.0;
+    curve2->inputLimits[2].max = 100.0;
+    curve2->inputLimits[3].min = 0.0;
+    curve2->inputLimits[3].max = 1.0;
+    curve2->inputLimits[4].min = 0.0;
+    curve2->inputLimits[4].max = 1.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).SensCoolCapCurveIndex = 2;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -3.25323327026219;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.990977022339372;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 4.03828937789764;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.952179101682919;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 38;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::QuadLinear;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = -3.25323327026219;
+    curve3->coeff[1] = -0.990977022339372;
+    curve3->coeff[2] = 4.03828937789764;
+    curve3->coeff[3] = 0.952179101682919;
+    curve3->coeff[4] = 0.0;
+    curve3->inputLimits[0].min = -100;
+    curve3->inputLimits[0].max = 100;
+    curve3->inputLimits[1].min = -100;
+    curve3->inputLimits[1].max = 100;
+    curve3->inputLimits[2].min = 0;
+    curve3->inputLimits[2].max = 100;
+    curve3->inputLimits[3].min = 0;
+    curve3->inputLimits[3].max = 38;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CoolPowCurveIndex = 3;
 
     CheckSimpleWAHPRatedCurvesOutputs(*state, "WAHP");
@@ -1199,61 +1195,61 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirWetbulbTemp = 19.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirDrybulbTemp = 27.0;
 
-    CurveNum = 4;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -0.68126221;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.99529297;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.93611888;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.02081177;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.008438868;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 80.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 2.0;
+    auto *curve4 = state->dataCurveManager->PerfCurve(4);
+    curve4->curveType = CurveType::QuadLinear;
+    curve4->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve4->coeff[0] = -0.68126221;
+    curve4->coeff[1] = 1.99529297;
+    curve4->coeff[2] = -0.93611888;
+    curve4->coeff[3] = 0.02081177;
+    curve4->coeff[4] = 0.008438868;
+    curve4->inputLimits[0].min = 0.0;
+    curve4->inputLimits[0].max = 80.0;
+    curve4->inputLimits[1].min = 0.0;
+    curve4->inputLimits[1].max = 100.0;
+    curve4->inputLimits[2].min = 0.0;
+    curve4->inputLimits[2].max = 2.0;
+    curve4->inputLimits[3].min = 0.0;
+    curve4->inputLimits[3].max = 2.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).TotalCoolCapCurveIndex = 4;
 
-    CurveNum = 5;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 2.24209455;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 7.28913391;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -9.06079896;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.36729404;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.218826161;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.00901534;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[4].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[4].max = 1.0;
+    auto *curve5 = state->dataCurveManager->PerfCurve(5);
+    curve5->curveType = CurveType::QuintLinear;
+    curve5->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve5->coeff[0] = 2.24209455;
+    curve5->coeff[1] = 7.28913391;
+    curve5->coeff[2] = -9.06079896;
+    curve5->coeff[3] = -0.36729404;
+    curve5->coeff[4] = 0.218826161;
+    curve5->coeff[5] = 0.00901534;
+    curve5->inputLimits[0].min = 0.0;
+    curve5->inputLimits[0].max = 100.0;
+    curve5->inputLimits[1].min = 0.0;
+    curve5->inputLimits[1].max = 100.0;
+    curve5->inputLimits[2].min = 0.0;
+    curve5->inputLimits[2].max = 100.0;
+    curve5->inputLimits[3].min = 0.0;
+    curve5->inputLimits[3].max = 1.0;
+    curve5->inputLimits[4].min = 0.0;
+    curve5->inputLimits[4].max = 1.0;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).SensCoolCapCurveIndex = 5;
 
-    CurveNum = 6;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -3.20456384;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.47656454;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 3.16734236;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.10244637;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -0.038132556;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 38;
+    auto *curve6 = state->dataCurveManager->PerfCurve(6);
+    curve6->curveType = CurveType::QuadLinear;
+    curve6->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve6->coeff[0] = -3.20456384;
+    curve6->coeff[1] = 0.47656454;
+    curve6->coeff[2] = 3.16734236;
+    curve6->coeff[3] = 0.10244637;
+    curve6->coeff[4] = -0.038132556;
+    curve6->inputLimits[0].min = -100;
+    curve6->inputLimits[0].max = 100;
+    curve6->inputLimits[1].min = -100;
+    curve6->inputLimits[1].max = 100;
+    curve6->inputLimits[2].min = 0;
+    curve6->inputLimits[2].max = 100;
+    curve6->inputLimits[3].min = 0;
+    curve6->inputLimits[3].max = 38;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CoolPowCurveIndex = 6;
 
     CheckSimpleWAHPRatedCurvesOutputs(*state, "WAHP 2");
@@ -1278,7 +1274,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     // uses the user-specified COP at rated conditions
 
     int HPNum(2);
-    int CurveNum;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
@@ -1334,96 +1329,95 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0045;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
 
-    state->dataCurveManager->NumCurves = 5;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(5);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -9.32564313298629;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 11.088084240584;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -1.75195196204063;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.760820340847872;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 80.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 2.0;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::QuadLinear;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = -9.32564313298629;
+    curve1->coeff[1] = 11.088084240584;
+    curve1->coeff[2] = -1.75195196204063;
+    curve1->coeff[3] = 0.760820340847872;
+    curve1->coeff[4] = 0.0;
+    curve1->inputLimits[0].min = 0.0;
+    curve1->inputLimits[0].max = 80.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 100.0;
+    curve1->inputLimits[2].min = 0.0;
+    curve1->inputLimits[2].max = 2.0;
+    curve1->inputLimits[3].min = 0.0;
+    curve1->inputLimits[3].max = 2.0;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -5.26562830117273;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 17.3118017582604;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -11.4496890368762;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.944804890543481;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.739606605780884;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[4].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[4].max = 1.0;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::QuintLinear;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = -5.26562830117273;
+    curve2->coeff[1] = 17.3118017582604;
+    curve2->coeff[2] = -11.4496890368762;
+    curve2->coeff[3] = -0.944804890543481;
+    curve2->coeff[4] = 0.739606605780884;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 0.0;
+    curve2->inputLimits[0].max = 100.0;
+    curve2->inputLimits[1].min = 0.0;
+    curve2->inputLimits[1].max = 100.0;
+    curve2->inputLimits[2].min = 0.0;
+    curve2->inputLimits[2].max = 100.0;
+    curve2->inputLimits[3].min = 0.0;
+    curve2->inputLimits[3].max = 1.0;
+    curve2->inputLimits[4].min = 0.0;
+    curve2->inputLimits[4].max = 1.0;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -3.25323327026219;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -0.990977022339372;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 4.03828937789764;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.952179101682919;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 38;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::QuadLinear;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = -3.25323327026219;
+    curve3->coeff[1] = -0.990977022339372;
+    curve3->coeff[2] = 4.03828937789764;
+    curve3->coeff[3] = 0.952179101682919;
+    curve3->coeff[4] = 0.0;
+    curve3->inputLimits[0].min = -100;
+    curve3->inputLimits[0].max = 100;
+    curve3->inputLimits[1].min = -100;
+    curve3->inputLimits[1].max = 100;
+    curve3->inputLimits[2].min = 0;
+    curve3->inputLimits[2].max = 100;
+    curve3->inputLimits[3].min = 0;
+    curve3->inputLimits[3].max = 38;
 
-    CurveNum = 4;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -1.30782327125798;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = -2.37467612404102;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 4.00919247797279;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.615580752610271;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 38;
+    auto *curve4 = state->dataCurveManager->PerfCurve(4);
+    curve4->curveType = CurveType::QuadLinear;
+    curve4->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve4->coeff[0] = -1.30782327125798;
+    curve4->coeff[1] = -2.37467612404102;
+    curve4->coeff[2] = 4.00919247797279;
+    curve4->coeff[3] = 0.615580752610271;
+    curve4->coeff[4] = 0.0;
+    curve4->inputLimits[0].min = -100;
+    curve4->inputLimits[0].max = 100;
+    curve4->inputLimits[1].min = -100;
+    curve4->inputLimits[1].max = 100;
+    curve4->inputLimits[2].min = 0;
+    curve4->inputLimits[2].max = 100;
+    curve4->inputLimits[3].min = 0;
+    curve4->inputLimits[3].max = 38;
 
-    CurveNum = 5;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = -2.17352461285805;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.830808361346509;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 1.5682782658283;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.689709515714146;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = -100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = 100;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = 38;
+    auto *curve5 = state->dataCurveManager->PerfCurve(5);
+    curve5->curveType = CurveType::QuadLinear;
+    curve5->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve5->coeff[0] = -2.17352461285805;
+    curve5->coeff[1] = 0.830808361346509;
+    curve5->coeff[2] = 1.5682782658283;
+    curve5->coeff[3] = 0.689709515714146;
+    curve5->coeff[4] = 0.0;
+    curve5->inputLimits[0].min = -100;
+    curve5->inputLimits[0].max = 100;
+    curve5->inputLimits[1].min = -100;
+    curve5->inputLimits[1].max = 100;
+    curve5->inputLimits[2].min = 0;
+    curve5->inputLimits[2].max = 100;
+    curve5->inputLimits[3].min = 0;
+    curve5->inputLimits[3].max = 38;
 
     // performance curve coefficients
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).TotalCoolCapCurveIndex = 1;
@@ -1496,6 +1490,215 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
                     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapHeatAtRatedCdts,
                 0.0,
                 0.00001);
+
+    EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapHeatAtRatedCdts /
+                    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolAtRatedCdts,
+                1.23,
+                0.00001);
+}
+
+TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedConditionsNoDesHtgAirFlow)
+{
+    // This unit test is similar as above but checks if the capacities can still be
+    // correctly calculated when the design heating air flow rate is 0
+
+    int HPNum(2);
+
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurZoneEqNum = 1;
+
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(HPNum);
+    state->dataSize->FinalZoneSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(24);
+
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPType = WatertoAirHP::Cooling;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedAirVolFlowRate = AutoSize;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolTotal = AutoSize;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolSens = AutoSize;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedWaterVolFlowRate = 0.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterOutletNodeNum = 2;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntWaterTemp = 30.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirWetbulbTemp = 19.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedEntAirDrybulbTemp = 27.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompanionHeatingCoilNum = 2;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
+
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPType = WatertoAirHP::Heating;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedAirVolFlowRate = AutoSize;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapHeat = AutoSize;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedWaterVolFlowRate = 0.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum = 3;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterOutletNodeNum = 4;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedEntWaterTemp = 20.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedEntAirDrybulbTemp = 20.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompanionCoolingCoilNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatioRatedHeatRatedTotCoolCap = 1.23;
+
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.20;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 40;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0075;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 15;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatOutTemp = 2.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 25.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 2.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.0045;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.0045;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 25.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.0045;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtHeatPeak = 15.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0045;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
+
+    state->dataCurveManager->allocateCurveVector(5);
+
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::QuadLinear;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = -9.32564313298629;
+    curve1->coeff[1] = 11.088084240584;
+    curve1->coeff[2] = -1.75195196204063;
+    curve1->coeff[3] = 0.760820340847872;
+    curve1->coeff[4] = 0.0;
+    curve1->inputLimits[0].min = 0.0;
+    curve1->inputLimits[0].max = 80.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 100.0;
+    curve1->inputLimits[2].min = 0.0;
+    curve1->inputLimits[2].max = 2.0;
+    curve1->inputLimits[3].min = 0.0;
+    curve1->inputLimits[3].max = 2.0;
+
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::QuintLinear;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = -5.26562830117273;
+    curve2->coeff[1] = 17.3118017582604;
+    curve2->coeff[2] = -11.4496890368762;
+    curve2->coeff[3] = -0.944804890543481;
+    curve2->coeff[4] = 0.739606605780884;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 0.0;
+    curve2->inputLimits[0].max = 100.0;
+    curve2->inputLimits[1].min = 0.0;
+    curve2->inputLimits[1].max = 100.0;
+    curve2->inputLimits[2].min = 0.0;
+    curve2->inputLimits[2].max = 100.0;
+    curve2->inputLimits[3].min = 0.0;
+    curve2->inputLimits[3].max = 1.0;
+    curve2->inputLimits[4].min = 0.0;
+    curve2->inputLimits[4].max = 1.0;
+
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::QuadLinear;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = -3.25323327026219;
+    curve3->coeff[1] = -0.990977022339372;
+    curve3->coeff[2] = 4.03828937789764;
+    curve3->coeff[3] = 0.952179101682919;
+    curve3->coeff[4] = 0.0;
+    curve3->inputLimits[0].min = -100;
+    curve3->inputLimits[0].max = 100;
+    curve3->inputLimits[1].min = -100;
+    curve3->inputLimits[1].max = 100;
+    curve3->inputLimits[2].min = 0;
+    curve3->inputLimits[2].max = 100;
+    curve3->inputLimits[3].min = 0;
+    curve3->inputLimits[3].max = 38;
+
+    auto *curve4 = state->dataCurveManager->PerfCurve(4);
+    curve4->curveType = CurveType::QuadLinear;
+    curve4->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve4->coeff[0] = -1.30782327125798;
+    curve4->coeff[1] = -2.37467612404102;
+    curve4->coeff[2] = 4.00919247797279;
+    curve4->coeff[3] = 0.615580752610271;
+    curve4->coeff[4] = 0.0;
+    curve4->inputLimits[0].min = -100;
+    curve4->inputLimits[0].max = 100;
+    curve4->inputLimits[1].min = -100;
+    curve4->inputLimits[1].max = 100;
+    curve4->inputLimits[2].min = 0;
+    curve4->inputLimits[2].max = 100;
+    curve4->inputLimits[3].min = 0;
+    curve4->inputLimits[3].max = 38;
+
+    auto *curve5 = state->dataCurveManager->PerfCurve(5);
+    curve5->curveType = CurveType::QuadLinear;
+    curve5->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve5->coeff[0] = -2.17352461285805;
+    curve5->coeff[1] = 0.830808361346509;
+    curve5->coeff[2] = 1.5682782658283;
+    curve5->coeff[3] = 0.689709515714146;
+    curve5->coeff[4] = 0.0;
+    curve5->inputLimits[0].min = -100;
+    curve5->inputLimits[0].max = 100;
+    curve5->inputLimits[1].min = -100;
+    curve5->inputLimits[1].max = 100;
+    curve5->inputLimits[2].min = 0;
+    curve5->inputLimits[2].max = 100;
+    curve5->inputLimits[3].min = 0;
+    curve5->inputLimits[3].max = 38;
+
+    // performance curve coefficients
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).TotalCoolCapCurveIndex = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).SensCoolCapCurveIndex = 2;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CoolPowCurveIndex = 3;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).HeatCapCurveIndex = 4;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).HeatPowCurveIndex = 5;
+
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCOPCoolAtRatedCdts = 5.12;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCOPHeatAtRatedCdts = 3.0;
+
+    state->dataSize->DesDayWeath(1).Temp(15) = 32.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
+    state->dataSize->ZoneEqDXCoil = true;
+
+    // create and attach a plant loop
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).Name = "Condenser Water Loop";
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
+    loopside.TotalBranches = 1;
+    loopside.Branch.allocate(1);
+    auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
+
+    loopsidebranch.TotalComponents = 2;
+    loopsidebranch.Comp.allocate(2);
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name =
+        state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantType;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.loopNum = 1;
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).Name =
+        state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).Type =
+        state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPPlantType;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).NodeNumIn =
+        state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.loopNum = 1;
+
+    // plant loop design leaving water temperature (design entering water temperature for WAHP coil)
+    state->dataSize->NumPltSizInput = 1;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).PlantLoopName = "Condenser Water Loop";
+    state->dataSize->PlantSizData(1).ExitTemp = 29.4;
+
+    WaterToAirHeatPumpSimple::SizeHVACWaterToAir(*state, 1);
+    WaterToAirHeatPumpSimple::SizeHVACWaterToAir(*state, 2);
 
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapHeatAtRatedCdts /
                     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolAtRatedCdts,

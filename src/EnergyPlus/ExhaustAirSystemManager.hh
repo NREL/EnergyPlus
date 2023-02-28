@@ -52,6 +52,8 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include <ObjexxFCL/Optional.hh>
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -133,7 +135,7 @@ namespace ExhaustAirSystemManager {
 
     void SimZoneHVACExhaustControls(EnergyPlusData &state);
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Optional<bool const> FlowRatio);
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, ObjexxFCL::Optional<bool const> FlowRatio);
 
     void SizeExhaustSystem(EnergyPlusData &state, int const exhSysNum);
 
@@ -148,12 +150,12 @@ namespace ExhaustAirSystemManager {
 
 struct ExhaustAirSystemMgr : BaseGlobalStruct
 {
-
     bool GetInputFlag = true;
-
+    std::map<int, int> mixerIndexMap;
+    bool mappingDone = false;
     void clear_state() override
     {
-        this->GetInputFlag = true;
+        new (this) ExhaustAirSystemMgr();
     }
 };
 
@@ -164,7 +166,7 @@ struct ExhaustControlSystemMgr : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->GetInputFlag = true;
+        new (this) ExhaustControlSystemMgr();
     }
 };
 

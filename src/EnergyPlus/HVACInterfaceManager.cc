@@ -1154,7 +1154,7 @@ void SetupCommonPipes(EnergyPlusData &state)
             if (first_supply_component_type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
                 // If/when the model supports variable-pumping primary, this can be removed.
                 ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
-                ShowContinueError(state, "Occurs on plant loop name = " + thisPlantLoop.Name);
+                ShowContinueError(state, format("Occurs on plant loop name = {}", thisPlantLoop.Name));
                 ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
                 ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
             }
@@ -1197,7 +1197,7 @@ void SetupCommonPipes(EnergyPlusData &state)
                 thisCommonPipe.SupplySideInletPumpType = FlowType::Variable;
                 // If/when the model supports variable-pumping primary, this can be removed.
                 ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
-                ShowContinueError(state, "Occurs on plant loop name = " + thisPlantLoop.Name);
+                ShowContinueError(state, format("Occurs on plant loop name = {}", thisPlantLoop.Name));
                 ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
                 ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
             }

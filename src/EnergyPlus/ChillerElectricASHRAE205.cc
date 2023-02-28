@@ -140,7 +140,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
     auto const &objectSchemaProps = ip->getObjectSchemaProps(state, state.dataIPShortCut->cCurrentModuleObject);
     for (auto &instance : ChillerInstances.items()) {
         auto const &fields = instance.value();
-        auto const &thisObjectName = instance.key();
+        std::string const &thisObjectName = instance.key();
         GlobalNames::VerifyUniqueChillerName(
             state, state.dataIPShortCut->cCurrentModuleObject, thisObjectName, ErrorsFound, state.dataIPShortCut->cCurrentModuleObject + " Name");
 
@@ -264,7 +264,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\"", std::string{RoutineName}, state.dataIPShortCut->cCurrentModuleObject, thisObjectName));
-            ShowContinueError(state, "Invalid Chiller Flow Mode = " + fields.at("chiller_flow_mode").get<std::string>());
+            ShowContinueError(state, format("Invalid Chiller Flow Mode = {}", fields.at("chiller_flow_mode").get<std::string>()));
             ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
             ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
             thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
@@ -464,8 +464,8 @@ ASHRAE205ChillerSpecs *ASHRAE205ChillerSpecs::factory(EnergyPlusData &state, std
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "ASHRAE205ChillerSpecs::factory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
-    return nullptr;                                                                                                // LCOV_EXCL_LINE
+    ShowFatalError(state, format("ASHRAE205ChillerSpecs::factory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
+    return nullptr;                                                                                                         // LCOV_EXCL_LINE
 }
 
 void ASHRAE205ChillerSpecs::oneTimeInit_new(EnergyPlusData &state)
@@ -513,7 +513,8 @@ void ASHRAE205ChillerSpecs::oneTimeInit_new(EnergyPlusData &state)
                                                 this->AuxiliaryHeatInletNode,
                                                 _);
     }
-#if 0  // If and when heat recovery is implemented, uncomment
+// If and when heat recovery is implemented, uncomment
+#if 0
         if (this->HeatRecActive) {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
@@ -683,8 +684,9 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
     }
     // Recalculate volumetric flow rates from component mass flow rates if necessary
 
-#if 0  // Revisit when heat recovery implemented
-       // Initialize heat recovery flow rates at node
+// Revisit when heat recovery implemented
+#if 0
+      // Initialize heat recovery flow rates at node
         if (this->HeatRecActive) {
 
             // check if inlet limit active and if exceeded.
@@ -770,7 +772,7 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
     } else {
         if (this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             ShowSevereError(state, "Autosizing of Electric Chiller evap flow rate requires a loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in Electric Chiller object=" + this->Name);
+            ShowContinueError(state, format("Occurs in Electric Chiller object={}", this->Name));
             ErrorsFound = true;
         }
         if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
@@ -848,7 +850,7 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
             if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Electric ASHRAE 205 Chiller condenser fluid flow rate requires a condenser");
                 ShowContinueError(state, "loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Electric ASHRAE 205 Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Electric ASHRAE 205 Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
@@ -945,7 +947,7 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
     } else {
         if (this->RefCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             ShowSevereError(state, "Autosizing of Electric Chiller reference capacity requires a loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in Electric Chiller object=" + this->Name);
+            ShowContinueError(state, format("Occurs in Electric Chiller object={}", this->Name));
             ErrorsFound = true;
         }
         if (!this->RefCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->RefCap > 0.0)) { // Hard-sized with no sizing data
@@ -1488,7 +1490,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
                                                                                         this->InterpolationType);
     this->QEvaporator = lookupVariablesCooling.net_evaporator_capacity * this->ChillerCyclingRatio;
 
-    auto evapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpEvap;
+    Real64 evapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpEvap;
     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - evapDeltaTemp;
 
     // TODO: Revisit fault
