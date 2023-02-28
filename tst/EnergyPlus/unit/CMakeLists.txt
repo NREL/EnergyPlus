@@ -155,6 +155,7 @@ set(test_src
     InternalHeatGains.unit.cc
     KusudaAchenbachGroundTemperatureModel.unit.cc
     LowTempRadiantSystem.unit.cc
+    Material.unit.cc
     MicroCHPElectricGenerator.unit.cc
     MicroturbineElectricGenerator.unit.cc
     MixedAir.unit.cc
@@ -174,6 +175,7 @@ set(test_src
     PVWatts.unit.cc
     PackagedTerminalHeatPump.unit.cc
     Photovoltaics.unit.cc
+    PhotovoltaicThermalCollectors.unit.cc
     PierceSurface.unit.cc
     Pipes.unit.cc
     Plant/Branch.unit.cc
