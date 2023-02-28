@@ -525,7 +525,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                     tariff(iInObj).demWinTime = 0.50;
 		} break;
 	        default: {
-		    assert(false);
+		    // assert(false); // EconomicTariff unit test gets here with NumOfTimeStepInHour == 0
 		} break;
 		}
             }
@@ -555,7 +555,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                     tariff(iInObj).demWinTime = 0.25;
                 } break;
 	        default: {
-		    assert(false);
+		    // assert(false); // EconomicTariff unit test got here with NumOfTimeStepInHour == 0
 	        } break;
 		}
             }

@@ -303,11 +303,11 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
     bool Okay;
     bool Get_ErrorsFound(false);
 
-    state.dataIPShortCut->cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
-    int NumExhaustAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    std::string_view cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
+    int NumExhaustAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (NumExhaustAbsorbers <= 0) {
-        ShowSevereError(state, format("No {} equipment found in input file", state.dataIPShortCut->cCurrentModuleObject));
+        ShowSevereError(state, format("No {} equipment found in input file", cCurrentModuleObject));
         Get_ErrorsFound = true;
     }
 
@@ -320,7 +320,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
 
     for (AbsorberNum = 1; AbsorberNum <= NumExhaustAbsorbers; ++AbsorberNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 cCurrentModuleObject,
                                                                  AbsorberNum,
                                                                  state.dataIPShortCut->cAlphaArgs,
                                                                  NumAlphas,
@@ -331,14 +331,14 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, Get_ErrorsFound);
+        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
 
         // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
-        VerifyUniqueChillerName(state, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), Get_ErrorsFound, state.dataIPShortCut->cCurrentModuleObject + " Name");
+        VerifyUniqueChillerName(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), Get_ErrorsFound, fmt::format("{} Name", cCurrentModuleObject));
 
         auto &thisChiller = state.dataChillerExhaustAbsorption->ExhaustAbsorber(AbsorberNum);
         thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-        ChillerName = state.dataIPShortCut->cCurrentModuleObject + " Named " + thisChiller.Name;
+        ChillerName = fmt::format("{} Named {}", cCurrentModuleObject, thisChiller.Name);
 
         // Assign capacities
         thisChiller.NomCoolingCap = state.dataIPShortCut->rNumericArgs(1);
@@ -372,7 +372,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         TestCompSet(state,
-                    state.dataIPShortCut->cCurrentModuleObject,
+                    cCurrentModuleObject,
                     state.dataIPShortCut->cAlphaArgs(1),
                     state.dataIPShortCut->cAlphaArgs(2),
                     state.dataIPShortCut->cAlphaArgs(3),
@@ -397,14 +397,14 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                           NodeInputManager::CompFluidStream::Tertiary,
                                                           DataLoopNode::ObjectIsNotParent);
         TestCompSet(state,
-                    state.dataIPShortCut->cCurrentModuleObject,
+                    cCurrentModuleObject,
                     state.dataIPShortCut->cAlphaArgs(1),
                     state.dataIPShortCut->cAlphaArgs(6),
                     state.dataIPShortCut->cAlphaArgs(7),
                     "Hot Water Nodes");
         if (Get_ErrorsFound) {
             ShowFatalError(state,
-                           format("Errors found in processing node input for {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                           format("Errors found in processing node input for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             Get_ErrorsFound = false;
         }
 
@@ -441,7 +441,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         thisChiller.ThermalEnergyHeatFHPLRCurve = GetCurveCheck(state, state.dataIPShortCut->cAlphaArgs(14), Get_ErrorsFound, ChillerName);
         if (Get_ErrorsFound) {
             ShowFatalError(state,
-                           format("Errors found in processing curve input for {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                           format("Errors found in processing curve input for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             Get_ErrorsFound = false;
         }
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "LeavingCondenser")) {
@@ -451,7 +451,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         } else {
             thisChiller.isEnterCondensTemp = true;
             ShowWarningError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15)));
-            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "resetting to ENTERING-CONDENSER, simulation continues");
         }
         // Assign Other Paramters
@@ -462,18 +462,18 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         } else {
             thisChiller.isWaterCooled = true;
             ShowWarningError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16)));
-            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "resetting to WATER-COOLED, simulation continues");
         }
         if (!thisChiller.isEnterCondensTemp && !thisChiller.isWaterCooled) {
             thisChiller.isEnterCondensTemp = true;
-            ShowWarningError(state, format("{}=\"{}\", invalid value", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowWarningError(state, format("{}=\"{}\", invalid value", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "Invalid to have both LeavingCondenser and AirCooled.");
             ShowContinueError(state, "resetting to EnteringCondenser, simulation continues");
         }
         if (thisChiller.isWaterCooled) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                ShowSevereError(state, format("{}=\"{}\", invalid value", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}=\"{}\", invalid value", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "For WaterCooled chiller the condenser outlet node is required.");
                 Get_ErrorsFound = true;
             }
@@ -496,7 +496,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                               NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             TestCompSet(state,
-                        state.dataIPShortCut->cCurrentModuleObject,
+                        cCurrentModuleObject,
                         state.dataIPShortCut->cAlphaArgs(1),
                         state.dataIPShortCut->cAlphaArgs(4),
                         state.dataIPShortCut->cAlphaArgs(5),
@@ -515,7 +515,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             // Connection not required for air or evap cooled condenser so no call to TestCompSet here
             CheckAndAddAirNodeNumber(state, thisChiller.CondReturnNodeNum, Okay);
             if (!Okay) {
-                ShowWarningError(state, format("{}, Adding OutdoorAir:Node={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(4)));
+                ShowWarningError(state, format("{}, Adding OutdoorAir:Node={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(4)));
             }
         }
 
@@ -527,13 +527,13 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             thisChiller.CompType_Num = GeneratorType::Microturbine;
             thisChiller.ExhaustSourceName = state.dataIPShortCut->cAlphaArgs(18);
 
-            auto *thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, thisChiller.ExhaustSourceName);
+            auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, thisChiller.ExhaustSourceName);
             thisChiller.ExhaustAirInletNodeNum = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs *>(thisMTG)->CombustionAirOutletNodeNum;
         }
     }
 
     if (Get_ErrorsFound) {
-        ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
+        ShowFatalError(state, format("Errors found in processing input for {}", cCurrentModuleObject));
     }
 }
 
