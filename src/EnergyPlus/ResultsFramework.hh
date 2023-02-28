@@ -223,7 +223,7 @@ namespace ResultsFramework {
         bool rVariablesScanned() const;
         bool iVariablesScanned() const;
 
-        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
+        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin, int calendarYear);
         //        void newRow(const std::string &ts);
         virtual void pushVariableValue(const int reportID, double value);
 
@@ -234,11 +234,17 @@ namespace ResultsFramework {
 
         void writeReport(JsonOutputFilePaths &jsonOutputFilePaths, bool outputJSON, bool outputCBOR, bool outputMsgPack);
 
+        // Need to find a way to protect these, they can't be changed on the fly
+        bool iso8601 = false;
+        bool beginningOfInterval = false;
+
     protected:
         bool IDataFrameEnabled = false;
         bool RDataFrameEnabled = false;
         bool RVariablesScanned = false;
         bool IVariablesScanned = false;
+        int lastHour = 0;
+        int lastMinute = 0;
         std::string ReportFrequency;
         std::vector<std::string> TS;
         std::map<int, Variable> variableMap;
@@ -327,7 +333,11 @@ namespace ResultsFramework {
             outputVariableIndices = std::vector<bool>(num_output_variables, false);
         }
 
-        void writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl);
+        void writeOutput(EnergyPlusData &state,
+                         std::vector<std::string> const &outputVariables,
+                         InputOutputFile &outputFile,
+                         bool outputControl,
+                         bool rewriteTimestamp);
         void parseTSOutputs(EnergyPlusData &state,
                             json const &data,
                             std::vector<std::string> const &outputVariables,
@@ -342,7 +352,7 @@ namespace ResultsFramework {
         std::map<std::string, std::vector<std::string>> outputs;
         std::vector<bool> outputVariableIndices;
 
-        static std::string &convertToMonth(EnergyPlusData &state, std::string &datetime);
+        static std::string &convertToMonth(std::string &datetime);
         void updateReportingFrequency(OutputProcessor::ReportingFrequency reportingFrequency);
         // void readRVI();
         // void readMVI();
@@ -394,6 +404,43 @@ namespace ResultsFramework {
         MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
         MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
+        void setISO8601(const bool value)
+        {
+            rewriteTimestamp = !value;
+            RIDetailedZoneTSData.iso8601 = value;
+            RIDetailedHVACTSData.iso8601 = value;
+            RITimestepTSData.iso8601 = value;
+            RIHourlyTSData.iso8601 = value;
+            RIDailyTSData.iso8601 = value;
+            RIMonthlyTSData.iso8601 = value;
+            RIRunPeriodTSData.iso8601 = value;
+            RIYearlyTSData.iso8601 = value;
+            TSMeters.iso8601 = value;
+            HRMeters.iso8601 = value;
+            DYMeters.iso8601 = value;
+            MNMeters.iso8601 = value;
+            SMMeters.iso8601 = value;
+            YRMeters.iso8601 = value;
+        }
+
+        void setBeginningOfInterval(const bool value)
+        {
+            RIDetailedZoneTSData.beginningOfInterval = value;
+            RIDetailedHVACTSData.beginningOfInterval = value;
+            RITimestepTSData.beginningOfInterval = value;
+            RIHourlyTSData.beginningOfInterval = value;
+            RIDailyTSData.beginningOfInterval = value;
+            RIMonthlyTSData.beginningOfInterval = value;
+            RIRunPeriodTSData.beginningOfInterval = value;
+            RIYearlyTSData.beginningOfInterval = value;
+            TSMeters.beginningOfInterval = value;
+            HRMeters.beginningOfInterval = value;
+            DYMeters.beginningOfInterval = value;
+            MNMeters.beginningOfInterval = value;
+            SMMeters.beginningOfInterval = value;
+            YRMeters.beginningOfInterval = value;
+        }
+
         void writeOutputs(EnergyPlusData &state);
 
         void addReportVariable(std::string_view const keyedValue,
@@ -415,6 +462,7 @@ namespace ResultsFramework {
         bool outputJSON = false;
         bool outputCBOR = false;
         bool outputMsgPack = false;
+        bool rewriteTimestamp = true; // Convert monthly data timestamp to month name
         std::vector<std::string> outputVariables;
 
         void writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths);
