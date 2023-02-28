@@ -113,9 +113,9 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
         Material::MaterialChild *p = new Material::MaterialChild;
         state->dataMaterial->Material.push_back(p);
     }
-    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
-    auto *thisMaterial_2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
-    auto *thisMaterial_3 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(3));
+    auto *thisMaterial_1 = state->dataMaterial->Material(1);
+    auto *thisMaterial_2 = state->dataMaterial->Material(2);
+    auto *thisMaterial_3 = state->dataMaterial->Material(3);
     thisMaterial_1->Name = "WALL_1";
     thisMaterial_1->Group = Material::MaterialGroup::RegularMaterial;
     thisMaterial_2->Name = "WALL_2";

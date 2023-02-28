@@ -303,7 +303,7 @@ namespace HeatBalFiniteDiffManager {
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,
                                         int finiteDifferenceLayerIndex,
                                         int surfaceIndex,
-                                        const Material::MaterialChild *materialDefinition,
+                                        const Material::MaterialProperties *materialDefinition,
                                         Real64 temperaturePrevious,
                                         Real64 temperatureUpdated,
                                         Real64 &updatedSpecificHeat,

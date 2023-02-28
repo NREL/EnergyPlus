@@ -86,16 +86,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     state->dataHeatBalSurf->SurfMovInsulExtPresent(1) = true;
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
-    Material::MaterialChild *mat = new Material::MaterialChild;
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
     state->dataMaterial->Material.push_back(mat);
-    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
-    thisMaterial->Resistance = 1.25;
-    thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
-    thisMaterial->Group = Material::MaterialGroup::RegularMaterial;
-    thisMaterial->AbsorpSolar = 0.75;
-    thisMaterial->AbsorpThermal = 0.75;
-    thisMaterial->Trans = 0.25;
-    thisMaterial->ReflectSolBeamFront = 0.20;
+    state->dataMaterial->Material(1)->Resistance = 1.25;
+    state->dataMaterial->Material(1)->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
+    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(1)->AbsorpSolar = 0.75;
+    state->dataMaterial->Material(1)->AbsorpThermal = 0.75;
+    state->dataMaterial->Material(1)->Trans = 0.25;
+    state->dataMaterial->Material(1)->ReflectSolBeamFront = 0.20;
     state->dataHeatBal->Zone.allocate(1);
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->space.allocate(1);
@@ -139,15 +138,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
-    Material::MaterialChild *mat = new Material::MaterialChild;
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
     state->dataMaterial->Material.push_back(mat);
-    mat->Resistance = 1.25;
-    mat->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
-    mat->Group = Material::MaterialGroup::RegularMaterial;
-    mat->AbsorpSolar = 0.75;
-    mat->AbsorpThermal = 0.75;
-    mat->Trans = 0.25;
-    mat->ReflectSolBeamFront = 0.20;
+    state->dataMaterial->Material(1)->Resistance = 1.25;
+    state->dataMaterial->Material(1)->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
+    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::RegularMaterial;
+    state->dataMaterial->Material(1)->AbsorpSolar = 0.75;
+    state->dataMaterial->Material(1)->AbsorpThermal = 0.75;
+    state->dataMaterial->Material(1)->Trans = 0.25;
+    state->dataMaterial->Material(1)->ReflectSolBeamFront = 0.20;
     state->dataHeatBal->Zone.allocate(1);
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->space.allocate(1);

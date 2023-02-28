@@ -74,7 +74,7 @@ using namespace DataSurfaces;
 using namespace DataHeatBalance;
 namespace WindowManager {
 
-    std::shared_ptr<CBSDFLayer> getBSDFLayer(EnergyPlusData &state, const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    std::shared_ptr<CBSDFLayer> getBSDFLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -98,7 +98,7 @@ namespace WindowManager {
         return aFactory->getBSDFLayer(state);
     }
 
-    CScatteringLayer getScatteringLayer(EnergyPlusData &state, const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CScatteringLayer getScatteringLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -188,8 +188,7 @@ namespace WindowManager {
             auto &construction(state.dataConstruction->Construct(ConstrNum));
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
-                    auto const *material = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
-                    assert(material != nullptr);
+                    auto *material(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     if (BITF_TEST_NONE(BITF(material->Group),
                                        BITF(Material::MaterialGroup::WindowGas) | BITF(Material::MaterialGroup::WindowGasMixture) |
                                            BITF(Material::MaterialGroup::ComplexWindowGap) | BITF(Material::MaterialGroup::ComplexWindowShade))) {
@@ -234,9 +233,7 @@ namespace WindowManager {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
                 Material::MaterialGroup::WindowBlind) {
                 IntBlind = true;
-                BlNum = dynamic_cast<Material::MaterialChild *>(
-                            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)))
-                            ->BlindDataPtr;
+                BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->BlindDataPtr;
             }
 
             if (IntShade || IntBlind) {
@@ -244,14 +241,12 @@ namespace WindowManager {
                     Real64 EpsGlIR = 0.0;
                     Real64 RhoGlIR = 0.0;
                     if (IntShade || IntBlind) {
-                        EpsGlIR = dynamic_cast<Material::MaterialChild *>(
-                                      state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1)))
-                                      ->AbsorpThermalBack;
+                        EpsGlIR =
+                            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
                         RhoGlIR = 1 - EpsGlIR;
                     }
                     if (IntShade) {
-                        auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr));
-                        assert(thisMaterialShade != nullptr);
+                        auto const *thisMaterialShade = state.dataMaterial->Material(ShadeLayPtr);
                         Real64 TauShIR = thisMaterialShade->TransThermal;
                         Real64 EpsShIR = thisMaterialShade->AbsorpThermal;
                         Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
@@ -296,7 +291,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEMaterialFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEMaterialFactory::CWCEMaterialFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCEMaterialFactory::CWCEMaterialFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : m_MaterialProperties(t_Material), m_Range(t_Range), m_Initialized(false)
     {
     }
@@ -313,7 +308,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecularMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCESpecularMaterialsFactory::CWCESpecularMaterialsFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCESpecularMaterialsFactory::CWCESpecularMaterialsFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : CWCEMaterialFactory(t_Material, t_Range)
     {
     }
@@ -361,7 +356,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEMaterialDualBandFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEMaterialDualBandFactory::CWCEMaterialDualBandFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCEMaterialDualBandFactory::CWCEMaterialDualBandFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : CWCEMaterialFactory(t_Material, t_Range)
     {
     }
@@ -382,7 +377,8 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindMaterialsFactory::CWCEVenetianBlindMaterialsFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCEVenetianBlindMaterialsFactory::CWCEVenetianBlindMaterialsFactory(const Material::MaterialProperties &t_Material,
+                                                                         const WavelengthRange t_Range)
         : CWCEMaterialDualBandFactory(t_Material, t_Range)
     {
     }
@@ -426,7 +422,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEScreenMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEScreenMaterialsFactory::CWCEScreenMaterialsFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCEScreenMaterialsFactory::CWCEScreenMaterialsFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : CWCEMaterialDualBandFactory(t_Material, t_Range)
     {
         // Current EnergyPlus model does not support material transmittance different from zero.
@@ -464,7 +460,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEDiffuseShadeMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEDiffuseShadeMaterialsFactory::CWCEDiffuseShadeMaterialsFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCEDiffuseShadeMaterialsFactory::CWCEDiffuseShadeMaterialsFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : CWCEMaterialDualBandFactory(t_Material, t_Range)
     {
     }
@@ -500,7 +496,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCECellFactory
     ///////////////////////////////////////////////////////////////////////////////
-    IWCECellDescriptionFactory::IWCECellDescriptionFactory(const Material::MaterialChild &t_Material) : m_Material(t_Material)
+    IWCECellDescriptionFactory::IWCECellDescriptionFactory(const Material::MaterialProperties &t_Material) : m_Material(t_Material)
     {
     }
 
@@ -508,7 +504,7 @@ namespace WindowManager {
     //   CWCESpecularCellFactory
     ///////////////////////////////////////////////////////////////////////////////
 
-    CWCESpecularCellFactory::CWCESpecularCellFactory(const Material::MaterialChild &t_Material) : IWCECellDescriptionFactory(t_Material)
+    CWCESpecularCellFactory::CWCESpecularCellFactory(const Material::MaterialProperties &t_Material) : IWCECellDescriptionFactory(t_Material)
     {
     }
 
@@ -520,7 +516,8 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindCellFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindCellFactory::CWCEVenetianBlindCellFactory(const Material::MaterialChild &t_Material) : IWCECellDescriptionFactory(t_Material)
+    CWCEVenetianBlindCellFactory::CWCEVenetianBlindCellFactory(const Material::MaterialProperties &t_Material)
+        : IWCECellDescriptionFactory(t_Material)
     {
     }
 
@@ -541,7 +538,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEScreenCellFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEScreenCellFactory::CWCEScreenCellFactory(const Material::MaterialChild &t_Material) : IWCECellDescriptionFactory(t_Material)
+    CWCEScreenCellFactory::CWCEScreenCellFactory(const Material::MaterialProperties &t_Material) : IWCECellDescriptionFactory(t_Material)
     {
     }
 
@@ -557,7 +554,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEDiffuseShadeCellFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEDiffuseShadeCellFactory::CWCEDiffuseShadeCellFactory(const Material::MaterialChild &t_Material) : IWCECellDescriptionFactory(t_Material)
+    CWCEDiffuseShadeCellFactory::CWCEDiffuseShadeCellFactory(const Material::MaterialProperties &t_Material) : IWCECellDescriptionFactory(t_Material)
     {
     }
 
@@ -569,7 +566,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEBSDFLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCELayerFactory::CWCELayerFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCELayerFactory::CWCELayerFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : m_Material(t_Material), m_Range(t_Range), m_BSDFInitialized(false), m_SimpleInitialized(false), m_MaterialFactory(nullptr)
     {
     }
@@ -617,7 +614,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecularLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCESpecularLayerFactory::CWCESpecularLayerFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCESpecularLayerFactory::CWCESpecularLayerFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : CWCELayerFactory(t_Material, t_Range)
     {
         m_CellFactory = std::make_shared<CWCESpecularCellFactory>(t_Material);
@@ -631,7 +628,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindLayerFactory::CWCEVenetianBlindLayerFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCEVenetianBlindLayerFactory::CWCEVenetianBlindLayerFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : CWCELayerFactory(t_Material, t_Range)
     {
         m_CellFactory = std::make_shared<CWCEVenetianBlindCellFactory>(t_Material);
@@ -645,7 +642,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEScreenLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEScreenLayerFactory::CWCEScreenLayerFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCEScreenLayerFactory::CWCEScreenLayerFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : CWCELayerFactory(t_Material, t_Range)
     {
         m_CellFactory = std::make_shared<CWCEScreenCellFactory>(t_Material);
@@ -659,7 +656,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEDiffuseShadeLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEDiffuseShadeLayerFactory::CWCEDiffuseShadeLayerFactory(const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
+    CWCEDiffuseShadeLayerFactory::CWCEDiffuseShadeLayerFactory(const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
         : CWCELayerFactory(t_Material, t_Range)
     {
         m_CellFactory = std::make_shared<CWCEDiffuseShadeCellFactory>(t_Material);

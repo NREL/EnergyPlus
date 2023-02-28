@@ -641,8 +641,7 @@ namespace HeatBalFiniteDiffManager {
                 // now there are special equations for R-only layers.
 
                 CurrentLayer = thisConstruct.LayerPoint(Layer);
-                auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
-                assert(thisMaterial != nullptr);
+                auto *thisMaterial = state.dataMaterial->Material(CurrentLayer);
 
                 thisConstructFD.Name(Layer) = thisMaterial->Name;
                 thisConstructFD.Thickness(Layer) = thisMaterial->Thickness;
@@ -1614,8 +1613,7 @@ namespace HeatBalFiniteDiffManager {
 
                 int const ConstrNum(surface.Construction);
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-                auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay));
-                assert(mat != nullptr);
+                auto const *mat(state.dataMaterial->Material(MatLay));
                 auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
                 auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
                 auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
@@ -1787,8 +1785,7 @@ namespace HeatBalFiniteDiffManager {
         int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
 
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-        auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay));
-        assert(mat != nullptr);
+        auto const *mat(state.dataMaterial->Material(MatLay));
         auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
         auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
         auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
@@ -1918,12 +1915,10 @@ namespace HeatBalFiniteDiffManager {
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
             int const MatLay(construct.LayerPoint(Lay));
-            auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay));
-            assert(mat != nullptr);
+            auto const *mat(state.dataMaterial->Material(MatLay));
 
             int const MatLay2(construct.LayerPoint(Lay + 1));
-            auto const *mat2 = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay2));
-            assert(mat2 != nullptr);
+            auto const *mat2(state.dataMaterial->Material(MatLay2));
 
             auto const &condActuator1(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
             auto const &condActuator2(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay + 1));
@@ -2328,8 +2323,7 @@ namespace HeatBalFiniteDiffManager {
         Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
         if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-            auto const *mat = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay));
-            assert(mat != nullptr);
+            auto const *mat(state.dataMaterial->Material(MatLay));
             auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
             auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
             auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
@@ -2635,7 +2629,7 @@ namespace HeatBalFiniteDiffManager {
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,
                                         int finiteDifferenceLayerIndex,
                                         int surfaceIndex,
-                                        const Material::MaterialChild *materialDefinition,
+                                        const Material::MaterialProperties *materialDefinition,
                                         Real64 temperaturePrevious,
                                         Real64 temperatureUpdated,
                                         Real64 &updatedSpecificHeat,

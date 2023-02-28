@@ -145,26 +145,16 @@ namespace Material {
     constexpr std::array<std::string_view, static_cast<int>(VariableAbsCtrlSignal::Num)> VariableAbsCtrlSignalUC = {
         "SURFACETEMPERATURE", "SURFACERECEIVEDSOLARRADIATION", "SPACEHEATINGCOOLINGMODE", "SCHEDULED"};
 
-  struct MaterialBase
+  struct MaterialProperties
     {
 
         // Members
-        std::string Name = "";                                            // Name of material layer
-        Material::MaterialGroup Group = Material::MaterialGroup::Invalid; // Material group type (see Material Parameters above.  Currently
-
-        virtual bool dummy()
-        {
-            return true;
-        }
-    };
-
-    struct MaterialChild : public MaterialBase
-    {
+        std::string Name;              // Name of material layer
+        Material::MaterialGroup Group; // Material group type (see Material Parameters above.  Currently
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
-        DataSurfaces::SurfaceRoughness Roughness =
-            DataSurfaces::SurfaceRoughness::Invalid; // Surface roughness index (See Surface Roughness parameters
+        DataSurfaces::SurfaceRoughness Roughness; // Surface roughness index (See Surface Roughness parameters
         // above.  Current: VerySmooth, Smooth, MediumSmooth,
         // MediumRough, Rough, VeryRough)
         // Thermo-physical material properties
@@ -366,7 +356,7 @@ namespace Material {
 
 struct MaterialData : BaseGlobalStruct
 {
-    EPVector<Material::MaterialBase *> Material;
+    EPVector<Material::MaterialProperties *> Material;
     int TotMaterials = 0; // Total number of unique materials (layers) in this simulation
 
     void clear_state() override

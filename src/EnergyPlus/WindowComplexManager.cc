@@ -2866,8 +2866,7 @@ namespace WindowComplexManager {
         IGap = 0;
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
-            assert(thisMaterial != nullptr);
+            auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
 
             if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
                 (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
@@ -2928,25 +2927,23 @@ namespace WindowComplexManager {
 
                 GasPointer = thisMaterial->GasPointer;
 
-                auto const *thisMaterialGasPt = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(GasPointer));
-                assert(thisMaterialGasPt != nullptr);
-                nmix(IGap + 1) = thisMaterialGasPt->NumberOfGasesInMixture;
+                nmix(IGap + 1) = state.dataMaterial->Material(GasPointer)->NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    frct(IMix, IGap + 1) = thisMaterialGasPt->GasFract(IMix);
+                    frct(IMix, IGap + 1) = state.dataMaterial->Material(GasPointer)->GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
                     bool feedData(false);
-                    CheckGasCoefs(thisMaterialGasPt->GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
+                    CheckGasCoefs(state.dataMaterial->Material(GasPointer)->GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
-                        wght(iprop(IMix, IGap + 1)) = thisMaterialGasPt->GasWght(IMix);
-                        gama(iprop(IMix, IGap + 1)) = thisMaterialGasPt->GasSpecHeatRatio(IMix);
+                        wght(iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasWght(IMix);
+                        gama(iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasSpecHeatRatio(IMix);
                         for (i = 1; i <= 3; ++i) {
-                            gcon(i, iprop(IMix, IGap + 1)) = thisMaterialGasPt->GasCon(i, IMix);
-                            gvis(i, iprop(IMix, IGap + 1)) = thisMaterialGasPt->GasVis(i, IMix);
-                            gcp(i, iprop(IMix, IGap + 1)) = thisMaterialGasPt->GasCp(i, IMix);
+                            gcon(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasCon(i, IMix);
+                            gvis(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasVis(i, IMix);
+                            gcp(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer)->GasCp(i, IMix);
                         }
                     } // IF feedData THEN
                 }

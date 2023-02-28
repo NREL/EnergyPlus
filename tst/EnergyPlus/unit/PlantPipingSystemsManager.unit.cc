@@ -1915,13 +1915,12 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
     Real64 Thickness;
     int MaterialIndex;
 
-    Material::MaterialChild *p = new Material::MaterialChild;
+    Material::MaterialProperties *p = new Material::MaterialProperties;
     state->dataMaterial->Material.push_back(p);
 
     // Test 1: Material has a valid thickness and is not R-only, result should be false
     MaterialIndex = 1;
-    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MaterialIndex));
-    thisMaterial->ROnly = false;
+    state->dataMaterial->Material(MaterialIndex)->ROnly = false;
     Thickness = 0.01;
     ExpectedResult = false;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1931,7 +1930,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
     // Test 2a: Material has a valid thickness but is R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    thisMaterial->ROnly = true;
+    state->dataMaterial->Material(MaterialIndex)->ROnly = true;
     Thickness = 0.01;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1941,7 +1940,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
     // Test 2b: Material does not have a valid thickness but is not R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    thisMaterial->ROnly = false;
+    state->dataMaterial->Material(MaterialIndex)->ROnly = false;
     Thickness = 0.0;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1950,7 +1949,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
 
     // Test 3: Material does not have a valid thickness and is not R-only, result should be true
     MaterialIndex = 1;
-    thisMaterial->ROnly = true;
+    state->dataMaterial->Material(MaterialIndex)->ROnly = true;
     Thickness = 0.0;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);

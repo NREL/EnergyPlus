@@ -885,11 +885,10 @@ namespace PlantPipingSystemsManager {
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 } else {
-                    auto const *thisMaterialSlab = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisDomain.SlabMaterialNum));
-                    thisDomain.SlabThickness = thisMaterialSlab->Thickness;
-                    thisDomain.SlabProperties.Density = thisMaterialSlab->Density;
-                    thisDomain.SlabProperties.SpecificHeat = thisMaterialSlab->SpecHeat;
-                    thisDomain.SlabProperties.Conductivity = thisMaterialSlab->Conductivity;
+                    thisDomain.SlabThickness = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Thickness;
+                    thisDomain.SlabProperties.Density = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Density;
+                    thisDomain.SlabProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->SpecHeat;
+                    thisDomain.SlabProperties.Conductivity = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Conductivity;
                 }
             }
 
@@ -915,12 +914,10 @@ namespace PlantPipingSystemsManager {
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 } else {
-                    auto const *thisMaterialHoriz =
-                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisDomain.HorizInsMaterialNum));
-                    thisDomain.HorizInsThickness = thisMaterialHoriz->Thickness;
-                    thisDomain.HorizInsProperties.Density = thisMaterialHoriz->Density;
-                    thisDomain.HorizInsProperties.SpecificHeat = thisMaterialHoriz->SpecHeat;
-                    thisDomain.HorizInsProperties.Conductivity = thisMaterialHoriz->Conductivity;
+                    thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Thickness;
+                    thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Density;
+                    thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->SpecHeat;
+                    thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                         ErrorsFound = true;
                         SiteGroundDomainNoMassMatError(
@@ -966,12 +963,10 @@ namespace PlantPipingSystemsManager {
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 } else {
-                    auto const *thisMaterialVert =
-                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisDomain.VertInsMaterialNum));
-                    thisDomain.VertInsThickness = thisMaterialVert->Thickness;
-                    thisDomain.VertInsProperties.Density = thisMaterialVert->Density;
-                    thisDomain.VertInsProperties.SpecificHeat = thisMaterialVert->SpecHeat;
-                    thisDomain.VertInsProperties.Conductivity = thisMaterialVert->Conductivity;
+                    thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Thickness;
+                    thisDomain.VertInsProperties.Density = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Density;
+                    thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->SpecHeat;
+                    thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                         ErrorsFound = true;
                         SiteGroundDomainNoMassMatError(
@@ -1299,12 +1294,10 @@ namespace PlantPipingSystemsManager {
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 } else {
-                    auto const *thisMaterialHoriz =
-                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisDomain.HorizInsMaterialNum));
-                    thisDomain.HorizInsThickness = thisMaterialHoriz->Thickness;
-                    thisDomain.HorizInsProperties.Density = thisMaterialHoriz->Density;
-                    thisDomain.HorizInsProperties.SpecificHeat = thisMaterialHoriz->SpecHeat;
-                    thisDomain.HorizInsProperties.Conductivity = thisMaterialHoriz->Conductivity;
+                    thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Thickness;
+                    thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Density;
+                    thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->SpecHeat;
+                    thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                         ErrorsFound = true;
                         SiteGroundDomainNoMassMatError(
@@ -1356,12 +1349,10 @@ namespace PlantPipingSystemsManager {
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 } else {
-                    auto const *thisMaterialVert =
-                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisDomain.VertInsMaterialNum));
-                    thisDomain.VertInsThickness = thisMaterialVert->Thickness;
-                    thisDomain.VertInsProperties.Density = thisMaterialVert->Density;
-                    thisDomain.VertInsProperties.SpecificHeat = thisMaterialVert->SpecHeat;
-                    thisDomain.VertInsProperties.Conductivity = thisMaterialVert->Conductivity;
+                    thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Thickness;
+                    thisDomain.VertInsProperties.Density = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Density;
+                    thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->SpecHeat;
+                    thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                         ErrorsFound = true;
                         SiteGroundDomainNoMassMatError(
@@ -1428,7 +1419,7 @@ namespace PlantPipingSystemsManager {
     bool SiteGroundDomainUsingNoMassMat([[maybe_unused]] EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum)
     {
 
-        if ((MaterialThickness <= 0.0) || (dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MaterialNum))->ROnly)) {
+        if ((MaterialThickness <= 0.0) || (state.dataMaterial->Material(MaterialNum)->ROnly)) {
             return true;
         } else {
             return false;

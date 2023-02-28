@@ -1779,11 +1779,11 @@ namespace HeatBalanceManager {
                 // Find the material in the list of materials
 
                 thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
+
                 // count number of glass layers
                 if (thisConstruct.LayerPoint(Layer) > 0) {
-                    auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
-                    MaterialLayerGroup = thisMaterial->Group;
-                    if (MaterialLayerGroup == Material::MaterialGroup::WindowGlass) ++iMatGlass;
+                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
+                    MaterialLayerGroup = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group;
                     if ((MaterialLayerGroup == Material::MaterialGroup::GlassEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::DrapeEquivalentLayer) ||
@@ -1806,12 +1806,10 @@ namespace HeatBalanceManager {
                     thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), state.dataHeatBal->TCGlazings);
 
                     if (thisConstruct.LayerPoint(Layer) > 0) {
-                        auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
-
                         // reset layer pointer to the first glazing in the TC GlazingGroup
                         thisConstruct.LayerPoint(Layer) = state.dataHeatBal->TCGlazings(thisConstruct.LayerPoint(Layer)).LayerPoint(1);
                         thisConstruct.TCLayer = thisConstruct.LayerPoint(Layer);
-                        if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
+                        if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
                         thisConstruct.TCFlag = 1;
                         thisConstruct.TCMasterConst = ConstrNum;
                         thisConstruct.TCGlassID = iMatGlass; // the TC glass layer ID
@@ -1828,10 +1826,9 @@ namespace HeatBalanceManager {
                                            ConstructAlphas(Layer)));
                     ErrorsFound = true;
                 } else {
-                    auto const *thisMaterial =
-                        dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)));
                     state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += state.dataHeatBal->NominalR(thisConstruct.LayerPoint(Layer));
-                    if (thisMaterial->Group == Material::MaterialGroup::RegularMaterial && !thisMaterial->ROnly) {
+                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::RegularMaterial &&
+                        !state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->ROnly) {
                         state.dataHeatBal->NoRegularMaterialsUsed = false;
                     }
                 }
@@ -4513,71 +4510,73 @@ namespace HeatBalanceManager {
 
             // reallocate Material type
 
+            for (int i = 1; i <= state.dataMaterial->TotMaterials; i++) {
+                Material::MaterialProperties *p = new Material::MaterialProperties;
+                state.dataMaterial->Material.push_back(p);
+            }
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials, 0.0);
 
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataMaterial->TotMaterials; ++loop) {
-                Material::MaterialChild *thisMaterial = new Material::MaterialChild;
-                state.dataMaterial->Material.push_back(thisMaterial);
-                thisMaterial->Name = "";
-                thisMaterial->Group = Material::MaterialGroup::Invalid;
-                thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Invalid;
-                thisMaterial->Conductivity = 0.0;
-                thisMaterial->Density = 0.0;
-                thisMaterial->IsoMoistCap = 0.0;
-                thisMaterial->Porosity = 0.0;
-                thisMaterial->Resistance = 0.0;
-                thisMaterial->SpecHeat = 0.0;
-                thisMaterial->ThermGradCoef = 0.0;
-                thisMaterial->Thickness = 0.0;
-                thisMaterial->VaporDiffus = 0.0;
-                thisMaterial->AbsorpSolar = 0.0;
-                thisMaterial->AbsorpThermal = 0.0;
-                thisMaterial->AbsorpVisible = 0.0;
-                thisMaterial->ReflectShade = 0.0;
-                thisMaterial->Trans = 0.0;
-                thisMaterial->ReflectShadeVis = 0.0;
-                thisMaterial->TransVis = 0.0;
-                thisMaterial->GlassTransDirtFactor = 1.0;
-                thisMaterial->SolarDiffusing = false;
-                thisMaterial->AbsorpThermalBack = 0.0;
-                thisMaterial->AbsorpThermalFront = 0.0;
-                thisMaterial->ReflectSolBeamBack = 0.0;
-                thisMaterial->ReflectSolBeamFront = 0.0;
-                thisMaterial->ReflectSolDiffBack = 0.0;
-                thisMaterial->ReflectSolDiffFront = 0.0;
-                thisMaterial->ReflectVisBeamBack = 0.0;
-                thisMaterial->ReflectVisBeamFront = 0.0;
-                thisMaterial->ReflectVisDiffBack = 0.0;
-                thisMaterial->ReflectVisDiffFront = 0.0;
-                thisMaterial->TransSolBeam = 0.0;
-                thisMaterial->TransThermal = 0.0;
-                thisMaterial->TransVisBeam = 0.0;
-                thisMaterial->GlassSpectralDataPtr = 0;
-                thisMaterial->NumberOfGasesInMixture = 0;
-                thisMaterial->GasCon = 0.0;
-                thisMaterial->GasVis = 0.0;
-                thisMaterial->GasCp = 0.0;
-                thisMaterial->gasTypes = Material::GasType::Custom;
-                thisMaterial->GasWght = 0.0;
-                thisMaterial->GasSpecHeatRatio = 0.0;
-                thisMaterial->GasFract = 0.0;
-                thisMaterial->WinShadeToGlassDist = 0.0;
-                thisMaterial->WinShadeTopOpeningMult = 0.0;
-                thisMaterial->WinShadeBottomOpeningMult = 0.0;
-                thisMaterial->WinShadeLeftOpeningMult = 0.0;
-                thisMaterial->WinShadeRightOpeningMult = 0.0;
-                thisMaterial->WinShadeAirFlowPermeability = 0.0;
-                thisMaterial->BlindDataPtr = 0;
-                thisMaterial->EMPDmu = 0.0;
-                thisMaterial->MoistACoeff = 0.0;
-                thisMaterial->MoistBCoeff = 0.0;
-                thisMaterial->MoistCCoeff = 0.0;
-                thisMaterial->MoistDCoeff = 0.0;
-                thisMaterial->EMPDSurfaceDepth = 0.0;
-                thisMaterial->EMPDDeepDepth = 0.0;
-                thisMaterial->EMPDmuCoating = 0.0;
-                thisMaterial->EMPDCoatingThickness = 0.0;
+                state.dataMaterial->Material(loop)->Name = "";
+                state.dataMaterial->Material(loop)->Group = Material::MaterialGroup::Invalid;
+                state.dataMaterial->Material(loop)->Roughness = DataSurfaces::SurfaceRoughness::Invalid;
+                state.dataMaterial->Material(loop)->Conductivity = 0.0;
+                state.dataMaterial->Material(loop)->Density = 0.0;
+                state.dataMaterial->Material(loop)->IsoMoistCap = 0.0;
+                state.dataMaterial->Material(loop)->Porosity = 0.0;
+                state.dataMaterial->Material(loop)->Resistance = 0.0;
+                state.dataMaterial->Material(loop)->SpecHeat = 0.0;
+                state.dataMaterial->Material(loop)->ThermGradCoef = 0.0;
+                state.dataMaterial->Material(loop)->Thickness = 0.0;
+                state.dataMaterial->Material(loop)->VaporDiffus = 0.0;
+                state.dataMaterial->Material(loop)->AbsorpSolar = 0.0;
+                state.dataMaterial->Material(loop)->AbsorpThermal = 0.0;
+                state.dataMaterial->Material(loop)->AbsorpVisible = 0.0;
+                state.dataMaterial->Material(loop)->ReflectShade = 0.0;
+                state.dataMaterial->Material(loop)->Trans = 0.0;
+                state.dataMaterial->Material(loop)->ReflectShadeVis = 0.0;
+                state.dataMaterial->Material(loop)->TransVis = 0.0;
+                state.dataMaterial->Material(loop)->GlassTransDirtFactor = 1.0;
+                state.dataMaterial->Material(loop)->SolarDiffusing = false;
+                state.dataMaterial->Material(loop)->AbsorpThermalBack = 0.0;
+                state.dataMaterial->Material(loop)->AbsorpThermalFront = 0.0;
+                state.dataMaterial->Material(loop)->ReflectSolBeamBack = 0.0;
+                state.dataMaterial->Material(loop)->ReflectSolBeamFront = 0.0;
+                state.dataMaterial->Material(loop)->ReflectSolDiffBack = 0.0;
+                state.dataMaterial->Material(loop)->ReflectSolDiffFront = 0.0;
+                state.dataMaterial->Material(loop)->ReflectVisBeamBack = 0.0;
+                state.dataMaterial->Material(loop)->ReflectVisBeamFront = 0.0;
+                state.dataMaterial->Material(loop)->ReflectVisDiffBack = 0.0;
+                state.dataMaterial->Material(loop)->ReflectVisDiffFront = 0.0;
+                state.dataMaterial->Material(loop)->TransSolBeam = 0.0;
+                state.dataMaterial->Material(loop)->TransThermal = 0.0;
+                state.dataMaterial->Material(loop)->TransVisBeam = 0.0;
+                state.dataMaterial->Material(loop)->GlassSpectralDataPtr = 0;
+                state.dataMaterial->Material(loop)->NumberOfGasesInMixture = 0;
+                state.dataMaterial->Material(loop)->GasCon = 0.0;
+                state.dataMaterial->Material(loop)->GasVis = 0.0;
+                state.dataMaterial->Material(loop)->GasCp = 0.0;
+                state.dataMaterial->Material(loop)->gasTypes = Material::GasType::Custom;
+                state.dataMaterial->Material(loop)->GasWght = 0.0;
+                state.dataMaterial->Material(loop)->GasSpecHeatRatio = 0.0;
+                state.dataMaterial->Material(loop)->GasFract = 0.0;
+                state.dataMaterial->Material(loop)->WinShadeToGlassDist = 0.0;
+                state.dataMaterial->Material(loop)->WinShadeTopOpeningMult = 0.0;
+                state.dataMaterial->Material(loop)->WinShadeBottomOpeningMult = 0.0;
+                state.dataMaterial->Material(loop)->WinShadeLeftOpeningMult = 0.0;
+                state.dataMaterial->Material(loop)->WinShadeRightOpeningMult = 0.0;
+                state.dataMaterial->Material(loop)->WinShadeAirFlowPermeability = 0.0;
+                state.dataMaterial->Material(loop)->BlindDataPtr = 0;
+                state.dataMaterial->Material(loop)->EMPDmu = 0.0;
+                state.dataMaterial->Material(loop)->MoistACoeff = 0.0;
+                state.dataMaterial->Material(loop)->MoistBCoeff = 0.0;
+                state.dataMaterial->Material(loop)->MoistCCoeff = 0.0;
+                state.dataMaterial->Material(loop)->MoistDCoeff = 0.0;
+                state.dataMaterial->Material(loop)->EMPDSurfaceDepth = 0.0;
+                state.dataMaterial->Material(loop)->EMPDDeepDepth = 0.0;
+                state.dataMaterial->Material(loop)->EMPDmuCoating = 0.0;
+                state.dataMaterial->Material(loop)->EMPDCoatingThickness = 0.0;
             }
 
             // Glass objects
@@ -4588,8 +4587,7 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     ++MaterNum;
-                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-                    assert(thisMaterial != nullptr);
+                    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
                     thisMaterial->Group = Material::MaterialGroup::WindowGlass;
                     NextLine = W5DataFile.readLine();
@@ -4638,8 +4636,7 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     ++MaterNum;
-                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-                    assert(thisMaterial != nullptr);
+                    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
@@ -4660,8 +4657,7 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     MaterNum = MaterNumSysGap(IGap, IGlSys);
-                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-                    assert(thisMaterial != nullptr);
+                    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
                     thisMaterial->NumberOfGasesInMixture = NumGases(IGap, IGlSys);
                     thisMaterial->Group = Material::MaterialGroup::WindowGas;
                     if (NumGases(IGap, IGlSys) > 1) thisMaterial->Group = Material::MaterialGroup::WindowGasMixture;
@@ -4786,10 +4782,8 @@ namespace HeatBalanceManager {
                 }
 
                 thisConstruct.OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-                thisConstruct.InsideAbsorpThermal =
-                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(TotMaterialsPrev + NGlass(IGlSys)))->AbsorpThermalBack;
-                thisConstruct.OutsideAbsorpThermal =
-                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(TotMaterialsPrev + 1))->AbsorpThermalFront;
+                thisConstruct.InsideAbsorpThermal = state.dataMaterial->Material(TotMaterialsPrev + NGlass(IGlSys))->AbsorpThermalBack;
+                thisConstruct.OutsideAbsorpThermal = state.dataMaterial->Material(TotMaterialsPrev + 1)->AbsorpThermalFront;
                 thisConstruct.TypeIsWindow = true;
                 thisConstruct.FromWindow5DataFile = true;
                 thisConstruct.W5FileGlazingSysHeight = WinHeight(IGlSys);
@@ -4934,8 +4928,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = 0.0;
                 for (loop = 1; loop <= NGlass(IGlSys) + NGaps(IGlSys); ++loop) {
                     MatNum = thisConstruct.LayerPoint(loop);
-                    auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
-                    assert(thisMaterial != nullptr);
+                    auto const *thisMaterial = state.dataMaterial->Material(MatNum);
                     if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += thisMaterial->Thickness / thisMaterial->Conductivity;
                     } else if (thisMaterial->Group == Material::MaterialGroup::WindowGas ||
@@ -5145,7 +5138,7 @@ namespace HeatBalanceManager {
 
         // First get the concrete layer
         iFCConcreteLayer = UtilityRoutines::FindItemInPtrList("~FC_Concrete", state.dataMaterial->Material);
-        Rcon = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(iFCConcreteLayer))->Resistance;
+        Rcon = state.dataMaterial->Material(iFCConcreteLayer)->Resistance;
 
         // Count number of constructions defined with Ffactor or Cfactor method
         TotFfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
@@ -5258,7 +5251,7 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
 
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum))->Resistance = Rfic;
+            state.dataMaterial->Material(MaterNum)->Resistance = Rfic;
             state.dataHeatBal->NominalR(MaterNum) = Rfic;
 
             // excluding thermal resistance of inside or outside air film
@@ -5357,7 +5350,7 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
 
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum))->Resistance = Rfic;
+            state.dataMaterial->Material(MaterNum)->Resistance = Rfic;
             state.dataHeatBal->NominalR(MaterNum) = Rfic;
 
             // Reff includes the wall itself and soil, but excluding thermal resistance of inside or outside air film
@@ -5864,8 +5857,7 @@ namespace HeatBalanceManager {
         NumNewConst = 0;
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
-                iTCG = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer))
-                           ->TCParent;
+                iTCG = state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer)->TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
                 iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
                 for (iTC = 1; iTC <= iMat; ++iTC) {
@@ -5886,8 +5878,7 @@ namespace HeatBalanceManager {
         NumNewConst = state.dataHeatBal->TotConstructs;
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
-                iTCG = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer))
-                           ->TCParent;
+                iTCG = state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer)->TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
                 iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
                 for (iTC = 1; iTC <= iMat; ++iTC) {
@@ -5958,8 +5949,7 @@ namespace HeatBalanceManager {
         Real64 RLowSide(0.0);
         Real64 RHiSide(0.0);
 
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-        assert(thisMaterial != nullptr);
+        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
         // first fill out defaults
         thisMaterial->GlassSpectralDataPtr = 0;
         thisMaterial->SolarDiffusing = false;
@@ -6276,10 +6266,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            delete state.dataMaterial->Material(MaterNum);
-            state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-            assert(thisMaterial != nullptr);
+            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             thisMaterial->Group = Material::MaterialGroup::ComplexWindowGap;
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
             thisMaterial->ROnly = true;
@@ -6368,10 +6355,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            delete state.dataMaterial->Material(MaterNum);
-            state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-            assert(thisMaterial != nullptr);
+            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             thisMaterial->Group = Material::MaterialGroup::ComplexWindowShade;
             thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
             thisMaterial->ROnly = true;

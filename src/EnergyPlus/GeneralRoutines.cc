@@ -994,9 +994,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         InitExteriorConvectionCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
-        AbsThermSurf =
-            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
-                ->AbsorpThermal;
+        AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermal;
         TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
         TsBaffK = TmpTsBaf + DataGlobalConstants::KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero

@@ -902,8 +902,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                     // Push back construction's layers
                     for (int layer = 1; layer <= c.TotLayers; layer++) {
-                        auto const *mat = dynamic_cast<const Material::MaterialChild *>(Materials(c.LayerPoint(layer)));
-                        assert(mat != nullptr);
+                        auto const *mat = Materials(c.LayerPoint(layer));
                         if (mat->ROnly) {
                             ErrorsFound = true;
                             ShowSevereError(state, format("Construction=\"{}\", constructions referenced by surfaces with a", c.Name));
@@ -927,8 +926,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                 // Set slab construction
                 for (int i = 0; i < Constructs(surface.Construction).TotLayers; ++i) {
-                    auto const *mat = dynamic_cast<const Material::MaterialChild *>(Materials(Constructs(surface.Construction).LayerPoint[i]));
-                    assert(mat != nullptr);
+                    auto const *mat = Materials(Constructs(surface.Construction).LayerPoint[i]);
                     if (mat->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(

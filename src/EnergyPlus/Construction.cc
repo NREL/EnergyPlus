@@ -214,8 +214,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         // Obtain thermal properties from the Material derived type
 
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
-        assert(thisMaterial != nullptr);
+        auto *thisMaterial = state.dataMaterial->Material(CurrentLayer);
 
         dl(Layer) = thisMaterial->Thickness;
         rk(Layer) = thisMaterial->Conductivity;
@@ -293,8 +292,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 // then use the "exact" approach to model a massless layer
                 // based on the node equations for the state space method.
 
-                if ((Layer == 1) || (Layer == this->TotLayers) ||
-                    (!dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(this->LayerPoint(Layer)))->ROnly)) {
+                if ((Layer == 1) || (Layer == this->TotLayers) || (!state.dataMaterial->Material(this->LayerPoint(Layer))->ROnly)) {
                     cp(Layer) = 1.007;
                     rho(Layer) = 1.1614;
                     rk(Layer) = 0.0263;
@@ -1904,8 +1902,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint(I);
-        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(Layer));
-        assert(thisMaterial != nullptr);
+        auto const *thisMaterial = state.dataMaterial->Material(Layer);
         switch (thisMaterial->Group) {
         case Material::MaterialGroup::Air: {
             static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
@@ -1913,7 +1910,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         } break;
         default: {
             static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-            Material::MaterialChild const *mp = dynamic_cast<const Material::MaterialChild *>(thisMaterial);
+            Material::MaterialProperties const *mp = thisMaterial;
             print(state.files.eio, Format_701, mp->Name, mp->Thickness, mp->Conductivity, mp->Density, mp->SpecHeat, mp->Resistance);
         } break;
         }

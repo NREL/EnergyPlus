@@ -55,9 +55,8 @@ namespace DataSurfaces {
 }
 
 namespace DataHeatBalance {
-    struct MaterialBase;
-    struct MaterialChild;
-} // namespace DataHeatBalance
+    struct MaterialProperties;
+}
 
 } // namespace EnergyPlus
 
@@ -166,17 +165,18 @@ namespace WindowManager {
         int getNumOfLayers(EnergyPlusData &state) const;
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer>
-        getSolidLayer(EnergyPlusData &state, Material::MaterialChild const *material, int const t_Index);
+        getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const *material, int const t_Index);
 
-        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialChild const *material) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialProperties const *material) const;
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
-        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state, Material::MaterialChild const *material) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state,
+                                                                            Material::MaterialProperties const *material) const;
 
-        Gases::CGas getGas(Material::MaterialChild const *material) const;
+        Gases::CGas getGas(Material::MaterialProperties const *material) const;
         static Gases::CGas getAir();
-        Material::MaterialChild *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
+        Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
     };
 } // namespace WindowManager
 

@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, test_overallUfactorFromFilmsAndCond)
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
     for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
+        Material::MaterialProperties *p = new Material::MaterialProperties;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataMaterial->Material(materialOutside)->Group = Material::MaterialGroup::WindowGlass;
@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, test_getOutdoorNfrc)
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
     for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
+        Material::MaterialProperties *p = new Material::MaterialProperties;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataMaterial->Material(materialOutside)->Group = Material::MaterialGroup::WindowGlass;
@@ -184,7 +184,7 @@ TEST_F(EnergyPlusFixture, test_getIndoorNfrc)
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
     for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
+        Material::MaterialProperties *p = new Material::MaterialProperties;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataMaterial->Material(materialOutside)->Group = Material::MaterialGroup::WindowGlass;
@@ -219,7 +219,7 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
     state->dataConstruction->Construct(simpleCons).AbsDiff.allocate(2);
     int numMaterials = materialInside + 1;
     for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
+        Material::MaterialProperties *p = new Material::MaterialProperties;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataMaterial->Material(materialOutside)->Group = Material::MaterialGroup::WindowGlass;
@@ -299,7 +299,7 @@ TEST_F(EnergyPlusFixture, test_getActiveConstructionNumber)
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
     for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
+        Material::MaterialProperties *p = new Material::MaterialProperties;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataMaterial->Material(materialOutside)->Group = Material::MaterialGroup::WindowGlass;
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, test_getIGU)
     state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
     int numMaterials = materialInside;
     for (int i = 1; i <= numMaterials; i++) {
-        Material::MaterialChild *p = new Material::MaterialChild;
+        Material::MaterialProperties *p = new Material::MaterialProperties;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataMaterial->Material(materialOutside)->Group = Material::MaterialGroup::WindowGlass;

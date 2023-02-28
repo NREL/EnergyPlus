@@ -171,9 +171,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             state.dataSQLiteProcedures->sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
         for (int materialNum = 1; materialNum <= state.dataMaterial->TotMaterials; ++materialNum) {
-            auto const *thisMaterialBase = state.dataMaterial->Material(materialNum);
-            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(thisMaterialBase);
-            assert(thisMaterial != nullptr);
+            auto const *thisMaterial = state.dataMaterial->Material(materialNum);
             state.dataSQLiteProcedures->sqlite->addMaterialData(materialNum, thisMaterial);
         }
         for (int constructNum = 1; constructNum <= state.dataHeatBal->TotConstructs; ++constructNum) {
@@ -2126,7 +2124,7 @@ void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData c
     zoneGroups.push_back(std::make_unique<ZoneGroup>(m_errorStream, m_db, number, zoneGroupData));
 }
 
-void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialChild const *materialData)
+void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const *materialData)
 {
     materials.push_back(std::make_unique<Material>(m_errorStream, m_db, number, materialData));
 }

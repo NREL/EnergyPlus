@@ -223,7 +223,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     SurfaceFD(surfaceIndex).PhaseChangeStateOld(finiteDiffLayerIndex) = HysteresisPhaseChange::PhaseChangeStates::MELTING;
 
     // create a materials data object and assign the phase change variable based on above IDF processing
-    Material::MaterialChild material;
+    Material::MaterialProperties material;
     material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(*state, "PCMNAME");
 
     // create local variables to calculate and call the new worker function
