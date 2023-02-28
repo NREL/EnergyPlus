@@ -453,7 +453,7 @@ namespace AirLoopHVACDOAS {
                 }
                 // Check controller type
                 std::string_view CurrentModuleObject = "AirLoopHVAC:OutdoorAirSystem";
-		auto &thisOutsideAirSys = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum);
+                auto &thisOutsideAirSys = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum);
                 for (int InListNum = 1; InListNum <= thisOutsideAirSys.NumControllers; ++InListNum) {
                     if (UtilityRoutines::SameString(thisOutsideAirSys.ControllerType(InListNum), "Controller:OutdoorAir")) {
                         ShowSevereError(state,
@@ -470,14 +470,13 @@ namespace AirLoopHVACDOAS {
                 int CoolingCoilOrder = 0;
                 int FanOrder = 0;
                 for (int CompNum = 1; CompNum <= thisOutsideAirSys.NumComponents; ++CompNum) {
-		    std::string &CompType = thisOutsideAirSys.ComponentType(CompNum);
-		    std::string &CompName = thisOutsideAirSys.ComponentName(CompNum);
+                    std::string &CompType = thisOutsideAirSys.ComponentType(CompNum);
+                    std::string &CompName = thisOutsideAirSys.ComponentName(CompNum);
 
                     bool InletNodeErrFlag = false;
                     bool OutletNodeErrFlag = false;
 
-                    const std::string typeNameUC =
-                        UtilityRoutines::MakeUPPERCase(thisOutsideAirSys.ComponentType(CompNum));
+                    const std::string typeNameUC = UtilityRoutines::MakeUPPERCase(thisOutsideAirSys.ComponentType(CompNum));
                     ValidEquipListType foundType = static_cast<ValidEquipListType>(getEnumerationValue(validEquipNamesUC, typeNameUC));
 
                     switch (foundType) {
@@ -605,8 +604,10 @@ namespace AirLoopHVACDOAS {
                         break;
 
                     case ValidEquipListType::CoilSystemCoolingWaterHeatExchangerAssisted:
-                        thisOutsideAirSys.InletNodeNum(CompNum) = HVACHXAssistedCoolingCoil::GetCoilInletNode(state, CompType, CompName, InletNodeErrFlag);
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, CompType, CompName, OutletNodeErrFlag);
+                        thisOutsideAirSys.InletNodeNum(CompNum) =
+                            HVACHXAssistedCoolingCoil::GetCoilInletNode(state, CompType, CompName, InletNodeErrFlag);
+                        thisOutsideAirSys.OutletNodeNum(CompNum) =
+                            HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, CompType, CompName, OutletNodeErrFlag);
                         break;
 
                     case ValidEquipListType::CoilSystemCoolingDX:
@@ -616,14 +617,17 @@ namespace AirLoopHVACDOAS {
                             thisOutsideAirSys.compPointer[CompNum] =
                                 UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
                         }
-                        thisOutsideAirSys.InletNodeNum(CompNum) = thisOutsideAirSys.compPointer[CompNum]->getAirInNode(state, CompName, 0, InletNodeErrFlag);
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = thisOutsideAirSys.compPointer[CompNum]->getAirOutNode(state, CompName, 0, OutletNodeErrFlag);
+                        thisOutsideAirSys.InletNodeNum(CompNum) =
+                            thisOutsideAirSys.compPointer[CompNum]->getAirInNode(state, CompName, 0, InletNodeErrFlag);
+                        thisOutsideAirSys.OutletNodeNum(CompNum) =
+                            thisOutsideAirSys.compPointer[CompNum]->getAirOutNode(state, CompName, 0, OutletNodeErrFlag);
                         CoolingCoilOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilSystemHeatingDX:
                         thisOutsideAirSys.InletNodeNum(CompNum) = HVACDXHeatPumpSystem::GetHeatingCoilInletNodeNum(state, CompName, InletNodeErrFlag);
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = HVACDXHeatPumpSystem::GetHeatingCoilOutletNodeNum(state, CompName, OutletNodeErrFlag);
+                        thisOutsideAirSys.OutletNodeNum(CompNum) =
+                            HVACDXHeatPumpSystem::GetHeatingCoilOutletNodeNum(state, CompName, OutletNodeErrFlag);
                         break;
 
                     case ValidEquipListType::CoilUserDefined:
@@ -644,7 +648,8 @@ namespace AirLoopHVACDOAS {
                     case ValidEquipListType::DehumidifierDesiccantNoFans:
                     case ValidEquipListType::DehumidifierDesiccantSystem:
                         thisOutsideAirSys.InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirInletNodeNum(state, CompName, InletNodeErrFlag);
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(state, CompName, OutletNodeErrFlag);
+                        thisOutsideAirSys.OutletNodeNum(CompNum) =
+                            DesiccantDehumidifiers::GetProcAirOutletNodeNum(state, CompName, OutletNodeErrFlag);
                         break;
 
                     case ValidEquipListType::HumidifierSteamElectric:
@@ -659,8 +664,10 @@ namespace AirLoopHVACDOAS {
                         break;
 
                     case ValidEquipListType::SolarCollectorFlatPlatePhotovoltaicThermal:
-                        thisOutsideAirSys.InletNodeNum(CompNum) = PhotovoltaicThermalCollectors::GetAirInletNodeNum(state, CompName, InletNodeErrFlag);
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = PhotovoltaicThermalCollectors::GetAirOutletNodeNum(state, CompName, OutletNodeErrFlag);
+                        thisOutsideAirSys.InletNodeNum(CompNum) =
+                            PhotovoltaicThermalCollectors::GetAirInletNodeNum(state, CompName, InletNodeErrFlag);
+                        thisOutsideAirSys.OutletNodeNum(CompNum) =
+                            PhotovoltaicThermalCollectors::GetAirOutletNodeNum(state, CompName, OutletNodeErrFlag);
                         break;
 
                     case ValidEquipListType::EvaporativeCoolerDirectCeldekPad:
@@ -673,8 +680,10 @@ namespace AirLoopHVACDOAS {
                         break;
 
                     case ValidEquipListType::ZoneHVACTerminalUnitVariableRefrigerantFlow:
-                        thisOutsideAirSys.InletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUInAirNodeFromName(state, CompName, InletNodeErrFlag);
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUOutAirNodeFromName(state, CompName, OutletNodeErrFlag);
+                        thisOutsideAirSys.InletNodeNum(CompNum) =
+                            HVACVariableRefrigerantFlow::GetVRFTUInAirNodeFromName(state, CompName, InletNodeErrFlag);
+                        thisOutsideAirSys.OutletNodeNum(CompNum) =
+                            HVACVariableRefrigerantFlow::GetVRFTUOutAirNodeFromName(state, CompName, OutletNodeErrFlag);
                         break;
 
                     default:

@@ -816,12 +816,12 @@ namespace CommandLineInterface {
 
             //                                  Heading line found, now looking for Kind
             while (inputFile.good() && !NewHeading) {
-		const auto innerReadResult = inputFile.readLine(); // readLine returns a ReadResult<std::string>, hence no & (THIS_AUTO_OK)
+                const auto innerReadResult = inputFile.readLine(); // readLine returns a ReadResult<std::string>, hence no & (THIS_AUTO_OK)
                 if (innerReadResult.eof) {
                     break;
                 }
 
-		std::string line = innerReadResult.data;
+                std::string line = innerReadResult.data;
                 strip(line);
 
                 if (line.empty()) continue; // Ignore Blank Lines

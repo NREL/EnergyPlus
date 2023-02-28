@@ -237,15 +237,15 @@ namespace FanCoilUnits {
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanType;
 
-        using NodeInputManager::GetOnlySingleNode;
-        using WaterCoils::GetCoilWaterInletNode;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
         using MixedAir::GetOAMixerIndex;
         using MixedAir::GetOAMixerNodeNumbers;
+        using NodeInputManager::GetOnlySingleNode;
         using SingleDuct::GetATMixer;
+        using WaterCoils::GetCoilWaterInletNode;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -481,8 +481,8 @@ namespace FanCoilUnits {
                         FanCoil(FanCoilNum).CoolCoilOutletNodeNum =
                             WaterCoils::GetCoilOutletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                     } else {
-                        FanCoil(FanCoilNum).CoolCoilFluidInletNode =
-			    HVACHXAssistedCoolingCoil::GetCoilWaterInletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
+                        FanCoil(FanCoilNum).CoolCoilFluidInletNode = HVACHXAssistedCoolingCoil::GetCoilWaterInletNode(
+                            state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                         FanCoil(FanCoilNum).CoolCoilInletNodeNum =
                             HVACHXAssistedCoolingCoil::GetCoilInletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                         FanCoil(FanCoilNum).CoolCoilOutletNodeNum = HVACHXAssistedCoolingCoil::GetCoilOutletNode(
@@ -530,7 +530,7 @@ namespace FanCoilUnits {
                     ErrorsFound = true;
                 } else {
                     FanCoil(FanCoilNum).DesignHeatingCapacity =
-			HeatingCoils::GetCoilCapacity(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, errFlag);
+                        HeatingCoils::GetCoilCapacity(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, errFlag);
                     FanCoil(FanCoilNum).HeatCoilInletNodeNum =
                         HeatingCoils::GetCoilInletNode(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, errFlag);
                     FanCoil(FanCoilNum).HeatCoilOutletNodeNum =

@@ -788,27 +788,9 @@ namespace Furnaces {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using NodeInputManager::GetOnlySingleNode;
-        using WaterToAirHeatPumpSimple::SetSimpleWSHPData;
-        using VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed;
-        using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
-        using VariableSpeedCoils::GetCoilIndexVariableSpeed;
-        using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
-        using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
-        using VariableSpeedCoils::GetVSCoilCondenserInletNode;
-        using VariableSpeedCoils::SetVarSpeedCoilData;
-        using HeatingCoils::GetHeatingCoilPLFCurveIndex;
-        using HeatingCoils::GetHeatingCoilTypeNum;
         using DXCoils::GetCoilTypeNum;
         using DXCoils::GetDXCoilIndex;
         using DXCoils::SetDXCoolingCoilData;
-        using HVACHXAssistedCoolingCoil::GetHXDXCoilIndex;
-        using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-        using HVACHXAssistedCoolingCoil::GetActualDXCoilIndex;
-        using WaterCoils::GetCoilMaxWaterFlowRate;
-        using WaterCoils::GetCoilWaterInletNode;
-        using SteamCoils::GetCoilAirOutletNode;
-        using SteamCoils::GetCoilSteamInletNode;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanIndex;
@@ -816,6 +798,24 @@ namespace Furnaces {
         using Fans::GetFanOutletNode;
         using Fans::GetFanType;
         using FluidProperties::GetSatDensityRefrig;
+        using HeatingCoils::GetHeatingCoilPLFCurveIndex;
+        using HeatingCoils::GetHeatingCoilTypeNum;
+        using HVACHXAssistedCoolingCoil::GetActualDXCoilIndex;
+        using HVACHXAssistedCoolingCoil::GetHXDXCoilIndex;
+        using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
+        using NodeInputManager::GetOnlySingleNode;
+        using SteamCoils::GetCoilAirOutletNode;
+        using SteamCoils::GetCoilSteamInletNode;
+        using VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed;
+        using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
+        using VariableSpeedCoils::GetCoilIndexVariableSpeed;
+        using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
+        using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
+        using VariableSpeedCoils::GetVSCoilCondenserInletNode;
+        using VariableSpeedCoils::SetVarSpeedCoilData;
+        using WaterCoils::GetCoilMaxWaterFlowRate;
+        using WaterCoils::GetCoilWaterInletNode;
+        using WaterToAirHeatPumpSimple::SetSimpleWSHPData;
 
         using EMSManager::ManageEMS;
         using HVACControllers::CheckCoilWaterInletNode;
@@ -826,8 +826,8 @@ namespace Furnaces {
         std::string_view CurrentModuleObject; // Object type for getting and error messages
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-	std::string_view constexpr getUnitaryHeatOnly("GetUnitaryHeatOnly");
-	std::string_view constexpr getAirLoopHVACHeatCoolInput("GetAirLoopHVACHeatCoolInput");
+        std::string_view constexpr getUnitaryHeatOnly("GetUnitaryHeatOnly");
+        std::string_view constexpr getAirLoopHVACHeatCoolInput("GetAirLoopHVACHeatCoolInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FurnaceNum;                // The Furnace that you are currently loading input into
@@ -1217,7 +1217,8 @@ namespace Furnaces {
             if (UtilityRoutines::SameString(HeatingCoilType, "Coil:Heating:Fuel") ||
                 UtilityRoutines::SameString(HeatingCoilType, "Coil:Heating:Electric")) {
                 errFlag = false;
-                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, HeatingCoilType, HeatingCoilName, errFlag);
+                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num =
+                    HeatingCoils::GetHeatingCoilTypeNum(state, HeatingCoilType, HeatingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
@@ -1231,7 +1232,7 @@ namespace Furnaces {
 
                         // Get index to Heating Coil
                         errFlag = false;
-			HeatingCoils::GetCoilIndex(state, HeatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, errFlag);
+                        HeatingCoils::GetCoilIndex(state, HeatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, errFlag);
                         if (errFlag) {
                             ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                             ErrorsFound = true;
@@ -1240,7 +1241,7 @@ namespace Furnaces {
                         // Get the furnace design capacity
                         errFlag = false;
                         state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity =
-			    HeatingCoils::GetCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
+                            HeatingCoils::GetCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError(state, format("...occurs in {} ={}", CurrentModuleObject, Alphas(1)));
                             ErrorsFound = true;
@@ -1334,7 +1335,7 @@ namespace Furnaces {
 
                     errFlag = false;
                     state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex =
-			SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", HeatingCoilName, errFlag);
+                        SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", HeatingCoilName, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex == 0) {
                         ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(11), HeatingCoilName));
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -1352,7 +1353,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil steam max volume flow rate
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow =
-			SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, errFlag);
+                        SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity =
@@ -1363,7 +1364,7 @@ namespace Furnaces {
                     // Get the Heating Coil Inlet Node
                     errFlag = false;
                     HeatingCoilInletNode =
-			SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, HeatingCoilName, errFlag);
+                        SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, HeatingCoilName, errFlag);
                     state.dataFurnaces->Furnace(FurnaceNum).HWCoilAirInletNode = HeatingCoilInletNode;
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -1827,7 +1828,8 @@ namespace Furnaces {
             if (UtilityRoutines::SameString(HeatingCoilType, "Coil:Heating:Fuel") ||
                 UtilityRoutines::SameString(HeatingCoilType, "Coil:Heating:Electric")) {
                 errFlag = false;
-                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, HeatingCoilType, HeatingCoilName, errFlag);
+                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num =
+                    HeatingCoils::GetHeatingCoilTypeNum(state, HeatingCoilType, HeatingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
@@ -1842,7 +1844,7 @@ namespace Furnaces {
 
                         // Get heating coil index
                         errFlag = false;
-			HeatingCoils::GetCoilIndex(state, HeatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, errFlag);
+                        HeatingCoils::GetCoilIndex(state, HeatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, errFlag);
                         if (errFlag) {
                             ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                             ErrorsFound = true;
@@ -1851,7 +1853,7 @@ namespace Furnaces {
                         // Get the design heating capacity
                         errFlag = false;
                         state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity =
-			    HeatingCoils::GetCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
+                            HeatingCoils::GetCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                             ErrorsFound = true;
@@ -1952,7 +1954,7 @@ namespace Furnaces {
 
                     errFlag = false;
                     state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex =
-			SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", HeatingCoilName, errFlag);
+                        SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", HeatingCoilName, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex == 0) {
                         ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(11), HeatingCoilName));
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -1970,7 +1972,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil steam max volume flow rate
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow =
-			SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, errFlag);
+                        SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity =
@@ -1981,7 +1983,7 @@ namespace Furnaces {
                     // Get the Heating Coil Inlet Node
                     errFlag = false;
                     HeatingCoilInletNode =
-			SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, HeatingCoilName, errFlag);
+                        SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, HeatingCoilName, errFlag);
                     state.dataFurnaces->Furnace(FurnaceNum).HWCoilAirInletNode = HeatingCoilInletNode;
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -2038,7 +2040,7 @@ namespace Furnaces {
                 } else { // mine data from DX cooling coil
 
                     // Get DX cooling coil index
-		    DXCoils::GetDXCoilIndex(state, CoolingCoilName, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, IsNotOK);
+                    DXCoils::GetDXCoilIndex(state, CoolingCoilName, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                         ErrorsFound = true;
@@ -2047,7 +2049,7 @@ namespace Furnaces {
                     // Get DX cooling coil capacity
                     errFlag = false;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity =
-			DXCoils::GetCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
+                        DXCoils::GetCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                         ErrorsFound = true;
@@ -2074,7 +2076,7 @@ namespace Furnaces {
                         }
                     } else {
                         state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum =
-			    DXCoils::GetCoilCondenserInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
+                            DXCoils::GetCoilCondenserInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     }
                     if (errFlag) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -2105,7 +2107,7 @@ namespace Furnaces {
 
                     // Get DX cooling coil capacity
                     state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity =
-			HVACHXAssistedCoolingCoil::GetCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
+                        HVACHXAssistedCoolingCoil::GetCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                     errFlag = false;
                     if (errFlag) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -2154,7 +2156,7 @@ namespace Furnaces {
                             state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = GetVSCoilCondenserInletNode(state, CoolingCoilName, errFlag);
                         }
                     } else {
-			state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(
+                        state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(
                             state, "COIL:COOLING:DX:SINGLESPEED", GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, errFlag), errFlag);
                     }
 
@@ -2310,7 +2312,7 @@ namespace Furnaces {
                     UtilityRoutines::SameString(ReheatingCoilType, "Coil:Heating:Desuperheater")) {
 
                     state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num =
-			HeatingCoils::GetHeatingCoilTypeNum(state, ReheatingCoilType, ReheatingCoilName, errFlag);
+                        HeatingCoils::GetHeatingCoilTypeNum(state, ReheatingCoilType, ReheatingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                         ErrorsFound = true;
@@ -2324,7 +2326,7 @@ namespace Furnaces {
                         } else { // mine data from reheat coil
 
                             // Get the heating coil index
-			    HeatingCoils::GetCoilIndex(state, ReheatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, IsNotOK);
+                            HeatingCoils::GetCoilIndex(state, ReheatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, IsNotOK);
                             if (IsNotOK) {
                                 ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                                 ErrorsFound = true;
@@ -2333,7 +2335,7 @@ namespace Furnaces {
                             // Get the design supplemental heating capacity
                             errFlag = false;
                             state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
-				HeatingCoils::GetCoilCapacity(state, ReheatingCoilType, ReheatingCoilName, errFlag);
+                                HeatingCoils::GetCoilCapacity(state, ReheatingCoilType, ReheatingCoilName, errFlag);
                             if (errFlag) {
                                 ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                                 ErrorsFound = true;
@@ -2426,7 +2428,7 @@ namespace Furnaces {
 
                         errFlag = false;
                         state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex =
-			    SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", ReheatingCoilName, errFlag);
+                            SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", ReheatingCoilName, errFlag);
                         if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex == 0) {
                             ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(11), ReheatingCoilName));
                             ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -2444,19 +2446,20 @@ namespace Furnaces {
 
                         // Get the Heating Coil steam max volume flow rate
                         state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
-			    SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag);
+                            SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag);
                         if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity = GetSatDensityRefrig(
                                 state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, getAirLoopHVACHeatCoolInput);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
-				SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag) * SteamDensity;
+                                SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag) *
+                                SteamDensity;
                         }
 
                         // Get the Heating Coil Inlet Node
                         errFlag = false;
-                        ReheatCoilInletNode =
-			    SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ReheatingCoilName, errFlag);
+                        ReheatCoilInletNode = SteamCoils::GetCoilAirInletNode(
+                            state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ReheatingCoilName, errFlag);
                         state.dataFurnaces->Furnace(FurnaceNum).SuppCoilAirInletNode = ReheatCoilInletNode;
                         if (errFlag) {
                             ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -3197,7 +3200,7 @@ namespace Furnaces {
 
                 } else { // mine data from DX heating coil
 
-		    DXCoils::GetDXCoilIndex(state, HeatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, IsNotOK);
+                    DXCoils::GetDXCoilIndex(state, HeatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, format("...occurs {} = {}", CurrentModuleObject, Alphas(1)));
                         ErrorsFound = true;
@@ -3215,7 +3218,7 @@ namespace Furnaces {
                     // Get the design heating capacity
                     errFlag = false;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity =
-			DXCoils::GetCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
+                        DXCoils::GetCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("...occurs in {} ={}", CurrentModuleObject, Alphas(1)));
                         ErrorsFound = true;
@@ -3286,7 +3289,7 @@ namespace Furnaces {
 
                     // Get the cooling coil node numbers
                     errFlag = false;
-		    DXCoils::GetDXCoilIndex(state, CoolingCoilName, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, errFlag);
+                    DXCoils::GetDXCoilIndex(state, CoolingCoilName, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, errFlag);
                     CoolingCoilInletNode = DXCoils::GetCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilOutletNode = DXCoils::GetCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
@@ -3297,7 +3300,7 @@ namespace Furnaces {
                     // Get the DX cooling coil design capacity
                     errFlag = false;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity =
-			DXCoils::GetCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
+                        DXCoils::GetCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                         ErrorsFound = true;
@@ -3405,7 +3408,7 @@ namespace Furnaces {
                 UtilityRoutines::SameString(SuppHeatCoilType, "Coil:Heating:Electric")) {
 
                 state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num =
-		    HeatingCoils::GetHeatingCoilTypeNum(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                    HeatingCoils::GetHeatingCoilTypeNum(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
@@ -3418,7 +3421,7 @@ namespace Furnaces {
 
                     } else { // mine data from the supplemental heating coil
 
-			HeatingCoils::GetCoilIndex(state, SuppHeatCoilName, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, IsNotOK);
+                        HeatingCoils::GetCoilIndex(state, SuppHeatCoilName, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, IsNotOK);
                         if (IsNotOK) {
                             ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                             ErrorsFound = true;
@@ -3444,7 +3447,7 @@ namespace Furnaces {
                         // Get the supplemental heating coil design capacity
                         errFlag = false;
                         state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
-			    HeatingCoils::GetCoilCapacity(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                            HeatingCoils::GetCoilCapacity(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                             ErrorsFound = true;
@@ -3518,7 +3521,7 @@ namespace Furnaces {
 
                     errFlag = false;
                     state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex =
-			SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", SuppHeatCoilName, errFlag);
+                        SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", SuppHeatCoilName, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex == 0) {
                         ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(12), SuppHeatCoilName));
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -3536,19 +3539,20 @@ namespace Furnaces {
 
                     // Get the Heating Coil steam max volume flow rate
                     state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
-			SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag);
+                        SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity =
                             GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, getAirLoopHVACHeatCoolInput);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
-			    SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag) * SteamDensity;
+                            SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag) *
+                            SteamDensity;
                     }
 
                     // Get the Heating Coil Inlet Node
                     errFlag = false;
                     SupHeatCoilInletNode =
-			SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, SuppHeatCoilName, errFlag);
+                        SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, SuppHeatCoilName, errFlag);
                     state.dataFurnaces->Furnace(FurnaceNum).SuppCoilAirInletNode = SupHeatCoilInletNode;
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -3896,7 +3900,7 @@ namespace Furnaces {
             errFlag = false;
             if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum =
-		    DXCoils::GetCoilCondenserInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
+                    DXCoils::GetCoilCondenserInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
             } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
                     IHPCoilName = state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).SCCoilName;
@@ -3905,7 +3909,7 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = GetVSCoilCondenserInletNode(state, CoolingCoilName, errFlag);
                 }
             } else {
-		    state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(
+                state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(
                     state, "Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, errFlag), errFlag);
             }
             if (errFlag) {
@@ -4156,7 +4160,8 @@ namespace Furnaces {
                     ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
                 } else {
-			state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex = WaterToAirHeatPump::GetCoilIndex(state, HeatingCoilType, HeatingCoilName, errFlag);
+                    state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex =
+                        WaterToAirHeatPump::GetCoilIndex(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilInletNode = WaterToAirHeatPump::GetCoilInletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilOutletNode = WaterToAirHeatPump::GetCoilOutletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                 }
@@ -4170,7 +4175,7 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex =
-			WaterToAirHeatPumpSimple::GetCoilIndex(state, HeatingCoilType, HeatingCoilName, errFlag);
+                        WaterToAirHeatPumpSimple::GetCoilIndex(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilInletNode = WaterToAirHeatPumpSimple::GetCoilInletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilOutletNode = WaterToAirHeatPumpSimple::GetCoilOutletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                 }
@@ -4204,7 +4209,8 @@ namespace Furnaces {
                     ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
                 } else {
-                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex = WaterToAirHeatPump::GetCoilIndex(state, CoolingCoilType, CoolingCoilName, errFlag);
+                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex =
+                        WaterToAirHeatPump::GetCoilIndex(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilInletNode = WaterToAirHeatPump::GetCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilOutletNode = WaterToAirHeatPump::GetCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                 }
@@ -4296,7 +4302,7 @@ namespace Furnaces {
                 UtilityRoutines::SameString(SuppHeatCoilType, "Coil:Heating:Electric")) {
 
                 state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num =
-		    HeatingCoils::GetHeatingCoilTypeNum(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                    HeatingCoils::GetHeatingCoilTypeNum(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
@@ -4309,7 +4315,7 @@ namespace Furnaces {
 
                     } else { // mine data from the supplemental heating coil
 
-			HeatingCoils::GetCoilIndex(state, SuppHeatCoilName, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, IsNotOK);
+                        HeatingCoils::GetCoilIndex(state, SuppHeatCoilName, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, IsNotOK);
                         if (IsNotOK) {
                             ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                             ErrorsFound = true;
@@ -4334,7 +4340,7 @@ namespace Furnaces {
                         // Get the supplemental heating coil design capacity
                         errFlag = false;
                         state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
-			    HeatingCoils::GetCoilCapacity(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                            HeatingCoils::GetCoilCapacity(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                             ErrorsFound = true;
@@ -4408,7 +4414,8 @@ namespace Furnaces {
                 } else { // mine data from heating coil object
 
                     errFlag = false;
-                    state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex = SteamCoils::GetSteamCoilIndex(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                    state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex =
+                        SteamCoils::GetSteamCoilIndex(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex == 0) {
                         ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(12), SuppHeatCoilName));
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -4426,19 +4433,20 @@ namespace Furnaces {
 
                     // Get the Heating Coil steam max volume flow rate
                     state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
-			SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag);
+                        SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity =
                             GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, getAirLoopHVACHeatCoolInput);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
-			    SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag) * SteamDensity;
+                            SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, errFlag) *
+                            SteamDensity;
                     }
 
                     // Get the Heating Coil Inlet Node
                     errFlag = false;
                     SupHeatCoilInletNode =
-			SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, SuppHeatCoilName, errFlag);
+                        SteamCoils::GetCoilAirInletNode(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, SuppHeatCoilName, errFlag);
                     state.dataFurnaces->Furnace(FurnaceNum).SuppCoilAirInletNode = SupHeatCoilInletNode;
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataFurnaces->Furnace(FurnaceNum).Name));
@@ -5168,13 +5176,13 @@ namespace Furnaces {
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanSpeedRatioCurveIndex;
 
-        using PlantUtilities::ScanPlantLoopsForObject;
-        using SteamCoils::SimulateSteamCoilComponents;
         using Fans::GetFanVolFlow;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
         using PlantUtilities::InitComponentNodes;
+        using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
+        using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::GetCoilMaxWaterFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -5183,7 +5191,7 @@ namespace Furnaces {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr Small5WLoad(5.0);
-	std::string_view constexpr RoutineName("InitFurnace");
+        std::string_view constexpr RoutineName("InitFurnace");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5379,7 +5387,7 @@ namespace Furnaces {
                         ShowFatalError(state, "InitFurnace: Program terminated for previous conditions.");
                     }
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow =
-			SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
+                        SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
@@ -5443,7 +5451,7 @@ namespace Furnaces {
                         ShowFatalError(state, "InitFurnace: Program terminated for previous conditions.");
                     }
                     state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
-			SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ErrorsFound);
+                        SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ErrorsFound);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
@@ -5513,7 +5521,8 @@ namespace Furnaces {
                                                     state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
                                                     1.0,
                                                     QActual); // QCoilReq, simulate any load > 0 to get max capacity
-                        CoilMaxVolFlowRate = SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
+                        CoilMaxVolFlowRate =
+                            SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
@@ -5554,7 +5563,8 @@ namespace Furnaces {
                                                     state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex,
                                                     1.0,
                                                     QActual); // QCoilReq, simulate any load > 0 to get max capacity
-                        CoilMaxVolFlowRate = SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ErrorsFound);
+                        CoilMaxVolFlowRate =
+                            SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
@@ -5848,10 +5858,10 @@ namespace Furnaces {
                                             1.0,
                                             QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                 state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity =
-		    SteamCoils::GetCoilCapacity(state,
-                                         state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType,
-                                         state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
-                                         ErrorsFound);
+                    SteamCoils::GetCoilCapacity(state,
+                                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType,
+                                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
+                                                ErrorsFound);
 
             } // from IF(Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingSteam) THEN
 
@@ -5893,10 +5903,10 @@ namespace Furnaces {
                                             1.0,
                                             QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                 state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
-		    SteamCoils::GetCoilCapacity(state,
-                                         state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType,
-                                         state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
-                                         ErrorsFound);
+                    SteamCoils::GetCoilCapacity(state,
+                                                state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType,
+                                                state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
+                                                ErrorsFound);
 
             } // from IF(Furnace(FurnaceNum)%SuppHeatCoilType_Num == Coil_HeatingSteam) THEN
         }     // from IF( FirstHVACIteration ) THEN
@@ -7909,7 +7919,8 @@ namespace Furnaces {
                                                       false);
                                 }
                                 //           Now solve again with tighter PLR limits
-                                auto f = [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
+                                auto f =
+                                    [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
                                         return CalcFurnaceResidual(state,
                                                                    PartLoadRatio,
                                                                    FurnaceNum,
@@ -10467,12 +10478,12 @@ namespace Furnaces {
         Real64 HotWaterMdot;    // actual hot water mass flow rate
         std::array<Real64, 4> Par;
         int SolFlag;
-	std::string &HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
-        int CoilTypeNum(0);                                          // heating coil type number
-        int HeatingCoilIndex(0);                                     // heating coil index
-        int CoilControlNode(0);                                      // control node for hot water and steam heating coils
-        int CoilOutletNode(0);                                       // air outlet node of the heatiing coils
-        PlantLocation plantLoc{};                                    // plant loop location
+        std::string &HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
+        int CoilTypeNum(0);                                                 // heating coil type number
+        int HeatingCoilIndex(0);                                            // heating coil index
+        int CoilControlNode(0);                                             // control node for hot water and steam heating coils
+        int CoilOutletNode(0);                                              // air outlet node of the heatiing coils
+        PlantLocation plantLoc{};                                           // plant loop location
 
         QActual = 0.0;
 
@@ -11166,7 +11177,8 @@ namespace Furnaces {
                     // Calculate the part load fraction
                     SpeedRatio = 0.0;
                     SpeedNum = 1;
-                    auto f = [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
+                    auto f =
+                        [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
                             return VSHPCyclingResidual(
                                 state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp, 1.0);
                         };
@@ -11321,7 +11333,8 @@ namespace Furnaces {
                 Par[8] = static_cast<int>(CompressorOp);
                 Par[9] = 0.0;
                 if (SpeedNum < 2) {
-                    auto f = [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
+                    auto f =
+                        [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
                             return VSHPCyclingResidual(
                                 state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp, 0.0);
                         };

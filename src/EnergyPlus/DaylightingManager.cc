@@ -4263,7 +4263,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
         DisplayString(state, "ReturnFrom DElight DaylightCoefficients Calc");
         if (iErrorFlag != 0) {
             // Open DElight Daylight Factors Error File for reading
-	    auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp); // (THIS_AUTO_OK)
+            auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp); // (THIS_AUTO_OK)
 
             // Sequentially read lines in DElight Daylight Factors Error File
             // and process them using standard EPlus warning/error handling calls
@@ -4272,7 +4272,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
             bEndofErrFile = !iDElightErrorFile.good();
             bRecordsOnErrFile = false;
             while (!bEndofErrFile) {
-		auto cErrorLine = iDElightErrorFile.readLine(); // (THIS_AUTO_OK)
+                auto cErrorLine = iDElightErrorFile.readLine(); // (THIS_AUTO_OK)
                 if (cErrorLine.eof) {
                     bEndofErrFile = true;
                     continue;
@@ -6145,7 +6145,7 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
             // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
             if (iErrorFlag != 0) {
                 // Open DElight Electric Lighting Error File for reading
-		auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp); // (THIS_AUTO_OK)
+                auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp); // (THIS_AUTO_OK)
                 elOpened = iDElightErrorFile.good();
 
                 // Sequentially read lines in DElight Electric Lighting Error File
@@ -6153,7 +6153,7 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                 bEndofErrFile = false;
                 iReadStatus = 0;
                 while (!bEndofErrFile && elOpened) {
-		    auto cErrorLine = iDElightErrorFile.readLine(); // (THIS_AUTO_OK)
+                    auto cErrorLine = iDElightErrorFile.readLine(); // (THIS_AUTO_OK)
                     if (cErrorLine.eof) {
                         bEndofErrFile = true;
                         continue;
@@ -6183,9 +6183,9 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                     ShowFatalError(state, "End of DElight Error Messages");
                 }
             } else { // RJH 2008-03-07: No errors
-                // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
-                // Open DElight Electric Lighting Dump File for reading
-		auto iDElightErrorFile = state.files.outputDelightEldmpFilePath.try_open(state.files.outputControl.delighteldmp); // (THIS_AUTO_OK)
+                     // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
+                     // Open DElight Electric Lighting Dump File for reading
+                auto iDElightErrorFile = state.files.outputDelightEldmpFilePath.try_open(state.files.outputControl.delighteldmp); // (THIS_AUTO_OK)
                 if (iDElightErrorFile.is_open()) {
                     elOpened = true;
                 } else {
@@ -6198,8 +6198,8 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                 int iDElightRefPt = 0; // Reference Point number for reading DElight Dump File (eplusout.delighteldmp)
                 iReadStatus = 0;
                 while (!bEndofErrFile && elOpened) {
-		    auto line = iDElightErrorFile.read<Real64>(); // (THIS_AUTO_OK)
-                    Real64 dRefPtIllum = line.data; // tmp var for reading RefPt illuminance
+                    auto line = iDElightErrorFile.read<Real64>(); // (THIS_AUTO_OK)
+                    Real64 dRefPtIllum = line.data;               // tmp var for reading RefPt illuminance
                     if (line.eof) {
                         bEndofErrFile = true;
                         continue;
@@ -7449,7 +7449,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
                 }
 
                 // BRANCH ON LIGHTING SYSTEM TYPE
-		DataDaylighting::LtgCtrlType LSYSTP = thisDaylightControl.LightControlType;
+                DataDaylighting::LtgCtrlType LSYSTP = thisDaylightControl.LightControlType;
                 Real64 FP = 0.0;
                 if (LSYSTP != DataDaylighting::LtgCtrlType::Stepped) {
                     // Continuously dimmable system with linear power curve
@@ -9858,14 +9858,14 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) { // Report only hourly
 
             // Write X scale column header
-	    std::string mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), state.dataGlobal->HourOfDay);
+            std::string mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), state.dataGlobal->HourOfDay);
             if (state.dataDaylightingData->IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
             RefPt = 1;
             for (X = 1; X <= state.dataDaylightingData->IllumMap(MapNum).Xnum; ++X) {
-		const std::string AddXorYString = format("{}({:.2R};{:.2R})=",
-                                                  state.dataDaylightingData->MapColSep,
-                                                  state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt),
-                                                  state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
+                const std::string AddXorYString = format("{}({:.2R};{:.2R})=",
+                                                         state.dataDaylightingData->MapColSep,
+                                                         state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt),
+                                                         state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
                 if (state.dataDaylightingData->IllumMap(MapNum).HeaderXLineLengthNeeded) linelen += int(len(AddXorYString));
                 mapLine += AddXorYString;
                 ++RefPt;
@@ -9999,7 +9999,7 @@ void CloseReportIllumMaps(EnergyPlusData &state)
         }
 
         if (!state.dataDaylightingData->mapResultsReported && !state.dataErrTracking->AbortProcessing) {
-	    const std::string message = "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
+            const std::string message = "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
             ShowSevereError(state, message);
             print(state.files.map, "{}\n", message);
         }
@@ -10786,7 +10786,8 @@ void WriteDaylightMapTitle(EnergyPlusData &state,
     // The purpose of the routine is to allow the daylighting map data to be written in various formats
 
     // must add correct number of commas at end
-    const std::string fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
+    const std::string fullmapName =
+        fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
     print(mapFile,
           "Date/Time{}{}{}{}{}{}\n",
           state.dataDaylightingData->MapColSep,

@@ -2382,7 +2382,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         break;
     }
     case GeneratorType::FuelCell: {
-	auto *thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
+        auto *thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->SimFuelCellGenerator(state, runFlag, myElecLoadRequest, FirstHVACIteration);
         electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->Report.ACPowerGen;
         electricityProd = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->Report.ACEnergyGen;

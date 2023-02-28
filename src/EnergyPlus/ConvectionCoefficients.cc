@@ -208,7 +208,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &Surface(state.dataSurface->Surface);
-	
+
     if (state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs) {
         GetUserConvectionCoefficients(state);
         state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;

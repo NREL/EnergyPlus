@@ -2255,7 +2255,8 @@ namespace Curve {
                         std::vector<Btwxt::GridAxis> gridAxes;
                         gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-                        auto gridIndex = state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes)); // Btwxt nonsense (THIS_AUTO_OK)
+                        auto gridIndex =
+                            state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes)); // Btwxt nonsense (THIS_AUTO_OK)
                         thisCurve->TableIndex = gridIndex;
                         thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
                     }

@@ -759,10 +759,10 @@ void CheckThisZoneForSizing(EnergyPlusData &state,
 }
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string_view CompType,    // Component Type (e.g. Chiller:Electric)
-                       std::string const &CompName,  // Component Name (e.g. Big Chiller)
-                       bool &IsNotOK,                // .TRUE. if this component pair is invalid
-                       std::string_view CallString // Context of this pair -- for error message
+                       std::string_view CompType,   // Component Type (e.g. Chiller:Electric)
+                       std::string const &CompName, // Component Name (e.g. Big Chiller)
+                       bool &IsNotOK,               // .TRUE. if this component pair is invalid
+                       std::string_view CallString  // Context of this pair -- for error message
 )
 {
 
@@ -803,11 +803,11 @@ void ValidateComponent(EnergyPlusData &state,
 }
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string_view CompType,    // Component Type (e.g. Chiller:Electric)
+                       std::string_view CompType,      // Component Type (e.g. Chiller:Electric)
                        std::string const &CompValType, // Component "name" field type
                        std::string const &CompName,    // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                  // .TRUE. if this component pair is invalid
-                       std::string_view CallString   // Context of this pair -- for error message
+                       std::string_view CallString     // Context of this pair -- for error message
 )
 {
 
@@ -1029,9 +1029,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     }
     if (A == 0.0) { // should have been caught earlier
     }
-    Array1D<Real64> Area(array_sub(state.dataSurface->Surface,
-                        &SurfaceData::Area,
-                        SurfPtrARR)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+    Array1D<Real64> Area(
+        array_sub(state.dataSurface->Surface,
+                  &SurfaceData::Area,
+                  SurfPtrARR)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
     // now figure area-weighted averages from underlying surfaces.
     //    Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Vwind = sum(LocalWindArr * Area) / A;
@@ -1552,7 +1553,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
     if (state.dataSplitterComponent->NumSplitters == 0) {
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ZoneSplitter") > 0) {
-	    SplitterComponent::GetSplitterInput(state);
+            SplitterComponent::GetSplitterInput(state);
         }
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {
@@ -1936,7 +1937,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
     if (state.dataMixerComponent->NumMixers == 0) {
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ZoneMixer") > 0) {
-	    MixerComponent::GetMixerInput(state);
+            MixerComponent::GetMixerInput(state);
         }
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {

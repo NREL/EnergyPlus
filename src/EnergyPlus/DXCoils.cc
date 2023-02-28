@@ -15076,7 +15076,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         // I'm not sure if there are any more of these instances in the codebase.  If so I am going to tag all of them with CONST_LAMBDA_CAPTURE.
         Real64 dbRated = CoolingCoilInletAirDryBulbTempRated;
         Real64 wbRated = CoolingCoilInletAirWetBulbTempRated;
-        auto f = [&state, DXCoilNum, TempDryBulb_Leaving_Apoint, TargetNetCapacity, par3, par7, fanInNode, fanOutNode, externalStatic, dbRated, wbRated](
+        auto f =
+            [&state, DXCoilNum, TempDryBulb_Leaving_Apoint, TargetNetCapacity, par3, par7, fanInNode, fanOutNode, externalStatic, dbRated, wbRated](
                 Real64 SupplyAirMassFlowRate) {
                 static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
                 auto &coil = state.dataDXCoils->DXCoil(DXCoilNum);

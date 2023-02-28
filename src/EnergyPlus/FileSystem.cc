@@ -144,7 +144,7 @@ namespace FileSystem {
         fs::path p = fs::absolute(path);
 
         while (fs::is_symlink(p)) {
-	    fs::path linkpath = fs::read_symlink(p);
+            fs::path linkpath = fs::read_symlink(p);
             if (linkpath.is_absolute()) {
                 p = linkpath;
             } else {
@@ -227,10 +227,10 @@ namespace FileSystem {
     FileTypes getFileType(fs::path const &filePath)
     {
 #ifdef _WIN32
-	std::string const filePathStr = fs::path(filePath).extension().string();
-	std::string_view extension = filePathStr.c_str();
+        std::string const filePathStr = fs::path(filePath).extension().string();
+        std::string_view extension = filePathStr.c_str();
 #else
-	std::string_view extension = fs::path(filePath).extension().c_str();
+        std::string_view extension = fs::path(filePath).extension().c_str();
 #endif
 
         extension.remove_prefix(extension.find_last_of('.') + 1);
@@ -339,7 +339,7 @@ namespace FileSystem {
     std::string readFile(fs::path const &filePath, std::ios_base::openmode mode)
     {
 #ifdef _WIN32
-	std::string filePathStr = filePath.string();
+        std::string filePathStr = filePath.string();
         const char *path = filePathStr.c_str();
 #else
         const char *path = filePath.c_str();
@@ -386,7 +386,7 @@ namespace FileSystem {
     nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode)
     {
 #ifdef _WIN32
-	std::string filePathStr = filePath.string();
+        std::string filePathStr = filePath.string();
         const char *path = filePathStr.c_str();
 #else
         const char *path = filePath.c_str();

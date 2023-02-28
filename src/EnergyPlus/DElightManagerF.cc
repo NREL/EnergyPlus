@@ -784,7 +784,7 @@ namespace DElightManagerF {
         // ratio for the entire building based on user input.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-	constexpr std::string_view CurrentModuleObject("GeometryTransform");
+        constexpr std::string_view CurrentModuleObject("GeometryTransform");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphas(1);
@@ -862,7 +862,7 @@ namespace DElightManagerF {
                             Real64 &pdPowerReducFac,
                             int piErrorFlag)
     {
-	std::vector<char> zoneNameArr(getCharArrayFromString(cZoneName));
+        std::vector<char> zoneNameArr(getCharArrayFromString(cZoneName));
         delightelecltgctrl(
             iNameLength, &zoneNameArr[0], dBldgLat, dHISKF, dHISUNF, dCloudFraction, dSOLCOSX, dSOLCOSY, dSOLCOSZ, &pdPowerReducFac, &piErrorFlag);
     }

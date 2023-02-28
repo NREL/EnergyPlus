@@ -1244,7 +1244,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 }
 
 int InputProcessor::getObjectItemNum(EnergyPlusData &state,
-                                     std::string_view ObjType,     // Object Type (ref: IDD Objects)
+                                     std::string_view ObjType,       // Object Type (ref: IDD Objects)
                                      std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                                      std::string const &ObjName      // Name of the object type
 )
@@ -1255,7 +1255,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     json *obj;
     auto obj_iter = epJSON.find(std::string(ObjType));
     if (obj_iter == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
-	auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             return -1; // indicates object type not found, see function GeneralRoutines::ValidateComponent
         }

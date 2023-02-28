@@ -162,7 +162,7 @@ public:
     );
 
     int getObjectItemNum(EnergyPlusData &state,
-                         std::string_view ObjType,     // Object Type (ref: IDD Objects)
+                         std::string_view ObjType,       // Object Type (ref: IDD Objects)
                          std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                          std::string const &ObjName      // Name of the object type
     );
@@ -307,14 +307,14 @@ private:
 
     inline std::string convertToUpper(std::string_view s)
     {
-	std::string s2;
+        std::string s2;
         size_t len = s.size();
-	s2.resize(len);
+        s2.resize(len);
         for (size_t i = 0; i < len; ++i) {
             char c = s[i];
             s2[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only
         }
-	s2[len] = '\0';
+        s2[len] = '\0';
         return s2;
     }
 

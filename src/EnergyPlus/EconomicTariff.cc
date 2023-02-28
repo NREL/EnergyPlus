@@ -477,9 +477,12 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "QuarterHour")) {
             // check to make sure that the demand window and the TIMESTEP IN HOUR are consistant.
             {
-		switch (state.dataGlobal->NumOfTimeStepInHour) {
-		case 1:	case 3:	case 5: case 15: {
-		    tariff(iInObj).demandWindow = DemandWindow::Hour;
+                switch (state.dataGlobal->NumOfTimeStepInHour) {
+                case 1:
+                case 3:
+                case 5:
+                case 15: {
+                    tariff(iInObj).demandWindow = DemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
                     ShowWarningError(state,
                                      format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -487,8 +490,11 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                                       format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
                     ShowContinueError(state, "Demand window will be set to FullHour, and the simulation continues.");
-		} break;
-	        case 2: case 6: case 10: case 30: {
+                } break;
+                case 2:
+                case 6:
+                case 10:
+                case 30: {
                     tariff(iInObj).demandWindow = DemandWindow::Half;
                     tariff(iInObj).demWinTime = 0.50;
                     ShowWarningError(state,
@@ -497,20 +503,26 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                                       format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
                     ShowContinueError(state, "Demand window will be set to HalfHour, and the simulation continues.");
-		} break;
-	        case 4: case 12: case 20: case 60: {
+                } break;
+                case 4:
+                case 12:
+                case 20:
+                case 60: {
                     tariff(iInObj).demandWindow = DemandWindow::Quarter;
                     tariff(iInObj).demWinTime = 0.25;
                 } break;
-	        default: {
-		    assert(false);
-	        } break;
-		}
+                default: {
+                    assert(false);
+                } break;
+                }
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "HalfHour")) {
             {
-		switch (state.dataGlobal->NumOfTimeStepInHour) {
-		case 1:	case 3:	case 5: case 15: {
+                switch (state.dataGlobal->NumOfTimeStepInHour) {
+                case 1:
+                case 3:
+                case 5:
+                case 15: {
                     tariff(iInObj).demandWindow = DemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
                     ShowWarningError(state,
@@ -519,15 +531,22 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                                       format("Demand window of HalfHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
                     ShowContinueError(state, "Demand window will be set to FullHour, and the simulation continues.");
-		} break;
-	        case 2: case 4: case 6: case 10: case 12: case 20: case 30: case 60: {
+                } break;
+                case 2:
+                case 4:
+                case 6:
+                case 10:
+                case 12:
+                case 20:
+                case 30:
+                case 60: {
                     tariff(iInObj).demandWindow = DemandWindow::Half;
                     tariff(iInObj).demWinTime = 0.50;
-		} break;
-	        default: {
-		    // assert(false); // EconomicTariff unit test gets here with NumOfTimeStepInHour == 0
-		} break;
-		}
+                } break;
+                default: {
+                    // assert(false); // EconomicTariff unit test gets here with NumOfTimeStepInHour == 0
+                } break;
+                }
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "FullHour")) {
             tariff(iInObj).demandWindow = DemandWindow::Hour;
@@ -541,23 +560,32 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         } else {
             // if not entered default to the same logic as quarter of an hour
             {
-		switch (state.dataGlobal->NumOfTimeStepInHour) {
-                case 1: case 3: case 5: case 15: {
+                switch (state.dataGlobal->NumOfTimeStepInHour) {
+                case 1:
+                case 3:
+                case 5:
+                case 15: {
                     tariff(iInObj).demandWindow = DemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
-		} break;
-	        case 2: case 6: case 10: case 30: {
+                } break;
+                case 2:
+                case 6:
+                case 10:
+                case 30: {
                     tariff(iInObj).demandWindow = DemandWindow::Half;
                     tariff(iInObj).demWinTime = 0.50;
-		} break;
-	        case 4: case 12: case 20: case 60: { 
+                } break;
+                case 4:
+                case 12:
+                case 20:
+                case 60: {
                     tariff(iInObj).demandWindow = DemandWindow::Quarter;
                     tariff(iInObj).demWinTime = 0.25;
                 } break;
-	        default: {
-		    // assert(false); // EconomicTariff unit test got here with NumOfTimeStepInHour == 0
-	        } break;
-		}
+                default: {
+                    // assert(false); // EconomicTariff unit test got here with NumOfTimeStepInHour == 0
+                } break;
+                }
             }
         }
         // monthly charge

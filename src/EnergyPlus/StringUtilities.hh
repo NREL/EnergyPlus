@@ -157,7 +157,7 @@ inline auto nth_occurrence(std::string_view input_str, char const search_char, s
     return pos;
 }
 
-template <typename... Param> bool readList(std::string_view input, Param &&... param)
+template <typename... Param> bool readList(std::string_view input, Param &&...param)
 {
     if constexpr (std::conjunction_v<std::is_same<double &, Param>...> || std::conjunction_v<std::is_same<int &, Param>...>) {
         size_t index = 0;
