@@ -97,7 +97,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
             }
             this->autoSizedValue -= fanDeltaT;
 
-            if (this->autoSizedValue<this->dataDesInletWaterTemp &&this->dataWaterFlowUsedForSizing> 0.0) { // flow here is water vol flow rate
+            if (this->autoSizedValue < this->dataDesInletWaterTemp && this->dataWaterFlowUsedForSizing > 0.0) { // flow here is water vol flow rate
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
@@ -156,7 +156,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 }
                 this->autoSizedValue -= fanDeltaT;
             }
-            if (this->autoSizedValue<this->dataDesInletWaterTemp &&this->dataWaterFlowUsedForSizing> 0.0) {
+            if (this->autoSizedValue < this->dataDesInletWaterTemp && this->dataWaterFlowUsedForSizing > 0.0) {
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
