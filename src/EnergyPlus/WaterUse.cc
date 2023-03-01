@@ -1053,6 +1053,8 @@ namespace WaterUse {
 
         if (this->TargetTempSchedule > 0) {
             this->TargetTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TargetTempSchedule);
+        } else if (this->allowHotControl) { // If no TargetTempSchedule, but allowHotControl is set, use all hot water if applicable
+            this->TargetTemp = this->HotTemp;
         } else { // If no TargetTempSchedule, use all cold water
             this->TargetTemp = this->ColdTemp;
         }
