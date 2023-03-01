@@ -529,7 +529,7 @@ int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view c
     auto const &find_obj = epJSON.find(std::string(ObjectWord));
 
     if (find_obj == epJSON.end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
             return 0;
         }
@@ -539,7 +539,7 @@ int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view c
     }
 
     if (schema()["properties"].find(std::string(ObjectWord)) == schema()["properties"].end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowWarningError(state, fmt::format("Requested Object not found in Definitions: {}", ObjectWord));
         }
@@ -961,7 +961,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
 
     auto find_iterators = objectCacheMap.find(std::string(Object));
     if (find_iterators == objectCacheMap.end()) {
-        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(Object)));
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
             return;
         }
@@ -1120,7 +1120,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     Status = 1;
 }
 
-int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number)
+int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string_view Object, int const Number)
 {
     // Given the number (index) of an object in JSON order, return it's number in original idf order
 
@@ -1129,7 +1129,7 @@ int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string const &Objec
     if (state.dataGlobal->isEpJSON || !state.dataGlobal->preserveIDFOrder) return idfOrderNumber;
 
     json *obj;
-    auto obj_iter = epJSON.find(Object);
+    auto obj_iter = epJSON.find(std::string(Object));
     if (obj_iter == epJSON.end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
@@ -1217,7 +1217,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     json *obj;
     auto obj_iter = epJSON.find(std::string(ObjType));
     if (obj_iter == epJSON.end() || obj_iter.value().find(std::string(ObjName)) == obj_iter.value().end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjType)));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             return -1; // indicates object type not found, see function GeneralRoutines::ValidateComponent
         }
@@ -1244,7 +1244,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 }
 
 int InputProcessor::getObjectItemNum(EnergyPlusData &state,
-                                     std::string const &ObjType,     // Object Type (ref: IDD Objects)
+                                     std::string_view ObjType,       // Object Type (ref: IDD Objects)
                                      std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                                      std::string const &ObjName      // Name of the object type
 )
@@ -1253,8 +1253,8 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     // Get the occurrence number of an object of type ObjType and name ObjName
 
     json *obj;
-    auto obj_iter = epJSON.find(ObjType);
-    if (epJSON.find(ObjType) == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
+    auto obj_iter = epJSON.find(std::string(ObjType));
+    if (obj_iter == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             return -1; // indicates object type not found, see function GeneralRoutines::ValidateComponent
@@ -1501,7 +1501,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     NumNumeric = 0;
     const json *object;
     if (schema()["properties"].find(std::string(ObjectWord)) == schema()["properties"].end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
@@ -1514,7 +1514,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
 
     json *objects;
     if (epJSON.find(std::string(ObjectWord)) == epJSON.end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
