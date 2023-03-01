@@ -183,7 +183,7 @@ namespace WindowManager {
         state.dataHeatBal->NumSurfaceScreens = state.dataHeatBal->TotScreens;
         if (state.dataHeatBal->NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
 
-        auto &aWinConstSimp = CWindowConstructionsSimplified::instance();
+        auto &aWinConstSimp = CWindowConstructionsSimplified::instance(state);
         for (auto ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             auto &construction(state.dataConstruction->Construct(ConstrNum));
             if (construction.isGlazingConstruction(state)) {
@@ -275,7 +275,7 @@ namespace WindowManager {
     Real64 GetSolarTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
     {
         const auto aWinConstSimp =
-            CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
+            CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
         return aWinConstSimp->getPropertySimple(
             0.3, 2.5, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectHemispherical);
     }
@@ -283,7 +283,7 @@ namespace WindowManager {
     Real64 GetVisibleTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
     {
         const auto aWinConstSimp =
-            CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Visible, ConstrNum);
+            CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Visible, ConstrNum);
         return aWinConstSimp->getPropertySimple(
             0.38, 0.78, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectHemispherical);
     }

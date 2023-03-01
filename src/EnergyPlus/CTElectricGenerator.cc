@@ -802,7 +802,7 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::oneTimeInit(EnergyPlusData &state)
     {
-        auto constexpr RoutineName("InitICEngineGenerators");
+        std::string_view constexpr RoutineName("InitICEngineGenerators");
         bool errFlag;
 
         if (this->MyPlantScanFlag) { // this flag to be removed

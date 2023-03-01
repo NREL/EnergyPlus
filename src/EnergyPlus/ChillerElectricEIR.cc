@@ -1655,7 +1655,8 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
 
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         if (this->IPLVFlag) {
-            Real64 IPLV = 0.0;
+            Real64 IPLVSI = 0.0;
+            Real64 IPLVIP = 0.0;
             StandardRatings::CalcChillerIPLV(state,
                                              this->Name,
                                              DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
@@ -1666,7 +1667,8 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                                              this->ChillerEIRFTIndex,
                                              this->ChillerEIRFPLRIndex,
                                              this->MinUnloadRat,
-                                             IPLV,
+                                             IPLVSI,
+                                             IPLVIP,
                                              ObjexxFCL::Optional<const Real64>(),
                                              ObjexxFCL::Optional_int_const(),
                                              ObjexxFCL::Optional<const Real64>());

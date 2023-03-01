@@ -477,8 +477,11 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "QuarterHour")) {
             // check to make sure that the demand window and the TIMESTEP IN HOUR are consistant.
             {
-                auto const SELECT_CASE_var(state.dataGlobal->NumOfTimeStepInHour);
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
+                switch (state.dataGlobal->NumOfTimeStepInHour) {
+                case 1:
+                case 3:
+                case 5:
+                case 15: {
                     tariff(iInObj).demandWindow = DemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
                     ShowWarningError(state,
@@ -487,7 +490,11 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                                       format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
                     ShowContinueError(state, "Demand window will be set to FullHour, and the simulation continues.");
-                } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) || (SELECT_CASE_var == 30)) {
+                } break;
+                case 2:
+                case 6:
+                case 10:
+                case 30: {
                     tariff(iInObj).demandWindow = DemandWindow::Half;
                     tariff(iInObj).demWinTime = 0.50;
                     ShowWarningError(state,
@@ -496,15 +503,26 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                                       format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
                     ShowContinueError(state, "Demand window will be set to HalfHour, and the simulation continues.");
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 60)) {
+                } break;
+                case 4:
+                case 12:
+                case 20:
+                case 60: {
                     tariff(iInObj).demandWindow = DemandWindow::Quarter;
                     tariff(iInObj).demWinTime = 0.25;
+                } break;
+                default: {
+                    assert(false);
+                } break;
                 }
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "HalfHour")) {
             {
-                auto const SELECT_CASE_var(state.dataGlobal->NumOfTimeStepInHour);
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
+                switch (state.dataGlobal->NumOfTimeStepInHour) {
+                case 1:
+                case 3:
+                case 5:
+                case 15: {
                     tariff(iInObj).demandWindow = DemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
                     ShowWarningError(state,
@@ -513,10 +531,21 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                                       format("Demand window of HalfHour is not consistent with number of timesteps per hour [{}].",
                                              state.dataGlobal->NumOfTimeStepInHour));
                     ShowContinueError(state, "Demand window will be set to FullHour, and the simulation continues.");
-                } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) ||
-                           (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 30) || (SELECT_CASE_var == 60)) {
+                } break;
+                case 2:
+                case 4:
+                case 6:
+                case 10:
+                case 12:
+                case 20:
+                case 30:
+                case 60: {
                     tariff(iInObj).demandWindow = DemandWindow::Half;
                     tariff(iInObj).demWinTime = 0.50;
+                } break;
+                default: {
+                    // assert(false); // EconomicTariff unit test gets here with NumOfTimeStepInHour == 0
+                } break;
                 }
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "FullHour")) {
@@ -531,16 +560,31 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         } else {
             // if not entered default to the same logic as quarter of an hour
             {
-                auto const SELECT_CASE_var(state.dataGlobal->NumOfTimeStepInHour);
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
+                switch (state.dataGlobal->NumOfTimeStepInHour) {
+                case 1:
+                case 3:
+                case 5:
+                case 15: {
                     tariff(iInObj).demandWindow = DemandWindow::Hour;
                     tariff(iInObj).demWinTime = 1.00;
-                } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) || (SELECT_CASE_var == 30)) {
+                } break;
+                case 2:
+                case 6:
+                case 10:
+                case 30: {
                     tariff(iInObj).demandWindow = DemandWindow::Half;
                     tariff(iInObj).demWinTime = 0.50;
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 60)) {
+                } break;
+                case 4:
+                case 12:
+                case 20:
+                case 60: {
                     tariff(iInObj).demandWindow = DemandWindow::Quarter;
                     tariff(iInObj).demWinTime = 0.25;
+                } break;
+                default: {
+                    // assert(false); // EconomicTariff unit test got here with NumOfTimeStepInHour == 0
+                } break;
                 }
             }
         }
@@ -2525,7 +2569,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 computation(iTariff).firstStep = 0;
                 computation(iTariff).lastStep = -1;
                 ShowWarningError(state,
-                                 format("CreateDefaultComputation: In UtilityCost:Computation: No lines in the auto generated computation can be "
+                                 format("CreateDefaultComputation: In UtilityCost:Computation: No lines in the auto-generated computation can be "
                                         "interpreted in tariff: {}",
                                         tariff(iTariff).tariffName));
             }
@@ -2808,7 +2852,7 @@ void ComputeTariff(EnergyPlusData &state)
             for (jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
                 curStep = state.dataEconTariff->steps(jStep);
                 {
-                    auto const SELECT_CASE_var(curStep);
+                    int const SELECT_CASE_var(curStep);
                     if (SELECT_CASE_var == 0) { // end of line - assign variable and clear stack
                         // if the stack still has two items on it then assign the values to the
                         // pointer otherwise if it follows a NOOP line it will only have one item
@@ -3301,7 +3345,7 @@ void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable)
     }
     // find proper season mask
     {
-        auto const SELECT_CASE_var(chargeSimple(indexInChg).season);
+        int const SELECT_CASE_var(chargeSimple(indexInChg).season);
         if (SELECT_CASE_var == seasonSummer) {
             seasonMask = econVar(tariff(curTariff).nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
@@ -3363,7 +3407,7 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
     sourceVals = econVar(chargeBlock(indexInChg).sourcePt).values;
     // find proper season mask
     {
-        auto const SELECT_CASE_var(chargeBlock(indexInChg).season);
+        int const SELECT_CASE_var(chargeBlock(indexInChg).season);
         if (SELECT_CASE_var == seasonSummer) {
             seasonMask = econVar(tariff(curTariff).nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
@@ -3495,7 +3539,7 @@ void evaluateRatchet(EnergyPlusData &state, int const usingVariable)
     }
     // find proper season from mask
     {
-        auto const SELECT_CASE_var(ratchet(indexInChg).seasonFrom);
+        int const SELECT_CASE_var(ratchet(indexInChg).seasonFrom);
         if (SELECT_CASE_var == seasonSummer) {
             seasonFromMask = econVar(tariff(curTariff).nativeIsSummer).values;
             isMonthly = false;
@@ -3520,7 +3564,7 @@ void evaluateRatchet(EnergyPlusData &state, int const usingVariable)
     }
     // find proper season to mask
     {
-        auto const SELECT_CASE_var(ratchet(indexInChg).seasonTo);
+        int const SELECT_CASE_var(ratchet(indexInChg).seasonTo);
         if (SELECT_CASE_var == seasonSummer) {
             seasonToMask = econVar(tariff(curTariff).nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
@@ -3622,7 +3666,7 @@ void evaluateQualify(EnergyPlusData &state, int const usingVariable)
     }
     // find proper season mask
     {
-        auto const SELECT_CASE_var(qualify(indexInQual).season);
+        int const SELECT_CASE_var(qualify(indexInQual).season);
         if (SELECT_CASE_var == seasonSummer) {
             seasonMask = econVar(tariff(curTariff).nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
@@ -3677,7 +3721,7 @@ void evaluateQualify(EnergyPlusData &state, int const usingVariable)
     maxConsecQualMonths = 0;
     for (iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
         {
-            auto const SELECT_CASE_var(monthsQualify(iMonth));
+            int const SELECT_CASE_var(monthsQualify(iMonth));
             if (SELECT_CASE_var == 1) { // qualified
                 ++cntAllQualMonths;
                 ++cntConsecQualMonths;
@@ -4315,7 +4359,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 }
                 tableBody(3, iTariff) = tariff(iTariff).reportMeter;
                 {
-                    auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
+                    int const SELECT_CASE_var(tariff(iTariff).buyOrSell);
                     if (SELECT_CASE_var == buyFromUtility) {
                         tableBody(4, iTariff) = "Buy";
                     } else if (SELECT_CASE_var == sellToUtility) {
@@ -4527,7 +4571,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 for (lStep = computation(iTariff).firstStep; lStep <= computation(iTariff).lastStep; ++lStep) {
                     curStep = state.dataEconTariff->steps(lStep);
                     {
-                        auto const SELECT_CASE_var(curStep);
+                        int const SELECT_CASE_var(curStep);
                         if (SELECT_CASE_var == 0) { // end of line
                             WriteTextLine(state, rstrip(outString));
                             outString = "";
@@ -4617,7 +4661,7 @@ void showWarningsBasedOnTotal(EnergyPlusData &state)
     if (state.dataEconTariff->numTariff > 0) {
         for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             {
-                auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
+                int const SELECT_CASE_var(tariff(iTariff).buyOrSell);
                 if (SELECT_CASE_var == buyFromUtility) {
                     if (tariff(iTariff).totalAnnualCost < 0) {
                         ShowWarningError(state,
@@ -4786,7 +4830,7 @@ void ReportEconomicVariable(
                     curCategory = econVar(curCatPt).specific;
                 }
                 {
-                    auto const SELECT_CASE_var(curCategory);
+                    int const SELECT_CASE_var(curCategory);
                     if (SELECT_CASE_var == catEnergyCharges) {
                         tableBody(15, nCntOfVar) = "EnergyCharges";
                     } else if (SELECT_CASE_var == catDemandCharges) {
@@ -4940,7 +4984,7 @@ void selectTariff(EnergyPlusData &state)
                 if (tariff(iTariff).isSelected) {
                     if (groupIndex(iTariff) == mGroup) {
                         {
-                            auto const SELECT_CASE_var(tariff(iTariff).kindElectricMtr);
+                            int const SELECT_CASE_var(tariff(iTariff).kindElectricMtr);
                             if (SELECT_CASE_var == kindMeterElecSimple) {
                                 lowestSimpleTariff = iTariff;
                             } else if (SELECT_CASE_var == kindMeterElecProduced) {

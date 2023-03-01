@@ -4214,7 +4214,6 @@ void CLIPPOLY(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // The Sutherland-Hodgman algorithm for polygon clipping is employed.
 
-    using General::ReallocateRealArray;
     using General::SafeDivide;
 
     typedef Array2D<Int64>::size_type size_type;
@@ -8602,7 +8601,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             int ConstrNum = state.dataSurface->Surface(SurfNum2).Construction;
             if (state.dataSurface->Surface(SurfNum2).activeShadedConstruction > 0)
                 ConstrNum = state.dataSurface->Surface(SurfNum2).activeShadedConstruction;
-            auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum);
+            auto aLayer = CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum);
 
             ///////////////////////////////////////////////
             // Solar absorbed in window layers

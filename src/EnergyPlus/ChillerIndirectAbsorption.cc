@@ -104,7 +104,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 // Manufacturers performance data can be used to generate the coefficients for the model.
 
 static constexpr std::string_view calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
-auto constexpr waterIndex(1);
+int constexpr waterIndex = 1;
 static constexpr std::string_view fluidNameSteam = "STEAM";
 static constexpr std::string_view fluidNameWater = "WATER";
 

@@ -813,7 +813,6 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger events.
 
-    auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
     using FluidProperties::GetDensityGlycol;
     using PlantUtilities::ScanPlantLoopsForNodeNum;
@@ -844,7 +843,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         InitControllerOneTimeFlag = false;
     }
 
-    if (!state.dataGlobal->SysSizingCalc && InitControllerSetPointCheckFlag && DoSetPointTest) {
+    if (!state.dataGlobal->SysSizingCalc && InitControllerSetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
         // check for missing setpoints
         for (int ControllerIndex = 1; ControllerIndex <= NumControllers; ++ControllerIndex) {
             int SensedNode = ControllerProps(ControllerIndex).SensedNode;
@@ -2059,7 +2058,7 @@ void DumpAirLoopStatistics(EnergyPlusData &state)
     }
 
     InputOutputFilePath StatisticsFilePath{"statistics.HVACControllers.csv"};
-    auto statisticsFile = StatisticsFilePath.open(state, "DumpAirLoopStatistics");
+    auto statisticsFile = StatisticsFilePath.open(state, "DumpAirLoopStatistics"); // (THIS_AUTO_OK)
 
     // note that the AirLoopStats object does not seem to be initialized when this code
     // is executed and it causes a crash here
@@ -2197,7 +2196,7 @@ void SetupAirLoopControllersTracer(EnergyPlusData &state, int const AirLoopNum)
     // and writes header row with titles.
 
     // Open main controller trace file for each air loop
-    const auto TraceFilePath = "controller." + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".csv";
+    const std::string TraceFilePath = fmt::format("controller.{}.csv", state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
 
     auto &AirLoopStats(state.dataHVACControllers->AirLoopStats(AirLoopNum));
 
@@ -2309,18 +2308,18 @@ void TraceIterationStamp(EnergyPlusData &state,
     // Note that we do not go to the next line
     print(TraceFile,
           "{},{},{},{},{},{},{},{},{},{},{},{},",
-          General::LogicalToInteger(state.dataGlobal->ZoneSizingCalc),
-          General::LogicalToInteger(state.dataGlobal->SysSizingCalc),
+          static_cast<int>(state.dataGlobal->ZoneSizingCalc),
+          static_cast<int>(state.dataGlobal->SysSizingCalc),
           state.dataEnvrn->CurEnvirNum,
-          General::LogicalToInteger(state.dataGlobal->WarmupFlag),
+          static_cast<int>(state.dataGlobal->WarmupFlag),
           CreateHVACTimeString(state),
           MakeHVACTimeIntervalString(state),
-          General::LogicalToInteger(state.dataGlobal->BeginTimeStepFlag),
-          General::LogicalToInteger(state.dataHVACGlobal->FirstTimeStepSysFlag),
-          General::LogicalToInteger(FirstHVACIteration),
+          static_cast<int>(state.dataGlobal->BeginTimeStepFlag),
+          static_cast<int>(state.dataHVACGlobal->FirstTimeStepSysFlag),
+          static_cast<int>(FirstHVACIteration),
           AirLoopPass,
           AirLoopNumCalls,
-          General::LogicalToInteger(AirLoopConverged));
+          static_cast<int>(AirLoopConverged));
 }
 
 void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum)
@@ -2358,7 +2357,7 @@ void SetupIndividualControllerTracer(EnergyPlusData &state, int const ControlNum
 
     auto &controllerProps(state.dataHVACControllers->ControllerProps(ControlNum));
 
-    const auto TraceFilePath = "controller." + controllerProps.ControllerName + ".csv";
+    const std::string TraceFilePath = fmt::format("controller.{}.csv", controllerProps.ControllerName);
     auto &TraceFile = *controllerProps.TraceFile;
     TraceFile.filePath = TraceFilePath;
     TraceFile.open();
@@ -2431,11 +2430,11 @@ void TraceIndividualController(EnergyPlusData &state,
     print(TraceFile,
           "{},{},{},{},{},{},{},{},",
           state.dataEnvrn->CurEnvirNum,
-          General::LogicalToInteger(state.dataGlobal->WarmupFlag),
+          static_cast<int>(state.dataGlobal->WarmupFlag),
           CreateHVACTimeString(state),
           MakeHVACTimeIntervalString(state),
           AirLoopPass,
-          General::LogicalToInteger(FirstHVACIteration),
+          static_cast<int>(FirstHVACIteration),
           Operation,
           ControllerProps.NumCalcCalls);
 
@@ -2454,7 +2453,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ' ',
               ' ',
               ControllerProps.Mode,
-              General::LogicalToInteger(IsConvergedFlag),
+              static_cast<int>(IsConvergedFlag),
               ControllerProps.NextActuatedValue);
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
@@ -2479,7 +2478,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ControllerProps.DeltaSensed,
               ControllerProps.Offset,
               ControllerProps.Mode,
-              General::LogicalToInteger(IsConvergedFlag),
+              static_cast<int>(IsConvergedFlag),
               ControllerProps.NextActuatedValue);
 
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
@@ -2505,7 +2504,7 @@ void TraceIndividualController(EnergyPlusData &state,
               ControllerProps.DeltaSensed,
               ControllerProps.Offset,
               ControllerProps.Mode,
-              General::LogicalToInteger(IsConvergedFlag),
+              static_cast<int>(IsConvergedFlag),
               ControllerProps.NextActuatedValue);
 
         // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
@@ -2530,6 +2529,43 @@ void TraceIndividualController(EnergyPlusData &state,
     TraceFile.flush();
 }
 
+Real64 GetCurrentHVACTime(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dimitri Curtil
+    //       DATE WRITTEN   November 2004
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This routine returns the time in seconds at the end of the current HVAC step.
+
+    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
+    // erronously truncate all sub-minute system time steps down to the closest full minute.
+    // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
+    // as real.
+    Real64 const CurrentHVACTime =
+        (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + state.dataHVACGlobal->SysTimeElapsed + state.dataHVACGlobal->TimeStepSys;
+    return CurrentHVACTime * DataGlobalConstants::SecInHour;
+}
+
+Real64 GetPreviousHVACTime(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dimitri Curtil
+    //       DATE WRITTEN   November 2004
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This routine returns the time in seconds at the beginning of the current HVAC step.
+
+    // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
+    // erronously truncate all sub-minute system time steps down to the closest full minute.
+    Real64 const PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + state.dataHVACGlobal->SysTimeElapsed;
+    return PreviousHVACTime * DataGlobalConstants::SecInHour;
+}
+
 std::string CreateHVACTimeString(EnergyPlusData &state)
 {
 
@@ -2541,7 +2577,7 @@ std::string CreateHVACTimeString(EnergyPlusData &state)
     // This function creates a string describing the current time stamp of the system
     // time step.
 
-    std::string Buffer = General::CreateTimeString(General::GetCurrentHVACTime(state));
+    std::string Buffer = General::CreateTimeString(GetCurrentHVACTime(state));
     return state.dataEnvrn->CurMnDy + ' ' + stripped(Buffer);
 }
 
@@ -2572,7 +2608,7 @@ std::string MakeHVACTimeIntervalString(EnergyPlusData &state)
     // This function creates a string describing the current time interval of the system
     // time step.
 
-    return stripped(General::CreateHVACTimeIntervalString(state));
+    return format("{} - {}", General::CreateTimeString(GetPreviousHVACTime(state)), General::CreateTimeString(GetCurrentHVACTime(state)));
 }
 
 void CheckControllerListOrder(EnergyPlusData &state)

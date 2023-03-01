@@ -550,6 +550,8 @@ namespace OutputProcessor {
         Array1D_string spaceTypeName; // Array of space type names
     };
 
+    int DetermineMinuteForReporting(EnergyPlusData &state);
+
     void InitializeOutput(EnergyPlusData &state);
 
     void SetupTimePointers(EnergyPlusData &state,
@@ -599,8 +601,6 @@ namespace OutputProcessor {
     // *****************************************************************************
     // The following routines implement Energy Meters in EnergyPlus.
     // *****************************************************************************
-
-    void InitializeMeters(EnergyPlusData &state);
 
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound);
 

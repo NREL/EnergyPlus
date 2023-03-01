@@ -432,7 +432,7 @@ namespace CrossVentMgr {
         CosPhi = std::cos((state.dataEnvrn->WindDir - SurfNorm) * DataGlobalConstants::DegToRadians);
         if (CosPhi <= 0) {
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -601,7 +601,7 @@ namespace CrossVentMgr {
             state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -625,7 +625,7 @@ namespace CrossVentMgr {
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
             state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -668,7 +668,7 @@ namespace CrossVentMgr {
         state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
         state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
         state.dataRoomAirMod->Qtot(ZoneNum) = 0.0;
-        auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+        auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
         for (int i = 1, u = flows.u(); i <= u; ++i) {
             auto &e(flows(i));
             e.Ujet = e.Urec = e.Qrec = 0.0;
