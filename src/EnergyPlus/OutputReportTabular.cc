@@ -13985,6 +13985,7 @@ void WritePredefinedTables(EnergyPlusData &state)
             for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
                 if (curObjectName == uniqueObjectName(mUnqObjNames)) {
                     found = mUnqObjNames;
+                    break;
                 }
             }
             // if found then point to the unique object
