@@ -465,8 +465,8 @@ namespace SurfaceGeometry {
         }
 
         for (auto &thisZone : state.dataHeatBal->Zone) {
-            int CeilCount = 0.0;
-            int FloorCount = 0.0;
+            int CeilCount = 0;
+            int FloorCount = 0;
             int WallCount = 0;
             Real64 AverageHeight = 0.0; // Used to keep track of average height of a surface/zone
             Real64 ZMax = -99999.0;     // Maximum Z of a surface (detailed outside coefficient calculation)
@@ -510,7 +510,7 @@ namespace SurfaceGeometry {
                     }
                 }
             }
-            if (CeilCount > 0.0 && FloorCount > 0.0) {
+            if (CeilCount > 0 && FloorCount > 0) {
                 AverageHeight = ZCeilAvg - ZFlrAvg;
             } else {
                 AverageHeight = (ZMax - ZMin);
