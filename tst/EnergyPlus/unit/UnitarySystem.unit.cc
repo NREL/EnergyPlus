@@ -4661,8 +4661,6 @@ SetpointManager:Scheduled,
           MaximumHumidityRatio, !- Control Variable
           Always 20C, !- Schedule Name
           Water Cooling Coil Air Outlet Node;  !- Setpoint Node or NodeList Name
-
-    });
 )IDF";
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
