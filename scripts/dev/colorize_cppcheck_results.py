@@ -6,6 +6,7 @@ For display on GHA (or locally)
 
 __author__ = "Julien Marrec, EffiBEM"
 __email__ = "julien@effibem.com"
+__license__ = "Public Domain"
 
 import re
 from collections import Counter
