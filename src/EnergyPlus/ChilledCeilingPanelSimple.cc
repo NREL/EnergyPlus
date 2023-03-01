@@ -1157,7 +1157,7 @@ bool CoolingPanelParams::SizeCoolingPanelUA(EnergyPlusData &state)
     // These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
     Real64 RatCapToTheoMax; // Ratio of unit capacity to theoretical maximum output based on rated parameters
 
-    Real64 const Cp = 4120.0; // Just an approximation, don't need to get an exact number
+    Real64 constexpr Cp = 4120.0; // Just an approximation, don't need to get an exact number
     Real64 const MDot = this->RatedWaterFlowRate;
     Real64 const MDotXCp = Cp * MDot;
     Real64 const Qrated = this->ScaledCoolingCapacity;
