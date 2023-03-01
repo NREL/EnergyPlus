@@ -4510,16 +4510,12 @@ namespace HeatBalanceManager {
 
             // reallocate Material type
 
-            for (int i = 1; i <= state.dataMaterial->TotMaterials; i++) {
-                Material::MaterialBase *p = new Material::MaterialBase;
-                state.dataMaterial->Material.push_back(p);
-            }
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials, 0.0);
 
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataMaterial->TotMaterials; ++loop) {
                 auto *thisMaterial = new Material::MaterialChild;
-                state.dataMaterial->Material(loop) = thisMaterial;
+                state.dataMaterial->Material.push_back(thisMaterial);
                 thisMaterial->Name = "";
                 thisMaterial->Group = Material::MaterialGroup::Invalid;
                 thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Invalid;
