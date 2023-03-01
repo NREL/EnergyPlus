@@ -201,7 +201,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
     numLoadCenters_ = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Distribution");
 
     if (numLoadCenters_ > 0) {
-        for (auto iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum) {
+        for (int iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum) {
             // call Electric Power Load Center constructor, in place
             elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state, iLoadCenterNum));
         }
@@ -262,7 +262,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         bool foundInFromGridTransformer = false;
 
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
-        for (auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
+        for (int loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      loopTransformer,
@@ -1025,7 +1025,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         numGenerators = numNums / 2; // note IDD needs Min Fields = 6
         if (mod((numAlphas - 1 + numNums), 5) != 0) ++numGenerators;
         int alphaCount = 2;
-        for (auto genCount = 1; genCount <= numGenerators; ++genCount) {
+        for (int genCount = 1; genCount <= numGenerators; ++genCount) {
             // call constructor in place
             generatorsPresent_ = true;
             elecGenCntrlObj.emplace_back(new GeneratorController(state,
@@ -2227,7 +2227,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantType = DataPlant::PlantEquipmentType::Generator_FCExhaust;
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
-        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
+        auto *thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->ExhaustHX.Name;
         break;
     }
@@ -2329,7 +2329,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     switch (generatorType) {
     case GeneratorType::ICEngine: {
 
-        auto thisICE = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(state, name);
+        auto *thisICE = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(state, name);
 
         // dummy vars
         PlantLocation L(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
@@ -2349,7 +2349,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     }
     case GeneratorType::CombTurbine: {
 
-        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(state, name);
+        auto *thisCTE = CTElectricGenerator::CTGeneratorData::factory(state, name);
         // dummy vars
         PlantLocation L(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
         Real64 tempLoad = myElecLoadRequest;
@@ -2382,7 +2382,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         break;
     }
     case GeneratorType::FuelCell: {
-        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
+        auto *thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->SimFuelCellGenerator(state, runFlag, myElecLoadRequest, FirstHVACIteration);
         electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->Report.ACPowerGen;
         electricityProd = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->Report.ACEnergyGen;
@@ -2393,7 +2393,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         break;
     }
     case GeneratorType::MicroCHP: {
-        auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, name);
+        auto *thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, name);
 
         // simulate
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(thisMCHP)->InitMicroCHPNoNormalizeGenerators(state);
@@ -2414,7 +2414,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         break;
     }
     case GeneratorType::Microturbine: {
-        auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, name);
+        auto *thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, name);
 
         // dummy vars
         PlantLocation L(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
@@ -3985,7 +3985,7 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
 
                 batteryDamage_ = 0.0;
 
-                for (auto binNum = 0; binNum < cycleBinNum_; ++binNum) {
+                for (int binNum = 0; binNum < cycleBinNum_; ++binNum) {
                     //       Battery damage is calculated by accumulating the impact from each cycle.
                     batteryDamage_ += oneNmb0_[binNum] / Curve::CurveValue(state, lifeCurveNum_, (double(binNum) / double(cycleBinNum_)));
                 }
@@ -4827,7 +4827,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             specialMeter_.resize(numWiredMeters, false);
 
             // Meter check deferred because they may have not been "loaded" yet,
-            for (auto loopCount = 0; loopCount < numWiredMeters; ++loopCount) {
+            for (int loopCount = 0; loopCount < numWiredMeters; ++loopCount) {
                 wiredMeterNames_[loopCount] = UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
                 // Assign SpecialMeter as TRUE if the meter name is Electricity:Facility or Electricity:HVAC
                 if (UtilityRoutines::SameString(wiredMeterNames_[loopCount], "Electricity:Facility") ||

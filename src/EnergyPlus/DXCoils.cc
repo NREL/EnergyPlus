@@ -7975,7 +7975,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecCoilAirFlow == AutoSize) {
                     IsAutoSize = true;
                 }
-                // Auto size Primary Coil Air Flow * Secondary Coil Scaling Factor
+                // Autosize Primary Coil Air Flow * Secondary Coil Scaling Factor
                 SecCoilAirFlowDes =
                     state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1) * state.dataDXCoils->DXCoil(DXCoilNum).SecCoilAirFlowScalingFactor;
                 if (IsAutoSize) {
@@ -8022,7 +8022,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [m3/s]";
                 SizingMethod = AutoCalculateSizing;
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
-                // Auto size low speed condenser air flow to 1/3 Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+                // Autosize low speed condenser air flow to 1/3 Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
                 state.dataSize->DataFractionUsedForSizing = 0.000114 * 0.3333;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).EvapCondAirFlow2;
@@ -8058,7 +8058,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 }
                 SizingMethod = AutoCalculateSizing;
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
-                // Auto size high speed evap condenser pump power to Total Capacity * 0.004266 w/w (15 w/ton)
+                // Autosize high speed evap condenser pump power to Total Capacity * 0.004266 w/w (15 w/ton)
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
                 state.dataSize->DataFractionUsedForSizing = 0.004266;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower(Mode);
@@ -8073,7 +8073,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
-                // Auto size low speed evap condenser pump power to 1/3 Total Capacity * 0.004266 w/w (15 w/ton)
+                // Autosize low speed evap condenser pump power to 1/3 Total Capacity * 0.004266 w/w (15 w/ton)
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
                 state.dataSize->DataFractionUsedForSizing = 0.004266 * 0.3333;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower2;
@@ -8089,7 +8089,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
-                // Auto size low speed air flow rate to 1/3 high speed air flow rate
+                // Autosize low speed air flow rate to 1/3 high speed air flow rate
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode);
                 state.dataSize->DataFractionUsedForSizing = 0.3333;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate2;
@@ -8105,7 +8105,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                 CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
-                // Auto size low speed capacity to 1/3 high speed capacity
+                // Autosize low speed capacity to 1/3 high speed capacity
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
                 state.dataSize->DataFractionUsedForSizing = 0.3333;
                 TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap2;
@@ -8179,7 +8179,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum);
                 SizingMethod = AutoCalculateSizing;
                 CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
-                // Auto size low speed SHR to be the same as high speed SHR
+                // Autosize low speed SHR to be the same as high speed SHR
                 state.dataSize->DataConstantUsedForSizing = state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR(Mode);
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 state.dataSize->DataDXSpeedNum = 2; // refers to low speed in sizer
@@ -8201,7 +8201,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == StandardRatings::DefrostStrat::Resistive) {
                     CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                     CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
-                    // Auto size low speed capacity to 1/3 high speed capacity
+                    // Autosize low speed capacity to 1/3 high speed capacity
                     state.dataSize->DataConstantUsedForSizing = state.dataSize->DXCoolCap;
                     state.dataSize->DataFractionUsedForSizing = 1.0;
                     TempSize = state.dataDXCoils->DXCoil(DXCoilNum).DefrostCapacity;
@@ -8221,7 +8221,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
 
     // Autosizing for multispeed cooling coil
     if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling) {
-        // flow rate auto size
+        // flow rate autosize
         for (Mode = state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
             // Sizing multispeed air volume flow rate
             IsAutoSize = false;
@@ -8261,7 +8261,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = AutoCalculateSizing;
-                    // Auto size low speed flow to fraction of the highest speed flow
+                    // Autosize low speed flow to fraction of the highest speed flow
                     state.dataSize->DataConstantUsedForSizing =
                         state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
                     if (!IsAutoSize && !HardSizeNoDesRun) state.dataSize->DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
@@ -8354,7 +8354,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = AutoCalculateSizing;
-                    // auto size low speed capacity to fraction of the highest speed capacity
+                    // autosize low speed capacity to fraction of the highest speed capacity
                     if (!HardSizeNoDesRun) {
                         state.dataSize->DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                     } else {
@@ -8449,7 +8449,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 IsAutoSize = true;
             }
             if (IsAutoSize || !HardSizeNoDesRun) {
-                // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+                // Autosize condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
                 MSEvapCondAirFlowDes = ((float)Mode / state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds) * MSRatedTotCapDesAtMaxSpeed * 0.000114;
             } else {
                 // this is done to duplicate any existing calc method
@@ -8517,7 +8517,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             }
 
             if (IsAutoSize || !HardSizeNoDesRun) {
-                // Auto size low speed evap condenser pump power to 1/3 Total Capacity * 0.004266 w/w (15 w/ton)
+                // Autosize low speed evap condenser pump power to 1/3 Total Capacity * 0.004266 w/w (15 w/ton)
                 MSEvapCondPumpElecNomPowerDes =
                     ((float)Mode / state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds) * MSRatedTotCapDesAtMaxSpeed * 0.004266;
             } else {
@@ -8586,7 +8586,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
 
     // Autosizing for multispeed heating coil
     if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
-        // flow rate auto size
+        // flow rate autosize
         for (Mode = state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
             IsAutoSize = false;
             if (state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) == AutoSize) {
@@ -8670,7 +8670,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode) == AutoSize) {
                     IsAutoSize = true;
                 }
-                // Auto size Primary Coil air flow * Secondary Coil Scaling Factor
+                // Autosize Primary Coil air flow * Secondary Coil Scaling Factor
                 SecCoilAirFlowDes = state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) *
                                     state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlowScalingFactor(Mode);
                 if (IsAutoSize) {
@@ -8766,7 +8766,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = AutoCalculateSizing;
-                    // auto size low speed capacity to fraction of the highest speed capacity
+                    // autosize low speed capacity to fraction of the highest speed capacity
                     if (!HardSizeNoDesRun) {
                         state.dataSize->DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                     } else {
@@ -9426,7 +9426,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     using Curve::CurveValue;
     auto &HPWHCrankcaseDBTemp = state.dataHVACGlobal->HPWHCrankcaseDBTemp;
     auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10522,7 +10522,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     // Using/Aliasing
     using Curve::CurveValue;
     auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -14658,7 +14658,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
     // Using/Aliasing
     auto &DXElecCoolingPower = state.dataHVACGlobal->DXElecCoolingPower;
     auto &DXElecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using Psychrometrics::RhoH2O;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -17093,7 +17093,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     // Using/Aliasing
     using Curve::CurveValue;
     auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 
     using namespace HVACVariableRefrigerantFlow;

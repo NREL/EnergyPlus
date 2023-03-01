@@ -4263,7 +4263,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
         DisplayString(state, "ReturnFrom DElight DaylightCoefficients Calc");
         if (iErrorFlag != 0) {
             // Open DElight Daylight Factors Error File for reading
-            auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp);
+            auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp); // (THIS_AUTO_OK)
 
             // Sequentially read lines in DElight Daylight Factors Error File
             // and process them using standard EPlus warning/error handling calls
@@ -4272,7 +4272,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
             bEndofErrFile = !iDElightErrorFile.good();
             bRecordsOnErrFile = false;
             while (!bEndofErrFile) {
-                auto cErrorLine = iDElightErrorFile.readLine();
+                auto cErrorLine = iDElightErrorFile.readLine(); // (THIS_AUTO_OK)
                 if (cErrorLine.eof) {
                     bEndofErrFile = true;
                     continue;
@@ -5782,7 +5782,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
     ObTrans = 1.0;
 
     auto const &window(state.dataSurface->Surface(IWin));
-    auto const window_iBaseSurf(window.BaseSurf);
+    int const window_iBaseSurf(window.BaseSurf);
 
     // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
     // Building elements are assumed to be opaque
@@ -5816,7 +5816,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
     } else { // Surface octree search
 
         auto const &window_base(window_iBaseSurf > 0 ? state.dataSurface->Surface(window_iBaseSurf) : window);
-        auto const window_base_p(&window_base);
+        auto const *window_base_p(&window_base);
 
         // Lambda function for the octree to test for surface hit and update transmittance if hit
         auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
@@ -5882,10 +5882,10 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
     Real64 const d12(distance(R1, R2)); // Distance between R1 and R2
 
     auto const &window(state.dataSurface->Surface(IWin));
-    auto const window_Enclosure(window.SolarEnclIndex);
-    auto const window_iBaseSurf(window.BaseSurf);
+    int const window_Enclosure(window.SolarEnclIndex);
+    int const window_iBaseSurf(window.BaseSurf);
     auto const &window_base(window_iBaseSurf > 0 ? state.dataSurface->Surface(window_iBaseSurf) : window);
-    auto const window_base_iExtBoundCond(window_base.ExtBoundCond);
+    int const window_base_iExtBoundCond(window_base.ExtBoundCond);
 
     // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
@@ -5905,9 +5905,9 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
 
     } else { // Surface octree search
 
-        auto const window_base_p(&window_base);
+        auto const *window_base_p(&window_base);
         auto const &window_base_adjacent(window_base_iExtBoundCond > 0 ? state.dataSurface->Surface(window_base_iExtBoundCond) : window_base);
-        auto const window_base_adjacent_p(&window_base_adjacent);
+        auto const *window_base_adjacent_p(&window_base_adjacent);
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
@@ -5966,15 +5966,15 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
     Real64 const d12(distance(R1, R2));                   // Distance between R1 and R2 (m)
 
     auto const &window1(state.dataSurface->Surface(IWin1));
-    auto const window1_iBaseSurf(window1.BaseSurf);
+    int const window1_iBaseSurf(window1.BaseSurf);
     auto const &window1_base(window1_iBaseSurf > 0 ? state.dataSurface->Surface(window1_iBaseSurf) : window1);
-    auto const window1_base_iExtBoundCond(window1_base.ExtBoundCond);
+    int const window1_base_iExtBoundCond(window1_base.ExtBoundCond);
 
     auto const &window2(state.dataSurface->Surface(IWin2));
-    auto const window2_Enclosure(window2.SolarEnclIndex);
-    auto const window2_iBaseSurf(window2.BaseSurf);
+    int const window2_Enclosure(window2.SolarEnclIndex);
+    int const window2_iBaseSurf(window2.BaseSurf);
     auto const &window2_base(window2_iBaseSurf > 0 ? state.dataSurface->Surface(window2_iBaseSurf) : window2);
-    auto const window2_base_iExtBoundCond(window2_base.ExtBoundCond);
+    int const window2_base_iExtBoundCond(window2_base.ExtBoundCond);
 
     // Preconditions
     //        assert( window1.Zone == window2_Zone ); //? This is violated in PurchAirWithDoubleFacadeDaylighting so then why the asymmetry
@@ -6000,13 +6000,13 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
 
     } else { // Surface octree search
 
-        auto const window1_base_p(&window1_base);
+        auto const *window1_base_p(&window1_base);
         auto const &window1_base_adjacent(window1_base_iExtBoundCond > 0 ? state.dataSurface->Surface(window1_base_iExtBoundCond) : window1_base);
-        auto const window1_base_adjacent_p(&window1_base_adjacent);
+        auto const *window1_base_adjacent_p(&window1_base_adjacent);
 
-        auto const window2_base_p(&window2_base);
+        auto const *window2_base_p(&window2_base);
         auto const &window2_base_adjacent(window2_base_iExtBoundCond > 0 ? state.dataSurface->Surface(window2_base_iExtBoundCond) : window2_base);
-        auto const window2_base_adjacent_p(&window2_base_adjacent);
+        auto const *window2_base_adjacent_p(&window2_base_adjacent);
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
@@ -6145,7 +6145,7 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
             // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
             if (iErrorFlag != 0) {
                 // Open DElight Electric Lighting Error File for reading
-                auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp);
+                auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp); // (THIS_AUTO_OK)
                 elOpened = iDElightErrorFile.good();
 
                 // Sequentially read lines in DElight Electric Lighting Error File
@@ -6153,7 +6153,7 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                 bEndofErrFile = false;
                 iReadStatus = 0;
                 while (!bEndofErrFile && elOpened) {
-                    auto cErrorLine = iDElightErrorFile.readLine();
+                    auto cErrorLine = iDElightErrorFile.readLine(); // (THIS_AUTO_OK)
                     if (cErrorLine.eof) {
                         bEndofErrFile = true;
                         continue;
@@ -6183,9 +6183,9 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                     ShowFatalError(state, "End of DElight Error Messages");
                 }
             } else { // RJH 2008-03-07: No errors
-                // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
-                // Open DElight Electric Lighting Dump File for reading
-                auto iDElightErrorFile = state.files.outputDelightEldmpFilePath.try_open(state.files.outputControl.delighteldmp);
+                     // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
+                     // Open DElight Electric Lighting Dump File for reading
+                auto iDElightErrorFile = state.files.outputDelightEldmpFilePath.try_open(state.files.outputControl.delighteldmp); // (THIS_AUTO_OK)
                 if (iDElightErrorFile.is_open()) {
                     elOpened = true;
                 } else {
@@ -6198,8 +6198,8 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                 int iDElightRefPt = 0; // Reference Point number for reading DElight Dump File (eplusout.delighteldmp)
                 iReadStatus = 0;
                 while (!bEndofErrFile && elOpened) {
-                    auto line = iDElightErrorFile.read<Real64>();
-                    Real64 dRefPtIllum = line.data; // tmp var for reading RefPt illuminance
+                    auto line = iDElightErrorFile.read<Real64>(); // (THIS_AUTO_OK)
+                    Real64 dRefPtIllum = line.data;               // tmp var for reading RefPt illuminance
                     if (line.eof) {
                         bEndofErrFile = true;
                         continue;
@@ -6751,7 +6751,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
         int count = 0;
         for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
             std::vector<int> const &listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
-            for (const auto IWin : listOfExtWin) {
+            for (const int IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
                 int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
@@ -6795,7 +6795,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             auto &thisTVIS2 = state.dataDaylightingManager->TVIS2(igroup);
             auto &thisASETIL = state.dataDaylightingManager->ASETIL(igroup);
 
-            for (const auto IWin : listOfExtWin) {
+            for (const int IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
                 int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
@@ -6952,7 +6952,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             int countBeforeListOfExtWinLoop = count;
             bool atLeastOneGlareControlIsActive = false;
 
-            for (const auto IWin : listOfExtWin) {
+            for (const int IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
                 int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
@@ -7087,7 +7087,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             count = countBeforeListOfExtWinLoop;
             breakOuterLoop = false;
 
-            for (const auto IWin : listOfExtWin) {
+            for (const int IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
                 int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
@@ -7272,7 +7272,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         }
                     } // End of check if window glare control is active
                 }
-            } // end of for(auto IWin : listOfExtWin)
+            } // end of for (int IWin : listOfExtWin)
             if (breakOuterLoop) break;
         } // for group
     }     // GlareFlag
@@ -7449,7 +7449,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
                 }
 
                 // BRANCH ON LIGHTING SYSTEM TYPE
-                auto LSYSTP = thisDaylightControl.LightControlType;
+                DataDaylighting::LtgCtrlType LSYSTP = thisDaylightControl.LightControlType;
                 Real64 FP = 0.0;
                 if (LSYSTP != DataDaylighting::LtgCtrlType::Stepped) {
                     // Continuously dimmable system with linear power curve
@@ -9858,14 +9858,14 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) { // Report only hourly
 
             // Write X scale column header
-            auto mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), state.dataGlobal->HourOfDay);
+            std::string mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), state.dataGlobal->HourOfDay);
             if (state.dataDaylightingData->IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
             RefPt = 1;
             for (X = 1; X <= state.dataDaylightingData->IllumMap(MapNum).Xnum; ++X) {
-                const auto AddXorYString = format("{}({:.2R};{:.2R})=",
-                                                  state.dataDaylightingData->MapColSep,
-                                                  state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt),
-                                                  state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
+                const std::string AddXorYString = format("{}({:.2R};{:.2R})=",
+                                                         state.dataDaylightingData->MapColSep,
+                                                         state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt),
+                                                         state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
                 if (state.dataDaylightingData->IllumMap(MapNum).HeaderXLineLengthNeeded) linelen += int(len(AddXorYString));
                 mapLine += AddXorYString;
                 ++RefPt;
@@ -9987,19 +9987,19 @@ void CloseReportIllumMaps(EnergyPlusData &state)
         for (int MapNum = 1; MapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++MapNum) {
             if (!state.dataDaylightingData->IllumMap(MapNum).mapFile->good()) continue; // fatal error processing
 
-            const auto mapLines = state.dataDaylightingData->IllumMap(MapNum).mapFile->getLines();
+            const std::vector<std::string> mapLines = state.dataDaylightingData->IllumMap(MapNum).mapFile->getLines();
             if (mapLines.empty()) {
                 ShowSevereError(state, format("CloseReportIllumMaps: IllumMap=\"{}\" is empty.", state.dataDaylightingData->IllumMap(MapNum).Name));
                 break;
             }
-            for (const auto &mapLine : mapLines) {
+            for (const std::string &mapLine : mapLines) {
                 print(state.files.map, "{}\n", mapLine);
             }
             state.dataDaylightingData->IllumMap(MapNum).mapFile->del();
         }
 
         if (!state.dataDaylightingData->mapResultsReported && !state.dataErrTracking->AbortProcessing) {
-            const auto message = "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
+            const std::string message = "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
             ShowSevereError(state, message);
             print(state.files.map, "{}\n", message);
         }
@@ -10439,7 +10439,7 @@ std::size_t CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
     std::size_t maxShadeDeployOrderExtWinsSize = 0;
     for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
         auto &thisDaylightCtrl = state.dataDaylightingData->daylightControl(controlNum);
-        for (auto sequence : shadeControlSequence) {
+        for (auto sequence : shadeControlSequence) { // This is an iterator (THIS_AUTO_OK)
             int curShadeControl = sequence.second;
             if (state.dataSurface->WindowShadingControl(curShadeControl).multiSurfaceControl == MultiSurfaceControl::Group) {
                 // add a group of surfaces since they should be deployed as a group
@@ -10482,8 +10482,8 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
             if (thisDaylightCtrl.ShadeDeployOrderExtWins.size() > 0) {
                 int count = 0;
                 bool showOnce = true;
-                for (auto listOfExtWin : thisDaylightCtrl.ShadeDeployOrderExtWins) {
-                    for (auto IWinShdOrd : listOfExtWin) {
+                for (std::vector<int> listOfExtWin : thisDaylightCtrl.ShadeDeployOrderExtWins) {
+                    for (int IWinShdOrd : listOfExtWin) {
                         ++count;
                         if (count > thisEnclDaylight.NumOfDayltgExtWins) {
                             if (showOnce) {
@@ -10786,7 +10786,8 @@ void WriteDaylightMapTitle(EnergyPlusData &state,
     // The purpose of the routine is to allow the daylighting map data to be written in various formats
 
     // must add correct number of commas at end
-    const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
+    const std::string fullmapName =
+        fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
     print(mapFile,
           "Date/Time{}{}{}{}{}{}\n",
           state.dataDaylightingData->MapColSep,
