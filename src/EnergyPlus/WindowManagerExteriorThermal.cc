@@ -650,7 +650,7 @@ namespace WindowManager {
             auto &surface(state.dataSurface->Surface(m_SurfNum));
             const auto ConstrNum{getActiveConstructionNumber(state, surface, m_SurfNum)};
             std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> aLayer =
-                CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
+                CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
 
             // Report is done for normal incidence
             constexpr Real64 Theta{0.0};
