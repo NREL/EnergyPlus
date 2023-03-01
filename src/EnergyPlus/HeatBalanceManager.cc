@@ -4783,8 +4783,10 @@ namespace HeatBalanceManager {
                 }
 
                 thisConstruct.OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-                thisConstruct.InsideAbsorpThermal = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(TotMaterialsPrev + NGlass(IGlSys)))->AbsorpThermalBack;
-                thisConstruct.OutsideAbsorpThermal = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(TotMaterialsPrev + 1))->AbsorpThermalFront;
+                thisConstruct.InsideAbsorpThermal =
+                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(TotMaterialsPrev + NGlass(IGlSys)))->AbsorpThermalBack;
+                thisConstruct.OutsideAbsorpThermal =
+                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(TotMaterialsPrev + 1))->AbsorpThermalFront;
                 thisConstruct.TypeIsWindow = true;
                 thisConstruct.FromWindow5DataFile = true;
                 thisConstruct.W5FileGlazingSysHeight = WinHeight(IGlSys);
