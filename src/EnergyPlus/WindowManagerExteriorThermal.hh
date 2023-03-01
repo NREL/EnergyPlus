@@ -55,8 +55,9 @@ namespace DataSurfaces {
 }
 
 namespace DataHeatBalance {
-    struct MaterialProperties;
-}
+    struct MaterialBase;
+    struct MaterialChild;
+} // namespace DataHeatBalance
 
 } // namespace EnergyPlus
 
@@ -171,8 +172,7 @@ namespace WindowManager {
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
-        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state,
-                                                                            Material::MaterialBase const *material) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state, Material::MaterialBase const *material) const;
 
         Gases::CGas getGas(Material::MaterialBase const *material) const;
         static Gases::CGas getAir();

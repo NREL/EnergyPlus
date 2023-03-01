@@ -66,8 +66,9 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace DataHeatBalance {
-    struct MaterialProperties;
-}
+    struct MaterialBase;
+    struct MaterialChild;
+} // namespace DataHeatBalance
 
 } // namespace EnergyPlus
 
