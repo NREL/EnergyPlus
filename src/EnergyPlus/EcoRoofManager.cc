@@ -829,7 +829,7 @@ namespace EcoRoofManager {
 
         auto *thisMaterial =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
-        assert(thisMat != nullptr);
+        assert(thisMaterial != nullptr);
         if (state.dataEcoRoofMgr->UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE

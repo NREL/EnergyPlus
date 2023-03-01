@@ -149,12 +149,13 @@ namespace Material {
     {
 
         // Members
-        std::string Name;              // Name of material layer
-        Material::MaterialGroup Group; // Material group type (see Material Parameters above.  Currently
+        std::string Name = "";                                            // Name of material layer
+        Material::MaterialGroup Group = Material::MaterialGroup::Invalid; // Material group type (see Material Parameters above.  Currently
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
-        DataSurfaces::SurfaceRoughness Roughness; // Surface roughness index (See Surface Roughness parameters
+        DataSurfaces::SurfaceRoughness Roughness =
+            DataSurfaces::SurfaceRoughness::Invalid; // Surface roughness index (See Surface Roughness parameters
         // above.  Current: VerySmooth, Smooth, MediumSmooth,
         // MediumRough, Rough, VeryRough)
         // Thermo-physical material properties

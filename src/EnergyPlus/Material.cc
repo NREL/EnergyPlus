@@ -419,8 +419,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Load the material derived type from the input data.
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::Air;
         thisMaterial->Name = MaterialNames(1);
 
