@@ -401,8 +401,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     thisConstruct.TypeIsWindow = false;
     for (Layer = 1; Layer <= TotLayers; ++Layer) {
         MaterNum = thisConstruct.LayerPoint(Layer);
-        auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
         if (MaterNum == 0) continue; // error -- has been caught will stop program later
+        auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
         thisConstruct.TypeIsWindow =
             (thisMaterial->Group == Material::MaterialGroup::WindowGlass || thisMaterial->Group == Material::MaterialGroup::WindowGas ||
              thisMaterial->Group == Material::MaterialGroup::WindowGasMixture || thisMaterial->Group == Material::MaterialGroup::Shade ||
@@ -489,8 +489,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         TotGasLayers = 0;
         for (Layer = 1; Layer <= TotLayers; ++Layer) {
             MaterNum = thisConstruct.LayerPoint(Layer);
-            auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
+            auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) ++TotGlassLayers;
             if (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing) ++TotGlassLayers;
             if (thisMaterial->Group == Material::MaterialGroup::Shade || thisMaterial->Group == Material::MaterialGroup::WindowBlind ||
@@ -662,8 +662,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 // check that none of the other layers are glazing or gas
                 for (Layer = 1; Layer <= TotLayers; ++Layer) {
                     MaterNum = thisConstruct.LayerPoint(Layer);
-                    auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                     if (MaterNum == 0) continue; // error -- has been caught will stop program later
+                    auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                     if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
                         ErrorsFound = true;
                         ShowSevereError(state, format("CheckAndSetConstructionProperties: Error in window construction {}--", thisConstruct.Name));
@@ -1453,8 +1453,8 @@ void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
             NumLayers = thisConstruct.TotLayers;
             for (Layer = 1; Layer <= NumLayers; ++Layer) {
                 MaterNum = thisConstruct.LayerPoint(Layer);
-                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) continue;
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (thisMaterial->Group == Material::MaterialGroup::Shade || thisMaterial->Group == Material::MaterialGroup::WindowBlind)
                     state.dataSurface->SurfWinHasShadeOrBlindLayer(loopSurfNum) = true;
             }

@@ -337,7 +337,6 @@ namespace HeatBalFiniteDiffManager {
 
                 // Load the material derived type from the input data.
                 MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
-                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {} entered={}, must match to a valid Material name.",
@@ -347,6 +346,7 @@ namespace HeatBalFiniteDiffManager {
                     ErrorsFound = true;
                     continue;
                 }
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
 
                 if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
