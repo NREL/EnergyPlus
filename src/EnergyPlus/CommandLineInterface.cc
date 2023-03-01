@@ -598,7 +598,7 @@ namespace CommandLineInterface {
             state.dataStrGlobals->CurrentWorkingFolder = iniFile.filePath;
             // Relying on compiler to supply full path name here
             // TODO: not sure I understand this block
-            // const auto TempIndx = index(state.dataStrGlobals->CurrentWorkingFolder, state.dataStrGlobals->pathChar, true);
+            // const int TempIndx = index(state.dataStrGlobals->CurrentWorkingFolder, state.dataStrGlobals->pathChar, true);
             // if (TempIndx == std::string::npos) {
             // state.dataStrGlobals->CurrentWorkingFolder = "";
             //} else {
@@ -816,12 +816,12 @@ namespace CommandLineInterface {
 
             //                                  Heading line found, now looking for Kind
             while (inputFile.good() && !NewHeading) {
-                const auto innerReadResult = inputFile.readLine();
+                const auto innerReadResult = inputFile.readLine(); // readLine returns a ReadResult<std::string>, hence no & (THIS_AUTO_OK)
                 if (innerReadResult.eof) {
                     break;
                 }
 
-                auto line = innerReadResult.data;
+                std::string line = innerReadResult.data;
                 strip(line);
 
                 if (line.empty()) continue; // Ignore Blank Lines
@@ -889,7 +889,7 @@ namespace CommandLineInterface {
         fs::path const RVIfile = (state.dataStrGlobals->inputDirPath / state.dataStrGlobals->inputFilePathNameOnly).replace_extension(".rvi");
         fs::path const MVIfile = (state.dataStrGlobals->inputDirPath / state.dataStrGlobals->inputFilePathNameOnly).replace_extension(".mvi");
 
-        const auto rviFileExists = FileSystem::fileExists(RVIfile);
+        const bool rviFileExists = FileSystem::fileExists(RVIfile);
         if (!rviFileExists) {
             std::ofstream ofs{RVIfile};
             if (!ofs.good()) {
@@ -900,7 +900,7 @@ namespace CommandLineInterface {
             }
         }
 
-        const auto mviFileExists = FileSystem::fileExists(MVIfile);
+        const bool mviFileExists = FileSystem::fileExists(MVIfile);
         if (!mviFileExists) {
             std::ofstream ofs{MVIfile};
             if (!ofs.good()) {

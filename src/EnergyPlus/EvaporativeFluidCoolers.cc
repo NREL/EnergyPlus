@@ -2184,8 +2184,8 @@ namespace EvaporativeFluidCoolers {
         this->OutletWaterTemp = inletWaterTemp;
         AirFlowRate = 0.0;
 
-        auto loopSide = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum);
-        auto calcScheme = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme;
+        auto const &loopSide = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum);
+        DataPlant::LoopDemandCalcScheme calcScheme = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme;
         if (calcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             TempSetPoint = loopSide.TempSetPoint;
         } else if (calcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
