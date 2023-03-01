@@ -79,7 +79,7 @@ namespace GlobalNames {
 
     void IntraObjUniquenessCheck(EnergyPlusData &state,
                                  std::string &NameToVerify,
-                                 std::string const &CurrentModuleObject,
+                                 std::string_view const CurrentModuleObject,
                                  std::string_view FieldName,
                                  std::unordered_set<std::string> &UniqueStrings,
                                  bool &ErrorsFound);
@@ -98,7 +98,7 @@ namespace GlobalNames {
                                      bool &ErrorsFound);
 
     void VerifyUniqueChillerName(EnergyPlusData &state,
-                                 std::string const &TypeToVerify,
+                                 std::string_view TypeToVerify,
                                  std::string const &NameToVerify,
                                  bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
                                  std::string const &StringToDisplay);

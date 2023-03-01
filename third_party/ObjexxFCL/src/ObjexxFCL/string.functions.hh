@@ -802,41 +802,13 @@ ichar( std::string_view const s )
 	return ( ! s.empty() ? static_cast< int >( s[ 0 ] ) : 0 );
 }
 
-// One-Character string of a Given ASCII Integer Value
-inline
-std::string
-achar( int const i )
-{
-	return std::string( 1, static_cast< char >( i ) );
-}
-
 // Conversion to Numeric Types /////
 
-// Type of a string for Type Supporting Stream Input
-template< typename T >
-inline
-T
-type_of( std::string_view const s ) // Check is_type first
-{
-	std::istringstream t_stream( trimmed_whitespace( s ) );
-	T t;
-	t_stream >> t;
-	return ( t_stream && t_stream.eof() ? t : T() );
-}
-
 // Modifier /////
-
-// Lowercase a string
-std::string &
-lowercase( std::string & s );
 
 // Uppercase a string
 std::string &
 uppercase( std::string & s );
-
-// Right Justify a string
-std::string &
-rjustify( std::string & s );
 
 // Trim Trailing Space from a string
 std::string &
@@ -846,10 +818,6 @@ trim( std::string & s );
 std::string &
 strip( std::string & s, std::string const & chars );
 
-// Strip Specified Characters from a string's Left Tail
-std::string &
-lstrip( std::string & s, std::string const & chars );
-
 // Strip Specified Characters from a string's Right Tail
 std::string &
 rstrip( std::string & s, std::string const & chars );
@@ -857,10 +825,6 @@ rstrip( std::string & s, std::string const & chars );
 // Strip Space from a string's Tails
 std::string &
 strip( std::string & s );
-
-// Strip Space from a string's Left Tail
-std::string &
-lstrip( std::string & s );
 
 // Strip Space from a string's Right Tail
 std::string &
@@ -876,26 +840,6 @@ pad( std::string & s, std::string::size_type const len )
 	return s;
 }
 
-// Left-Pad a string to a Specified Length
-inline
-std::string &
-lpad( std::string & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) s.insert( static_cast< std::string::size_type >( 0 ), len - s_len, ' ' ); // Left-pad
-	return s;
-}
-
-// Right-Pad a string to a Specified Length
-inline
-std::string &
-rpad( std::string & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len < len ) s.append( len - s_len, ' ' ); // Pad
-	return s;
-}
-
 // Pare a string to a Specified Length
 inline
 std::string &
@@ -905,36 +849,9 @@ pare( std::string & s, std::string::size_type const len )
 	return s;
 }
 
-// Left-Pare a string to a Specified Length
-inline
-std::string &
-lpare( std::string & s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	if ( s_len > len ) s.erase( 0, s_len - len ); // Pare
-	return s;
-}
-
-// Right-Pare a string to a Specified Length
-inline
-std::string &
-rpare( std::string & s, std::string::size_type const len )
-{
-	if ( s.length() > len ) s.erase( len ); // Pare
-	return s;
-}
-
 // Size a string to a Specified Length
 std::string &
 size( std::string & s, std::string::size_type const len );
-
-// Left-Size a string to a Specified Length
-std::string &
-lsize( std::string & s, std::string::size_type const len );
-
-// Right-Size a string to a Specified Length
-std::string &
-rsize( std::string & s, std::string::size_type const len );
 
 // Center a string wrt its Whitespace
 std::string &
@@ -975,10 +892,6 @@ blank( std::string::size_type const len )
 	return std::string( len, ' ' );
 }
 
-// Lowercased Copy of a string
-std::string
-lowercased( std::string_view const s );
-
 // Uppercased Copy of a string
 std::string
 uppercased( std::string_view const s );
@@ -1003,93 +916,17 @@ trimmed_whitespace( std::string_view const s );
 std::string
 stripped( std::string_view const s, std::string_view const chars );
 
-// Specified Characters Stripped from a string's Left Tail Copy of a string
-std::string
-lstripped( std::string_view const s, std::string_view const chars );
-
-// Specified Characters Stripped from a string's Right Tail Copy of a string
-std::string
-rstripped( std::string_view const s, std::string_view const chars );
-
 // Space Stripped from a string's Tails Copy of a string
 std::string
 stripped( std::string_view const s );
-
-// Space Stripped from a string's Left Tail Copy of a string
-std::string
-lstripped( std::string_view const s );
-
-// Space Stripped from a string's Right Tail Copy of a string
-std::string
-rstripped( std::string_view const s );
 
 // Whitespace Stripped from a string's Tails Copy of a string
 std::string
 stripped_whitespace( std::string_view const s );
 
-// Padded to a Specified Length Copy of a string
-inline
-std::string
-padded( std::string_view const s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	return ( s_len < len ? std::string{s} + std::string( len - s_len, ' ' ) : std::string{s} );
-}
-
-// Left-Padded to a Specified Length Copy of a string
-inline
-std::string
-lpadded( std::string_view const s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	return ( s_len < len ? std::string( len - s_len, ' ' ).append( s ) : std::string{s} );
-}
-
-// Right-Padded to a Specified Length Copy of a string
-inline
-std::string
-rpadded( std::string_view const s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	return ( s_len < len ? std::string{s} + std::string( len - s_len, ' ' ) : std::string{s} );
-}
-
-// Pared to a Specified Length Copy of a string
-inline
-std::string
-pared( std::string_view const s, std::string::size_type const len )
-{
-	return ( s.length() > len ? std::string( s, 0, len ) : std::string{s} );
-}
-
-// Left-Pared to a Specified Length Copy of a string
-inline
-std::string
-lpared( std::string_view const s, std::string::size_type const len )
-{
-	std::string::size_type const s_len( s.length() );
-	return ( s_len > len ? std::string( s, s_len - len, std::string::npos ) : std::string{s} );
-}
-
-// Right-Pared to a Specified Length Copy of a string
-inline
-std::string
-rpared( std::string_view const s, std::string::size_type const len )
-{
-	return ( s.length() > len ? std::string( s, 0, len ) : std::string{s} );
-}
-
 // Sized to a Specified Length Copy of a string
 std::string
 sized( std::string_view const s, std::string::size_type const len );
-
-// Left-Sized to a Specified Length Copy of a string
-std::string
-lsized( std::string_view const s, std::string::size_type const len );
-
-// Right-Sized to a Specified Length Copy of a string
-std::string
-rsized( std::string_view const s, std::string::size_type const len );
 
 // Centered in a string of Specified Length Copy of a string
 std::string
@@ -1102,10 +939,6 @@ centered( std::string_view const s )
 {
 	return centered( stripped_whitespace( s ), s.length() );
 }
-
-// Removed Repeat Characters from a Possibly Unsorted string Preserving Order Copy of a string
-std::string
-uniqued( std::string_view const s );
 
 // Substring Replaced Copy of a string
 inline
@@ -1120,14 +953,6 @@ replaced( std::string_view const s, std::string_view const a, std::string_view c
 // Overlayed string with Another string, Expanding Size as Needed
 std::string
 overlayed( std::string_view const s, std::string_view const t, std::string::size_type const pos = 0 );
-
-// Overlayed string with Another string, Expanding Size as Needed
-inline
-std::string
-overlaid( std::string_view const s, std::string_view const t, std::string::size_type const pos = 0 )
-{
-	return overlayed( s, t, pos );
-}
 
 // Repeated Copies
 std::string
@@ -1166,79 +991,6 @@ operator +( std::string const & s, char const * const t )
 }
 
 // Conversion To std::string
-
-// string of a Template Argument Type Supporting Stream Output
-template< typename T >
-inline
-std::string
-string_of( T const & t )
-{
-	std::ostringstream t_stream;
-	t_stream << std::uppercase << std::setprecision( TypeTraits< T >::precision ) << t;
-	return t_stream.str();
-}
-
-// string of a Template Argument Type Supporting Stream Output
-template< typename T >
-inline
-std::string
-string_of(
- T const & t,
- int const p // Precision
-)
-{
-	std::ostringstream t_stream;
-	t_stream << std::uppercase << std::setprecision( p ) << t;
-	return t_stream.str();
-}
-
-// Left-Justified string of a Template Argument Type Supporting Stream Output
-template< typename T >
-inline
-std::string
-lstring_of(
- T const & t,
- int const w, // Minimum width
- char const f = ' ' // Fill character
-)
-{
-	std::ostringstream t_stream;
-	t_stream << std::left << std::uppercase
-	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision ) << t;
-	return t_stream.str();
-}
-
-// Right-Justified General Format string of a Template Argument Type Supporting Stream Output
-template< typename T >
-inline
-std::string
-general_string_of(
- T const & t,
- int const w = TypeTraits< T >::iwidth, // Minimum width
- std::streamsize const p = TypeTraits< T >::precision // Precision
-)
-{
-	std::ostringstream t_stream;
-	t_stream << std::right << std::uppercase << std::showpoint
-	 << std::setw( w ) << std::setprecision( p ) << t;
-	return t_stream.str();
-}
-
-// Right-Justified Fixed Format string of a Template Argument Type Supporting Stream Output
-template< typename T >
-inline
-std::string
-fixed_string_of(
- T const & t,
- int const w = TypeTraits< T >::iwidth, // Minimum width
- std::streamsize const p = TypeTraits< T >::precision // Precision
-)
-{
-	std::ostringstream t_stream;
-	t_stream << std::right << std::uppercase << std::fixed << std::showpoint
-	 << std::setw( w ) << std::setprecision( p ) << t;
-	return t_stream.str();
-}
 
 } // ObjexxFCL
 

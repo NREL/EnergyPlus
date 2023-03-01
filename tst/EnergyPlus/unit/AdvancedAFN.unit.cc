@@ -74,7 +74,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     int OpenStatus;
     int OpenProbStatus;
     int CloseProbStatus;
-    int CurveNum;
 
     AirflowNetworkNumOfOccuVentCtrls = 1;
     state->afn->OccupantVentilationControl.allocate(AirflowNetworkNumOfOccuVentCtrls);
@@ -115,36 +114,35 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->afn->OccupantVentilationControl(1).ComfortLowTempCurveNum = 1;
     state->afn->OccupantVentilationControl(1).ComfortHighTempCurveNum = 2;
 
-    state->dataCurveManager->NumCurves = 2;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(2);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 21.2;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.09;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = -50.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 10.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 2.0;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::Quadratic;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = 21.2;
+    curve1->coeff[1] = 0.09;
+    curve1->coeff[2] = 0.0;
+    curve1->coeff[3] = 0.0;
+    curve1->coeff[4] = 0.0;
+    curve1->coeff[5] = 0.0;
+    curve1->inputLimits[0].min = -50.0;
+    curve1->inputLimits[0].max = 10.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 2.0;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).interpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 18.8;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 0.33;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 10.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 50.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 2.0;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::Quadratic;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = 18.8;
+    curve2->coeff[1] = 0.33;
+    curve2->coeff[2] = 0.0;
+    curve2->coeff[3] = 0.0;
+    curve2->coeff[4] = 0.0;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 10.0;
+    curve2->inputLimits[0].max = 50.0;
+    curve2->inputLimits[1].min = 0.0;
+    curve2->inputLimits[1].max = 2.0;
 
     state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenProbStatus);

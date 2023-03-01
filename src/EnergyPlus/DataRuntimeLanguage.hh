@@ -539,8 +539,8 @@ struct RuntimeLanguageData : BaseGlobalStruct
     int NumEMSCurveIndices = 0;           // count of EMS curve index variables in model
     int NumEMSConstructionIndices = 0;    // count of EMS construction index variables in model
 
-    //######################################################################################################################################
-    // code for ExternalInterface
+    // ######################################################################################################################################
+    //  code for ExternalInterface
     int NumExternalInterfaceGlobalVariables = 0;                           // count of ExternalInterface runtime variable
     int NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = 0; // count of ExternalInterface runtime variable for FMUImport
     // will be updated with values from ExternalInterface
@@ -550,7 +550,7 @@ struct RuntimeLanguageData : BaseGlobalStruct
     int NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0; // count of ExternalInterface Actuators for FMUImport
     int NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0; // count of ExternalInterface Actuators for FMUExport
 
-    //######################################################################################################################################
+    // ######################################################################################################################################
 
     bool OutputEDDFile = false;               // set to true if user requests EDD output file be written
     bool OutputFullEMSTrace = false;          // how much to write out to trace, if true do verbose for each line

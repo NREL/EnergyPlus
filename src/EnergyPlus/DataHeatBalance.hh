@@ -84,33 +84,6 @@ namespace DataHeatBalance {
     using DataSurfaces::MaxSlatAngs;
     using DataVectorTypes::Vector;
 
-    // Parameters to indicate material group type for use with the Material
-    // derived type (see below):
-    enum class MaterialGroup
-    {
-        Invalid = -1,
-        RegularMaterial,
-        Air,
-        Shade,
-        WindowGlass,
-        WindowGas,
-        WindowBlind,
-        WindowGasMixture,
-        Screen,
-        EcoRoof,
-        IRTMaterial,
-        WindowSimpleGlazing,
-        ComplexWindowShade,
-        ComplexWindowGap,
-        GlassEquivalentLayer,
-        ShadeEquivalentLayer,
-        DrapeEquivalentLayer,
-        BlindEquivalentLayer,
-        ScreenEquivalentLayer,
-        GapEquivalentLayer,
-        Num
-    };
-
     // Parameters for Interior and Exterior Solar Distribution
     enum class Shadowing
     {
@@ -450,33 +423,6 @@ namespace DataHeatBalance {
     constexpr Real64 ZoneInitialTemp(23.0);       // Zone temperature for initialization
     constexpr Real64 SurfInitialTemp(23.0);       // Surface temperature for initialization
     constexpr Real64 SurfInitialConvCoeff(3.076); // Surface convective coefficient for initialization
-
-    // Air       Argon     Krypton   Xenon
-    // Gas conductivity coefficients for gases in a mixture
-    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsCon = {{{2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                            {7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
-
-    // Air       Argon     Krypton   Xenon
-    // Gas viscosity coefficients for gases in a mixture
-    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsVis = {{{3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                            {4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                                                            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
-
-    // Air       Argon     Krypton   Xenon
-    // Gas specific heat coefficients for gases in a mixture
-    static constexpr std::array<std::array<Real64, 10>, 3> GasCoeffsCp = {{
-        {1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-        {1.2324e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-    }};
-
-    // Air       Argon     Krypton   Xenon
-    static constexpr std::array<Real64, 10> GasWght = {
-        28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Gas molecular weights for gases in a mixture
-
-    // Gas specific heat ratios.  Used for gasses in low pressure
-    static constexpr std::array<Real64, 10> GasSpecificHeatRatio = {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     struct TCGlazingsType
     {
@@ -1979,9 +1925,9 @@ namespace DataHeatBalance {
 
     void CalcScreenTransmittance(EnergyPlusData &state,
                                  int SurfaceNum,
-                                 Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
-                                 Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
-                                 Optional_int_const ScreenNumber = _ // Optional screen number
+                                 ObjexxFCL::Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
+                                 ObjexxFCL::Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
+                                 ObjexxFCL::Optional_int_const ScreenNumber = _ // Optional screen number
     );
 
     std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness Roughness); // Roughness String
@@ -2042,6 +1988,7 @@ struct HeatBalanceData : BaseGlobalStruct
     bool AnyKiva = false;                // Kiva used
     bool AnyAirBoundary = false;         // Construction:AirBoundary used (implies grouped solar and radiant is present)
     bool AnyBSDF = false;                // True if any WindowModelType == WindowModel:: BSDF
+    bool AnyVariableAbsorptance = false; // true if any MaterialProperty:VariableAbsorptance is present
     int MaxNumberOfWarmupDays = 25;      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays = 1;       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor = 1.0;      // Relaxation factor, for looping across all the surfaces.
@@ -2074,7 +2021,6 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotCrossMixing = 0;     // Total Cross Mixing Statementsn instances after expansion to spaces
     int TotRefDoorMixing = 0;   // Total RefrigerationDoor Mixing Statements in input
     int TotBBHeat = 0;          // Total BBHeat Statements instances after expansion to spaces
-    int TotMaterials = 0;       // Total number of unique materials (layers) in this simulation
     int TotConstructs = 0;      // Total number of unique constructions in this simulation
     int TotSpectralData = 0;    // Total window glass spectral data sets
     int W5GlsMat = 0;           // Window5 Glass Materials, specified by transmittance and front and back reflectance

@@ -432,7 +432,7 @@ namespace CrossVentMgr {
         CosPhi = std::cos((state.dataEnvrn->WindDir - SurfNorm) * DataGlobalConstants::DegToRadians);
         if (CosPhi <= 0) {
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -474,8 +474,10 @@ namespace CrossVentMgr {
                 ShowSevereError(
                     state, "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model");
                 ShowContinueError(state,
-                                  "Surface " + state.afn->AirflowNetworkLinkageData(Ctd).Name + " in zone " + state.dataHeatBal->Zone(ZoneNum).Name +
-                                      " uses leakage component " + state.afn->AirflowNetworkLinkageData(Ctd).CompName);
+                                  format("Surface {} in zone {} uses leakage component {}",
+                                         state.afn->AirflowNetworkLinkageData(Ctd).Name,
+                                         state.dataHeatBal->Zone(ZoneNum).Name,
+                                         state.afn->AirflowNetworkLinkageData(Ctd).CompName));
                 ShowContinueError(state, "Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and ");
                 ShowContinueError(state, "AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model");
                 ShowFatalError(state, "Previous severe error causes program termination");
@@ -529,7 +531,7 @@ namespace CrossVentMgr {
                 YY_Wall /= double(NSides);
                 ZZ_Wall /= double(NSides);
             }
-            auto DroomTemp = std::sqrt(pow_2(XX - XX_Wall) + pow_2(YY - YY_Wall) + pow_2(ZZ - ZZ_Wall));
+            double DroomTemp = std::sqrt(pow_2(XX - XX_Wall) + pow_2(YY - YY_Wall) + pow_2(ZZ - ZZ_Wall));
             if (DroomTemp > state.dataRoomAirMod->Droom(ZoneNum)) {
                 state.dataRoomAirMod->Droom(ZoneNum) = DroomTemp;
             }
@@ -599,7 +601,7 @@ namespace CrossVentMgr {
             state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -623,7 +625,7 @@ namespace CrossVentMgr {
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
             state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -666,7 +668,7 @@ namespace CrossVentMgr {
         state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
         state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
         state.dataRoomAirMod->Qtot(ZoneNum) = 0.0;
-        auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+        auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
         for (int i = 1, u = flows.u(); i <= u; ++i) {
             auto &e(flows(i));
             e.Ujet = e.Urec = e.Qrec = 0.0;

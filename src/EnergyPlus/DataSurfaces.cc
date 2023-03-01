@@ -240,8 +240,9 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
         // ZoneEquipConfigNum = ZoneNum;
         // check whether this zone is a controlled zone or not
         if (!state.dataHeatBal->Zone(Zone).IsControlled) {
-            ShowFatalError(
-                state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + state.dataHeatBal->Zone(Zone).Name);
+            ShowFatalError(state,
+                           format("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone {}",
+                                  state.dataHeatBal->Zone(Zone).Name));
             // return;
         }
         // determine supply air conditions
@@ -502,7 +503,7 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     if (totalWidth == 0.0) {
         // This should never happen, but if it does, print a somewhat meaningful fatal error
         // (instead of allowing a divide by zero).
-        ShowFatalError(state, "Calculated projected surface width is zero for surface=\"" + Name + "\"");
+        ShowFatalError(state, format("Calculated projected surface width is zero for surface=\"{}\"", Name));
     }
 
     Real64 averageHeight = 0.0;
@@ -531,7 +532,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.EnclIndex = SolarEnclIndex;
     calcHashKey.TAirRef = state.dataSurface->SurfTAirRef(SurfNum);
 
-    auto extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+    int extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
     if (extBoundCond > 0) {
         calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
         calcHashKey.ExtEnclIndex = state.dataSurface->Surface(extBoundCond).SolarEnclIndex;
@@ -731,6 +732,45 @@ Real64 AbsBackSide(EnergyPlusData &state, int SurfNum)
         (state.dataSurface->SurfWinExtBeamAbsByShade(SurfNum) + state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum)) *
         state.dataSurface->SurfWinShadeAbsFacFace2(SurfNum);
     return AbsorptanceFromExteriorBackSide + AbsorptanceFromInteriorBackSide;
+}
+
+void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
+{
+    if (!state.dataHeatBal->AnyVariableAbsorptance) return;
+    for (int surfNum : state.dataSurface->AllHTSurfaceList) {
+        auto const &thisSurface = state.dataSurface->Surface(surfNum);
+        int ConstrNum = thisSurface.Construction;
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        int TotLayers = thisConstruct.TotLayers;
+        if (TotLayers == 0) continue;
+        int materNum = thisConstruct.LayerPoint(1);
+        if (materNum == 0) continue; // error finding material number
+        auto const *thisMaterial = state.dataMaterial->Material(materNum);
+        if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+            // check for dynamic coating defined on interior surface
+            if (thisSurface.ExtBoundCond != ExternalEnvironment) {
+                ShowWarningError(state,
+                                 format("MaterialProperty:VariableAbsorptance defined on an interior surface, {}. This VariableAbsorptance property "
+                                        "will be ignored here",
+                                        thisSurface.Name));
+            } else {
+                state.dataSurface->AllVaryAbsOpaqSurfaceList.push_back(surfNum);
+            }
+        }
+    }
+    // check for dynamic coating defined on the non-outside layer of a construction
+    for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        for (int Layer = 2; Layer <= thisConstruct.TotLayers; ++Layer) {
+            auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
+            if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+                ShowWarningError(state,
+                                 format("MaterialProperty:VariableAbsorptance defined on a inside-layer materials, {}. This VariableAbsorptance "
+                                        "property will be ignored here",
+                                        thisMaterial->Name));
+            }
+        }
+    }
 }
 
 } // namespace EnergyPlus::DataSurfaces

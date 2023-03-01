@@ -129,7 +129,7 @@ void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, std
     // the alphas and numerics required to process the Report:SurfaceColorScheme object.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
+    constexpr std::string_view CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
     state.dataSurfColor->DXFcolorno = DataSurfaceColors::defaultcolorno;
 
@@ -176,19 +176,26 @@ void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, std
             if (lNumericBlanks(numargs)) {
                 if (!lAlphaBlanks(numargs + 1)) {
                     ShowWarningError(state,
-                                     "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
-                                         cAlphas(numargs + 1) + ", " + cNumericFields(numargs) + " was blank.  Default color retained.");
+                                     format("SetUpSchemeColors: {}={}, {}={}, {} was blank.  Default color retained.",
+                                            cAlphaFields(1),
+                                            SchemeName,
+                                            cAlphaFields(numargs + 1),
+                                            cAlphas(numargs + 1),
+                                            cNumericFields(numargs)));
                 }
                 continue;
             }
             if (!MatchAndSetColorTextString(state, cAlphas(numargs + 1), numptr, ColorType)) {
                 ShowWarningError(state,
-                                 "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
-                                     cAlphas(numargs + 1) + ", is invalid.  No color set.");
+                                 format("SetUpSchemeColors: {}={}, {}={}, is invalid.  No color set.",
+                                        cAlphaFields(1),
+                                        SchemeName,
+                                        cAlphaFields(numargs + 1),
+                                        cAlphas(numargs + 1)));
             }
         }
     } else {
-        ShowWarningError(state, "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
+        ShowWarningError(state, format("SetUpSchemeColors: Name={} not on input file. Default colors will be used.", SchemeName));
     }
 }
 

@@ -54,7 +54,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -183,7 +182,9 @@ namespace DataPlant {
         "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
         "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
         "HeatPump:PlantLoop:EIR:Cooling",
-        "HeatPump:PlantLoop:EIR:Heating"};
+        "HeatPump:PlantLoop:EIR:Heating",
+        "HeatPump:AirToWater:FuelFired:Cooling",
+        "HeatPump:AirToWater:FuelFired:Heating"};
 
     static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
@@ -282,7 +283,9 @@ namespace DataPlant {
         "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
         "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
         "HEATPUMP:PLANTLOOP:EIR:COOLING",
-        "HEATPUMP:PLANTLOOP:EIR:HEATING"};
+        "HEATPUMP:PLANTLOOP:EIR:HEATING",
+        "HEATPUMP:AIRTOWATER:FUELFIRED:COOLING",
+        "HEATPUMP:AIRTOWATER:FUELFIRED:HEATING"};
 
     static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
         LoopType::Plant, //	"Boiler:HotWater"

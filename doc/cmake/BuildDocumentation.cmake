@@ -11,10 +11,19 @@ else()
   set(THIS_TEX_INTERACTION "${TEX_INTERACTION}")
 endif()
 
+set(COMMAND_ECHO_MODE NONE)
+if (XELATEX_MEM_FLAGS)
+  set(XELATEX_MEM_FLAGS "--extra-mem-top=2000000" "--extra-mem-bot=4000000")
+endif()
+
 if(DOCS_TESTING)
 
   # TODO: You can change this to ON for active debugging if you find a problem
   set(_DEBUG_DOCS OFF)
+  if(_DEBUG_DOCS)
+    set(COMMAND_ECHO_MODE STDOUT)
+    set(CMAKE_VERBOSE_MAKEFILE ON)
+  endif()
 
   if (XELATEX_MEM_FLAGS)
     message("XELATEX_MEM_FLAGS=${XELATEX_MEM_FLAGS}")
@@ -51,7 +60,11 @@ if(DOCS_TESTING)
         if (PASS_NUM LESS 2)
           message("${INNAME} Pass ${PASS_NUM}: TOC is missing (as expected)")
         else()
-          message(FATAL_ERROR "${INNAME} Pass ${PASS_NUM}: TOC is missing")
+          if (DEBUG_DOCS)
+            message(AUTHOR_WARNING "${INNAME} Pass ${PASS_NUM}: TOC is missing")
+          else()
+            message(FATAL_ERROR "${INNAME} Pass ${PASS_NUM}: TOC is missing")
+          endif()
         endif()
       else()
         message("${INNAME} Pass ${PASS_NUM}: TOC OK, Number of entries in TOC = ${_TOC_NUMENTRIES}")
@@ -74,9 +87,10 @@ if(DOCS_TESTING)
 endif()
 
 execute_process(
-  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
+  COMMAND "${XELATEX}" --interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
   TIMEOUT 600
   RESULT_VARIABLE ERRCODE
+  COMMAND_ECHO ${COMMAND_ECHO_MODE}
 )
 
 if(DOCS_TESTING)
@@ -88,9 +102,10 @@ if(DOCS_TESTING)
 endif()
 
 execute_process(
-  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
+  COMMAND "${XELATEX}" --interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
   TIMEOUT 600
   RESULT_VARIABLE ERRCODE
+  COMMAND_ECHO ${COMMAND_ECHO_MODE}
 )
 
 if(DOCS_TESTING)
@@ -102,9 +117,10 @@ if(DOCS_TESTING)
 endif()
 
 execute_process(
-  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
+  COMMAND "${XELATEX}" --interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
   TIMEOUT 600
   RESULT_VARIABLE ERRCODE
+  COMMAND_ECHO ${COMMAND_ECHO_MODE}
 )
 
 if(DOCS_TESTING)
