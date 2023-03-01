@@ -152,7 +152,7 @@ namespace Curve {
         // Reset curve outputs prior to simulating air loops, plant loops, etc.
         // This allows the report variable for curve/table objects to show an inactive state.
 
-        for (auto c : state.dataCurveManager->PerfCurve) {
+        for (auto &c : state.dataCurveManager->PerfCurve) {
             c->output = DataLoopNode::SensedNodeFlagValue;
             for (auto &i : c->inputs) {
                 i = DataLoopNode::SensedNodeFlagValue;
@@ -2255,7 +2255,8 @@ namespace Curve {
                         std::vector<Btwxt::GridAxis> gridAxes;
                         gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-                        auto gridIndex = state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
+                        auto gridIndex =
+                            state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes)); // Btwxt nonsense (THIS_AUTO_OK)
                         thisCurve->TableIndex = gridIndex;
                         thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
                     }
@@ -2282,7 +2283,7 @@ namespace Curve {
             varListLimits; // ugly, but this is needed for legacy behavior (otherwise limits are reset by Btwxt if they are within bounds).
         std::map<std::string, std::vector<double>> varListNormalizeTargets;
         if (numIndVarLists > 0) {
-            auto const indVarListInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:IndependentVariableList");
+            auto const &indVarListInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:IndependentVariableList");
             for (auto &instance : indVarListInstances.items()) {
 
                 auto const &fields = instance.value();
@@ -2293,7 +2294,7 @@ namespace Curve {
                 std::vector<Btwxt::GridAxis> gridAxes;
 
                 // Loop through independent variables in list and add them to the grid
-                for (auto indVar : fields.at("independent_variables")) {
+                for (auto &indVar : fields.at("independent_variables")) {
                     std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2413,7 +2414,7 @@ namespace Curve {
 
         int numTblLookups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Table:Lookup");
         if (numTblLookups > 0) {
-            auto const lookupInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:Lookup");
+            auto const &lookupInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:Lookup");
             for (auto &instance : lookupInstances.items()) {
 
                 auto const &fields = instance.value();
@@ -2538,7 +2539,7 @@ namespace Curve {
                                        lookupValues.end());
 
                 } else if (fields.count("values")) {
-                    for (auto value : fields.at("values")) {
+                    for (auto &value : fields.at("values")) {
                         lookupValues.push_back(value.at("output_value").get<Real64>() / normalizationDivisor);
                     }
                 } else {
@@ -2549,11 +2550,11 @@ namespace Curve {
                 thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
 
                 if (normalizeMethod == NM_AUTO_WITH_DIVISOR) {
-                    auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
+                    auto const &normalizeTarget = varListNormalizeTargets.at(indVarListName);
 
                     bool pointsSpecified = false;
                     bool pointsUnspecified = false;
-                    for (auto value : normalizeTarget) {
+                    for (double value : normalizeTarget) {
                         if (std::isnan(value)) {
                             pointsUnspecified = true;
                         } else {
@@ -2700,7 +2701,7 @@ namespace Curve {
                     str.remove_prefix(first_char);
                 }
                 double result = 0;
-                auto answer = fast_float::from_chars(str.data(), str.data() + str.size(), result);
+                auto answer = fast_float::from_chars(str.data(), str.data() + str.size(), result); // struct returned by value (THIS_AUTO_OK)
                 if (answer.ec != std::errc()) {
                     return std::numeric_limits<double>::quiet_NaN();
                 }

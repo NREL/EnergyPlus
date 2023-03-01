@@ -3527,7 +3527,7 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
 
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
         auto &thisSpace = state.dataHeatBal->space(spaceNum);
-        for (auto SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+        for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 Real64 height = state.dataSurface->Surface(SurfNum).Height;
                 bool isWindow = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow;
@@ -4224,8 +4224,8 @@ RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state)
                 itnext = std::begin(surface.Vertex);
             }
 
-            auto curVertex = *it;
-            auto nextVertex = *itnext;
+            auto &curVertex = *it;
+            auto &nextVertex = *itnext;
             auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
                 return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
             });

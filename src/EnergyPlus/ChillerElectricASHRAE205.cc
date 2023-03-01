@@ -135,7 +135,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
     state.dataChillerElectricASHRAE205->Electric205Chiller.allocate(numElectric205Chillers);
 
-    auto const ChillerInstances = ip->epJSON.find(state.dataIPShortCut->cCurrentModuleObject).value();
+    auto const &ChillerInstances = ip->epJSON.find(state.dataIPShortCut->cCurrentModuleObject).value();
     int ChillerNum{0};
     auto const &objectSchemaProps = ip->getObjectSchemaProps(state, state.dataIPShortCut->cCurrentModuleObject);
     for (auto &instance : ChillerInstances.items()) {
@@ -171,7 +171,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         thisChiller.InterpolationType =
             InterpMethods[UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
 
-        const auto compressorSequence = thisChiller.Representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
+        const auto &compressorSequence = thisChiller.Representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
         // minmax_element is sound but perhaps overkill; as sequence numbers are required by A205 to be in ascending order
         const auto minmaxSequenceNum = std::minmax_element(compressorSequence.begin(), compressorSequence.end());
         thisChiller.MinSequenceNumber = *(minmaxSequenceNum.first);
@@ -276,7 +276,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
 
         {
-            auto tmpFlowRate = fields.at("chilled_water_maximum_requested_flow_rate");
+            auto &tmpFlowRate = fields.at("chilled_water_maximum_requested_flow_rate");
             if (tmpFlowRate == "Autosize") {
                 thisChiller.EvapVolFlowRate = DataSizing::AutoSize;
                 thisChiller.EvapVolFlowRateWasAutoSized = true;
@@ -285,7 +285,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             }
         }
         {
-            auto tmpFlowRate = fields.at("condenser_maximum_requested_flow_rate");
+            auto &tmpFlowRate = fields.at("condenser_maximum_requested_flow_rate");
             if (tmpFlowRate == "Autosize") {
                 thisChiller.CondVolFlowRate = DataSizing::AutoSize;
                 thisChiller.CondVolFlowRateWasAutoSized = true;
@@ -1481,7 +1481,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     }
 
     // Use performance map to get the rest of results at new sequence number
-    auto lookupVariablesCooling =
+    auto lookupVariablesCooling = // This is a struct returned by value, relying on RVO (THIS_AUTO_OK)
         this->Representation->performance.performance_map_cooling.calculate_performance(this->EvapVolFlowRate,
                                                                                         this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
                                                                                         this->CondVolFlowRate,
@@ -1513,7 +1513,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         }
 #endif // 0
 
-    auto cd = this->Representation->performance.cycling_degradation_coefficient;
+    Real64 cd = this->Representation->performance.cycling_degradation_coefficient;
     Real64 cyclingFactor{(1.0 - cd) + (cd * this->ChillerCyclingRatio)};
     Real64 runtimeFactor{this->ChillerCyclingRatio / cyclingFactor};
     this->Power = lookupVariablesCooling.input_power * runtimeFactor + ((1 - this->ChillerCyclingRatio) * standbyPower);
@@ -1539,7 +1539,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
 
     // Oil cooler and Auxiliary Heat delta-T calculations
     if (this->OilCoolerInletNode) {
-        auto oilCoolerDeltaTemp{0.0};
+        Real64 oilCoolerDeltaTemp = 0.0;
         PlantUtilities::SetComponentFlowRate(
             state, this->OilCoolerMassFlowRate, this->OilCoolerInletNode, this->OilCoolerOutletNode, this->OCPlantLoc);
 
@@ -1557,7 +1557,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         state.dataLoopNodes->Node(this->OilCoolerOutletNode).Temp = state.dataLoopNodes->Node(this->OilCoolerInletNode).Temp - oilCoolerDeltaTemp;
     }
     if (this->AuxiliaryHeatInletNode) {
-        auto auxiliaryDeltaTemp{0.0};
+        Real64 auxiliaryDeltaTemp = 0.0;
         PlantUtilities::SetComponentFlowRate(
             state, this->AuxiliaryMassFlowRate, this->AuxiliaryHeatInletNode, this->AuxiliaryHeatOutletNode, this->AHPlantLoc);
 

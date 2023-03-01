@@ -85,8 +85,8 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
     using namespace DataSurfaces;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto CurrentModuleObject1("ZoneHVAC:LowTemperatureRadiant:SurfaceGroup");
-    constexpr auto CurrentModuleObject2("ZoneHVAC:VentilatedSlab:SlabGroup");
+    constexpr std::string_view CurrentModuleObject1("ZoneHVAC:LowTemperatureRadiant:SurfaceGroup");
+    constexpr std::string_view CurrentModuleObject2("ZoneHVAC:VentilatedSlab:SlabGroup");
     Real64 constexpr FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
     Real64 constexpr SurfListMinFlowFrac(0.001);    // Minimum allowed flow fraction (to avoid divide by zero)
 
