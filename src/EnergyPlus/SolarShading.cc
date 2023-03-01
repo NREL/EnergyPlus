@@ -7479,6 +7479,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     Real64 RGlFront = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffFront;
                                     auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
                                         state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1)));
+                                    assert(thisMaterial != nullptr);
                                     Real64 AbsSh = thisMaterial->AbsorpSolar;
                                     Real64 RhoSh = 1.0 - AbsSh - thisMaterial->Trans;
                                     Real64 AShBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef) * AbsSh /
@@ -7496,6 +7497,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 t2k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).tBareSolCoef(2));
                                         auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
                                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(3)));
+                                        assert(thisMaterial != nullptr);
                                         Real64 TrSh = thisMaterial->Trans;                   // Shade material solar transmittance
                                         Real64 RhoSh = thisMaterial->ReflectShade;           // Shade material solar absorptance
                                         Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh)); // Shade material solar absorptance
@@ -7507,6 +7509,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         Real64 rfd3k = state.dataConstruction->Construct(ConstrNumBack).rfBareSolDiff(3);
                                         auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
                                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(5)));
+                                        assert(thisMaterial != nullptr);
                                         Real64 TrSh = thisMaterial->Trans;
                                         Real64 RhoSh = thisMaterial->ReflectShade;
                                         Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh));

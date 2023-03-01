@@ -508,8 +508,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::WindowGlass;
 
         // Load the material derived type from the input data.

@@ -210,6 +210,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
         }
 
         auto *material(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum)));
+        assert(material != nullptr);
         // See if Material was defined with R only.  (No density is defined then and not applicable for EMPD).
         //  What about materials other than "regular materials" (e.g. Glass, Air, etc)
         if (material->Group == Material::MaterialGroup::RegularMaterial && MaterialProps(1) > 0.0) {
@@ -554,6 +555,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
         state.dataConstruction->Construct(ConstrNum).TotLayers); // Then find the material pointer
 
     auto const *material(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatNum)));
+    assert(material != nullptr);
     if (material->EMPDmu <= 0.0) {
         rv_surface = PsyRhovFnTdbWPb(
             TempZone, state.dataZoneTempPredictorCorrector->zoneHeatBalance(surface.Zone).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);

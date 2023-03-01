@@ -4662,6 +4662,7 @@ namespace HeatBalanceManager {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     MaterNum = MaterNumSysGap(IGap, IGlSys);
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+                    assert(thisMaterial != nullptr);
                     thisMaterial->NumberOfGasesInMixture = NumGases(IGap, IGlSys);
                     thisMaterial->Group = Material::MaterialGroup::WindowGas;
                     if (NumGases(IGap, IGlSys) > 1) thisMaterial->Group = Material::MaterialGroup::WindowGasMixture;
@@ -4933,6 +4934,7 @@ namespace HeatBalanceManager {
                 for (loop = 1; loop <= NGlass(IGlSys) + NGaps(IGlSys); ++loop) {
                     MatNum = thisConstruct.LayerPoint(loop);
                     auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
+                    assert(thisMaterial != nullptr);
                     if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += thisMaterial->Thickness / thisMaterial->Conductivity;
                     } else if (thisMaterial->Group == Material::MaterialGroup::WindowGas ||
@@ -5863,6 +5865,7 @@ namespace HeatBalanceManager {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
                 auto const *thisMaterial =
                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer));
+                assert(thisMaterial != nullptr);
                 iTCG = thisMaterial->TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
                 iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
@@ -5886,6 +5889,7 @@ namespace HeatBalanceManager {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
                 auto const *thisMaterial =
                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer));
+                assert(thisMaterial != nullptr);
                 iTCG = thisMaterial->TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
                 iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
@@ -5958,6 +5962,7 @@ namespace HeatBalanceManager {
         Real64 RHiSide(0.0);
 
         auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        assert(thisMaterial != nullptr);
         // first fill out defaults
         thisMaterial->GlassSpectralDataPtr = 0;
         thisMaterial->SolarDiffusing = false;

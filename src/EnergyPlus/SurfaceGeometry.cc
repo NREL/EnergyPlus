@@ -2646,6 +2646,7 @@ namespace SurfaceGeometry {
                         for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                             iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
                             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iTmp2));
+                            assert(thisMaterial != nullptr);
                             if (thisMaterial->Group == Material::MaterialGroup::WindowBlind) {
                                 BlNum = thisMaterial->BlindDataPtr;
                                 state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
@@ -6270,6 +6271,7 @@ namespace SurfaceGeometry {
                 for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                     auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(LayerPtr));
+                    assert(thisMaterial != nullptr);
                     if (thisMaterial->Group == Material::MaterialGroup::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, format("{}: Interior Window or GlassDoor {} has a glass layer with", cRoutineName, SubSurfaceName));
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
@@ -16074,7 +16076,9 @@ namespace SurfaceGeometry {
             auto &thisConstLayer(state.dataConstruction->Construct(ConstrNum).LayerPoint(LayerNo));
             auto &revConstLayer(state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
             auto *thisMatLay(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstLayer)));
+            assert(thisMatLay != nullptr);
             auto *revMatLay(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(revConstLayer)));
+            assert(revMatLay != nullptr);
             if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
                 (thisMatLay->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
                 (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||  // to have certain properties flipped from front to back

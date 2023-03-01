@@ -544,6 +544,7 @@ namespace EcoRoofManager {
     {
         auto const *thisMat =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+        assert(thisMat != nullptr);
         auto &thisEcoRoof = state.dataEcoRoofMgr;
 
         thisEcoRoof->EcoRoofbeginFlag = false;
@@ -707,6 +708,7 @@ namespace EcoRoofManager {
 
         auto const *thisMat =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+        assert(thisMat != nullptr);
         auto &thisEcoRoof = state.dataEcoRoofMgr;
         auto &thisSurf = state.dataSurface->Surface(SurfNum);
 
@@ -827,6 +829,7 @@ namespace EcoRoofManager {
 
         auto *thisMaterial =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+        assert(thisMat != nullptr);
         if (state.dataEcoRoofMgr->UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE

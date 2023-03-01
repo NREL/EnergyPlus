@@ -2928,6 +2928,7 @@ namespace WindowComplexManager {
                 GasPointer = thisMaterial->GasPointer;
 
                 auto const *thisMaterialGas = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(GasPointer));
+                assert(thisMaterialGas != nullptr);
                 nmix(IGap + 1) = thisMaterialGas->NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
                     frct(IMix, IGap + 1) = thisMaterialGas->GasFract(IMix);

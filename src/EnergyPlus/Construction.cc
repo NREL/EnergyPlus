@@ -215,6 +215,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
         // Obtain thermal properties from the Material derived type
 
         auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
+        assert(thisMaterial != nullptr);
 
         dl(Layer) = thisMaterial->Thickness;
         rk(Layer) = thisMaterial->Conductivity;

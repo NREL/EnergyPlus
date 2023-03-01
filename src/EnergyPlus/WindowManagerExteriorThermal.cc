@@ -707,6 +707,7 @@ namespace WindowManager {
         }
         if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
             const auto *material = dynamic_cast<Material::MaterialChild *>(getLayerMaterial(state, t_Index));
+            assert(material != nullptr);
             thickness = material->WinShadeToGlassDist;
         }
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);

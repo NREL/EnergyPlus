@@ -642,6 +642,7 @@ namespace HeatBalFiniteDiffManager {
 
                 CurrentLayer = thisConstruct.LayerPoint(Layer);
                 auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
+                assert(thisMaterial != nullptr);
 
                 thisConstructFD.Name(Layer) = thisMaterial->Name;
                 thisConstructFD.Thickness(Layer) = thisMaterial->Thickness;

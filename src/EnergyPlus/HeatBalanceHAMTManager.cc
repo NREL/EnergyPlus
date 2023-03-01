@@ -293,6 +293,7 @@ namespace HeatBalanceHAMTManager {
                 continue;
             }
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
                                  format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject1, cAlphaFieldNames(1), AlphaArray(1)));
@@ -328,6 +329,7 @@ namespace HeatBalanceHAMTManager {
                 continue;
             }
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
                                  format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject2, cAlphaFieldNames(1), AlphaArray(1)));
@@ -357,6 +359,7 @@ namespace HeatBalanceHAMTManager {
         // check the isotherm
         for (matid = 1; matid <= state.dataMaterial->TotMaterials; ++matid) {
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->niso > 0) {
                 // - First sort
                 for (jj = 1; jj <= thisMaterial->niso - 1; ++jj) {
@@ -421,6 +424,7 @@ namespace HeatBalanceHAMTManager {
                 continue;
             }
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
                                  format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject3, cAlphaFieldNames(1), AlphaArray(1)));
@@ -466,6 +470,7 @@ namespace HeatBalanceHAMTManager {
                 continue;
             }
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
                                  format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject4, cAlphaFieldNames(1), AlphaArray(1)));
@@ -510,6 +515,7 @@ namespace HeatBalanceHAMTManager {
                 continue;
             }
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
                                  format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject5, cAlphaFieldNames(1), AlphaArray(1)));
@@ -557,6 +563,7 @@ namespace HeatBalanceHAMTManager {
                 continue;
             }
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->ROnly) {
                 ShowWarningError(state,
                                  format("{} {}=\"{}\" is defined as an R-only value material.", cHAMTObject6, cAlphaFieldNames(1), AlphaArray(1)));
@@ -679,6 +686,7 @@ namespace HeatBalanceHAMTManager {
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
                 matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
                 auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(matid));
+                assert(thisMaterial != nullptr);
                 if (thisMaterial->ROnly) {
                     ShowSevereError(state,
                                     format("{}Construction={} cannot contain R-only value materials.",

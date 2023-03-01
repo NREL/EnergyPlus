@@ -534,6 +534,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             MaterNum = thisConstruct.LayerPoint(Layer);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
             auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->SolarDiffusing && TotShadeLayers > 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("CheckAndSetConstructionProperties: Window construction={}", thisConstruct.Name));
@@ -549,6 +550,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 MaterNum = thisConstruct.LayerPoint(Layer);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
                 auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+                assert(thisMaterial != nullptr);
                 if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
                     ++GlassLayNum;
                     if (GlassLayNum < TotGlassLayers && thisMaterial->SolarDiffusing) {
@@ -618,6 +620,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                     LayNumSh = 2 * TotGlassLayers - 1;
                     MatSh = thisConstruct.LayerPoint(LayNumSh);
                     auto const *thisMaterialSh = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatSh));
+                    assert(thisMaterialSh != nullptr);
                     // For double pane, shade/blind must be layer #3.
                     // For triple pane, it must be layer #5 (i.e., between two inner panes).
                     if (thisMaterialSh->Group != Material::MaterialGroup::Shade && thisMaterialSh->Group != Material::MaterialGroup::WindowBlind)
