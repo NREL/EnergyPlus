@@ -4589,7 +4589,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
             ElecCoolingPower = TotCap * EIR * RuntimeFraction;
         }
         // now see if coil is running dry
-        PartLoadOutAirEnth = EvapInletEnthalpy - (TotCap * PartLoadRatio) / EvapAirMassFlow;
+        PartLoadOutAirEnth = EvapInletEnthalpy - (TotCap * PLR) / EvapAirMassFlow;
         PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
         if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
             CoilMightBeDry = true;
