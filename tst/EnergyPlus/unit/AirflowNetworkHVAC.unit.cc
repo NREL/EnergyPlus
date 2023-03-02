@@ -5960,7 +5960,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataEnvrn->WindSpeed = 4.9;
     state->dataEnvrn->WindDir = 270.0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 0.1;
 
     for (int i = 1; i <= 50; ++i) {
         state->afn->AirflowNetworkNodeSimu(i).TZ = 23.0;
