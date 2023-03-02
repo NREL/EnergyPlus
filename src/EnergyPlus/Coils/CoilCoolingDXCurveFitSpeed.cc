@@ -493,15 +493,9 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
         hDelta = TotCap / AirMassFlow;
 
         if (indexSHRFT > 0 && indexSHRFFF > 0) {
-            Real64 SHRTempModFrac = 1.0;
-            if (indexSHRFT > 0) {
-                SHRTempModFrac = max(Curve::CurveValue(state, indexSHRFT, inletWetBulb, inletNode.Temp), 0.0);
-            }
+            Real64 SHRTempModFrac = max(Curve::CurveValue(state, indexSHRFT, inletWetBulb, inletNode.Temp), 0.0);
 
-            Real64 SHRFlowModFrac = 1.0;
-            if (indexSHRFFF > 0) {
-                SHRFlowModFrac = max(Curve::CurveValue(state, indexSHRFFF, AirFF), 0.0);
-            }
+            Real64 SHRFlowModFrac = max(Curve::CurveValue(state, indexSHRFFF, AirFF), 0.0);
 
             SHR = this->grossRatedSHR * SHRTempModFrac * SHRFlowModFrac;
             SHR = max(min(SHR, 1.0), 0.0);
