@@ -177,17 +177,16 @@ namespace WindowManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(Material::MaterialBase const &t_MaterialPropertiesBase)
+    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(Material::MaterialChild const &t_MaterialProperties)
     {
-        auto const *t_MaterialProperties = dynamic_cast<const Material::MaterialChild *>(&t_MaterialPropertiesBase);
-        Real64 Tsol = t_MaterialProperties->Trans;
-        Real64 Rfsol = t_MaterialProperties->ReflectSolBeamFront;
-        Real64 Rbsol = t_MaterialProperties->ReflectSolBeamBack;
+        Real64 Tsol = t_MaterialProperties.Trans;
+        Real64 Rfsol = t_MaterialProperties.ReflectSolBeamFront;
+        Real64 Rbsol = t_MaterialProperties.ReflectSolBeamBack;
         std::shared_ptr<CMaterial> aSolMat = std::make_shared<CMaterialSingleBand>(Tsol, Tsol, Rfsol, Rbsol, 0.3, 2.5);
 
-        Real64 Tvis = t_MaterialProperties->TransVis;
-        Real64 Rfvis = t_MaterialProperties->ReflectVisBeamFront;
-        Real64 Rbvis = t_MaterialProperties->ReflectVisBeamBack;
+        Real64 Tvis = t_MaterialProperties.TransVis;
+        Real64 Rfvis = t_MaterialProperties.ReflectVisBeamFront;
+        Real64 Rbvis = t_MaterialProperties.ReflectVisBeamBack;
         std::shared_ptr<CMaterial> aVisMat = std::make_shared<CMaterialSingleBand>(Tvis, Tvis, Rfvis, Rbvis, 0.38, 0.78);
 
         CMaterialDualBand aMat = CMaterialDualBand(aVisMat, aSolMat, 0.49);
