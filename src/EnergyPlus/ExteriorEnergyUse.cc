@@ -113,7 +113,7 @@ namespace ExteriorEnergyUse {
         using ScheduleManager::GetScheduleName;
         using namespace OutputReportPredefined;
         // SUBROUTINE PARAMETER DEFINITIONS:
-        auto constexpr RoutineName("GetExteriorEnergyUseInput: ");
+        std::string_view constexpr RoutineName("GetExteriorEnergyUseInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                // Item to be "gotten"

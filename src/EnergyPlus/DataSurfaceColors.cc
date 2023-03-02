@@ -129,7 +129,7 @@ void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, std
     // the alphas and numerics required to process the Report:SurfaceColorScheme object.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
+    constexpr std::string_view CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
     state.dataSurfColor->DXFcolorno = DataSurfaceColors::defaultcolorno;
 

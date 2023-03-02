@@ -813,7 +813,6 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger events.
 
-    auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
     using FluidProperties::GetDensityGlycol;
     using PlantUtilities::ScanPlantLoopsForNodeNum;
@@ -844,7 +843,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         InitControllerOneTimeFlag = false;
     }
 
-    if (!state.dataGlobal->SysSizingCalc && InitControllerSetPointCheckFlag && DoSetPointTest) {
+    if (!state.dataGlobal->SysSizingCalc && InitControllerSetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
         // check for missing setpoints
         for (int ControllerIndex = 1; ControllerIndex <= NumControllers; ++ControllerIndex) {
             int SensedNode = ControllerProps(ControllerIndex).SensedNode;
@@ -2059,7 +2058,7 @@ void DumpAirLoopStatistics(EnergyPlusData &state)
     }
 
     InputOutputFilePath StatisticsFilePath{"statistics.HVACControllers.csv"};
-    auto statisticsFile = StatisticsFilePath.open(state, "DumpAirLoopStatistics");
+    auto statisticsFile = StatisticsFilePath.open(state, "DumpAirLoopStatistics"); // (THIS_AUTO_OK)
 
     // note that the AirLoopStats object does not seem to be initialized when this code
     // is executed and it causes a crash here
@@ -2197,7 +2196,7 @@ void SetupAirLoopControllersTracer(EnergyPlusData &state, int const AirLoopNum)
     // and writes header row with titles.
 
     // Open main controller trace file for each air loop
-    const auto TraceFilePath = "controller." + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".csv";
+    const std::string TraceFilePath = fmt::format("controller.{}.csv", state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
 
     auto &AirLoopStats(state.dataHVACControllers->AirLoopStats(AirLoopNum));
 
@@ -2358,7 +2357,7 @@ void SetupIndividualControllerTracer(EnergyPlusData &state, int const ControlNum
 
     auto &controllerProps(state.dataHVACControllers->ControllerProps(ControlNum));
 
-    const auto TraceFilePath = "controller." + controllerProps.ControllerName + ".csv";
+    const std::string TraceFilePath = fmt::format("controller.{}.csv", controllerProps.ControllerName);
     auto &TraceFile = *controllerProps.TraceFile;
     TraceFile.filePath = TraceFilePath;
     TraceFile.open();

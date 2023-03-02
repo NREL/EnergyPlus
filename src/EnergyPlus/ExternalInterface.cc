@@ -108,11 +108,6 @@ void ExternalInterfaceExchangeVariables(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Exchanges variables between EnergyPlus and the BCVTB socket.
 
-    // Using/Aliasing
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string errorMessage; // Error message
-    int retValErrMsg;
-
     if (state.dataExternalInterface->GetInputFlag) {
         GetExternalInterfaceInput(state);
         state.dataExternalInterface->GetInputFlag = false;
@@ -129,8 +124,10 @@ void ExternalInterfaceExchangeVariables(EnergyPlusData &state)
     }
 
     if (state.dataExternalInterface->haveExternalInterfaceFMUImport) {
-        char *errorMessagePtr(&errorMessage[0]);
-        retValErrMsg = checkOperatingSystem(errorMessagePtr);
+        std::string errorMessage; // Error message
+        errorMessage.reserve(100);
+        char *errorMessagePtr(errorMessage.data());
+        const int retValErrMsg = checkOperatingSystem(errorMessagePtr);
         if (retValErrMsg != 0) {
             ShowSevereError(state, format("ExternalInterface/ExternalInterfaceExchangeVariables:{}", errorMessagePtr));
             state.dataExternalInterface->ErrorsFound = true;
@@ -464,9 +461,9 @@ void InitExternalInterface(EnergyPlusData &state)
         if (FileSystem::fileExists(simCfgFilNam)) {
 
             // preprocess the strings into char vectors before making the library call
-            auto xmlStrOutTypArr(getCharArrayFromString(xmlStrOutTyp));
-            auto xmlStrOutArr(getCharArrayFromString(xmlStrOut));
-            auto xmlStrInArr(getCharArrayFromString(xmlStrIn));
+            std::vector<char> xmlStrOutTypArr(getCharArrayFromString(xmlStrOutTyp));
+            std::vector<char> xmlStrOutArr(getCharArrayFromString(xmlStrOut));
+            std::vector<char> xmlStrInArr(getCharArrayFromString(xmlStrIn));
 
             // now make the library call
             if (state.dataExternalInterface->haveExternalInterfaceBCVTB) {
@@ -882,7 +879,7 @@ void InstantiateInitializeFMUImport(EnergyPlusData &state)
     // Instantiate FMUs
     for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
         for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
-            auto folderStr = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string();
+            std::string const &folderStr = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string();
             state.dataExternalInterface->FMU(i).Instance(j).fmicomponent =
                 fmiEPlusInstantiateSlave((char *)folderStr.c_str(),
                                          &state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder,
@@ -1219,8 +1216,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 // unpack fmus
                 // preprocess arguments for library call
                 {
-                    auto fullFileNameArr(getCharArrayFromString(fullFileName(i)));
-                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
+                    std::vector<char> fullFileNameArr(getCharArrayFromString(fullFileName(i)));
+                    std::vector<char> workingFolderArr(
+                        getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
                     int lenFileName(len(fullFileName(i)));
 
                     // make the library call
@@ -1239,7 +1237,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 {
                     // determine modelID and modelGUID of all FMU instances
                     // preprocess arguments for library call
-                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
+                    std::vector<char> workingFolderArr(
+                        getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
 
                     // make the library call
                     state.dataExternalInterface->FMU(i).Instance(j).Index =
@@ -1265,13 +1264,14 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 {
                     // get the path to the binaries
                     // preprocess args for library call
-                    auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
+                    std::vector<char> workingFolderArr(
+                        getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
                     // Reserve some space in the string, becasue addLibPathCurrentWorkflowFolder doesn't allocate memory for the
                     // workingFolderWithLibArr Note: you can't call str.resize(str.length() + 91) because the conversion to std::vector<char> will
                     // find the null terminator and so it will have no effect
                     std::string reservedString = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string() +
                                                  "                                                                                           ";
-                    auto workingFolderWithLibArr(getCharArrayFromString(reservedString));
+                    std::vector<char> workingFolderWithLibArr(getCharArrayFromString(reservedString));
 
                     // make the library call
                     retValfmiPathLib = addLibPathCurrentWorkingFolder(&workingFolderWithLibArr[0],
@@ -1303,8 +1303,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 {
                     // determine the FMI version
                     // preprocess args for library call
-                    auto workingFolderWithLibArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib.string()));
-                    auto VersionNumArr(
+                    std::vector<char> workingFolderWithLibArr(
+                        getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib.string()));
+                    std::vector<char> VersionNumArr(
                         getCharArrayFromString("    ")); // the version should only be 3 characters long, since for now we only handle "1.0"
 
                     // make the library call
@@ -1399,7 +1400,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         }
 
                         // preprocess args for library call
-                        auto inputVarNameArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable(k).Name));
+                        std::vector<char> inputVarNameArr(
+                            getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable(k).Name));
                         int inputVarNameLen(len(state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable(k).Name));
 
                         // make the library call
@@ -1555,7 +1557,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         // get the value reference by using the FMU name and the variable name.
 
                         // preprocess the arguments before the following library call
-                        auto NameCharArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule(k).Name));
+                        std::vector<char> NameCharArr(
+                            getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule(k).Name));
                         int lengthVar(len(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule(k).Name));
 
                         // make the library call
@@ -1666,7 +1669,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableVariable(k).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                         // get the value reference by using the FMU name and the variable name.
-                        auto NameCharArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).Name));
+                        std::vector<char> NameCharArr(
+                            getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).Name));
                         int tempLength(len(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).Name));
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).ValueReference =
                             getValueReferenceByNameFMUOutputVariables(
@@ -1777,7 +1781,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableActuator(k).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                         // get the value reference by using the FMU name and the variable name.
-                        auto tempNameArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).Name));
+                        std::vector<char> tempNameArr(
+                            getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).Name));
                         int tempLength(len(state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).Name));
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).ValueReference =
                             getValueReferenceByNameFMUOutputVariables(

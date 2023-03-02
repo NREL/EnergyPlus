@@ -231,7 +231,7 @@ namespace BaseboardRadiator {
         int constexpr iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to water baseboard Radiator system electric heating capacity per floor area sizing
         int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
+            3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autosized heating capacity
 
         bool ErrorsFound(false); // If errors detected in input
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;

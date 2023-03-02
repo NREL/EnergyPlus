@@ -302,9 +302,8 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
     std::string ChillerName;
     bool Okay;
     bool Get_ErrorsFound(false);
-    auto cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
-    cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
+    std::string_view cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
     int NumExhaustAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (NumExhaustAbsorbers <= 0) {
@@ -335,11 +334,12 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
 
         // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
-        VerifyUniqueChillerName(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
+        VerifyUniqueChillerName(
+            state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), Get_ErrorsFound, fmt::format("{} Name", cCurrentModuleObject));
 
         auto &thisChiller = state.dataChillerExhaustAbsorption->ExhaustAbsorber(AbsorberNum);
         thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-        ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
+        ChillerName = fmt::format("{} Named {}", cCurrentModuleObject, thisChiller.Name);
 
         // Assign capacities
         thisChiller.NomCoolingCap = state.dataIPShortCut->rNumericArgs(1);

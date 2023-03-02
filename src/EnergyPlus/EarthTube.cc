@@ -354,7 +354,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             ErrorsFound = true;
         }
 
-        auto soilType = static_cast<SoilType>(getEnumerationValue(soilTypeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+        SoilType soilType = static_cast<SoilType>(getEnumerationValue(soilTypeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
         constexpr std::array<Real64, static_cast<int>(SoilType::Num)> thermalDiffusivity = {0.0781056, 0.055728, 0.0445824, 0.024192};
         constexpr std::array<Real64, static_cast<int>(SoilType::Num)> thermalConductivity = {2.42, 1.3, 0.865, 0.346};
         if (soilType == SoilType::Invalid) {
