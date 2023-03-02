@@ -754,13 +754,6 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test1)
     For: AllDays,            !- Field 2
     Until: 24:00,22.0;       !- Field 3
 
-  ! Schedule:Compact,
-  !  Water Equipment Temp Sched,  !- Name
-  !  Temperature,             !- Schedule Type Limits Name
-  !  Through: 12/31,          !- Field 1
-  !  For: AllDays,            !- Field 2
-  !  Until: 24:00,43.3;       !- Field 3
-
   Schedule:Compact,
     SWHSys1 Water Heater Setpoint Temperature Schedule Name,  !- Name
     Temperature,             !- Schedule Type Limits Name
@@ -851,7 +844,7 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test1)
     ,                        !- End-Use Subcategory
     1.0e-005,                !- Peak Flow Rate {m3/s}
     ,                        !- Flow Rate Fraction Schedule Name
-    , ! Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Core_ZN,                 !- Zone Name
@@ -861,9 +854,9 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -891,7 +884,7 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test1)
     thisWaterConnections.InitConnections(*state);
     thisWaterEquipment.WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
-    // configuration allows hot water mixing. A target temp schedule exists with either a hot temp schedule or a connnections object
+    // The target temp will default to the hot water temperature if there exists either a hot temp schedule or a water use connnections object.
     EXPECT_TRUE(thisWaterEquipment.allowHotControl);
     EXPECT_FALSE(thisWaterEquipment.TargetTempSchedule);
     EXPECT_NEAR(thisWaterEquipment.TargetTemp, 45, 1e-5);
@@ -1149,13 +1142,6 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test2)
     For: AllDays,            !- Field 2
     Until: 24:00,22.0;       !- Field 3
 
-  ! Schedule:Compact,
-  !  Water Equipment Temp Sched,  !- Name
-  !  Temperature,             !- Schedule Type Limits Name
-  !  Through: 12/31,          !- Field 1
-  !  For: AllDays,            !- Field 2
-  !  Until: 24:00,43.3;       !- Field 3
-
   Schedule:Compact,
     SWHSys1 Water Heater Setpoint Temperature Schedule Name,  !- Name
     Temperature,             !- Schedule Type Limits Name
@@ -1228,25 +1214,12 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test2)
     Intermittent,            !- Pump Control Type
     ;                        !- Pump Flow Rate Schedule Name
 
-  ! WaterUse:Connections,
-  !   Core_ZN Water Equipment, !- Name
-  !   Core_ZN Water Equipment Water Inlet Node,  !- Inlet Node Name
-  !   Core_ZN Water Equipment Water Outlet Node,  !- Outlet Node Name
-  !  ,                        !- Supply Water Storage Tank Name
-  !  ,                        !- Reclamation Water Storage Tank Name
-  !  ,                        !- Hot Water Supply Temperature Schedule Name
-  !  ,                        !- Cold Water Supply Temperature Schedule Name
-  !  ,                        !- Drain Water Heat Exchanger Type
-  !  ,                        !- Drain Water Heat Exchanger Destination
-  !  ,                        !- Drain Water Heat Exchanger U-Factor Times Area {W/K}
-  !  Core_ZN Water Equipment; !- Water Use Equipment 1 Name
-
   WaterUse:Equipment,
     Core_ZN Water Equipment, !- Name
     ,                        !- End-Use Subcategory
     1.0e-005,                !- Peak Flow Rate {m3/s}
     ,                        !- Flow Rate Fraction Schedule Name
-    , ! Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ,                        !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Core_ZN,                 !- Zone Name
@@ -1256,9 +1229,9 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -1278,15 +1251,11 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test2)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->WaterMainsTemp = 15;
 
-    // Set plant loop temperature to 45C
-    // state->dataLoopNodes->Node(1).Temp = 45;
     Real64 WaterEquipNum = 1;
-    // auto &thisWaterConnections = state->dataWaterUse->WaterConnections(WaterConnNum);
     auto &thisWaterEquipment = state->dataWaterUse->WaterEquipment(WaterEquipNum);
-    // thisWaterConnections.InitConnections(*state);
     thisWaterEquipment.WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
-    // configuration allows hot water mixing. A target temp schedule exists with either a hot temp schedule or a connnections object
+    // A target temp will default to cold water temperature is there is neither a hot temp schedule nor a water use connnections object.
     EXPECT_FALSE(thisWaterEquipment.allowHotControl);
     EXPECT_FALSE(thisWaterEquipment.TargetTempSchedule);
     EXPECT_NEAR(thisWaterEquipment.TargetTemp, 15, 1e-5);
