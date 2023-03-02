@@ -2384,7 +2384,7 @@ OutputControl:Files,
 
 \subsection{OutputControl:Timestamp}\label{outputcontrol_timestamp}
 
-Controls the format of the timestamp used in the native CSV and JSON outputs. The default timestamp is formated
+Controls the format of the timestamp used in the native CSV and JSON outputs. The default timestamp is formatted
 as ``$MM$/$DD$ $hh$:$mm$:$ss$'', where
 
 \begin{wherelist}
@@ -2436,9 +2436,9 @@ interval (``\textbf{No}''). The default is ``\textbf{No}''.
 
 \subsubsection{Example}\label{example-for-timestamp}
 
-An example IDF input object that uses the ISO 8601 format and places the timestamp at beginning of the interval.
+An example IDF input object that uses the ISO 8601 format and places the timestamp at beginning of the interval is shown below.
 \begin{lstlisting}
-Output:SQLite,
+OutputControl:Timestamp,
    Yes,           !- ISO 8601 Format
    Yes;           !- Timestamp at Beginning of Interval
 \end{lstlisting}
