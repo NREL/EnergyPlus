@@ -14655,14 +14655,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
     // PURPOSE OF THIS SUBROUTINE:
     // Fills some of the report variables for the DX coils
 
-    // Using/Aliasing
-    using Psychrometrics::RhoH2O;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RhoWater;
-    Real64 Tavg;
-    Real64 SpecHumOut;
-    Real64 SpecHumIn;
     Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
 
     auto &dxCoil = state.dataDXCoils->DXCoil(DXCoilNum);
@@ -14753,13 +14746,10 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
         // calculate and report condensation rates  (how much water extracted from the air stream)
         // water flow of water in m3/s for water system interactions
         //  put here to catch all types of DX coils
-        Tavg = (dxCoil.InletAirTemp - dxCoil.OutletAirTemp) / 2.0;
-        RhoWater = RhoH2O(Tavg);
-        // CR9155 Remove specific humidity calculations
-        SpecHumIn = dxCoil.InletAirHumRat;
-        SpecHumOut = dxCoil.OutletAirHumRat;
+        Real64 Tavg = (dxCoil.InletAirTemp - dxCoil.OutletAirTemp) / 2.0;
         //  mdot * del HumRat / rho water
-        dxCoil.CondensateVdot = max(0.0, (dxCoil.InletAirMassFlowRate * (SpecHumIn - SpecHumOut) / RhoWater));
+        dxCoil.CondensateVdot =
+            max(0.0, (dxCoil.InletAirMassFlowRate * (dxCoil.InletAirHumRat - dxCoil.OutletAirHumRat) / Psychrometrics::RhoH2O(Tavg)));
         dxCoil.CondensateVol = dxCoil.CondensateVdot * ReportingConstant;
 
         state.dataWaterData->WaterStorage(dxCoil.CondensateTankID).VdotAvailSupply(dxCoil.CondensateTankSupplyARRID) = dxCoil.CondensateVdot;
