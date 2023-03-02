@@ -220,6 +220,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         state.dataMaterial->TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
     }
 
+    // yujie: This looks kind of silly, but we need it to keep the Materials array in IDF order.
     for (int i = 1; i <= state.dataMaterial->TotMaterials; i++) {
         MaterialBase *p = new MaterialBase;
         state.dataMaterial->Material.push_back(p);
