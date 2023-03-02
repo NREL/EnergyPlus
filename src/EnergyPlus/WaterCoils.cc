@@ -5196,7 +5196,7 @@ void ReportWaterCoil(EnergyPlusData &state, int const CoilNum)
         // calculate and report condensation rates  (how much water extracted from the air stream)
         // water volumetric flow of water in m3/s for water system interactions
         //  put here to catch all types of DX coils
-        Tavg = (state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp - state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp) / 2.0;
+        Tavg = (state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp + state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp) / 2.0;
 
         RhoWater = GetDensityGlycol(state,
                                     state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum).FluidName,

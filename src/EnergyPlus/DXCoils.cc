@@ -14768,7 +14768,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
         // calculate and report condensation rates  (how much water extracted from the air stream)
         // water flow of water in m3/s for water system interactions
         //  put here to catch all types of DX coils
-        Tavg = (state.dataDXCoils->DXCoil(DXCoilNum).InletAirTemp - state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp) / 2.0;
+        Tavg = (state.dataDXCoils->DXCoil(DXCoilNum).InletAirTemp + state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp) / 2.0;
         RhoWater = RhoH2O(Tavg);
         // CR9155 Remove specific humidity calculations
         SpecHumIn = state.dataDXCoils->DXCoil(DXCoilNum).InletAirHumRat;
