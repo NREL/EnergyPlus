@@ -272,6 +272,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
         MatNum = thisConstruct.LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
+        assert(thisMaterial != nullptr);
         if (thisMaterial->EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {
             EMPDzone(state.dataSurface->Surface(SurfNum).Zone) = true;
         } else {
@@ -774,6 +775,7 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
+        assert(thisMaterial != nullptr);
         if (thisMaterial->EMPDMaterialProps) {
             static constexpr std::string_view Format_700(
                 " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");

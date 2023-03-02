@@ -746,6 +746,7 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
         int materNum = thisConstruct.LayerPoint(1);
         if (materNum == 0) continue; // error finding material number
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(materNum));
+        assert(thisMaterial != nullptr);
         if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
             // check for dynamic coating defined on interior surface
             if (thisSurface.ExtBoundCond != ExternalEnvironment) {

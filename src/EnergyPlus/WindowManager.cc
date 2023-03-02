@@ -795,6 +795,7 @@ namespace WindowManager {
                 state.dataWindowManager->LayerNum[IGlass - 1] = LayNum;
                 LayPtr = thisConstruct.LayerPoint(LayNum);
                 auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
+                assert(thisMaterial != nullptr);
 
                 SpecDataNum = thisMaterial->GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
@@ -853,6 +854,7 @@ namespace WindowManager {
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     LayPtr = thisConstruct.LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
                     auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
+                    assert(thisMaterial != nullptr);
                     if (!thisMaterial->GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass - 1]; ++ILam) {
 
@@ -1693,6 +1695,7 @@ namespace WindowManager {
                 ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
                 auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
+                assert(thisMaterial != nullptr);
                 if (thisMaterial->SolarDiffusing) {
                     if (!state.dataSurface->Surface(SurfNum).HasShadeControl) {
                         state.dataSurface->SurfWinSolarDiffusing(SurfNum) = true;
@@ -2352,6 +2355,7 @@ namespace WindowManager {
                 LayPtr = state.dataConstruction->Construct(IConst).LayerPoint(Lay);
 
                 auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
+                assert(thisMaterial != nullptr);
                 if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
                     (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
                     ++IGlass;
@@ -6701,6 +6705,7 @@ namespace WindowManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
             auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
+            assert(thisMaterial != nullptr);
             if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
                 (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
@@ -7402,6 +7407,7 @@ namespace WindowManager {
                     for (i = 1; i <= state.dataConstruction->Construct(ThisNum).TotLayers; ++i) {
                         Layer = state.dataConstruction->Construct(ThisNum).LayerPoint(i);
                         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(Layer));
+                        assert(thisMaterial != nullptr);
                         switch (thisMaterial->Group) {
                         case Material::MaterialGroup::WindowGas: {
                             static constexpr std::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");

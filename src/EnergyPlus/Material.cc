@@ -1067,8 +1067,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::GlassEquivalentLayer;
 
         // Load the material derived type from the input data.
@@ -1159,8 +1159,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::WindowGas;
         thisMaterial->gasTypes(1) = GasType::Invalid;
         thisMaterial->NumberOfGasesInMixture = 1;
@@ -1266,8 +1266,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::GapEquivalentLayer;
         thisMaterial->gasTypes(1) = GasType::Invalid;
         thisMaterial->NumberOfGasesInMixture = 1;
@@ -1528,8 +1528,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::ShadeEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
@@ -1621,8 +1621,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::DrapeEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
@@ -1895,8 +1895,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::ScreenEquivalentLayer;
 
         // Load the material derived type from the input data.
@@ -2330,8 +2330,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::BlindEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
@@ -2633,6 +2633,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 if (iMat != 0) {
                     // TC glazing
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iMat));
+                    assert(thisMaterial != nullptr);
                     thisMaterial->SpecTemp = state.dataIPShortCut->rNumericArgs(iTC);
                     thisMaterial->TCParent = Loop;
                     state.dataHeatBal->TCGlazings(Loop).LayerPoint(iTC) = iMat;
@@ -2684,8 +2685,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             continue;
         }
         ++MaterNum;
-        state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        auto *thisMaterial = new Material::MaterialChild;
+        state.dataMaterial->Material(MaterNum) = thisMaterial;
         thisMaterial->Group = MaterialGroup::WindowSimpleGlazing;
         thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
         thisMaterial->SimpleWindowUfactor = state.dataIPShortCut->rNumericArgs(1);
@@ -2723,6 +2724,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
 
             auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            assert(thisMaterial != nullptr);
             switch (thisMaterial->Group) {
             case MaterialGroup::Air: {
                 print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
@@ -2751,6 +2753,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->Group != MaterialGroup::RegularMaterial) continue;
             SetupEMSActuator(state,
                              "Material",
@@ -2822,6 +2825,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
             return;
         }
         auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+        assert(thisMaterial != nullptr);
 
         if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
             ShowSevereError(

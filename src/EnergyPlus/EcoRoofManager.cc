@@ -224,6 +224,7 @@ namespace EcoRoofManager {
 
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)));
+        assert(thisMaterial != nullptr);
         RoughSurf = thisMaterial->Roughness;
         AbsThermSurf = thisMaterial->AbsorpThermal;
         HMovInsul = 0.0;

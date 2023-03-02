@@ -840,6 +840,7 @@ namespace HeatBalanceHAMTManager {
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
                 matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
                 auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(matid));
+                assert(thisMaterial != nullptr);
 
                 for (did = 1; did <= thisMaterial->divs; ++did) {
                     ++cid;
@@ -1128,6 +1129,7 @@ namespace HeatBalanceHAMTManager {
                 matid = cells(cid).matid;
 
                 auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(matid));
+                assert(thisMaterial != nullptr);
                 cells(cid).temp = thisMaterial->itemp;
                 cells(cid).tempp1 = thisMaterial->itemp;
                 cells(cid).tempp2 = thisMaterial->itemp;
@@ -1242,11 +1244,12 @@ namespace HeatBalanceHAMTManager {
 
             for (cid = state.dataHeatBalHAMTMgr->firstcell(sid); cid <= state.dataHeatBalHAMTMgr->lastcell(sid); ++cid) {
                 matid = cells(cid).matid;
-                auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(matid));
                 cells(cid).vp = RHtoVP(state, cells(cid).rh, cells(cid).temp);
                 cells(cid).vpp1 = RHtoVP(state, cells(cid).rhp1, cells(cid).tempp1);
                 cells(cid).vpsat = PsyPsatFnTemp(state, cells(cid).tempp1);
                 if (matid > 0) {
+                    auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(matid));
+                    assert(thisMaterial != nullptr);
                     interp(thisMaterial->niso, thisMaterial->isorh, thisMaterial->isodata, cells(cid).rhp1, cells(cid).water, cells(cid).dwdphi);
                     if (state.dataEnvrn->IsRain && state.dataHeatBalHAMTMgr->rainswitch) {
                         interp(thisMaterial->nsuc, thisMaterial->sucwater, thisMaterial->sucdata, cells(cid).water, cells(cid).dw);
