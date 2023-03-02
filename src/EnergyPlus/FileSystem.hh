@@ -55,6 +55,7 @@
 #include <fmt/ranges.h>
 #include <nlohmann/json.hpp>
 #include <string>
+#ifndef __cppcheck__
 #if __has_include(<filesystem>)
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -62,7 +63,9 @@ namespace fs = std::filesystem;
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
+// cppcheck-suppress preprocessorErrorDirective
 #error "no filesystem support"
+#endif
 #endif
 
 #include <EnergyPlus/EnergyPlus.hh>

@@ -1034,6 +1034,7 @@ namespace Psychrometrics {
 
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        // cppcheck-suppress invalidPointerCast
         Int64 Tdb_tag(*reinterpret_cast<Int64 const *>(&T) >> Grid_Shift);
         DISABLE_WARNING_POP
         Int64 const hash(Tdb_tag & psatcache_mask);
@@ -1044,6 +1045,7 @@ namespace Psychrometrics {
             Tdb_tag <<= Grid_Shift;
             DISABLE_WARNING_PUSH
             DISABLE_WARNING_STRICT_ALIASING
+            // cppcheck-suppress invalidPointerCast
             Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
             DISABLE_WARNING_POP
             cPsat.Psat = PsyPsatFnTemp_raw(state, Tdb_tag_r, CalledFrom);
@@ -1091,7 +1093,9 @@ namespace Psychrometrics {
 #endif
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        // cppcheck-suppress invalidPointerCast
         Int64 H_tag = *reinterpret_cast<Int64 const *>(&H) >> Grid_Shift;
+        // cppcheck-suppress invalidPointerCast
         Int64 Pb_tag = *reinterpret_cast<Int64 const *>(&Pb) >> Grid_Shift;
         DISABLE_WARNING_POP
         Int64 hash = (H_tag ^ Pb_tag) & Int64(tsat_hbp_cache_size - 1);
@@ -1491,6 +1495,7 @@ namespace Psychrometrics {
         std::uint64_t Grid_Shift = 64 - 12 - state.dataPsychCache->tsatprecision_bits;
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        // cppcheck-suppress invalidPointerCast
         Int64 const Pb_tag(*reinterpret_cast<Int64 const *>(&Press) >> Grid_Shift);
         DISABLE_WARNING_POP
 

@@ -108,11 +108,6 @@ void ExternalInterfaceExchangeVariables(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Exchanges variables between EnergyPlus and the BCVTB socket.
 
-    // Using/Aliasing
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string errorMessage; // Error message
-    int retValErrMsg;
-
     if (state.dataExternalInterface->GetInputFlag) {
         GetExternalInterfaceInput(state);
         state.dataExternalInterface->GetInputFlag = false;
@@ -129,8 +124,10 @@ void ExternalInterfaceExchangeVariables(EnergyPlusData &state)
     }
 
     if (state.dataExternalInterface->haveExternalInterfaceFMUImport) {
-        char *errorMessagePtr(&errorMessage[0]);
-        retValErrMsg = checkOperatingSystem(errorMessagePtr);
+        std::string errorMessage; // Error message
+        errorMessage.reserve(100);
+        char *errorMessagePtr(errorMessage.data());
+        const int retValErrMsg = checkOperatingSystem(errorMessagePtr);
         if (retValErrMsg != 0) {
             ShowSevereError(state, format("ExternalInterface/ExternalInterfaceExchangeVariables:{}", errorMessagePtr));
             state.dataExternalInterface->ErrorsFound = true;
