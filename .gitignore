@@ -46,6 +46,8 @@ build
 /Build*/
 /debug*/
 /release?*/
+.cppcheck-build-dir
+cppcheck.txt
 
 # by default CLion uses cmake-build-debug as the build folder, so add that as well
 cmake-build-*

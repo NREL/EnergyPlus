@@ -802,3 +802,145 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoolingCoil)
     EXPECT_NEAR(RatedCoilTotCap * coilCapFunTempFac, c1->coilTotCapAtPeak, 0.000001);
     EXPECT_LT(RatedCoilTotCap, c1->coilTotCapAtPeak);
 }
+
+TEST_F(EnergyPlusFixture, ReportCoilSelection_4PipeFCU_ElecHeatingCoil)
+{
+    std::string coil1Name("ElecHeatCoil");          // user-defined name of the coil
+    std::string coil1Type("Coil:Heating:Electric"); // idf input object class name of coil
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+
+    int curSysNum = 0;
+    int curOASysNum = 0;
+    int curZoneEqNum = 1;
+    state->dataZoneEquip->ZoneEquipList.allocate(1);
+    auto &zoneEquipList = state->dataZoneEquip->ZoneEquipList(curZoneEqNum);
+
+    zoneEquipList.NumOfEquipTypes = 1;
+    zoneEquipList.EquipName.allocate(1);
+    zoneEquipList.EquipType.allocate(1);
+    zoneEquipList.EquipTypeEnum.allocate(1);
+    zoneEquipList.EquipName(1) = "Zone 1 FCU";
+    zoneEquipList.EquipType(1) = "ZoneHVAC:FourPipeFanCoil";
+    zoneEquipList.EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::FanCoil4Pipe;
+
+    Real64 totGrossCap = 6206.4;
+    Real64 sensGrossCap = 6206.4;
+    Real64 airVolFlowRate = 0.1385;
+    Real64 waterFlowRate = 0.0;
+
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
+        *state, coil1Name, coil1Type, totGrossCap, sensGrossCap, airVolFlowRate, waterFlowRate);
+    auto &c1 = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0];
+
+    EXPECT_EQ(totGrossCap, c1->coilTotCapFinal);
+    EXPECT_EQ(sensGrossCap, c1->coilSensCapFinal);
+    EXPECT_EQ(airVolFlowRate, c1->coilRefAirVolFlowFinal);
+    EXPECT_EQ(waterFlowRate, c1->coilRefWaterVolFlowFinal);
+
+    // set electric heating coil conditions
+    Real64 RatedCoilTotCap = 6206.5;
+    Real64 RatedCoilSensCap = 6206.5;
+    Real64 RatedAirMassFlow = 0.163;
+    Real64 RatedCoilInDb = 12.3785;
+    Real64 RatedCoilInHumRat = 0.00335406;
+    Real64 RatedCoilInWb = 6.02;
+    Real64 RatedCoilOutDb = 50.0;
+    Real64 RatedCoilOutHumRat = 0.004;
+    Real64 RatedCoilOutWb = -999.0;
+    Real64 RatedCoilOadbRef = -17.30;
+    Real64 RatedCoilOawbRef = -17.30;
+    Real64 MinOaFrac = 0.0;
+    Real64 RatedCoilBpFactor = 0.0;
+    Real64 RatedCoilEff = 0.80;
+    Real64 result_coilDesEntEnth = Psychrometrics::PsyHFnTdbW(RatedCoilInDb, RatedCoilInHumRat);
+    Real64 result_coilDesOutEnth = Psychrometrics::PsyHFnTdbW(RatedCoilOutDb, RatedCoilOutHumRat);
+    // set coil inlet/outlet conditions
+    state->dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(*state,
+                                                                                coil1Name,
+                                                                                coil1Type,
+                                                                                RatedCoilTotCap,
+                                                                                RatedCoilSensCap,
+                                                                                RatedAirMassFlow,
+                                                                                RatedCoilInDb,
+                                                                                RatedCoilInHumRat,
+                                                                                RatedCoilInWb,
+                                                                                RatedCoilOutDb,
+                                                                                RatedCoilOutHumRat,
+                                                                                RatedCoilOutWb,
+                                                                                RatedCoilOadbRef,
+                                                                                RatedCoilOawbRef,
+                                                                                RatedCoilBpFactor,
+                                                                                RatedCoilEff);
+    // check coil inlet/outlet conditions set correctly
+    EXPECT_EQ(RatedCoilInDb, c1->ratedCoilInDb);
+    EXPECT_EQ(RatedCoilInHumRat, c1->ratedCoilInHumRat);
+    EXPECT_NEAR(result_coilDesEntEnth, c1->ratedCoilInEnth, 0.1);
+    EXPECT_EQ(RatedCoilOutDb, c1->ratedCoilOutDb);
+    EXPECT_EQ(RatedCoilOutHumRat, c1->ratedCoilOutHumRat);
+    EXPECT_NEAR(result_coilDesOutEnth, c1->ratedCoilOutEnth, 0.1);
+
+    // test electric heating coil reporting
+    state->dataSize->ZoneEqSizing.allocate(1);
+    auto &zoneEqSizing = state->dataSize->ZoneEqSizing(curZoneEqNum);
+    state->dataSize->FinalZoneSizing.allocate(1);
+    auto &finalZoneSizing = state->dataSize->FinalZoneSizing(curZoneEqNum);
+    state->dataSize->ZoneEqFanCoil = true;
+    zoneEqSizing.OAVolFlow = 0.02830;
+    state->dataEnvrn->StdRhoAir = 1.1759;
+    MinOaFrac = zoneEqSizing.OAVolFlow * state->dataEnvrn->StdRhoAir / RatedAirMassFlow;
+    // set final zone sizing object inputs
+    finalZoneSizing.HeatDesDay = "Heat Design Day";
+    finalZoneSizing.DesHeatLoad = RatedCoilSensCap;
+    finalZoneSizing.OutTempAtHeatPeak = -17.30;
+    finalZoneSizing.OutHumRatAtHeatPeak = 0.00083893;
+    finalZoneSizing.ZoneRetTempAtHeatPeak = 20.0;
+    finalZoneSizing.ZoneHumRatAtHeatPeak = 0.007;
+    finalZoneSizing.ZoneTempAtHeatPeak = 20.0;
+    finalZoneSizing.HeatDesTemp = 50.0;
+    finalZoneSizing.HeatDesHumRat = 0.004;
+    finalZoneSizing.DesHeatOAFlowFrac = MinOaFrac;
+    finalZoneSizing.DesHeatMassFlow = RatedAirMassFlow;
+    // set additional function arguments
+    Real64 fanHeatGain = 0.0;
+    Real64 coilCapFunTempFac = 1.0;
+    Real64 DXFlowPerCapMinRatio = 0.00004;
+    Real64 DXFlowPerCapMaxRatio = 0.00006;
+    // calculate coil entering conditions
+    Real64 result_coilEntAirDryBulbTemp = MinOaFrac * finalZoneSizing.OutTempAtHeatPeak + (1.0 - MinOaFrac) * finalZoneSizing.ZoneTempAtHeatPeak;
+    Real64 result_coilEntAirHumRat = MinOaFrac * finalZoneSizing.OutHumRatAtHeatPeak + (1.0 - MinOaFrac) * finalZoneSizing.ZoneHumRatAtHeatPeak;
+    // calc sensible capacity
+    Real64 result_sensCapacity =
+        Psychrometrics::PsyCpAirFnW(finalZoneSizing.HeatDesHumRat) * RatedAirMassFlow * (finalZoneSizing.HeatDesTemp - result_coilEntAirDryBulbTemp);
+    // set coil entering and leaving condition to autosize
+    c1->coilDesEntTemp = -999.0;
+    c1->coilDesEntHumRat = -999.0;
+    c1->coilDesLvgTemp = -999.0;
+    c1->coilDesLvgHumRat = -999.0;
+    // check setCoilHeatingCapacity calculations and coil conditions are set correctly
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(*state,
+                                                                                coil1Name,
+                                                                                coil1Type,
+                                                                                RatedCoilTotCap,
+                                                                                false,
+                                                                                curSysNum,
+                                                                                curZoneEqNum,
+                                                                                curOASysNum,
+                                                                                fanHeatGain,
+                                                                                coilCapFunTempFac,
+                                                                                DXFlowPerCapMinRatio,
+                                                                                DXFlowPerCapMaxRatio);
+    // check design outlet conditions
+    EXPECT_EQ(finalZoneSizing.HeatDesTemp, c1->coilDesLvgTemp);
+    EXPECT_EQ(finalZoneSizing.HeatDesHumRat, c1->coilDesLvgHumRat);
+    // check design coil entering air conditions
+    EXPECT_NEAR(result_coilEntAirDryBulbTemp, c1->coilDesEntTemp, 0.0001);
+    EXPECT_NEAR(result_coilEntAirHumRat, c1->coilDesEntHumRat, 0.000001);
+    // check total and sensible heating capacity
+    EXPECT_EQ(6206.5, RatedCoilTotCap);
+    EXPECT_NEAR(RatedCoilTotCap, c1->coilTotCapAtPeak, 0.1);
+    EXPECT_NEAR(RatedCoilTotCap, c1->coilSensCapAtPeak, 0.1);
+    EXPECT_NEAR(result_sensCapacity, c1->coilSensCapAtPeak, 0.1);
+}
