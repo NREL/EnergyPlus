@@ -52,9 +52,9 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
 
@@ -88,9 +88,9 @@ namespace Construction {
         Real64 OutsideAbsorpSolar = 0.0;  // Outside Layer solar absorptance of an opaque surface; not used for windows.
         Real64 InsideAbsorpThermal = 0.0; // Inside Layer Thermal absorptance for opaque surfaces or windows;
         // for windows, applies to innermost glass layer
-        Real64 OutsideAbsorpThermal = 0.0;                                                         // Outside Layer Thermal absorptance
-        DataSurfaces::SurfaceRoughness OutsideRoughness = DataSurfaces::SurfaceRoughness::Invalid; // Outside Surface roughness index
-        int DayltPropPtr = 0;                                                                      // Pointer to Daylight Construction Properties
+        Real64 OutsideAbsorpThermal = 0.0;                                                 // Outside Layer Thermal absorptance
+        Material::SurfaceRoughness OutsideRoughness = Material::SurfaceRoughness::Invalid; // Outside Surface roughness index
+        int DayltPropPtr = 0;                                                              // Pointer to Daylight Construction Properties
         int W5FrameDivider = 0; // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
         // Conductive properties for the construction

@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Shape.hh>
 
 namespace EnergyPlus {
@@ -250,23 +251,6 @@ namespace DataSurfaces {
         "Tubular Daylighting Device",
         "KivaFoundation - TwoDimensionalFiniteDifference",
         "Air Boundary - No Heat Transfer"};
-
-    // Parameters to indicate surface roughness for use with the Material
-    // derived type:
-    enum class SurfaceRoughness
-    {
-        Invalid = -1,
-        VeryRough,
-        Rough,
-        MediumRough,
-        MediumSmooth,
-        Smooth,
-        VerySmooth,
-        Num
-    };
-
-    constexpr std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> SurfaceRoughnessUC{
-        "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
 
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
@@ -1144,19 +1128,19 @@ namespace DataSurfaces {
         // Members
         // from input data
         std::string Name;
-        std::string OSCMName;             // OtherSideConditionsModel
-        int OSCMPtr;                      // OtherSideConditionsModel index
-        Real64 Porosity;                  // fraction of absorber plate [--]
-        Real64 LWEmitt;                   // Thermal Emissivity of Baffle Surface [dimensionless]
-        Real64 SolAbsorp;                 // Solar Absorbtivity of Baffle Surface [dimensionless]
-        SurfaceRoughness BaffleRoughness; // surface roughness for exterior convection calcs.
-        Real64 PlenGapThick;              // Depth of Plenum Behind Baffle [m]
-        int NumSurfs;                     // a single baffle can have multiple surfaces underneath it
-        Array1D_int SurfPtrs;             // = 0  ! array of pointers for participating underlying surfaces
-        Real64 HdeltaNPL;                 // Height scale for Cavity buoyancy  [m]
-        Real64 AreaRatio;                 // Ratio of actual surface are to projected surface area [dimensionless]
-        Real64 Cv;                        // volume-based effectiveness of openings for wind-driven vent when Passive
-        Real64 Cd;                        // discharge coefficient of openings for buoyancy-driven vent when Passive
+        std::string OSCMName;                       // OtherSideConditionsModel
+        int OSCMPtr;                                // OtherSideConditionsModel index
+        Real64 Porosity;                            // fraction of absorber plate [--]
+        Real64 LWEmitt;                             // Thermal Emissivity of Baffle Surface [dimensionless]
+        Real64 SolAbsorp;                           // Solar Absorbtivity of Baffle Surface [dimensionless]
+        Material::SurfaceRoughness BaffleRoughness; // surface roughness for exterior convection calcs.
+        Real64 PlenGapThick;                        // Depth of Plenum Behind Baffle [m]
+        int NumSurfs;                               // a single baffle can have multiple surfaces underneath it
+        Array1D_int SurfPtrs;                       // = 0  ! array of pointers for participating underlying surfaces
+        Real64 HdeltaNPL;                           // Height scale for Cavity buoyancy  [m]
+        Real64 AreaRatio;                           // Ratio of actual surface are to projected surface area [dimensionless]
+        Real64 Cv;                                  // volume-based effectiveness of openings for wind-driven vent when Passive
+        Real64 Cd;                                  // discharge coefficient of openings for buoyancy-driven vent when Passive
         // data from elsewhere and calculated
         Real64 ActualArea;  // Overall Area of Collect with surface corrugations.
         Real64 ProjArea;    // Overall Area of Collector projected, as if flat [m2]
@@ -1180,10 +1164,10 @@ namespace DataSurfaces {
 
         // Default Constructor
         ExtVentedCavityStruct()
-            : OSCMPtr(0), Porosity(0.0), LWEmitt(0.0), SolAbsorp(0.0), BaffleRoughness(SurfaceRoughness::VeryRough), PlenGapThick(0.0), NumSurfs(0),
-              HdeltaNPL(0.0), AreaRatio(0.0), Cv(0.0), Cd(0.0), ActualArea(0.0), ProjArea(0.0), Centroid(0.0, 0.0, 0.0), TAirCav(0.0), Tbaffle(0.0),
-              TairLast(20.0), TbaffleLast(20.0), HrPlen(0.0), HcPlen(0.0), MdotVent(0.0), Tilt(0.0), Azimuth(0.0), QdotSource(0.0), Isc(0.0),
-              PassiveACH(0.0), PassiveMdotVent(0.0), PassiveMdotWind(0.0), PassiveMdotTherm(0.0)
+            : OSCMPtr(0), Porosity(0.0), LWEmitt(0.0), SolAbsorp(0.0), BaffleRoughness(Material::SurfaceRoughness::VeryRough), PlenGapThick(0.0),
+              NumSurfs(0), HdeltaNPL(0.0), AreaRatio(0.0), Cv(0.0), Cd(0.0), ActualArea(0.0), ProjArea(0.0), Centroid(0.0, 0.0, 0.0), TAirCav(0.0),
+              Tbaffle(0.0), TairLast(20.0), TbaffleLast(20.0), HrPlen(0.0), HcPlen(0.0), MdotVent(0.0), Tilt(0.0), Azimuth(0.0), QdotSource(0.0),
+              Isc(0.0), PassiveACH(0.0), PassiveMdotVent(0.0), PassiveMdotWind(0.0), PassiveMdotTherm(0.0)
         {
         }
     };

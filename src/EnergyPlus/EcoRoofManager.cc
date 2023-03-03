@@ -149,7 +149,7 @@ namespace EcoRoofManager {
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
 
         Real64 AbsThermSurf;                      // Thermal absoptance of the exterior surface
-        DataSurfaces::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
+        Material::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
         Real64 HMovInsul;                         // "Convection" coefficient of movable insulation
         Real64 Tgk;                               // Ground temperature in Kelvin
         Real64 Ta;                                // current air temperature
@@ -414,15 +414,15 @@ namespace EcoRoofManager {
                 Gammah = std::pow(1.0 - 5.0 * Rib, -0.5);
             }
 
-            if (RoughSurf == DataSurfaces::SurfaceRoughness::VerySmooth) {
+            if (RoughSurf == Material::SurfaceRoughness::VerySmooth) {
                 state.dataEcoRoofMgr->Zog = 0.0008;
-            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::Smooth) {
+            } else if (RoughSurf == Material::SurfaceRoughness::Smooth) {
                 state.dataEcoRoofMgr->Zog = 0.0010;
-            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::MediumSmooth) {
+            } else if (RoughSurf == Material::SurfaceRoughness::MediumSmooth) {
                 state.dataEcoRoofMgr->Zog = 0.0015;
-            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::MediumRough) {
+            } else if (RoughSurf == Material::SurfaceRoughness::MediumRough) {
                 state.dataEcoRoofMgr->Zog = 0.0020;
-            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::Rough) {
+            } else if (RoughSurf == Material::SurfaceRoughness::Rough) {
                 state.dataEcoRoofMgr->Zog = 0.0030;
             } else { // VeryRough
                 state.dataEcoRoofMgr->Zog = 0.005;

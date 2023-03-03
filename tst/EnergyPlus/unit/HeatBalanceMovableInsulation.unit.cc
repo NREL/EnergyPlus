@@ -90,7 +90,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     state->dataMaterial->Material.push_back(mat);
     auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
     thisMaterial_1->Resistance = 1.25;
-    thisMaterial_1->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
+    thisMaterial_1->Roughness = Material::SurfaceRoughness::VeryRough;
     thisMaterial_1->Group = Material::MaterialGroup::RegularMaterial;
     thisMaterial_1->AbsorpSolar = 0.75;
     thisMaterial_1->AbsorpThermal = 0.75;
@@ -107,7 +107,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
     EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsSolarExt(1));
     EXPECT_EQ(0.8, state->dataHeatBalSurf->SurfMovInsulHExt(1));
-    EXPECT_TRUE(compare_enums(DataSurfaces::SurfaceRoughness::VeryRough, state->dataHeatBalSurf->SurfRoughnessExt(1)));
+    EXPECT_TRUE(compare_enums(Material::SurfaceRoughness::VeryRough, state->dataHeatBalSurf->SurfRoughnessExt(1)));
     EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsThermalExt(1));
 
     state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
@@ -143,7 +143,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     state->dataMaterial->Material.push_back(mat);
     auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
     thisMaterial_1->Resistance = 1.25;
-    thisMaterial_1->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
+    thisMaterial_1->Roughness = Material::SurfaceRoughness::VeryRough;
     thisMaterial_1->Group = Material::MaterialGroup::RegularMaterial;
     thisMaterial_1->AbsorpSolar = 0.75;
     thisMaterial_1->AbsorpThermal = 0.75;

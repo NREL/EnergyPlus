@@ -118,7 +118,7 @@ namespace Material {
     constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
 
     extern const std::array<std::string_view, static_cast<int>(GasType::Num)> gasTypeNames;
-    extern const std::array<std::string_view, static_cast<int>(Material::GapVentType::Num)> GapVentTypeNames;
+    extern const std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeNames;
 
     enum class SlatAngleType
     {
@@ -145,17 +145,34 @@ namespace Material {
     constexpr std::array<std::string_view, static_cast<int>(VariableAbsCtrlSignal::Num)> VariableAbsCtrlSignalUC = {
         "SURFACETEMPERATURE", "SURFACERECEIVEDSOLARRADIATION", "SPACEHEATINGCOOLINGMODE", "SCHEDULED"};
 
+    // Parameters to indicate surface roughness for use with the Material
+    // derived type:
+    enum class SurfaceRoughness
+    {
+        Invalid = -1,
+        VeryRough,
+        Rough,
+        MediumRough,
+        MediumSmooth,
+        Smooth,
+        VerySmooth,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> SurfaceRoughnessUC{
+        "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
+
     struct MaterialBase
     {
 
         // Members
         std::string Name = "";                                            // Name of material layer
-        Material::MaterialGroup Group = Material::MaterialGroup::Invalid; // Material group type (see Material Parameters above.  Currently
+        MaterialGroup Group = MaterialGroup::Invalid; // Material group type (see Material Parameters above.  Currently
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
-        DataSurfaces::SurfaceRoughness Roughness =
-            DataSurfaces::SurfaceRoughness::Invalid; // Surface roughness index (See Surface Roughness parameters
+        SurfaceRoughness Roughness =
+            SurfaceRoughness::Invalid; // Surface roughness index (See Surface Roughness parameters
         // above.  Current: VerySmooth, Smooth, MediumSmooth,
         // MediumRough, Rough, VeryRough)
         // Thermo-physical material properties
@@ -362,7 +379,7 @@ namespace Material {
 
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
-    std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness Roughness); // Roughness String
+    std::string DisplayMaterialRoughness(SurfaceRoughness Roughness); // Roughness String
 
 } // namespace Material
 
