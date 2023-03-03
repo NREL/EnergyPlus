@@ -5127,7 +5127,6 @@ void ReportWaterCoil(EnergyPlusData &state, int const CoilNum)
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("ReportWaterCoil");
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
