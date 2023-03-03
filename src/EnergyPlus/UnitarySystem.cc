@@ -15014,7 +15014,7 @@ namespace UnitarySystems {
         if ((ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0) &&
             (inletNode.MassFlowRate > DataHVACGlobals::SmallAirVolFlow)) {
 
-            if (inletNode.Temp < (DesOutTemp - Acc)) {
+            if (inletNode.Temp < (DesOutTemp - DataHVACGlobals::TempControlTol)) {
                 if (this->m_EMSOverrideSuppCoilSpeedNumOn) {
                     this->setEMSSuppCoilStagePLR(state);
                 } else {
@@ -15286,11 +15286,10 @@ namespace UnitarySystems {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (this->warnIndex.m_SuppHeatCoilSensPLRIter < 1) {
                                 Real64 ReqOutput = inletNode.MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                                                         DesOutTemp, inletNode.HumRat, inletNode.Temp, inletNode.HumRat);
+                                                                                DesOutTemp, inletNode.HumRat, inletNode.Temp, inletNode.HumRat);
                                 Real64 FullOutput =
                                     inletNode.MassFlowRate *
-                                    Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                                                          outletNode.Temp, outletNode.HumRat, inletNode.Temp, inletNode.HumRat);
+                                    Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(outletNode.Temp, outletNode.HumRat, inletNode.Temp, inletNode.HumRat);
 
                                 ++this->warnIndex.m_SuppHeatCoilSensPLRIter;
                                 ShowWarningError(state,
@@ -15314,9 +15313,9 @@ namespace UnitarySystems {
                         } // IF(.NOT. WarmupFlag)THEN
                     } else if (SolFla == -2) {
                         Real64 ReqOutput = inletNode.MassFlowRate *
-                                    Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DesOutTemp, inletNode.HumRat, inletNode.Temp, inletNode.HumRat);
-                        Real64 FullOutput = inletNode.MassFlowRate *
-                                     Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(outletNode.Temp, outletNode.HumRat, inletNode.Temp, inletNode.HumRat);
+                                           Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DesOutTemp, inletNode.HumRat, inletNode.Temp, inletNode.HumRat);
+                        Real64 FullOutput = inletNode.MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                                                                         outletNode.Temp, outletNode.HumRat, inletNode.Temp, inletNode.HumRat);
 
                         PartLoadFrac = ReqOutput / FullOutput;
                         if (!state.dataGlobal->WarmupFlag) {
