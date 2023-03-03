@@ -69,7 +69,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     // This unit test checks warnings/errors associated with unreasonable temperatures in WaterUse:Equipment
     bool ErrorsFound(false);
 
-    std::string const idf_objects = R"IDF(
+    std::string_view constexpr idf_objects = R"IDF(
   Zone,
     Core_ZN,                 !- Name
     0.0000,                  !- Direction of Relative North {deg}
@@ -513,7 +513,7 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test1)
     // This one should default to the hot water temperature
     bool ErrorsFound(false);
 
-    std::string const idf_objects = R"IDF(
+    std::string_view constexpr idf_objects = R"IDF(
   Zone,
     Core_ZN,                 !- Name
     0.0000,                  !- Direction of Relative North {deg}
@@ -901,7 +901,7 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test2)
     // This time defaults to the cold water temperature
     bool ErrorsFound(false);
 
-    std::string const idf_objects = R"IDF(
+    std::string_view constexpr idf_objects = R"IDF(
   Zone,
     Core_ZN,                 !- Name
     0.0000,                  !- Direction of Relative North {deg}
