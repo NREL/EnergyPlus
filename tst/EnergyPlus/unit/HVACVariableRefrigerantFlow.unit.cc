@@ -22761,40 +22761,38 @@ TEST_F(EnergyPlusFixture, VRFHP_CondenserCalc_PLR_Issue_Test)
 {
     // Take an example to test the COP and electric cooling/heaitng power
     // issue described in 9252
-    std::string const idf_objects = delimited_string({
+    std::string_view constexpr idf_objects = R"IDF(
+    Curve:Biquadratic,
+      BiquadraticCurve,        !- Name
+      1.0,                     !- Coefficient1 Constant
+      0,                       !- Coefficient2 x
+      0,                       !- Coefficient3 x**2
+      0,                       !- Coefficient4 y
+      0,                       !- Coefficient5 y**2
+      0,                       !- Coefficient6 x*y
+      -100,                    !- Minimum Value of x
+      100,                     !- Maximum Value of x
+      -100,                    !- Minimum Value of y
+      100,                     !- Maximum Value of y
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Temperature,             !- Input Unit Type for X
+      Temperature,             !- Input Unit Type for Y
+      Dimensionless;           !- Output Unit Type
 
-        "  Curve:Biquadratic,",
-        "    BiquadraticCurve,        !- Name",
-        "    1.0,                     !- Coefficient1 Constant",
-        "    0,                       !- Coefficient2 x",
-        "    0,                       !- Coefficient3 x**2",
-        "    0,                       !- Coefficient4 y",
-        "    0,                       !- Coefficient5 y**2",
-        "    0,                       !- Coefficient6 x*y",
-        "    -100,                    !- Minimum Value of x",
-        "    100,                     !- Maximum Value of x",
-        "    -100,                    !- Minimum Value of y",
-        "    100,                     !- Maximum Value of y",
-        "    ,                        !- Minimum Curve Output",
-        "    ,                        !- Maximum Curve Output",
-        "    Temperature,             !- Input Unit Type for X",
-        "    Temperature,             !- Input Unit Type for Y",
-        "    Dimensionless;           !- Output Unit Type",
-
-        "  Curve:Cubic,",
-        "    EIRfPLR,                 !- Name",
-        "    0.0,                     !- Coefficient1 Constant",
-        "    1.0,                     !- Coefficient2 x",
-        "    0.0,                     !- Coefficient3 x**2",
-        "    0.0,                     !- Coefficient4 x**3",
-        "    0,                       !- Minimum Value of x",
-        "    1,                       !- Maximum Value of x",
-        "    ,                        !- Minimum Curve Output",
-        "    ,                        !- Maximum Curve Output",
-        "    Dimensionless,           !- Input Unit Type for X",
-        "    Dimensionless;           !- Output Unit Type",
-
-    });
+    Curve:Cubic,
+      EIRfPLR,                 !- Name
+      0.0,                     !- Coefficient1 Constant
+      1.0,                     !- Coefficient2 x
+      0.0,                     !- Coefficient3 x**2
+      0.0,                     !- Coefficient4 x**3
+      0,                       !- Minimum Value of x
+      1,                       !- Maximum Value of x
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Dimensionless,           !- Input Unit Type for X
+      Dimensionless;           !- Output Unit Type
+    )IDF";
 
     ASSERT_TRUE(process_idf(idf_objects));
     Curve::GetCurveInput(*state);
