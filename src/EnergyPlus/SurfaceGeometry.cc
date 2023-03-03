@@ -12454,17 +12454,20 @@ namespace SurfaceGeometry {
             bool isZoneEnclosed = isEnclosedVolume(ZoneStruct, listOfedgeNotUsedTwice);
             ZoneVolumeCalcMethod volCalcMethod;
 
+            Real64 floorAreaForVolume = (thisZone.FloorArea > 0.0) ? thisZone.FloorArea : thisZone.geometricFloorArea;
+            Real64 ceilingAreaForVolume = (thisZone.CeilingArea > 0.0) ? thisZone.CeilingArea : thisZone.geometricCeilingArea;
+
             if (isZoneEnclosed) {
                 CalcVolume = Vectors::CalcPolyhedronVolume(state, ZoneStruct);
                 volCalcMethod = ZoneVolumeCalcMethod::Enclosed;
-            } else if (thisZone.FloorArea > 0.0 && thisZone.CeilingHeight > 0.0 && areFloorAndCeilingSame(state, ZoneStruct)) {
-                CalcVolume = thisZone.FloorArea * thisZone.CeilingHeight;
+            } else if (floorAreaForVolume > 0.0 && thisZone.CeilingHeight > 0.0 && areFloorAndCeilingSame(state, ZoneStruct)) {
+                CalcVolume = floorAreaForVolume * thisZone.CeilingHeight;
                 volCalcMethod = ZoneVolumeCalcMethod::FloorAreaTimesHeight1;
-            } else if (isFloorHorizontal && areWallsVertical && areWallsSameHeight && thisZone.FloorArea > 0.0 && thisZone.CeilingHeight > 0.0) {
-                CalcVolume = thisZone.FloorArea * thisZone.CeilingHeight;
+            } else if (isFloorHorizontal && areWallsVertical && areWallsSameHeight && floorAreaForVolume > 0.0 && thisZone.CeilingHeight > 0.0) {
+                CalcVolume = floorAreaForVolume * thisZone.CeilingHeight;
                 volCalcMethod = ZoneVolumeCalcMethod::FloorAreaTimesHeight2;
-            } else if (isCeilingHorizontal && areWallsVertical && areWallsSameHeight && thisZone.CeilingArea > 0.0 && thisZone.CeilingHeight > 0.0) {
-                CalcVolume = thisZone.CeilingArea * thisZone.CeilingHeight;
+            } else if (isCeilingHorizontal && areWallsVertical && areWallsSameHeight && ceilingAreaForVolume > 0.0 && thisZone.CeilingHeight > 0.0) {
+                CalcVolume = ceilingAreaForVolume * thisZone.CeilingHeight;
                 volCalcMethod = ZoneVolumeCalcMethod::CeilingAreaTimesHeight;
             } else if (areOppositeWallsSame(state, ZoneStruct, oppositeWallArea, distanceBetweenOppositeWalls)) {
                 CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
@@ -12575,8 +12578,8 @@ namespace SurfaceGeometry {
                     }
                 }
             } else if (thisZone.ceilingHeightEntered) { // User did not enter zone volume, but entered ceiling height
-                if (thisZone.FloorArea > 0.0) {
-                    thisZone.Volume = thisZone.FloorArea * thisZone.CeilingHeight;
+                if (floorAreaForVolume > 0.0) {
+                    thisZone.Volume = floorAreaForVolume * thisZone.CeilingHeight;
                 } else { // ceiling height entered but floor area zero
                     thisZone.Volume = CalcVolume;
                 }
