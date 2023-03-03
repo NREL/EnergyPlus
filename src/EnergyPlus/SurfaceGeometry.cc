@@ -7742,7 +7742,7 @@ namespace SurfaceGeometry {
 
         state.dataSurface->TotExtVentCav = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        state.dataSurface->ExtVentedCavity.allocate(state.dataSurface->TotExtVentCav);
+        state.dataHeatBal->ExtVentedCavity.allocate(state.dataSurface->TotExtVentCav);
 
         for (Item = 1; Item <= state.dataSurface->TotExtVentCav; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -7763,7 +7763,7 @@ namespace SurfaceGeometry {
 
             UtilityRoutines::VerifyName(state,
                                         state.dataIPShortCut->cAlphaArgs(1),
-                                        state.dataSurface->ExtVentedCavity,
+                                        state.dataHeatBal->ExtVentedCavity,
                                         Item - 1,
                                         ErrorInName,
                                         IsBlank,
@@ -7773,17 +7773,17 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
                 continue;
             }
-            state.dataSurface->ExtVentedCavity(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataHeatBal->ExtVentedCavity(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-            state.dataSurface->ExtVentedCavity(Item).OSCMName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataHeatBal->ExtVentedCavity(Item).OSCMName = state.dataIPShortCut->cAlphaArgs(2);
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 Found = UtilityRoutines::FindItemInList(
-                    state.dataSurface->ExtVentedCavity(Item).OSCMName, state.dataSurface->OSCM, state.dataSurface->TotOSCM);
+                    state.dataHeatBal->ExtVentedCavity(Item).OSCMName, state.dataSurface->OSCM, state.dataSurface->TotOSCM);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}\".",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(2),
                                            state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
@@ -7793,59 +7793,59 @@ namespace SurfaceGeometry {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {} cannot be blank.",
                                        cCurrentModuleObject,
-                                       state.dataSurface->ExtVentedCavity(Item).Name,
+                                       state.dataHeatBal->ExtVentedCavity(Item).Name,
                                        state.dataIPShortCut->cAlphaFieldNames(2)));
                 ErrorsFound = true;
             }
-            state.dataSurface->ExtVentedCavity(Item).OSCMPtr = Found;
+            state.dataHeatBal->ExtVentedCavity(Item).OSCMPtr = Found;
 
             Roughness = state.dataIPShortCut->cAlphaArgs(3);
             // Select the correct Number for the associated ascii name for the roughness type
             if (UtilityRoutines::SameString(Roughness, "VerySmooth")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VerySmooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VerySmooth;
             } else if (UtilityRoutines::SameString(Roughness, "Smooth")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Smooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Smooth;
             } else if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumSmooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumSmooth;
             } else if (UtilityRoutines::SameString(Roughness, "MediumRough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumRough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumRough;
             } else if (UtilityRoutines::SameString(Roughness, "Rough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Rough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Rough;
             } else if (UtilityRoutines::SameString(Roughness, "VeryRough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VeryRough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VeryRough;
             } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             // Was it set?
-            if (state.dataSurface->ExtVentedCavity(Item).BaffleRoughness == Material::SurfaceRoughness::Invalid) {
+            if (state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness == Material::SurfaceRoughness::Invalid) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {}=\"{}",
                                        cCurrentModuleObject,
-                                       state.dataSurface->ExtVentedCavity(Item).Name,
+                                       state.dataHeatBal->ExtVentedCavity(Item).Name,
                                        state.dataIPShortCut->cAlphaFieldNames(3),
                                        state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
 
             AlphaOffset = 3;
-            state.dataSurface->ExtVentedCavity(Item).NumSurfs = NumAlphas - AlphaOffset;
-            if (state.dataSurface->ExtVentedCavity(Item).NumSurfs == 0) {
+            state.dataHeatBal->ExtVentedCavity(Item).NumSurfs = NumAlphas - AlphaOffset;
+            if (state.dataHeatBal->ExtVentedCavity(Item).NumSurfs == 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", no underlying surfaces specified. Must have at least one.",
                                        cCurrentModuleObject,
-                                       state.dataSurface->ExtVentedCavity(Item).Name));
+                                       state.dataHeatBal->ExtVentedCavity(Item).Name));
                 ErrorsFound = true;
                 continue;
             }
-            state.dataSurface->ExtVentedCavity(Item).SurfPtrs.allocate(state.dataSurface->ExtVentedCavity(Item).NumSurfs);
-            state.dataSurface->ExtVentedCavity(Item).SurfPtrs = 0;
-            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
+            state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs.allocate(state.dataHeatBal->ExtVentedCavity(Item).NumSurfs);
+            state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs = 0;
+            for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
                 Found = UtilityRoutines::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
                                            state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset)));
                     ErrorsFound = true;
@@ -7856,7 +7856,7 @@ namespace SurfaceGeometry {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
                                            state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset)));
                     ShowContinueError(state, "...because it is not a Heat Transfer Surface.");
@@ -7867,7 +7867,7 @@ namespace SurfaceGeometry {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
                                            state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset)));
                     ShowContinueError(state, "...because it is not exposed to Sun.");
@@ -7878,7 +7878,7 @@ namespace SurfaceGeometry {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
                                            state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset)));
                     ShowContinueError(state, "...because it is not exposed to Wind.");
@@ -7886,7 +7886,7 @@ namespace SurfaceGeometry {
                     continue;
                 }
                 if (state.dataSurface->Surface(Found).ExtBoundCond != OtherSideCondModeledExt) {
-                    ShowSevereError(state, format("{}=\"{}\", is invalid", cCurrentModuleObject, state.dataSurface->ExtVentedCavity(Item).Name));
+                    ShowSevereError(state, format("{}=\"{}\", is invalid", cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
                     ShowContinueError(state,
                                       format("...because {}=\"{}\".",
                                              state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
@@ -7895,7 +7895,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                     continue;
                 }
-                state.dataSurface->ExtVentedCavity(Item).SurfPtrs(ThisSurf) = Found;
+                state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs(ThisSurf) = Found;
 
                 // now set info in Surface structure
                 state.dataSurface->SurfExtCavNum(Found) = Item;
@@ -7907,7 +7907,7 @@ namespace SurfaceGeometry {
             // now that we should have all the surfaces, do some preperations and checks.
 
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
-            Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataSurface->ExtVentedCavity(Item).SurfPtrs));
+            Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs));
             //            AvgAzimuth = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Azimuth * Surface( ExtVentedCavity( Item ).SurfPtrs
             //).Area
             //)
@@ -7915,28 +7915,28 @@ namespace SurfaceGeometry {
             AvgAzimuth = sum_product_sub(state.dataSurface->Surface,
                                          &SurfaceData::Azimuth,
                                          &SurfaceData::Area,
-                                         state.dataSurface->ExtVentedCavity(Item).SurfPtrs) /
+                                         state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs) /
                          surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
             //            AvgTilt = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Tilt * Surface( ExtVentedCavity( Item ).SurfPtrs ).Area )
             //            /
             // sum(  Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             AvgTilt = sum_product_sub(
-                          state.dataSurface->Surface, &SurfaceData::Tilt, &SurfaceData::Area, state.dataSurface->ExtVentedCavity(Item).SurfPtrs) /
+                          state.dataSurface->Surface, &SurfaceData::Tilt, &SurfaceData::Area, state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs) /
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
-                SurfID = state.dataSurface->ExtVentedCavity(Item).SurfPtrs(ThisSurf);
+            for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
+                SurfID = state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs(ThisSurf);
                 if (std::abs(state.dataSurface->Surface(SurfID).Azimuth - AvgAzimuth) > 15.0) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Azimuth different from others in the associated group.",
                                             cCurrentModuleObject,
-                                            state.dataSurface->ExtVentedCavity(Item).Name,
+                                            state.dataHeatBal->ExtVentedCavity(Item).Name,
                                             state.dataSurface->Surface(SurfID).Name));
                 }
                 if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > 10.0) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Tilt different from others in the associated group.",
                                             cCurrentModuleObject,
-                                            state.dataSurface->ExtVentedCavity(Item).Name,
+                                            state.dataHeatBal->ExtVentedCavity(Item).Name,
                                             state.dataSurface->Surface(SurfID).Name));
                 }
 
@@ -7946,30 +7946,30 @@ namespace SurfaceGeometry {
                 //         //'subtracted in the group of surfaces associated with '//TRIM(ExtVentedCavity(Item)%Name))
                 // endif
             }
-            state.dataSurface->ExtVentedCavity(Item).Tilt = AvgTilt;
-            state.dataSurface->ExtVentedCavity(Item).Azimuth = AvgAzimuth;
+            state.dataHeatBal->ExtVentedCavity(Item).Tilt = AvgTilt;
+            state.dataHeatBal->ExtVentedCavity(Item).Azimuth = AvgAzimuth;
 
             // find area weighted centroid.
             //            ExtVentedCavity( Item ).Centroid.z = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Centroid.z * Surface(
             // ExtVentedCavity(  Item
             //).SurfPtrs ).Area ) / sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced
             // by below
-            state.dataSurface->ExtVentedCavity(Item).Centroid.z = sum_product_sub(state.dataSurface->Surface,
+            state.dataHeatBal->ExtVentedCavity(Item).Centroid.z = sum_product_sub(state.dataSurface->Surface,
                                                                                   &SurfaceData::Centroid,
                                                                                   &Vector::z,
                                                                                   state.dataSurface->Surface,
                                                                                   &SurfaceData::Area,
-                                                                                  state.dataSurface->ExtVentedCavity(Item).SurfPtrs) /
+                                                                                  state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs) /
                                                                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
             // now handle rNumericArgs from input object
-            state.dataSurface->ExtVentedCavity(Item).Porosity = state.dataIPShortCut->rNumericArgs(1);
-            state.dataSurface->ExtVentedCavity(Item).LWEmitt = state.dataIPShortCut->rNumericArgs(2);
-            state.dataSurface->ExtVentedCavity(Item).SolAbsorp = state.dataIPShortCut->rNumericArgs(3);
-            state.dataSurface->ExtVentedCavity(Item).HdeltaNPL = state.dataIPShortCut->rNumericArgs(4);
-            state.dataSurface->ExtVentedCavity(Item).PlenGapThick = state.dataIPShortCut->rNumericArgs(5);
-            if (state.dataSurface->ExtVentedCavity(Item).PlenGapThick <= 0.0) {
-                ShowSevereError(state, format("{}=\"{}\", invalid .", cCurrentModuleObject, state.dataSurface->ExtVentedCavity(Item).Name));
+            state.dataHeatBal->ExtVentedCavity(Item).Porosity = state.dataIPShortCut->rNumericArgs(1);
+            state.dataHeatBal->ExtVentedCavity(Item).LWEmitt = state.dataIPShortCut->rNumericArgs(2);
+            state.dataHeatBal->ExtVentedCavity(Item).SolAbsorp = state.dataIPShortCut->rNumericArgs(3);
+            state.dataHeatBal->ExtVentedCavity(Item).HdeltaNPL = state.dataIPShortCut->rNumericArgs(4);
+            state.dataHeatBal->ExtVentedCavity(Item).PlenGapThick = state.dataIPShortCut->rNumericArgs(5);
+            if (state.dataHeatBal->ExtVentedCavity(Item).PlenGapThick <= 0.0) {
+                ShowSevereError(state, format("{}=\"{}\", invalid .", cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
                 ErrorsFound = true;
                 ShowContinueError(state,
                                   format("...because field \"{}\" must be greater than Zero=[{:.2T}].",
@@ -7977,68 +7977,68 @@ namespace SurfaceGeometry {
                                          state.dataIPShortCut->rNumericArgs(5)));
                 continue;
             }
-            state.dataSurface->ExtVentedCavity(Item).AreaRatio = state.dataIPShortCut->rNumericArgs(6);
-            state.dataSurface->ExtVentedCavity(Item).Cv = state.dataIPShortCut->rNumericArgs(7);
-            state.dataSurface->ExtVentedCavity(Item).Cd = state.dataIPShortCut->rNumericArgs(8);
+            state.dataHeatBal->ExtVentedCavity(Item).AreaRatio = state.dataIPShortCut->rNumericArgs(6);
+            state.dataHeatBal->ExtVentedCavity(Item).Cv = state.dataIPShortCut->rNumericArgs(7);
+            state.dataHeatBal->ExtVentedCavity(Item).Cd = state.dataIPShortCut->rNumericArgs(8);
 
             // Fill out data we now know
             // sum areas of HT surface areas
             //            ExtVentedCavity( Item ).ProjArea = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array
             // subscript  usage: Replaced by below
-            state.dataSurface->ExtVentedCavity(Item).ProjArea = surfaceArea;
-            if (state.dataSurface->ExtVentedCavity(Item).ProjArea <= 0.0) {
-                ShowSevereError(state, format("{}=\"{}\", invalid .", cCurrentModuleObject, state.dataSurface->ExtVentedCavity(Item).Name));
+            state.dataHeatBal->ExtVentedCavity(Item).ProjArea = surfaceArea;
+            if (state.dataHeatBal->ExtVentedCavity(Item).ProjArea <= 0.0) {
+                ShowSevereError(state, format("{}=\"{}\", invalid .", cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
                 ErrorsFound = true;
                 ShowContinueError(state,
                                   format("...because gross area of underlying surfaces must be greater than Zero=[{:.2T}].",
-                                         state.dataSurface->ExtVentedCavity(Item).ProjArea));
+                                         state.dataHeatBal->ExtVentedCavity(Item).ProjArea));
                 continue;
             }
-            state.dataSurface->ExtVentedCavity(Item).ActualArea =
-                state.dataSurface->ExtVentedCavity(Item).ProjArea * state.dataSurface->ExtVentedCavity(Item).AreaRatio;
+            state.dataHeatBal->ExtVentedCavity(Item).ActualArea =
+                state.dataHeatBal->ExtVentedCavity(Item).ProjArea * state.dataHeatBal->ExtVentedCavity(Item).AreaRatio;
 
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Baffle Surface Temperature",
                                 OutputProcessor::Unit::C,
-                                state.dataSurface->ExtVentedCavity(Item).Tbaffle,
+                                state.dataHeatBal->ExtVentedCavity(Item).Tbaffle,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Air Drybulb Temperature",
                                 OutputProcessor::Unit::C,
-                                state.dataSurface->ExtVentedCavity(Item).TAirCav,
+                                state.dataHeatBal->ExtVentedCavity(Item).TAirCav,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Total Natural Ventilation Air Change Rate",
                                 OutputProcessor::Unit::ach,
-                                state.dataSurface->ExtVentedCavity(Item).PassiveACH,
+                                state.dataHeatBal->ExtVentedCavity(Item).PassiveACH,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataSurface->ExtVentedCavity(Item).PassiveMdotVent,
+                                state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotVent,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataSurface->ExtVentedCavity(Item).PassiveMdotWind,
+                                state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotWind,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataSurface->ExtVentedCavity(Item).PassiveMdotTherm,
+                                state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotTherm,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
         }
     }
 

@@ -2325,8 +2325,8 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
         if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
-            state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
-            state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
+            state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
+            state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
         }
     }
     // Initialize Kiva convection algorithms
@@ -9583,29 +9583,29 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
 
     RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, OutHumRatExt);
 
-    holeArea = state.dataSurface->ExtVentedCavity(CavNum).ActualArea * state.dataSurface->ExtVentedCavity(CavNum).Porosity;
+    holeArea = state.dataHeatBal->ExtVentedCavity(CavNum).ActualArea * state.dataHeatBal->ExtVentedCavity(CavNum).Porosity;
 
-    AspRat = state.dataSurface->ExtVentedCavity(CavNum).HdeltaNPL * 2.0 / state.dataSurface->ExtVentedCavity(CavNum).PlenGapThick;
-    TmpTscoll = state.dataSurface->ExtVentedCavity(CavNum).TbaffleLast;
-    TmpTaPlen = state.dataSurface->ExtVentedCavity(CavNum).TairLast;
+    AspRat = state.dataHeatBal->ExtVentedCavity(CavNum).HdeltaNPL * 2.0 / state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick;
+    TmpTscoll = state.dataHeatBal->ExtVentedCavity(CavNum).TbaffleLast;
+    TmpTaPlen = state.dataHeatBal->ExtVentedCavity(CavNum).TairLast;
 
     // all the work is done in this routine located in GeneralRoutines.cc
 
     for (iter = 1; iter <= 3; ++iter) { // this is a sequential solution approach.
 
         CalcPassiveExteriorBaffleGap(state,
-                                     state.dataSurface->ExtVentedCavity(CavNum).SurfPtrs,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).SurfPtrs,
                                      holeArea,
-                                     state.dataSurface->ExtVentedCavity(CavNum).Cv,
-                                     state.dataSurface->ExtVentedCavity(CavNum).Cd,
-                                     state.dataSurface->ExtVentedCavity(CavNum).HdeltaNPL,
-                                     state.dataSurface->ExtVentedCavity(CavNum).SolAbsorp,
-                                     state.dataSurface->ExtVentedCavity(CavNum).LWEmitt,
-                                     state.dataSurface->ExtVentedCavity(CavNum).Tilt,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).Cv,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).Cd,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).HdeltaNPL,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).SolAbsorp,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).LWEmitt,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).Tilt,
                                      AspRat,
-                                     state.dataSurface->ExtVentedCavity(CavNum).PlenGapThick,
-                                     state.dataSurface->ExtVentedCavity(CavNum).BaffleRoughness,
-                                     state.dataSurface->ExtVentedCavity(CavNum).QdotSource,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).BaffleRoughness,
+                                     state.dataHeatBal->ExtVentedCavity(CavNum).QdotSource,
                                      TmpTscoll,
                                      TmpTaPlen,
                                      HcPlen,
@@ -9617,30 +9617,30 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
 
     } // sequential solution
     // now fill results into derived types
-    state.dataSurface->ExtVentedCavity(CavNum).Isc = Isc;
-    state.dataSurface->ExtVentedCavity(CavNum).TAirCav = TmpTaPlen;
-    state.dataSurface->ExtVentedCavity(CavNum).Tbaffle = TmpTscoll;
-    state.dataSurface->ExtVentedCavity(CavNum).HrPlen = HrPlen;
-    state.dataSurface->ExtVentedCavity(CavNum).HcPlen = HcPlen;
-    state.dataSurface->ExtVentedCavity(CavNum).PassiveACH =
+    state.dataHeatBal->ExtVentedCavity(CavNum).Isc = Isc;
+    state.dataHeatBal->ExtVentedCavity(CavNum).TAirCav = TmpTaPlen;
+    state.dataHeatBal->ExtVentedCavity(CavNum).Tbaffle = TmpTscoll;
+    state.dataHeatBal->ExtVentedCavity(CavNum).HrPlen = HrPlen;
+    state.dataHeatBal->ExtVentedCavity(CavNum).HcPlen = HcPlen;
+    state.dataHeatBal->ExtVentedCavity(CavNum).PassiveACH =
         (MdotVent / RhoAir) *
-        (1.0 / (state.dataSurface->ExtVentedCavity(CavNum).ProjArea * state.dataSurface->ExtVentedCavity(CavNum).PlenGapThick)) *
+        (1.0 / (state.dataHeatBal->ExtVentedCavity(CavNum).ProjArea * state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick)) *
         DataGlobalConstants::SecInHour;
-    state.dataSurface->ExtVentedCavity(CavNum).PassiveMdotVent = MdotVent;
-    state.dataSurface->ExtVentedCavity(CavNum).PassiveMdotWind = VdotWind * RhoAir;
-    state.dataSurface->ExtVentedCavity(CavNum).PassiveMdotTherm = VdotThermal * RhoAir;
+    state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotVent = MdotVent;
+    state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotWind = VdotWind * RhoAir;
+    state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotTherm = VdotThermal * RhoAir;
 
     // now do some updates
-    state.dataSurface->ExtVentedCavity(CavNum).TairLast = state.dataSurface->ExtVentedCavity(CavNum).TAirCav;
-    state.dataSurface->ExtVentedCavity(CavNum).TbaffleLast = state.dataSurface->ExtVentedCavity(CavNum).Tbaffle;
+    state.dataHeatBal->ExtVentedCavity(CavNum).TairLast = state.dataHeatBal->ExtVentedCavity(CavNum).TAirCav;
+    state.dataHeatBal->ExtVentedCavity(CavNum).TbaffleLast = state.dataHeatBal->ExtVentedCavity(CavNum).Tbaffle;
 
     // update the OtherSideConditionsModel coefficients.
-    thisOSCM = state.dataSurface->ExtVentedCavity(CavNum).OSCMPtr;
+    thisOSCM = state.dataHeatBal->ExtVentedCavity(CavNum).OSCMPtr;
 
-    state.dataSurface->OSCM(thisOSCM).TConv = state.dataSurface->ExtVentedCavity(CavNum).TAirCav;
-    state.dataSurface->OSCM(thisOSCM).HConv = state.dataSurface->ExtVentedCavity(CavNum).HcPlen;
-    state.dataSurface->OSCM(thisOSCM).TRad = state.dataSurface->ExtVentedCavity(CavNum).Tbaffle;
-    state.dataSurface->OSCM(thisOSCM).HRad = state.dataSurface->ExtVentedCavity(CavNum).HrPlen;
+    state.dataSurface->OSCM(thisOSCM).TConv = state.dataHeatBal->ExtVentedCavity(CavNum).TAirCav;
+    state.dataSurface->OSCM(thisOSCM).HConv = state.dataHeatBal->ExtVentedCavity(CavNum).HcPlen;
+    state.dataSurface->OSCM(thisOSCM).TRad = state.dataHeatBal->ExtVentedCavity(CavNum).Tbaffle;
+    state.dataSurface->OSCM(thisOSCM).HRad = state.dataHeatBal->ExtVentedCavity(CavNum).HrPlen;
 }
 
 void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)

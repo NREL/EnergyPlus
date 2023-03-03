@@ -2249,7 +2249,7 @@ namespace Photovoltaics {
         // Using/Aliasing
         using namespace DataSurfaces;
 
-        state.dataSurface->ExtVentedCavity(VentModNum).QdotSource = QSource / state.dataSurface->ExtVentedCavity(VentModNum).ProjArea;
+        state.dataHeatBal->ExtVentedCavity(VentModNum).QdotSource = QSource / state.dataHeatBal->ExtVentedCavity(VentModNum).ProjArea;
     }
 
     void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex)
@@ -2282,8 +2282,8 @@ namespace Photovoltaics {
         CavNum = 0;
         Found = false;
         for (thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
-            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
-                if (SurfacePtr == state.dataSurface->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
+            for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
+                if (SurfacePtr == state.dataHeatBal->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
                     Found = true;
                     CavNum = thisCav;
                 }
@@ -2316,7 +2316,7 @@ namespace Photovoltaics {
         // access derived type
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        TsColl = state.dataSurface->ExtVentedCavity(VentModNum).Tbaffle;
+        TsColl = state.dataHeatBal->ExtVentedCavity(VentModNum).Tbaffle;
     }
 
     // -------------------------------------------------------------------------------
