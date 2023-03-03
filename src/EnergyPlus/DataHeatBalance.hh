@@ -1930,8 +1930,6 @@ namespace DataHeatBalance {
                                  ObjexxFCL::Optional_int_const ScreenNumber = _ // Optional screen number
     );
 
-    std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness Roughness); // Roughness String
-
     Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
                                          int numSurf,  // index for Surface array.
                                          bool &isValid // returns true if result is valid

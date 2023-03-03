@@ -1285,49 +1285,6 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     }
 }
 
-std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness const Roughness) // Roughness String
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   October 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine is given a roughness value and returns the character representation.
-
-    // Return value
-    std::string cRoughness; // Character representation of Roughness
-
-    // Select the correct Number for the associated ascii name for the roughness type
-    switch (Roughness) {
-    case DataSurfaces::SurfaceRoughness::VeryRough: {
-        cRoughness = "VeryRough";
-    } break;
-    case DataSurfaces::SurfaceRoughness::Rough: {
-        cRoughness = "Rough";
-    } break;
-    case DataSurfaces::SurfaceRoughness::MediumRough: {
-        cRoughness = "MediumRough";
-    } break;
-    case DataSurfaces::SurfaceRoughness::MediumSmooth: {
-        cRoughness = "MediumSmooth";
-    } break;
-    case DataSurfaces::SurfaceRoughness::Smooth: {
-        cRoughness = "Smooth";
-    } break;
-    case DataSurfaces::SurfaceRoughness::VerySmooth: {
-        cRoughness = "VerySmooth";
-    } break;
-    default: {
-        cRoughness = "";
-    } break;
-    }
-
-    return cRoughness;
-}
-
 Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
                                      int const numSurf, // index for Surface array.
                                      bool &isValid      // returns true if result is valid
