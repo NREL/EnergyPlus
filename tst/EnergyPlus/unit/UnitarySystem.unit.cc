@@ -97,6 +97,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -1272,6 +1273,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     // overwrite outdoor weather temp to variable speed coil rated water temp until this gets fixed
     state->dataSize->DesDayWeath(1).Temp(1) = 29.4;
@@ -1560,6 +1563,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -1798,6 +1803,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -2393,6 +2400,8 @@ Curve:Quadratic,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -2930,6 +2939,8 @@ Curve:Quadratic,
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -3178,6 +3189,8 @@ Curve:Quadratic,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -3394,6 +3407,8 @@ Curve:Quadratic,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -3895,6 +3910,8 @@ Curve:Biquadratic,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -4298,6 +4315,8 @@ SetpointManager:Scheduled,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -4630,6 +4649,18 @@ SetpointManager:Scheduled,
   Always 20C, !- Schedule Name
   Water Cooling Coil Air Outlet Node;  !- Setpoint Node or NodeList Name
 
+Schedule:Compact,
+    Always Point004,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00, 0.004;      !- Field 3
+
+SetpointManager:Scheduled,
+    CW Coil Humidity Setpoint Manager, !- Name
+    MaximumHumidityRatio, !- Control Variable
+    Always Point004, !- Schedule Name
+    Water Cooling Coil Air Outlet Node;  !- Setpoint Node or NodeList Name
 )IDF";
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
@@ -4665,6 +4696,8 @@ SetpointManager:Scheduled,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -9123,7 +9156,7 @@ Curve:Biquadratic,
     EXPECT_FALSE(thisSys->m_MyFanFlag); // fan speed variables have been set
 }
 
-TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
+TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_LoadControl)
 {
 
     bool ErrorsFound(false);
@@ -9623,6 +9656,449 @@ Curve:QuadLinear,
     // Unitary System mines data from coil objects
     EXPECT_EQ(thisSys->m_MinOATCompressorCooling, -1000.0);
     EXPECT_EQ(thisSys->m_MinOATCompressorHeating, -1000.0);
+}
+
+TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
+{
+
+    bool ErrorsFound(false);
+    bool FirstHVACIteration(false);
+
+    std::string_view constexpr idf_objects = R"IDF(
+
+    Zone,
+      EAST ZONE,              !- Name
+      0,                      !- Direction of Relative North{ deg }
+      0,                      !- X Origin{ m }
+      0,                      !- Y Origin{ m }
+      0,                      !- Z Origin{ m }
+      1,                      !- Type
+      1,                      !- Multiplier
+      autocalculate,          !- Ceiling Height{ m }
+      autocalculate;          !- Volume{ m3 }
+      
+
+    ZoneHVAC:EquipmentConnections,
+    EAST ZONE,                 !- Zone Name
+      Zone2Equipment,          !- Zone Conditioning Equipment List Name
+      Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name
+      Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name
+      Zone 2 Node,             !- Zone Air Node Name
+      Zone 2 Outlet Node;      !- Zone Return Air Node Name
+      
+
+    ZoneHVAC:EquipmentList,
+      Zone2Equipment,          !- Name
+      SequentialLoad,          !- Load Distribution Scheme
+      AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type
+      Unitary System Model,    !- Zone Equipment 1 Name
+      1,                       !- Zone Equipment 1 Cooling Sequence
+      1,                       !- Zone Equipment 1 Heating or No - Load Sequence
+      ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+      ;                        !- Zone Equipment 1 Sequential Heating Fraction
+      
+
+    AirLoopHVAC:UnitarySystem,
+      Unitary System Model,   !- Name
+      Setpoint,               !- Control Type
+      East Zone,              !- Controlling Zone or Thermostat Location
+      None,                   !- Dehumidification Control Type
+      FanAndCoilAvailSched,   !- Availability Schedule Name
+      Zone Exhaust Node,      !- Air Inlet Node Name
+      Zone 2 Inlet Node,      !- Air Outlet Node Name
+      Fan:OnOff,              !- Supply Fan Object Type
+      Supply Fan 1,           !- Supply Fan Name
+      BlowThrough,            !- Fan Placement
+      ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name
+      Coil:Heating:WaterToAirHeatPump:EquationFit,       !- Heating Coil Object Type
+      Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
+      ,                       !- DX Heating Coil Sizing Ratio
+      Coil:Cooling:WaterToAirHeatPump:EquationFit, !- Cooling Coil Object Type
+      Sys 1 Heat Pump Cooling Mode,  !- Cooling Coil Name
+      ,                       !- Use DOAS DX Cooling Coil
+      ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }
+      ,                       !- Latent Load Control
+      Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
+      Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name
+      SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation
+      1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }
+      ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }
+      ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+      ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
+      SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation
+      1.6,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }
+      ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }
+      ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
+      ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+      SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+      1.6,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }
+      ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }
+      ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+      ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
+      ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
+      ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+      80;                     !- Maximum Supply Air Temperature{ C }
+
+    Fan:OnOff,
+      Supply Fan 1,           !- Name
+      FanAndCoilAvailSched,   !- Availability Schedule Name
+      0.7,                    !- Fan Total Efficiency
+      600.0,                  !- Pressure Rise{ Pa }
+      1.6,                    !- Maximum Flow Rate{ m3 / s }
+      0.9,                    !- Motor Efficiency
+      1.0,                    !- Motor In Airstream Fraction
+      Zone Exhaust Node,      !- Air Inlet Node Name
+      DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+
+    Coil:Cooling:WaterToAirHeatPump:EquationFit,
+      Sys 1 Heat Pump Cooling Mode,  !- Name
+      Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name
+      Sys 1 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name
+      DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
+      Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+      1.4,                     !- Rated Air Flow Rate {m3/s}
+      0.00165,                 !- Rated Water Flow Rate {m3/s}
+      40125.6,                 !- Gross Rated Total Cooling Capacity {W}
+      28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
+      7.007757577,             !- Gross Rated Cooling COP
+      ,                        !- Rated Entering Water Temperature
+      ,                        !- Rated Entering Air Dry-Bulb Temperature
+      ,                        !- Rated Entering Air Wet-Bulb Temperature
+      TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
+      SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name
+      CoolPowCurve,            !- Cooling Power Consumption Curve Name
+      0,                       !- Nominal Time for Condensate Removal to Begin {s}
+      0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+
+    Coil:Heating:WaterToAirHeatPump:EquationFit,
+      Sys 1 Heat Pump Heating Mode,  !- Name
+      Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
+      Sys 1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
+      Heating Coil Air Inlet Node,  !- Air Inlet Node Name
+      Reheat Coil Air Inlet Node,  !- Air Outlet Node Name
+      1.4,                     !- Rated Air Flow Rate {m3/s}
+      0.00165,                 !- Rated Water Flow Rate {m3/s}
+      33156.73,                !- Gross Rated Heating Capacity {W}
+      3.167053691,             !- Gross Rated Heating COP
+      ,                         !- Rated Entering Water Temperature
+      ,                         !- Rated Entering Air Dry-Bulb Temperature
+      ,                         !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
+      HeatCapCurve,             !- Heating Capacity Curve Name
+      HeatPowCurve;             !- Heating Power Consumption Curve Name
+
+    Coil:Heating:Fuel,
+      Humidistat Reheat Coil 1, !- Name
+      FanAndCoilAvailSched, !- Availability Schedule Name
+      NaturalGas,             !- Fuel Type
+      0.8, !- Gas Burner Efficiency
+      32000, !- Nominal Capacity{ W }
+      Reheat Coil Air Inlet Node, !- Air Inlet Node Name
+      Zone 2 Inlet Node;    !- Air Outlet Node Name
+
+    ScheduleTypeLimits,
+      Any Number;             !- Name
+
+    Schedule:Compact,
+      FanAndCoilAvailSched,   !- Name
+      Any Number,             !- Schedule Type Limits Name
+      Through: 12/31,         !- Field 1
+      For: AllDays,           !- Field 2
+      Until: 24:00, 1.0;      !- Field 3
+
+    Schedule:Compact,
+      ContinuousFanSchedule,  !- Name
+      Any Number,             !- Schedule Type Limits Name
+      Through: 12/31,         !- Field 1
+      For: AllDays,           !- Field 2
+      Until: 24:00, 1.0;      !- Field 3
+
+    Schedule:Compact,
+      Always 20C,                     !- Name
+      Any Number,                     !- Schedule Type Limits Name
+      Through: 12/31,                 !- Field 1
+      For: AllDays,                   !- Field 2
+      Until: 24:00, 20.0;             !- Field 3
+
+    SetpointManager:Scheduled,
+      Cooling Coil Setpoint Manager,  !- Name
+      Temperature,                    !- Control Variable
+      Always 20C,                     !- Schedule Name
+      Zone 2 Inlet Node;              !- Setpoint Node or NodeList Name
+
+    Curve:Quadratic,
+      CoolCapFFF,       !- Name
+      0.8,                    !- Coefficient1 Constant
+      0.2,                    !- Coefficient2 x
+      0.0,                    !- Coefficient3 x**2
+      0.5,                    !- Minimum Value of x
+      1.5;                    !- Maximum Value of x
+
+    Curve:Quadratic,
+      COOLEIRFFF,           !- Name
+      1.1552,                 !- Coefficient1 Constant
+      -0.1808,                !- Coefficient2 x
+      0.0256,                 !- Coefficient3 x**2
+      0.5,                    !- Minimum Value of x
+      1.5;                    !- Maximum Value of x
+
+    Curve:Quadratic,
+      PLFFPLR,          !- Name
+      0.85,                   !- Coefficient1 Constant
+      0.15,                   !- Coefficient2 x
+      0.0,                    !- Coefficient3 x**2
+      0.0,                    !- Minimum Value of x
+      1.0;                    !- Maximum Value of x
+
+    Curve:Biquadratic,
+      CoolCapFT,        !- Name
+      0.942587793,            !- Coefficient1 Constant
+      0.009543347,            !- Coefficient2 x
+      0.000683770,            !- Coefficient3 x**2
+      -0.011042676,           !- Coefficient4 y
+      0.000005249,            !- Coefficient5 y**2
+      -0.000009720,           !- Coefficient6 x*y
+      12.77778,               !- Minimum Value of x
+      23.88889,               !- Maximum Value of x
+      18.0,                   !- Minimum Value of y
+      46.11111,               !- Maximum Value of y
+      ,                       !- Minimum Curve Output
+      ,                       !- Maximum Curve Output
+      Temperature,            !- Input Unit Type for X
+      Temperature,            !- Input Unit Type for Y
+      Dimensionless;          !- Output Unit Type
+
+    Curve:Biquadratic,
+      COOLEIRFT,            !- Name
+      0.342414409,            !- Coefficient1 Constant
+      0.034885008,            !- Coefficient2 x
+      -0.000623700,           !- Coefficient3 x**2
+      0.004977216,            !- Coefficient4 y
+      0.000437951,            !- Coefficient5 y**2
+      -0.000728028,           !- Coefficient6 x*y
+      12.77778,               !- Minimum Value of x
+      23.88889,               !- Maximum Value of x
+      18.0,                   !- Minimum Value of y
+      46.11111,               !- Maximum Value of y
+      ,                       !- Minimum Curve Output
+      ,                       !- Maximum Curve Output
+      Temperature,            !- Input Unit Type for X
+      Temperature,            !- Input Unit Type for Y
+      Dimensionless;          !- Output Unit Type
+
+    Curve:QuintLinear,
+      SensCoolCapCurve,     ! Curve Name
+      2.24209455,           ! CoefficientC1
+      7.28913391,           ! CoefficientC2
+      -9.06079896,          ! CoefficientC3
+      -0.36729404,          ! CoefficientC4
+      0.218826161,          ! CoefficientC5
+      0.00901534,           ! CoefficientC6
+      0.,                   ! Minimum Value of v
+      100.,                 ! Maximum Value of v
+      0.,                   ! Minimum Value of w
+      100.,                 ! Maximum Value of w
+      0.,                   ! Minimum Value of x
+      100.,                 ! Maximum Value of x
+      0.,                   ! Minimum Value of y
+      100.,                 ! Maximum Value of y
+      0,                    ! Minimum Value of z
+      100,                  ! Maximum Value of z
+      0.,                   ! Minimum Curve Output
+      38.;                  ! Maximum Curve Output
+
+    Curve:QuadLinear,
+      TotCoolCapCurve,      ! Curve Name
+      -0.68126221,          ! CoefficientC1
+      1.99529297,           ! CoefficientC2
+      -0.93611888,          ! CoefficientC3
+      0.02081177,           ! CoefficientC4
+      0.008438868,          ! CoefficientC5
+      0.,                   ! Minimum Value of w
+      100.,                 ! Maximum Value of w
+      0.,                   ! Minimum Value of x
+      100.,                 ! Maximum Value of x
+      0.,                   ! Minimum Value of y
+      100.,                 ! Maximum Value of y
+      0,                    ! Minimum Value of z
+      100,                  ! Maximum Value of z
+      0.,                   ! Minimum Curve Output
+      38.;                  ! Maximum Curve Output
+
+    Curve:QuadLinear,
+      CoolPowCurve,         ! Curve Name
+      -3.20456384,          ! CoefficientC1
+      0.47656454,           ! CoefficientC2
+      3.16734236,           ! CoefficientC3
+      0.10244637,           ! CoefficientC4
+      -0.038132556,         ! CoefficientC5
+      0.,                   ! Minimum Value of w
+      100.,                 ! Maximum Value of w
+      0.,                   ! Minimum Value of x
+      100.,                 ! Maximum Value of x
+      0.,                   ! Minimum Value of y
+      100.,                 ! Maximum Value of y
+      0,                    ! Minimum Value of z
+      100,                  ! Maximum Value of z
+      0.,                   ! Minimum Curve Output
+      38.;                  ! Maximum Curve Output
+
+    Curve:QuadLinear,
+      HeatCapCurve,         ! Curve Name
+      -5.50102734,          ! CoefficientC1
+      -0.96688754,          ! CoefficientC2
+      7.70755007,           ! CoefficientC3
+      0.031928881,          ! CoefficientC4
+      0.028112522,          ! CoefficientC5
+      0.,                   ! Minimum Value of w
+      100.,                 ! Maximum Value of w
+      0.,                   ! Minimum Value of x
+      100.,                 ! Maximum Value of x
+      0.,                   ! Minimum Value of y
+      100.,                 ! Maximum Value of y
+      0,                    ! Minimum Value of z
+      100,                  ! Maximum Value of z
+      0.,                   ! Minimum Curve Output
+      38.;                  ! Maximum Curve Output
+
+    Curve:QuadLinear,
+      HeatPowCurve,         ! Curve Name
+      -7.47517858,          ! CoefficientC1
+      6.40876653,           ! CoefficientC2
+      1.99711665,           ! CoefficientC3
+      -0.050682973,         ! CoefficientC4
+      0.011385145,          ! CoefficientC5
+      0.,                   ! Minimum Value of w
+      100.,                 ! Maximum Value of w
+      0.,                   ! Minimum Value of x
+      100.,                 ! Maximum Value of x
+      0.,                   ! Minimum Value of y
+      100.,                 ! Maximum Value of y
+      0,                    ! Minimum Value of z
+      100,                  ! Maximum Value of z
+      0.,                   ! Minimum Curve Output
+      38.;                  ! Maximum Curve Output
+)IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                            // expect no errors
+
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
+
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+    auto &plantLoop1 = state->dataPlnt->PlantLoop(1);
+    auto &plantLoop2 = state->dataPlnt->PlantLoop(2);
+    plantLoop1.Name = "ChilledWaterLoop";
+    plantLoop1.FluidName = "FluidWaterLoop";
+    plantLoop1.FluidIndex = 1;
+    plantLoop1.FluidName = "WATER";
+    plantLoop1.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP COOLING MODE";
+    plantLoop1.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
+    plantLoop1.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 6;
+
+    plantLoop2.Name = "HotWaterLoop";
+    plantLoop2.FluidName = "FluidWaterLoop";
+    plantLoop2.FluidIndex = 1;
+    plantLoop2.FluidName = "WATER";
+    plantLoop2.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP HEATING MODE";
+    plantLoop2.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
+    plantLoop2.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 9;
+
+    std::string compName = "UNITARY SYSTEM MODEL";
+    int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
+    bool zoneEquipment = true;
+    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
+
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
+
+    ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
+    EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
+
+    state->dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
+    state->dataHVACGlobal->DoSetPointTest = true; // Force setpoint check
+
+    auto &inletNode = state->dataLoopNodes->Node(thisSys->AirInNode);
+    auto &outletNode = state->dataLoopNodes->Node(thisSys->AirOutNode);
+
+    // set up unitary system inlet condtions
+    inletNode.Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
+    inletNode.HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
+    inletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
+    inletNode.MassFlowRate = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
+    inletNode.MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
+
+    OutputReportPredefined::SetPredefinedTables(*state);
+
+    int AirLoopNum = 0;
+    int CompIndex = 1;
+    bool HeatActive = false;
+    bool CoolActive = true;
+    int constexpr ZoneOAUnitNum = 0;
+    Real64 constexpr OAUCoilOutTemp = 0.0;
+    bool const ZoneEquipment = true;
+    Real64 sensOut = 0.0;
+    Real64 latOut = 0.0;
+
+    outletNode.TempSetPoint = 20.0; // expect cooling coil operation
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+
+    auto &coolingCoil = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(thisSys->m_CoolingCoilIndex);
+    auto &heatingCoil = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(thisSys->m_HeatingCoilIndex);
+    EXPECT_NEAR(outletNode.Temp, 20.0, 0.01);
+    EXPECT_NEAR(coolingCoil.QLoadTotal, 19885.0, 1.0);
+    EXPECT_NEAR(heatingCoil.QLoadTotal, 0.0, 1.0);
+
+    outletNode.TempSetPoint = 30.0; // expect heating coil operation
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+
+    EXPECT_NEAR(outletNode.Temp, 30.0, 0.01);
+    EXPECT_NEAR(coolingCoil.QLoadTotal, 0.0, 1.0);
+    EXPECT_NEAR(heatingCoil.QLoadTotal, 5216.7, 1.0);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
@@ -18199,8 +18675,7 @@ Coil:Heating:Fuel,
   1.0,                            !- Gas Burner Efficiency
   autosize,                       !- Nominal Capacity
   Heating Coil Air Inlet Node,    !- Air Inlet Node Name
-  Zone 2 Inlet Node,              !- Air Outlet Node Name
-  Zone 2 Inlet Node;              !- Temperature Setpoint Node Name
+  Zone 2 Inlet Node;              !- Air Outlet Node Name
 
 ScheduleTypeLimits,
   Any Number;                     !- Name
@@ -18253,6 +18728,8 @@ Curve:Quadratic,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -18405,8 +18882,7 @@ Coil:Heating:Electric,
   1.0,                            !- Efficiency
   autosize,                       !- Nominal Capacity
   Heating Coil Air Inlet Node,    !- Air Inlet Node Name
-  Zone 2 Inlet Node,              !- Air Outlet Node Name
-  Zone 2 Inlet Node;              !- Temperature Setpoint Node Name
+  Zone 2 Inlet Node;              !- Air Outlet Node Name
 
 ScheduleTypeLimits,
   Any Number;                     !- Name
@@ -18459,6 +18935,8 @@ Curve:Quadratic,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -18603,7 +19081,7 @@ Coil:Heating:Desuperheater,
   Zone 2 Inlet Node,              !- Coil Air Outlet Node Name
   Refrigeration:CompressorRack,   !- Heating Source Type
   SelfContainedDisplay,           !- Heating Source Name
-  Zone 2 Inlet Node,              !- Coil Temperature Setpoint Node Name
+  ,                               !- Coil Temperature Setpoint Node Name
   0.1;                            !- Parasitic Electric Load {W}
 
 ScheduleTypeLimits,
@@ -18767,6 +19245,8 @@ Schedule:Compact,
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHVACGlobal->DoSetPointTest = true;
+    SetPointManager::ManageSetPoints(*state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;

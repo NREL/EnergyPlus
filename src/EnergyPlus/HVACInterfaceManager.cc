@@ -787,7 +787,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
     // accordingly.
 
-    auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
+    auto &PlantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe;
 
     // One time call to set up report variables and set common pipe 'type' flag
     if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
@@ -798,7 +798,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     int NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
     int NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
-    auto &MyEnvrnFlag(PlantCommonPipe(LoopNum).MyEnvrnFlag);
+    auto &MyEnvrnFlag = PlantCommonPipe(LoopNum).MyEnvrnFlag;
     if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         PlantCommonPipe(LoopNum).Flow = 0.0;
         PlantCommonPipe(LoopNum).Temp = 0.0;
@@ -1120,8 +1120,8 @@ void SetupCommonPipes(EnergyPlusData &state)
         // reference to easily lookup the first item once
         auto &thisPlantLoop = state.dataPlnt->PlantLoop(CurLoopNum);
         auto &thisCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(CurLoopNum);
-        auto &first_demand_component_type(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type);
-        auto &first_supply_component_type(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type);
+        auto const &first_demand_component_type = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type;
+        auto const &first_supply_component_type = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type;
 
         switch (thisPlantLoop.CommonPipeType) {
         case DataPlant::CommonPipeType::No:

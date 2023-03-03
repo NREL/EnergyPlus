@@ -832,7 +832,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Temporary KA model for initialization
-    std::unique_ptr<KusudaGroundTempsModel> tempModel(new KusudaGroundTempsModel());
+    auto tempModel = std::make_unique<KusudaGroundTempsModel>();
 
     tempModel->objectName = "KAModelForFDModel";
     tempModel->objectType = GroundTempObjType::KusudaGroundTemp;
