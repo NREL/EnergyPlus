@@ -1458,13 +1458,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 HardSizeNoDesRun = true;
                 if (thisEvapCond.PadArea > 0.0) {
                     // report for the indirect evap cooler types only
-                    if (thisEvapCond.PadArea > 0.0) {
-                        BaseSizer::reportSizerOutput(state,
-                                                     "EvaporativeCooler:Direct:CelDekPad",
-                                                     thisEvapCond.Name,
-                                                     "User-Specified Celdek Pad Area [m2]",
-                                                     thisEvapCond.PadArea);
-                    }
+                    BaseSizer::reportSizerOutput(
+                        state, "EvaporativeCooler:Direct:CelDekPad", thisEvapCond.Name, "User-Specified Celdek Pad Area [m2]", thisEvapCond.PadArea);
                 }
             } else { // Autosize or hardsize with design data
                 // zone equip evap coolers

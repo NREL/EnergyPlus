@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # check out the repo to get the script downloaded
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
         # gets the current PR and stores it in a variable
       - uses: jwalton/gh-find-current-pr@v1
         id: findPr

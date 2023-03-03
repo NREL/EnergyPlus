@@ -605,19 +605,6 @@
     Until: 24:00,117.239997864; !- Field 3
 
   Schedule:Compact,
-    BasinHeaterSched,        !- Name
-    On/Off,                  !- Schedule Type Limits Name
-    Through: 1/31,           !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,1.0,        !- Field 3
-    Through: 2/2,            !- Field 5
-    For: AllDays,            !- Field 6
-    Until: 24:00,0.0,        !- Field 7
-    Through: 12/31,          !- Field 9
-    For: AllDays,            !- Field 10
-    Until: 24:00,1.0;        !- Field 11
-
-  Schedule:Compact,
     ShadeTransSch,           !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2031,25 +2018,6 @@
     Until: 24:00,1.0;        !- Field 21
 
   Schedule:Compact,
-    CoolingCoilAvailSched,   !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,0.0,        !- Field 3
-    Through: 9/30,           !- Field 5
-    For: WeekDays,           !- Field 6
-    Until: 7:00,0.0,         !- Field 7
-    Until: 17:00,1.0,        !- Field 9
-    Until: 24:00,0.0,        !- Field 11
-    For: SummerDesignDay WinterDesignDay, !- Field 13
-    Until: 24:00,1.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,0.0,        !- Field 17
-    Through: 12/31,          !- Field 19
-    For: AllDays,            !- Field 20
-    Until: 24:00,0.0;        !- Field 21
-
-  Schedule:Compact,
     ReheatCoilAvailSched,    !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
@@ -2729,22 +2697,21 @@
     0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
-    VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
-    VAV Sys 1 Outlet Node;   !- Temperature Setpoint Node Name
+    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name
 
   SetpointManager:Scheduled,
-    Supply Air Hum Rate Manager 1,  !- Name
+    Supply Air HumRat Manager 1,  !- Name
     MaximumHumidityRatio,    !- Control Variable
-    Supply Air Hum Rate Schedule,  !- Schedule Name
+    Supply Air HumRat Schedule,  !- Schedule Name
     VAV Sys 1 Outlet Node;   !- Setpoint Node or NodeList Name
 
   SetpointManager:Scheduled,
-    Supply Air Hum Rate Manager 2,  !- Name
+    Supply Air HumRat Manager 2,  !- Name
     MaximumHumidityRatio,    !- Control Variable
-    Supply Air Hum Rate Schedule,  !- Schedule Name
+    Supply Air HumRat Schedule,  !- Schedule Name
     Main Heating Coil 1 Inlet Node;  !- Setpoint Node or NodeList Name
 
-  Schedule:Constant,Supply Air Hum Rate Schedule,,0.006;
+  Schedule:Constant,Supply Air HumRat Schedule,Any Number,0.006;
 
 ! end changes
 
@@ -3040,15 +3007,9 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
-  Output:Variable,*,Coil System Compressor Speed Ratio,hourly;
-
   Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
-
-  Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
-
-  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
 
   Output:Variable,*,Fan Electricity Rate,hourly;
 
@@ -3133,10 +3094,6 @@
   Output:Variable,*,Unitary System Frost Control Status,hourly;
 
   Output:Variable,*,Unitary System Heating Ancillary Electricity Energy,hourly;
-
-  Output:Variable,*,Unitary System Cycling Ratio,hourly;
-
-  Output:Variable,*,Unitary System Compressor Speed Ratio,hourly;
 
   Output:Variable,*,Water Heater Tank Temperature,hourly;
 
