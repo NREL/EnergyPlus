@@ -3483,7 +3483,7 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     //   timestep to the appropriate bin.
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using ScheduleManager::GetCurrentScheduleValue;
 
     // Locals
@@ -3609,20 +3609,9 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
     //   holding the data that will be reported later.
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
     using General::EncodeMonDayHrMin;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int iTable;  // loop variable for monthlyTables
@@ -3736,7 +3725,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                     // per MJW when a summed variable is used divide it by the length of the time step
                     if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                         if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                            curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                            curValue /= (TimeStepSysSec);
                         } else {
                             curValue /= state.dataGlobal->TimeStepZoneSec;
                         }
@@ -3754,7 +3743,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                     // per MJW when a summed variable is used divide it by the length of the time step
                     if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                         if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                            curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                            curValue /= (TimeStepSysSec);
                         } else {
                             curValue /= state.dataGlobal->TimeStepZoneSec;
                         }
@@ -3859,7 +3848,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                             // When a summed variable is used divide it by the length of the time step
                             if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                    scanValue /= (TimeStepSysSec);
                                 } else {
                                     scanValue /= state.dataGlobal->TimeStepZoneSec;
                                 }
@@ -3902,7 +3891,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                         case AggType::MaximumDuringHoursShown: {
                             if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                    scanValue /= (TimeStepSysSec);
                                 } else {
                                     scanValue /= state.dataGlobal->TimeStepZoneSec;
                                 }
@@ -3915,7 +3904,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                         case AggType::MinimumDuringHoursShown: {
                             if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                    scanValue /= (TimeStepSysSec);
                                 } else {
                                     scanValue /= state.dataGlobal->TimeStepZoneSec;
                                 }
@@ -4385,11 +4374,12 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // the output variables and data structures shown.
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    
     Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
     Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+
     state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
     state.dataHeatBal->SysTotalHVACRejectHeatLoss = 0;
 
@@ -4637,7 +4627,9 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
     // The peak reports follow a similar example.
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    
     using General::EncodeMonDayHrMin;
 
     auto &Zone(state.dataHeatBal->Zone);
@@ -4706,18 +4698,18 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
                                   state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR) -
                                   state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
         if (ZoneEqHeatorCool > 0.0) {
-            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSys * DataGlobalConstants::SecInHour;
+            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSysSec;
         } else {
-            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqCl += ZoneEqHeatorCool * TimeStepSys * DataGlobalConstants::SecInHour;
+            ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnZoneEqCl += ZoneEqHeatorCool * TimeStepSysSec;
         }
         // Interzone Air Transfer Heat Addition
         // Interzone Air Transfer Heat Removal
         if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones > 0.0) {
             ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnIzaAdd +=
-                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult * TimeStepSys * DataGlobalConstants::SecInHour;
+                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult * TimeStepSysSec;
         } else {
             ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnIzaRem +=
-                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult * TimeStepSys * DataGlobalConstants::SecInHour;
+                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTzones * mult * TimeStepSysSec;
         }
         // Window Heat Addition
         // Window Heat Removal
@@ -4729,10 +4721,10 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
         // Infiltration Heat Removal
         if (state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil > 0.0) {
             ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnInfilAdd +=
-                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult * TimeStepSys * DataGlobalConstants::SecInHour;
+                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult * TimeStepSysSec;
         } else {
             ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnInfilRem +=
-                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult * TimeStepSys * DataGlobalConstants::SecInHour;
+                state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDtInfil * mult * TimeStepSysSec;
         }
         // Equipment Sensible Heat Addition
         // Equipment Sensible Heat Removal
@@ -15148,7 +15140,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
     //   Save sequence of values for report during sizing.
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &ort(state.dataOutRptTab);
@@ -15159,8 +15151,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
         for (state.dataOutRptTab->iZoneGCLH = 1; state.dataOutRptTab->iZoneGCLH <= state.dataGlobal->NumOfZones; ++state.dataOutRptTab->iZoneGCLH) {
             ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatGain -
-                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatLoss) /
-                 (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
+                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatLoss) / (TimeStepSysSec)); // zone infiltration
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenGainW -
@@ -15168,8 +15159,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
             }
             ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentGain -
-                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentLoss) /
-                 (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
+                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentLoss) / (TimeStepSysSec)); // zone infiltration
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatGainW -
@@ -15178,8 +15168,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
 
             ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatGain -
-                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatLoss) /
-                 (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
+                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatLoss) / (TimeStepSysSec)); // zone ventilation
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenGainW -
@@ -15187,8 +15176,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
             }
             ort->zoneVentLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentGain -
-                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentLoss) /
-                 (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
+                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentLoss) / (TimeStepSysSec)); // zone ventilation
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatGainW -
@@ -15197,8 +15185,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
 
             ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatGain -
-                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatLoss) /
-                 (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
+                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatLoss) / (TimeStepSysSec)); // zone mixing
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->interZoneMixInstantSeq(
                     state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
@@ -15207,8 +15194,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
             }
             ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentGain -
-                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentLoss) /
-                 (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
+                  state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentLoss) / (TimeStepSysSec)); // zone mixing
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->interZoneMixLatentSeq(
                     state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=

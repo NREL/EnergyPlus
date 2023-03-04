@@ -5346,17 +5346,14 @@ namespace LowTempRadiantSystem {
         // iterating orwe had to go back and shorten the time step.  As a result, we have to subtract out the previous value that we
         // added.  If the system time step elapsed is different, then we just need to add the new values to the running average.
 
-        // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
         for (int radSurfNum = 1; radSurfNum <= this->NumOfSurfaces; ++radSurfNum) {
 
             int surfNum = this->SurfacePtr(radSurfNum);
 
-            if (state.dataLowTempRadSys->LastSysTimeElapsed(surfNum) == SysTimeElapsed) {
+            if (state.dataLowTempRadSys->LastSysTimeElapsed(surfNum) == state.dataHVACGlobal->SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
                 state.dataLowTempRadSys->QRadSysSrcAvg(surfNum) -= state.dataLowTempRadSys->LastQRadSysSrc(surfNum) *
@@ -5963,7 +5960,7 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
@@ -5993,11 +5990,11 @@ namespace LowTempRadiantSystem {
             this->WaterOutletTemp = this->WaterInletTemp;
         }
 
-        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HeatEnergy = this->HeatPower * TimeStepSysSec;
+        this->CoolEnergy = this->CoolPower * TimeStepSysSec;
 
         if (this->CondCausedShutDown) {
-            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour;
+            this->CondCausedTimeOff = TimeStepSysSec;
         } else {
             this->CondCausedTimeOff = 0.0;
         }
@@ -6009,7 +6006,7 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         using FluidProperties::GetSpecificHeatGlycol;
 
         auto constexpr routineName("ReportConstantFlowSystem");
@@ -6069,13 +6066,13 @@ namespace LowTempRadiantSystem {
             this->PumpHeattoFluid = 0.0;
         }
 
-        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        this->PumpEnergy = this->PumpPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HeatEnergy = this->HeatPower * TimeStepSysSec;
+        this->CoolEnergy = this->CoolPower * TimeStepSysSec;
+        this->PumpEnergy = this->PumpPower * TimeStepSysSec;
+        this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSysSec;
 
         if (this->CondCausedShutDown) {
-            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour;
+		this->CondCausedTimeOff = TimeStepSysSec;
         } else {
             this->CondCausedTimeOff = 0.0;
         }
@@ -6087,8 +6084,6 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
         for (int radSurfNum = 1; radSurfNum <= this->NumOfSurfaces; ++radSurfNum) {
@@ -6098,7 +6093,7 @@ namespace LowTempRadiantSystem {
         totalRadSysPower *= double(Zone(this->ZonePtr).Multiplier * Zone(this->ZonePtr).ListMultiplier);
 
         this->ElecPower = totalRadSysPower;
-        this->ElecEnergy = this->ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ElecEnergy = this->ElecPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->HeatPower = this->ElecPower;
         this->HeatEnergy = this->ElecEnergy;
     }

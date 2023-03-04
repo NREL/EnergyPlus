@@ -3282,6 +3282,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     Real64 ADUHeatFlowrate;
     bool CompLoadFlag;
 
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     if (!state.dataSysRpts->AirLoopLoadsReportEnabled) return;
 
     for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
@@ -3344,7 +3345,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                 if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                 CompLoad = Node(OutletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                CompLoad *= TimeStepSysSec;
                 CompEnergyUse = 0.0;
                 EnergyType = DataGlobalConstants::ResourceType::None;
                 CompLoadFlag = true;
@@ -3365,7 +3366,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                     if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                     CompLoad = Node(OutletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                    Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                    CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                    CompLoad *= TimeStepSysSec;
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
@@ -3387,7 +3388,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                         CompLoad =
                             Node(OutletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                 Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                        CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                        CompLoad *= TimeStepSysSec;
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
@@ -3466,7 +3467,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                             (Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat) * Node(OutletNodeNum).MassFlowRate);
                     }
                 }
-                CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                CompLoad *= TimeStepSysSec;
                 CompEnergyUse = 0.0;
                 EnergyType = DataGlobalConstants::ResourceType::None;
                 CompLoadFlag = true;
@@ -3485,7 +3486,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                     if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                     CompLoad = Node(InletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                   Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                    CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                    CompLoad *= TimeStepSysSec;
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
@@ -3505,7 +3506,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                         CompLoad =
                             Node(InletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                        CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                        CompLoad *= TimeStepSysSec;
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
@@ -4080,7 +4081,8 @@ void ReportVentilationLoads(EnergyPlusData &state)
     Real64 constexpr SmallLoad(0.1); // (W)
 
     auto &Node(state.dataLoopNodes->Node);
-    auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
 
     if (!state.dataSysRpts->VentReportStructureCreated) return;
     if (!state.dataSysRpts->VentLoadsReportEnabled) return;
@@ -4189,7 +4191,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4208,7 +4210,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4231,7 +4233,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 }
 
                 break;
@@ -4249,7 +4251,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4269,7 +4271,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4288,7 +4290,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4308,7 +4310,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4332,7 +4334,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4353,7 +4355,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
 
                     ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
+                        (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4450,7 +4452,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).TargetVentilationFlowVoz +=
                     termUnitOAFrac * thisZoneVentRepVars.TargetVentilationFlowVoz;
                 Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) /
-                                         (TimeStepSys * DataGlobalConstants::SecInHour);
+                                         (TimeStepSysSec);
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).NatVentFlow += termUnitOAFrac * naturalVentFlow;
 
                 if (thisZonePredefRep.isOccupied) {
@@ -4483,8 +4485,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     AirSysOutAirFlow = 0.0;
                 }
                 // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                AirSysZoneVentLoad = (ADUCoolFlowrate + ADUHeatFlowrate) * (AirSysEnthMixedAir - AirSysEnthReturnAir) * TimeStepSys *
-                                     DataGlobalConstants::SecInHour; //*KJperJ
+                AirSysZoneVentLoad = (ADUCoolFlowrate + ADUHeatFlowrate) * (AirSysEnthMixedAir - AirSysEnthReturnAir) * TimeStepSysSec; //*KJperJ
             }
             ZAirSysZoneVentLoad += AirSysZoneVentLoad;
             ZAirSysOutAirFlow += AirSysOutAirFlow;
@@ -4494,16 +4495,16 @@ void ReportVentilationLoads(EnergyPlusData &state)
         OutAirFlow = ZAirSysOutAirFlow + ZFAUOutAirFlow;
         // assign report variables
         thisZoneVentRepVars.OAMassFlow = OutAirFlow;
-        thisZoneVentRepVars.OAMass = thisZoneVentRepVars.OAMassFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisZoneVentRepVars.OAMass = thisZoneVentRepVars.OAMassFlow * TimeStepSysSec;
 
         // determine volumetric values from mass flow using standard density (adjusted for elevation)
         thisZoneVentRepVars.OAVolFlowStdRho = thisZoneVentRepVars.OAMassFlow / state.dataEnvrn->StdRhoAir;
-        thisZoneVentRepVars.OAVolStdRho = thisZoneVentRepVars.OAVolFlowStdRho * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisZoneVentRepVars.OAVolStdRho = thisZoneVentRepVars.OAVolFlowStdRho * TimeStepSysSec;
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
         Real64 totMechNatVentVolStdRho =
             thisZoneVentRepVars.OAVolStdRho + state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen;
-        Real64 targetVoz = thisZoneVentRepVars.TargetVentilationFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 targetVoz = thisZoneVentRepVars.TargetVentilationFlowVoz * TimeStepSysSec;
         // Allow 1% tolerance
         if (totMechNatVentVolStdRho < (0.99 * targetVoz)) {
             thisZoneVentRepVars.TimeBelowVozDyn = TimeStepSys;
@@ -4523,7 +4524,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                                               state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).MAT,
                                               state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).ZoneAirHumRatAvg);
         if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.OAVolFlowCrntRho = thisZoneVentRepVars.OAMassFlow / currentZoneAirDensity;
-        thisZoneVentRepVars.OAVolCrntRho = thisZoneVentRepVars.OAVolFlowCrntRho * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisZoneVentRepVars.OAVolCrntRho = thisZoneVentRepVars.OAVolFlowCrntRho * TimeStepSysSec;
         if (ZoneVolume > 0.0) thisZoneVentRepVars.MechACH = (thisZoneVentRepVars.OAVolCrntRho / TimeStepSys) / ZoneVolume;
 
         // store data for predefined tabular report on outside air
@@ -4624,14 +4625,14 @@ void ReportVentilationLoads(EnergyPlusData &state)
         auto &thisSysPreDefRep = state.dataSysRpts->SysPreDefRep(sysNum);
         Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow * state.dataEnvrn->StdRhoAir;
         thisSysVentRepVars.MechVentFlow = mechVentFlow;
-        thisSysPreDefRep.MechVentTotal += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
-        thisSysPreDefRep.NatVentTotal += thisSysVentRepVars.NatVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisSysPreDefRep.MechVentTotal += mechVentFlow * TimeStepSysSec;
+        thisSysPreDefRep.NatVentTotal += thisSysVentRepVars.NatVentFlow * TimeStepSysSec;
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
         Real64 totMechNatVentVolFlowStdRho = mechVentFlow + thisSysVentRepVars.NatVentFlow;
 
         Real64 targetFlowVoz = thisSysVentRepVars.TargetVentilationFlowVoz;
-        thisSysPreDefRep.TargetVentTotalVoz += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisSysPreDefRep.TargetVentTotalVoz += targetFlowVoz * TimeStepSysSec;
         // Allow 1% tolerance
         if (totMechNatVentVolFlowStdRho < (0.99 * targetFlowVoz)) {
             thisSysVentRepVars.TimeBelowVozDyn = TimeStepSys;
@@ -4646,9 +4647,9 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
         if (thisSysVentRepVars.AnyZoneOccupied) {
             thisSysPreDefRep.TimeOccupiedTotal += TimeStepSys;
-            thisSysPreDefRep.MechVentTotalOcc += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
-            thisSysPreDefRep.NatVentTotalOcc += thisSysVentRepVars.NatVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
-            thisSysPreDefRep.TargetVentTotalVozOcc += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSysPreDefRep.MechVentTotalOcc += mechVentFlow * TimeStepSysSec;
+            thisSysPreDefRep.NatVentTotalOcc += thisSysVentRepVars.NatVentFlow * TimeStepSysSec;
+            thisSysPreDefRep.TargetVentTotalVozOcc += targetFlowVoz * TimeStepSysSec;
             thisSysPreDefRep.TimeBelowVozDynTotalOcc += thisSysVentRepVars.TimeBelowVozDyn;
             thisSysPreDefRep.TimeAboveVozDynTotalOcc += thisSysVentRepVars.TimeAboveVozDyn;
             thisSysPreDefRep.TimeAtVozDynTotalOcc += thisSysVentRepVars.TimeAtVozDyn;
@@ -4665,7 +4666,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 thisSysPreDefRep.TimeAtOALimit[limitFactorIndex] += TimeStepSys;
                 if (thisSysVentRepVars.AnyZoneOccupied) {
                     thisSysPreDefRep.TimeAtOALimitOcc[limitFactorIndex] += TimeStepSys;
-                    thisSysPreDefRep.MechVentTotAtLimitOcc[limitFactorIndex] += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+                    thisSysPreDefRep.MechVentTotAtLimitOcc[limitFactorIndex] += mechVentFlow * TimeStepSysSec;
                 }
             }
         }
