@@ -119,9 +119,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataMaterial->Material.push_back(p);
     dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MatNum))->AbsorpThermal = 0.8;
     // allocate exterior vented cavity variable data
-    state->dataSurface->ExtVentedCavity.allocate(1);
-    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
-    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
+    state->dataHeatBal->ExtVentedCavity.allocate(1);
+    state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
+    state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
     state->dataHeatBal->Zone.allocate(ZoneNum);
     state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
@@ -168,7 +168,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     // call to test fix to resolve crash
     CalcPassiveExteriorBaffleGap(*state,
-                                 state->dataSurface->ExtVentedCavity(1).SurfPtrs,
+                                 state->dataHeatBal->ExtVentedCavity(1).SurfPtrs,
                                  VentArea,
                                  Cv,
                                  Cd,
@@ -199,8 +199,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
     state->dataConstruction->Construct.deallocate();
     state->dataMaterial->Material.deallocate();
-    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
-    state->dataSurface->ExtVentedCavity.deallocate();
+    state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
+    state->dataHeatBal->ExtVentedCavity.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->SurfQRadSWOutIncident.deallocate();
 }

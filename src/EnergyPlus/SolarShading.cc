@@ -6478,7 +6478,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                 Real64 SlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
                 Real64 ProfAngInterpFac = state.dataSurface->SurfWinProfAngInterpFac(SurfNum);
 
-                auto const &thisBlind = state.dataHeatBal->Blind(BlNum);
+                auto const &thisBlind = state.dataMaterial->Blind(BlNum);
                 if (VarSlats) {
                     // Used in time step variable reporting
                     FrontDiffDiffTrans = General::InterpGeneral(
@@ -6752,7 +6752,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 Real64 rbd2 = thisConstruct.rbBareSolDiff(2);
                                 Real64 tfshBB =
                                     state.dataSurface->SurfWinBlindBmBmTrans(SurfNum); // Bare-blind front and back beam-beam solar transmittance
-                                auto const &thisBlind = state.dataHeatBal->Blind(BlNum);
+                                auto const &thisBlind = state.dataMaterial->Blind(BlNum);
                                 Real64 tbshBB = WindowManager::BlindBeamBeamTrans(ProfAng,
                                                                                   DataGlobalConstants::Pi - SlatAng,
                                                                                   thisBlind.SlatWidth,
@@ -6992,7 +6992,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             }
                             // For blinds with horizontal slats, allow different diffuse/diffuse transmittance for
                             // ground and sky solar
-                            if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
+                            if (state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
                                 DataWindowEquivalentLayer::Orientation::Horizontal) {
                                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                     DiffTransGnd =
@@ -7234,7 +7234,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowModel::EQL) {
                 state.dataSolarShading->SurfWinTransDifSolar(SurfNum) = DiffTrans * state.dataSurface->Surface(SurfNum).Area;
                 if (ANY_BLIND(ShadeFlag)) {
-                    if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
+                    if (state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
                         DataWindowEquivalentLayer::Orientation::Horizontal) {
                         state.dataSolarShading->SurfWinTransDifSolarGnd(SurfNum) = DiffTransGnd * state.dataSurface->Surface(SurfNum).Area;
                         state.dataSolarShading->SurfWinTransDifSolarSky(SurfNum) = DiffTransSky * state.dataSurface->Surface(SurfNum).Area;
@@ -7524,8 +7524,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 // of back exterior window with BLIND
                                 if (ANY_BLIND(ShadeFlagBack)) {
                                     int BlNumBack = state.dataSurface->SurfWinBlindNumber(BackSurfNum); // Back surface blind number
-                                    auto const &thisBlindBack = state.dataHeatBal->Blind(BlNumBack);
-                                    auto const &thisBlind = state.dataHeatBal->Blind(BlNum);
+                                    auto const &thisBlindBack = state.dataMaterial->Blind(BlNumBack);
+                                    auto const &thisBlind = state.dataMaterial->Blind(BlNum);
                                     Real64 ProfAngBack =
                                         state.dataSurface->SurfWinProfileAng(BackSurfNum); // Back window solar profile angle (radians)
 
@@ -8444,7 +8444,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         state.dataSurface->SurfWinDifSolarEnergy(SurfNum) =
                             state.dataSurface->SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         if (ANY_BLIND(ShadeFlag)) {
-                            if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
+                            if (state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
                                 DataWindowEquivalentLayer::Orientation::Horizontal) {
                                 state.dataSurface->SurfWinDifSolar(SurfNum) = SkySolarInc * state.dataSolarShading->SurfWinTransDifSolarSky(SurfNum) +
                                                                               GndSolarInc * state.dataSolarShading->SurfWinTransDifSolarGnd(SurfNum);
@@ -9917,7 +9917,7 @@ void WindowShadingManager(EnergyPlusData &state)
                     // Blind in place or may be in place due to glare control
                     int BlNum = state.dataSurface->SurfWinBlindNumber(ISurf);
                     if (BlNum > 0) {
-                        Real64 InputSlatAngle = state.dataHeatBal->Blind(BlNum).SlatAngle *
+                        Real64 InputSlatAngle = state.dataMaterial->Blind(BlNum).SlatAngle *
                                                 DataGlobalConstants::DegToRadians; // Slat angle of associated Material:WindowBlind (rad)
                         Real64 ProfAng;                                            // Solar profile angle (rad)
                         Real64 SlatAng;                                            // Slat angle this time step (rad)
@@ -9930,7 +9930,7 @@ void WindowShadingManager(EnergyPlusData &state)
                         DaylightingManager::ProfileAngle(state,
                                                          ISurf,
                                                          state.dataEnvrn->SOLCOS,
-                                                         state.dataHeatBal->Blind(BlNum).SlatOrientation,
+                                                         state.dataMaterial->Blind(BlNum).SlatOrientation,
                                                          state.dataSurface->SurfWinProfileAng(ISurf));
                         ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
                         if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
@@ -9941,28 +9941,28 @@ void WindowShadingManager(EnergyPlusData &state)
                         state.dataSurface->SurfWinProfAngInterpFac(ISurf) =
                             (ProfAng + DataGlobalConstants::PiOvr2 - (ProfAngIndex - 1) * DeltaProfAng) / DeltaProfAng;
 
-                        if (state.dataHeatBal->Blind(BlNum).SlatWidth > state.dataHeatBal->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
+                        if (state.dataMaterial->Blind(BlNum).SlatWidth > state.dataMaterial->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
                             ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
-                            Real64 ThetaBase = std::acos(std::cos(ProfAng) * state.dataHeatBal->Blind(BlNum).SlatSeparation /
-                                                         state.dataHeatBal->Blind(BlNum).SlatWidth);
+                            Real64 ThetaBase = std::acos(std::cos(ProfAng) * state.dataMaterial->Blind(BlNum).SlatSeparation /
+                                                         state.dataMaterial->Blind(BlNum).SlatWidth);
                             // There are two solutions for the slat angle that just blocks beam radiation
                             ThetaBlock1 = ProfAng + ThetaBase;
                             ThetaBlock2 = ProfAng + DataGlobalConstants::Pi - ThetaBase;
                             state.dataSolarShading->ThetaSmall = min(ThetaBlock1, ThetaBlock2);
                             state.dataSolarShading->ThetaBig = max(ThetaBlock1, ThetaBlock2);
-                            state.dataSolarShading->ThetaMin = state.dataHeatBal->Blind(BlNum).MinSlatAngle * DataGlobalConstants::DegToRadians;
-                            state.dataSolarShading->ThetaMax = state.dataHeatBal->Blind(BlNum).MaxSlatAngle * DataGlobalConstants::DegToRadians;
+                            state.dataSolarShading->ThetaMin = state.dataMaterial->Blind(BlNum).MinSlatAngle * DataGlobalConstants::DegToRadians;
+                            state.dataSolarShading->ThetaMax = state.dataMaterial->Blind(BlNum).MaxSlatAngle * DataGlobalConstants::DegToRadians;
                         }
 
                         // TH 5/20/2010, CR 8064: Slat Width <= Slat Separation
-                        if (state.dataHeatBal->Blind(BlNum).SlatWidth <= state.dataHeatBal->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
+                        if (state.dataMaterial->Blind(BlNum).SlatWidth <= state.dataMaterial->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
                             if (state.dataSurface->WindowShadingControl(IShadingCtrl).slatAngleControl == SlatAngleControl::BlockBeamSolar) {
                                 ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
-                                if (std::abs(std::cos(ProfAng) * state.dataHeatBal->Blind(BlNum).SlatSeparation /
-                                             state.dataHeatBal->Blind(BlNum).SlatWidth) <= 1.0) {
+                                if (std::abs(std::cos(ProfAng) * state.dataMaterial->Blind(BlNum).SlatSeparation /
+                                             state.dataMaterial->Blind(BlNum).SlatWidth) <= 1.0) {
                                     // set to block 100% of beam solar, not necessarily to block maximum solar (beam + diffuse)
-                                    ThetaBase = std::acos(std::cos(ProfAng) * state.dataHeatBal->Blind(BlNum).SlatSeparation /
-                                                          state.dataHeatBal->Blind(BlNum).SlatWidth);
+                                    ThetaBase = std::acos(std::cos(ProfAng) * state.dataMaterial->Blind(BlNum).SlatSeparation /
+                                                          state.dataMaterial->Blind(BlNum).SlatWidth);
                                     state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
                                 } else {
                                     // cannot block 100% of beam solar, turn slats to be perpendicular to sun beam to block maximal beam solar
@@ -9975,8 +9975,8 @@ void WindowShadingManager(EnergyPlusData &state)
 
                                 state.dataSolarShading->ThetaSmall = min(ThetaBlock1, ThetaBlock2);
                                 state.dataSolarShading->ThetaBig = max(ThetaBlock1, ThetaBlock2);
-                                state.dataSolarShading->ThetaMin = state.dataHeatBal->Blind(BlNum).MinSlatAngle * DataGlobalConstants::DegToRadians;
-                                state.dataSolarShading->ThetaMax = state.dataHeatBal->Blind(BlNum).MaxSlatAngle * DataGlobalConstants::DegToRadians;
+                                state.dataSolarShading->ThetaMin = state.dataMaterial->Blind(BlNum).MinSlatAngle * DataGlobalConstants::DegToRadians;
+                                state.dataSolarShading->ThetaMax = state.dataMaterial->Blind(BlNum).MaxSlatAngle * DataGlobalConstants::DegToRadians;
                             }
                         }
 
@@ -9985,7 +9985,7 @@ void WindowShadingManager(EnergyPlusData &state)
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
                             if ((state.dataSurface->SurfWinSlatAngThisTS(ISurf) <= state.dataSolarShading->ThetaSmall ||
                                  state.dataSurface->SurfWinSlatAngThisTS(ISurf) >= state.dataSolarShading->ThetaBig) &&
-                                (state.dataHeatBal->Blind(BlNum).SlatWidth > state.dataHeatBal->Blind(BlNum).SlatSeparation) &&
+                                (state.dataMaterial->Blind(BlNum).SlatWidth > state.dataMaterial->Blind(BlNum).SlatSeparation) &&
                                 (BeamSolarOnWindow > 0.0))
                                 state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
                         } break;
@@ -9993,18 +9993,18 @@ void WindowShadingManager(EnergyPlusData &state)
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) =
                                 GetCurrentScheduleValue(state, state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) =
-                                max(state.dataHeatBal->Blind(BlNum).MinSlatAngle,
-                                    min(state.dataSurface->SurfWinSlatAngThisTS(ISurf), state.dataHeatBal->Blind(BlNum).MaxSlatAngle)) *
+                                max(state.dataMaterial->Blind(BlNum).MinSlatAngle,
+                                    min(state.dataSurface->SurfWinSlatAngThisTS(ISurf), state.dataMaterial->Blind(BlNum).MaxSlatAngle)) *
                                 DataGlobalConstants::DegToRadians;
                             if ((state.dataSurface->SurfWinSlatAngThisTS(ISurf) <= state.dataSolarShading->ThetaSmall ||
                                  state.dataSurface->SurfWinSlatAngThisTS(ISurf) >= state.dataSolarShading->ThetaBig) &&
-                                (state.dataHeatBal->Blind(BlNum).SlatWidth > state.dataHeatBal->Blind(BlNum).SlatSeparation) &&
+                                (state.dataMaterial->Blind(BlNum).SlatWidth > state.dataMaterial->Blind(BlNum).SlatSeparation) &&
                                 (BeamSolarOnWindow > 0.0))
                                 state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
                         } break;
                         case SlatAngleControl::BlockBeamSolar: { // 'BLOCKBEAMSOLAR'
                             if (BeamSolarOnWindow > 0.0) {
-                                if (state.dataHeatBal->Blind(BlNum).SlatSeparation >= state.dataHeatBal->Blind(BlNum).SlatWidth) {
+                                if (state.dataMaterial->Blind(BlNum).SlatSeparation >= state.dataMaterial->Blind(BlNum).SlatWidth) {
                                     // TH 5/20/2010. CR 8064.
                                     // The following line of code assumes slats are always vertical/closed to minimize solar penetration
                                     // The slat angle can however change if the only goal is to block maximum amount of direct beam solar
@@ -10065,17 +10065,17 @@ void WindowShadingManager(EnergyPlusData &state)
                         // Air flow permeability for calculation of convective air flow between blind and glass
                         SlatAng = state.dataSurface->SurfWinSlatAngThisTS(ISurf);
                         PermeabilityA =
-                            std::sin(SlatAng) - state.dataHeatBal->Blind(BlNum).SlatThickness / state.dataHeatBal->Blind(BlNum).SlatSeparation;
-                        PermeabilityB = 1.0 - (std::abs(state.dataHeatBal->Blind(BlNum).SlatWidth * std::cos(SlatAng)) +
-                                               state.dataHeatBal->Blind(BlNum).SlatThickness * std::sin(SlatAng)) /
-                                                  state.dataHeatBal->Blind(BlNum).SlatSeparation;
+                            std::sin(SlatAng) - state.dataMaterial->Blind(BlNum).SlatThickness / state.dataMaterial->Blind(BlNum).SlatSeparation;
+                        PermeabilityB = 1.0 - (std::abs(state.dataMaterial->Blind(BlNum).SlatWidth * std::cos(SlatAng)) +
+                                               state.dataMaterial->Blind(BlNum).SlatThickness * std::sin(SlatAng)) /
+                                                  state.dataMaterial->Blind(BlNum).SlatSeparation;
                         state.dataSurface->SurfWinBlindAirFlowPermeability(ISurf) = min(1.0, max(0.0, PermeabilityA, PermeabilityB));
                         state.dataSurface->SurfWinBlindBmBmTrans(ISurf) =
                             WindowManager::BlindBeamBeamTrans(ProfAng,
                                                               SlatAng,
-                                                              state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                                              state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                                              state.dataHeatBal->Blind(BlNum).SlatThickness);
+                                                              state.dataMaterial->Blind(BlNum).SlatWidth,
+                                                              state.dataMaterial->Blind(BlNum).SlatSeparation,
+                                                              state.dataMaterial->Blind(BlNum).SlatThickness);
                         // Calculate blind interpolation factors and indices.
                         if (state.dataSurface->SurfWinMovableSlats(ISurf)) {
                             if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {

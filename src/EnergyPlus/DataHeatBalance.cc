@@ -92,7 +92,7 @@ namespace EnergyPlus::DataHeatBalance {
 // SolarShading, etc. Modules.
 
 // Using/Aliasing
-using DataSurfaces::MaxSlatAngs;
+using Material::MaxSlatAngs;
 using namespace DataVectorTypes;
 using DataBSDFWindow::BSDFLayerAbsorpStruct;
 using DataBSDFWindow::BSDFWindowInputStruct;
@@ -642,7 +642,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                         if (thisMaterialSh->Group == Material::MaterialGroup::WindowBlind) {
                             BlNum = thisMaterialSh->BlindDataPtr;
                             if (BlNum > 0) {
-                                if ((thisMaterialGapL->Thickness + thisMaterialGapR->Thickness) < state.dataHeatBal->Blind(BlNum).SlatWidth) {
+                                if ((thisMaterialGapL->Thickness + thisMaterialGapR->Thickness) < state.dataMaterial->Blind(BlNum).SlatWidth) {
                                     ErrorsFound = true;
                                     ShowSevereError(state,
                                                     format("CheckAndSetConstructionProperties: For window construction {}", thisConstruct.Name));
@@ -897,21 +897,21 @@ void AddVariableSlatBlind(EnergyPlusData &state,
 
     // maybe it's already there
     errFlag = false;
-    Found = UtilityRoutines::FindItemInList("~" + state.dataHeatBal->Blind(inBlindNumber).Name, state.dataHeatBal->Blind);
+    Found = UtilityRoutines::FindItemInList("~" + state.dataMaterial->Blind(inBlindNumber).Name, state.dataMaterial->Blind);
     if (Found == 0) {
         // Add a new blind
-        state.dataHeatBal->Blind.redimension(++state.dataHeatBal->TotBlinds);
-        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds) = state.dataHeatBal->Blind(inBlindNumber);
-        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).Name = "~" + state.dataHeatBal->Blind(inBlindNumber).Name;
+        state.dataMaterial->Blind.redimension(++state.dataHeatBal->TotBlinds);
+        state.dataMaterial->Blind(state.dataHeatBal->TotBlinds) = state.dataMaterial->Blind(inBlindNumber);
+        state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).Name = "~" + state.dataMaterial->Blind(inBlindNumber).Name;
         outBlindNumber = state.dataHeatBal->TotBlinds;
-        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngleType = DataWindowEquivalentLayer::AngleType::Variable;
+        state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngleType = DataWindowEquivalentLayer::AngleType::Variable;
 
         // Minimum and maximum slat angles allowed by slat geometry
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatWidth >
-            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatSeparation) {
-            MinSlatAngGeom = std::asin(state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatThickness /
-                                       (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatThickness +
-                                        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) /
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatWidth >
+            state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatSeparation) {
+            MinSlatAngGeom = std::asin(state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatThickness /
+                                       (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatThickness +
+                                        state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) /
                              DataGlobalConstants::DegToRadians;
         } else {
             MinSlatAngGeom = 0.0;
@@ -920,55 +920,55 @@ void AddVariableSlatBlind(EnergyPlusData &state,
 
         // Error if maximum slat angle less than minimum
 
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle <
-            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle) {
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle <
+            state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle) {
             errFlag = true;
-            ShowSevereError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataHeatBal->Blind(inBlindNumber).Name));
+            ShowSevereError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataMaterial->Blind(inBlindNumber).Name));
             ShowContinueError(state,
                               format("Minimum Slat Angle=[{:.1R}], is greater than Maximum Slat Angle=[{:.1R}] deg.",
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
         }
 
         // Error if input slat angle not in input min/max range
 
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle >
-                state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
-            (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle < state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle ||
-             state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle >
-                 state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle >
+                state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
+            (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle < state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle ||
+             state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle >
+                 state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
             errFlag = true;
-            ShowSevereError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataHeatBal->Blind(inBlindNumber).Name));
+            ShowSevereError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataMaterial->Blind(inBlindNumber).Name));
             ShowContinueError(state,
                               format("Slat Angle=[{:.1R}] is outside of the input min/max range, min=[{:.1R}], max=[{:.1R}] deg.",
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle,
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle,
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
         }
 
         // Warning if input minimum slat angle is less than that allowed by slat geometry
 
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle < MinSlatAngGeom) {
-            ShowWarningError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataHeatBal->Blind(inBlindNumber).Name));
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle < MinSlatAngGeom) {
+            ShowWarningError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataMaterial->Blind(inBlindNumber).Name));
             ShowContinueError(
                 state,
                 format("Minimum Slat Angle=[{:.1R}] is less than the smallest allowed by slat dimensions and spacing, min=[{:.1R}] deg.",
-                       state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                       state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
                        MinSlatAngGeom));
             ShowContinueError(state, format("Minimum Slat Angle will be set to {:.1R} deg.", MinSlatAngGeom));
-            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle = MinSlatAngGeom;
+            state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle = MinSlatAngGeom;
         }
 
         // Warning if input maximum slat angle is greater than that allowed by slat geometry
 
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
-            ShowWarningError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataHeatBal->Blind(inBlindNumber).Name));
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
+            ShowWarningError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataMaterial->Blind(inBlindNumber).Name));
             ShowContinueError(state,
                               format("Maximum Slat Angle=[{:.1R}] is greater than the largest allowed by slat dimensions and spacing, [{:.1R}] deg.",
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle,
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle,
                                      MaxSlatAngGeom));
             ShowContinueError(state, format("Maximum Slat Angle will be set to {:.1R} deg.", MaxSlatAngGeom));
-            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
+            state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
         }
     } else {
         outBlindNumber = Found;

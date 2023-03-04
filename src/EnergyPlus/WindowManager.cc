@@ -937,36 +937,36 @@ namespace WindowManager {
                         tshv = ShadeTransVis;
                         ash = ShadeAbs;
                     } else if (IntBlind || ExtBlind) {
-                        ShadeTrans = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTrans(ISlatAng);
-                        ShadeTransGnd = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTransGnd(ISlatAng);
-                        ShadeTransSky = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTransSky(ISlatAng);
-                        ShadeTransVis = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(ISlatAng);
+                        ShadeTrans = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTrans(ISlatAng);
+                        ShadeTransGnd = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTransGnd(ISlatAng);
+                        ShadeTransSky = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTransSky(ISlatAng);
+                        ShadeTransVis = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(ISlatAng);
                         if (IntBlind) { // Interior blind
-                            ShadeAbs = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbs(ISlatAng);
-                            ShadeRefl = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffRefl(ISlatAng);
-                            ShadeReflGnd = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffReflGnd(ISlatAng);
-                            ShadeReflSky = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffReflSky(ISlatAng);
-                            ShadeReflVis = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(ISlatAng);
+                            ShadeAbs = state.dataMaterial->Blind(BlNum).SolFrontDiffAbs(ISlatAng);
+                            ShadeRefl = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffRefl(ISlatAng);
+                            ShadeReflGnd = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffReflGnd(ISlatAng);
+                            ShadeReflSky = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffReflSky(ISlatAng);
+                            ShadeReflVis = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(ISlatAng);
                         } else { // Exterior blind
-                            ShadeAbs = state.dataHeatBal->Blind(BlNum).SolBackDiffAbs(ISlatAng);
-                            ShadeRefl = state.dataHeatBal->Blind(BlNum).SolBackDiffDiffRefl(ISlatAng);
-                            ShadeReflVis = state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(ISlatAng);
+                            ShadeAbs = state.dataMaterial->Blind(BlNum).SolBackDiffAbs(ISlatAng);
+                            ShadeRefl = state.dataMaterial->Blind(BlNum).SolBackDiffDiffRefl(ISlatAng);
+                            ShadeReflVis = state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl(ISlatAng);
                         }
                     } else if (BGBlind) {
-                        tsh = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTrans(ISlatAng);
-                        tshGnd = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTransGnd(ISlatAng);
-                        tshSky = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTransSky(ISlatAng);
-                        tshv = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(ISlatAng);
-                        rfsh = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffRefl(ISlatAng);
-                        rfshGnd = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffReflGnd(ISlatAng);
-                        rfshSky = state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffReflSky(ISlatAng);
-                        rfshv = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(ISlatAng);
-                        rbsh = state.dataHeatBal->Blind(BlNum).SolBackDiffDiffRefl(ISlatAng);
-                        rbshv = state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(ISlatAng);
-                        afsh = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbs(ISlatAng);
-                        afshGnd = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsGnd(ISlatAng);
-                        afshSky = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsSky(ISlatAng);
-                        absh = state.dataHeatBal->Blind(BlNum).SolBackDiffAbs(ISlatAng);
+                        tsh = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTrans(ISlatAng);
+                        tshGnd = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTransGnd(ISlatAng);
+                        tshSky = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTransSky(ISlatAng);
+                        tshv = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(ISlatAng);
+                        rfsh = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffRefl(ISlatAng);
+                        rfshGnd = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffReflGnd(ISlatAng);
+                        rfshSky = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffReflSky(ISlatAng);
+                        rfshv = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(ISlatAng);
+                        rbsh = state.dataMaterial->Blind(BlNum).SolBackDiffDiffRefl(ISlatAng);
+                        rbshv = state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl(ISlatAng);
+                        afsh = state.dataMaterial->Blind(BlNum).SolFrontDiffAbs(ISlatAng);
+                        afshGnd = state.dataMaterial->Blind(BlNum).SolFrontDiffAbsGnd(ISlatAng);
+                        afshSky = state.dataMaterial->Blind(BlNum).SolFrontDiffAbsSky(ISlatAng);
+                        absh = state.dataMaterial->Blind(BlNum).SolBackDiffAbs(ISlatAng);
                     } else if (ScreenOn && ScNum > 0) {
                         //       diffuse screen properties are calculated during initialization (quarter-hemispherical integration of beam properties)
                         ShadeAbs = state.dataHeatBal->SurfaceScreens(ScNum).DifScreenAbsorp;
@@ -1018,11 +1018,11 @@ namespace WindowManager {
                             if (ExtShade || ExtScreen) thisConstruct.AbsDiff(IGlass) = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
                         }
                         if (ExtBlind) {
-                            thisConstruct.AbsDiffBlind(ISlatAng) = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbs(ISlatAng) +
+                            thisConstruct.AbsDiffBlind(ISlatAng) = state.dataMaterial->Blind(BlNum).SolFrontDiffAbs(ISlatAng) +
                                                                    ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
-                            thisConstruct.AbsDiffBlindGnd(ISlatAng) = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsGnd(ISlatAng) +
+                            thisConstruct.AbsDiffBlindGnd(ISlatAng) = state.dataMaterial->Blind(BlNum).SolFrontDiffAbsGnd(ISlatAng) +
                                                                       ShadeTransGnd * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
-                            thisConstruct.AbsDiffBlindSky(ISlatAng) = state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsSky(ISlatAng) +
+                            thisConstruct.AbsDiffBlindSky(ISlatAng) = state.dataMaterial->Blind(BlNum).SolFrontDiffAbsSky(ISlatAng) +
                                                                       ShadeTransSky * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
                             thisConstruct.BlTransDiff(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTrans;
                             thisConstruct.BlTransDiffGnd(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransGnd;
@@ -1095,9 +1095,9 @@ namespace WindowManager {
 
                             thisConstruct.AbsDiffBlind(ISlatAng) = tsolDiff * ShadeReflFac * ShadeAbs;
                             thisConstruct.AbsDiffBlindGnd(ISlatAng) =
-                                tsolDiff * ShadeReflFac * state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsGnd(ISlatAng);
+                                tsolDiff * ShadeReflFac * state.dataMaterial->Blind(BlNum).SolFrontDiffAbsGnd(ISlatAng);
                             thisConstruct.AbsDiffBlindSky(ISlatAng) =
-                                tsolDiff * ShadeReflFac * state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsSky(ISlatAng);
+                                tsolDiff * ShadeReflFac * state.dataMaterial->Blind(BlNum).SolFrontDiffAbsSky(ISlatAng);
                             thisConstruct.BlTransDiff(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTrans;
                             thisConstruct.BlTransDiffGnd(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransGnd;
                             thisConstruct.BlTransDiffSky(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransSky;
@@ -1112,11 +1112,11 @@ namespace WindowManager {
                                 thisConstruct.BlAbsDiffBack(ISlatAng, IGlass) = thisConstruct.AbsDiffBack(IGlass) * ShadeTrans * ShadeReflFac;
                             }
 
-                            thisConstruct.AbsDiffBackBlind(ISlatAng) = state.dataHeatBal->Blind(BlNum).SolBackDiffAbs(ISlatAng) +
+                            thisConstruct.AbsDiffBackBlind(ISlatAng) = state.dataMaterial->Blind(BlNum).SolBackDiffAbs(ISlatAng) +
                                                                        ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffBack * ShadeAbs;
-                            thisConstruct.BlReflectSolDiffBack(ISlatAng) = state.dataHeatBal->Blind(BlNum).SolBackDiffDiffRefl(ISlatAng) +
+                            thisConstruct.BlReflectSolDiffBack(ISlatAng) = state.dataMaterial->Blind(BlNum).SolBackDiffDiffRefl(ISlatAng) +
                                                                            pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffBack * ShadeReflFac;
-                            thisConstruct.BlReflectVisDiffBack(ISlatAng) = state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(ISlatAng) +
+                            thisConstruct.BlReflectVisDiffBack(ISlatAng) = state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl(ISlatAng) +
                                                                            pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffBack * ShadeReflFacVis;
                         } // End of check if interior blind
 
@@ -1393,7 +1393,7 @@ namespace WindowManager {
                     // Continue loop over slat angles only for blinds with variable slat angle
                     if (ShadeOn || ScreenOn) break;
                     if (BlindOn) {
-                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
+                        if (state.dataMaterial->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     }
                 } // End of slat angle loop
             }     // End of check if construction has a shade or blind
@@ -1504,8 +1504,8 @@ namespace WindowManager {
                         state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
-                        TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
-                        EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
+                        TauShIR = state.dataMaterial->Blind(BlNum).IRFrontTrans(ISlatAng);
+                        EpsShIR = state.dataMaterial->Blind(BlNum).IRBackEmiss(ISlatAng);
                         RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
@@ -1514,7 +1514,7 @@ namespace WindowManager {
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
                     if (IntBlind) {
-                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
+                        if (state.dataMaterial->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     }
                 } // End of slat angle loop
             }     // End of check if interior shade or interior blind
@@ -2418,34 +2418,34 @@ namespace WindowManager {
                         }
                         // Blind on
                         BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
-                        state.dataWindowManager->thick[TotGlassLay] = state.dataHeatBal->Blind(BlNum).SlatThickness;
+                        state.dataWindowManager->thick[TotGlassLay] = state.dataMaterial->Blind(BlNum).SlatThickness;
                         state.dataWindowManager->scon[TotGlassLay] =
-                            state.dataHeatBal->Blind(BlNum).SlatConductivity / state.dataHeatBal->Blind(BlNum).SlatThickness;
+                            state.dataMaterial->Blind(BlNum).SlatConductivity / state.dataMaterial->Blind(BlNum).SlatThickness;
 
                         if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                             int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                             Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
                             state.dataWindowManager->emis[state.dataWindowManager->nglface] =
-                                General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRFrontEmiss(SurfWinSlatsAngIndex),
-                                                       state.dataHeatBal->Blind(BlNum).IRFrontEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                General::InterpGeneral(state.dataMaterial->Blind(BlNum).IRFrontEmiss(SurfWinSlatsAngIndex),
+                                                       state.dataMaterial->Blind(BlNum).IRFrontEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                        SurfWinSlatsAngInterpFac);
                             state.dataWindowManager->emis[state.dataWindowManager->nglface + 1] =
-                                General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRBackEmiss(SurfWinSlatsAngIndex),
-                                                       state.dataHeatBal->Blind(BlNum).IRBackEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                General::InterpGeneral(state.dataMaterial->Blind(BlNum).IRBackEmiss(SurfWinSlatsAngIndex),
+                                                       state.dataMaterial->Blind(BlNum).IRBackEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                        SurfWinSlatsAngInterpFac);
                             state.dataWindowManager->tir[state.dataWindowManager->nglface] =
-                                General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRFrontTrans(SurfWinSlatsAngIndex),
-                                                       state.dataHeatBal->Blind(BlNum).IRFrontTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                General::InterpGeneral(state.dataMaterial->Blind(BlNum).IRFrontTrans(SurfWinSlatsAngIndex),
+                                                       state.dataMaterial->Blind(BlNum).IRFrontTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                        SurfWinSlatsAngInterpFac);
                             state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] =
-                                General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRBackTrans(SurfWinSlatsAngIndex),
-                                                       state.dataHeatBal->Blind(BlNum).IRBackTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                General::InterpGeneral(state.dataMaterial->Blind(BlNum).IRBackTrans(SurfWinSlatsAngIndex),
+                                                       state.dataMaterial->Blind(BlNum).IRBackTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                        SurfWinSlatsAngInterpFac);
                         } else {
-                            state.dataWindowManager->emis[state.dataWindowManager->nglface] = state.dataHeatBal->Blind(BlNum).IRFrontEmiss(1);
-                            state.dataWindowManager->emis[state.dataWindowManager->nglface + 1] = state.dataHeatBal->Blind(BlNum).IRBackEmiss(1);
-                            state.dataWindowManager->tir[state.dataWindowManager->nglface] = state.dataHeatBal->Blind(BlNum).IRFrontTrans(1);
-                            state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] = state.dataHeatBal->Blind(BlNum).IRBackTrans(1);
+                            state.dataWindowManager->emis[state.dataWindowManager->nglface] = state.dataMaterial->Blind(BlNum).IRFrontEmiss(1);
+                            state.dataWindowManager->emis[state.dataWindowManager->nglface + 1] = state.dataMaterial->Blind(BlNum).IRBackEmiss(1);
+                            state.dataWindowManager->tir[state.dataWindowManager->nglface] = state.dataMaterial->Blind(BlNum).IRFrontTrans(1);
+                            state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] = state.dataMaterial->Blind(BlNum).IRBackTrans(1);
                         }
                     }
                 }
@@ -2477,7 +2477,7 @@ namespace WindowManager {
                         dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr))->WinShadeToGlassDist;
                 } else { // Interior or exterior blind
                     state.dataWindowManager->gap[IGap - 1] =
-                        state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
+                        state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
                 }
                 state.dataWindowManager->gnmix[IGap - 1] = 1;
                 state.dataWindowManager->gwght[0][IGap - 1] = Material::GasWght[static_cast<int>(Material::GasType::Air)];
@@ -4070,12 +4070,12 @@ namespace WindowManager {
         } else {
             // Blind on
             BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
-            GapDepth = state.dataHeatBal->Blind(BlNum).BlindToGlassDist;
+            GapDepth = state.dataMaterial->Blind(BlNum).BlindToGlassDist;
             AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
-            ATopGap = state.dataHeatBal->Blind(BlNum).BlindTopOpeningMult * AGap;
-            ABotGap = state.dataHeatBal->Blind(BlNum).BlindBottomOpeningMult * AGap;
-            ALeftGap = state.dataHeatBal->Blind(BlNum).BlindLeftOpeningMult * GapHeight * GapDepth;
-            ARightGap = state.dataHeatBal->Blind(BlNum).BlindRightOpeningMult * GapHeight * GapDepth;
+            ATopGap = state.dataMaterial->Blind(BlNum).BlindTopOpeningMult * AGap;
+            ABotGap = state.dataMaterial->Blind(BlNum).BlindBottomOpeningMult * AGap;
+            ALeftGap = state.dataMaterial->Blind(BlNum).BlindLeftOpeningMult * GapHeight * GapDepth;
+            ARightGap = state.dataMaterial->Blind(BlNum).BlindRightOpeningMult * GapHeight * GapDepth;
             AHolesGap = state.dataSurface->SurfWinBlindAirFlowPermeability(SurfNum) * GapHeight * state.dataSurface->Surface(SurfNum).Width;
         }
 
@@ -4273,10 +4273,10 @@ namespace WindowManager {
         } else {
             // Blind on
             BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
-            ATopGap = state.dataHeatBal->Blind(BlNum).BlindTopOpeningMult * AGap;
-            ABotGap = state.dataHeatBal->Blind(BlNum).BlindBottomOpeningMult * AGap;
-            ALeftGap = state.dataHeatBal->Blind(BlNum).BlindLeftOpeningMult * GapHeight * GapDepth;
-            ARightGap = state.dataHeatBal->Blind(BlNum).BlindRightOpeningMult * GapHeight * GapDepth;
+            ATopGap = state.dataMaterial->Blind(BlNum).BlindTopOpeningMult * AGap;
+            ABotGap = state.dataMaterial->Blind(BlNum).BlindBottomOpeningMult * AGap;
+            ALeftGap = state.dataMaterial->Blind(BlNum).BlindLeftOpeningMult * GapHeight * GapDepth;
+            ARightGap = state.dataMaterial->Blind(BlNum).BlindRightOpeningMult * GapHeight * GapDepth;
             AHolesGap = state.dataSurface->SurfWinBlindAirFlowPermeability(SurfNum) * GapHeight * state.dataSurface->Surface(SurfNum).Width;
         }
 
@@ -6628,31 +6628,31 @@ namespace WindowManager {
                            TScBmDifVis * TDifVis / (1 - RGlDiffFrontVis * RScDifBackVis);
             } else {
                 VarSlats = false;
-                if (state.dataHeatBal->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Variable) VarSlats = true;
-                SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                if (state.dataMaterial->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Variable) VarSlats = true;
+                SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                 TBlBmBm = BlindBeamBeamTrans(0.0,
                                              SlatAng,
-                                             state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                             state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                             state.dataHeatBal->Blind(BlNum).SlatThickness);
+                                             state.dataMaterial->Blind(BlNum).SlatWidth,
+                                             state.dataMaterial->Blind(BlNum).SlatSeparation,
+                                             state.dataMaterial->Blind(BlNum).SlatThickness);
                 TBmBmBl = TBmBm * TBlBmBm;
                 TBmBmBlVis = TBmBmVis * TBlBmBm;
-                TBlBmDif = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffTrans);
-                TBlBmDifVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans);
+                TBlBmDif = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans);
+                TBlBmDifVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans);
                 TDif = state.dataConstruction->Construct(ConstrNumBare).TransDiff;
                 TDifVis = state.dataConstruction->Construct(ConstrNumBare).TransDiffVis;
                 if (ShadeFlag == WinShadingType::IntBlind) {
                     RGlDiffBack = state.dataConstruction->Construct(ConstrNumBare).ReflectSolDiffBack;
                     RGlDiffBackVis = state.dataConstruction->Construct(ConstrNumBare).ReflectVisDiffBack;
-                    RhoBlFront = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffRefl);
-                    RhoBlFrontVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl);
-                    AbsBlFront = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolFrontBeamAbs);
-                    RhoBlDiffFront = InterpSlatAng(SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffRefl);
-                    RhoBlDiffFrontVis = InterpSlatAng(SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl);
-                    AbsBlDiffFront = InterpSlatAng(SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolFrontDiffAbs);
+                    RhoBlFront = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolFrontBeamDiffRefl);
+                    RhoBlFrontVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffRefl);
+                    AbsBlFront = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolFrontBeamAbs);
+                    RhoBlDiffFront = InterpSlatAng(SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolFrontDiffDiffRefl);
+                    RhoBlDiffFrontVis = InterpSlatAng(SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl);
+                    AbsBlDiffFront = InterpSlatAng(SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolFrontDiffAbs);
                     AbsBeamShadeNorm = TBmBm * (AbsBlFront + RhoBlFront * RGlDiffBack * AbsBlDiffFront / (1.0 - RhoBlDiffFront * RGlDiffBack));
-                    TBlDifDif = InterpSlatAng(SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolFrontDiffDiffTrans);
-                    TBlDifDifVis = InterpSlatAng(SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans);
+                    TBlDifDif = InterpSlatAng(SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTrans);
+                    TBlDifDifVis = InterpSlatAng(SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans);
                     TSolNorm = TBmBm * (TBlBmBm + TBlBmDif + TBlDifDif * RhoBlFront * RGlDiffBack / (1.0 - RhoBlDiffFront * RGlDiffBack));
                     //     use of TBlBmBm here is correct, visible and IR transmittance are the same (reference deleted CR6925 on 3/20/2006)
                     TVisNorm = TBmBmVis *
@@ -6661,20 +6661,20 @@ namespace WindowManager {
                 if (ShadeFlag == WinShadingType::ExtBlind) {
                     TBlBmBm = BlindBeamBeamTrans(0.0,
                                                  SlatAng,
-                                                 state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                                 state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                                 state.dataHeatBal->Blind(BlNum).SlatThickness);
+                                                 state.dataMaterial->Blind(BlNum).SlatWidth,
+                                                 state.dataMaterial->Blind(BlNum).SlatSeparation,
+                                                 state.dataMaterial->Blind(BlNum).SlatThickness);
                     RGlFront = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).ReflSolBeamFrontCoef);
                     RGlFrontVis = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).ReflSolBeamFrontCoef);
-                    AbsBlFront = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolFrontBeamAbs);
-                    AbsBlBack = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolBackBeamAbs);
-                    AbsBlDiffBack = InterpSlatAng(SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolBackDiffAbs);
+                    AbsBlFront = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolFrontBeamAbs);
+                    AbsBlBack = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolBackBeamAbs);
+                    AbsBlDiffBack = InterpSlatAng(SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolBackDiffAbs);
                     RGlDiffFront = state.dataConstruction->Construct(ConstrNumBare).ReflectSolDiffFront;
                     RGlDiffFrontVis = state.dataConstruction->Construct(ConstrNumBare).ReflectVisDiffFront;
-                    RhoBlDiffBack = InterpSlatAng(SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolBackDiffDiffRefl);
-                    RhoBlDiffBackVis = InterpSlatAng(SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl);
-                    RhoBlBack = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolBackBeamDiffRefl);
-                    RhoBlBackVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolBackBeamDiffRefl);
+                    RhoBlDiffBack = InterpSlatAng(SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolBackDiffDiffRefl);
+                    RhoBlDiffBackVis = InterpSlatAng(SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl);
+                    RhoBlBack = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolBackBeamDiffRefl);
+                    RhoBlBackVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataMaterial->Blind(BlNum).SolBackBeamDiffRefl);
                     AbsBeamShadeNorm =
                         AbsBlFront + AbsBlBack * RGlFront * TBlBmBm +
                         (AbsBlDiffBack * RGlDiffFront / (1.0 - RhoBlDiffBack * RGlDiffFront)) * (RGlFront * TBlBmBm * RhoBlBack + TBlBmDif);
@@ -7437,13 +7437,13 @@ namespace WindowManager {
                             print(state.files.eio,
                                   Format_704,
                                   thisMaterial->Name,
-                                  state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                  state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                  state.dataHeatBal->Blind(BlNum).SlatThickness,
-                                  state.dataHeatBal->Blind(BlNum).SlatAngle,
-                                  state.dataHeatBal->Blind(BlNum).SlatTransSolBeamDiff,
-                                  state.dataHeatBal->Blind(BlNum).SlatFrontReflSolBeamDiff,
-                                  state.dataHeatBal->Blind(BlNum).BlindToGlassDist);
+                                  state.dataMaterial->Blind(BlNum).SlatWidth,
+                                  state.dataMaterial->Blind(BlNum).SlatSeparation,
+                                  state.dataMaterial->Blind(BlNum).SlatThickness,
+                                  state.dataMaterial->Blind(BlNum).SlatAngle,
+                                  state.dataMaterial->Blind(BlNum).SlatTransSolBeamDiff,
+                                  state.dataMaterial->Blind(BlNum).SlatFrontReflSolBeamDiff,
+                                  state.dataMaterial->Blind(BlNum).BlindToGlassDist);
                         } break;
                         case Material::MaterialGroup::Screen: {
                             if (thisMaterial->ScreenDataPtr > 0) {
@@ -7694,35 +7694,35 @@ namespace WindowManager {
 
         for (BlindNum = 1; BlindNum <= state.dataHeatBal->TotBlinds; ++BlindNum) {
 
-            bld_pr(2) = state.dataHeatBal->Blind(BlindNum).SlatWidth;
-            bld_pr(3) = state.dataHeatBal->Blind(BlindNum).SlatSeparation;
+            bld_pr(2) = state.dataMaterial->Blind(BlindNum).SlatWidth;
+            bld_pr(3) = state.dataMaterial->Blind(BlindNum).SlatSeparation;
 
             for (ISolVis = 1; ISolVis <= 2; ++ISolVis) {
                 if (ISolVis == 1) { // For solar calculation
                     bld_pr(4) = 0.0;
                     bld_pr(5) = 0.0;
                     bld_pr(6) = 0.0;
-                    bld_pr(7) = state.dataHeatBal->Blind(BlindNum).SlatTransSolBeamDiff;
-                    bld_pr(8) = state.dataHeatBal->Blind(BlindNum).SlatFrontReflSolBeamDiff;
-                    bld_pr(9) = state.dataHeatBal->Blind(BlindNum).SlatBackReflSolBeamDiff;
-                    bld_pr(10) = state.dataHeatBal->Blind(BlindNum).SlatTransSolDiffDiff;
-                    bld_pr(11) = state.dataHeatBal->Blind(BlindNum).SlatFrontReflSolDiffDiff;
-                    bld_pr(12) = state.dataHeatBal->Blind(BlindNum).SlatBackReflSolDiffDiff;
+                    bld_pr(7) = state.dataMaterial->Blind(BlindNum).SlatTransSolBeamDiff;
+                    bld_pr(8) = state.dataMaterial->Blind(BlindNum).SlatFrontReflSolBeamDiff;
+                    bld_pr(9) = state.dataMaterial->Blind(BlindNum).SlatBackReflSolBeamDiff;
+                    bld_pr(10) = state.dataMaterial->Blind(BlindNum).SlatTransSolDiffDiff;
+                    bld_pr(11) = state.dataMaterial->Blind(BlindNum).SlatFrontReflSolDiffDiff;
+                    bld_pr(12) = state.dataMaterial->Blind(BlindNum).SlatBackReflSolDiffDiff;
                 } else { // For visible calculation
                     bld_pr(4) = 0.0;
                     bld_pr(5) = 0.0;
                     bld_pr(6) = 0.0;
-                    bld_pr(7) = state.dataHeatBal->Blind(BlindNum).SlatTransVisBeamDiff;
-                    bld_pr(8) = state.dataHeatBal->Blind(BlindNum).SlatFrontReflVisBeamDiff;
-                    bld_pr(9) = state.dataHeatBal->Blind(BlindNum).SlatBackReflVisBeamDiff;
-                    bld_pr(10) = state.dataHeatBal->Blind(BlindNum).SlatTransVisDiffDiff;
-                    bld_pr(11) = state.dataHeatBal->Blind(BlindNum).SlatFrontReflVisDiffDiff;
-                    bld_pr(12) = state.dataHeatBal->Blind(BlindNum).SlatBackReflVisDiffDiff;
+                    bld_pr(7) = state.dataMaterial->Blind(BlindNum).SlatTransVisBeamDiff;
+                    bld_pr(8) = state.dataMaterial->Blind(BlindNum).SlatFrontReflVisBeamDiff;
+                    bld_pr(9) = state.dataMaterial->Blind(BlindNum).SlatBackReflVisBeamDiff;
+                    bld_pr(10) = state.dataMaterial->Blind(BlindNum).SlatTransVisDiffDiff;
+                    bld_pr(11) = state.dataMaterial->Blind(BlindNum).SlatFrontReflVisDiffDiff;
+                    bld_pr(12) = state.dataMaterial->Blind(BlindNum).SlatBackReflVisDiffDiff;
                 }
                 // For IR calculation
-                bld_pr(13) = state.dataHeatBal->Blind(BlindNum).SlatTransIR;
-                bld_pr(14) = state.dataHeatBal->Blind(BlindNum).SlatFrontEmissIR;
-                bld_pr(15) = state.dataHeatBal->Blind(BlindNum).SlatBackEmissIR;
+                bld_pr(13) = state.dataMaterial->Blind(BlindNum).SlatTransIR;
+                bld_pr(14) = state.dataMaterial->Blind(BlindNum).SlatFrontEmissIR;
+                bld_pr(15) = state.dataMaterial->Blind(BlindNum).SlatBackEmissIR;
 
                 // Calculate diffuse properties of blind. If blind has variable slat angle, &
                 // vary slat angle from 0 to 180 deg in 10-deg steps (for MaxSlatAngs = 19).
@@ -7731,32 +7731,32 @@ namespace WindowManager {
                 for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
 
                     st_lay = 0.0;
-                    if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
-                        bld_el = state.dataHeatBal->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                    if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
+                        bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
                     } else {                                                                     // Variable slat angle
                         bld_el = (DataGlobalConstants::Pi / (MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                     }
                     BlindOpticsDiffuse(state, BlindNum, ISolVis, bld_pr, bld_el, st_lay);
 
                     if (ISolVis == 1) { // Fill blind diffuse solar and IR properties
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffDiffTrans(ISlatAng) = st_lay(9);
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffDiffRefl(ISlatAng) = st_lay(10);
-                        state.dataHeatBal->Blind(BlindNum).SolBackDiffDiffTrans(ISlatAng) = st_lay(11);
-                        state.dataHeatBal->Blind(BlindNum).SolBackDiffDiffRefl(ISlatAng) = st_lay(12);
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffAbs(ISlatAng) = max(0.0, 1.0 - st_lay(9) - st_lay(10));
-                        state.dataHeatBal->Blind(BlindNum).SolBackDiffAbs(ISlatAng) = max(0.0, 1.0 - st_lay(11) - st_lay(12));
-                        state.dataHeatBal->Blind(BlindNum).IRFrontTrans(ISlatAng) = st_lay(13);
-                        state.dataHeatBal->Blind(BlindNum).IRFrontEmiss(ISlatAng) = st_lay(14);
-                        state.dataHeatBal->Blind(BlindNum).IRBackTrans(ISlatAng) = st_lay(13);
-                        state.dataHeatBal->Blind(BlindNum).IRBackEmiss(ISlatAng) = st_lay(15);
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffDiffTrans(ISlatAng) = st_lay(9);
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffDiffRefl(ISlatAng) = st_lay(10);
+                        state.dataMaterial->Blind(BlindNum).SolBackDiffDiffTrans(ISlatAng) = st_lay(11);
+                        state.dataMaterial->Blind(BlindNum).SolBackDiffDiffRefl(ISlatAng) = st_lay(12);
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffAbs(ISlatAng) = max(0.0, 1.0 - st_lay(9) - st_lay(10));
+                        state.dataMaterial->Blind(BlindNum).SolBackDiffAbs(ISlatAng) = max(0.0, 1.0 - st_lay(11) - st_lay(12));
+                        state.dataMaterial->Blind(BlindNum).IRFrontTrans(ISlatAng) = st_lay(13);
+                        state.dataMaterial->Blind(BlindNum).IRFrontEmiss(ISlatAng) = st_lay(14);
+                        state.dataMaterial->Blind(BlindNum).IRBackTrans(ISlatAng) = st_lay(13);
+                        state.dataMaterial->Blind(BlindNum).IRBackEmiss(ISlatAng) = st_lay(15);
                     } else { // Fill blind diffuse visible properties
-                        state.dataHeatBal->Blind(BlindNum).VisFrontDiffDiffTrans(ISlatAng) = st_lay(9);
-                        state.dataHeatBal->Blind(BlindNum).VisFrontDiffDiffRefl(ISlatAng) = st_lay(10);
-                        state.dataHeatBal->Blind(BlindNum).VisBackDiffDiffTrans(ISlatAng) = st_lay(11);
-                        state.dataHeatBal->Blind(BlindNum).VisBackDiffDiffRefl(ISlatAng) = st_lay(12);
+                        state.dataMaterial->Blind(BlindNum).VisFrontDiffDiffTrans(ISlatAng) = st_lay(9);
+                        state.dataMaterial->Blind(BlindNum).VisFrontDiffDiffRefl(ISlatAng) = st_lay(10);
+                        state.dataMaterial->Blind(BlindNum).VisBackDiffDiffTrans(ISlatAng) = st_lay(11);
+                        state.dataMaterial->Blind(BlindNum).VisBackDiffDiffRefl(ISlatAng) = st_lay(12);
                     }
 
-                    if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
+                    if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                 } // End of slat angle loop
 
                 // Calculate beam properties of blind. Vary profile angle from -90 to +90 deg in 5-deg steps.
@@ -7769,8 +7769,8 @@ namespace WindowManager {
 
                     for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
                         st_lay = 0.0;
-                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
-                            bld_el = state.dataHeatBal->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                        if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
+                            bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
                         } else {                                                                     // Variable slat angle
                             bld_el = (DataGlobalConstants::Pi / (MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                         }
@@ -7780,52 +7780,52 @@ namespace WindowManager {
                         BlindOpticsBeam(state, BlindNum, bld_pr, bld_el, sun_el, st_lay);
 
                         if (ISolVis == 1) { // Fill blind beam solar properties
-                            state.dataHeatBal->Blind(BlindNum).SolFrontBeamBeamTrans(ISlatAng, IProfAng) = st_lay(1);
-                            state.dataHeatBal->Blind(BlindNum).SolFrontBeamBeamRefl(ISlatAng, IProfAng) = st_lay(2);
-                            state.dataHeatBal->Blind(BlindNum).SolBackBeamBeamTrans(ISlatAng, IProfAng) = st_lay(3);
-                            state.dataHeatBal->Blind(BlindNum).SolBackBeamBeamRefl(ISlatAng, IProfAng) = st_lay(4);
-                            state.dataHeatBal->Blind(BlindNum).SolFrontBeamDiffTrans(ISlatAng, IProfAng) = st_lay(5);
-                            state.dataHeatBal->Blind(BlindNum).SolFrontBeamDiffRefl(ISlatAng, IProfAng) = st_lay(6);
-                            state.dataHeatBal->Blind(BlindNum).SolBackBeamDiffTrans(ISlatAng, IProfAng) = st_lay(7);
-                            state.dataHeatBal->Blind(BlindNum).SolBackBeamDiffRefl(ISlatAng, IProfAng) = st_lay(8);
-                            state.dataHeatBal->Blind(BlindNum).SolFrontBeamAbs(ISlatAng, IProfAng) =
+                            state.dataMaterial->Blind(BlindNum).SolFrontBeamBeamTrans(ISlatAng, IProfAng) = st_lay(1);
+                            state.dataMaterial->Blind(BlindNum).SolFrontBeamBeamRefl(ISlatAng, IProfAng) = st_lay(2);
+                            state.dataMaterial->Blind(BlindNum).SolBackBeamBeamTrans(ISlatAng, IProfAng) = st_lay(3);
+                            state.dataMaterial->Blind(BlindNum).SolBackBeamBeamRefl(ISlatAng, IProfAng) = st_lay(4);
+                            state.dataMaterial->Blind(BlindNum).SolFrontBeamDiffTrans(ISlatAng, IProfAng) = st_lay(5);
+                            state.dataMaterial->Blind(BlindNum).SolFrontBeamDiffRefl(ISlatAng, IProfAng) = st_lay(6);
+                            state.dataMaterial->Blind(BlindNum).SolBackBeamDiffTrans(ISlatAng, IProfAng) = st_lay(7);
+                            state.dataMaterial->Blind(BlindNum).SolBackBeamDiffRefl(ISlatAng, IProfAng) = st_lay(8);
+                            state.dataMaterial->Blind(BlindNum).SolFrontBeamAbs(ISlatAng, IProfAng) =
                                 max(0.0, 1.0 - st_lay(6) - st_lay(1) - st_lay(5));
-                            state.dataHeatBal->Blind(BlindNum).SolBackBeamAbs(ISlatAng, IProfAng) = max(0.0, 1.0 - st_lay(7) - st_lay(3) - st_lay(8));
+                            state.dataMaterial->Blind(BlindNum).SolBackBeamAbs(ISlatAng, IProfAng) = max(0.0, 1.0 - st_lay(7) - st_lay(3) - st_lay(8));
 
                         } else { // Fill blind beam visible properties
-                            state.dataHeatBal->Blind(BlindNum).VisFrontBeamBeamTrans(ISlatAng, IProfAng) = st_lay(1);
-                            state.dataHeatBal->Blind(BlindNum).VisFrontBeamBeamRefl(ISlatAng, IProfAng) = st_lay(2);
-                            state.dataHeatBal->Blind(BlindNum).VisBackBeamBeamTrans(ISlatAng, IProfAng) = st_lay(3);
-                            state.dataHeatBal->Blind(BlindNum).VisBackBeamBeamRefl(ISlatAng, IProfAng) = st_lay(4);
-                            state.dataHeatBal->Blind(BlindNum).VisFrontBeamDiffTrans(ISlatAng, IProfAng) = st_lay(5);
-                            state.dataHeatBal->Blind(BlindNum).VisFrontBeamDiffRefl(ISlatAng, IProfAng) = st_lay(6);
-                            state.dataHeatBal->Blind(BlindNum).VisBackBeamDiffTrans(ISlatAng, IProfAng) = st_lay(7);
-                            state.dataHeatBal->Blind(BlindNum).VisBackBeamDiffRefl(ISlatAng, IProfAng) = st_lay(8);
+                            state.dataMaterial->Blind(BlindNum).VisFrontBeamBeamTrans(ISlatAng, IProfAng) = st_lay(1);
+                            state.dataMaterial->Blind(BlindNum).VisFrontBeamBeamRefl(ISlatAng, IProfAng) = st_lay(2);
+                            state.dataMaterial->Blind(BlindNum).VisBackBeamBeamTrans(ISlatAng, IProfAng) = st_lay(3);
+                            state.dataMaterial->Blind(BlindNum).VisBackBeamBeamRefl(ISlatAng, IProfAng) = st_lay(4);
+                            state.dataMaterial->Blind(BlindNum).VisFrontBeamDiffTrans(ISlatAng, IProfAng) = st_lay(5);
+                            state.dataMaterial->Blind(BlindNum).VisFrontBeamDiffRefl(ISlatAng, IProfAng) = st_lay(6);
+                            state.dataMaterial->Blind(BlindNum).VisBackBeamDiffTrans(ISlatAng, IProfAng) = st_lay(7);
+                            state.dataMaterial->Blind(BlindNum).VisBackBeamDiffRefl(ISlatAng, IProfAng) = st_lay(8);
                         }
 
-                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
+                        if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     } // End of loop over slat angles
                 }     // End of loop over profile angles
 
                 if (ISolVis == 1) {
                     for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffDiffTransGnd(ISlatAng) =
-                            DiffuseAverageProfAngGnd(state.dataHeatBal->Blind(BlindNum).SolFrontBeamBeamTrans(ISlatAng, {1, 37})) +
-                            DiffuseAverageProfAngGnd(state.dataHeatBal->Blind(BlindNum).SolFrontBeamDiffTrans(ISlatAng, {1, 37}));
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffDiffTransSky(ISlatAng) =
-                            DiffuseAverageProfAngSky(state.dataHeatBal->Blind(BlindNum).SolFrontBeamBeamTrans(ISlatAng, {1, 37})) +
-                            DiffuseAverageProfAngSky(state.dataHeatBal->Blind(BlindNum).SolFrontBeamDiffTrans(ISlatAng, {1, 37}));
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffAbsGnd(ISlatAng) =
-                            DiffuseAverageProfAngGnd(state.dataHeatBal->Blind(BlindNum).SolFrontBeamAbs(ISlatAng, {1, 37}));
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffAbsSky(ISlatAng) =
-                            DiffuseAverageProfAngSky(state.dataHeatBal->Blind(BlindNum).SolFrontBeamAbs(ISlatAng, {1, 37}));
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffDiffReflGnd(ISlatAng) =
-                            DiffuseAverageProfAngGnd(state.dataHeatBal->Blind(BlindNum).SolFrontBeamDiffRefl(ISlatAng, {1, 37}));
-                        state.dataHeatBal->Blind(BlindNum).SolFrontDiffDiffReflSky(ISlatAng) =
-                            DiffuseAverageProfAngSky(state.dataHeatBal->Blind(BlindNum).SolFrontBeamDiffRefl(ISlatAng, {1, 37}));
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffDiffTransGnd(ISlatAng) =
+                            DiffuseAverageProfAngGnd(state.dataMaterial->Blind(BlindNum).SolFrontBeamBeamTrans(ISlatAng, {1, 37})) +
+                            DiffuseAverageProfAngGnd(state.dataMaterial->Blind(BlindNum).SolFrontBeamDiffTrans(ISlatAng, {1, 37}));
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffDiffTransSky(ISlatAng) =
+                            DiffuseAverageProfAngSky(state.dataMaterial->Blind(BlindNum).SolFrontBeamBeamTrans(ISlatAng, {1, 37})) +
+                            DiffuseAverageProfAngSky(state.dataMaterial->Blind(BlindNum).SolFrontBeamDiffTrans(ISlatAng, {1, 37}));
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffAbsGnd(ISlatAng) =
+                            DiffuseAverageProfAngGnd(state.dataMaterial->Blind(BlindNum).SolFrontBeamAbs(ISlatAng, {1, 37}));
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffAbsSky(ISlatAng) =
+                            DiffuseAverageProfAngSky(state.dataMaterial->Blind(BlindNum).SolFrontBeamAbs(ISlatAng, {1, 37}));
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffDiffReflGnd(ISlatAng) =
+                            DiffuseAverageProfAngGnd(state.dataMaterial->Blind(BlindNum).SolFrontBeamDiffRefl(ISlatAng, {1, 37}));
+                        state.dataMaterial->Blind(BlindNum).SolFrontDiffDiffReflSky(ISlatAng) =
+                            DiffuseAverageProfAngSky(state.dataMaterial->Blind(BlindNum).SolFrontBeamDiffRefl(ISlatAng, {1, 37}));
 
                         // TH 2/17/2010. Added. Loop only for movable slat blinds
-                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
+                        if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     }
                 }
 
@@ -8251,9 +8251,9 @@ namespace WindowManager {
                 if (std::abs(std::sin(gamma)) > 0.01) {
                     if ((phib > 0.0 && phib <= DataGlobalConstants::PiOvr2 && phis <= phib) ||
                         (phib > DataGlobalConstants::PiOvr2 && phib <= DataGlobalConstants::Pi && phis > -(DataGlobalConstants::Pi - phib))) {
-                        fEdge1 = state.dataHeatBal->Blind(BlindNum).SlatThickness * std::abs(std::sin(gamma)) /
-                                 ((state.dataHeatBal->Blind(BlindNum).SlatSeparation +
-                                   state.dataHeatBal->Blind(BlindNum).SlatThickness / std::abs(std::sin(phib))) *
+                        fEdge1 = state.dataMaterial->Blind(BlindNum).SlatThickness * std::abs(std::sin(gamma)) /
+                                 ((state.dataMaterial->Blind(BlindNum).SlatSeparation +
+                                   state.dataMaterial->Blind(BlindNum).SlatThickness / std::abs(std::sin(phib))) *
                                   std::cos(phis));
                     }
                     fEdgeSource(Iphis) = min(1.0, std::abs(fEdge1));
@@ -8534,9 +8534,9 @@ namespace WindowManager {
             if (std::abs(std::sin(gamma)) > 0.01) {
                 if ((phib > 0.0 && phib <= DataGlobalConstants::PiOvr2 && phis <= phib) ||
                     (phib > DataGlobalConstants::PiOvr2 && phib <= DataGlobalConstants::Pi && phis > -(DataGlobalConstants::Pi - phib))) {
-                    fEdge1 = state.dataHeatBal->Blind(BlindNum).SlatThickness * std::abs(std::sin(gamma)) /
-                             ((state.dataHeatBal->Blind(BlindNum).SlatSeparation +
-                               state.dataHeatBal->Blind(BlindNum).SlatThickness / std::abs(std::sin(phib))) *
+                    fEdge1 = state.dataMaterial->Blind(BlindNum).SlatThickness * std::abs(std::sin(gamma)) /
+                             ((state.dataMaterial->Blind(BlindNum).SlatSeparation +
+                               state.dataMaterial->Blind(BlindNum).SlatThickness / std::abs(std::sin(phib))) *
                               std::cos(phis));
                 }
                 fEdge = min(1.0, std::abs(fEdge1));
@@ -8547,9 +8547,9 @@ namespace WindowManager {
 
             p(1 + i) = BlindBeamBeamTrans(phis,
                                           phib,
-                                          state.dataHeatBal->Blind(BlindNum).SlatWidth,
-                                          state.dataHeatBal->Blind(BlindNum).SlatSeparation,
-                                          state.dataHeatBal->Blind(BlindNum).SlatThickness);
+                                          state.dataMaterial->Blind(BlindNum).SlatWidth,
+                                          state.dataMaterial->Blind(BlindNum).SlatSeparation,
+                                          state.dataMaterial->Blind(BlindNum).SlatThickness);
             //       Direct-to-direct reflectance; this is zero for now since all reflection is assumed to be diffuse.
             p(2 + i) = 0.0;
 
@@ -8663,7 +8663,7 @@ namespace WindowManager {
         // Linear interpolation.
 
         // Using/Aliasing
-        using DataSurfaces::MaxSlatAngs;
+        using Material::MaxSlatAngs;
 
         if (VarSlats) { // Variable-angle slats
             Real64 SlatAng1 = std::clamp(SlatAng, 0.0, DataGlobalConstants::Pi);
@@ -8698,7 +8698,7 @@ namespace WindowManager {
         // Linear interpolation.
 
         // Using/Aliasing
-        using DataSurfaces::MaxSlatAngs;
+        using Material::MaxSlatAngs;
 
         // Argument array dimensioning
         PropArray.dim(MaxSlatAngs, 37);

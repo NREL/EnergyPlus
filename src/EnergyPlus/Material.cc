@@ -2008,7 +2008,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     }
 
     if (state.dataHeatBal->TotBlinds > 0) {
-        state.dataHeatBal->Blind.allocate(state.dataHeatBal->TotBlinds); // Allocate the array Size to the number of blinds
+        state.dataMaterial->Blind.allocate(state.dataHeatBal->TotBlinds); // Allocate the array Size to the number of blinds
     }
 
     state.dataHeatBalMgr->CurrentModuleObject = "WindowMaterial:Blind";
@@ -2045,58 +2045,58 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // Load the material derived type from the input data.
 
         thisMaterial->Name = MaterialNames(1);
-        state.dataHeatBal->Blind(Loop).Name = MaterialNames(1);
+        state.dataMaterial->Blind(Loop).Name = MaterialNames(1);
         thisMaterial->Roughness = Material::SurfaceRoughness::Rough;
         thisMaterial->BlindDataPtr = Loop;
         thisMaterial->ROnly = true;
 
-        state.dataHeatBal->Blind(Loop).MaterialNumber = MaterNum;
+        state.dataMaterial->Blind(Loop).MaterialNumber = MaterNum;
         if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
-            state.dataHeatBal->Blind(Loop).SlatOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
+            state.dataMaterial->Blind(Loop).SlatOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
         } else if (UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
-            state.dataHeatBal->Blind(Loop).SlatOrientation = DataWindowEquivalentLayer::Orientation::Vertical;
+            state.dataMaterial->Blind(Loop).SlatOrientation = DataWindowEquivalentLayer::Orientation::Vertical;
         }
-        state.dataHeatBal->Blind(Loop).SlatWidth = MaterialProps(1);
-        state.dataHeatBal->Blind(Loop).SlatSeparation = MaterialProps(2);
-        state.dataHeatBal->Blind(Loop).SlatThickness = MaterialProps(3);
-        state.dataHeatBal->Blind(Loop).SlatAngle = MaterialProps(4);
-        state.dataHeatBal->Blind(Loop).SlatConductivity = MaterialProps(5);
-        state.dataHeatBal->Blind(Loop).SlatTransSolBeamDiff = MaterialProps(6);
-        state.dataHeatBal->Blind(Loop).SlatFrontReflSolBeamDiff = MaterialProps(7);
-        state.dataHeatBal->Blind(Loop).SlatBackReflSolBeamDiff = MaterialProps(8);
-        state.dataHeatBal->Blind(Loop).SlatTransSolDiffDiff = MaterialProps(9);
-        state.dataHeatBal->Blind(Loop).SlatFrontReflSolDiffDiff = MaterialProps(10);
-        state.dataHeatBal->Blind(Loop).SlatBackReflSolDiffDiff = MaterialProps(11);
-        state.dataHeatBal->Blind(Loop).SlatTransVisBeamDiff = MaterialProps(12);
-        state.dataHeatBal->Blind(Loop).SlatFrontReflVisBeamDiff = MaterialProps(13);
-        state.dataHeatBal->Blind(Loop).SlatBackReflVisBeamDiff = MaterialProps(14);
-        state.dataHeatBal->Blind(Loop).SlatTransVisDiffDiff = MaterialProps(15);
-        state.dataHeatBal->Blind(Loop).SlatFrontReflVisDiffDiff = MaterialProps(16);
-        state.dataHeatBal->Blind(Loop).SlatBackReflVisDiffDiff = MaterialProps(17);
-        state.dataHeatBal->Blind(Loop).SlatTransIR = MaterialProps(18);
-        state.dataHeatBal->Blind(Loop).SlatFrontEmissIR = MaterialProps(19);
-        state.dataHeatBal->Blind(Loop).SlatBackEmissIR = MaterialProps(20);
-        state.dataHeatBal->Blind(Loop).BlindToGlassDist = MaterialProps(21);
-        state.dataHeatBal->Blind(Loop).BlindTopOpeningMult = MaterialProps(22);
-        state.dataHeatBal->Blind(Loop).BlindBottomOpeningMult = MaterialProps(23);
-        state.dataHeatBal->Blind(Loop).BlindLeftOpeningMult = MaterialProps(24);
-        state.dataHeatBal->Blind(Loop).BlindRightOpeningMult = MaterialProps(25);
-        state.dataHeatBal->Blind(Loop).MinSlatAngle = MaterialProps(26);
-        state.dataHeatBal->Blind(Loop).MaxSlatAngle = MaterialProps(27);
+        state.dataMaterial->Blind(Loop).SlatWidth = MaterialProps(1);
+        state.dataMaterial->Blind(Loop).SlatSeparation = MaterialProps(2);
+        state.dataMaterial->Blind(Loop).SlatThickness = MaterialProps(3);
+        state.dataMaterial->Blind(Loop).SlatAngle = MaterialProps(4);
+        state.dataMaterial->Blind(Loop).SlatConductivity = MaterialProps(5);
+        state.dataMaterial->Blind(Loop).SlatTransSolBeamDiff = MaterialProps(6);
+        state.dataMaterial->Blind(Loop).SlatFrontReflSolBeamDiff = MaterialProps(7);
+        state.dataMaterial->Blind(Loop).SlatBackReflSolBeamDiff = MaterialProps(8);
+        state.dataMaterial->Blind(Loop).SlatTransSolDiffDiff = MaterialProps(9);
+        state.dataMaterial->Blind(Loop).SlatFrontReflSolDiffDiff = MaterialProps(10);
+        state.dataMaterial->Blind(Loop).SlatBackReflSolDiffDiff = MaterialProps(11);
+        state.dataMaterial->Blind(Loop).SlatTransVisBeamDiff = MaterialProps(12);
+        state.dataMaterial->Blind(Loop).SlatFrontReflVisBeamDiff = MaterialProps(13);
+        state.dataMaterial->Blind(Loop).SlatBackReflVisBeamDiff = MaterialProps(14);
+        state.dataMaterial->Blind(Loop).SlatTransVisDiffDiff = MaterialProps(15);
+        state.dataMaterial->Blind(Loop).SlatFrontReflVisDiffDiff = MaterialProps(16);
+        state.dataMaterial->Blind(Loop).SlatBackReflVisDiffDiff = MaterialProps(17);
+        state.dataMaterial->Blind(Loop).SlatTransIR = MaterialProps(18);
+        state.dataMaterial->Blind(Loop).SlatFrontEmissIR = MaterialProps(19);
+        state.dataMaterial->Blind(Loop).SlatBackEmissIR = MaterialProps(20);
+        state.dataMaterial->Blind(Loop).BlindToGlassDist = MaterialProps(21);
+        state.dataMaterial->Blind(Loop).BlindTopOpeningMult = MaterialProps(22);
+        state.dataMaterial->Blind(Loop).BlindBottomOpeningMult = MaterialProps(23);
+        state.dataMaterial->Blind(Loop).BlindLeftOpeningMult = MaterialProps(24);
+        state.dataMaterial->Blind(Loop).BlindRightOpeningMult = MaterialProps(25);
+        state.dataMaterial->Blind(Loop).MinSlatAngle = MaterialProps(26);
+        state.dataMaterial->Blind(Loop).MaxSlatAngle = MaterialProps(27);
 
         // TH 2/11/2010. For CR 8010
         // By default all blinds have fixed slat angle, new blinds with variable slat angle are created if
         //  they are used with window shading controls that adjust slat angles like ScheduledSlatAngle or BlockBeamSolar
-        state.dataHeatBal->Blind(Loop).SlatAngleType = DataWindowEquivalentLayer::AngleType::Fixed;
+        state.dataMaterial->Blind(Loop).SlatAngleType = DataWindowEquivalentLayer::AngleType::Fixed;
 
-        if (state.dataHeatBal->Blind(Loop).SlatWidth < state.dataHeatBal->Blind(Loop).SlatSeparation) {
+        if (state.dataMaterial->Blind(Loop).SlatWidth < state.dataMaterial->Blind(Loop).SlatSeparation) {
             ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Angles/Widths");
             ShowContinueError(state,
                               format("{} [{:.2R}] is less than {} [{:.2R}].",
                                      state.dataIPShortCut->cNumericFieldNames(1),
-                                     state.dataHeatBal->Blind(Loop).SlatWidth,
+                                     state.dataMaterial->Blind(Loop).SlatWidth,
                                      state.dataIPShortCut->cNumericFieldNames(2),
-                                     state.dataHeatBal->Blind(Loop).SlatSeparation));
+                                     state.dataMaterial->Blind(Loop).SlatSeparation));
             ShowContinueError(state, "This will allow direct beam to be transmitted when Slat angle = 0.");
         }
 
@@ -2217,7 +2217,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                               state.dataIPShortCut->cNumericFieldNames(18) + " + " + state.dataIPShortCut->cNumericFieldNames(20) + " not < 1.0");
         }
 
-        if (state.dataHeatBal->Blind(Loop).BlindToGlassDist < 0.5 * state.dataHeatBal->Blind(Loop).SlatWidth) {
+        if (state.dataMaterial->Blind(Loop).BlindToGlassDist < 0.5 * state.dataMaterial->Blind(Loop).SlatWidth) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(
@@ -2225,9 +2225,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         // Minimum and maximum slat angles allowed by slat geometry
-        if (state.dataHeatBal->Blind(Loop).SlatWidth > state.dataHeatBal->Blind(Loop).SlatSeparation) {
-            MinSlatAngGeom = std::asin(state.dataHeatBal->Blind(Loop).SlatThickness /
-                                       (state.dataHeatBal->Blind(Loop).SlatThickness + state.dataHeatBal->Blind(Loop).SlatSeparation)) /
+        if (state.dataMaterial->Blind(Loop).SlatWidth > state.dataMaterial->Blind(Loop).SlatSeparation) {
+            MinSlatAngGeom = std::asin(state.dataMaterial->Blind(Loop).SlatThickness /
+                                       (state.dataMaterial->Blind(Loop).SlatThickness + state.dataMaterial->Blind(Loop).SlatSeparation)) /
                              DataGlobalConstants::DegToRadians;
         } else {
             MinSlatAngGeom = 0.0;
@@ -2235,23 +2235,23 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         MaxSlatAngGeom = 180.0 - MinSlatAngGeom;
 
         // Error if input slat angle not in range allowed by slat geometry
-        if ((state.dataHeatBal->Blind(Loop).SlatSeparation + state.dataHeatBal->Blind(Loop).SlatThickness) <
-            state.dataHeatBal->Blind(Loop).SlatWidth) {
-            if (state.dataHeatBal->Blind(Loop).SlatAngle < MinSlatAngGeom) {
+        if ((state.dataMaterial->Blind(Loop).SlatSeparation + state.dataMaterial->Blind(Loop).SlatThickness) <
+            state.dataMaterial->Blind(Loop).SlatWidth) {
+            if (state.dataMaterial->Blind(Loop).SlatAngle < MinSlatAngGeom) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError(state,
                                   format("{}=[{:.1R}], is less than smallest allowed by slat dimensions and spacing, [{:.1R}] deg.",
                                          state.dataIPShortCut->cNumericFieldNames(4),
-                                         state.dataHeatBal->Blind(Loop).SlatAngle,
+                                         state.dataMaterial->Blind(Loop).SlatAngle,
                                          MinSlatAngGeom));
-            } else if (state.dataHeatBal->Blind(Loop).SlatAngle > MaxSlatAngGeom) {
+            } else if (state.dataMaterial->Blind(Loop).SlatAngle > MaxSlatAngGeom) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError(state,
                                   format("{}=[{:.1R}], is greater than largest allowed by slat dimensions and spacing, [{:.1R}] deg.",
                                          state.dataIPShortCut->cNumericFieldNames(4),
-                                         state.dataHeatBal->Blind(Loop).SlatAngle,
+                                         state.dataMaterial->Blind(Loop).SlatAngle,
                                          MinSlatAngGeom));
             }
         }

@@ -569,7 +569,7 @@ namespace WindowManager {
         }
         if (material->Group == Material::MaterialGroup::WindowBlind) {
             int blNum = state.dataSurface->SurfWinBlindNumber(m_SurfNum);
-            auto blind = state.dataHeatBal->Blind(blNum);
+            auto blind = state.dataMaterial->Blind(blNum);
             thickness = blind.SlatThickness;
             conductivity = blind.SlatConductivity;
             Atop = blind.BlindTopOpeningMult;
@@ -704,7 +704,7 @@ namespace WindowManager {
         const auto ShadeFlag{getShadeType(state, m_ConstructionNumber)};
 
         if (ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind) {
-            thickness = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
+            thickness = state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
         if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
             const auto *material = dynamic_cast<Material::MaterialChild *>(getLayerMaterial(state, t_Index));

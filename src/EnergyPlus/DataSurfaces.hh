@@ -82,7 +82,6 @@ namespace DataSurfaces {
     using DataVectorTypes::Vector;
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr int MaxSlatAngs(19);
     constexpr int MaxProfAngs(37);
     constexpr int MaxPolyCoeff(6);
 
@@ -804,8 +803,9 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceWindowCalc()
-            : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(MaxSlatAngs, 0.0),
-              EffGlassEmiss(MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0), EnclAreaReflProdMinusThisSurf(3, 0.0)
+            : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0),
+              EffShBlindEmiss(Material::MaxSlatAngs, 0.0), EffGlassEmiss(Material::MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0),
+              EnclAreaReflProdMinusThisSurf(3, 0.0)
         {
         }
     };
@@ -1664,7 +1664,7 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::IntMassObject> IntMassObjects;
     EPVector<DataSurfaces::GroundSurfacesProperty> GroundSurfsProperty;
 
-    int actualMaxSlatAngs = DataSurfaces::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
+    int actualMaxSlatAngs = Material::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
 
     void clear_state() override
     {
@@ -2007,7 +2007,7 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfLocalEnvironment.deallocate();
         this->SurroundingSurfsProperty.deallocate();
         this->IntMassObjects.deallocate();
-        this->actualMaxSlatAngs = DataSurfaces::MaxSlatAngs;
+        this->actualMaxSlatAngs = Material::MaxSlatAngs;
         this->GroundSurfsProperty.deallocate();
     }
 };

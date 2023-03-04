@@ -258,8 +258,8 @@ namespace WindowManager {
                         state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
-                        Real64 TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
-                        Real64 EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
+                        Real64 TauShIR = state.dataMaterial->Blind(BlNum).IRFrontTrans(ISlatAng);
+                        Real64 EpsShIR = state.dataMaterial->Blind(BlNum).IRBackEmiss(ISlatAng);
                         Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
@@ -268,7 +268,7 @@ namespace WindowManager {
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
                     if (IntBlind) {
-                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
+                        if (state.dataMaterial->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     }
                 } // End of slat angle loop
             }     // End of check if interior shade or interior blind
@@ -388,7 +388,7 @@ namespace WindowManager {
     std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial(EnergyPlusData &state)
     {
         int blindDataPtr = m_MaterialProperties.BlindDataPtr;
-        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
+        auto &blind(state.dataMaterial->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
@@ -406,7 +406,7 @@ namespace WindowManager {
     std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         int blindDataPtr = m_MaterialProperties.BlindDataPtr;
-        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
+        auto &blind(state.dataMaterial->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
@@ -525,7 +525,7 @@ namespace WindowManager {
     std::shared_ptr<ICellDescription> CWCEVenetianBlindCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         const int blindDataPtr = m_Material.BlindDataPtr;
-        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
+        auto &blind(state.dataMaterial->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         Real64 slatWidth = blind.SlatWidth;
