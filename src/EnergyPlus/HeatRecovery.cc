@@ -3291,6 +3291,8 @@ namespace HeatRecovery {
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputChar = state.dataHeatRecovery->error1.OutputChar;
         auto &OutputCharLo = state.dataHeatRecovery->error1.OutputCharLo;
         auto &OutputCharHi = state.dataHeatRecovery->error1.OutputCharHi;
@@ -3301,13 +3303,13 @@ namespace HeatRecovery {
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error for variables of regeneration outlet temperature equation
             // Regen inlet temp for temp eqn
@@ -3419,7 +3421,7 @@ namespace HeatRecovery {
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
+        TimeStepSysLast = TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
 
         //   If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
@@ -3655,6 +3657,8 @@ namespace HeatRecovery {
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputChar = state.dataHeatRecovery->error2.OutputChar;
         auto &OutputCharLo = state.dataHeatRecovery->error2.OutputCharLo;
         auto &OutputCharHi = state.dataHeatRecovery->error2.OutputCharHi;
@@ -3666,13 +3670,13 @@ namespace HeatRecovery {
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error for variables of regeneration outlet humidity ratio equation
             // Regen inlet temp for humidity ratio eqn
@@ -3783,7 +3787,7 @@ namespace HeatRecovery {
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
+        TimeStepSysLast = TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
 
         //   If regen and procees inlet temperatures are the same the coil is off, do not print out of bounds warning for this case
@@ -4018,6 +4022,8 @@ namespace HeatRecovery {
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputChar = state.dataHeatRecovery->error3.OutputChar;
         auto &OutputCharLo = state.dataHeatRecovery->error3.OutputCharLo;
         auto &OutputCharHi = state.dataHeatRecovery->error3.OutputCharHi;
@@ -4028,13 +4034,13 @@ namespace HeatRecovery {
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration outlet temperature is greater than regen inlet temperature
             if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.print) {
@@ -4081,7 +4087,7 @@ namespace HeatRecovery {
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
+        TimeStepSysLast = TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
 
         // checking model regeneration outlet temperature to always be less than or equal to regeneration inlet temperature
@@ -4184,6 +4190,8 @@ namespace HeatRecovery {
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputChar = state.dataHeatRecovery->error4.OutputChar;
         auto &OutputCharLo = state.dataHeatRecovery->error4.OutputCharLo;
         auto &OutputCharHi = state.dataHeatRecovery->error4.OutputCharHi;
@@ -4194,13 +4202,13 @@ namespace HeatRecovery {
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration outlet humidity ratio is less than regeneration inlet humidity ratio
             if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.print) {
@@ -4246,7 +4254,7 @@ namespace HeatRecovery {
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
+        TimeStepSysLast = TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
 
         // checking for regeneration outlet humidity ratio less than or equal to regeneration inlet humidity ratio
@@ -4352,6 +4360,8 @@ namespace HeatRecovery {
 
         using Psychrometrics::PsyRhFnTdbWPb;
 
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH2;
         auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH2;
         auto &OutputChar = state.dataHeatRecovery->error6.OutputChar;
@@ -4365,13 +4375,13 @@ namespace HeatRecovery {
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration inlet relative humidity is outside model boundaries
             if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.print) {
@@ -4421,7 +4431,7 @@ namespace HeatRecovery {
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
 
         //     save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
+        TimeStepSysLast = TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
 
         //     Check that condition is not above saturation curve prior to next calc (PsyRhFnTdbWPb) to avoid psyc routine errors
@@ -4530,6 +4540,8 @@ namespace HeatRecovery {
         using Psychrometrics::PsyRhFnTdbWPb;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH;
         auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH;
         auto &OutputChar = state.dataHeatRecovery->error5.OutputChar;
@@ -4543,13 +4555,13 @@ namespace HeatRecovery {
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration inlet relative humidity is outside model boundaries
             if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.print) {
@@ -4600,7 +4612,7 @@ namespace HeatRecovery {
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
 
         //     save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
+        TimeStepSysLast = TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
 
         //     Check that condition is not above saturation curve prior to next calc (PsyRhFnTdbWPb) to avoid psyc routine errors
@@ -4702,6 +4714,8 @@ namespace HeatRecovery {
         // Using/Aliasing
         using General::CreateSysTimeIntervalString;
 
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputCharProc = state.dataHeatRecovery->OutputCharProc;
         auto &OutputCharRegen = state.dataHeatRecovery->OutputCharRegen;
         auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast7;
@@ -4714,13 +4728,13 @@ namespace HeatRecovery {
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && state.dataHVACGlobal->TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast) {
 
             // print error when regeneration inlet relative humidity is outside model boundaries
             if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.print) {
@@ -4748,7 +4762,7 @@ namespace HeatRecovery {
         } // IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
 
         //     save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = state.dataHVACGlobal->TimeStepSys;
+        TimeStepSysLast = TimeStepSys;
         CurrentEndTimeLast = CurrentEndTime;
 
         // checking if regeneration inlet relative humidity is within model boundaries

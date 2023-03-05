@@ -1198,9 +1198,11 @@ namespace HighTempRadiantSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // Zone index number for the current radiant system
+	Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+	Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // First, update the running average if necessary...
-        if (state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) == state.dataHVACGlobal->SysTimeElapsed) {
+        if (state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) == SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
             // not valid
             state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) -= state.dataHighTempRadSys->LastQHTRadSrc(RadSysNum) *
@@ -1210,11 +1212,11 @@ namespace HighTempRadiantSystem {
 
         // Update the running average and the "last" values with the current values of the appropriate variables
         state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) +=
-            state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
+            state.dataHighTempRadSys->QHTRadSource(RadSysNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
         state.dataHighTempRadSys->LastQHTRadSrc(RadSysNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum);
-        state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) = state.dataHVACGlobal->SysTimeElapsed;
-        state.dataHighTempRadSys->LastTimeStepSys(RadSysNum) = state.dataHVACGlobal->TimeStepSys;
+        state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) = SysTimeElapsed;
+        state.dataHighTempRadSys->LastTimeStepSys(RadSysNum) = TimeStepSys;
 
         switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
         case RadControlType::MATControl:

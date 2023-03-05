@@ -3552,12 +3552,11 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     int zoneNum,
     int spaceNum)
 {
-	
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
-	
     assert(zoneNum > 0);
     this->updateTemperatures(state, shortenTimeStepSys, useZoneTimeStepHistory, priorTimeStep, zoneNum, spaceNum);
+
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
 
     Real64 volume = 0.0;
     if (spaceNum > 0) {
@@ -3565,6 +3564,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     } else {
         volume = state.dataHeatBal->Zone(zoneNum).Volume;
     }
+
     this->AirPowerCap = volume * state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens *
                         Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->ZoneAirHumRat) *
                         Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / (TimeStepSysSec);
@@ -3602,7 +3602,8 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                                     thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).SysDepZoneLoadsLagged;
                 this->AirPowerCap = thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).AirVolume *
                                     state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens * thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).RhoAir *
-                                    thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).CpAir / (TimeStepSys);
+                                    thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).CpAir /
+                                    (TimeStepSysSec);
                 this->TempHistoryTerm = this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2]);
                 this->TempDepZnLd = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
                 this->TempIndZnLd = this->TempHistoryTerm + this->TempIndCoef;
@@ -3615,7 +3616,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     // Exact solution or Euler method
     state.dataHVACGlobal->ShortenTimeStepSysRoomAir = false;
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
-        if (shortenTimeStepSys && state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
+        if (shortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
             if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                 this->ZoneT1 = this->ZoneTM2;
                 this->ZoneW1 = this->ZoneWM2;
@@ -4259,9 +4260,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the zone air temperature and modifies the system
     // time step.
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
-    
+
     static constexpr std::string_view RoutineName("correctAirTemp");
 
     Real64 tempChange = DataPrecisionGlobals::constant_zero; // Zone or space air temperature change between previous and current timestep
@@ -4273,6 +4272,8 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
 
     Real64 ZoneMult = thisZone.Multiplier * thisZone.ListMultiplier;
 
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    
     // update the variables actually used in the balance equations.
     if (!useZoneTimeStepHistory) {
         this->ZTM = this->DSXMAT;
@@ -5828,9 +5829,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
     auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
-	   
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    
     // Sum all convective internal gains: SumIntGain
     SumIntGains = InternalHeatGains::zoneSumAllInternalConvectionGains(state, ZoneNum);
 
@@ -7105,8 +7105,6 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                                                   int const zoneNum,
                                                   int const spaceNum)
 {
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
     assert(zoneNum > 0);
     if (ShortenTimeStepSys) {
         // timestep has just shifted from full zone timestep to a new shorter system timestep
@@ -7131,9 +7129,10 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
 
         if (state.dataHVACGlobal->NumOfSysTimeSteps !=
             state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
-
+            Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
             this->MAT = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->XMAT, this->DSXMAT);
-            this->ZoneAirHumRat = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
+            this->ZoneAirHumRat =
+                DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
 
             if (spaceNum == 0 && state.dataRoomAirMod->anyNonMixingRoomAirModel) {
                 if (state.dataRoomAirMod->IsZoneDV(zoneNum) || state.dataRoomAirMod->IsZoneUI(zoneNum)) {
