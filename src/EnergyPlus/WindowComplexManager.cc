@@ -2884,28 +2884,28 @@ namespace WindowComplexManager {
             } else if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowShade) {
                 ++IGlass;
                 TempInt = thisMaterial->ComplexShadePtr;
-                LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
+                LayerType(IGlass) = state.dataMaterial->ComplexShade(TempInt).LayerType;
 
-                thick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Thickness;
-                scon(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Conductivity;
-                emis(2 * IGlass - 1) = state.dataHeatBal->ComplexShade(TempInt).FrontEmissivity;
-                emis(2 * IGlass) = state.dataHeatBal->ComplexShade(TempInt).BackEmissivity;
-                tir(2 * IGlass - 1) = state.dataHeatBal->ComplexShade(TempInt).IRTransmittance;
-                tir(2 * IGlass) = state.dataHeatBal->ComplexShade(TempInt).IRTransmittance;
+                thick(IGlass) = state.dataMaterial->ComplexShade(TempInt).Thickness;
+                scon(IGlass) = state.dataMaterial->ComplexShade(TempInt).Conductivity;
+                emis(2 * IGlass - 1) = state.dataMaterial->ComplexShade(TempInt).FrontEmissivity;
+                emis(2 * IGlass) = state.dataMaterial->ComplexShade(TempInt).BackEmissivity;
+                tir(2 * IGlass - 1) = state.dataMaterial->ComplexShade(TempInt).IRTransmittance;
+                tir(2 * IGlass) = state.dataMaterial->ComplexShade(TempInt).IRTransmittance;
 
                 // This needs to be converted into correct areas. That can be done only after loading complete window data
-                Atop(IGlass) = state.dataHeatBal->ComplexShade(TempInt).TopOpeningMultiplier;
-                Abot(IGlass) = state.dataHeatBal->ComplexShade(TempInt).BottomOpeningMultiplier;
-                Al(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LeftOpeningMultiplier;
-                Ar(IGlass) = state.dataHeatBal->ComplexShade(TempInt).RightOpeningMultiplier;
-                Ah(IGlass) = state.dataHeatBal->ComplexShade(TempInt).FrontOpeningMultiplier;
+                Atop(IGlass) = state.dataMaterial->ComplexShade(TempInt).TopOpeningMultiplier;
+                Abot(IGlass) = state.dataMaterial->ComplexShade(TempInt).BottomOpeningMultiplier;
+                Al(IGlass) = state.dataMaterial->ComplexShade(TempInt).LeftOpeningMultiplier;
+                Ar(IGlass) = state.dataMaterial->ComplexShade(TempInt).RightOpeningMultiplier;
+                Ah(IGlass) = state.dataMaterial->ComplexShade(TempInt).FrontOpeningMultiplier;
 
-                SlatThick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatThickness;
-                SlatWidth(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatWidth;
-                SlatAngle(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatAngle;
-                SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
-                SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
-                SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
+                SlatThick(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatThickness;
+                SlatWidth(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatWidth;
+                SlatAngle(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatAngle;
+                SlatCond(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatConductivity;
+                SlatSpacing(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatSpacing;
+                SlatCurve(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatCurve;
             } else if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) {
                 ++IGap;
                 gap(IGap) = thisMaterial->Thickness;

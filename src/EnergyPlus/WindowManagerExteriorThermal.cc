@@ -625,7 +625,7 @@ namespace WindowManager {
         }
         if (material->Group == Material::MaterialGroup::ComplexWindowShade) {
             auto shdPtr = material->ComplexShadePtr;
-            auto &shade(state.dataHeatBal->ComplexShade(shdPtr));
+            auto &shade(state.dataMaterial->ComplexShade(shdPtr));
             thickness = shade.Thickness;
             conductivity = shade.Conductivity;
             emissFront = shade.FrontEmissivity;

@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
@@ -512,6 +513,30 @@ namespace Material {
         }
     };
 
+    struct WindowComplexShade
+    {
+        // Members
+        std::string Name; // Name for complex shade
+        TARCOGParams::TARCOGLayerType LayerType =
+            TARCOGParams::TARCOGLayerType::Invalid; // Layer type (OtherShadingType, Venetian, Woven, Perforated)
+        Real64 Thickness = 0.0;                     // Layer thickness (m)
+        Real64 Conductivity = 0.0;                  // Layer conductivity (W/m2K)
+        Real64 IRTransmittance = 0.0;               // IR Transmittance
+        Real64 FrontEmissivity = 0.0;               // Emissivity of front surface
+        Real64 BackEmissivity = 0.0;                // Emissivity of back surface
+        Real64 TopOpeningMultiplier = 0.0;          // Coverage percent for top opening (%)
+        Real64 BottomOpeningMultiplier = 0.0;       // Coverage percent for bottom opening (%)
+        Real64 LeftOpeningMultiplier = 0.0;         // Coverage percent for left opening (%)
+        Real64 RightOpeningMultiplier = 0.0;        // Coverage percent for right opening (%)
+        Real64 FrontOpeningMultiplier = 0.0;        // Coverage percent for front opening (%)
+        Real64 SlatWidth = 0.0;                     // Slat width (m)
+        Real64 SlatSpacing = 0.0;                   // Slat spacing (m)
+        Real64 SlatThickness = 0.0;                 // Slat thickness (m)
+        Real64 SlatAngle = 0.0;                     // Slat angle (deg)
+        Real64 SlatConductivity = 0.0;              // Slat conductivity (W/m2K)
+        Real64 SlatCurve = 0.0;                     // Curvature radius of slat (if =0 then flat) (m)
+    };
+
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     std::string DisplayMaterialRoughness(SurfaceRoughness Roughness); // Roughness String
@@ -521,9 +546,11 @@ namespace Material {
 struct MaterialData : BaseGlobalStruct
 {
     EPVector<Material::MaterialBase *> Material;
-    int TotMaterials = 0; // Total number of unique materials (layers) in this simulation
+    int TotMaterials = 0;     // Total number of unique materials (layers) in this simulation
+    int TotComplexShades = 0; // Total number of shading materials for complex fenestrations
 
     Array1D<Material::WindowBlindProperties> Blind;
+    EPVector<Material::WindowComplexShade> ComplexShade;
     void clear_state() override
     {
         for (int i = 0; i < TotMaterials; ++i) {

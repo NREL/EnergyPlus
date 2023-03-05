@@ -183,7 +183,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     state.dataHeatBal->W5GasMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gas");
     state.dataHeatBal->W5GasMatMixture = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:GasMixture");
     state.dataHeatBal->TotShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade");
-    state.dataHeatBal->TotComplexShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
+    state.dataMaterial->TotComplexShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
     state.dataHeatBal->TotComplexGaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap");
     state.dataHeatBal->TotScreens = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen");
     state.dataHeatBal->TotBlinds = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind");
@@ -200,7 +200,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     state.dataMaterial->TotMaterials = RegMat + RegRMat + AirMat + state.dataHeatBal->W5GlsMat + state.dataHeatBal->W5GlsMatAlt +
                                        state.dataHeatBal->W5GasMat + state.dataHeatBal->W5GasMatMixture + state.dataHeatBal->TotShades +
                                        state.dataHeatBal->TotScreens + state.dataHeatBal->TotBlinds + EcoRoofMat + IRTMat +
-                                       state.dataHeatBal->TotSimpleWindow + state.dataHeatBal->TotComplexShades + state.dataHeatBal->TotComplexGaps +
+                                       state.dataHeatBal->TotSimpleWindow + state.dataMaterial->TotComplexShades + state.dataHeatBal->TotComplexGaps +
                                        state.dataHeatBal->W5GlsMatEQL + state.dataHeatBal->TotShadesEQL + state.dataHeatBal->TotDrapesEQL +
                                        state.dataHeatBal->TotBlindsEQL + state.dataHeatBal->TotScreensEQL + state.dataHeatBal->W5GapMatEQL;
 
@@ -2701,7 +2701,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     }
 
     // Simon: Place to load materials for complex fenestrations
-    if ((state.dataHeatBal->TotComplexShades > 0) || (state.dataHeatBal->TotComplexGaps > 0)) {
+    if ((state.dataMaterial->TotComplexShades > 0) || (state.dataHeatBal->TotComplexGaps > 0)) {
         HeatBalanceManager::SetupComplexFenestrationMaterialInput(state, MaterNum, ErrorsFound);
         if (ErrorsFound) {
             ShowSevereError(state, "Errors found in processing complex fenestration material input");

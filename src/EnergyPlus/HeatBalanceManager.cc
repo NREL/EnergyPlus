@@ -6336,13 +6336,13 @@ namespace HeatBalanceManager {
 
         // Reading WindowMaterial:ComplexShade
         cCurrentModuleObject = "WindowMaterial:ComplexShade";
-        state.dataHeatBal->TotComplexShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataMaterial->TotComplexShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (state.dataHeatBal->TotComplexShades > 0) {
-            state.dataHeatBal->ComplexShade.allocate(state.dataHeatBal->TotComplexShades); // Allocate the array Size to the number of complex shades
+        if (state.dataMaterial->TotComplexShades > 0) {
+            state.dataMaterial->ComplexShade.allocate(state.dataMaterial->TotComplexShades); // Allocate the array Size to the number of complex shades
         }
 
-        for (Loop = 1; Loop <= state.dataHeatBal->TotComplexShades; ++Loop) {
+        for (Loop = 1; Loop <= state.dataMaterial->TotComplexShades; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
@@ -6377,23 +6377,23 @@ namespace HeatBalanceManager {
             thisMaterial->ComplexShadePtr = Loop;
 
             thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataHeatBal->ComplexShade(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataMaterial->ComplexShade(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "OTHERSHADINGTYPE") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::DIFFSHADE;
+                    state.dataMaterial->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::DIFFSHADE;
                 } else if (SELECT_CASE_var == "VENETIANHORIZONTAL") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ;
+                    state.dataMaterial->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ;
                 } else if (SELECT_CASE_var == "VENETIANVERTICAL") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::VENETBLIND_VERT;
+                    state.dataMaterial->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::VENETBLIND_VERT;
                 } else if (SELECT_CASE_var == "WOVEN") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::WOVSHADE;
+                    state.dataMaterial->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::WOVSHADE;
                 } else if (SELECT_CASE_var == "PERFORATED") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::PERFORATED;
+                    state.dataMaterial->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::PERFORATED;
                 } else if (SELECT_CASE_var == "BSDF") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::BSDF;
+                    state.dataMaterial->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::BSDF;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -6409,13 +6409,13 @@ namespace HeatBalanceManager {
                 }
             }
 
-            state.dataHeatBal->ComplexShade(Loop).Thickness = state.dataIPShortCut->rNumericArgs(1);
+            state.dataMaterial->ComplexShade(Loop).Thickness = state.dataIPShortCut->rNumericArgs(1);
             thisMaterial->Thickness = state.dataIPShortCut->rNumericArgs(1);
-            state.dataHeatBal->ComplexShade(Loop).Conductivity = state.dataIPShortCut->rNumericArgs(2);
+            state.dataMaterial->ComplexShade(Loop).Conductivity = state.dataIPShortCut->rNumericArgs(2);
             thisMaterial->Conductivity = state.dataIPShortCut->rNumericArgs(2);
-            state.dataHeatBal->ComplexShade(Loop).IRTransmittance = state.dataIPShortCut->rNumericArgs(3);
-            state.dataHeatBal->ComplexShade(Loop).FrontEmissivity = state.dataIPShortCut->rNumericArgs(4);
-            state.dataHeatBal->ComplexShade(Loop).BackEmissivity = state.dataIPShortCut->rNumericArgs(5);
+            state.dataMaterial->ComplexShade(Loop).IRTransmittance = state.dataIPShortCut->rNumericArgs(3);
+            state.dataMaterial->ComplexShade(Loop).FrontEmissivity = state.dataIPShortCut->rNumericArgs(4);
+            state.dataMaterial->ComplexShade(Loop).BackEmissivity = state.dataIPShortCut->rNumericArgs(5);
 
             // Simon: in heat balance radiation exchange routines AbsorpThermal is used
             // and program will crash if value is not assigned.  Not sure if this is correct
@@ -6424,18 +6424,18 @@ namespace HeatBalanceManager {
             thisMaterial->AbsorpThermalFront = state.dataIPShortCut->rNumericArgs(4);
             thisMaterial->AbsorpThermalBack = state.dataIPShortCut->rNumericArgs(5);
 
-            state.dataHeatBal->ComplexShade(Loop).TopOpeningMultiplier = state.dataIPShortCut->rNumericArgs(6);
-            state.dataHeatBal->ComplexShade(Loop).BottomOpeningMultiplier = state.dataIPShortCut->rNumericArgs(7);
-            state.dataHeatBal->ComplexShade(Loop).LeftOpeningMultiplier = state.dataIPShortCut->rNumericArgs(8);
-            state.dataHeatBal->ComplexShade(Loop).RightOpeningMultiplier = state.dataIPShortCut->rNumericArgs(9);
-            state.dataHeatBal->ComplexShade(Loop).FrontOpeningMultiplier = state.dataIPShortCut->rNumericArgs(10);
+            state.dataMaterial->ComplexShade(Loop).TopOpeningMultiplier = state.dataIPShortCut->rNumericArgs(6);
+            state.dataMaterial->ComplexShade(Loop).BottomOpeningMultiplier = state.dataIPShortCut->rNumericArgs(7);
+            state.dataMaterial->ComplexShade(Loop).LeftOpeningMultiplier = state.dataIPShortCut->rNumericArgs(8);
+            state.dataMaterial->ComplexShade(Loop).RightOpeningMultiplier = state.dataIPShortCut->rNumericArgs(9);
+            state.dataMaterial->ComplexShade(Loop).FrontOpeningMultiplier = state.dataIPShortCut->rNumericArgs(10);
 
-            state.dataHeatBal->ComplexShade(Loop).SlatWidth = state.dataIPShortCut->rNumericArgs(11);
-            state.dataHeatBal->ComplexShade(Loop).SlatSpacing = state.dataIPShortCut->rNumericArgs(12);
-            state.dataHeatBal->ComplexShade(Loop).SlatThickness = state.dataIPShortCut->rNumericArgs(13);
-            state.dataHeatBal->ComplexShade(Loop).SlatAngle = state.dataIPShortCut->rNumericArgs(14);
-            state.dataHeatBal->ComplexShade(Loop).SlatConductivity = state.dataIPShortCut->rNumericArgs(15);
-            state.dataHeatBal->ComplexShade(Loop).SlatCurve = state.dataIPShortCut->rNumericArgs(16);
+            state.dataMaterial->ComplexShade(Loop).SlatWidth = state.dataIPShortCut->rNumericArgs(11);
+            state.dataMaterial->ComplexShade(Loop).SlatSpacing = state.dataIPShortCut->rNumericArgs(12);
+            state.dataMaterial->ComplexShade(Loop).SlatThickness = state.dataIPShortCut->rNumericArgs(13);
+            state.dataMaterial->ComplexShade(Loop).SlatAngle = state.dataIPShortCut->rNumericArgs(14);
+            state.dataMaterial->ComplexShade(Loop).SlatConductivity = state.dataIPShortCut->rNumericArgs(15);
+            state.dataMaterial->ComplexShade(Loop).SlatCurve = state.dataIPShortCut->rNumericArgs(16);
 
             // IF (dataMaterial.Material(MaterNum)%Conductivity > 0.0) THEN
             //  NominalR(MaterNum)=dataMaterial.Material(MaterNum)%Thickness/dataMaterial.Material(MaterNum)%Conductivity
@@ -6583,8 +6583,8 @@ namespace HeatBalanceManager {
                                          state.dataIPShortCut->rNumericArgs(10)));
             }
 
-            if ((state.dataHeatBal->ComplexShade(Loop).LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) ||
-                (state.dataHeatBal->ComplexShade(Loop).LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ)) {
+            if ((state.dataMaterial->ComplexShade(Loop).LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) ||
+                (state.dataMaterial->ComplexShade(Loop).LayerType == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ)) {
                 if (state.dataIPShortCut->rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,

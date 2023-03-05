@@ -79,7 +79,6 @@ namespace DataHeatBalance {
     using namespace DataComplexFenestration;
     using DataComplexFenestration::GapDeflectionState;
     using DataComplexFenestration::GapSupportPillar;
-    using DataComplexFenestration::WindowComplexShade;
     using DataComplexFenestration::WindowThermalModelParams;
     using Material::MaxSlatAngs;
     using DataVectorTypes::Vector;
@@ -1948,7 +1947,6 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotTCGlazings = 0;      // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
     int NumSurfaceScreens = 0;  // Total number of screens on exterior windows
     int TotShades = 0;          // Total number of shade materials
-    int TotComplexShades = 0;   // Total number of shading materials for complex fenestrations
     int TotComplexGaps = 0;     // Total number of window gaps for complex fenestrations
     int TotSimpleWindow = 0;    // number of simple window systems.
     int W5GlsMatEQL = 0;        // Window5 Single-Gas Materials for Equivalent Layer window model
@@ -2122,7 +2120,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::MixingData> CrossMixing;
     EPVector<DataHeatBalance::AirBoundaryMixingSpecs> airBoundaryMixing;
     EPVector<DataHeatBalance::MixingData> RefDoorMixing;
-    EPVector<DataHeatBalance::WindowComplexShade> ComplexShade;
     EPVector<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
     EPVector<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
     EPVector<DataHeatBalance::ScreenTransData> ScreenTrans;

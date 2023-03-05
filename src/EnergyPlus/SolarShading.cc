@@ -9510,7 +9510,7 @@ void WindowShadingManager(EnergyPlusData &state)
                         const int TotLay = construction.TotLayers;
                         int ShadingLayerPtr = construction.LayerPoint(TotLay);
                         ShadingLayerPtr = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(ShadingLayerPtr))->ComplexShadePtr;
-                        auto &complexShade = state.dataHeatBal->ComplexShade(ShadingLayerPtr);
+                        auto &complexShade = state.dataMaterial->ComplexShade(ShadingLayerPtr);
                         auto TauShadeIR = complexShade.IRTransmittance;
                         auto EpsShadeIR = complexShade.BackEmissivity;
                         auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
