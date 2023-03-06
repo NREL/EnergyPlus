@@ -5353,7 +5353,7 @@ namespace LowTempRadiantSystem {
 
             int surfNum = this->SurfacePtr(radSurfNum);
 
-            if (state.dataLowTempRadSys->LastSysTimeElapsed(surfNum) == state.dataHVACGlobal->SysTimeElapsed) {
+            if (state.dataLowTempRadSys->LastSysTimeElapsed(surfNum) == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
                 state.dataLowTempRadSys->QRadSysSrcAvg(surfNum) -= state.dataLowTempRadSys->LastQRadSysSrc(surfNum) *

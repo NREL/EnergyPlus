@@ -999,12 +999,12 @@ namespace WaterManager {
         if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSchedDesign) {
             schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
             state.dataWaterData->Irrigation.ScheduledAmount =
-                schedRate * (TimeStepSysSec) / DataGlobalConstants::SecInHour; // convert to m/timestep // LOL
+                schedRate * TimeStepSysSec / DataGlobalConstants::SecInHour; // convert to m/timestep // LOL
 
         } else if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSmartSched) {
             schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
             state.dataWaterData->Irrigation.ScheduledAmount =
-                schedRate * (TimeStepSysSec) / DataGlobalConstants::SecInHour; // convert to m/timestep // LOL
+                schedRate * TimeStepSysSec / DataGlobalConstants::SecInHour; // convert to m/timestep // LOL
         }
     }
 
@@ -1077,10 +1077,10 @@ namespace WaterManager {
             underflowVdot = OrigVdotDemandRequest - state.dataWaterData->WaterStorage(TankNum).MaxOutFlowRate;
             TotVdotDemandAvail = state.dataWaterData->WaterStorage(TankNum).MaxOutFlowRate;
         }
-        TotVolDemandAvail = TotVdotDemandAvail * (TimeStepSysSec);
+        TotVolDemandAvail = TotVdotDemandAvail * TimeStepSysSec;
 
         NetVdotAdd = TotVdotSupplyAvail - TotVdotDemandAvail;
-        NetVolAdd = NetVdotAdd * (TimeStepSysSec);
+        NetVolAdd = NetVdotAdd * TimeStepSysSec;
 
         VolumePredict = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
 
@@ -1094,7 +1094,7 @@ namespace WaterManager {
                 (overflowVol + OverFillVolume);
             overflowVol += OverFillVolume;
             NetVolAdd -= OverFillVolume;
-            NetVdotAdd = NetVolAdd / (TimeStepSysSec);
+            NetVdotAdd = NetVolAdd / TimeStepSysSec;
             VolumePredict = state.dataWaterData->WaterStorage(TankNum).MaxCapacity;
         }
 
@@ -1103,10 +1103,10 @@ namespace WaterManager {
             Real64 AvailVolume = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + TotVolSupplyAvail;
             AvailVolume = max(0.0, AvailVolume);
             TotVolDemandAvail = AvailVolume;
-            TotVdotDemandAvail = AvailVolume / (TimeStepSysSec);
+            TotVdotDemandAvail = AvailVolume / TimeStepSysSec;
             underflowVdot = OrigVdotDemandRequest - TotVdotDemandAvail;
             NetVdotAdd = TotVdotSupplyAvail - TotVdotDemandAvail;
-            NetVolAdd = NetVdotAdd * (TimeStepSysSec);
+            NetVolAdd = NetVdotAdd * TimeStepSysSec;
             VolumePredict = 0.0;
         }
 
@@ -1136,7 +1136,7 @@ namespace WaterManager {
             // set mains draws for float on (all the way to Float off)
             if (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::MainsFloatValve) {
 
-                state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSysSec);
+                state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / TimeStepSysSec;
                 NetVolAdd = FillVolRequest;
             }
             // set demand request in supplying tank if needed
@@ -1144,14 +1144,14 @@ namespace WaterManager {
                 (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
                 state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).SupplyTankID)
                     .VdotRequestDemand(state.dataWaterData->WaterStorage(TankNum).SupplyTankDemandARRID) =
-                    FillVolRequest / (TimeStepSysSec);
+                    FillVolRequest / TimeStepSysSec;
             }
 
             // set demand request in groundwater well if needed
             if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) ||
                 (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
                 state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest =
-                    FillVolRequest / (TimeStepSysSec);
+                    FillVolRequest / TimeStepSysSec;
             }
         }
 
@@ -1160,7 +1160,7 @@ namespace WaterManager {
             if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup) ||
                 (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
                 FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
-                state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSysSec);
+                state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / TimeStepSysSec;
                 NetVolAdd = FillVolRequest;
             }
         }
@@ -1170,12 +1170,12 @@ namespace WaterManager {
             state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling = false;
         }
 
-        state.dataWaterData->WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSysSec);
+        state.dataWaterData->WaterStorage(TankNum).VdotOverflow = overflowVol / TimeStepSysSec;
         state.dataWaterData->WaterStorage(TankNum).VolOverflow = overflowVol;
         state.dataWaterData->WaterStorage(TankNum).TwaterOverflow = state.dataWaterManager->overflowTwater;
-        state.dataWaterData->WaterStorage(TankNum).NetVdot = NetVolAdd / (TimeStepSysSec);
+        state.dataWaterData->WaterStorage(TankNum).NetVdot = NetVolAdd / TimeStepSysSec;
         state.dataWaterData->WaterStorage(TankNum).MainsDrawVol =
-            state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot * (TimeStepSysSec);
+            state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot * TimeStepSysSec;
         state.dataWaterData->WaterStorage(TankNum).VdotToTank = TotVdotSupplyAvail;
         state.dataWaterData->WaterStorage(TankNum).VdotFromTank = TotVdotDemandAvail;
 

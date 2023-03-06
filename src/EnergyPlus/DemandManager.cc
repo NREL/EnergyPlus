@@ -225,7 +225,7 @@ void SimulateDemandManagerList(EnergyPlusData &state,
 
     DemandManagerList(ListNum).MeterDemand =
         GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
-        GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::System) / (TimeStepSysSec);
+        GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::System) / TimeStepSysSec;
 
     // Calculate average demand over the averaging window including the current timestep meter demand
     AverageDemand = DemandManagerList(ListNum).AverageDemand +

@@ -2875,8 +2875,7 @@ void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)
     }
 
     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElecCoolingPower = StandbyAncillaryPower;
-    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElecCoolingEnergy =
-        StandbyAncillaryPower * TimeStepSysSec;
+    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElecCoolingEnergy = StandbyAncillaryPower * TimeStepSysSec;
 
     state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp =
         state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
@@ -3178,8 +3177,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RuntimeFraction = RuntimeFraction;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserRuntimeFraction = RuntimeFraction;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapTotCoolingRate = TotCap * RuntimeFraction; // double check this
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapTotCoolingEnergy =
-            TotCap * RuntimeFraction * TimeStepSysSec;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSysSec;
         MinAirHumRat = min(state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat,
                            state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat);
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapSensCoolingRate =
@@ -3397,8 +3395,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
                                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageFluidIndex,
                                            RoutineName);
             // simple linear approximation of DT/Dt term in McpDT/Dt
-            QdotChargeLimit = TankMass * CpTank * (sTES - state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MinimumFluidTankTempLimit) /
-                              (TimeStepSysSec);
+            QdotChargeLimit = TankMass * CpTank * (sTES - state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MinimumFluidTankTempLimit) / TimeStepSysSec;
         } else {
             TESCanBeCharged = false;
         }
@@ -3408,8 +3405,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
         if (sTES < 1.0) {
             TESCanBeCharged = true;
             // find charge limit to reach limit
-            QdotChargeLimit = (1.0 - sTES) * state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity /
-                              (TimeStepSysSec);
+            QdotChargeLimit = (1.0 - sTES) * state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / TimeStepSysSec;
         } else {
             TESCanBeCharged = false;
         }
@@ -3634,8 +3630,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
         }
 
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapTotCoolingRate = EvapTotCap * EvapRuntimeFraction; // double check this
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapTotCoolingEnergy =
-            EvapTotCap * EvapRuntimeFraction * TimeStepSysSec;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapTotCoolingEnergy = EvapTotCap * EvapRuntimeFraction * TimeStepSysSec;
         MinAirHumRat = min(state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat,
                            state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat);
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapSensCoolingRate =
@@ -3916,8 +3911,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
                                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageFluidIndex,
                                            RoutineName);
             // simple linear approximation of DT/Dt term in McpDT/Dt
-            QdotDischargeLimit = TankMass * CpTank * (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MaximumFluidTankTempLimit - sTES) /
-                                 (TimeStepSysSec);
+            QdotDischargeLimit = TankMass * CpTank * (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MaximumFluidTankTempLimit - sTES) / TimeStepSysSec;
         } else {
             TESHasSomeCharge = false;
         }
@@ -3928,7 +3922,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
             TESHasSomeCharge = true;
             // discharge limit
             QdotDischargeLimit =
-                (sTES)*state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSysSec);
+                (sTES)*state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / TimeStepSysSec;
         } else {
             TESHasSomeCharge = false;
         }
@@ -4338,8 +4332,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
                                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageFluidIndex,
                                            RoutineName);
             // simple linear approximation of DT/Dt term in McpDT/Dt
-            QdotChargeLimit = TankMass * CpTank * (sTES - state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MinimumFluidTankTempLimit) /
-                              (TimeStepSysSec);
+            QdotChargeLimit = TankMass * CpTank * (sTES - state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MinimumFluidTankTempLimit) / TimeStepSysSec;
         } else {
             TESCanBeCharged = false;
         }
@@ -4349,8 +4342,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
         if (sTES < 1.0) {
             TESCanBeCharged = true;
             // find charge limit to reach limit
-            QdotChargeLimit = (1.0 - sTES) * state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity /
-                              (TimeStepSysSec);
+            QdotChargeLimit = (1.0 - sTES) * state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / TimeStepSysSec;
         } else {
             TESCanBeCharged = false;
         }
@@ -4532,8 +4524,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
                                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageFluidIndex,
                                            StorageTankName);
             // simple linear approximation of DT/Dt term in McpDT/Dt
-            QdotDischargeLimit = TankMass * CpTank * (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MaximumFluidTankTempLimit - sTES) /
-                                 (TimeStepSysSec);
+            QdotDischargeLimit = TankMass * CpTank * (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MaximumFluidTankTempLimit - sTES) / TimeStepSysSec;
         } else {
             TESHasSomeCharge = false;
         }
@@ -4544,7 +4535,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
             TESHasSomeCharge = true;
             // discharge limit
             QdotDischargeLimit =
-                (sTES)*state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSysSec);
+                (sTES)*state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / TimeStepSysSec;
         } else {
             TESHasSomeCharge = false;
         }
@@ -5012,13 +5003,13 @@ void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum)
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemain =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemainLastTimestep +
             std::abs(QdotIce) /
-                (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSysSec));
+                (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / TimeStepSysSec);
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemain > 1.0)
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemain = 1.0;
     } else { // not charging,but discharging
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemain =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemainLastTimestep -
-            QdotIce / (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSysSec));
+            QdotIce / (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / TimeStepSysSec);
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemain < 0.0)
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemain = 0.0;
     }

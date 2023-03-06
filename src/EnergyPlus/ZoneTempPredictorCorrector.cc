@@ -3567,7 +3567,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
 
     this->AirPowerCap = volume * state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens *
                         Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->ZoneAirHumRat) *
-                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / (TimeStepSysSec);
+                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / TimeStepSysSec;
     Real64 RAFNFrac = 0.0;
 
     // Calculate the various heat balance sums
@@ -3603,7 +3603,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                 this->AirPowerCap = thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).AirVolume *
                                     state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens * thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).RhoAir *
                                     thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).CpAir /
-                                    (TimeStepSysSec);
+                                    TimeStepSysSec;
                 this->TempHistoryTerm = this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2]);
                 this->TempDepZnLd = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
                 this->TempIndZnLd = this->TempHistoryTerm + this->TempIndCoef;
@@ -4087,7 +4087,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         Real64 LatentGain =
             this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; 
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // Calculate the coefficients for the 3rd Order derivative for final
         // zone humidity ratio.  The A, B, C coefficients are analogous to the heat balance.
@@ -4129,7 +4129,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             B = (roomAFNInfo.Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) + roomAFNInfo.Node(RoomAirNode).SumLinkMW +
                 roomAFNInfo.Node(RoomAirNode).SumHmARaW;
             C = roomAFNInfo.Node(RoomAirNode).RhoAir * roomAFNInfo.Node(RoomAirNode).AirVolume * thisZone.ZoneVolCapMultpMoist /
-                (TimeStepSysSec);
+                TimeStepSysSec;
         }
 
         // Use a 3rd Order derivative to predict zone moisture addition or removal and
@@ -4291,7 +4291,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     }
     this->AirPowerCap = volume * thisZone.ZoneVolCapMultpSens *
                         Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->ZoneAirHumRat, RoutineName) *
-                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / (TimeStepSysSec);
+                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / TimeStepSysSec;
 
     // SpaceHB TODO: For now, room air model is only for zones
     if (spaceNum == 0) {
@@ -5997,8 +5997,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        CzdTdt = RhoAir * CpAir * thisZone.Volume * thisZone.ZoneVolCapMultpSens * (thisZoneHB.MAT - thisZoneHB.ZTM[0]) /
-                 (TimeStepSysSec);
+        CzdTdt = RhoAir * CpAir * thisZone.Volume * thisZone.ZoneVolCapMultpSens * (thisZoneHB.MAT - thisZoneHB.ZTM[0]) / TimeStepSysSec;
         // Exact solution
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {

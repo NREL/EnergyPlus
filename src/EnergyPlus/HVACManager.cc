@@ -2906,9 +2906,10 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
         ZnAirRpt(ZoneLoop).ExfilMass = ZnAirRpt(ZoneLoop).InfilMass + ZnAirRpt(ZoneLoop).VentilMass + ZnAirRpt(ZoneLoop).MixMass +
                                        ZnAirRpt(ZoneLoop).OABalanceMass + ZnAirRpt(ZoneLoop).SysInletMass - ZnAirRpt(ZoneLoop).SysOutletMass; // kg
-        ZnAirRpt(ZoneLoop).ExfilSensiLoss = ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSysSec) *
+        // I am not happy with these un-parenthesized divisions and multiplications.  Someone clean this up.
+        ZnAirRpt(ZoneLoop).ExfilSensiLoss = ZnAirRpt(ZoneLoop).ExfilMass / TimeStepSysSec *
                                             (thisZoneHB.MAT - Zone(ZoneLoop).OutDryBulbTemp) * CpAir; // W
-        ZnAirRpt(ZoneLoop).ExfilLatentLoss = ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSysSec) *
+        ZnAirRpt(ZoneLoop).ExfilLatentLoss = ZnAirRpt(ZoneLoop).ExfilMass / TimeStepSysSec *
                                              (thisZoneHB.ZoneAirHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
         ZnAirRpt(ZoneLoop).ExfilTotalLoss = ZnAirRpt(ZoneLoop).ExfilLatentLoss + ZnAirRpt(ZoneLoop).ExfilSensiLoss;
 

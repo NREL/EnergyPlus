@@ -4451,8 +4451,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 }
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).TargetVentilationFlowVoz +=
                     termUnitOAFrac * thisZoneVentRepVars.TargetVentilationFlowVoz;
-                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) /
-                                         (TimeStepSysSec);
+                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) / TimeStepSysSec;
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).NatVentFlow += termUnitOAFrac * naturalVentFlow;
 
                 if (thisZonePredefRep.isOccupied) {

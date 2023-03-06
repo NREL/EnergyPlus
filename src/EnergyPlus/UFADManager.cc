@@ -1244,12 +1244,12 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
                 (state.dataRoomAirMod->HeightTransition(ZoneNum) - min(state.dataRoomAirMod->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
                 state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
                 PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / (TimeStepSysSec);
+                PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
             state.dataRoomAirMod->AIRRATMX(ZoneNum) =
                 state.dataHeatBal->Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAirMod->HeightTransition(ZoneNum)) / CeilingHeight *
                 state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
                 PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / (TimeStepSysSec);
+                PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
 
             if (state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 state.dataRoomAirMod->ZTM3OC(ZoneNum) = state.dataRoomAirMod->XM3TOC(ZoneNum);
@@ -1787,12 +1787,12 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
                 (state.dataRoomAirMod->HeightTransition(ZoneNum) - min(state.dataRoomAirMod->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
                 state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
                 PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / (TimeStepSysSec);
+                PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
             state.dataRoomAirMod->AIRRATMX(ZoneNum) =
                 state.dataHeatBal->Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAirMod->HeightTransition(ZoneNum)) / CeilingHeight *
                 state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
                 PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / (TimeStepSysSec);
+                PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
 
             if (state.dataHVACGlobal->UseZoneTimeStepHistory) {
                 state.dataRoomAirMod->ZTM3OC(ZoneNum) = state.dataRoomAirMod->XM3TOC(ZoneNum);
