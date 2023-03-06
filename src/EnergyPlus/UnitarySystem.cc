@@ -12364,8 +12364,6 @@ namespace UnitarySystems {
                     if (this->m_SpeedNum > this->m_NumOfSpeedCooling) {
                         this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
                         this->m_SpeedNum = this->m_NumOfSpeedCooling;
-                        CycRatio = this->m_CoolingCycRatio = 1.0;
-                        PartLoadFrac = SpeedRatio = this->m_CoolingSpeedRatio = 1.0;
                         useMaxedSpeed = true;
                         if (this->m_CoilSpeedErrIdx == 0) {
                             ShowWarningMessage(state, format("Wrong coil speed EMS override value, for unit=\"{}", this->m_CoolingCoilName));
@@ -18170,7 +18168,7 @@ namespace UnitarySystems {
 
     void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound)
     {
-        for (auto &unitarySystem : state.dataUnitarySystems->unitarySys) {
+        for (auto const &unitarySystem : state.dataUnitarySystems->unitarySys) {
             if (unitarySystem.m_HRcoolCoilFluidInletNode == waterCoilNodeNum && unitarySystem.m_WaterHRPlantLoopModel) {
                 nodeNotFound = false;
                 break;
