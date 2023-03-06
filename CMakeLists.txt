@@ -144,6 +144,11 @@ option(ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON)
 option(ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON)
 option(ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON)
 
+
+if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+  option(ENABLE_HARDENED_RUNTIME "Enable Control Flow Guard and Buffer Security Check" OFF)
+endif()
+
 mark_as_advanced(ENABLE_INSTALL_REMOTE)
 
 # Set a default build type if none was specified
