@@ -2415,7 +2415,7 @@ namespace SurfaceGeometry {
                         if (thisSurf.Class == SurfaceClass::Floor) {
                             thisZone.HasFloor = true;
                             thisSpace.hasFloor = true;
-                            state.dataHeatBal->space(spaceNum).calcFloorArea += thisSurf.Area;
+                            thisSpace.calcFloorArea += thisSurf.Area;
                         }
                         if (thisSurf.Class == SurfaceClass::Roof) {
                             thisZone.CeilingArea += thisSurf.Area;
