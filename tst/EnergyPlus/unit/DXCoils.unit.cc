@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -72,7 +73,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/DataWater.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
