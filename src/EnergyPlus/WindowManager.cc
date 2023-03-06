@@ -7876,7 +7876,7 @@ namespace WindowManager {
             "DONOTMODEL", "MODELASDIRECTBEAM", "MODELASDIFFUSE"};
 
         state.dataMaterial->SurfaceScreens.allocate(state.dataHeatBal->NumSurfaceScreens);
-        state.dataHeatBal->ScreenTrans.allocate(state.dataHeatBal->NumSurfaceScreens);
+        state.dataMaterial->ScreenTrans.allocate(state.dataHeatBal->NumSurfaceScreens);
         ScreenNum = 0;
 
         // Pre-calculate these constants
@@ -8024,19 +8024,19 @@ namespace WindowManager {
                 if (FoundMaterial) continue;
                 //   Store transmittance at direct normal angle
                 if (thisMaterial->ScreenMapResolution != 0) {
-                    state.dataHeatBal->ScreenTrans(ScreenNum).Trans.allocate(90 / thisMaterial->ScreenMapResolution + 1,
+                    state.dataMaterial->ScreenTrans(ScreenNum).Trans.allocate(90 / thisMaterial->ScreenMapResolution + 1,
                                                                              90 / thisMaterial->ScreenMapResolution + 1);
-                    state.dataHeatBal->ScreenTrans(ScreenNum).Scatt.allocate(90 / thisMaterial->ScreenMapResolution + 1,
+                    state.dataMaterial->ScreenTrans(ScreenNum).Scatt.allocate(90 / thisMaterial->ScreenMapResolution + 1,
                                                                              90 / thisMaterial->ScreenMapResolution + 1);
-                    state.dataHeatBal->ScreenTrans(ScreenNum).Trans = 0.0;
-                    state.dataHeatBal->ScreenTrans(ScreenNum).Scatt = 0.0;
+                    state.dataMaterial->ScreenTrans(ScreenNum).Trans = 0.0;
+                    state.dataMaterial->ScreenTrans(ScreenNum).Scatt = 0.0;
                     for (j = 90 / thisMaterial->ScreenMapResolution + 1; j >= 1; --j) {
                         for (i = 90 / thisMaterial->ScreenMapResolution + 1; i >= 1; --i) {
                             Real64 SunAzimuth = thisMaterial->ScreenMapResolution * (j - 1) * DataGlobalConstants::DegToRadians;
                             Real64 SunAltitude = thisMaterial->ScreenMapResolution * (i - 1) * DataGlobalConstants::DegToRadians;
                             CalcScreenTransmittance(state, 0, SunAltitude, SunAzimuth, ScreenNum);
-                            state.dataHeatBal->ScreenTrans(ScreenNum).Trans(i, j) = state.dataMaterial->SurfaceScreens(ScreenNum).BmBmTrans;
-                            state.dataHeatBal->ScreenTrans(ScreenNum).Scatt(i, j) = state.dataMaterial->SurfaceScreens(ScreenNum).BmDifTrans;
+                            state.dataMaterial->ScreenTrans(ScreenNum).Trans(i, j) = state.dataMaterial->SurfaceScreens(ScreenNum).BmBmTrans;
+                            state.dataMaterial->ScreenTrans(ScreenNum).Scatt(i, j) = state.dataMaterial->SurfaceScreens(ScreenNum).BmDifTrans;
                         }
                     }
 
@@ -8055,9 +8055,9 @@ namespace WindowManager {
                     for (j = 1; j <= 90 / thisMaterial->ScreenMapResolution + 1; ++j) {
                         print(screenCsvFile, "{}", (j - 1) * thisMaterial->ScreenMapResolution);
                         for (i = 90 / thisMaterial->ScreenMapResolution + 1; i >= 2; --i) {
-                            print(screenCsvFile, ",{:.6R}", state.dataHeatBal->ScreenTrans(ScreenNum).Trans(i, j));
+                            print(screenCsvFile, ",{:.6R}", state.dataMaterial->ScreenTrans(ScreenNum).Trans(i, j));
                         }
-                        print(screenCsvFile, ",{:.6R}\n", state.dataHeatBal->ScreenTrans(ScreenNum).Trans(i, j));
+                        print(screenCsvFile, ",{:.6R}\n", state.dataMaterial->ScreenTrans(ScreenNum).Trans(i, j));
                     }
                     print(screenCsvFile, "\n\n");
 
@@ -8076,15 +8076,15 @@ namespace WindowManager {
                     for (j = 1; j <= 90 / thisMaterial->ScreenMapResolution + 1; ++j) {
                         print(screenCsvFile, "{}", (j - 1) * thisMaterial->ScreenMapResolution);
                         for (i = 1; i <= 90 / thisMaterial->ScreenMapResolution; ++i) {
-                            print(screenCsvFile, ",{:.6R}", state.dataHeatBal->ScreenTrans(ScreenNum).Scatt(i, j));
+                            print(screenCsvFile, ",{:.6R}", state.dataMaterial->ScreenTrans(ScreenNum).Scatt(i, j));
                         }
-                        print(screenCsvFile, ",{:.6R}\n", state.dataHeatBal->ScreenTrans(ScreenNum).Scatt(i, j));
+                        print(screenCsvFile, ",{:.6R}\n", state.dataMaterial->ScreenTrans(ScreenNum).Scatt(i, j));
                     }
                     print(screenCsvFile, "\n\n");
                 }
             }
         }
-        state.dataHeatBal->ScreenTrans.deallocate();
+        state.dataMaterial->ScreenTrans.deallocate();
     }
 
     void BlindOpticsDiffuse(EnergyPlusData &state,

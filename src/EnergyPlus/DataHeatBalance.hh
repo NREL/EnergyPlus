@@ -1369,13 +1369,6 @@ namespace DataHeatBalance {
         Array1D<GenericComponentZoneIntGainStruct> device;
     };
 
-    struct ScreenTransData
-    {
-        // Members
-        Array2D<Real64> Trans;
-        Array2D<Real64> Scatt;
-    };
-
     struct ZoneCatEUseData
     {
         // Members
@@ -2086,7 +2079,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::MixingData> CrossMixing;
     EPVector<DataHeatBalance::AirBoundaryMixingSpecs> airBoundaryMixing;
     EPVector<DataHeatBalance::MixingData> RefDoorMixing;
-    EPVector<DataHeatBalance::ScreenTransData> ScreenTrans;
     EPVector<DataHeatBalance::ZoneCatEUseData> ZoneIntEEuse;
     EPVector<DataHeatBalance::RefrigCaseCreditData> RefrigCaseCredit;
     EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimRefrigeratedRack;

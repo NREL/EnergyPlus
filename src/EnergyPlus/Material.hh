@@ -594,6 +594,13 @@ namespace Material {
             ScreenBeamReflectanceModel::Invalid; // user specified method of accounting for scattered solar beam
     };
 
+    struct ScreenTransData
+    {
+        // Members
+        Array2D<Real64> Trans;
+        Array2D<Real64> Scatt;
+    };
+
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     std::string DisplayMaterialRoughness(SurfaceRoughness Roughness); // Roughness String
@@ -610,6 +617,7 @@ struct MaterialData : BaseGlobalStruct
     EPVector<Material::WindowComplexShade> ComplexShade;
     EPVector<Material::WindowThermalModelParams> WindowThermalModel;
     EPVector<Material::SurfaceScreenProperties> SurfaceScreens;
+    EPVector<Material::ScreenTransData> ScreenTrans;
     void clear_state() override
     {
         for (int i = 0; i < TotMaterials; ++i) {
