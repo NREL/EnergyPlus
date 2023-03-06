@@ -7790,7 +7790,8 @@ namespace WindowManager {
                             state.dataMaterial->Blind(BlindNum).SolBackBeamDiffRefl(ISlatAng, IProfAng) = st_lay(8);
                             state.dataMaterial->Blind(BlindNum).SolFrontBeamAbs(ISlatAng, IProfAng) =
                                 max(0.0, 1.0 - st_lay(6) - st_lay(1) - st_lay(5));
-                            state.dataMaterial->Blind(BlindNum).SolBackBeamAbs(ISlatAng, IProfAng) = max(0.0, 1.0 - st_lay(7) - st_lay(3) - st_lay(8));
+                            state.dataMaterial->Blind(BlindNum).SolBackBeamAbs(ISlatAng, IProfAng) =
+                                max(0.0, 1.0 - st_lay(7) - st_lay(3) - st_lay(8));
 
                         } else { // Fill blind beam visible properties
                             state.dataMaterial->Blind(BlindNum).VisFrontBeamBeamTrans(ISlatAng, IProfAng) = st_lay(1);
@@ -8025,9 +8026,9 @@ namespace WindowManager {
                 //   Store transmittance at direct normal angle
                 if (thisMaterial->ScreenMapResolution != 0) {
                     state.dataMaterial->ScreenTrans(ScreenNum).Trans.allocate(90 / thisMaterial->ScreenMapResolution + 1,
-                                                                             90 / thisMaterial->ScreenMapResolution + 1);
+                                                                              90 / thisMaterial->ScreenMapResolution + 1);
                     state.dataMaterial->ScreenTrans(ScreenNum).Scatt.allocate(90 / thisMaterial->ScreenMapResolution + 1,
-                                                                             90 / thisMaterial->ScreenMapResolution + 1);
+                                                                              90 / thisMaterial->ScreenMapResolution + 1);
                     state.dataMaterial->ScreenTrans(ScreenNum).Trans = 0.0;
                     state.dataMaterial->ScreenTrans(ScreenNum).Scatt = 0.0;
                     for (j = 90 / thisMaterial->ScreenMapResolution + 1; j >= 1; --j) {

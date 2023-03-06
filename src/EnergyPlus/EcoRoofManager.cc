@@ -148,17 +148,17 @@ namespace EcoRoofManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
 
-        Real64 AbsThermSurf;                      // Thermal absoptance of the exterior surface
+        Real64 AbsThermSurf;                  // Thermal absoptance of the exterior surface
         Material::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
-        Real64 HMovInsul;                         // "Convection" coefficient of movable insulation
-        Real64 Tgk;                               // Ground temperature in Kelvin
-        Real64 Ta;                                // current air temperature
-        Real64 Ws;                                // Wind Speed (m/s)
-        Real64 Waf;                               // Windspeed within canopy (m/s)
-        Real64 Latm;                              // Long Wave Radiation (W/m^2)
-        Real64 qaf;                               // mixing ratio of air near canopy
-        Real64 qg;                                // mixing ratio of air at surface.
-        Real64 RS;                                // shortwave radiation
+        Real64 HMovInsul;                     // "Convection" coefficient of movable insulation
+        Real64 Tgk;                           // Ground temperature in Kelvin
+        Real64 Ta;                            // current air temperature
+        Real64 Ws;                            // Wind Speed (m/s)
+        Real64 Waf;                           // Windspeed within canopy (m/s)
+        Real64 Latm;                          // Long Wave Radiation (W/m^2)
+        Real64 qaf;                           // mixing ratio of air near canopy
+        Real64 qg;                            // mixing ratio of air at surface.
+        Real64 RS;                            // shortwave radiation
         Real64 EpsilonOne;
         Real64 eair;
         Real64 Rhoa;

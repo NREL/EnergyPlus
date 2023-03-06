@@ -79,8 +79,8 @@ namespace DataHeatBalance {
     using namespace DataComplexFenestration;
     using DataComplexFenestration::GapDeflectionState;
     using DataComplexFenestration::GapSupportPillar;
-    using Material::MaxSlatAngs;
     using DataVectorTypes::Vector;
+    using Material::MaxSlatAngs;
 
     // Parameters for Interior and Exterior Solar Distribution
     enum class Shadowing

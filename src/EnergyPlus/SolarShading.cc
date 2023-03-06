@@ -6709,7 +6709,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 Real64 RGlDiffFront = thisConstruct.ReflectSolDiffFront;     // Glazing system front diffuse solar reflectance
                                 Real64 TScDifDif =
                                     state.dataMaterial->SurfaceScreens(ScNum).DifDifTrans; // Diffuse-diffuse solar transmittance of screen
-                                Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;      // Diffuse front reflectance of glass
+                                Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;       // Diffuse front reflectance of glass
                                 // Reduce the bare window absorbed beam by the screen beam transmittance and then account for
                                 // interreflections
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
@@ -7113,9 +7113,10 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             Real64 TBlBmBm;
                             if (ShadeFlag == WinShadingType::ExtScreen) { // Exterior screen
                                 Real64 RScBack = state.dataMaterial->SurfaceScreens(ScNum).ReflectSolBeamFront;
-                                Real64 RScDifDifBk = state.dataMaterial->SurfaceScreens(ScNum).DifReflect; // Diffuse-diffuse back refectance of screen
-                                Real64 RGlBmFr = POLYF(CosInc, thisConstruct.ReflSolBeamFrontCoef);       // Beam front reflectance of glass
-                                Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;                      // Diffuse front reflectance of glass
+                                Real64 RScDifDifBk =
+                                    state.dataMaterial->SurfaceScreens(ScNum).DifReflect;           // Diffuse-diffuse back refectance of screen
+                                Real64 RGlBmFr = POLYF(CosInc, thisConstruct.ReflSolBeamFrontCoef); // Beam front reflectance of glass
+                                Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;                // Diffuse front reflectance of glass
                                 // beam transmittance (written in subroutine CalcScreenTransmittance each time step)
                                 TScBmBm = state.dataMaterial->SurfaceScreens(ScNum).BmBmTrans;
                                 TBmBmSc = TBmBm * TScBmBm;
@@ -9955,7 +9956,8 @@ void WindowShadingManager(EnergyPlusData &state)
                         }
 
                         // TH 5/20/2010, CR 8064: Slat Width <= Slat Separation
-                        if (state.dataMaterial->Blind(BlNum).SlatWidth <= state.dataMaterial->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
+                        if (state.dataMaterial->Blind(BlNum).SlatWidth <= state.dataMaterial->Blind(BlNum).SlatSeparation &&
+                            BeamSolarOnWindow > 0.0) {
                             if (state.dataSurface->WindowShadingControl(IShadingCtrl).slatAngleControl == SlatAngleControl::BlockBeamSolar) {
                                 ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
                                 if (std::abs(std::cos(ProfAng) * state.dataMaterial->Blind(BlNum).SlatSeparation /

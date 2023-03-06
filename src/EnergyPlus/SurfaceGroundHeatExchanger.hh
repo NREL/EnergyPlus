@@ -73,26 +73,26 @@ namespace SurfaceGroundHeatExchanger {
         std::string InletNode;        // surface GHE inlet fluid node
         std::string OutletNode;       // surface GHE outlet fluid node
         Real64 DesignMassFlowRate;
-        Real64 TubeDiameter;                         // hydronic tube inside diameter
-        Real64 TubeSpacing;                          // tube spacing
-        Real64 SurfaceLength;                        // active length of surface GHE
-        Real64 SurfaceWidth;                         // active width of surface GHE
-        Real64 TopThermAbs;                          // Thermal absortivity of top layer
-        Real64 TopSolarAbs;                          // solar absortivity of top layer
-        Real64 BtmThermAbs;                          // Thermal absortivity of bottom layer
-        int LowerSurfCond;                           // Type of lower surf. boundary condition
-        int TubeCircuits;                            // number of circuits in total
-        int ConstructionNum;                         // construction index number
-        int InletNodeNum;                            // inlet node number
-        int OutletNodeNum;                           // oulet node number
+        Real64 TubeDiameter;                     // hydronic tube inside diameter
+        Real64 TubeSpacing;                      // tube spacing
+        Real64 SurfaceLength;                    // active length of surface GHE
+        Real64 SurfaceWidth;                     // active width of surface GHE
+        Real64 TopThermAbs;                      // Thermal absortivity of top layer
+        Real64 TopSolarAbs;                      // solar absortivity of top layer
+        Real64 BtmThermAbs;                      // Thermal absortivity of bottom layer
+        int LowerSurfCond;                       // Type of lower surf. boundary condition
+        int TubeCircuits;                        // number of circuits in total
+        int ConstructionNum;                     // construction index number
+        int InletNodeNum;                        // inlet node number
+        int OutletNodeNum;                       // oulet node number
         Material::SurfaceRoughness TopRoughness; // roughness of top layer
         Material::SurfaceRoughness BtmRoughness; // roughness of bottom layer
-        int FrozenErrIndex1;                         // recurring error index
-        int FrozenErrIndex2;                         // recurring error index
-        int ConvErrIndex1;                           // recurring error index
-        int ConvErrIndex2;                           // recurring error index
-        int ConvErrIndex3;                           // recurring error index
-                                                     // loop topology variables
+        int FrozenErrIndex1;                     // recurring error index
+        int FrozenErrIndex2;                     // recurring error index
+        int ConvErrIndex1;                       // recurring error index
+        int ConvErrIndex2;                       // recurring error index
+        int ConvErrIndex3;                       // recurring error index
+                                                 // loop topology variables
         PlantLocation plantLoc;
 
         // QTF Constants

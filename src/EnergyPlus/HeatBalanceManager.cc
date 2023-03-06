@@ -6339,7 +6339,8 @@ namespace HeatBalanceManager {
         state.dataMaterial->TotComplexShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataMaterial->TotComplexShades > 0) {
-            state.dataMaterial->ComplexShade.allocate(state.dataMaterial->TotComplexShades); // Allocate the array Size to the number of complex shades
+            state.dataMaterial->ComplexShade.allocate(
+                state.dataMaterial->TotComplexShades); // Allocate the array Size to the number of complex shades
         }
 
         for (Loop = 1; Loop <= state.dataMaterial->TotComplexShades; ++Loop) {

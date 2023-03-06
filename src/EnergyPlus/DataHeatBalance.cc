@@ -934,7 +934,8 @@ void AddVariableSlatBlind(EnergyPlusData &state,
 
         if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle >
                 state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
-            (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle < state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle ||
+            (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle <
+                 state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle ||
              state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle >
                  state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
             errFlag = true;

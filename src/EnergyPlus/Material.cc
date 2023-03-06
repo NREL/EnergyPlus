@@ -266,8 +266,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             thisMaterial->Name = materialName;
 
             std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
-            thisMaterial->Roughness = static_cast<Material::SurfaceRoughness>(
-                getEnumerationValue(Material::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
+            thisMaterial->Roughness =
+                static_cast<Material::SurfaceRoughness>(getEnumerationValue(Material::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
 
             thisMaterial->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
             thisMaterial->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");

@@ -3540,9 +3540,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                                                    SlatsAngInterpFac);
                                         TBlBmDif = WindowManager::InterpProfSlat(
                                             state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(SlatsAngIndexLower,
-                                                                                                  state.dataSurface->SurfWinProfAngIndex(SurfNum)),
+                                                                                                   state.dataSurface->SurfWinProfAngIndex(SurfNum)),
                                             state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(SlatsAngIndexUpper,
-                                                                                                  state.dataSurface->SurfWinProfAngIndex(SurfNum)),
+                                                                                                   state.dataSurface->SurfWinProfAngIndex(SurfNum)),
                                             state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
                                                 SlatsAngIndexLower, std::min(MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
                                             state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
@@ -3551,11 +3551,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                             state.dataSurface->SurfWinProfAngInterpFac(SurfNum));
                                     } else {
                                         FrontDiffTrans = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTrans(1);
-                                        TBlBmDif = General::InterpGeneral(
-                                            state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(1, state.dataSurface->SurfWinProfAngIndex(SurfNum)),
-                                            state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
-                                                1, std::min(MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
-                                            SlatsAngInterpFac);
+                                        TBlBmDif =
+                                            General::InterpGeneral(state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
+                                                                       1, state.dataSurface->SurfWinProfAngIndex(SurfNum)),
+                                                                   state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
+                                                                       1, std::min(MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
+                                                                   SlatsAngInterpFac);
                                     }
 
                                     // TBlBmBm - Blind beam-beam solar transmittance
@@ -8161,7 +8162,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(construct.LayerPoint(1)));
                         assert(thisMaterial != nullptr);
                         Material::SurfaceRoughness RoughSurf = thisMaterial->Roughness; // Outside surface roughness
-                        Real64 EmisOut = thisMaterial->AbsorpThermalFront;                  // Glass outside surface emissivity
+                        Real64 EmisOut = thisMaterial->AbsorpThermalFront;              // Glass outside surface emissivity
                         DataSurfaces::WinShadingType const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
                         if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
                             // Exterior shade in place
@@ -8859,7 +8860,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(construct.LayerPoint(1)));
                                 assert(thisMaterial != nullptr);
                                 Material::SurfaceRoughness RoughSurf = thisMaterial->Roughness; // Outside surface roughness
-                                Real64 EmisOut = thisMaterial->AbsorpThermalFront;                  // Glass outside surface emissivity
+                                Real64 EmisOut = thisMaterial->AbsorpThermalFront;              // Glass outside surface emissivity
                                 auto const shading_flag(state.dataSurface->SurfWinShadingFlag(surfNum));
                                 if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
                                     // Exterior shade in place
