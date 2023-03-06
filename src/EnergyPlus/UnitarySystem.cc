@@ -2954,15 +2954,13 @@ namespace UnitarySystems {
                         this->m_NoLoadAirFlowRateRatio =
                             min(this->m_NoLoadAirFlowRateRatio, (this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate));
                     }
-                } else if (MSHPIndex > -1) {
+                } else {
                     this->m_MaxNoCoolHeatAirVolFlow =
                         this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                     this->MaxNoCoolHeatAirMassFlow =
                         this->MaxHeatAirMassFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                     this->m_NoLoadAirFlowRateRatio = this->m_MSHeatingSpeedRatio[this->m_NumOfSpeedHeating] *
                                                      state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
-                } else {
-                    this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
                 }
             }
         }
@@ -12235,7 +12233,6 @@ namespace UnitarySystems {
         std::string CompName = this->m_CoolingCoilName;
         int FanOpMode = this->m_FanOpMode;
         Real64 SpeedRatio = 0.0;
-        int SpeedNum = 0;
         Real64 CycRatio = 0.0;
         Real64 PartLoadFrac = 0.0;
         int DehumidMode = 0;
@@ -12390,8 +12387,6 @@ namespace UnitarySystems {
                     if (this->m_SpeedNum < 0) {
                         this->m_CoolingSpeedNum = 0;
                         this->m_SpeedNum = 0;
-                        CycRatio = this->m_CoolingCycRatio = 0.0;
-                        SpeedRatio = this->m_CoolingSpeedRatio = 0.0;
                         if (this->m_CoilSpeedErrIdx == 0) {
                             ShowWarningMessage(state, format("Wrong coil speed EMS override value, for unit=\"{}", this->m_CoolingCoilName));
                             ShowContinueError(state, "  Input speed value is below zero. Speed level is set to zero.");
@@ -12438,6 +12433,7 @@ namespace UnitarySystems {
                                                  CoolingCoil,
                                                  this->m_SpeedNum);
                         OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
+                        int SpeedNum = 0;
                         if (SpeedNum == this->m_NumOfSpeedCooling) { // should be using this->m_SpeedNum? Diffs?
                             FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
                         }
@@ -12494,6 +12490,7 @@ namespace UnitarySystems {
                 } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
                            (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit)) {
 
+                    int SpeedNum = 0;
                     this->m_CoolingCoilSensDemand = ReqOutput;
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               "",
@@ -12683,7 +12680,7 @@ namespace UnitarySystems {
 
                         CycRatio = 1.0;
                         SpeedRatio = 0.0;
-                        for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
+                        for (int SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
                             if (SpeedNum > 1) {
                                 CycRatio = 0.0;
                                 SpeedRatio = 1.0;
@@ -12706,7 +12703,7 @@ namespace UnitarySystems {
                         SensLoad = -1.0; // turns on coil
                         this->m_CoolingSpeedRatio = SpeedRatio;
                         this->m_CoolingPartLoadFrac = PartLoadFrac;
-                        for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
+                        for (int SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
                             this->m_CoolingSpeedNum = SpeedNum;
                             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                       "",
@@ -12728,7 +12725,7 @@ namespace UnitarySystems {
                             }
                             if (OutletTemp < DesOutTemp && SensibleLoad) break;
                         }
-                        if (SpeedNum == 1) {
+                        if (this->m_CoolingSpeedNum == 1) {
                             CycRatio = 1.0;
                             SpeedRatio = 0.0;
                         } else {
@@ -13776,7 +13773,7 @@ namespace UnitarySystems {
                                                                   this->m_FanDelayTime,
                                                                   DataHVACGlobals::CompressorOperation::On,
                                                                   CycRatio,
-                                                                  SpeedNum,
+                                                                  this->m_CoolingSpeedNum,
                                                                   SpeedRatio,
                                                                   ReqOutput,
                                                                   dummy,
@@ -13786,7 +13783,7 @@ namespace UnitarySystems {
                         if (OutletHumRatLS > DesOutHumRat) {
                             CycRatio = 1.0;
 
-                            for (int speedNum = SpeedNum; speedNum <= this->m_NumOfSpeedCooling; ++speedNum) {
+                            for (int speedNum = this->m_CoolingSpeedNum; speedNum <= this->m_NumOfSpeedCooling; ++speedNum) {
                                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                           CompName,
                                                                           this->m_CoolingCoilIndex,
@@ -13803,14 +13800,13 @@ namespace UnitarySystems {
                                                                           OnOffAirFlowRatio);
                                 OutletHumRatHS = state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).HumRat;
                                 if (OutletHumRatHS < DesOutHumRat || speedNum == this->m_NumOfSpeedCooling) {
-                                    SpeedNum = speedNum;
                                     this->m_CoolingSpeedNum = speedNum;
                                     break;
                                 }
                             }
 
                             if (OutletHumRatHS < DesOutHumRat) {
-                                if (SpeedNum == 1) {
+                                if (this->m_CoolingSpeedNum == 1) {
                                     auto f = [&state, this, DesOutHumRat](Real64 const CycRatio) {
                                         return UnitarySys::DXCoilCyclingHumRatResidual(
                                             state,
@@ -13839,7 +13835,7 @@ namespace UnitarySystems {
                                     General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
                                 }
                             } else {
-                                if (SpeedNum == 1) {
+                                if (this->m_CoolingSpeedNum == 1) {
                                     CycRatio = 1.0;
                                 } else {
                                     SpeedRatio = 1.0;
@@ -14456,8 +14452,10 @@ namespace UnitarySystems {
                             OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                         } else {
                             for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
-                                if (SpeedNum > 1) CycRatio = 0.0;
-                                if (SpeedNum > 1) SpeedRatio = 1.0;
+                                if (SpeedNum > 1) {
+                                    CycRatio = 0.0;
+                                    SpeedRatio = 1.0;
+                                }
                                 this->m_HeatingSpeedNum = SpeedNum;
                                 this->simMultiSpeedCoils(state,
                                                          AirLoopNum,
@@ -18172,9 +18170,8 @@ namespace UnitarySystems {
 
     void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound)
     {
-        for (int sysNum = 0; sysNum < state.dataUnitarySystems->numUnitarySystems; ++sysNum) {
-            if (state.dataUnitarySystems->unitarySys[sysNum].m_HRcoolCoilFluidInletNode == waterCoilNodeNum &&
-                state.dataUnitarySystems->unitarySys[sysNum].m_WaterHRPlantLoopModel) {
+        for (auto &unitarySystem : state.dataUnitarySystems->unitarySys) {
+            if (unitarySystem.m_HRcoolCoilFluidInletNode == waterCoilNodeNum && unitarySystem.m_WaterHRPlantLoopModel) {
                 nodeNotFound = false;
                 break;
             }

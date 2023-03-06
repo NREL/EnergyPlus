@@ -4824,48 +4824,6 @@ namespace FanCoilUnits {
         return GetFanCoilMixedAirNode;
     }
 
-    int GetFanCoilInletAirNode(EnergyPlusData &state, int const FanCoilNum)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         B Griffith
-        //       DATE WRITTEN   Dec  2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // lookup function for inlet node for Fan Coil unit
-
-        // Return value
-        int GetFanCoilInletAirNode;
-
-        if (state.dataFanCoilUnits->GetFanCoilInputFlag) {
-            GetFanCoilUnits(state);
-            state.dataFanCoilUnits->GetFanCoilInputFlag = false;
-        }
-
-        GetFanCoilInletAirNode = 0;
-        if (FanCoilNum > 0 && FanCoilNum <= state.dataFanCoilUnits->NumFanCoils) {
-            GetFanCoilInletAirNode = state.dataFanCoilUnits->FanCoil(FanCoilNum).AirOutNode;
-        }
-
-        return GetFanCoilInletAirNode;
-    }
-
-    void GetFanCoilIndex(EnergyPlusData &state, std::string const &FanCoilName, int &FanCoilIndex)
-    {
-        bool ErrorsFound; // for error trapping
-        if (state.dataFanCoilUnits->GetFanCoilInputFlag) {
-            GetFanCoilUnits(state);
-            state.dataFanCoilUnits->GetFanCoilInputFlag = false;
-        }
-        FanCoilIndex = UtilityRoutines::FindItemInList(FanCoilName, state.dataFanCoilUnits->FanCoil);
-        if (FanCoilIndex == 0) {
-            ShowSevereError(state, format("GetFanCoilIndex: Fan Coil Unit not found={}", FanCoilName));
-        }
-        ErrorsFound = true;
-    }
-
     Real64 CalcFanCoilLoadResidual(EnergyPlusData &state,
                                    int FanCoilNum,            // Index to this fan coil unit
                                    bool FirstHVACIteration,   // FirstHVACIteration flag

@@ -1462,7 +1462,6 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     // Using/Aliasing
     using Fans::SetFanData;
     using Fans::SimulateFanComponents;
-    using HeatRecovery::SetHeatExchangerData;
     using ScheduleManager::GetScheduleMaxValue;
 
     static constexpr std::string_view RoutineName("SizeStandAloneERV: ");
@@ -1914,100 +1913,6 @@ Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
     }
 
     return AirFlowRate;
-}
-
-int GetSupplyAirInletNode(EnergyPlusData &state,
-                          std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
-                          std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
-                          bool &ErrorsFound               // set to true if problem
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   October 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function looks up the ERVCtrlName in the ERV Stand Alone list and returns the
-    // Supply Air Inlet Node Number, if found.  If incorrect name is given, ErrorsFound is returned as true
-    // and Supply Air Inlet Node Number as zero.
-
-    // Return value
-    int AirInletNode(0); // returned air inlet node number of the ERV unit
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichERV;
-
-    if (state.dataHVACStandAloneERV->GetERVInputFlag) {
-        GetStandAloneERV(state);
-        state.dataHVACStandAloneERV->GetERVInputFlag = false;
-    }
-
-    if (UtilityRoutines::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
-        WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
-        if (WhichERV != 0) {
-            AirInletNode = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirInletNode;
-        }
-    } else {
-        WhichERV = 0;
-    }
-
-    if (WhichERV == 0) {
-        ShowSevereError(state, format("Could not find ZoneHVAC:EnergyRecoveryVentilator with Controller Name=\"{}\"", ERVCtrlName));
-        ErrorsFound = true;
-        AirInletNode = 0;
-    }
-
-    return AirInletNode;
-}
-
-int GetExhaustAirInletNode(EnergyPlusData &state,
-                           std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
-                           std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
-                           bool &ErrorsFound               // set to true if problem
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   October 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function looks up the ERVCtrlName in the ERV Stand Alone list and returns the
-    // Exhaust Air Inlet Node Number, if found.  If incorrect name is given, ErrorsFound is returned as true
-    // and Exhaust Air Inlet Node Number as zero.
-
-    // Return value
-    int AirInletNode(0); // returned air inlet node number of the ERV unit
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichERV;
-
-    if (state.dataHVACStandAloneERV->GetERVInputFlag) {
-        GetStandAloneERV(state);
-        state.dataHVACStandAloneERV->GetERVInputFlag = false;
-    }
-
-    if (UtilityRoutines::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
-        WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
-        if (WhichERV != 0) {
-            AirInletNode = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ExhaustAirInletNode;
-        }
-    } else {
-        WhichERV = 0;
-    }
-
-    if (WhichERV == 0) {
-        ShowSevereError(state, format("Could not find ZoneHVAC:EnergyRecoveryVentilator with Controller Name=\"{}\"", ERVCtrlName));
-        ErrorsFound = true;
-        AirInletNode = 0;
-    }
-
-    return AirInletNode;
 }
 
 int GetStandAloneERVOutAirNode(EnergyPlusData &state, int const StandAloneERVNum)
