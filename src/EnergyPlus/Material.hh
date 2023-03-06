@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
@@ -537,6 +538,19 @@ namespace Material {
         Real64 SlatCurve = 0.0;                     // Curvature radius of slat (if =0 then flat) (m)
     };
 
+    struct WindowThermalModelParams
+    {
+        // Members
+        std::string Name;                                                                                   // Window thermal model name
+        TARCOGGassesParams::Stdrd CalculationStandard = TARCOGGassesParams::Stdrd::Invalid;                 // Tarcog calculation standard
+        TARCOGParams::TARCOGThermalModel ThermalModel = TARCOGParams::TARCOGThermalModel::Invalid;          // Tarcog thermal model
+        Real64 SDScalar = 0.0;                                                                              // SDScalar coefficient
+        TARCOGParams::DeflectionCalculation DeflectionModel = TARCOGParams::DeflectionCalculation::Invalid; // Deflection model
+        Real64 VacuumPressureLimit = 0.0; // Pressure limit at which it will be considered vacuum gas state
+        Real64 InitialTemperature = 0.0;  // Window(s) temperature in time of fabrication
+        Real64 InitialPressure = 0.0;     // Window(s) pressure in time of fabrication
+    };
+
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     std::string DisplayMaterialRoughness(SurfaceRoughness Roughness); // Roughness String
@@ -551,6 +565,7 @@ struct MaterialData : BaseGlobalStruct
 
     Array1D<Material::WindowBlindProperties> Blind;
     EPVector<Material::WindowComplexShade> ComplexShade;
+    EPVector<Material::WindowThermalModelParams> WindowThermalModel;
     void clear_state() override
     {
         for (int i = 0; i < TotMaterials; ++i) {

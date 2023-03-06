@@ -2740,13 +2740,13 @@ namespace WindowComplexManager {
         Pa = state.dataEnvrn->OutBaroPress;
 
         ThermalModelNum = state.dataConstruction->Construct(ConstrNum).BSDFInput.ThermalModel;
-        standard = state.dataHeatBal->WindowThermalModel(ThermalModelNum).CalculationStandard;
-        ThermalMod = state.dataHeatBal->WindowThermalModel(ThermalModelNum).ThermalModel;
-        CalcDeflection = state.dataHeatBal->WindowThermalModel(ThermalModelNum).DeflectionModel;
-        SDScalar = state.dataHeatBal->WindowThermalModel(ThermalModelNum).SDScalar;
-        VacuumPressure = state.dataHeatBal->WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
-        Tini = state.dataHeatBal->WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv;
-        Pini = state.dataHeatBal->WindowThermalModel(ThermalModelNum).InitialPressure;
+        standard = state.dataMaterial->WindowThermalModel(ThermalModelNum).CalculationStandard;
+        ThermalMod = state.dataMaterial->WindowThermalModel(ThermalModelNum).ThermalModel;
+        CalcDeflection = state.dataMaterial->WindowThermalModel(ThermalModelNum).DeflectionModel;
+        SDScalar = state.dataMaterial->WindowThermalModel(ThermalModelNum).SDScalar;
+        VacuumPressure = state.dataMaterial->WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
+        Tini = state.dataMaterial->WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv;
+        Pini = state.dataMaterial->WindowThermalModel(ThermalModelNum).InitialPressure;
 
         nlayer = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
         isky = 3; // IR radiation is provided from external source

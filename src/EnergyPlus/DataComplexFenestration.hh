@@ -75,19 +75,6 @@ namespace DataComplexFenestration {
         Real64 DeflectedThickness = 0.0;
     };
 
-    struct WindowThermalModelParams
-    {
-        // Members
-        std::string Name;                                                                                   // Window thermal model name
-        TARCOGGassesParams::Stdrd CalculationStandard = TARCOGGassesParams::Stdrd::Invalid;                 // Tarcog calculation standard
-        TARCOGParams::TARCOGThermalModel ThermalModel = TARCOGParams::TARCOGThermalModel::Invalid;          // Tarcog thermal model
-        Real64 SDScalar = 0.0;                                                                              // SDScalar coefficient
-        TARCOGParams::DeflectionCalculation DeflectionModel = TARCOGParams::DeflectionCalculation::Invalid; // Deflection model
-        Real64 VacuumPressureLimit = 0.0; // Pressure limit at which it will be considered vacuum gas state
-        Real64 InitialTemperature = 0.0;  // Window(s) temperature in time of fabrication
-        Real64 InitialPressure = 0.0;     // Window(s) pressure in time of fabrication
-    };
-
 } // namespace DataComplexFenestration
 
 } // namespace EnergyPlus

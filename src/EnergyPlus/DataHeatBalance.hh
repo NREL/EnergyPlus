@@ -79,7 +79,6 @@ namespace DataHeatBalance {
     using namespace DataComplexFenestration;
     using DataComplexFenestration::GapDeflectionState;
     using DataComplexFenestration::GapSupportPillar;
-    using DataComplexFenestration::WindowThermalModelParams;
     using Material::MaxSlatAngs;
     using DataVectorTypes::Vector;
 
@@ -2120,7 +2119,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::MixingData> CrossMixing;
     EPVector<DataHeatBalance::AirBoundaryMixingSpecs> airBoundaryMixing;
     EPVector<DataHeatBalance::MixingData> RefDoorMixing;
-    EPVector<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
     EPVector<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
     EPVector<DataHeatBalance::ScreenTransData> ScreenTrans;
     EPVector<DataHeatBalance::ZoneCatEUseData> ZoneIntEEuse;
