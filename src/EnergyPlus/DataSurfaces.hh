@@ -318,16 +318,6 @@ namespace DataSurfaces {
         Num
     };
 
-    // Parameter for window screens beam reflectance accounting
-    enum class ScreenBeamReflectanceModel
-    {
-        Invalid = -1,
-        DoNotModel,
-        DirectBeam,
-        Diffuse,
-        Num
-    };
-
     // Parameters for air flow window source
     enum class WindowAirFlowSource
     {

@@ -1132,7 +1132,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         IncidentAngle = 0.0;
     }
 
-    auto &thisScreen = state.dataHeatBal->SurfaceScreens(ScNum);
+    auto &thisScreen = state.dataMaterial->SurfaceScreens(ScNum);
 
     // ratio of screen material diameter to screen material spacing
     Gamma = thisScreen.ScreenDiameterToSpacingRatio;
@@ -1226,7 +1226,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Tscattered = max(0.0, Tscattered);
     TscatteredVis = max(0.0, TscatteredVis);
 
-    if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::DoNotModel) {
+    if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::DoNotModel) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect;
             thisScreen.BmBmTransVis = Tdirect;
@@ -1238,7 +1238,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::DirectBeam) {
+    } else if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::DirectBeam) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect + Tscattered;
             thisScreen.BmBmTransVis = Tdirect + TscatteredVis;
@@ -1250,7 +1250,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::Diffuse) {
+    } else if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::Diffuse) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect;
             thisScreen.BmBmTransVis = Tdirect;

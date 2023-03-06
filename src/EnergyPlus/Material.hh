@@ -136,6 +136,16 @@ namespace Material {
     constexpr std::array<std::string_view, static_cast<int>(SlatAngleType::Num)> SlatAngleTypeUC = {
         "FIXEDSLATANGLE", "MAXIMIZESOLAR", "BLOCKBEAMSOLAR"};
 
+    // Parameter for window screens beam reflectance accounting
+    enum class ScreenBeamReflectanceModel
+    {
+        Invalid = -1,
+        DoNotModel,
+        DirectBeam,
+        Diffuse,
+        Num
+    };
+
     enum class VariableAbsCtrlSignal
     {
         Invalid = -1,
@@ -551,6 +561,39 @@ namespace Material {
         Real64 InitialPressure = 0.0;     // Window(s) pressure in time of fabrication
     };
 
+    struct SurfaceScreenProperties
+    {
+        // Members
+        int MaterialNumber = 0; // Material pointer for the screen
+        Real64 BmBmTrans = 0.0; // Beam solar transmittance (dependent on sun angle)
+        // (this value can include scattering if the user so chooses)
+        Real64 BmBmTransBack = 0.0; // Beam solar transmittance (dependent on sun angle) from back side of screen
+        Real64 BmBmTransVis = 0.0;  // Visible solar transmittance (dependent on sun angle)
+        // (this value can include visible scattering if the user so chooses)
+        Real64 BmDifTrans = 0.0;     // Beam solar transmitted as diffuse radiation (dependent on sun angle)
+        Real64 BmDifTransBack = 0.0; // Beam solar transmitted as diffuse radiation (dependent on sun angle) from back side
+        Real64 BmDifTransVis = 0.0;  // Visible solar transmitted as diffuse radiation (dependent on sun angle)
+        // The following reflectance properties are dependent on sun angle:
+        Real64 ReflectSolBeamFront = 0.0;          // Beam solar reflected as diffuse radiation when sun is in front of screen
+        Real64 ReflectVisBeamFront = 0.0;          // Visible solar reflected as diffuse radiation when sun is in front of screen
+        Real64 ReflectSolBeamBack = 0.0;           // Beam solar reflected as diffuse radiation when sun is in back of screen
+        Real64 ReflectVisBeamBack = 0.0;           // Visible solar reflected as diffuse radiation when sun is in back of screen
+        Real64 AbsorpSolarBeamFront = 0.0;         // Front surface solar beam absorptance
+        Real64 AbsorpSolarBeamBack = 0.0;          // Back surface solar beam absorptance
+        Real64 DifDifTrans = 0.0;                  // Back surface diffuse solar transmitted
+        Real64 DifDifTransVis = 0.0;               // Back surface diffuse visible solar transmitted
+        Real64 DifScreenAbsorp = 0.0;              // Absorption of diffuse radiation
+        Real64 DifReflect = 0.0;                   // Back reflection of solar diffuse radiation
+        Real64 DifReflectVis = 0.0;                // Back reflection of visible diffuse radiation
+        Real64 ReflectScreen = 0.0;                // Screen assembly solar reflectance (user input adjusted for holes in screen)
+        Real64 ReflectScreenVis = 0.0;             // Screen assembly visible reflectance (user input adjusted for holes in screen)
+        Real64 ReflectCylinder = 0.0;              // Screen material solar reflectance (user input, does not account for holes in screen)
+        Real64 ReflectCylinderVis = 0.0;           // Screen material visible reflectance (user input, does not account for holes in screen)
+        Real64 ScreenDiameterToSpacingRatio = 0.0; // ratio of screen material diameter to screen material spacing
+        ScreenBeamReflectanceModel screenBeamReflectanceModel =
+            ScreenBeamReflectanceModel::Invalid; // user specified method of accounting for scattered solar beam
+    };
+
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
     std::string DisplayMaterialRoughness(SurfaceRoughness Roughness); // Roughness String
@@ -566,6 +609,7 @@ struct MaterialData : BaseGlobalStruct
     Array1D<Material::WindowBlindProperties> Blind;
     EPVector<Material::WindowComplexShade> ComplexShade;
     EPVector<Material::WindowThermalModelParams> WindowThermalModel;
+    EPVector<Material::SurfaceScreenProperties> SurfaceScreens;
     void clear_state() override
     {
         for (int i = 0; i < TotMaterials; ++i) {
