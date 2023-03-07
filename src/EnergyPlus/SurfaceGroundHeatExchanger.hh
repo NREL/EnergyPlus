@@ -85,8 +85,8 @@ namespace SurfaceGroundHeatExchanger {
         int ConstructionNum;                     // construction index number
         int InletNodeNum;                        // inlet node number
         int OutletNodeNum;                       // oulet node number
-        Material::SurfaceRoughness TopRoughness; // roughness of top layer
-        Material::SurfaceRoughness BtmRoughness; // roughness of bottom layer
+        Material::Roughness TopRoughness; // roughness of top layer
+        Material::Roughness BtmRoughness; // roughness of bottom layer
         int FrozenErrIndex1;                     // recurring error index
         int FrozenErrIndex2;                     // recurring error index
         int ConvErrIndex1;                       // recurring error index
@@ -152,7 +152,7 @@ namespace SurfaceGroundHeatExchanger {
         SurfaceGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), TubeDiameter(0.0), TubeSpacing(0.0), SurfaceLength(0.0), SurfaceWidth(0.0), TopThermAbs(0.0), TopSolarAbs(0.0),
               BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0),
-              TopRoughness(Material::SurfaceRoughness::Invalid), BtmRoughness(Material::SurfaceRoughness::Invalid), FrozenErrIndex1(0),
+              TopRoughness(Material::Roughness::Invalid), BtmRoughness(Material::Roughness::Invalid), FrozenErrIndex1(0),
               FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), plantLoc{}, TsrcConstCoef(0.0), TsrcVarCoef(0.0),
               QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0),
               LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),

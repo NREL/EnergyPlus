@@ -577,7 +577,7 @@ private:
         int const number;
         std::string const &name;
         EnergyPlus::Material::MaterialGroup const &group;
-        EnergyPlus::Material::SurfaceRoughness const &roughness;
+        EnergyPlus::Material::Roughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -628,7 +628,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        EnergyPlus::Material::SurfaceRoughness const &outsideRoughness;
+        EnergyPlus::Material::Roughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 

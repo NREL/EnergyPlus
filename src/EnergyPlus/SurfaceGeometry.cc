@@ -7802,21 +7802,21 @@ namespace SurfaceGeometry {
             Roughness = state.dataIPShortCut->cAlphaArgs(3);
             // Select the correct Number for the associated ascii name for the roughness type
             if (UtilityRoutines::SameString(Roughness, "VerySmooth")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VerySmooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::VerySmooth;
             } else if (UtilityRoutines::SameString(Roughness, "Smooth")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Smooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::Smooth;
             } else if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumSmooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::MediumSmooth;
             } else if (UtilityRoutines::SameString(Roughness, "MediumRough")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumRough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::MediumRough;
             } else if (UtilityRoutines::SameString(Roughness, "Rough")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Rough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::Rough;
             } else if (UtilityRoutines::SameString(Roughness, "VeryRough")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VeryRough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::VeryRough;
             } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             // Was it set?
-            if (state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness == Material::SurfaceRoughness::Invalid) {
+            if (state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness == Material::Roughness::Invalid) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {}=\"{}",
                                        cCurrentModuleObject,
@@ -14002,7 +14002,7 @@ namespace SurfaceGeometry {
                 dynamic_cast<Material::MaterialChild *>(
                     state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld)))
                     ->AbsorpThermalBack;
-            thisConstructNewSh.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
+            thisConstructNewSh.OutsideRoughness = Material::Roughness::VerySmooth;
             thisConstructNewSh.DayltPropPtr = 0;
             thisConstructNewSh.CTFCross = {0.0};
             thisConstructNewSh.CTFFlux = {0.0};
@@ -14153,7 +14153,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
             thisMaterial->Group = Material::MaterialGroup::WindowGas;
-            thisMaterial->Roughness = Material::SurfaceRoughness::MediumRough;
+            thisMaterial->Roughness = Material::Roughness::MediumRough;
             thisMaterial->Conductivity = 0.0;
             thisMaterial->Density = 0.0;
             thisMaterial->IsoMoistCap = 0.0;
@@ -14249,7 +14249,7 @@ namespace SurfaceGeometry {
             thisConstruct.InsideAbsorpThermal = state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
             thisConstruct.OutsideAbsorpThermal =
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(stormMaterial))->AbsorpThermalFront;
-            thisConstruct.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
+            thisConstruct.OutsideRoughness = Material::Roughness::VerySmooth;
             thisConstruct.DayltPropPtr = 0;
             thisConstruct.CTFCross = {0.0};
             thisConstruct.CTFFlux = {0.0};

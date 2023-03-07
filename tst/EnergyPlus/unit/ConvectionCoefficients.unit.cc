@@ -605,7 +605,7 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
 
     Real64 HMovInsul = 1.0;
-    Material::SurfaceRoughness RoughSurf = Material::SurfaceRoughness::VerySmooth;
+    Material::Roughness RoughSurf = Material::Roughness::VerySmooth;
     Real64 AbsThermSurf = 0.84;
     Real64 TempExt = -20.0;
     Real64 HExt;

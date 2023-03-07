@@ -622,7 +622,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     auto const &materialData1 = std::make_unique<Material::MaterialChild>();
     materialData1->Name = "test material 2";
     materialData1->Group = Material::MaterialGroup::Shade;
-    materialData1->Roughness = Material::SurfaceRoughness::Rough; // 1
+    materialData1->Roughness = Material::Roughness::Rough; // 1
     materialData1->Conductivity = 2;
     materialData1->Density = 2;
     materialData1->IsoMoistCap = 2;
@@ -647,7 +647,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     constructData1->OutsideAbsorpSolar = 2;
     constructData1->InsideAbsorpThermal = 2;
     constructData1->OutsideAbsorpThermal = 2;
-    constructData1->OutsideRoughness = Material::SurfaceRoughness::Rough; // 1
+    constructData1->OutsideRoughness = Material::Roughness::Rough; // 1
     constructData1->TypeIsWindow = true;
     constructData1->LayerPoint.allocate(2);
     constructData1->LayerPoint(1) = 2;
