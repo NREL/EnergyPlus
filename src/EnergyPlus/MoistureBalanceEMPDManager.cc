@@ -122,6 +122,7 @@ Real64 CalcDepthFromPeriod(EnergyPlusData &state,
     Real64 const PV_sat = Psychrometrics::PsyPsatFnTemp(state, T, "CalcDepthFromPeriod");
 
     auto const *mat = dynamic_cast<const Material::MaterialChild *>(matBase);
+    assert(mat != nullptr);
     // Calculate slope of moisture sorption curve
     Real64 const slope_MC = mat->MoistACoeff * mat->MoistBCoeff * std::pow(RH, mat->MoistBCoeff - 1) +
                             mat->MoistCCoeff * mat->MoistDCoeff * std::pow(RH, mat->MoistDCoeff - 1);

@@ -660,6 +660,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         } else {
             auto const *thisMaterialSoil =
                 dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum));
+            assert(thisMaterialSoil != nullptr);
             state.dataPipeHT->PipeHT(Item).SoilDensity = thisMaterialSoil->Density;
             state.dataPipeHT->PipeHT(Item).SoilDepth = thisMaterialSoil->Thickness;
             state.dataPipeHT->PipeHT(Item).SoilCp = thisMaterialSoil->SpecHeat;

@@ -190,6 +190,7 @@ namespace WindowManager {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
                     auto *materialBase(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     auto *material = dynamic_cast<Material::MaterialChild *>(materialBase);
+                    assert(material != nullptr);
                     if (BITF_TEST_NONE(BITF(material->Group),
                                        BITF(Material::MaterialGroup::WindowGas) | BITF(Material::MaterialGroup::WindowGasMixture) |
                                            BITF(Material::MaterialGroup::ComplexWindowGap) | BITF(Material::MaterialGroup::ComplexWindowShade))) {

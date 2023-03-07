@@ -2785,6 +2785,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     // try assigning phase change material properties for each material, won't do anything for non pcm surfaces
     for (auto *mBase : state.dataMaterial->Material) {
         auto *m = dynamic_cast<Material::MaterialChild *>(mBase);
+        assert(m != nullptr);
         m->phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(state, m->Name);
     }
 

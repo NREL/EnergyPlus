@@ -347,6 +347,7 @@ namespace DElightManagerF {
                                     // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
                                     auto const *thisMaterial =
                                         dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(iMatlLayer));
+                                    assert(thisMaterial != nullptr);
                                     rExtVisRefl = 1.0 - thisMaterial->AbsorpVisible;
                                 } else {
                                     rExtVisRefl = 0.0;
