@@ -3528,7 +3528,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 } else if (ShadeFlag == WinShadingType::ExtBlind) { // Exterior blind
                                     int BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
                                     int SlatsAngIndexLower = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
-                                    int SlatsAngIndexUpper = std::min(MaxProfAngs, SlatsAngIndexLower + 1);
+                                    int SlatsAngIndexUpper = std::min(Material::MaxProfAngs, SlatsAngIndexLower + 1);
                                     Real64 SlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
 
                                     Real64 FrontDiffTrans;
@@ -3544,9 +3544,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                             state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(SlatsAngIndexUpper,
                                                                                                    state.dataSurface->SurfWinProfAngIndex(SurfNum)),
                                             state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
-                                                SlatsAngIndexLower, std::min(MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
+                                                SlatsAngIndexLower, std::min(Material::MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
                                             state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
-                                                SlatsAngIndexUpper, std::min(MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
+                                                SlatsAngIndexUpper, std::min(Material::MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
                                             SlatsAngInterpFac,
                                             state.dataSurface->SurfWinProfAngInterpFac(SurfNum));
                                     } else {
@@ -3555,7 +3555,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                             General::InterpGeneral(state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
                                                                        1, state.dataSurface->SurfWinProfAngIndex(SurfNum)),
                                                                    state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
-                                                                       1, std::min(MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
+                                                                       1, std::min(Material::MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
                                                                    SlatsAngInterpFac);
                                     }
 
