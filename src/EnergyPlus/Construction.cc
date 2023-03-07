@@ -1898,7 +1898,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
           this->InsideAbsorpThermal,
           this->OutsideAbsorpSolar,
           this->InsideAbsorpSolar,
-          Material::DisplayMaterialRoughness(this->OutsideRoughness));
+          Material::RoughnessNames[static_cast<int>(this->OutsideRoughness)]);
 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint[I];

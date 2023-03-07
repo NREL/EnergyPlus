@@ -177,6 +177,8 @@ namespace Material {
     constexpr std::array<std::string_view, static_cast<int>(Roughness::Num)> RoughnessUC{
         "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
 
+    extern const std::array<std::string_view, static_cast<int>(Roughness::Num)> RoughnessNames;
+
     struct MaterialBase
     {
 
@@ -604,7 +606,6 @@ namespace Material {
 
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
-    std::string DisplayMaterialRoughness(Roughness Roughness); // Roughness String
 
 } // namespace Material
 

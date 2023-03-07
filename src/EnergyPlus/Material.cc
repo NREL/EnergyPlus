@@ -68,6 +68,8 @@ namespace EnergyPlus::Material {
 constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeNames = {"Sealed", "VentedIndoor", "VentedOutdoor"};
 constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> gasTypeNames = {"Custom", "Air", "Argon", "Krypton", "Xenon"};
 constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> GasTypeUC = {"CUSTOM", "AIR", "ARGON", "KRYPTON", "XENON"};
+constexpr std::array<std::string_view, static_cast<int>(Roughness::Num)> RoughnessNames = {
+    "VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"};
 
 // Air       Argon     Krypton   Xenon
 // Gas conductivity coefficients for gases in a mixture
@@ -344,8 +346,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Group = MaterialGroup::RegularMaterial;
         thisMaterial->Name = MaterialNames(1);
 
-        thisMaterial->Roughness = static_cast<Material::Roughness>(
-            getEnumerationValue(Material::RoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->Roughness =
+            static_cast<Material::Roughness>(getEnumerationValue(Material::RoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
         thisMaterial->Resistance = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -2522,8 +2524,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Name = MaterialNames(1);
         // need to treat the A2 with is just the name of the soil(it is
         // not important)
-        thisMaterial->Roughness = static_cast<Material::Roughness>(
-            getEnumerationValue(Material::RoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
+        thisMaterial->Roughness =
+            static_cast<Material::Roughness>(getEnumerationValue(Material::RoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
         if (UtilityRoutines::SameString(MaterialNames(4), "Simple")) {
             thisMaterial->EcoRoofCalculationMethod = 1;
         } else if (UtilityRoutines::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
@@ -2735,7 +2737,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                       Format_701,
                       thisMaterial->Name,
                       thisMaterial->Resistance,
-                      DisplayMaterialRoughness(thisMaterial->Roughness),
+                      Material::RoughnessNames[static_cast<int>(thisMaterial->Roughness)],
                       thisMaterial->Thickness,
                       thisMaterial->Conductivity,
                       thisMaterial->Density,
@@ -2887,49 +2889,6 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
             }
         }
     }
-}
-
-std::string DisplayMaterialRoughness(Material::Roughness const Roughness) // Roughness String
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   October 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine is given a roughness value and returns the character representation.
-
-    // Return value
-    std::string cRoughness; // Character representation of Roughness
-
-    // Select the correct Number for the associated ascii name for the roughness type
-    switch (Roughness) {
-    case Material::Roughness::VeryRough: {
-        cRoughness = "VeryRough";
-    } break;
-    case Material::Roughness::Rough: {
-        cRoughness = "Rough";
-    } break;
-    case Material::Roughness::MediumRough: {
-        cRoughness = "MediumRough";
-    } break;
-    case Material::Roughness::MediumSmooth: {
-        cRoughness = "MediumSmooth";
-    } break;
-    case Material::Roughness::Smooth: {
-        cRoughness = "Smooth";
-    } break;
-    case Material::Roughness::VerySmooth: {
-        cRoughness = "VerySmooth";
-    } break;
-    default: {
-        cRoughness = "";
-    } break;
-    }
-
-    return cRoughness;
 }
 
 } // namespace EnergyPlus::Material
