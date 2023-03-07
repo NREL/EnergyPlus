@@ -3021,7 +3021,7 @@ namespace HeatingCoils {
         // This subroutine updates the report variable for the coils.
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
 
         // report the HeatingCoil energy from this component

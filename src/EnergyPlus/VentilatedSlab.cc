@@ -4725,7 +4725,7 @@ namespace VentilatedSlab {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
         int RadSurfNum;               // DO loop counter for radiant surfaces in the system

@@ -809,7 +809,7 @@ namespace Photovoltaics {
         // calculate the electricity production using a simple PV model
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -868,7 +868,7 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto SetPVTQdotSource = PhotovoltaicThermalCollectors::SetPVTQdotSource;
         using TranspiredCollector::SetUTSCQdotSource;
 

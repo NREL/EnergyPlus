@@ -3363,7 +3363,7 @@ namespace UnitVentilator {
         //       DATE WRITTEN   May 2000
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
         unitVent.HeatEnergy = unitVent.HeatPower * TimeStepSysSec;

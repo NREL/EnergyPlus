@@ -3556,7 +3556,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     this->updateTemperatures(state, shortenTimeStepSys, useZoneTimeStepHistory, priorTimeStep, zoneNum, spaceNum);
 
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     Real64 volume = 0.0;
     if (spaceNum > 0) {
@@ -4087,7 +4087,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         Real64 LatentGain =
             this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // Calculate the coefficients for the 3rd Order derivative for final
         // zone humidity ratio.  The A, B, C coefficients are analogous to the heat balance.
@@ -4272,7 +4272,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
 
     Real64 ZoneMult = thisZone.Multiplier * thisZone.ListMultiplier;
 
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     
     // update the variables actually used in the balance equations.
     if (!useZoneTimeStepHistory) {
@@ -4896,7 +4896,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
     // Calculate hourly humidity ratio from infiltration + humidity added from latent load + system added moisture
     Real64 LatentGain = this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // Calculate the coefficients for the 3rd order derivative for final
     // zone humidity ratio.  The A, B, C coefficients are analogous to the
@@ -5399,7 +5399,7 @@ void InverseModelHumidity(EnergyPlusData &state,
     Real64 AA(0.0);
     Real64 BB(0.0);
     Real64 ActivityLevel(0.0);
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     auto &zone = state.dataHeatBal->Zone(ZoneNum);
     auto &hybridModelZone = state.dataHybridModel->HybridModelZone(ZoneNum);
@@ -5829,7 +5829,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
     auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     
     // Sum all convective internal gains: SumIntGain
     SumIntGains = InternalHeatGains::zoneSumAllInternalConvectionGains(state, ZoneNum);

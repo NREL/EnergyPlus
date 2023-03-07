@@ -2534,7 +2534,7 @@ void ReportFan(EnergyPlusData &state, int const FanNum)
     // This subroutine updates the report variables for the fans.
 
     // Using/Aliasing
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     auto &Fan(state.dataFans->Fan);
 

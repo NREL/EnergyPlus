@@ -1420,7 +1420,7 @@ namespace HighTempRadiantSystem {
         // This subroutine simply produces output for the high temperature radiant system.
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == RadHeaterType::Gas) {
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower =

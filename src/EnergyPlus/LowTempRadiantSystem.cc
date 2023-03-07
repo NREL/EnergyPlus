@@ -5960,7 +5960,7 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
@@ -6006,7 +6006,7 @@ namespace LowTempRadiantSystem {
         auto &Zone(state.dataHeatBal->Zone);
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using FluidProperties::GetSpecificHeatGlycol;
 
         auto constexpr routineName("ReportConstantFlowSystem");
@@ -6082,7 +6082,7 @@ namespace LowTempRadiantSystem {
     {
 
         auto &Zone(state.dataHeatBal->Zone);
-
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         // Using/Aliasing
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
@@ -6093,7 +6093,7 @@ namespace LowTempRadiantSystem {
         totalRadSysPower *= double(Zone(this->ZonePtr).Multiplier * Zone(this->ZonePtr).ListMultiplier);
 
         this->ElecPower = totalRadSysPower;
-        this->ElecEnergy = this->ElecPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ElecEnergy = this->ElecPower * TimeStepSysSec;
         this->HeatPower = this->ElecPower;
         this->HeatEnergy = this->ElecEnergy;
     }

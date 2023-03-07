@@ -3610,7 +3610,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
 
     // Using/Aliasing
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using General::EncodeMonDayHrMin;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4374,8 +4374,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // the output variables and data structures shown.
 
     // Using/Aliasing
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     
     Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
     Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
@@ -4628,7 +4627,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
 
     // Using/Aliasing
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     
     using General::EncodeMonDayHrMin;
 
@@ -15140,7 +15139,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
     //   Save sequence of values for report during sizing.
 
     // Using/Aliasing
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &ort(state.dataOutRptTab);

@@ -273,7 +273,7 @@ void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
     // Calculates report variables.
 
     // Using/Aliasing
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     this->Energy = this->Power * TimeStepSysSec;
 

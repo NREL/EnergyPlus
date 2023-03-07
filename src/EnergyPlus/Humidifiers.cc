@@ -1322,7 +1322,7 @@ namespace Humidifiers {
         // collect water system calculations , update and report them
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AvailTankVdot;
@@ -1396,7 +1396,7 @@ namespace Humidifiers {
         // Fill remaining report variables
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         ElecUseEnergy = ElecUseRate * TimeStepSysSec;
         WaterCons = WaterConsRate * TimeStepSysSec;

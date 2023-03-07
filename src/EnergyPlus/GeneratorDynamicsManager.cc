@@ -217,7 +217,7 @@ namespace GeneratorDynamicsManager {
         using namespace DataGlobalConstants;
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-	Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+	Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
 
@@ -811,7 +811,7 @@ namespace GeneratorDynamicsManager {
 
         // Using/Aliasing
         using namespace DataGlobalConstants;
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MdotFuel;

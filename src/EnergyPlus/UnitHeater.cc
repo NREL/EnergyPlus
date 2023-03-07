@@ -2034,7 +2034,7 @@ namespace UnitHeater {
         // Needs description, as appropriate.
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy =
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower * TimeStepSysSec;

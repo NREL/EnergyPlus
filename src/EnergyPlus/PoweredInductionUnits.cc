@@ -2381,7 +2381,7 @@ void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current
     // Fills some of the report variables for the PIU terminal boxes
 
     // Using/Aliasing
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

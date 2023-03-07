@@ -1004,7 +1004,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using InternalHeatGains::SumInternalConvectionGainsByTypes;
     using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
 
@@ -1515,7 +1515,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using InternalHeatGains::SumInternalConvectionGainsByTypes;
     using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
 

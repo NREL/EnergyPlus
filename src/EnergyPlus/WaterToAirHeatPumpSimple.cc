@@ -3020,7 +3020,7 @@ namespace WaterToAirHeatPumpSimple {
         // Capacity of Air Conditioners and Heat Pumps at Part-Load Conditions
         // with Constant Fan Operation ASHRAE Transactions 102 (1), pp. 266-274.
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 Tref(283.15); // Reference Temperature for performance curves,10C [K]
@@ -3339,7 +3339,7 @@ namespace WaterToAirHeatPumpSimple {
         // State Energy Simulation Program. M.S. Thesis, Department of Mechanical and Aerospace Engineering,
         // Oklahoma State University. (downloadable from www.hvac.okstate.edu)
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr Tref(283.15); // Reference Temperature for performance curves,10C [K]
@@ -3528,7 +3528,7 @@ namespace WaterToAirHeatPumpSimple {
         // METHODOLOGY EMPLOYED:
         // Data is moved from the HP data structure to the HP outlet nodes.
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;

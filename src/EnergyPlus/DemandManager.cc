@@ -207,7 +207,7 @@ void SimulateDemandManagerList(EnergyPlusData &state,
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

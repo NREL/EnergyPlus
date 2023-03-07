@@ -989,7 +989,7 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // update the current rate of irrigation
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using ScheduleManager::GetCurrentScheduleValue;
 
         Real64 schedRate;
@@ -1022,7 +1022,7 @@ namespace WaterManager {
         // for the storage tanks at each system timestep
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1438,7 +1438,7 @@ namespace WaterManager {
         // for the rain collector at each system timestep
 
         using DataEnvironment::OutWetBulbTempAt;
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1513,7 +1513,7 @@ namespace WaterManager {
         // starting simple and ignoring well storage and complex rate restrictions.
         // just uses nominal pump rate and power (assuming well designed well).
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 VdotDelivered;

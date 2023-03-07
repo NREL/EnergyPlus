@@ -3329,7 +3329,7 @@ void ReportEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
 
     // report the Evap Cooler energy from this component
@@ -4549,7 +4549,7 @@ void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) /
     // update output variables for the zone evap unit
 
     // Using/Aliasing
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; 
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec; 
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNodeNum;

@@ -3176,7 +3176,7 @@ void ReportPurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     // Calculate values of report variables, if necessary.
 
     // Using/Aliasing
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
 

@@ -239,6 +239,7 @@ void ManageHVAC(EnergyPlusData &state)
     state.dataHeatBalFanSys->QRadSurfAFNDuct = 0.0;
     state.dataHVACGlobal->SysTimeElapsed = 0.0;
     state.dataHVACGlobal->TimeStepSys = state.dataGlobal->TimeStepZone;
+    state.dataHVACGlobal->TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     FirstTimeStepSysFlag = true;
     ShortenTimeStepSys = false;
     UseZoneTimeStepHistory = true;
@@ -327,6 +328,7 @@ void ManageHVAC(EnergyPlusData &state)
         // then determine timestep length for even distribution, protect div by zero
         if (NumOfSysTimeSteps > 0) state.dataHVACGlobal->TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
         state.dataHVACGlobal->TimeStepSys = max(state.dataHVACGlobal->TimeStepSys, state.dataConvergeParams->MinTimeStepSys);
+	state.dataHVACGlobal->TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         UseZoneTimeStepHistory = false;
         ShortenTimeStepSys = true;
     } else {
@@ -2352,7 +2354,7 @@ void ReportInfiltrations(EnergyPlusData &state)
     Real64 H2OHtOfVap;          // Heat of vaporization of air
     Real64 ADSCorrectionFactor; // Correction factor of air flow model values when ADS is simulated
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     for (auto &thisInfiltration : state.dataHeatBal->Infiltration) {
 
@@ -2373,14 +2375,12 @@ void ReportInfiltrations(EnergyPlusData &state)
 
         if (thisZoneHB.MAT > thisZone.OutDryBulbTemp) {
 
-            thisInfiltration.InfilHeatLoss = thisInfiltration.MCpI_temp * (thisZoneHB.MAT - thisZone.OutDryBulbTemp) * TimeStepSys *
-                                             DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+            thisInfiltration.InfilHeatLoss = thisInfiltration.MCpI_temp * (thisZoneHB.MAT - thisZone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
             thisInfiltration.InfilHeatGain = 0.0;
 
         } else if (thisZoneHB.MAT <= thisZone.OutDryBulbTemp) {
 
-            thisInfiltration.InfilHeatGain = thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisZoneHB.MAT) * TimeStepSys *
-                                             DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+            thisInfiltration.InfilHeatGain = thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisZoneHB.MAT) * TimeStepSys * ADSCorrectionFactor;
             thisInfiltration.InfilHeatLoss = 0.0;
         }
 
@@ -2388,14 +2388,12 @@ void ReportInfiltrations(EnergyPlusData &state)
         H2OHtOfVap = PsyHgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.MAT);
         if (thisZoneHB.ZoneAirHumRat > state.dataEnvrn->OutHumRat) {
 
-            thisInfiltration.InfilLatentLoss = thisInfiltration.InfilMdot * (thisZoneHB.ZoneAirHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap *
-                                               TimeStepSysSec;
+            thisInfiltration.InfilLatentLoss = thisInfiltration.InfilMdot * (thisZoneHB.ZoneAirHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
             thisInfiltration.InfilLatentGain = 0.0;
 
         } else if (thisZoneHB.ZoneAirHumRat <= state.dataEnvrn->OutHumRat) {
 
-            thisInfiltration.InfilLatentGain = thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.ZoneAirHumRat) * H2OHtOfVap *
-                                               TimeStepSysSec;
+            thisInfiltration.InfilLatentGain = thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.ZoneAirHumRat) * H2OHtOfVap * TimeStepSysSec;
             thisInfiltration.InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
@@ -2463,7 +2461,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
     auto &Fan(state.dataFans->Fan);
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
         state.afn->report();
@@ -2891,16 +2889,13 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         ZnAirRpt(ZoneLoop).SysOutletMass = 0;
         if (!ZoneEquipConfig(ZoneLoop).IsControlled) {
             for (int k = 1; k <= ZoneEquipConfig(ZoneLoop).NumInletNodes; ++k) {
-                ZnAirRpt(ZoneLoop).SysInletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).InletNode(k)).MassFlowRate * TimeStepSys *
-                                                   DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                ZnAirRpt(ZoneLoop).SysInletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).InletNode(k)).MassFlowRate * TimeStepSysSec * ADSCorrectionFactor;
             }
             for (int k = 1; k <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ++k) {
-                ZnAirRpt(ZoneLoop).SysOutletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).ExhaustNode(k)).MassFlowRate * TimeStepSys *
-                                                    DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                ZnAirRpt(ZoneLoop).SysOutletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).ExhaustNode(k)).MassFlowRate * TimeStepSysSec * ADSCorrectionFactor;
             }
             for (int k = 1; k <= ZoneEquipConfig(ZoneLoop).NumReturnNodes; ++k) {
-                ZnAirRpt(ZoneLoop).SysOutletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).ReturnNode(k)).MassFlowRate * TimeStepSys *
-                                                    DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                ZnAirRpt(ZoneLoop).SysOutletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).ReturnNode(k)).MassFlowRate * TimeStepSysSec * ADSCorrectionFactor;
             }
         }
 

@@ -677,7 +677,7 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using Psychrometrics::PsyHgAirFnWTdb;
         using Psychrometrics::PsyRhFnTdbWPb;
 

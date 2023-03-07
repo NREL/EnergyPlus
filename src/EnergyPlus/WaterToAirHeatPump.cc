@@ -2098,7 +2098,7 @@ namespace WaterToAirHeatPump {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
         using PlantUtilities::SafeCopyPlantNode;
 

@@ -4305,7 +4305,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // METHODOLOGY EMPLOYED:
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         auto &MSHeatPump(state.dataHVACMultiSpdHP->MSHeatPump);
         auto &MSHeatPumpReport(state.dataHVACMultiSpdHP->MSHeatPumpReport);

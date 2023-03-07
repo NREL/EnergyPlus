@@ -1409,7 +1409,7 @@ namespace SurfaceGroundHeatExchanger {
         // This subroutine simply produces output for Surface ground heat exchangers
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // update flows and temps from node data
         this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;

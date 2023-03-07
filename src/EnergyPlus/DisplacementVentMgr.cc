@@ -517,7 +517,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     auto &UseZoneTimeStepHistory = state.dataHVACGlobal->UseZoneTimeStepHistory;
     using InternalHeatGains::SumInternalConvectionGainsByTypes;
     using InternalHeatGains::SumReturnAirConvectionGainsByTypes;

@@ -2732,7 +2732,7 @@ namespace OutdoorAirUnit {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         auto &OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
         OutAirUnit(OAUnitNum).TotHeatingEnergy = OutAirUnit(OAUnitNum).TotHeatingRate * TimeStepSysSec;

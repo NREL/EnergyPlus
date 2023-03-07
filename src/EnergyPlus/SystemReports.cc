@@ -3282,7 +3282,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     Real64 ADUHeatFlowrate;
     bool CompLoadFlag;
 
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     if (!state.dataSysRpts->AirLoopLoadsReportEnabled) return;
 
     for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
@@ -4082,7 +4082,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
     auto &Node(state.dataLoopNodes->Node);
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     if (!state.dataSysRpts->VentReportStructureCreated) return;
     if (!state.dataSysRpts->VentLoadsReportEnabled) return;

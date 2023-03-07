@@ -1089,7 +1089,7 @@ namespace ElectricBaseboardRadiator {
         //       DATE WRITTEN   Feb 2010
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         ElecBaseboard(BaseboardNum).ElecUseLoad = ElecBaseboard(BaseboardNum).ElecUseRate * TimeStepSysSec;
         ElecBaseboard(BaseboardNum).TotEnergy = ElecBaseboard(BaseboardNum).TotPower * TimeStepSysSec;

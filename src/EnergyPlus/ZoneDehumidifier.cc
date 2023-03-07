@@ -1099,7 +1099,7 @@ namespace ZoneDehumidifier {
         // Fills some of the report variables for the zone dehumidifiers
 
         // Using/Aliasing
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using Psychrometrics::RhoH2O;
 
         // DERIVED TYPE DEFINITIONS:

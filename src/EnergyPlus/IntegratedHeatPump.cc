@@ -2106,7 +2106,7 @@ void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)
 
 void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
 {
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // Obtains and Allocates AS-IHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -2214,7 +2214,7 @@ void DecideWorkMode(EnergyPlusData &state,
     using DataHVACGlobals::SmallLoad;
     using WaterThermalTanks::GetWaterThermalTankInput;
 
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     Real64 MyLoad(0.0);
     Real64 WHHeatTimeSav(0.0); // time accumulation for water heating

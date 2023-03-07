@@ -3016,7 +3016,7 @@ namespace HeatRecovery {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill remaining report variables
 
-        Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         this->ElecUseEnergy = this->ElecUseRate * TimeStepSysSec;
         this->SensHeatingEnergy = this->SensHeatingRate * TimeStepSysSec;
         this->LatHeatingEnergy = this->LatHeatingRate * TimeStepSysSec;

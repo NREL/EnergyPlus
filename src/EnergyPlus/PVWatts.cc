@@ -386,7 +386,7 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData &state)
     {
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // We only run this once for each zone time step.
         const int NumTimeStepsToday_loc = state.dataGlobal->HourOfDay * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;

@@ -954,7 +954,7 @@ namespace ThermalChimney {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine fills remaining report variables.
 
-        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         int ZoneLoop; // Counter for the # of zones (nz)
         Real64 AirDensity;
