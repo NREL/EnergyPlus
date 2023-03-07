@@ -899,7 +899,8 @@ void AddVariableSlatBlind(EnergyPlusData &state,
     Found = UtilityRoutines::FindItemInList("~" + state.dataMaterial->Blind(inBlindNumber).Name, state.dataMaterial->Blind);
     if (Found == 0) {
         // Add a new blind
-        state.dataMaterial->Blind.redimension(++state.dataHeatBal->TotBlinds);
+        state.dataHeatBal->TotBlinds += 1;
+        state.dataMaterial->Blind.push_back(Material::WindowBlindProperties());
         state.dataMaterial->Blind(state.dataHeatBal->TotBlinds) = state.dataMaterial->Blind(inBlindNumber);
         state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).Name = "~" + state.dataMaterial->Blind(inBlindNumber).Name;
         outBlindNumber = state.dataHeatBal->TotBlinds;

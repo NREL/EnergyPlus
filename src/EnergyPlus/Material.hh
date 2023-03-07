@@ -615,7 +615,7 @@ struct MaterialData : BaseGlobalStruct
     int TotMaterials = 0;     // Total number of unique materials (layers) in this simulation
     int TotComplexShades = 0; // Total number of shading materials for complex fenestrations
 
-    Array1D<Material::WindowBlindProperties> Blind;
+    EPVector<Material::WindowBlindProperties> Blind;
     EPVector<Material::WindowComplexShade> ComplexShade;
     EPVector<Material::WindowThermalModelParams> WindowThermalModel;
     EPVector<Material::ScreenProperties> Screens;
