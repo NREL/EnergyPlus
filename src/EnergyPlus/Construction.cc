@@ -25,7 +25,7 @@
 //     used to endorse or promote products derived from this software without specific prior
 //     written permission.
 //
-// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+// (4) Use of EnergyPlus(TM) Name. If Licensee [I] distributes the software in stand-alone form
 //     without changes from the version obtained under this License, or (ii) Licensee makes a
 //     reference solely to the software portion of its product, Licensee must refer to the
 //     software as "EnergyPlus version X" software, where "X" is the version number Licensee
@@ -143,19 +143,19 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     // that problems won't exist and it does not necessarily avoid any problems
     // that interpolated temperature histories might cause.
 
-    this->CTFCross = 0.0;
-    this->CTFFlux = 0.0;
-    this->CTFInside = 0.0;
-    this->CTFOutside = 0.0;
-    this->CTFSourceIn = 0.0;
-    this->CTFSourceOut = 0.0;
-    this->CTFTimeStep = 0.0;
-    this->CTFTSourceOut = 0.0;
-    this->CTFTSourceIn = 0.0;
-    this->CTFTSourceQ = 0.0;
-    this->CTFTUserOut = 0.0;
-    this->CTFTUserIn = 0.0;
-    this->CTFTUserSource = 0.0;
+    this->CTFCross = {0.0};
+    this->CTFFlux = {0.0};
+    this->CTFInside = {0.0};
+    this->CTFOutside = {0.0};
+    this->CTFSourceIn = {0.0};
+    this->CTFSourceOut = {0.0};
+    this->CTFTimeStep = {0.0};
+    this->CTFTSourceOut = {0.0};
+    this->CTFTSourceIn = {0.0};
+    this->CTFTSourceQ = {0.0};
+    this->CTFTUserOut = {0.0};
+    this->CTFTUserIn = {0.0};
+    this->CTFTUserSource = {0.0};
     this->NumHistories = 0;
     this->NumCTFTerms = 0;
     this->UValue = 0.0;
@@ -458,10 +458,10 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                     // Loop through the number of CTF history terms ...
                     for (int HistTerm = 0; HistTerm <= this->NumCTFTerms; ++HistTerm) {
 
-                        this->CTFInside(HistTerm) = otherConstruction.CTFOutside(HistTerm);
-                        this->CTFCross(HistTerm) = otherConstruction.CTFCross(HistTerm);
-                        this->CTFOutside(HistTerm) = otherConstruction.CTFInside(HistTerm);
-                        if (HistTerm != 0) this->CTFFlux(HistTerm) = otherConstruction.CTFFlux(HistTerm);
+                        this->CTFInside[HistTerm] = otherConstruction.CTFOutside[HistTerm];
+                        this->CTFCross[HistTerm] = otherConstruction.CTFCross[HistTerm];
+                        this->CTFOutside[HistTerm] = otherConstruction.CTFInside[HistTerm];
+                        if (HistTerm != 0) this->CTFFlux[HistTerm] = otherConstruction.CTFFlux[HistTerm];
 
                     } // ... end of CTF history terms loop.
 
@@ -1011,44 +1011,44 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         // Copy the CTFs into the storage arrays, converting them back to SI
         // units in the process.  First the "zero" terms and then the history terms...
-        this->CTFOutside(0) = this->s0(1, 1) * DataConversions::CFU;
-        this->CTFCross(0) = this->s0(1, 2) * DataConversions::CFU;
-        this->CTFInside(0) = -this->s0(2, 2) * DataConversions::CFU;
+        this->CTFOutside[0] = this->s0(1, 1) * DataConversions::CFU;
+        this->CTFCross[0] = this->s0(1, 2) * DataConversions::CFU;
+        this->CTFInside[0] = -this->s0(2, 2) * DataConversions::CFU;
         if (this->SourceSinkPresent) {
             // QTFs...
-            this->CTFSourceOut(0) = this->s0(3, 1);
-            this->CTFSourceIn(0) = this->s0(3, 2);
+            this->CTFSourceOut[0] = this->s0(3, 1);
+            this->CTFSourceIn[0] = this->s0(3, 2);
             // QTFs for temperature calculation at source/sink location
-            this->CTFTSourceOut(0) = this->s0(1, 3);
-            this->CTFTSourceIn(0) = this->s0(2, 3);
-            this->CTFTSourceQ(0) = this->s0(3, 3) / DataConversions::CFU;
+            this->CTFTSourceOut[0] = this->s0(1, 3);
+            this->CTFTSourceIn[0] = this->s0(2, 3);
+            this->CTFTSourceQ[0] = this->s0(3, 3) / DataConversions::CFU;
             if (this->TempAfterLayer != 0) {
                 // QTFs for user specified interior temperature calculations...
-                this->CTFTUserOut(0) = this->s0(1, 4);
-                this->CTFTUserIn(0) = this->s0(2, 4);
-                this->CTFTUserSource(0) = this->s0(3, 4) / DataConversions::CFU;
+                this->CTFTUserOut[0] = this->s0(1, 4);
+                this->CTFTUserIn[0] = this->s0(2, 4);
+                this->CTFTUserSource[0] = this->s0(3, 4) / DataConversions::CFU;
             }
         }
 
         for (int HistTerm = 1; HistTerm <= this->NumCTFTerms; ++HistTerm) {
             // "REGULAR" CTFs...
-            this->CTFOutside(HistTerm) = this->s(1, 1, HistTerm) * DataConversions::CFU;
-            this->CTFCross(HistTerm) = this->s(1, 2, HistTerm) * DataConversions::CFU;
-            this->CTFInside(HistTerm) = -this->s(2, 2, HistTerm) * DataConversions::CFU;
-            if (HistTerm != 0) this->CTFFlux(HistTerm) = -e(HistTerm);
+            this->CTFOutside[HistTerm] = this->s(1, 1, HistTerm) * DataConversions::CFU;
+            this->CTFCross[HistTerm] = this->s(1, 2, HistTerm) * DataConversions::CFU;
+            this->CTFInside[HistTerm] = -this->s(2, 2, HistTerm) * DataConversions::CFU;
+            if (HistTerm != 0) this->CTFFlux[HistTerm] = -e(HistTerm);
             if (this->SourceSinkPresent) {
                 // QTFs...
-                this->CTFSourceOut(HistTerm) = this->s(3, 1, HistTerm);
-                this->CTFSourceIn(HistTerm) = this->s(3, 2, HistTerm);
+                this->CTFSourceOut[HistTerm] = this->s(3, 1, HistTerm);
+                this->CTFSourceIn[HistTerm] = this->s(3, 2, HistTerm);
                 // QTFs for temperature calculation at source/sink location
-                this->CTFTSourceOut(HistTerm) = this->s(1, 3, HistTerm);
-                this->CTFTSourceIn(HistTerm) = this->s(2, 3, HistTerm);
-                this->CTFTSourceQ(HistTerm) = this->s(3, 3, HistTerm) / DataConversions::CFU;
+                this->CTFTSourceOut[HistTerm] = this->s(1, 3, HistTerm);
+                this->CTFTSourceIn[HistTerm] = this->s(2, 3, HistTerm);
+                this->CTFTSourceQ[HistTerm] = this->s(3, 3, HistTerm) / DataConversions::CFU;
                 if (this->TempAfterLayer != 0) {
                     // QTFs for user specified interior temperature calculations...
-                    this->CTFTUserOut(HistTerm) = this->s(1, 4, HistTerm);
-                    this->CTFTUserIn(HistTerm) = this->s(2, 4, HistTerm);
-                    this->CTFTUserSource(HistTerm) = this->s(3, 4, HistTerm) / DataConversions::CFU;
+                    this->CTFTUserOut[HistTerm] = this->s(1, 4, HistTerm);
+                    this->CTFTUserIn[HistTerm] = this->s(2, 4, HistTerm);
+                    this->CTFTUserSource[HistTerm] = this->s(3, 4, HistTerm) / DataConversions::CFU;
                 }
             }
         }
@@ -1349,7 +1349,7 @@ void ConstructionProps::calculateInverseMatrix()
     // Uses row elimination to zero the off-diagonal terms of
     // AMat while performing the same operations on another
     // matrix which starts as the identity matrix.  Once AMat
-    // has been converted to an identity matrix(I), the other
+    // has been converted to an identity matrix[I], the other
     // matrix which started as the I will then be the inverse
     // of A.  This algorithm has been customized for a
     // tri-diagonal matrix.
@@ -1450,7 +1450,7 @@ void ConstructionProps::calculateInverseMatrix()
         }
     } // ... end of reverse elimination loop.
 
-    // At this point, AMat1 is equal to the identity matrix (I)
+    // At this point, AMat1 is equal to the identity matrix [I]
     // and AInv is equal to the inverse of AMat.
 
     AMat1.deallocate();
@@ -1901,7 +1901,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
           Material::DisplayMaterialRoughness(this->OutsideRoughness));
 
     for (int I = 1; I <= this->TotLayers; ++I) {
-        int Layer = this->LayerPoint(I);
+        int Layer = this->LayerPoint[I];
         auto const *thisMaterial = state.dataMaterial->Material(Layer);
         switch (thisMaterial->Group) {
         case Material::MaterialGroup::Air: {
@@ -1919,10 +1919,10 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
     for (int I = this->NumCTFTerms; I >= 0; --I) {
         if (I != 0) {
             static constexpr std::string_view Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
-            print(state.files.eio, Format_703, I, this->CTFOutside(I), this->CTFCross(I), this->CTFInside(I), this->CTFFlux(I));
+            print(state.files.eio, Format_703, I, this->CTFOutside[I], this->CTFCross[I], this->CTFInside[I], this->CTFFlux[I]);
         } else {
             static constexpr std::string_view Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-            print(state.files.eio, Format_704, I, this->CTFOutside(I), this->CTFCross(I), this->CTFInside(I));
+            print(state.files.eio, Format_704, I, this->CTFOutside[I], this->CTFCross[I], this->CTFInside[I]);
         }
     }
 
@@ -1930,18 +1930,18 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         // QTFs...
         for (int I = this->NumCTFTerms; I >= 0; --I) {
             static constexpr std::string_view Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
-            print(state.files.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
+            print(state.files.eio, Format_705, I, this->CTFSourceOut[I], this->CTFSourceIn[I]);
         }
         // QTFs for source/sink location temperature calculation...
         for (int I = this->NumCTFTerms; I >= 0; --I) {
             static constexpr std::string_view Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-            print(state.files.eio, Format_706, I, this->CTFTSourceOut(I), this->CTFTSourceIn(I), this->CTFTSourceQ(I));
+            print(state.files.eio, Format_706, I, this->CTFTSourceOut[I], this->CTFTSourceIn[I], this->CTFTSourceQ[I]);
         }
         if (this->TempAfterLayer != 0) {
             // QTFs for user specified interior temperature calculation...
             for (int I = this->NumCTFTerms; I >= 0; --I) {
                 static constexpr std::string_view Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                print(state.files.eio, Format_707, I, this->CTFTUserOut(I), this->CTFTUserIn(I), this->CTFTUserSource(I));
+                print(state.files.eio, Format_707, I, this->CTFTUserOut[I], this->CTFTUserIn[I], this->CTFTUserSource[I]);
             }
         }
     }

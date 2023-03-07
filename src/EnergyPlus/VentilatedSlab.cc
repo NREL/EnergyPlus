@@ -3834,9 +3834,9 @@ namespace VentilatedSlab {
                     Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                    Ch = double(thisConstruct.CTFTSourceQ(0));
-                    Ci = double(thisConstruct.CTFTSourceIn(0));
-                    Cj = double(thisConstruct.CTFTSourceOut(0));
+                    Ch = double(thisConstruct.CTFTSourceQ[0]);
+                    Ci = double(thisConstruct.CTFTSourceIn[0]);
+                    Cj = double(thisConstruct.CTFTSourceOut[0]);
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -4111,9 +4111,9 @@ namespace VentilatedSlab {
                     Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                    Ch = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0));
-                    Ci = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0));
-                    Cj = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0));
+                    Ch = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceQ[0]);
+                    Ci = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceIn[0]);
+                    Cj = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceOut[0]);
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));

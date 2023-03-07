@@ -3885,9 +3885,9 @@ namespace LowTempRadiantSystem {
                     Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                    Ch = thisConstruct.CTFTSourceQ(0);
-                    Ci = thisConstruct.CTFTSourceIn(0);
-                    Cj = thisConstruct.CTFTSourceOut(0);
+                    Ch = thisConstruct.CTFTSourceQ[0];
+                    Ci = thisConstruct.CTFTSourceIn[0];
+                    Cj = thisConstruct.CTFTSourceOut[0];
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -4087,9 +4087,9 @@ namespace LowTempRadiantSystem {
                                 Ce = state.dataHeatBalFanSys->RadSysToHBTinCoef(SurfNum);
                                 Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
                                 Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                                Ch = thisConstruct.CTFTSourceQ(0);
-                                Ci = thisConstruct.CTFTSourceIn(0);
-                                Cj = thisConstruct.CTFTSourceOut(0);
+                                Ch = thisConstruct.CTFTSourceQ[0];
+                                Ci = thisConstruct.CTFTSourceIn[0];
+                                Cj = thisConstruct.CTFTSourceOut[0];
                                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
@@ -4903,9 +4903,9 @@ namespace LowTempRadiantSystem {
                 Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                 Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                Ch = thisConstruct.CTFTSourceQ(0);
-                Ci = thisConstruct.CTFTSourceIn(0);
-                Cj = thisConstruct.CTFTSourceOut(0);
+                Ch = thisConstruct.CTFTSourceQ[0];
+                Ci = thisConstruct.CTFTSourceIn[0];
+                Cj = thisConstruct.CTFTSourceOut[0];
 
                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));

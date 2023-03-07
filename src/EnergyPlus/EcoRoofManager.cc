@@ -272,23 +272,23 @@ namespace EcoRoofManager {
             state.dataEcoRoofMgr->Tg = state.dataEcoRoofMgr->Tgold;
             state.dataEcoRoofMgr->Tf = state.dataEcoRoofMgr->Tfold;
 
-            if (thisConstruct.CTFCross(0) > 0.01) {
+            if (thisConstruct.CTFCross[0] > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
-                F1temp = thisConstruct.CTFCross(0) / (thisConstruct.CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
+                F1temp = thisConstruct.CTFCross[0] / (thisConstruct.CTFInside[0] + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
                 Qsoilpart1 =
                     -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
                     F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                               state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
-                              state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
+                              state.dataConstruction->Construct(ConstrNum).CTFSourceIn[0] * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
                               state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
                               state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
                 Qsoilpart1 =
-                    -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + thisConstruct.CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                    -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + thisConstruct.CTFCross[0] * state.dataHeatBalSurf->SurfTempIn(SurfNum);
                 F1temp = 0.0;
             }
 
-            Qsoilpart2 = thisConstruct.CTFOutside(0) - F1temp * thisConstruct.CTFCross(0);
+            Qsoilpart2 = thisConstruct.CTFOutside[0] - F1temp * thisConstruct.CTFCross[0];
 
             state.dataEcoRoofMgr->Pa = state.dataEnvrn->StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
             Tgk = state.dataEcoRoofMgr->Tg + DataGlobalConstants::KelvinConv;

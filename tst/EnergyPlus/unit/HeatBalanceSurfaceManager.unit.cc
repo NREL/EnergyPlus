@@ -114,8 +114,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     state->dataConstruction->Construct.allocate(ConstrNum);
     state->dataConstruction->Construct(ConstrNum).Name = "TestConstruct";
-    state->dataConstruction->Construct(ConstrNum).CTFCross(0) = 0.0;
-    state->dataConstruction->Construct(ConstrNum).CTFOutside(0) = 1.0;
+    state->dataConstruction->Construct(ConstrNum).CTFCross[0] = 0.0;
+    state->dataConstruction->Construct(ConstrNum).CTFOutside[0] = 1.0;
     state->dataConstruction->Construct(ConstrNum).SourceSinkPresent = true;
     Material::MaterialBase *p = new Material::MaterialBase;
     state->dataMaterial->Material.push_back(p);
@@ -355,9 +355,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
     state->dataConstruction->Construct(1).NumHistories = 1;
-    state->dataConstruction->Construct(1).CTFTUserOut(0) = 0.5;
-    state->dataConstruction->Construct(1).CTFTUserIn(0) = 0.25;
-    state->dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
+    state->dataConstruction->Construct(1).CTFTUserOut[0] = 0.5;
+    state->dataConstruction->Construct(1).CTFTUserIn[0] = 0.25;
+    state->dataConstruction->Construct(1).CTFTUserSource[0] = 0.25;
 
     state->dataHeatBalSurf->SurfCurrNumHist(1) = 0;
     state->dataHeatBalSurf->SurfOutsideTempHist(1)(1) = 20.0;
@@ -2541,9 +2541,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
     state->dataConstruction->Construct(1).NumHistories = 1;
-    state->dataConstruction->Construct(1).CTFTUserOut(0) = 0.5;
-    state->dataConstruction->Construct(1).CTFTUserIn(0) = 0.25;
-    state->dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
+    state->dataConstruction->Construct(1).CTFTUserOut[0] = 0.5;
+    state->dataConstruction->Construct(1).CTFTUserIn[0] = 0.25;
+    state->dataConstruction->Construct(1).CTFTUserSource[0] = 0.25;
     SurfaceGeometry::AllocateSurfaceArrays(*state);
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
     OutputProcessor::GetReportVariableInput(*state);

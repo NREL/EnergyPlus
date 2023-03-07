@@ -105,23 +105,23 @@ namespace SurfaceGroundHeatExchanger {
         // conventional CTF terms
         int NumCTFTerms; // number of terms for surface
         // could be allocated rather than hard dimensioning.
-        Array1D<Real64> CTFin;    // surf flux in ctf - X
-        Array1D<Real64> CTFout;   // surf flux in ctf - Z
-        Array1D<Real64> CTFcross; // surf flux in ctf - Y
-        Array1D<Real64> CTFflux;  // surf flux in ctf - F
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFin = {0.0};    // surf flux in ctf - X
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFout = {0.0};   // surf flux in ctf - Z
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFcross = {0.0}; // surf flux in ctf - Y
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFflux = {0.0};  // surf flux in ctf - F
         // QTF coefficients
-        Array1D<Real64> CTFSourceIn;   // surf flux in ctf - Wi
-        Array1D<Real64> CTFSourceOut;  // surf flux out ctf - Wo
-        Array1D<Real64> CTFTSourceOut; // surf flux in qtf - x
-        Array1D<Real64> CTFTSourceIn;  // surf flux in qtf - y
-        Array1D<Real64> CTFTSourceQ;   // surf flux in qtf - f
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFSourceIn = {0.0};   // surf flux in ctf - Wi
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFSourceOut = {0.0};  // surf flux out ctf - Wo
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceOut = {0.0}; // surf flux in qtf - x
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceIn = {0.0};  // surf flux in qtf - y
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceQ = {0.0};   // surf flux in qtf - f
         // History data
-        Array1D<Real64> TbtmHistory;
-        Array1D<Real64> TtopHistory;
-        Array1D<Real64> TsrcHistory;
-        Array1D<Real64> QbtmHistory;
-        Array1D<Real64> QtopHistory;
-        Array1D<Real64> QsrcHistory;
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TbtmHistory = {0.0};
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TtopHistory = {0.0};
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TsrcHistory = {0.0};
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QbtmHistory = {0.0};
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QtopHistory = {0.0};
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QsrcHistory = {0.0};
         Real64 QSrc;
         Real64 QSrcAvg;
         Real64 LastQSrc;
@@ -154,16 +154,8 @@ namespace SurfaceGroundHeatExchanger {
               BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0),
               TopRoughness(Material::SurfaceRoughness::Invalid), BtmRoughness(Material::SurfaceRoughness::Invalid), FrozenErrIndex1(0),
               FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), plantLoc{}, TsrcConstCoef(0.0), TsrcVarCoef(0.0),
-              QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0),
-              CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              CTFTSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              TtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              QbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0),
-              LastTimeStepSys(0.0),
+              QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0),
+              LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
 
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), TopSurfaceTemp(0.0), BtmSurfaceTemp(0.0), TopSurfaceFlux(0.0), BtmSurfaceFlux(0.0),
               HeatTransferRate(0.0), SurfHeatTransferRate(0.0), Energy(0.0), SurfEnergy(0.0), SourceTemp(0.0),
@@ -265,6 +257,15 @@ namespace SurfaceGroundHeatExchanger {
 
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
+    inline std::array<Real64, DataGlobalConstants::MaxCTFTerms> eoshiftArray(std::array<Real64, DataGlobalConstants::MaxCTFTerms> const &a, int const shift, Real64 const initialValue)
+    {
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> o = {initialValue};
+        int const b(0 + std::max(shift, 0)), e(a.size() - 1 + std::min(shift, 0));
+        for (int i = b, j = std::max(1 - shift, 1); i <= e; ++i, ++j) {
+            o[j] = a[i];
+        }
+        return o;
+    }
     //==============================================================================
 
 } // namespace SurfaceGroundHeatExchanger
