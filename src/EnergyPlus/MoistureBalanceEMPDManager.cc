@@ -503,7 +503,6 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     Real64 RVaver; // Average zone vapor density
     Real64 dU_dRH;
     int Flag; // Convergence flag (0 - converged)
-    auto &OneTimeFlag = state.dataMoistureBalEMPD->OneTimeFlag;
     Real64 PVsurf;        // Surface vapor pressure
     Real64 PV_surf_layer; // Vapor pressure of surface layer
     Real64 PV_deep_layer;
@@ -516,13 +515,13 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     Real64 RH_surf_layer_tmp;
     Real64 RH_deep_layer;
 
-    if (state.dataGlobal->BeginEnvrnFlag && OneTimeFlag) {
+    if (state.dataGlobal->BeginEnvrnFlag && state.dataMoistureBalEMPD->OneTimeFlag) {
         InitMoistureBalanceEMPD(state);
-        OneTimeFlag = false;
+        state.dataMoistureBalEMPD->OneTimeFlag = false;
     }
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        OneTimeFlag = true;
+        state.dataMoistureBalEMPD->OneTimeFlag = true;
     }
 
     auto const &surface(state.dataSurface->Surface(SurfNum));                // input

@@ -855,26 +855,19 @@ void InitPIU(EnergyPlusData &state,
     int HotConNode; // hot water control node number in PIU
     int OutletNode; // unit air outlet node number
     Real64 RhoAir;  // air density at outside pressure and standard temperature and humidity
-    auto &MyEnvrnFlag = state.dataPowerInductionUnits->MyEnvrnFlag;
-    auto &MySizeFlag = state.dataPowerInductionUnits->MySizeFlag;
-    auto &MyPlantScanFlag = state.dataPowerInductionUnits->MyPlantScanFlag;
     int Loop;   // Loop checking control variable
     Real64 rho; // local plant fluid density
     bool errFlag;
 
     // Do the one time initializations
     if (state.dataPowerInductionUnits->MyOneTimeFlag) {
-
-        MyEnvrnFlag.allocate(state.dataPowerInductionUnits->NumPIUs);
-        MySizeFlag.allocate(state.dataPowerInductionUnits->NumPIUs);
-        MyPlantScanFlag.allocate(state.dataPowerInductionUnits->NumPIUs);
-        MyEnvrnFlag = true;
-        MySizeFlag = true;
-        MyPlantScanFlag = true;
+	state.dataPowerInductionUnits->MyEnvrnFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
+        state.dataPowerInductionUnits->MySizeFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
+        state.dataPowerInductionUnits->MyPlantScanFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
         state.dataPowerInductionUnits->MyOneTimeFlag = false;
     }
 
-    if (MyPlantScanFlag(PIUNum) && allocated(state.dataPlnt->PlantLoop)) {
+    if (state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) && allocated(state.dataPlnt->PlantLoop)) {
         if ((state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
             (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
             errFlag = false;
@@ -894,9 +887,9 @@ void InitPIU(EnergyPlusData &state,
             state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum =
                 DataPlant::CompData::getPlantComponent(state, state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc).NodeNumOut;
         }
-        MyPlantScanFlag(PIUNum) = false;
-    } else if (MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
-        MyPlantScanFlag(PIUNum) = false;
+        state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) = false;
+    } else if (state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
+        state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) = false;
     }
 
     if (!state.dataPowerInductionUnits->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -918,7 +911,8 @@ void InitPIU(EnergyPlusData &state,
         }
     }
 
-    if (!state.dataGlobal->SysSizingCalc && MySizeFlag(PIUNum) && !MyPlantScanFlag(PIUNum)) {
+    if (!state.dataGlobal->SysSizingCalc &&
+        state.dataPowerInductionUnits->MySizeFlag(PIUNum) && !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
 
         SizePIU(state, PIUNum);
 
@@ -940,11 +934,11 @@ void InitPIU(EnergyPlusData &state,
                                state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum);
         }
 
-        MySizeFlag(PIUNum) = false;
+        state.dataPowerInductionUnits->MySizeFlag(PIUNum) = false;
     }
 
     // Do the Begin Environment initializations
-    if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PIUNum)) {
+    if (state.dataGlobal->BeginEnvrnFlag && state.dataPowerInductionUnits->MyEnvrnFlag(PIUNum)) {
         RhoAir = state.dataEnvrn->StdRhoAir;
         PriNode = state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode;
         SecNode = state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode;
@@ -974,7 +968,7 @@ void InitPIU(EnergyPlusData &state,
 
         if (((state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SimpleHeating) ||
              (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SteamAirHeating)) &&
-            !MyPlantScanFlag(PIUNum)) {
+            !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
             InitComponentNodes(state,
                                state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
@@ -992,11 +986,11 @@ void InitPIU(EnergyPlusData &state,
             }
         }
 
-        MyEnvrnFlag(PIUNum) = false;
+        state.dataPowerInductionUnits->MyEnvrnFlag(PIUNum) = false;
     } // end one time inits
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag(PIUNum) = true;
+        state.dataPowerInductionUnits->MyEnvrnFlag(PIUNum) = true;
     }
 
     PriNode = state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode;

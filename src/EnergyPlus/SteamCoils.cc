@@ -495,24 +495,18 @@ namespace SteamCoils {
         int AirOutletNode;
         Real64 SteamDensity;
         Real64 StartEnthSteam;
-        auto &MyEnvrnFlag = state.dataSteamCoils->MyEnvrnFlag;
-        auto &MyPlantScanFlag = state.dataSteamCoils->MyPlantScanFlag;
         bool errFlag;
 
         if (state.dataSteamCoils->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(state.dataSteamCoils->NumSteamCoils);
-            state.dataSteamCoils->MySizeFlag.allocate(state.dataSteamCoils->NumSteamCoils);
-            state.dataSteamCoils->CoilWarningOnceFlag.allocate(state.dataSteamCoils->NumSteamCoils);
-            MyPlantScanFlag.allocate(state.dataSteamCoils->NumSteamCoils);
-            MyEnvrnFlag = true;
-            state.dataSteamCoils->MySizeFlag = true;
-            state.dataSteamCoils->CoilWarningOnceFlag = true;
-            MyPlantScanFlag = true;
+            state.dataSteamCoils->MyEnvrnFlag.dimension(state.dataSteamCoils->NumSteamCoils, true);
+            state.dataSteamCoils->MySizeFlag.dimension(state.dataSteamCoils->NumSteamCoils, true);
+            state.dataSteamCoils->CoilWarningOnceFlag.dimension(state.dataSteamCoils->NumSteamCoils, true);
+            state.dataSteamCoils->MyPlantScanFlag.dimension(state.dataSteamCoils->NumSteamCoils, true);
             state.dataSteamCoils->MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataSteamCoils->MyPlantScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataSteamCoils->SteamCoil(CoilNum).Name,
@@ -527,7 +521,7 @@ namespace SteamCoils {
             if (errFlag) {
                 ShowFatalError(state, "InitSteamCoil: Program terminated for previous conditions.");
             }
-            MyPlantScanFlag(CoilNum) = false;
+            state.dataSteamCoils->MyPlantScanFlag(CoilNum) = false;
         }
 
         if (!state.dataGlobal->SysSizingCalc && state.dataSteamCoils->MySizeFlag(CoilNum)) {
@@ -537,7 +531,7 @@ namespace SteamCoils {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataSteamCoils->MyEnvrnFlag(CoilNum)) {
             // Initialize all report variables to a known state at beginning of simulation
             state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = 0.0;
             state.dataSteamCoils->SteamCoil(CoilNum).TotSteamCoolingCoilEnergy = 0.0;
@@ -603,11 +597,11 @@ namespace SteamCoils {
                                state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate,
                                state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum);
-            MyEnvrnFlag(CoilNum) = false;
+            state.dataSteamCoils->MyEnvrnFlag(CoilNum) = false;
         } // End If for the Begin Environment initializations
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(CoilNum) = true;
+            state.dataSteamCoils->MyEnvrnFlag(CoilNum) = true;
         }
 
         // Do the Begin Day initializations

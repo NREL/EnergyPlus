@@ -143,14 +143,13 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // Index of unit in baseboard array
-        auto &GetInputFlag = state.dataHWBaseboardRad->GetInputFlag;
         Real64 QZnReq; // Zone load not yet satisfied
         Real64 MaxWaterFlow;
         Real64 MinWaterFlow;
 
-        if (GetInputFlag) {
+        if (state.dataHWBaseboardRad->GetInputFlag) {
             GetHWBaseboardInput(state);
-            GetInputFlag = false;
+            state.dataHWBaseboardRad->GetInputFlag = false;
         }
 
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
@@ -901,8 +900,6 @@ namespace HWBaseboardRadiator {
         Real64 constexpr Coeff(0.0000275); // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
-        auto &MyOneTimeFlag = state.dataHWBaseboardRad->MyOneTimeFlag;
-        auto &MyEnvrnFlag = state.dataHWBaseboardRad->MyEnvrnFlag;
         int Loop;
         int WaterInletNode;
         Real64 RhoAirStdInit;
@@ -910,34 +907,30 @@ namespace HWBaseboardRadiator {
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
 
-        auto &MySizeFlag = state.dataHWBaseboardRad->MySizeFlag;
         auto &ZeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf;
         auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
         auto &QBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg;
         auto &LastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc;
         auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
         auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
-        auto &SetLoopIndexFlag = state.dataHWBaseboardRad->SetLoopIndexFlag;
         auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataHWBaseboardRad->MyOneTimeFlag) {
 
             // Initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(NumHWBaseboards);
-            MySizeFlag.allocate(NumHWBaseboards);
+            state.dataHWBaseboardRad->MyEnvrnFlag.dimension(NumHWBaseboards, true);
+            state.dataHWBaseboardRad->MySizeFlag.dimension(NumHWBaseboards, true);
             ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QBBRadSource.dimension(NumHWBaseboards, 0.0);
             QBBRadSrcAvg.dimension(NumHWBaseboards, 0.0);
             LastQBBRadSrc.dimension(NumHWBaseboards, 0.0);
             LastSysTimeElapsed.dimension(NumHWBaseboards, 0.0);
             LastTimeStepSys.dimension(NumHWBaseboards, 0.0);
-            SetLoopIndexFlag.allocate(NumHWBaseboards);
-            MyEnvrnFlag = true;
-            MySizeFlag = true;
-            MyOneTimeFlag = false;
-            SetLoopIndexFlag = true;
+            state.dataHWBaseboardRad->SetLoopIndexFlag.dimension(NumHWBaseboards, true);
+            state.dataHWBaseboardRad->MyOneTimeFlag = false;
+
             for (Loop = 1; Loop <= NumHWBaseboards; ++Loop) {
                 // Air mass flow rate is obtained from the following linear equation (reset if autosize is used)
                 // m_dot = 0.0062 + 2.75e-05*q
@@ -945,7 +938,7 @@ namespace HWBaseboardRadiator {
             }
         }
 
-        if (SetLoopIndexFlag(BaseboardNum)) {
+        if (state.dataHWBaseboardRad->SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
@@ -961,18 +954,20 @@ namespace HWBaseboardRadiator {
                 if (errFlag) {
                     ShowFatalError(state, "InitHWBaseboard: Program terminated for previous conditions.");
                 }
-                SetLoopIndexFlag(BaseboardNum) = false;
+                state.dataHWBaseboardRad->SetLoopIndexFlag(BaseboardNum) = false;
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum) && !SetLoopIndexFlag(BaseboardNum)) {
+        if (!state.dataGlobal->SysSizingCalc &&
+            state.dataHWBaseboardRad->MySizeFlag(BaseboardNum) &&
+            !state.dataHWBaseboardRad->SetLoopIndexFlag(BaseboardNum)) {
             // For each coil, do the sizing once
             SizeHWBaseboard(state, BaseboardNum);
-            MySizeFlag(BaseboardNum) = false;
+            state.dataHWBaseboardRad->MySizeFlag(BaseboardNum) = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
@@ -1011,11 +1006,11 @@ namespace HWBaseboardRadiator {
             LastSysTimeElapsed = 0.0;
             LastTimeStepSys = 0.0;
 
-            MyEnvrnFlag(BaseboardNum) = false;
+            state.dataHWBaseboardRad->MyEnvrnFlag(BaseboardNum) = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(BaseboardNum) = true;
+            state.dataHWBaseboardRad->MyEnvrnFlag(BaseboardNum) = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
@@ -1592,7 +1587,6 @@ namespace HWBaseboardRadiator {
         int WaterInletNode;
         int WaterOutletNode;
         auto &Iter = state.dataHWBaseboardRad->Iter;
-        auto &MyEnvrnFlag2 = state.dataHWBaseboardRad->MyEnvrnFlag2;
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
         auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
         auto &QBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg;
@@ -1600,12 +1594,12 @@ namespace HWBaseboardRadiator {
         auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
         auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag2) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag2) {
             Iter = 0;
-            MyEnvrnFlag2 = false;
+            state.dataHWBaseboardRad->MyEnvrnFlag2 = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag2 = true;
+            state.dataHWBaseboardRad->MyEnvrnFlag2 = true;
         }
 
         // First, update the running average if necessary...

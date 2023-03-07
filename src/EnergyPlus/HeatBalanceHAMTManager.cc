@@ -131,10 +131,8 @@ namespace HeatBalanceHAMTManager {
         // Manages the Heat and Moisture Transfer calculations.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &OneTimeFlag = state.dataHeatBalHAMTMgr->OneTimeFlag;
-
-        if (OneTimeFlag) {
-            OneTimeFlag = false;
+        if (state.dataHeatBalHAMTMgr->OneTimeFlag) {
+            state.dataHeatBalHAMTMgr->OneTimeFlag = false;
             DisplayString(state, "Initialising Heat and Moisture Transfer Model");
             GetHeatBalHAMTInput(state);
             InitHeatBalHAMT(state);

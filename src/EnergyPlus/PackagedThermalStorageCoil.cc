@@ -2204,28 +2204,20 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &MyFlag = state.dataPackagedThermalStorageCoil->MyFlag;
-    auto &MySizeFlag = state.dataPackagedThermalStorageCoil->MySizeFlag;
-    auto &MyEnvrnFlag = state.dataPackagedThermalStorageCoil->MyEnvrnFlag;
-    auto &MyWarmupFlag = state.dataPackagedThermalStorageCoil->MyWarmupFlag;
     bool errFlag;
     PlantLocation plantLoc{};
     Real64 tmpSchedValue;
 
     if (state.dataPackagedThermalStorageCoil->MyOneTimeFlag) {
         // initialize the environment and sizing flags
-        MyFlag.allocate(state.dataPackagedThermalStorageCoil->NumTESCoils);
-        MySizeFlag.allocate(state.dataPackagedThermalStorageCoil->NumTESCoils);
-        MyEnvrnFlag.allocate(state.dataPackagedThermalStorageCoil->NumTESCoils);
-        MyWarmupFlag.allocate(state.dataPackagedThermalStorageCoil->NumTESCoils);
-        MyFlag = true;
-        MySizeFlag = true;
-        MyEnvrnFlag = true;
+        state.dataPackagedThermalStorageCoil->MyFlag.dimension(state.dataPackagedThermalStorageCoil->NumTESCoils, true);
+        state.dataPackagedThermalStorageCoil->MySizeFlag.dimension(state.dataPackagedThermalStorageCoil->NumTESCoils, true);
+        state.dataPackagedThermalStorageCoil->MyEnvrnFlag.dimension(state.dataPackagedThermalStorageCoil->NumTESCoils, true);
+        state.dataPackagedThermalStorageCoil->MyWarmupFlag.dimension(state.dataPackagedThermalStorageCoil->NumTESCoils, false);
         state.dataPackagedThermalStorageCoil->MyOneTimeFlag = false;
-        MyWarmupFlag = false;
     }
 
-    if (MyFlag(TESCoilNum)) {
+    if (state.dataPackagedThermalStorageCoil->MyFlag(TESCoilNum)) {
 
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
             errFlag = false;
@@ -2278,17 +2270,17 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
             }
 
         } // any plant connection to TES
-        MyFlag(TESCoilNum) = false;
+        state.dataPackagedThermalStorageCoil->MyFlag(TESCoilNum) = false;
     }
 
-    if (MySizeFlag(TESCoilNum)) {
+    if (state.dataPackagedThermalStorageCoil->MySizeFlag(TESCoilNum)) {
 
         SizeTESCoil(state, TESCoilNum);
 
-        MySizeFlag(TESCoilNum) = false;
+        state.dataPackagedThermalStorageCoil->MySizeFlag(TESCoilNum) = false;
     }
 
-    if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(TESCoilNum)) {
+    if (state.dataGlobal->BeginEnvrnFlag && state.dataPackagedThermalStorageCoil->MyEnvrnFlag(TESCoilNum)) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).QdotPlant = 0.0;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Q_Plant = 0.0;
@@ -2318,12 +2310,12 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectEvapCondBasinHeaterPower = 0.0;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectEvapCondBasinHeaterEnergy = 0.0;
 
-        MyEnvrnFlag(TESCoilNum) = false;
+        state.dataPackagedThermalStorageCoil->MyEnvrnFlag(TESCoilNum) = false;
     }
 
-    if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(TESCoilNum) = true;
+    if (!state.dataGlobal->BeginEnvrnFlag) state.dataPackagedThermalStorageCoil->MyEnvrnFlag(TESCoilNum) = true;
 
-    if (MyWarmupFlag(TESCoilNum) && (!state.dataGlobal->WarmupFlag)) {
+    if (state.dataPackagedThermalStorageCoil->MyWarmupFlag(TESCoilNum) && (!state.dataGlobal->WarmupFlag)) {
         // reset to initial condition once warm up is over.
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemain = 0.0;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemainLastTimestep = 0.0;
@@ -2331,10 +2323,10 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedFluidTankTemp;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedFluidTankTemp;
-        MyWarmupFlag(TESCoilNum) = false;
+        state.dataPackagedThermalStorageCoil->MyWarmupFlag(TESCoilNum) = false;
     }
 
-    if (state.dataGlobal->WarmupFlag) MyWarmupFlag(TESCoilNum) = true;
+    if (state.dataGlobal->WarmupFlag) state.dataPackagedThermalStorageCoil->MyWarmupFlag(TESCoilNum) = true;
 
     // determine control mode
     if (GetCurrentScheduleValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
