@@ -262,7 +262,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             MaterNum = ip->getIDFObjNum(state, state.dataHeatBalMgr->CurrentModuleObject, counter);
 
             // Load the material derived type from the input data.
-            auto thisMaterial = new Material::MaterialChild;
+            auto *thisMaterial = new Material::MaterialChild;
             state.dataMaterial->Material(MaterNum) = thisMaterial;
             thisMaterial->Group = MaterialGroup::RegularMaterial;
             thisMaterial->Name = materialName;
