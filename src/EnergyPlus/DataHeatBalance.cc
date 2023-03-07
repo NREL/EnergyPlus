@@ -92,7 +92,6 @@ namespace EnergyPlus::DataHeatBalance {
 // SolarShading, etc. Modules.
 
 // Using/Aliasing
-using Material::MaxSlatAngs;
 using namespace DataVectorTypes;
 using DataBSDFWindow::BSDFLayerAbsorpStruct;
 using DataBSDFWindow::BSDFWindowInputStruct;

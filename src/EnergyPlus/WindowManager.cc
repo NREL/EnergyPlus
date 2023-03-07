@@ -920,7 +920,7 @@ namespace WindowManager {
 
                 Real64 const tsolDiff_2(pow_2(tsolDiff));
                 Real64 const tvisDiff_2(pow_2(tvisDiff));
-                for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
+                for (ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
 
                     if (ShadeOn) {
                         auto const *thisMaterialSh =
@@ -1487,7 +1487,7 @@ namespace WindowManager {
             }
 
             if (IntShade || IntBlind) {
-                for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
+                for (ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
                     if (IntShade || IntBlind) {
                         EpsGlIR = dynamic_cast<const Material::MaterialChild *>(
                                       state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1)))
@@ -2427,19 +2427,19 @@ namespace WindowManager {
                             Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
                             state.dataWindowManager->emis[state.dataWindowManager->nglface] =
                                 General::InterpGeneral(state.dataMaterial->Blind(BlNum).IRFrontEmiss(SurfWinSlatsAngIndex),
-                                                       state.dataMaterial->Blind(BlNum).IRFrontEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                       state.dataMaterial->Blind(BlNum).IRFrontEmiss(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                        SurfWinSlatsAngInterpFac);
                             state.dataWindowManager->emis[state.dataWindowManager->nglface + 1] =
                                 General::InterpGeneral(state.dataMaterial->Blind(BlNum).IRBackEmiss(SurfWinSlatsAngIndex),
-                                                       state.dataMaterial->Blind(BlNum).IRBackEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                       state.dataMaterial->Blind(BlNum).IRBackEmiss(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                        SurfWinSlatsAngInterpFac);
                             state.dataWindowManager->tir[state.dataWindowManager->nglface] =
                                 General::InterpGeneral(state.dataMaterial->Blind(BlNum).IRFrontTrans(SurfWinSlatsAngIndex),
-                                                       state.dataMaterial->Blind(BlNum).IRFrontTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                       state.dataMaterial->Blind(BlNum).IRFrontTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                        SurfWinSlatsAngInterpFac);
                             state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] =
                                 General::InterpGeneral(state.dataMaterial->Blind(BlNum).IRBackTrans(SurfWinSlatsAngIndex),
-                                                       state.dataMaterial->Blind(BlNum).IRBackTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                       state.dataMaterial->Blind(BlNum).IRBackTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                        SurfWinSlatsAngInterpFac);
                         } else {
                             state.dataWindowManager->emis[state.dataWindowManager->nglface] = state.dataMaterial->Blind(BlNum).IRFrontEmiss(1);
@@ -2591,11 +2591,11 @@ namespace WindowManager {
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                     EffShBlEmiss =
                         General::InterpGeneral(window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                               window.EffShBlindEmiss(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                               window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
                                                state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                     EffGlEmiss =
                         General::InterpGeneral(window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                               window.EffGlassEmiss(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                               window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
                                                state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
                     EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
@@ -3866,7 +3866,7 @@ namespace WindowManager {
                     TransDiff = General::InterpGeneral(
                         state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
                         state.dataConstruction->Construct(ConstrNumSh)
-                            .BlTransDiff(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                            .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
                         state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
                     TransDiff = state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(1);
@@ -7725,16 +7725,16 @@ namespace WindowManager {
                 bld_pr(15) = state.dataMaterial->Blind(BlindNum).SlatBackEmissIR;
 
                 // Calculate diffuse properties of blind. If blind has variable slat angle, &
-                // vary slat angle from 0 to 180 deg in 10-deg steps (for MaxSlatAngs = 19).
+                // vary slat angle from 0 to 180 deg in 10-deg steps (for Material::MaxSlatAngs = 19).
                 // If blind has fixed slat angle, calculate properties at that angle only.
 
-                for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
+                for (ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
 
                     st_lay = 0.0;
                     if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
                         bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
                     } else {                                                                     // Variable slat angle
-                        bld_el = (DataGlobalConstants::Pi / (MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
+                        bld_el = (DataGlobalConstants::Pi / (Material::MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                     }
                     BlindOpticsDiffuse(state, BlindNum, ISolVis, bld_pr, bld_el, st_lay);
 
@@ -7761,18 +7761,18 @@ namespace WindowManager {
 
                 // Calculate beam properties of blind. Vary profile angle from -90 to +90 deg in 5-deg steps.
                 // If blind has variable slat angle, vary slat angle from 0 to 180 deg in 10-deg steps
-                // (for MaxSlatAngs = 19). If blind has fixed slat angle, calculate properties at that angle only.
+                // (for Material::MaxSlatAngs = 19). If blind has fixed slat angle, calculate properties at that angle only.
 
                 for (IProfAng = 1; IProfAng <= 37; ++IProfAng) {
                     sun_el = -DataGlobalConstants::Pi / 2.0 + (DataGlobalConstants::Pi / 36.0) * (IProfAng - 1);
                     sun_el_deg(IProfAng) = 57.2958 * sun_el;
 
-                    for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
+                    for (ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
                         st_lay = 0.0;
                         if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
                             bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
                         } else {                                                                     // Variable slat angle
-                            bld_el = (DataGlobalConstants::Pi / (MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
+                            bld_el = (DataGlobalConstants::Pi / (Material::MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                         }
 
                         // Beam solar-optical properties of blind for given profile angle and slat angle
@@ -7809,7 +7809,7 @@ namespace WindowManager {
                 }     // End of loop over profile angles
 
                 if (ISolVis == 1) {
-                    for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
+                    for (ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
                         state.dataMaterial->Blind(BlindNum).SolFrontDiffDiffTransGnd(ISlatAng) =
                             DiffuseAverageProfAngGnd(state.dataMaterial->Blind(BlindNum).SolFrontBeamBeamTrans(ISlatAng, {1, 37})) +
                             DiffuseAverageProfAngGnd(state.dataMaterial->Blind(BlindNum).SolFrontBeamDiffTrans(ISlatAng, {1, 37}));
@@ -8663,16 +8663,13 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // Using/Aliasing
-        using Material::MaxSlatAngs;
-
         if (VarSlats) { // Variable-angle slats
             Real64 SlatAng1 = std::clamp(SlatAng, 0.0, DataGlobalConstants::Pi);
-            static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
-            static Real64 constexpr DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
+            static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(Material::MaxSlatAngs) - 1.0));
+            static Real64 constexpr DeltaAng_inv((double(Material::MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
             int IBeta = 1 + int(SlatAng1 * DeltaAng_inv);                          // Slat angle index
             Real64 InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv; // Interpolation factor
-            return PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
+            return PropArray(IBeta) + InterpFac * (PropArray(min(Material::MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
         } else { // Fixed-angle slats or shade
             return PropArray(1);
         }
@@ -8698,11 +8695,8 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // Using/Aliasing
-        using Material::MaxSlatAngs;
-
         // Argument array dimensioning
-        PropArray.dim(MaxSlatAngs, 37);
+        PropArray.dim(Material::MaxSlatAngs, 37);
 
         Real64 SlatAng1 = std::clamp(SlatAng, 0.0, DataGlobalConstants::Pi);
 
@@ -8718,13 +8712,13 @@ namespace WindowManager {
         Real64 Val1;
         Real64 Val2;
         if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
-            Real64 constexpr DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+            Real64 constexpr DeltaSlatAng(DataGlobalConstants::Pi / (double(Material::MaxSlatAngs) - 1.0));
             int IBeta = int(SlatAng1 / DeltaSlatAng) + 1;                                 // Slat angle index
             Real64 SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng; // Slat angle interpolation factor
             Val1 = PropArray(IBeta, IAlpha); // Property values at points enclosing the given ProfAngle and SlatAngle
-            Val2 = PropArray(min(MaxSlatAngs, IBeta + 1), IAlpha);
+            Val2 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), IAlpha);
             Real64 Val3 = PropArray(IBeta, min(37, IAlpha + 1));
-            Real64 Val4 = PropArray(min(MaxSlatAngs, IBeta + 1), min(37, IAlpha + 1));
+            Real64 Val4 = PropArray(min(Material::MaxSlatAngs, IBeta + 1), min(37, IAlpha + 1));
             Real64 ValA = Val1 + SlatAngRatio * (Val2 - Val1); // Property values at given SlatAngle to be interpolated in profile angle
             Real64 ValB = Val3 + SlatAngRatio * (Val4 - Val3);
             return ValA + ProfAngRatio * (ValB - ValA);

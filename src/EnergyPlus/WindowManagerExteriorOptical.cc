@@ -239,7 +239,7 @@ namespace WindowManager {
             }
 
             if (IntShade || IntBlind) {
-                for (auto ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
+                for (auto ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
                     Real64 EpsGlIR = 0.0;
                     Real64 RhoGlIR = 0.0;
                     if (IntShade || IntBlind) {

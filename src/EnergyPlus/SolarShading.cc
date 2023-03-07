@@ -6985,7 +6985,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                 DiffTrans = General::InterpGeneral(thisConstructSh.BlTransDiff(SurfWinSlatsAngIndex),
-                                                                   thisConstructSh.BlTransDiff(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                                   thisConstructSh.BlTransDiff(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                                    SurfWinSlatsAngInterpFac);
                             } else {
                                 DiffTrans = thisConstructSh.BlTransDiff(1);
@@ -6997,11 +6997,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                     DiffTransGnd =
                                         General::InterpGeneral(thisConstructSh.BlTransDiffGnd(SurfWinSlatsAngIndex),
-                                                               thisConstructSh.BlTransDiffGnd(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                               thisConstructSh.BlTransDiffGnd(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                                SurfWinSlatsAngInterpFac);
                                     DiffTransSky =
                                         General::InterpGeneral(thisConstructSh.BlTransDiffSky(SurfWinSlatsAngIndex),
-                                                               thisConstructSh.BlTransDiffSky(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                               thisConstructSh.BlTransDiffSky(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                                SurfWinSlatsAngInterpFac);
                                 } else {
                                     DiffTransGnd = thisConstructSh.BlTransDiffGnd(1);
@@ -7568,12 +7568,12 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                             FrontDiffDiffRefl = General::InterpGeneral(
                                                 thisBlindBack.SolFrontDiffDiffRefl(state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum)),
                                                 thisBlindBack.SolFrontDiffDiffRefl(
-                                                    std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
+                                                    std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
                                                 state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
                                             FrontDiffAbs = General::InterpGeneral(
                                                 thisBlindBack.SolFrontDiffAbs(state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum)),
                                                 thisBlindBack.SolFrontDiffAbs(
-                                                    std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
+                                                    std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(BackSurfNum) + 1)),
                                                 state.dataSurface->SurfWinSlatsAngInterpFac(BackSurfNum));
                                             RhoBlFront = WindowManager::InterpProfSlat(
                                                 thisBlind.SolFrontBeamDiffRefl(SlatsAngIndexLowerBack, ProfAngIndexLowerBack),
@@ -9462,7 +9462,7 @@ void WindowShadingManager(EnergyPlusData &state)
     using General::POLYF;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+    static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(Material::MaxSlatAngs) - 1.0));
     static Real64 constexpr DeltaAng_inv(1.0 / DeltaAng);
     static Real64 constexpr DeltaProfAng(DataGlobalConstants::Pi / 36.0);
     int IConst; // Construction
@@ -11998,7 +11998,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                     if (state.dataSurface->SurfWinMovableSlats(HeatTransSurfNum)) {
                                         BlAbsDiffBk = General::InterpGeneral(
                                             construct_sh_BlAbsDiffBack(SurfWinSlatsAngIndex, IGlass),
-                                            construct_sh_BlAbsDiffBack(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1), IGlass),
+                                            construct_sh_BlAbsDiffBack(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1), IGlass),
                                             SurfWinSlatsAngInterpFac);
                                     } else {
                                         BlAbsDiffBk = construct_sh_BlAbsDiffBack(1, IGlass);
@@ -12025,7 +12025,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                     InsideDifReflectance = General::InterpGeneral(
                                         state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack(SurfWinSlatsAngIndex),
                                         state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack(
-                                            std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                            std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                         SurfWinSlatsAngInterpFac);
                                 } else {
                                     InsideDifReflectance = state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack(1);
@@ -12047,7 +12047,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                                 if (state.dataSurface->SurfWinMovableSlats(HeatTransSurfNum)) {
                                     AbsDiffBkBl =
                                         General::InterpGeneral(construct_sh.AbsDiffBackBlind(SurfWinSlatsAngIndex),
-                                                               construct_sh.AbsDiffBackBlind(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                                               construct_sh.AbsDiffBackBlind(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                                                SurfWinSlatsAngInterpFac);
                                 } else {
                                     AbsDiffBkBl = construct_sh.AbsDiffBackBlind(1);
@@ -12522,7 +12522,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
                         if (state.dataSurface->SurfWinMovableSlats(HeatTransSurfNum)) {
                             BlAbsDiffBk = General::InterpGeneral(
                                 state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(SurfWinSlatsAngIndex, IGlass),
-                                state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1), IGlass),
+                                state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1), IGlass),
                                 SurfWinSlatsAngInterpFac);
                         } else {
                             BlAbsDiffBk = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(1, IGlass);
@@ -12552,7 +12552,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
                     if (state.dataSurface->SurfWinMovableSlats(HeatTransSurfNum)) {
                         InsideDifReflectance = General::InterpGeneral(
                             state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(SurfWinSlatsAngIndex),
-                            state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                            state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                             SurfWinSlatsAngInterpFac);
                     } else {
                         InsideDifReflectance = state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(1);
@@ -12578,7 +12578,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
                     if (state.dataSurface->SurfWinMovableSlats(HeatTransSurfNum)) {
                         AbsDiffBkBl = General::InterpGeneral(
                             state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(SurfWinSlatsAngIndex),
-                            state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                            state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                             SurfWinSlatsAngInterpFac);
                     } else {
                         AbsDiffBkBl = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(1);
