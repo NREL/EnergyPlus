@@ -1799,7 +1799,6 @@ namespace DesiccantDehumidifiers {
 
         // Using/Aliasing
         auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
-        auto &SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -1829,21 +1828,17 @@ namespace DesiccantDehumidifiers {
         bool ErrorFlag;            // local error flag returned from data mining
 
         auto &DesicDehum(state.dataDesiccantDehumidifiers->DesicDehum);
-        auto &MyEnvrnFlag(state.dataDesiccantDehumidifiers->MyEnvrnFlag);
-        auto &MyPlantScanFlag(state.dataDesiccantDehumidifiers->MyPlantScanFlag);
 
         if (state.dataDesiccantDehumidifiers->InitDesiccantDehumidifierOneTimeFlag) {
 
             // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(state.dataDesiccantDehumidifiers->NumDesicDehums);
-            MyPlantScanFlag.allocate(state.dataDesiccantDehumidifiers->NumDesicDehums);
-            MyEnvrnFlag = true;
+            state.dataDesiccantDehumidifiers->MyEnvrnFlag.dimension(state.dataDesiccantDehumidifiers->NumDesicDehums, true);
+            state.dataDesiccantDehumidifiers->MyPlantScanFlag.dimension(state.dataDesiccantDehumidifiers->NumDesicDehums, true);
 
             state.dataDesiccantDehumidifiers->InitDesiccantDehumidifierOneTimeFlag = false;
-            MyPlantScanFlag = true;
         }
 
-        if (MyPlantScanFlag(DesicDehumNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataDesiccantDehumidifiers->MyPlantScanFlag(DesicDehumNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) ||
                 (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam)) {
                 if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) {
@@ -1905,13 +1900,13 @@ namespace DesiccantDehumidifiers {
                 // fill outlet node for regenartion hot water or steam heating coil
                 DesicDehum(DesicDehumNum).CoilOutletNode =
                     DataPlant::CompData::getPlantComponent(state, DesicDehum(DesicDehumNum).plantLoc).NodeNumOut;
-                MyPlantScanFlag(DesicDehumNum) = false;
+                state.dataDesiccantDehumidifiers->MyPlantScanFlag(DesicDehumNum) = false;
 
             } else { // DesicDehum is not connected to plant
-                MyPlantScanFlag(DesicDehumNum) = false;
+                state.dataDesiccantDehumidifiers->MyPlantScanFlag(DesicDehumNum) = false;
             }
-        } else if (MyPlantScanFlag(DesicDehumNum) && !state.dataGlobal->AnyPlantInModel) {
-            MyPlantScanFlag(DesicDehumNum) = false;
+        } else if (state.dataDesiccantDehumidifiers->MyPlantScanFlag(DesicDehumNum) && !state.dataGlobal->AnyPlantInModel) {
+            state.dataDesiccantDehumidifiers->MyPlantScanFlag(DesicDehumNum) = false;
         }
 
         switch (DesicDehum(DesicDehumNum).DehumTypeCode) {
@@ -1926,11 +1921,11 @@ namespace DesiccantDehumidifiers {
                                 ShowContinueError(state, format("Dehumidifier:Desiccant:NoFans: {}", DesicDehum(DesicDehumNum).Name));
                                 ShowContinueError(state, format("Node Referenced={}", state.dataLoopNodes->NodeID(ControlNode)));
                                 ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the process air outlet node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                    state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
                                     ShowContinueError(state, format("Dehumidifier:Desiccant:NoFans: {}", DesicDehum(DesicDehumNum).Name));
                                     ShowContinueError(state, format("Node Referenced={}", state.dataLoopNodes->NodeID(ControlNode)));
@@ -1966,7 +1961,7 @@ namespace DesiccantDehumidifiers {
         } break;
         case DesicDehumType::Generic: {
             //      Do the Begin Environment initializations
-            if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DesicDehumNum)) {
+            if (state.dataGlobal->BeginEnvrnFlag && state.dataDesiccantDehumidifiers->MyEnvrnFlag(DesicDehumNum)) {
                 // Change the Volume Flow Rates to Mass Flow Rates
                 DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate = DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate * state.dataEnvrn->StdRhoAir;
 
@@ -2019,7 +2014,7 @@ namespace DesiccantDehumidifiers {
                                        DesicDehum(DesicDehumNum).CoilOutletNode);
                 }
 
-                MyEnvrnFlag(DesicDehumNum) = false;
+                state.dataDesiccantDehumidifiers->MyEnvrnFlag(DesicDehumNum) = false;
             }
 
             if (!state.dataGlobal->SysSizingCalc && state.dataDesiccantDehumidifiers->MySetPointCheckFlag && DoSetPointTest) {
@@ -2031,11 +2026,11 @@ namespace DesiccantDehumidifiers {
                             ShowContinueError(state, format("{}: {}", DesicDehum(DesicDehumNum).DehumType, DesicDehum(DesicDehumNum).Name));
                             ShowContinueError(state, format("Node Referenced={}", state.dataLoopNodes->NodeID(ControlNode)));
                             ShowContinueError(state, "use a Setpoint Manager to establish a \"MaxHumRat\" setpoint at the process air control node.");
-                            SetPointErrorFlag = true;
+                            state.dataHVACGlobal->SetPointErrorFlag = true;
                         } else {
                             CheckIfNodeSetPointManagedByEMS(
-                                state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, SetPointErrorFlag);
-                            if (SetPointErrorFlag) {
+                                state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                            if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
                                 ShowContinueError(state, format("{}: {}", DesicDehum(DesicDehumNum).DehumType, DesicDehum(DesicDehumNum).Name));
                                 ShowContinueError(state, format("Node Referenced={}", state.dataLoopNodes->NodeID(ControlNode)));

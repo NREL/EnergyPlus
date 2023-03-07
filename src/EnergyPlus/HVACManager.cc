@@ -187,7 +187,6 @@ void ManageHVAC(EnergyPlusData &state)
     auto &NumOfSysTimeStepsLastZoneTimeStep = state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep;
     auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    auto &FirstTimeStepSysFlag = state.dataHVACGlobal->FirstTimeStepSysFlag;
     auto &ShortenTimeStepSys = state.dataHVACGlobal->ShortenTimeStepSys;
     auto &UseZoneTimeStepHistory = state.dataHVACGlobal->UseZoneTimeStepHistory;
     auto &NumOfSysTimeSteps = state.dataHVACGlobal->NumOfSysTimeSteps;
@@ -241,7 +240,7 @@ void ManageHVAC(EnergyPlusData &state)
     state.dataHeatBalFanSys->QRadSurfAFNDuct = 0.0;
     SysTimeElapsed = 0.0;
     TimeStepSys = state.dataGlobal->TimeStepZone;
-    FirstTimeStepSysFlag = true;
+    state.dataHVACGlobal->FirstTimeStepSysFlag = true;
     ShortenTimeStepSys = false;
     UseZoneTimeStepHistory = true;
     PriorTimeStep = state.dataGlobal->TimeStepZone;
@@ -309,7 +308,7 @@ void ManageHVAC(EnergyPlusData &state)
     ManageWaterInits(state);
 
     // Only simulate once per zone timestep; must be after SimHVAC
-    if (FirstTimeStepSysFlag && state.dataGlobal->MetersHaveBeenInitialized) {
+    if (state.dataHVACGlobal->FirstTimeStepSysFlag && state.dataGlobal->MetersHaveBeenInitialized) {
         ManageDemand(state);
     }
 
@@ -553,7 +552,7 @@ void ManageHVAC(EnergyPlusData &state)
         // UPDATE SYSTEM CLOCKS
         SysTimeElapsed += TimeStepSys;
 
-        FirstTimeStepSysFlag = false;
+        state.dataHVACGlobal->FirstTimeStepSysFlag = false;
     } // system time step  loop (loops once if no downstepping)
 
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
@@ -704,21 +703,15 @@ void SimHVAC(EnergyPlusData &state)
     Real64 constexpr square_sum_ConvergLogStackARR(2025);
     Real64 constexpr sum_square_ConvergLogStackARR(285);
 
-    auto &SimZoneEquipmentFlag = state.dataHVACGlobal->SimZoneEquipmentFlag;
-    auto &SimNonZoneEquipmentFlag = state.dataHVACGlobal->SimNonZoneEquipmentFlag;
-    auto &SimAirLoopsFlag = state.dataHVACGlobal->SimAirLoopsFlag;
-    auto &SimPlantLoopsFlag = state.dataHVACGlobal->SimPlantLoopsFlag;
-    auto &SimElecCircuitsFlag = state.dataHVACGlobal->SimElecCircuitsFlag;
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
-    auto &SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
 
     // Initialize all of the simulation flags to true for the first iteration
-    SimZoneEquipmentFlag = true;
-    SimNonZoneEquipmentFlag = true;
-    SimAirLoopsFlag = true;
-    SimPlantLoopsFlag = true;
-    SimElecCircuitsFlag = true;
+    state.dataHVACGlobal->SimZoneEquipmentFlag = true;
+    state.dataHVACGlobal->SimNonZoneEquipmentFlag = true;
+    state.dataHVACGlobal->SimAirLoopsFlag = true;
+    state.dataHVACGlobal->SimPlantLoopsFlag = true;
+    state.dataHVACGlobal->SimElecCircuitsFlag = true;
     FirstHVACIteration = true;
 
     if (state.dataAirLoop->AirLoopInputsFilled) {
@@ -814,10 +807,10 @@ void SimHVAC(EnergyPlusData &state)
     }
 
     if (state.dataGlobal->ZoneSizingCalc) {
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
+        ManageZoneEquipment(state, FirstHVACIteration, state.dataHVACGlobal->SimZoneEquipmentFlag, state.dataHVACGlobal->SimAirLoopsFlag);
         // need to call non zone equipment so water use zone gains can be included in sizing calcs
-        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
-        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+        ManageNonZoneEquipment(state, FirstHVACIteration, state.dataHVACGlobal->SimNonZoneEquipmentFlag);
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
         return;
     }
 
@@ -848,18 +841,18 @@ void SimHVAC(EnergyPlusData &state)
 
     // Manages the various component simulations
     SimSelectedEquipment(state,
-                         SimAirLoopsFlag,
-                         SimZoneEquipmentFlag,
-                         SimNonZoneEquipmentFlag,
-                         SimPlantLoopsFlag,
-                         SimElecCircuitsFlag,
+                         state.dataHVACGlobal->SimAirLoopsFlag,
+                         state.dataHVACGlobal->SimZoneEquipmentFlag,
+                         state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                         state.dataHVACGlobal->SimPlantLoopsFlag,
+                         state.dataHVACGlobal->SimElecCircuitsFlag,
                          FirstHVACIteration,
                          SimWithPlantFlowUnlocked);
 
     // Eventually, when all of the flags are set to false, the
     // simulation has converged for this system time step.
 
-    SimPlantLoopsFlag = true;
+    state.dataHVACGlobal->SimPlantLoopsFlag = true;
     SetAllPlantSimFlagsToValue(state, true); // set so loop to simulate at least once on non-first hvac
 
     FirstHVACIteration = false;
@@ -868,7 +861,11 @@ void SimHVAC(EnergyPlusData &state)
 
     // Main iteration loop for HVAC.  If any of the simulation flags are
     // true, then specific components must be resimulated.
-    while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
+    while ((state.dataHVACGlobal->SimAirLoopsFlag ||
+            state.dataHVACGlobal->SimZoneEquipmentFlag ||
+	    state.dataHVACGlobal->SimNonZoneEquipmentFlag ||
+	    state.dataHVACGlobal->SimPlantLoopsFlag ||
+	    state.dataHVACGlobal->SimElecCircuitsFlag) &&
            (state.dataHVACMgr->HVACManageIteration <= state.dataConvergeParams->MaxIter)) {
 
         if (state.dataGlobal->stopSimulation) break;
@@ -877,11 +874,11 @@ void SimHVAC(EnergyPlusData &state)
 
         // Manages the various component simulations
         SimSelectedEquipment(state,
-                             SimAirLoopsFlag,
-                             SimZoneEquipmentFlag,
-                             SimNonZoneEquipmentFlag,
-                             SimPlantLoopsFlag,
-                             SimElecCircuitsFlag,
+                             state.dataHVACGlobal->SimAirLoopsFlag,
+                             state.dataHVACGlobal->SimZoneEquipmentFlag,
+                             state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                             state.dataHVACGlobal->SimPlantLoopsFlag,
+                             state.dataHVACGlobal->SimElecCircuitsFlag,
                              FirstHVACIteration,
                              SimWithPlantFlowUnlocked);
 
@@ -894,72 +891,72 @@ void SimHVAC(EnergyPlusData &state)
 
         if (anyEMSRan && state.dataHVACMgr->HVACManageIteration <= 2) {
             // the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
-            SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
         }
         if (state.dataHVACMgr->HVACManageIteration < state.dataHVACGlobal->MinAirLoopIterationsAfterFirst) {
             // sequenced zone loads for airloops may require extra iterations depending upon zone equipment order and load distribution type
-            SimAirLoopsFlag = true;
-            SimZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = true;
         }
     }
     if (state.dataGlobal->AnyPlantInModel) {
         if (AnyPlantSplitterMixerLacksContinuity(state)) {
             // rerun systems in a "Final flow lock/last iteration" mode
             // now call for one second to last plant simulation
-            SimAirLoopsFlag = false;
-            SimZoneEquipmentFlag = false;
-            SimNonZoneEquipmentFlag = false;
-            SimPlantLoopsFlag = true;
-            SimElecCircuitsFlag = false;
+            state.dataHVACGlobal->SimAirLoopsFlag = false;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = false;
+            state.dataHVACGlobal->SimNonZoneEquipmentFlag = false;
+            state.dataHVACGlobal->SimPlantLoopsFlag = true;
+            state.dataHVACGlobal->SimElecCircuitsFlag = false;
             SimSelectedEquipment(state,
-                                 SimAirLoopsFlag,
-                                 SimZoneEquipmentFlag,
-                                 SimNonZoneEquipmentFlag,
-                                 SimPlantLoopsFlag,
-                                 SimElecCircuitsFlag,
+                                 state.dataHVACGlobal->SimAirLoopsFlag,
+                                 state.dataHVACGlobal->SimZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimPlantLoopsFlag,
+                                 state.dataHVACGlobal->SimElecCircuitsFlag,
                                  FirstHVACIteration,
                                  SimWithPlantFlowUnlocked);
             // now call for all non-plant simulation, but with plant flow lock on
-            SimAirLoopsFlag = true;
-            SimZoneEquipmentFlag = true;
-            SimNonZoneEquipmentFlag = true;
-            SimPlantLoopsFlag = false;
-            SimElecCircuitsFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimNonZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimPlantLoopsFlag = false;
+            state.dataHVACGlobal->SimElecCircuitsFlag = true;
             SimSelectedEquipment(state,
-                                 SimAirLoopsFlag,
-                                 SimZoneEquipmentFlag,
-                                 SimNonZoneEquipmentFlag,
-                                 SimPlantLoopsFlag,
-                                 SimElecCircuitsFlag,
+                                 state.dataHVACGlobal->SimAirLoopsFlag,
+                                 state.dataHVACGlobal->SimZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimPlantLoopsFlag,
+                                 state.dataHVACGlobal->SimElecCircuitsFlag,
                                  FirstHVACIteration,
                                  SimWithPlantFlowLocked);
             UpdateZoneInletConvergenceLog(state);
             // now call for a last plant simulation
-            SimAirLoopsFlag = false;
-            SimZoneEquipmentFlag = false;
-            SimNonZoneEquipmentFlag = false;
-            SimPlantLoopsFlag = true;
-            SimElecCircuitsFlag = false;
+            state.dataHVACGlobal->SimAirLoopsFlag = false;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = false;
+            state.dataHVACGlobal->SimNonZoneEquipmentFlag = false;
+            state.dataHVACGlobal->SimPlantLoopsFlag = true;
+            state.dataHVACGlobal->SimElecCircuitsFlag = false;
             SimSelectedEquipment(state,
-                                 SimAirLoopsFlag,
-                                 SimZoneEquipmentFlag,
-                                 SimNonZoneEquipmentFlag,
-                                 SimPlantLoopsFlag,
-                                 SimElecCircuitsFlag,
+                                 state.dataHVACGlobal->SimAirLoopsFlag,
+                                 state.dataHVACGlobal->SimZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimPlantLoopsFlag,
+                                 state.dataHVACGlobal->SimElecCircuitsFlag,
                                  FirstHVACIteration,
                                  SimWithPlantFlowUnlocked);
             // now call for a last all non-plant simulation, but with plant flow lock on
-            SimAirLoopsFlag = true;
-            SimZoneEquipmentFlag = true;
-            SimNonZoneEquipmentFlag = true;
-            SimPlantLoopsFlag = false;
-            SimElecCircuitsFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimNonZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimPlantLoopsFlag = false;
+            state.dataHVACGlobal->SimElecCircuitsFlag = true;
             SimSelectedEquipment(state,
-                                 SimAirLoopsFlag,
-                                 SimZoneEquipmentFlag,
-                                 SimNonZoneEquipmentFlag,
-                                 SimPlantLoopsFlag,
-                                 SimElecCircuitsFlag,
+                                 state.dataHVACGlobal->SimAirLoopsFlag,
+                                 state.dataHVACGlobal->SimZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimPlantLoopsFlag,
+                                 state.dataHVACGlobal->SimElecCircuitsFlag,
                                  FirstHVACIteration,
                                  SimWithPlantFlowLocked);
             UpdateZoneInletConvergenceLog(state);
@@ -984,19 +981,19 @@ void SimHVAC(EnergyPlusData &state)
                                     state.dataEnvrn->EnvironmentName,
                                     state.dataEnvrn->CurMnDy,
                                     CreateSysTimeIntervalString(state)));
-            if (SimAirLoopsFlag) {
+            if (state.dataHVACGlobal->SimAirLoopsFlag) {
                 ShowContinueError(state, "The solution for one or more of the Air Loop HVAC systems did not appear to converge");
             }
-            if (SimZoneEquipmentFlag) {
+            if (state.dataHVACGlobal->SimZoneEquipmentFlag) {
                 ShowContinueError(state, "The solution for zone HVAC equipment did not appear to converge");
             }
-            if (SimNonZoneEquipmentFlag) {
+            if (state.dataHVACGlobal->SimNonZoneEquipmentFlag) {
                 ShowContinueError(state, "The solution for non-zone equipment did not appear to converge");
             }
-            if (SimPlantLoopsFlag) {
+            if (state.dataHVACGlobal->SimPlantLoopsFlag) {
                 ShowContinueError(state, "The solution for one or more plant systems did not appear to converge");
             }
-            if (SimElecCircuitsFlag) {
+            if (state.dataHVACGlobal->SimElecCircuitsFlag) {
                 ShowContinueError(state, "The solution for on-site electric generators did not appear to converge");
             }
             if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -1835,7 +1832,7 @@ void SimHVAC(EnergyPlusData &state)
             }
         }
     }
-    if (SetPointErrorFlag) {
+    if (state.dataHVACGlobal->SetPointErrorFlag) {
         ShowFatalError(state, "Previous severe set point errors cause program termination");
     }
 }

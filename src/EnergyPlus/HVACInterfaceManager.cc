@@ -798,15 +798,14 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     int NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
     int NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
-    auto &MyEnvrnFlag = PlantCommonPipe(LoopNum).MyEnvrnFlag;
-    if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+    if (PlantCommonPipe(LoopNum).MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         PlantCommonPipe(LoopNum).Flow = 0.0;
         PlantCommonPipe(LoopNum).Temp = 0.0;
         PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
-        MyEnvrnFlag = false;
+        PlantCommonPipe(LoopNum).MyEnvrnFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag = true;
+        PlantCommonPipe(LoopNum).MyEnvrnFlag = true;
     }
 
     // every time inits
@@ -927,17 +926,16 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
     int const NodeNumSecOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
     // begin environment inits
-    auto &MyEnvrnFlag(plantCommonPipe.MyEnvrnFlag);
-    if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+    if (plantCommonPipe.MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         plantCommonPipe.PriToSecFlow = 0.0;
         plantCommonPipe.SecToPriFlow = 0.0;
         plantCommonPipe.PriCPLegFlow = 0.0;
         plantCommonPipe.SecCPLegFlow = 0.0;
-        MyEnvrnFlag = false;
+        plantCommonPipe.MyEnvrnFlag = false;
     }
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag = true;
+        plantCommonPipe.MyEnvrnFlag = true;
     }
 
     // every time inits

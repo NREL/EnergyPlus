@@ -7600,7 +7600,6 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     int TUListNum;                                                       // index to terminal unit list
     int TUIndex;                                                         // index to terminal unit
     int NumTU;                                                           // DO Loop index counter
-    auto &MyOneTimeEIOFlag = state.dataHVACVarRefFlow->MyOneTimeEIOFlag; // eio header flag reporting
     Real64 OnOffAirFlowRat;                                              // temporary variable used when sizing coils
     Real64 DXCoilCap;                                                    // capacity of DX cooling coil (W)
     bool IsAutoSize;                                                     // Indicator to autosize
@@ -8817,13 +8816,13 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             }
 
             // Report to eio other information not related to autosizing
-            if (MyOneTimeEIOFlag) {
+            if (state.dataHVACVarRefFlow->MyOneTimeEIOFlag) {
                 static constexpr std::string_view Format_990(
                     "! <VRF System Information>, VRF System Type, VRF System Name, VRF System Cooling Combination Ratio, VRF "
                     "System Heating Combination Ratio, VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
                     "Correction Factor\n");
                 print(state.files.eio, Format_990);
-                MyOneTimeEIOFlag = false;
+                state.dataHVACVarRefFlow->MyOneTimeEIOFlag = false;
             }
             static constexpr std::string_view Format_991(" VRF System Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
             print(state.files.eio,

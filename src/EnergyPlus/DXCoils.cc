@@ -6813,8 +6813,6 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
     static constexpr std::string_view RoutineName("InitDXCoil");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &MyEnvrnFlag = state.dataDXCoils->MyEnvrnFlag; // One time environment flag
-    auto &MySizeFlag = state.dataDXCoils->MySizeFlag;   // One time sizing flag
     Real64 RatedHeatPumpIndoorAirTemp;                  // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
     Real64 RatedHeatPumpIndoorHumRat;                   // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
     Real64 RatedVolFlowPerRatedTotCap;                  // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
@@ -6831,10 +6829,8 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
 
     if (state.dataDXCoils->MyOneTimeFlag) {
         // initialize the environment and sizing flags
-        MyEnvrnFlag.allocate(state.dataDXCoils->NumDXCoils);
-        MySizeFlag.allocate(state.dataDXCoils->NumDXCoils);
-        MyEnvrnFlag = true;
-        MySizeFlag = true;
+        state.dataDXCoils->MyEnvrnFlag.dimension(state.dataDXCoils->NumDXCoils, true);
+        state.dataDXCoils->MySizeFlag.dimension(state.dataDXCoils->NumDXCoils, true);
         state.dataDXCoils->MyOneTimeFlag = false;
     }
     // if "ISHundredPercentDOASDXCoil" =.TRUE., then set coil as 100% DOAS dx coil
@@ -6846,7 +6842,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
 
     if ((state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
          state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) &&
-        MyEnvrnFlag(DXCoilNum)) {
+        state.dataDXCoils->MyEnvrnFlag(DXCoilNum)) {
 
         SizeDXCoil(state, DXCoilNum);
 
@@ -6879,9 +6875,9 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
 
         //   call CalcHPWHDXCoil to determine DXCoil%RatedTotCap(1) for rated CBF calculation below
         CalcHPWHDXCoil(state, DXCoilNum, 1.0);
-        if (MySizeFlag(DXCoilNum)) {
+        if (state.dataDXCoils->MySizeFlag(DXCoilNum)) {
             SizeDXCoil(state, DXCoilNum);
-            MySizeFlag(DXCoilNum) = false;
+            state.dataDXCoils->MySizeFlag(DXCoilNum) = false;
         }
 
         state.dataDXCoils->DXCoil(DXCoilNum).RatedCBF(1) = CalcCBF(state,
@@ -6893,12 +6889,12 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                                                                    state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1),
                                                                    state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR(1),
                                                                    true);
-        MyEnvrnFlag(DXCoilNum) = false;
+        state.dataDXCoils->MyEnvrnFlag(DXCoilNum) = false;
     }
 
     if ((state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling ||
          state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) &&
-        MyEnvrnFlag(DXCoilNum)) {
+        state.dataDXCoils->MyEnvrnFlag(DXCoilNum)) {
         if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).MSHPHeatRecActive) {
                 for (SpeedNum = 1; SpeedNum <= state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds; ++SpeedNum) {
@@ -6912,7 +6908,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                 }
             }
         }
-        MyEnvrnFlag(DXCoilNum) = false;
+        state.dataDXCoils->MyEnvrnFlag(DXCoilNum) = false;
     }
 
     // Find the companion upstream coil (DX cooling coil) that is used with DX heating coils (HP AC units only)
@@ -6971,10 +6967,10 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
         } //(AirLoopInputsFilled)THEN
     }     //(CrankcaseHeaterReportVarFlag)THEN
 
-    if (!state.dataGlobal->SysSizingCalc && MySizeFlag(DXCoilNum)) {
+    if (!state.dataGlobal->SysSizingCalc && state.dataDXCoils->MySizeFlag(DXCoilNum)) {
         // for each coil, do the sizing once.
         SizeDXCoil(state, DXCoilNum);
-        MySizeFlag(DXCoilNum) = false;
+        state.dataDXCoils->MySizeFlag(DXCoilNum) = false;
 
         if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed ||
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed ||

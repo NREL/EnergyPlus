@@ -1256,7 +1256,6 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     bool hitExtObs;        // True iff ray from ref pt to ext win hits an exterior obstruction
     Real64 TVISIntWin;     // Visible transmittance of int win at COSBIntWin for light from ext win
     Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
-    auto &MySunIsUpFlag(state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag);
     int WinEl; // window elements counter
 
     auto &W2 = state.dataDaylightingManager->W2;
@@ -1471,15 +1470,15 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                                      mapNum);
                         } // End of hourly sun position loop, IHR
                     } else {
-                        if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                        if (state.dataEnvrn->SunIsUp && !state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag) {
                             ISunPos = 0;
-                            MySunIsUpFlag = true;
-                        } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
+                            state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag = true;
+                        } else if (state.dataEnvrn->SunIsUp && state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag) {
                             ISunPos = 1;
-                        } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
-                            MySunIsUpFlag = false;
+                        } else if (!state.dataEnvrn->SunIsUp && state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag) {
+                            state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag = false;
                             ISunPos = -1;
-                        } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                        } else if (!state.dataEnvrn->SunIsUp && !state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag) {
                             ISunPos = -1;
                         }
                         // daylightingCtrlNum parameter is unused for map points

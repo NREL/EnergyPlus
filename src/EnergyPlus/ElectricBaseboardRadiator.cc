@@ -121,13 +121,12 @@ namespace ElectricBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // Index of unit in baseboard array
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        auto &GetInputFlag = state.dataElectBaseboardRad->GetInputFlag;
         auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
         auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
 
-        if (GetInputFlag) {
+        if (state.dataElectBaseboardRad->GetInputFlag) {
             GetElectricBaseboardInput(state);
-            GetInputFlag = false;
+            state.dataElectBaseboardRad->GetInputFlag = false;
         }
 
         // Find the correct Baseboard Equipment
@@ -563,8 +562,6 @@ namespace ElectricBaseboardRadiator {
 
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
-        auto &MyOneTimeFlag = state.dataElectBaseboardRad->MyOneTimeFlag;
-        auto &MySizeFlag = state.dataElectBaseboardRad->MySizeFlag;
         auto &ZeroSourceSumHATsurf = state.dataElectBaseboardRad->ZeroSourceSumHATsurf;
         auto &QBBElecRadSource = state.dataElectBaseboardRad->QBBElecRadSource;
         auto &QBBElecRadSrcAvg = state.dataElectBaseboardRad->QBBElecRadSrcAvg;
@@ -573,26 +570,24 @@ namespace ElectricBaseboardRadiator {
         auto &LastTimeStepSys = state.dataElectBaseboardRad->LastTimeStepSys;
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataElectBaseboardRad->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            state.dataElectBaseboardRad->MyEnvrnFlag.allocate(NumElecBaseboards);
-            MySizeFlag.allocate(NumElecBaseboards);
+            state.dataElectBaseboardRad->MyEnvrnFlag.dimension(NumElecBaseboards, true);
+            state.dataElectBaseboardRad->MySizeFlag.dimension(NumElecBaseboards, true);
             ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QBBElecRadSource.dimension(NumElecBaseboards, 0.0);
             QBBElecRadSrcAvg.dimension(NumElecBaseboards, 0.0);
             LastQBBElecRadSrc.dimension(NumElecBaseboards, 0.0);
             LastSysTimeElapsed.dimension(NumElecBaseboards, 0.0);
             LastTimeStepSys.dimension(NumElecBaseboards, 0.0);
-            state.dataElectBaseboardRad->MyEnvrnFlag = true;
-            MySizeFlag = true;
 
-            MyOneTimeFlag = false;
+            state.dataElectBaseboardRad->MyOneTimeFlag = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataElectBaseboardRad->MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
-            MySizeFlag(BaseboardNum) = false;
+            state.dataElectBaseboardRad->MySizeFlag(BaseboardNum) = false;
         }
 
         // Do the Begin Environment initializations
