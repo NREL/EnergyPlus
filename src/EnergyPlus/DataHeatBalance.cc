@@ -1005,7 +1005,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     //  CALL CalcScreenTransmittance(SurfaceNum)
     //  Since a single Material:WindowScreen object may be used for multiple windows, the
     //  screen's direct beam properties are calculated for the screen material attached to this surface.
-    //  If a single Material:WindowScreen object is used for 3 windows then SurfaceScreens(3) is allocated.
+    //  If a single Material:WindowScreen object is used for 3 windows then Screens(3) is allocated.
 
     //  CALLs to CalcScreenTransmittance may be done by using the optional arguments as follows:
     //  CALLs to CalcScreenTransmittance at normal incidence are:
@@ -1068,7 +1068,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 ReflectCyl;            // Screen material reflectance
     Real64 ReflectCylVis;         // Screen material visible reflectance
 
-    // SurfaceScreens structure may be accessed using either the surface or screen index
+    // Screens structure may be accessed using either the surface or screen index
     // The screen index is based on the number of Surface:HeatTransfer:Sub objects using any Material:WindowScreen object
     if (present(ScreenNumber)) {
         ScNum = ScreenNumber;
@@ -1133,7 +1133,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         IncidentAngle = 0.0;
     }
 
-    auto &thisScreen = state.dataMaterial->SurfaceScreens(ScNum);
+    auto &thisScreen = state.dataMaterial->Screens(ScNum);
 
     // ratio of screen material diameter to screen material spacing
     Gamma = thisScreen.ScreenDiameterToSpacingRatio;

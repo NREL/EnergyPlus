@@ -1751,7 +1751,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Thickness = MaterialProps(6); // thickness = diameter
 
         if (MaterialProps(5) > 0.0) {
-            //      SurfaceScreens(ScNum)%ScreenDiameterToSpacingRatio = MaterialProps(6)/MaterialProps(5) or
+            //      Screens(ScNum)%ScreenDiameterToSpacingRatio = MaterialProps(6)/MaterialProps(5) or
             //      1-SQRT(dataMaterial.Material(MaterNum)%Trans
             if (MaterialProps(6) / MaterialProps(5) >= 1.0) {
                 ErrorsFound = true;

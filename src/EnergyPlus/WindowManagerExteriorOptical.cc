@@ -180,8 +180,8 @@ namespace WindowManager {
         if (state.dataHeatBal->TotBlinds > 0) CalcWindowBlindProperties(state);
 
         // Initialize SurfaceScreen structure
-        state.dataHeatBal->NumSurfaceScreens = state.dataHeatBal->TotScreens;
-        if (state.dataHeatBal->NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
+        state.dataHeatBal->NumScreens = state.dataHeatBal->TotScreens;
+        if (state.dataHeatBal->NumScreens > 0) CalcWindowScreenProperties(state);
 
         auto &aWinConstSimp = CWindowConstructionsSimplified::instance(state);
         for (auto ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {

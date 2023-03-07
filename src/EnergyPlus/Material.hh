@@ -561,7 +561,7 @@ namespace Material {
         Real64 InitialPressure = 0.0;     // Window(s) pressure in time of fabrication
     };
 
-    struct SurfaceScreenProperties
+    struct ScreenProperties
     {
         // Members
         int MaterialNumber = 0; // Material pointer for the screen
@@ -616,7 +616,7 @@ struct MaterialData : BaseGlobalStruct
     Array1D<Material::WindowBlindProperties> Blind;
     EPVector<Material::WindowComplexShade> ComplexShade;
     EPVector<Material::WindowThermalModelParams> WindowThermalModel;
-    EPVector<Material::SurfaceScreenProperties> SurfaceScreens;
+    EPVector<Material::ScreenProperties> Screens;
     EPVector<Material::ScreenTransData> ScreenTrans;
     void clear_state() override
     {

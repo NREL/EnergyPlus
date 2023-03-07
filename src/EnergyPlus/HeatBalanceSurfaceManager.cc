@@ -3579,13 +3579,13 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 } else if (ShadeFlag == WinShadingType::ExtScreen) { // Exterior screen
                                     state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) =
                                         DividerAbs *
-                                        (state.dataMaterial->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmBmTrans +
-                                         state.dataMaterial->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmDifTrans) *
+                                        (state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmBmTrans +
+                                         state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmDifTrans) *
                                         (DivIncSolarOutBm + DivIncSolarOutDif);
                                     state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) =
                                         DividerAbs *
-                                        (state.dataMaterial->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmBmTrans +
-                                         state.dataMaterial->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmDifTrans) *
+                                        (state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmBmTrans +
+                                         state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmDifTrans) *
                                         (DivIncSolarInBm + DivIncSolarInDif);
                                 }
                             }

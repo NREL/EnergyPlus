@@ -332,7 +332,7 @@ namespace WindowManager {
         if (state.dataHeatBal->TotBlinds > 0) CalcWindowBlindProperties(state);
 
         // Initialize SurfaceScreen structure
-        if (state.dataHeatBal->NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
+        if (state.dataHeatBal->NumScreens > 0) CalcWindowScreenProperties(state);
 
         // Get glazing system optical properties of constructions with glass or glass plus
         //   shade, screen or blind
@@ -444,7 +444,7 @@ namespace WindowManager {
                 ShadeLayPtr = thisConstruct.LayerPoint(ShadeLayNum);
                 auto const *thisMaterialShade = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShadeLayPtr));
                 if (ExtScreen) {
-                    TauShIR = state.dataMaterial->SurfaceScreens(ScNum).DifDifTrans;
+                    TauShIR = state.dataMaterial->Screens(ScNum).DifDifTrans;
                 } else {
                     TauShIR = thisMaterialShade->TransThermal;
                 }
@@ -969,11 +969,11 @@ namespace WindowManager {
                         absh = state.dataMaterial->Blind(BlNum).SolBackDiffAbs(ISlatAng);
                     } else if (ScreenOn && ScNum > 0) {
                         //       diffuse screen properties are calculated during initialization (quarter-hemispherical integration of beam properties)
-                        ShadeAbs = state.dataMaterial->SurfaceScreens(ScNum).DifScreenAbsorp;
-                        ShadeTrans = state.dataMaterial->SurfaceScreens(ScNum).DifDifTrans;
-                        ShadeTransVis = state.dataMaterial->SurfaceScreens(ScNum).DifDifTransVis;
-                        ShadeRefl = state.dataMaterial->SurfaceScreens(ScNum).DifReflect;
-                        ShadeReflVis = state.dataMaterial->SurfaceScreens(ScNum).DifReflectVis;
+                        ShadeAbs = state.dataMaterial->Screens(ScNum).DifScreenAbsorp;
+                        ShadeTrans = state.dataMaterial->Screens(ScNum).DifDifTrans;
+                        ShadeTransVis = state.dataMaterial->Screens(ScNum).DifDifTransVis;
+                        ShadeRefl = state.dataMaterial->Screens(ScNum).DifReflect;
+                        ShadeReflVis = state.dataMaterial->Screens(ScNum).DifReflectVis;
                         rsh = ShadeRefl;
                         rshv = ShadeReflVis;
                         tsh = ShadeTrans;
@@ -1628,7 +1628,7 @@ namespace WindowManager {
                     if (ShadingType == WinShadingType::ExtScreen) {
                         //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
                         //     from this subroutine. The blind structure is initialized first and then the screen structure is initialized.
-                        ++state.dataHeatBal->NumSurfaceScreens;
+                        ++state.dataHeatBal->NumScreens;
                         break; // only need to find the first window shading control since they should be identical
                     }
                 }
@@ -2394,9 +2394,9 @@ namespace WindowManager {
                         if (ShadeFlag == WinShadingType::ExtScreen) {
                             state.dataWindowManager->emis[state.dataWindowManager->nglface] = thisMaterialShade->AbsorpThermalFront;
                             state.dataWindowManager->tir[state.dataWindowManager->nglface] =
-                                state.dataMaterial->SurfaceScreens(thisMaterialShade->ScreenDataPtr).DifDifTrans;
+                                state.dataMaterial->Screens(thisMaterialShade->ScreenDataPtr).DifDifTrans;
                             state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] =
-                                state.dataMaterial->SurfaceScreens(thisMaterialShade->ScreenDataPtr).DifDifTrans;
+                                state.dataMaterial->Screens(thisMaterialShade->ScreenDataPtr).DifDifTrans;
                         } else {
                             state.dataWindowManager->emis[state.dataWindowManager->nglface] = thisMaterialShade->AbsorpThermal;
                             state.dataWindowManager->tir[state.dataWindowManager->nglface] = thisMaterialShade->TransThermal;
@@ -6608,16 +6608,16 @@ namespace WindowManager {
             if (ShadeFlag == WinShadingType::ExtScreen) {
                 //   Don't need to call subroutine, use normal incident properties (SUBROUTINE CalcNominalWindowCond)
                 //   Last call to CalcScreenTransmittance(ISurf) was done at direct normal angle (0,0) in CalcWindowScreenProperties
-                TScBmBm = state.dataMaterial->SurfaceScreens(ScNum).BmBmTrans;
-                TScBmBmVis = state.dataMaterial->SurfaceScreens(ScNum).BmBmTransVis;
-                TScBmDif = state.dataMaterial->SurfaceScreens(ScNum).BmDifTrans;
-                TScBmDifVis = state.dataMaterial->SurfaceScreens(ScNum).BmDifTransVis;
+                TScBmBm = state.dataMaterial->Screens(ScNum).BmBmTrans;
+                TScBmBmVis = state.dataMaterial->Screens(ScNum).BmBmTransVis;
+                TScBmDif = state.dataMaterial->Screens(ScNum).BmDifTrans;
+                TScBmDifVis = state.dataMaterial->Screens(ScNum).BmDifTransVis;
                 TDif = state.dataConstruction->Construct(ConstrNumBare).TransDiff;
                 TDifVis = state.dataConstruction->Construct(ConstrNumBare).TransDiffVis;
-                RScBack = state.dataMaterial->SurfaceScreens(ScNum).ReflectScreen;
-                RScBackVis = state.dataMaterial->SurfaceScreens(ScNum).ReflectScreenVis;
-                RScDifBack = state.dataMaterial->SurfaceScreens(ScNum).DifReflect;
-                RScDifBackVis = state.dataMaterial->SurfaceScreens(ScNum).DifReflectVis;
+                RScBack = state.dataMaterial->Screens(ScNum).ReflectScreen;
+                RScBackVis = state.dataMaterial->Screens(ScNum).ReflectScreenVis;
+                RScDifBack = state.dataMaterial->Screens(ScNum).DifReflect;
+                RScDifBackVis = state.dataMaterial->Screens(ScNum).DifReflectVis;
                 RGlFront = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).ReflSolBeamFrontCoef);
                 RGlFrontVis = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).ReflSolBeamFrontCoef);
                 RGlDiffFront = state.dataConstruction->Construct(ConstrNumBare).ReflectSolDiffFront;
@@ -7455,12 +7455,12 @@ namespace WindowManager {
                                       thisMaterial->Thickness,
                                       thisMaterial->Conductivity,
                                       thisMaterial->AbsorpThermal,
-                                      state.dataMaterial->SurfaceScreens(thisMaterial->ScreenDataPtr).BmBmTrans,
-                                      state.dataMaterial->SurfaceScreens(thisMaterial->ScreenDataPtr).ReflectSolBeamFront,
-                                      state.dataMaterial->SurfaceScreens(thisMaterial->ScreenDataPtr).ReflectVisBeamFront,
-                                      state.dataMaterial->SurfaceScreens(thisMaterial->ScreenDataPtr).DifReflect,
-                                      state.dataMaterial->SurfaceScreens(thisMaterial->ScreenDataPtr).DifReflectVis,
-                                      state.dataMaterial->SurfaceScreens(thisMaterial->ScreenDataPtr).ScreenDiameterToSpacingRatio,
+                                      state.dataMaterial->Screens(thisMaterial->ScreenDataPtr).BmBmTrans,
+                                      state.dataMaterial->Screens(thisMaterial->ScreenDataPtr).ReflectSolBeamFront,
+                                      state.dataMaterial->Screens(thisMaterial->ScreenDataPtr).ReflectVisBeamFront,
+                                      state.dataMaterial->Screens(thisMaterial->ScreenDataPtr).DifReflect,
+                                      state.dataMaterial->Screens(thisMaterial->ScreenDataPtr).DifReflectVis,
+                                      state.dataMaterial->Screens(thisMaterial->ScreenDataPtr).ScreenDiameterToSpacingRatio,
                                       thisMaterial->WinShadeToGlassDist);
                             }
                         } break;
@@ -7876,8 +7876,8 @@ namespace WindowManager {
         constexpr std::array<std::string_view, static_cast<int>(Material::ScreenBeamReflectanceModel::Num)> ScreenBeamReflectanceModelNamesUC{
             "DONOTMODEL", "MODELASDIRECTBEAM", "MODELASDIFFUSE"};
 
-        state.dataMaterial->SurfaceScreens.allocate(state.dataHeatBal->NumSurfaceScreens);
-        state.dataMaterial->ScreenTrans.allocate(state.dataHeatBal->NumSurfaceScreens);
+        state.dataMaterial->Screens.allocate(state.dataHeatBal->NumScreens);
+        state.dataMaterial->ScreenTrans.allocate(state.dataHeatBal->NumScreens);
         ScreenNum = 0;
 
         // Pre-calculate these constants
@@ -7935,19 +7935,19 @@ namespace WindowManager {
                     //     If a screen material is used more than once, the Material structure's screen data pointer holds the screen number
                     //     of the last window surface. Use this method to access the screen parameter's only for static variables such as
                     //     diffuse properties (InitGlassOpticalCalculations). For all cases where the screen properties are a function of
-                    //     sun azimuth and altitude angles, use the SurfaceScreens structure.
+                    //     sun azimuth and altitude angles, use the Screens structure.
                     thisMaterial->ScreenDataPtr = ScreenNum;
-                    state.dataMaterial->SurfaceScreens(ScreenNum).MaterialNumber = MatNum;
+                    state.dataMaterial->Screens(ScreenNum).MaterialNumber = MatNum;
                     //     Invert calculation done in GetMaterialInput to find Diameter to Spacing ratio (Props(7)/Props(6))
                     //     dataMaterial.Material(MaterNum)%Trans = (1 - MaterialProps(7)/MaterialProps(6))**2.0
-                    state.dataMaterial->SurfaceScreens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(thisMaterial->Trans);
+                    state.dataMaterial->Screens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(thisMaterial->Trans);
 
-                    state.dataMaterial->SurfaceScreens(ScreenNum).screenBeamReflectanceModel = static_cast<Material::ScreenBeamReflectanceModel>(
+                    state.dataMaterial->Screens(ScreenNum).screenBeamReflectanceModel = static_cast<Material::ScreenBeamReflectanceModel>(
                         getEnumerationValue(ScreenBeamReflectanceModelNamesUC, UtilityRoutines::MakeUPPERCase(thisMaterial->ReflectanceModeling)));
 
                     // Reflectance of screen material only
-                    state.dataMaterial->SurfaceScreens(ScreenNum).ReflectCylinder = thisMaterial->ReflectShade / (1 - thisMaterial->Trans);
-                    state.dataMaterial->SurfaceScreens(ScreenNum).ReflectCylinderVis = thisMaterial->ReflectShadeVis / (1 - thisMaterial->Trans);
+                    state.dataMaterial->Screens(ScreenNum).ReflectCylinder = thisMaterial->ReflectShade / (1 - thisMaterial->Trans);
+                    state.dataMaterial->Screens(ScreenNum).ReflectCylinderVis = thisMaterial->ReflectShadeVis / (1 - thisMaterial->Trans);
 
                     //     Integrate the transmittance over a quarter hemisphere for use in diffuse calculations
                     SumTrans = 0.0;
@@ -7964,40 +7964,40 @@ namespace WindowManager {
                             // Integrate transmittance using coordinate transform
                             CalcScreenTransmittance(state, 0, relativeAltitude(i, j), relativeAzimuth(i, j), ScreenNum);
                             SumTrans +=
-                                (state.dataMaterial->SurfaceScreens(ScreenNum).BmBmTrans + state.dataMaterial->SurfaceScreens(ScreenNum).BmDifTrans) *
+                                (state.dataMaterial->Screens(ScreenNum).BmBmTrans + state.dataMaterial->Screens(ScreenNum).BmDifTrans) *
                                 skyArea[i - 1];
-                            SumTransVis += (state.dataMaterial->SurfaceScreens(ScreenNum).BmBmTransVis +
-                                            state.dataMaterial->SurfaceScreens(ScreenNum).BmDifTransVis) *
+                            SumTransVis += (state.dataMaterial->Screens(ScreenNum).BmBmTransVis +
+                                            state.dataMaterial->Screens(ScreenNum).BmDifTransVis) *
                                            skyArea[i - 1];
-                            SumReflect += state.dataMaterial->SurfaceScreens(ScreenNum).ReflectSolBeamFront * skyArea[i - 1];
-                            SumReflectVis += state.dataMaterial->SurfaceScreens(ScreenNum).ReflectVisBeamFront * skyArea[i - 1];
+                            SumReflect += state.dataMaterial->Screens(ScreenNum).ReflectSolBeamFront * skyArea[i - 1];
+                            SumReflectVis += state.dataMaterial->Screens(ScreenNum).ReflectVisBeamFront * skyArea[i - 1];
                             SumArea += skyArea[i - 1];
                         }
                     }
 
                     // Reflectance of overall screen including openings and scattered transmittance
-                    state.dataMaterial->SurfaceScreens(ScreenNum).ReflectScreen =
-                        state.dataMaterial->SurfaceScreens(ScreenNum).ReflectCylinder *
-                        (1.0 - (state.dataMaterial->SurfaceScreens(ScreenNum).BmBmTrans + state.dataMaterial->SurfaceScreens(ScreenNum).BmDifTrans));
-                    state.dataMaterial->SurfaceScreens(ScreenNum).ReflectScreenVis =
-                        state.dataMaterial->SurfaceScreens(ScreenNum).ReflectCylinderVis *
+                    state.dataMaterial->Screens(ScreenNum).ReflectScreen =
+                        state.dataMaterial->Screens(ScreenNum).ReflectCylinder *
+                        (1.0 - (state.dataMaterial->Screens(ScreenNum).BmBmTrans + state.dataMaterial->Screens(ScreenNum).BmDifTrans));
+                    state.dataMaterial->Screens(ScreenNum).ReflectScreenVis =
+                        state.dataMaterial->Screens(ScreenNum).ReflectCylinderVis *
                         (1.0 -
-                         (state.dataMaterial->SurfaceScreens(ScreenNum).BmBmTransVis + state.dataMaterial->SurfaceScreens(ScreenNum).BmDifTransVis));
+                         (state.dataMaterial->Screens(ScreenNum).BmBmTransVis + state.dataMaterial->Screens(ScreenNum).BmDifTransVis));
 
                     if (SumArea != 0) {
-                        state.dataMaterial->SurfaceScreens(ScreenNum).DifDifTrans = SumTrans / SumArea;
-                        state.dataMaterial->SurfaceScreens(ScreenNum).DifDifTransVis = SumTransVis / SumArea;
-                        state.dataMaterial->SurfaceScreens(ScreenNum).DifReflect = SumReflect / SumArea;
-                        state.dataMaterial->SurfaceScreens(ScreenNum).DifReflectVis = SumReflectVis / SumArea;
+                        state.dataMaterial->Screens(ScreenNum).DifDifTrans = SumTrans / SumArea;
+                        state.dataMaterial->Screens(ScreenNum).DifDifTransVis = SumTransVis / SumArea;
+                        state.dataMaterial->Screens(ScreenNum).DifReflect = SumReflect / SumArea;
+                        state.dataMaterial->Screens(ScreenNum).DifReflectVis = SumReflectVis / SumArea;
                     }
-                    state.dataMaterial->SurfaceScreens(ScreenNum).DifScreenAbsorp = max(
+                    state.dataMaterial->Screens(ScreenNum).DifScreenAbsorp = max(
                         0.0,
-                        (1.0 - state.dataMaterial->SurfaceScreens(ScreenNum).DifDifTrans - state.dataMaterial->SurfaceScreens(ScreenNum).DifReflect));
+                        (1.0 - state.dataMaterial->Screens(ScreenNum).DifDifTrans - state.dataMaterial->Screens(ScreenNum).DifReflect));
 
-                    thisMaterial->AbsorpThermalBack = state.dataMaterial->SurfaceScreens(ScreenNum).DifScreenAbsorp;
-                    thisMaterial->AbsorpThermalFront = state.dataMaterial->SurfaceScreens(ScreenNum).DifScreenAbsorp;
-                    thisMaterial->ReflectSolBeamFront = state.dataMaterial->SurfaceScreens(ScreenNum).DifReflect;
-                    thisMaterial->ReflectSolBeamBack = state.dataMaterial->SurfaceScreens(ScreenNum).DifReflect;
+                    thisMaterial->AbsorpThermalBack = state.dataMaterial->Screens(ScreenNum).DifScreenAbsorp;
+                    thisMaterial->AbsorpThermalFront = state.dataMaterial->Screens(ScreenNum).DifScreenAbsorp;
+                    thisMaterial->ReflectSolBeamFront = state.dataMaterial->Screens(ScreenNum).DifReflect;
+                    thisMaterial->ReflectSolBeamBack = state.dataMaterial->Screens(ScreenNum).DifReflect;
 
                 } // (ShadingType == 'EXTERIORSCREEN')
             }
@@ -8011,16 +8011,16 @@ namespace WindowManager {
             auto screenCsvFile = state.files.screenCsv.open(state, "CalcWindowScreenComponents", state.files.outputControl.screen);
 
             //  WRITE(ScreenTransUnitNo,*)' '
-            for (ScreenNum = 1; ScreenNum <= state.dataHeatBal->NumSurfaceScreens; ++ScreenNum) {
-                MatNum = state.dataMaterial->SurfaceScreens(ScreenNum).MaterialNumber;
+            for (ScreenNum = 1; ScreenNum <= state.dataHeatBal->NumScreens; ++ScreenNum) {
+                MatNum = state.dataMaterial->Screens(ScreenNum).MaterialNumber;
                 auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
                 assert(thisMaterial != nullptr);
                 //   Do not print transmittance map if angle increment is equal to 0
                 if (thisMaterial->ScreenMapResolution == 0) continue;
                 FoundMaterial = false;
-                for (i = ScreenNum + 1; i <= state.dataHeatBal->NumSurfaceScreens; ++i) {
+                for (i = ScreenNum + 1; i <= state.dataHeatBal->NumScreens; ++i) {
                     //     Write out transmittance data once for each Material:WindowScreen object
-                    if (MatNum == state.dataMaterial->SurfaceScreens(i).MaterialNumber) FoundMaterial = true;
+                    if (MatNum == state.dataMaterial->Screens(i).MaterialNumber) FoundMaterial = true;
                 }
                 if (FoundMaterial) continue;
                 //   Store transmittance at direct normal angle
@@ -8036,14 +8036,14 @@ namespace WindowManager {
                             Real64 SunAzimuth = thisMaterial->ScreenMapResolution * (j - 1) * DataGlobalConstants::DegToRadians;
                             Real64 SunAltitude = thisMaterial->ScreenMapResolution * (i - 1) * DataGlobalConstants::DegToRadians;
                             CalcScreenTransmittance(state, 0, SunAltitude, SunAzimuth, ScreenNum);
-                            state.dataMaterial->ScreenTrans(ScreenNum).Trans(i, j) = state.dataMaterial->SurfaceScreens(ScreenNum).BmBmTrans;
-                            state.dataMaterial->ScreenTrans(ScreenNum).Scatt(i, j) = state.dataMaterial->SurfaceScreens(ScreenNum).BmDifTrans;
+                            state.dataMaterial->ScreenTrans(ScreenNum).Trans(i, j) = state.dataMaterial->Screens(ScreenNum).BmBmTrans;
+                            state.dataMaterial->ScreenTrans(ScreenNum).Scatt(i, j) = state.dataMaterial->Screens(ScreenNum).BmDifTrans;
                         }
                     }
 
                     print(screenCsvFile,
                           "MATERIAL:WINDOWSCREEN:{}\n",
-                          state.dataMaterial->Material(state.dataMaterial->SurfaceScreens(ScreenNum).MaterialNumber)->Name);
+                          state.dataMaterial->Material(state.dataMaterial->Screens(ScreenNum).MaterialNumber)->Name);
                     print(screenCsvFile,
                           "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and "
                           "altitude (column) angles (deg) [relative to surface normal].\n");
@@ -8064,7 +8064,7 @@ namespace WindowManager {
 
                     print(screenCsvFile,
                           "MATERIAL:WINDOWSCREEN:{}\n",
-                          state.dataMaterial->Material(state.dataMaterial->SurfaceScreens(ScreenNum).MaterialNumber)->Name);
+                          state.dataMaterial->Material(state.dataMaterial->Screens(ScreenNum).MaterialNumber)->Name);
                     print(screenCsvFile,
                           "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and "
                           "altitude (column) angles (deg) [relative to surface normal].\n");

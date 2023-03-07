@@ -1904,7 +1904,7 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotBlinds = 0;          // Total number of blind materials
     int TotScreens = 0;         // Total number of exterior window screen materials
     int TotTCGlazings = 0;      // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
-    int NumSurfaceScreens = 0;  // Total number of screens on exterior windows
+    int NumScreens = 0;         // Total number of screens on exterior windows
     int TotShades = 0;          // Total number of shade materials
     int TotComplexGaps = 0;     // Total number of window gaps for complex fenestrations
     int TotSimpleWindow = 0;    // number of simple window systems.
