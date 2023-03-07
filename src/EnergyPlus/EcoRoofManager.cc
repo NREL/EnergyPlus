@@ -148,17 +148,17 @@ namespace EcoRoofManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
 
-        Real64 AbsThermSurf;                  // Thermal absoptance of the exterior surface
+        Real64 AbsThermSurf;           // Thermal absoptance of the exterior surface
         Material::Roughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
-        Real64 HMovInsul;                     // "Convection" coefficient of movable insulation
-        Real64 Tgk;                           // Ground temperature in Kelvin
-        Real64 Ta;                            // current air temperature
-        Real64 Ws;                            // Wind Speed (m/s)
-        Real64 Waf;                           // Windspeed within canopy (m/s)
-        Real64 Latm;                          // Long Wave Radiation (W/m^2)
-        Real64 qaf;                           // mixing ratio of air near canopy
-        Real64 qg;                            // mixing ratio of air at surface.
-        Real64 RS;                            // shortwave radiation
+        Real64 HMovInsul;              // "Convection" coefficient of movable insulation
+        Real64 Tgk;                    // Ground temperature in Kelvin
+        Real64 Ta;                     // current air temperature
+        Real64 Ws;                     // Wind Speed (m/s)
+        Real64 Waf;                    // Windspeed within canopy (m/s)
+        Real64 Latm;                   // Long Wave Radiation (W/m^2)
+        Real64 qaf;                    // mixing ratio of air near canopy
+        Real64 qg;                     // mixing ratio of air at surface.
+        Real64 RS;                     // shortwave radiation
         Real64 EpsilonOne;
         Real64 eair;
         Real64 Rhoa;
@@ -414,19 +414,9 @@ namespace EcoRoofManager {
                 Gammah = std::pow(1.0 - 5.0 * Rib, -0.5);
             }
 
-            if (RoughSurf == Material::Roughness::VerySmooth) {
-                state.dataEcoRoofMgr->Zog = 0.0008;
-            } else if (RoughSurf == Material::Roughness::Smooth) {
-                state.dataEcoRoofMgr->Zog = 0.0010;
-            } else if (RoughSurf == Material::Roughness::MediumSmooth) {
-                state.dataEcoRoofMgr->Zog = 0.0015;
-            } else if (RoughSurf == Material::Roughness::MediumRough) {
-                state.dataEcoRoofMgr->Zog = 0.0020;
-            } else if (RoughSurf == Material::Roughness::Rough) {
-                state.dataEcoRoofMgr->Zog = 0.0030;
-            } else { // VeryRough
-                state.dataEcoRoofMgr->Zog = 0.005;
-            } // TODO: fix this after creating FindEnumeratedValueIndex()
+            // "VeryRough, Rough, MediumRough, MediumSmooth, Smooth, VerySmooth"
+            std::array<Real64, 6> zogLookup = {0.005, 0.0030, 0.0020, 0.0015, 0.0010, 0.0008};
+            state.dataEcoRoofMgr->Zog = zogLookup[static_cast<int>(RoughSurf)];
 
             Chng = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rch; // bulk transfer coefficient near ground
             Chg = Gammah * ((1.0 - sigmaf) * Chng + sigmaf * Cfhn);
