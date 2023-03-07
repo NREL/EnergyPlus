@@ -964,7 +964,7 @@ namespace UnitarySystems {
                                int &branchIndex,
                                int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
-    void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound);
+    void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct

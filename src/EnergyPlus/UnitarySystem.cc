@@ -18166,7 +18166,7 @@ namespace UnitarySystems {
         state.dataUnitarySystems->reportVariablesAreSetup = true;
     }
 
-    void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound)
+    void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound)
     {
         for (auto const &unitarySystem : state.dataUnitarySystems->unitarySys) {
             if (unitarySystem.m_HRcoolCoilFluidInletNode == waterCoilNodeNum && unitarySystem.m_WaterHRPlantLoopModel) {
