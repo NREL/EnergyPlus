@@ -1564,8 +1564,8 @@ void UpdateCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     // Existing code for hot water baseboard models (radiant-convective variety)
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
     // First, update the running average if necessary...
@@ -1727,7 +1727,7 @@ void CoolingPanelParams::ReportCoolingPanel(EnergyPlusData &state)
     // REFERENCES:
     // Existing code for hot water baseboard models (radiant-convective variety)
 
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // All of the power numbers are negative for cooling.  This is because they will have a negative
     // or cooling impact on the surfaces/zones.  However, the output variables are noted as cooling.

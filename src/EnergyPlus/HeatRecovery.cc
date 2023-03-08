@@ -3016,14 +3016,14 @@ namespace HeatRecovery {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill remaining report variables
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ElecUseEnergy = this->ElecUseRate * ReportingConstant;
-        this->SensHeatingEnergy = this->SensHeatingRate * ReportingConstant;
-        this->LatHeatingEnergy = this->LatHeatingRate * ReportingConstant;
-        this->TotHeatingEnergy = this->TotHeatingRate * ReportingConstant;
-        this->SensCoolingEnergy = this->SensCoolingRate * ReportingConstant;
-        this->LatCoolingEnergy = this->LatCoolingRate * ReportingConstant;
-        this->TotCoolingEnergy = this->TotCoolingRate * ReportingConstant;
+        Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+        this->ElecUseEnergy = this->ElecUseRate * TimeStepSysSec;
+        this->SensHeatingEnergy = this->SensHeatingRate * TimeStepSysSec;
+        this->LatHeatingEnergy = this->LatHeatingRate * TimeStepSysSec;
+        this->TotHeatingEnergy = this->TotHeatingRate * TimeStepSysSec;
+        this->SensCoolingEnergy = this->SensCoolingRate * TimeStepSysSec;
+        this->LatCoolingEnergy = this->LatCoolingRate * TimeStepSysSec;
+        this->TotCoolingEnergy = this->TotCoolingRate * TimeStepSysSec;
 
         state.dataHVACGlobal->AirToAirHXElecPower = this->ElecUseRate;
     }
@@ -3288,11 +3288,11 @@ namespace HeatRecovery {
         // routine.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputChar = state.dataHeatRecovery->error1.OutputChar;
         auto &OutputCharLo = state.dataHeatRecovery->error1.OutputCharLo;
         auto &OutputCharHi = state.dataHeatRecovery->error1.OutputCharHi;
@@ -3654,11 +3654,11 @@ namespace HeatRecovery {
         // routine.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputChar = state.dataHeatRecovery->error2.OutputChar;
         auto &OutputCharLo = state.dataHeatRecovery->error2.OutputCharLo;
         auto &OutputCharHi = state.dataHeatRecovery->error2.OutputCharHi;
@@ -4019,11 +4019,11 @@ namespace HeatRecovery {
         // routine.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputChar = state.dataHeatRecovery->error3.OutputChar;
         auto &OutputCharLo = state.dataHeatRecovery->error3.OutputCharLo;
         auto &OutputCharHi = state.dataHeatRecovery->error3.OutputCharHi;
@@ -4187,11 +4187,11 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputChar = state.dataHeatRecovery->error4.OutputChar;
         auto &OutputCharLo = state.dataHeatRecovery->error4.OutputCharLo;
         auto &OutputCharHi = state.dataHeatRecovery->error4.OutputCharHi;
@@ -4356,12 +4356,12 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using Psychrometrics::PsyRhFnTdbWPb;
 
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH2;
         auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH2;
         auto &OutputChar = state.dataHeatRecovery->error6.OutputChar;
@@ -4535,13 +4535,13 @@ namespace HeatRecovery {
         // user if these relative humidities are out of bounds based on the limits set by the user.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using Psychrometrics::PsyRhFnTdbWPb;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH;
         auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH;
         auto &OutputChar = state.dataHeatRecovery->error5.OutputChar;
@@ -4712,10 +4712,10 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &OutputCharProc = state.dataHeatRecovery->OutputCharProc;
         auto &OutputCharRegen = state.dataHeatRecovery->OutputCharRegen;
         auto &TimeStepSysLast = state.dataHeatRecovery->TimeStepSysLast7;
