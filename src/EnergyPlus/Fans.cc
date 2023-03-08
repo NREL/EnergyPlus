@@ -2534,11 +2534,11 @@ void ReportFan(EnergyPlusData &state, int const FanNum)
     // This subroutine updates the report variables for the fans.
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     auto &Fan(state.dataFans->Fan);
 
-    Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
+    Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSysSec;
     Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
     if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {

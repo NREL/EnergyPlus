@@ -3016,14 +3016,14 @@ namespace HeatRecovery {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill remaining report variables
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ElecUseEnergy = this->ElecUseRate * ReportingConstant;
-        this->SensHeatingEnergy = this->SensHeatingRate * ReportingConstant;
-        this->LatHeatingEnergy = this->LatHeatingRate * ReportingConstant;
-        this->TotHeatingEnergy = this->TotHeatingRate * ReportingConstant;
-        this->SensCoolingEnergy = this->SensCoolingRate * ReportingConstant;
-        this->LatCoolingEnergy = this->LatCoolingRate * ReportingConstant;
-        this->TotCoolingEnergy = this->TotCoolingRate * ReportingConstant;
+        Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+        this->ElecUseEnergy = this->ElecUseRate * TimeStepSysSec;
+        this->SensHeatingEnergy = this->SensHeatingRate * TimeStepSysSec;
+        this->LatHeatingEnergy = this->LatHeatingRate * TimeStepSysSec;
+        this->TotHeatingEnergy = this->TotHeatingRate * TimeStepSysSec;
+        this->SensCoolingEnergy = this->SensCoolingRate * TimeStepSysSec;
+        this->LatCoolingEnergy = this->LatCoolingRate * TimeStepSysSec;
+        this->TotCoolingEnergy = this->TotCoolingRate * TimeStepSysSec;
 
         state.dataHVACGlobal->AirToAirHXElecPower = this->ElecUseRate;
     }
@@ -3288,12 +3288,13 @@ namespace HeatRecovery {
         // routine.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	auto &thisError = state.dataHeatRecovery->error1;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -3648,13 +3649,13 @@ namespace HeatRecovery {
         // routine.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	auto &thisError = state.dataHeatRecovery->error2;
 
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4007,12 +4008,13 @@ namespace HeatRecovery {
         // routine.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &thisError = state.dataHeatRecovery->error3;
+
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4169,12 +4171,14 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	auto &thisError = state.dataHeatRecovery->error4; // (THIS_AUTO_OK)
+
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
         // current end time is compared with last to see if time step changed
 
         //   calculate end time of current time step
@@ -4332,12 +4336,12 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using Psychrometrics::PsyRhFnTdbWPb;
 
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH2;
         auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH2;
 	auto &thisError = state.dataHeatRecovery->error6;
@@ -4506,13 +4510,13 @@ namespace HeatRecovery {
         // user if these relative humidities are out of bounds based on the limits set by the user.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
         using Psychrometrics::PsyRhFnTdbWPb;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH;
         auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH;
 	auto &thisError = state.dataHeatRecovery->error5;
@@ -4678,12 +4682,13 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
 	auto &thisError = state.dataHeatRecovery->error7;
-	
+
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
         // current end time is compared with last to see if time step changed
         Real64 ABSImbalancedFlow; // absolute value of process and regeneration air flow imbalance fraction
 
