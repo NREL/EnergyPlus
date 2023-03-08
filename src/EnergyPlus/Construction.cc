@@ -1349,7 +1349,7 @@ void ConstructionProps::calculateInverseMatrix()
     // Uses row elimination to zero the off-diagonal terms of
     // AMat while performing the same operations on another
     // matrix which starts as the identity matrix.  Once AMat
-    // has been converted to an identity matrix[I], the other
+    // has been converted to an identity matrix(I), the other
     // matrix which started as the I will then be the inverse
     // of A.  This algorithm has been customized for a
     // tri-diagonal matrix.
@@ -1450,7 +1450,7 @@ void ConstructionProps::calculateInverseMatrix()
         }
     } // ... end of reverse elimination loop.
 
-    // At this point, AMat1 is equal to the identity matrix [I]
+    // At this point, AMat1 is equal to the identity matrix (I)
     // and AInv is equal to the inverse of AMat.
 
     AMat1.deallocate();
@@ -1901,7 +1901,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
           Material::RoughnessNames[static_cast<int>(this->OutsideRoughness)]);
 
     for (int I = 1; I <= this->TotLayers; ++I) {
-        int Layer = this->LayerPoint[I];
+        int Layer = this->LayerPoint(I);
         auto const *thisMaterial = state.dataMaterial->Material(Layer);
         switch (thisMaterial->group) {
         case Material::Group::Air: {
