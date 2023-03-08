@@ -149,7 +149,7 @@ namespace EcoRoofManager {
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
 
         Real64 AbsThermSurf;           // Thermal absoptance of the exterior surface
-        Material::Roughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
+        Material::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
         Real64 HMovInsul;              // "Convection" coefficient of movable insulation
         Real64 Tgk;                    // Ground temperature in Kelvin
         Real64 Ta;                     // current air temperature

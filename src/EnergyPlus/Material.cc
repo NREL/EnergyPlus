@@ -68,7 +68,7 @@ namespace EnergyPlus::Material {
 constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeNames = {"Sealed", "VentedIndoor", "VentedOutdoor"};
 constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> gasTypeNames = {"Custom", "Air", "Argon", "Krypton", "Xenon"};
 constexpr std::array<std::string_view, static_cast<int>(GasType::Num)> GasTypeUC = {"CUSTOM", "AIR", "ARGON", "KRYPTON", "XENON"};
-constexpr std::array<std::string_view, static_cast<int>(Roughness::Num)> RoughnessNames = {
+constexpr std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> RoughnessNames = {
     "VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"};
 
 // Air       Argon     Krypton   Xenon
@@ -269,7 +269,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
             std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
             thisMaterial->Roughness =
-                static_cast<Roughness>(getEnumerationValue(RoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
+                static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
 
             thisMaterial->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
             thisMaterial->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
@@ -303,7 +303,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Conductivity = 1.95; // W/mK
         thisMaterial->Density = 2240.0;    // kg/m3
         thisMaterial->SpecHeat = 900.0;    // J/kgK
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
         thisMaterial->AbsorpSolar = 0.7;
         thisMaterial->AbsorpThermal = 0.9;
         thisMaterial->AbsorpVisible = 0.7;
@@ -346,8 +346,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->group = Group::Regular;
         thisMaterial->Name = MaterialNames(1);
 
-        thisMaterial->Roughness =
-            static_cast<Roughness>(getEnumerationValue(RoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->Roughness = static_cast<SurfaceRoughness>(
+            getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
         thisMaterial->Resistance = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -385,7 +385,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             thisMaterial->group = Group::Regular;
             thisMaterial->Name = format("~FC_Insulation_{}", Loop);
             thisMaterial->ROnly = true;
-            thisMaterial->Roughness = Roughness::MediumRough;
+            thisMaterial->Roughness = SurfaceRoughness::MediumRough;
             thisMaterial->AbsorpSolar = 0.0;
             thisMaterial->AbsorpThermal = 0.0;
             thisMaterial->AbsorpVisible = 0.0;
@@ -427,7 +427,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->group = Group::Air;
         thisMaterial->Name = MaterialNames(1);
 
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
 
         thisMaterial->Resistance = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -518,7 +518,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // Load the material derived type from the input data.
 
         thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::VerySmooth;
+        thisMaterial->Roughness = SurfaceRoughness::VerySmooth;
         thisMaterial->ROnly = true;
         thisMaterial->Thickness = MaterialProps(1);
         if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
@@ -986,7 +986,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // Load the material derived type from the input data.
 
         thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::VerySmooth;
+        thisMaterial->Roughness = SurfaceRoughness::VerySmooth;
         thisMaterial->Thickness = MaterialProps(1);
         thisMaterial->ROnly = true;
 
@@ -1076,7 +1076,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Load the material derived type from the input data.
         thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::VerySmooth;
+        thisMaterial->Roughness = SurfaceRoughness::VerySmooth;
         thisMaterial->ROnly = true;
 
         thisMaterial->TausFrontBeamBeam = MaterialProps(1);
@@ -1175,7 +1175,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->NumberOfGasesInMixture = 1;
         thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
 
         thisMaterial->Thickness = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -1282,7 +1282,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->NumberOfGasesInMixture = 1;
         thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
 
         thisMaterial->Thickness = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -1388,7 +1388,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
         }
 
-        thisMaterial->Roughness = Roughness::MediumRough; // Unused
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough; // Unused
 
         thisMaterial->Thickness = MaterialProps(1);
         if (thisMaterial->Thickness <= 0.0) {
@@ -1452,7 +1452,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // Load the material derived type from the input data.
 
         thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
         thisMaterial->Trans = MaterialProps(1);
         thisMaterial->ReflectShade = MaterialProps(2);
         thisMaterial->TransVis = MaterialProps(3);
@@ -1536,7 +1536,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->group = Group::ShadeEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
         thisMaterial->ROnly = true;
 
         //  Front side and back side have the same beam-Beam Transmittance
@@ -1629,7 +1629,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->group = Group::DrapeEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
         thisMaterial->ROnly = true;
 
         //  Front side and back side have the same properties
@@ -1729,7 +1729,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                               state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + MaterialNames(2) +
                                   "\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.");
         }
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
         thisMaterial->ReflectShade = MaterialProps(1);
         if (thisMaterial->ReflectShade < 0.0 || thisMaterial->ReflectShade > 1.0) {
             ErrorsFound = true;
@@ -1905,7 +1905,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // Load the material derived type from the input data.
         // WindowMaterial:Screen:EquivalentLayer,
         thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::MediumRough;
+        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
         thisMaterial->ROnly = true;
         thisMaterial->TausFrontBeamBeam = MaterialProps(1);
         thisMaterial->TausBackBeamBeam = MaterialProps(1);
@@ -2048,7 +2048,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->Name = MaterialNames(1);
         state.dataMaterial->Blind(Loop).Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::Rough;
+        thisMaterial->Roughness = SurfaceRoughness::Rough;
         thisMaterial->BlindDataPtr = Loop;
         thisMaterial->ROnly = true;
 
@@ -2338,7 +2338,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->group = Group::BlindEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = Roughness::Rough;
+        thisMaterial->Roughness = SurfaceRoughness::Rough;
         thisMaterial->ROnly = true;
 
         if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
@@ -2524,8 +2524,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Name = MaterialNames(1);
         // need to treat the A2 with is just the name of the soil(it is
         // not important)
-        thisMaterial->Roughness =
-            static_cast<Roughness>(getEnumerationValue(RoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
+        thisMaterial->Roughness = static_cast<SurfaceRoughness>(
+            getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
         if (UtilityRoutines::SameString(MaterialNames(4), "Simple")) {
             thisMaterial->EcoRoofCalculationMethod = 1;
         } else if (UtilityRoutines::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {

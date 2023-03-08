@@ -4555,7 +4555,7 @@ namespace HeatBalanceManager {
                     } else {
                         thisMaterial->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
                     }
-                    thisMaterial->Roughness = Material::Roughness::VerySmooth;
+                    thisMaterial->Roughness = Material::SurfaceRoughness::VerySmooth;
                     thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
                     if (thisMaterial->Thickness <= 0.0) {
                         ShowSevereError(state,
@@ -4588,7 +4588,7 @@ namespace HeatBalanceManager {
                         thisMaterial->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
                     }
                     thisMaterial->Thickness *= 0.001;
-                    thisMaterial->Roughness = Material::Roughness::MediumRough; // Unused
+                    thisMaterial->Roughness = Material::SurfaceRoughness::MediumRough; // Unused
                 }
             }
 
@@ -4723,7 +4723,7 @@ namespace HeatBalanceManager {
                     if (IGlass < NGlass(IGlSys)) thisConstruct.LayerPoint(2 * IGlass) = MaterNumSysGap(IGlass, IGlSys);
                 }
 
-                thisConstruct.OutsideRoughness = Material::Roughness::VerySmooth;
+                thisConstruct.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
                 thisConstruct.InsideAbsorpThermal =
                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(TotMaterialsPrev + NGlass(IGlSys)))->AbsorpThermalBack;
                 thisConstruct.OutsideAbsorpThermal =
@@ -5905,7 +5905,7 @@ namespace HeatBalanceManager {
         // first fill out defaults
         thisMaterial->GlassSpectralDataPtr = 0;
         thisMaterial->SolarDiffusing = false;
-        thisMaterial->Roughness = Material::Roughness::VerySmooth;
+        thisMaterial->Roughness = Material::SurfaceRoughness::VerySmooth;
         thisMaterial->TransThermal = 0.0;
         thisMaterial->AbsorpThermalBack = 0.84;
         thisMaterial->AbsorpThermalFront = 0.84;
@@ -6221,7 +6221,7 @@ namespace HeatBalanceManager {
             auto *thisMaterial = new Material::MaterialChild;
             state.dataMaterial->Material(MaterNum) = thisMaterial;
             thisMaterial->group = Material::Group::ComplexWindowGap;
-            thisMaterial->Roughness = Material::Roughness::Rough;
+            thisMaterial->Roughness = Material::SurfaceRoughness::Rough;
             thisMaterial->ROnly = true;
 
             thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -6312,7 +6312,7 @@ namespace HeatBalanceManager {
             auto *thisMaterial = new Material::MaterialChild;
             state.dataMaterial->Material(MaterNum) = thisMaterial;
             thisMaterial->group = Material::Group::ComplexWindowShade;
-            thisMaterial->Roughness = Material::Roughness::Rough;
+            thisMaterial->Roughness = Material::SurfaceRoughness::Rough;
             thisMaterial->ROnly = true;
 
             // Assign pointer to ComplexShade

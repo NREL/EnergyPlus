@@ -1522,7 +1522,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     }
     state.dataHeatBalSurf->SurfAbsSolarExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalExt.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, Material::Roughness::Invalid);
+    state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, Material::SurfaceRoughness::Invalid);
     state.dataHeatBalSurf->SurfAbsSolarInt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalInt.dimension(state.dataSurface->TotSurfaces, 0.0);
 
@@ -7259,7 +7259,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         continue;
                     }
                     // Roughness index of the exterior surface
-                    Material::Roughness RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
+                    Material::SurfaceRoughness RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
                     // Thermal absoptance of the exterior surface
                     Real64 AbsThermSurf = state.dataHeatBalSurf->SurfAbsThermalExt(SurfNum);
                     HMovInsul = 0;
@@ -7441,7 +7441,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(
                         state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
                     assert(thisMaterial != nullptr);
-                    Material::Roughness RoughSurf = thisMaterial->Roughness;
+                    Material::SurfaceRoughness RoughSurf = thisMaterial->Roughness;
                     Real64 AbsThermSurf = thisMaterial->AbsorpThermal;
 
                     // Set Kiva exterior convection algorithms
@@ -8172,8 +8172,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     if (surface.ExtBoundCond == ExternalEnvironment) {
                         auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(construct.LayerPoint(1)));
                         assert(thisMaterial != nullptr);
-                        Material::Roughness RoughSurf = thisMaterial->Roughness; // Outside surface roughness
-                        Real64 EmisOut = thisMaterial->AbsorpThermalFront;       // Glass outside surface emissivity
+                        Material::SurfaceRoughness RoughSurf = thisMaterial->Roughness; // Outside surface roughness
+                        Real64 EmisOut = thisMaterial->AbsorpThermalFront;              // Glass outside surface emissivity
                         DataSurfaces::WinShadingType const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
                         if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
                             // Exterior shade in place
@@ -8870,8 +8870,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                 auto const *thisMaterial =
                                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(construct.LayerPoint(1)));
                                 assert(thisMaterial != nullptr);
-                                Material::Roughness RoughSurf = thisMaterial->Roughness; // Outside surface roughness
-                                Real64 EmisOut = thisMaterial->AbsorpThermalFront;       // Glass outside surface emissivity
+                                Material::SurfaceRoughness RoughSurf = thisMaterial->Roughness; // Outside surface roughness
+                                Real64 EmisOut = thisMaterial->AbsorpThermalFront;              // Glass outside surface emissivity
                                 auto const shading_flag(state.dataSurface->SurfWinShadingFlag(surfNum));
                                 if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
                                     // Exterior shade in place

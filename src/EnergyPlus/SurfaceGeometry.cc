@@ -7802,21 +7802,21 @@ namespace SurfaceGeometry {
             Roughness = state.dataIPShortCut->cAlphaArgs(3);
             // Select the correct Number for the associated ascii name for the roughness type
             if (UtilityRoutines::SameString(Roughness, "VerySmooth")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::VerySmooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VerySmooth;
             } else if (UtilityRoutines::SameString(Roughness, "Smooth")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::Smooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Smooth;
             } else if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::MediumSmooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumSmooth;
             } else if (UtilityRoutines::SameString(Roughness, "MediumRough")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::MediumRough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumRough;
             } else if (UtilityRoutines::SameString(Roughness, "Rough")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::Rough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Rough;
             } else if (UtilityRoutines::SameString(Roughness, "VeryRough")) {
-                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::Roughness::VeryRough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VeryRough;
             } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             // Was it set?
-            if (state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness == Material::Roughness::Invalid) {
+            if (state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness == Material::SurfaceRoughness::Invalid) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {}=\"{}",
                                        cCurrentModuleObject,
@@ -10465,8 +10465,7 @@ namespace SurfaceGeometry {
                         ShowContinueError(state, format("Shading Device in error=\"{}\".", state.dataMaterial->Material(IShadingDevice)->Name));
                         ErrorsFound = true;
                     }
-                    if ((ShTyp == WinShadingType::ExtScreen) &&
-                        state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Screen) {
+                    if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Screen) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has {}= ExteriorScreen but matching shading device is not an exterior window screen.",
                                                cCurrentModuleObject,
@@ -14002,7 +14001,7 @@ namespace SurfaceGeometry {
                 dynamic_cast<Material::MaterialChild *>(
                     state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld)))
                     ->AbsorpThermalBack;
-            thisConstructNewSh.OutsideRoughness = Material::Roughness::VerySmooth;
+            thisConstructNewSh.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
             thisConstructNewSh.DayltPropPtr = 0;
             thisConstructNewSh.CTFCross = {0.0};
             thisConstructNewSh.CTFFlux = {0.0};
@@ -14153,7 +14152,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
             thisMaterial->group = Material::Group::WindowGas;
-            thisMaterial->Roughness = Material::Roughness::MediumRough;
+            thisMaterial->Roughness = Material::SurfaceRoughness::MediumRough;
             thisMaterial->Conductivity = 0.0;
             thisMaterial->Density = 0.0;
             thisMaterial->IsoMoistCap = 0.0;
@@ -14249,7 +14248,7 @@ namespace SurfaceGeometry {
             thisConstruct.InsideAbsorpThermal = state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
             thisConstruct.OutsideAbsorpThermal =
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(stormMaterial))->AbsorpThermalFront;
-            thisConstruct.OutsideRoughness = Material::Roughness::VerySmooth;
+            thisConstruct.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
             thisConstruct.DayltPropPtr = 0;
             thisConstruct.CTFCross = {0.0};
             thisConstruct.CTFFlux = {0.0};
@@ -16079,11 +16078,10 @@ namespace SurfaceGeometry {
             assert(thisMatLay != nullptr);
             auto *revMatLay(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(revConstLayer)));
             assert(revMatLay != nullptr);
-            if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
+            if ((thisConstLayer != revConstLayer) ||                   // Not pointing to the same layer
                 (thisMatLay->group == Material::Group::WindowGlass) || // Not window glass or glass equivalent layer which have
                 (revMatLay->group == Material::Group::WindowGlass) ||  // to have certain properties flipped from front to back
-                (thisMatLay->group == Material::Group::GlassEquivalentLayer) ||
-                (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
+                (thisMatLay->group == Material::Group::GlassEquivalentLayer) || (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
                 Real64 constexpr SmallDiff = 0.0001;
