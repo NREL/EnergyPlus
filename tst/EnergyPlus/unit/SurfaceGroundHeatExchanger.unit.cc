@@ -66,7 +66,8 @@ TEST_F(EnergyPlusFixture, test_eoshiftArrayPos)
     }
 }
 
-TEST_F(EnergyPlusFixture, test_eoshiftArrayNeg) {
+TEST_F(EnergyPlusFixture, test_eoshiftArrayNeg)
+{
     const std::array<Real64, 19> A({1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0});
     std::array<Real64, 19> B = SurfaceGroundHeatExchanger::eoshiftArray(A, -1, 0.0);
     std::array<Real64, 19> target = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0};
