@@ -1106,11 +1106,10 @@ namespace ZoneDehumidifier {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 RhoWater;          // Density of condensate (water) being removed (kg/m3)
-        Real64 InletAirTemp;      // Dry-bulb temperature of air entering the dehumidifier (C)
-        Real64 OutletAirTemp;     // Dry-bulb temperature of air leaving the dehumidifier (C)
-        int AirInletNodeNum;      // Node number corresponding to the air entering dehumidifier
-
+        Real64 RhoWater;      // Density of condensate (water) being removed (kg/m3)
+        Real64 InletAirTemp;  // Dry-bulb temperature of air entering the dehumidifier (C)
+        Real64 OutletAirTemp; // Dry-bulb temperature of air leaving the dehumidifier (C)
+        int AirInletNodeNum;  // Node number corresponding to the air entering dehumidifier
 
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingEnergy =
             state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingRate * TimeStepSysSec;

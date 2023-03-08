@@ -844,8 +844,7 @@ namespace Photovoltaics {
             state.dataPhotovoltaic->PVarray(thisPV).SurfaceSink = state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower;
 
             // array energy, power * timestep
-            state.dataPhotovoltaic->PVarray(thisPV).Report.DCEnergy =
-                state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower * TimeStepSysSec;
+            state.dataPhotovoltaic->PVarray(thisPV).Report.DCEnergy = state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower * TimeStepSysSec;
             state.dataPhotovoltaic->PVarray(thisPV).Report.ArrayEfficiency = Eff;
         } else { // not enough incident solar, zero things out
 
@@ -875,8 +874,7 @@ namespace Photovoltaics {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
 
-        state.dataPhotovoltaic->PVarray(PVnum).Report.DCEnergy =
-            state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower * TimeStepSysSec;
+        state.dataPhotovoltaic->PVarray(PVnum).Report.DCEnergy = state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower * TimeStepSysSec;
 
         // add check for multiplier.  if surface is attached to a zone that is on a multiplier
         // then PV production should be multiplied out as well
@@ -1200,7 +1198,8 @@ namespace Photovoltaics {
         }
 
         // Do the beginning of every time step initializations
-        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
+        TimeElapsed =
+            state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
         if (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.TimeElapsed != TimeElapsed) {
             // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK;

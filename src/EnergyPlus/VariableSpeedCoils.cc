@@ -6612,7 +6612,6 @@ namespace VariableSpeedCoils {
         // water temperature. In addition, knowledge of the fan heat is required to back into
         // a compressor COP.
 
-	    
         // Using/Aliasing
         using Curve::CurveValue;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
@@ -6671,14 +6670,14 @@ namespace VariableSpeedCoils {
         Real64 CpAir;                 // Specific heat of air [J/kg_C]
         Real64 MaxHumRat;             // max possible humidity
         Real64 MaxOutletEnth;         // max possible outlet enthalpy
-        int EvapInletNode;    // Evaporator air inlet node number
-        int EvapOutletNode;   // Evaporator air outlet node number
-        int CondInletNode;    // Condenser water inlet node number
-        int CondOutletNode;   // Condenser water outlet node number
-        int MaxSpeed;         // maximum speed level
-        int SpeedCal;         // calculated speed level
-        Real64 rhoair(0.0);   // entering air density
-        Real64 RhoWater(0.0); // water density
+        int EvapInletNode;            // Evaporator air inlet node number
+        int EvapOutletNode;           // Evaporator air outlet node number
+        int CondInletNode;            // Condenser water inlet node number
+        int CondOutletNode;           // Condenser water outlet node number
+        int MaxSpeed;                 // maximum speed level
+        int SpeedCal;                 // calculated speed level
+        Real64 rhoair(0.0);           // entering air density
+        Real64 RhoWater(0.0);         // water density
 
         // note: load side is the evaporator side, and source side is the condenser side
 
@@ -7301,7 +7300,7 @@ namespace VariableSpeedCoils {
         Real64 QWasteHeat1;         // recoverable waste heat at low speed
         Real64 QWasteHeat2;         // recoverable waste heat at high speed
         Real64 PLF;                 // part-load function
-        Real64 rhoair(0.0); // entering air density
+        Real64 rhoair(0.0);         // entering air density
 
         // ADDED VARIABLES FOR air source coil
         MaxSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds;
@@ -8353,8 +8352,7 @@ namespace VariableSpeedCoils {
             state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterEnthalpy;
         }
 
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal =
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible =

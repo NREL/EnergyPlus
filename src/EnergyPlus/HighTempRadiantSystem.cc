@@ -1198,8 +1198,8 @@ namespace HighTempRadiantSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // Zone index number for the current radiant system
-	Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-	Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // First, update the running average if necessary...
         if (state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) == SysTimeElapsed) {
@@ -1426,7 +1426,7 @@ namespace HighTempRadiantSystem {
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower =
                 state.dataHighTempRadSys->QHTRadSource(RadSysNum) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).CombustionEffic;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasEnergy =
-            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower * TimeStepSysSec;
+                state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower * TimeStepSysSec;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower = 0.0;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecEnergy = 0.0;
         } else if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == RadHeaterType::Electric) {

@@ -6072,7 +6072,7 @@ namespace LowTempRadiantSystem {
         this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSysSec;
 
         if (this->CondCausedShutDown) {
-		this->CondCausedTimeOff = TimeStepSysSec;
+            this->CondCausedTimeOff = TimeStepSysSec;
         } else {
             this->CondCausedTimeOff = 0.0;
         }

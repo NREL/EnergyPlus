@@ -1307,7 +1307,7 @@ namespace WindowAC {
         // PURPOSE OF THIS SUBROUTINE:
         // Fills some of the report variables for the window AC units
 
-	    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         state.dataWindowAC->WindAC(WindACNum).SensCoolEnergy = state.dataWindowAC->WindAC(WindACNum).SensCoolEnergyRate * TimeStepSysSec;
         state.dataWindowAC->WindAC(WindACNum).TotCoolEnergy = state.dataWindowAC->WindAC(WindACNum).TotCoolEnergyRate * TimeStepSysSec;

@@ -186,7 +186,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     state->dataHVACGlobal->TimeStepSys = 10.0 / 60.0;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    
+
     Real64 ZoneTempChange;
 
     // Hybrid modeling trigger

@@ -217,7 +217,7 @@ namespace GeneratorDynamicsManager {
         using namespace DataGlobalConstants;
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-	Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
 
@@ -714,10 +714,8 @@ namespace GeneratorDynamicsManager {
                 if (PLRforSubtimestepShutDown == 0.0) {
                     state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSysSec;
                 } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime =
-                        TimeStepSysSec * (PLRforSubtimestepShutDown);
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime =
-                        TimeStepSysSec * (1.0 - PLRforSubtimestepShutDown);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSysSec * (PLRforSubtimestepShutDown);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSysSec * (1.0 - PLRforSubtimestepShutDown);
                 } else {
                     state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSysSec;
                 }
@@ -726,10 +724,8 @@ namespace GeneratorDynamicsManager {
                 if (PLRforSubtimestepShutDown == 0.0) {
                     state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSysSec;
                 } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime =
-                        TimeStepSysSec * (PLRforSubtimestepShutDown);
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime =
-                        TimeStepSysSec * (1.0 - PLRforSubtimestepShutDown);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSysSec * (PLRforSubtimestepShutDown);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSysSec * (1.0 - PLRforSubtimestepShutDown);
                 } else {
                     state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSysSec;
                 }
@@ -738,10 +734,8 @@ namespace GeneratorDynamicsManager {
                 if (PLRforSubtimestepShutDown == 0.0) {
                     state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSysSec;
                 } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime =
-                        TimeStepSysSec * (PLRforSubtimestepShutDown);
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime =
-                        TimeStepSysSec * (1.0 - PLRforSubtimestepShutDown);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSysSec * (PLRforSubtimestepShutDown);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSysSec * (1.0 - PLRforSubtimestepShutDown);
                 } else {
                     state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSysSec;
                 }
@@ -751,18 +745,14 @@ namespace GeneratorDynamicsManager {
                     state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSysSec;
 
                 } else if ((PLRforSubtimestepStartUp > 0.0) && (PLRforSubtimestepStartUp < 1.0)) {
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime =
-                        TimeStepSysSec * (1.0 - PLRforSubtimestepStartUp);
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime =
-                        TimeStepSysSec * (PLRforSubtimestepStartUp);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSysSec * (1.0 - PLRforSubtimestepStartUp);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSysSec * (PLRforSubtimestepStartUp);
                 } else {
                     if (PLRforSubtimestepShutDown == 0.0) {
                         state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSysSec;
                     } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                        state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime =
-                            TimeStepSysSec * (PLRforSubtimestepShutDown);
-                        state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime =
-                            TimeStepSysSec * (1.0 - PLRforSubtimestepShutDown);
+                        state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSysSec * (PLRforSubtimestepShutDown);
+                        state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSysSec * (1.0 - PLRforSubtimestepShutDown);
                     } else {
                         state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSysSec;
                     }

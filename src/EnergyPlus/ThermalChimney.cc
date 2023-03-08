@@ -967,7 +967,8 @@ namespace ThermalChimney {
             AirDensity = PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->OutBaroPress, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).MAT, thisZoneHB.ZoneAirHumRat);
             CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
-            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume = (thisZoneHB.MCPThermChim / CpAir / AirDensity) * TimeStepSysSec;
+            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume =
+                (thisZoneHB.MCPThermChim / CpAir / AirDensity) * TimeStepSysSec;
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyMass = (thisZoneHB.MCPThermChim / CpAir) * TimeStepSysSec;
 
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss = 0.0;
@@ -977,14 +978,16 @@ namespace ThermalChimney {
 
                 state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss =
                     thisZoneHB.MCPThermChim *
-                    (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT - state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) * TimeStepSysSec;
+                    (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT - state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) *
+                    TimeStepSysSec;
                 state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain = 0.0;
 
             } else if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT <= state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) {
 
                 state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain =
                     thisZoneHB.MCPThermChim *
-                        (state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT) * TimeStepSysSec;
+                    (state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT) *
+                    TimeStepSysSec;
                 state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss = 0.0;
             }
 

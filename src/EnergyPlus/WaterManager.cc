@@ -1143,8 +1143,7 @@ namespace WaterManager {
             if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::OtherTankFloatValve) ||
                 (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
                 state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).SupplyTankID)
-                    .VdotRequestDemand(state.dataWaterData->WaterStorage(TankNum).SupplyTankDemandARRID) =
-                    FillVolRequest / TimeStepSysSec;
+                    .VdotRequestDemand(state.dataWaterData->WaterStorage(TankNum).SupplyTankDemandARRID) = FillVolRequest / TimeStepSysSec;
             }
 
             // set demand request in groundwater well if needed
@@ -1174,8 +1173,7 @@ namespace WaterManager {
         state.dataWaterData->WaterStorage(TankNum).VolOverflow = overflowVol;
         state.dataWaterData->WaterStorage(TankNum).TwaterOverflow = state.dataWaterManager->overflowTwater;
         state.dataWaterData->WaterStorage(TankNum).NetVdot = NetVolAdd / TimeStepSysSec;
-        state.dataWaterData->WaterStorage(TankNum).MainsDrawVol =
-            state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot * TimeStepSysSec;
+        state.dataWaterData->WaterStorage(TankNum).MainsDrawVol = state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot * TimeStepSysSec;
         state.dataWaterData->WaterStorage(TankNum).VdotToTank = TotVdotSupplyAvail;
         state.dataWaterData->WaterStorage(TankNum).VdotFromTank = TotVdotDemandAvail;
 

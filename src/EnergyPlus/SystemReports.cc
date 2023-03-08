@@ -4190,8 +4190,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4209,8 +4208,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4232,8 +4230,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 }
 
                 break;
@@ -4250,8 +4247,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4270,8 +4266,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4289,8 +4284,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(ZFAUTempMixedAir, ZFAUHumRatMixedAir);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4309,8 +4303,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4333,8 +4326,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4354,8 +4346,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
 
-                    ZFAUZoneVentLoad +=
-                        (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
+                    ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
@@ -4451,7 +4442,8 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 }
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).TargetVentilationFlowVoz +=
                     termUnitOAFrac * thisZoneVentRepVars.TargetVentilationFlowVoz;
-                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) / TimeStepSysSec;
+                Real64 naturalVentFlow =
+                    (state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) / TimeStepSysSec;
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).NatVentFlow += termUnitOAFrac * naturalVentFlow;
 
                 if (thisZonePredefRep.isOccupied) {

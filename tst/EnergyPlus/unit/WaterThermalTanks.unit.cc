@@ -758,8 +758,9 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataHVACGlobal->SysTimeElapsed = 0.0;
-    
-    Tank.TimeElapsed = state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + state->dataHVACGlobal->SysTimeElapsed;
+
+    Tank.TimeElapsed =
+        state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + state->dataHVACGlobal->SysTimeElapsed;
 
     state->dataHVACGlobal->HPWHInletDBTemp = 21.666666666666668;
     state->dataHVACGlobal->HPWHInletWBTemp = 14.963459972723468;
@@ -1034,7 +1035,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     ASSERT_FALSE(ErrorsFound);
     state->dataHVACGlobal->TimeStepSys = 1;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    
+
     SetPredefinedTables(*state);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
@@ -1394,7 +1395,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     state->dataHVACGlobal->TimeStepSys = 1;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    
+
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
     state->dataGlobal->TimeStep = 1;
@@ -1611,7 +1612,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataHVACGlobal->SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + state->dataHVACGlobal->SysTimeElapsed;
+    Tank.TimeElapsed =
+        state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + state->dataHVACGlobal->SysTimeElapsed;
     Tank.AmbientTemp = 20.0;
     Tank.UseInletTemp = 10.0;
     Tank.SetPointTemp = 48.89;

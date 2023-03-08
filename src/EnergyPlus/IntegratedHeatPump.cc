@@ -2290,7 +2290,8 @@ void DecideWorkMode(EnergyPlusData &state,
     // keep the water heating time and volume history
     WHHeatTimeSav = ihp.SHDWHRunTime;
     if (IHPOperationMode::SpaceClgDedicatedWaterHtg == ihp.CurMode) {
-	    WHHeatVolSave = ihp.WaterFlowAccumVol + state.dataLoopNodes->Node(ihp.WaterTankoutNod).MassFlowRate / 983.0 * TimeStepSysSec; // 983 - water density at 60 C
+        WHHeatVolSave = ihp.WaterFlowAccumVol +
+                        state.dataLoopNodes->Node(ihp.WaterTankoutNod).MassFlowRate / 983.0 * TimeStepSysSec; // 983 - water density at 60 C
     } else {
         WHHeatVolSave = 0.0;
     }

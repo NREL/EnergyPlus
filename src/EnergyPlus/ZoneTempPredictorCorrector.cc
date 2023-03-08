@@ -3602,8 +3602,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                                     thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).SysDepZoneLoadsLagged;
                 this->AirPowerCap = thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).AirVolume *
                                     state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens * thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).RhoAir *
-                                    thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).CpAir /
-                                    TimeStepSysSec;
+                                    thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).CpAir / TimeStepSysSec;
                 this->TempHistoryTerm = this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2]);
                 this->TempDepZnLd = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
                 this->TempIndZnLd = this->TempHistoryTerm + this->TempIndCoef;
@@ -4128,8 +4127,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             A = roomAFNInfo.Node(RoomAirNode).SumLinkM + roomAFNInfo.Node(RoomAirNode).SumHmARa;
             B = (roomAFNInfo.Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) + roomAFNInfo.Node(RoomAirNode).SumLinkMW +
                 roomAFNInfo.Node(RoomAirNode).SumHmARaW;
-            C = roomAFNInfo.Node(RoomAirNode).RhoAir * roomAFNInfo.Node(RoomAirNode).AirVolume * thisZone.ZoneVolCapMultpMoist /
-                TimeStepSysSec;
+            C = roomAFNInfo.Node(RoomAirNode).RhoAir * roomAFNInfo.Node(RoomAirNode).AirVolume * thisZone.ZoneVolCapMultpMoist / TimeStepSysSec;
         }
 
         // Use a 3rd Order derivative to predict zone moisture addition or removal and
@@ -4273,7 +4271,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     Real64 ZoneMult = thisZone.Multiplier * thisZone.ListMultiplier;
 
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    
+
     // update the variables actually used in the balance equations.
     if (!useZoneTimeStepHistory) {
         this->ZTM = this->DSXMAT;
@@ -5830,7 +5828,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    
+
     // Sum all convective internal gains: SumIntGain
     SumIntGains = InternalHeatGains::zoneSumAllInternalConvectionGains(state, ZoneNum);
 
@@ -7130,8 +7128,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
             state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
             Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
             this->MAT = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->XMAT, this->DSXMAT);
-            this->ZoneAirHumRat =
-                DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
+            this->ZoneAirHumRat = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
 
             if (spaceNum == 0 && state.dataRoomAirMod->anyNonMixingRoomAirModel) {
                 if (state.dataRoomAirMod->IsZoneDV(zoneNum) || state.dataRoomAirMod->IsZoneUI(zoneNum)) {

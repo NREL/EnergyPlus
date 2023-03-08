@@ -2385,10 +2385,8 @@ void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    state.dataPowerInductionUnits->PIU(PIUNum).HeatingEnergy =
-        state.dataPowerInductionUnits->PIU(PIUNum).HeatingRate * TimeStepSysSec;
-    state.dataPowerInductionUnits->PIU(PIUNum).SensCoolEnergy =
-        state.dataPowerInductionUnits->PIU(PIUNum).SensCoolRate * TimeStepSysSec;
+    state.dataPowerInductionUnits->PIU(PIUNum).HeatingEnergy = state.dataPowerInductionUnits->PIU(PIUNum).HeatingRate * TimeStepSysSec;
+    state.dataPowerInductionUnits->PIU(PIUNum).SensCoolEnergy = state.dataPowerInductionUnits->PIU(PIUNum).SensCoolRate * TimeStepSysSec;
 
     // set zone OA Volume flow rate
     state.dataPowerInductionUnits->PIU(PIUNum).CalcOutdoorAirVolumeFlowRate(state);
