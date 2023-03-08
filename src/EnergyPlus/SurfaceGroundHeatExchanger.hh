@@ -55,6 +55,8 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -262,7 +264,7 @@ namespace SurfaceGroundHeatExchanger {
     {
         std::array<Real64, DataGlobalConstants::MaxCTFTerms> o = {initialValue};
         int const b(0 + std::max(shift, 0)), e(a.size() - 1 + std::min(shift, 0));
-        for (int i = b, j = std::max(1 - shift, 1); i <= e; ++i, ++j) {
+        for (int i = b, j = std::max(0 - shift, 0); i <= e; ++i, ++j) {
             o[j] = a[i];
         }
         return o;
