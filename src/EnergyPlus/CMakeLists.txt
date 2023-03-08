@@ -845,11 +845,7 @@ target_link_libraries(energyplusapi PRIVATE energypluslib)
 target_link_libraries(energyplusapi PRIVATE project_options project_fp_options project_warnings)
 
 set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@executable_path")
-install(
-  TARGETS energyplusapi
-  RUNTIME DESTINATION ./
-  LIBRARY DESTINATION ./
-  ARCHIVE DESTINATION ./)
+
 
 # now the actual E+ executable
 if(APPLE OR UNIX)
@@ -878,7 +874,45 @@ add_custom_command(
     -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}" -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}" -P
     "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake")
 
-install(TARGETS energyplus energyplusapi DESTINATION ./)
+install(
+  TARGETS energyplusapi energyplus
+  EXPORT energyplus
+  RUNTIME DESTINATION ./
+  LIBRARY DESTINATION ./
+  ARCHIVE DESTINATION ./
+  INCLUDES DESTINATION include
+                       include/EnergyPlus/api
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
+  VERSION ${ENERGYPLUS_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+
+export(
+  EXPORT
+  energyplus
+       NAMESPACE "energyplus::"
+       FILE "${PROJECT_BINARY_DIR}/energyplusConfig.cmake"
+)
+
+install(
+  EXPORT energyplus
+        DESTINATION lib/cmake/energyplus
+        NAMESPACE "energyplus::"
+        COMPONENT "CPPAPI"
+  FILE energyplusConfig.cmake
+)
+
+install(
+  FILES
+    "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
+  DESTINATION
+    lib/cmake/energyplus/
+  COMPONENT "CPPAPI"
+)
 
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
@@ -943,9 +977,7 @@ if(BUILD_PACKAGE)
     install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/" DESTINATION "./python_standard_lib")
   endif()
   # we'll want to always provide the C API headers
-  foreach(HEADER ${API_HEADERS})
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}" DESTINATION "./include/EnergyPlus/api")
-  endforeach()
+  install(FILES ${API_HEADERS} DESTINATION "./include/EnergyPlus/api")
   # we'll want to always grab the python API wrapper
   # TODO: I don't think we want to quote the generator expression
   install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/" DESTINATION "./pyenergyplus")
