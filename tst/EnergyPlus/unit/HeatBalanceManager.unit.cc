@@ -350,9 +350,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     state->dataMaterial->Material(3)->Name = "GLASS";
 
     // Material layer group index
-    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::WindowGlass;
-    state->dataMaterial->Material(2)->Group = Material::MaterialGroup::WindowGas;
-    state->dataMaterial->Material(3)->Group = Material::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(1)->group = Material::Group::WindowGlass;
+    state->dataMaterial->Material(2)->group = Material::Group::WindowGas;
+    state->dataMaterial->Material(3)->group = Material::Group::WindowGlass;
 
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
@@ -2636,7 +2636,7 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     state->dataSurface->Surface(2).HasShadeControl = false;
-    state->dataMaterial->Material(3)->Group = Material::MaterialGroup::Screen;
+    state->dataMaterial->Material(3)->group = Material::Group::Screen;
     GetIncidentSolarMultiplier(*state, ErrorsFound);
     error_string =
         delimited_string({"   ** Severe  ** Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window"});

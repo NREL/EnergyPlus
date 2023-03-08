@@ -9498,7 +9498,7 @@ void WindowShadingManager(EnergyPlusData &state)
                     for (auto Lay = 1; Lay <= TotLayers; ++Lay) {
                         const int LayPtr = construction.LayerPoint(Lay);
                         auto *material(state.dataMaterial->Material(LayPtr));
-                        const bool isShading = material->Group == Material::MaterialGroup::ComplexWindowShade;
+                        const bool isShading = material->group == Material::Group::ComplexWindowShade;
                         if (isShading && Lay == 1) {
                             state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::ExtShade;
                         }

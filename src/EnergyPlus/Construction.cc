@@ -1903,8 +1903,8 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint[I];
         auto const *thisMaterial = state.dataMaterial->Material(Layer);
-        switch (thisMaterial->Group) {
-        case Material::MaterialGroup::Air: {
+        switch (thisMaterial->group) {
+        case Material::Group::Air: {
             static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
             print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
         } break;
@@ -1958,10 +1958,10 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // PURPOSE OF THIS SUBROUTINE:
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
-    const Material::MaterialGroup MaterialGroup = state.dataMaterial->Material(LayerPoint(1))->Group;
-    return (MaterialGroup == Material::MaterialGroup::WindowGlass) || (MaterialGroup == Material::MaterialGroup::Shade) ||
-           (MaterialGroup == Material::MaterialGroup::Screen) || (MaterialGroup == Material::MaterialGroup::WindowBlind) ||
-           (MaterialGroup == Material::MaterialGroup::WindowSimpleGlazing);
+    const Material::Group MaterialGroup = state.dataMaterial->Material(LayerPoint(1))->group;
+    return (MaterialGroup == Material::Group::WindowGlass) || (MaterialGroup == Material::Group::Shade) ||
+           (MaterialGroup == Material::Group::Screen) || (MaterialGroup == Material::Group::WindowBlind) ||
+           (MaterialGroup == Material::Group::WindowSimpleGlazing);
 }
 
 Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue)

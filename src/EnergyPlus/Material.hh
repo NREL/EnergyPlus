@@ -65,10 +65,10 @@ namespace Material {
 
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
-    enum class MaterialGroup
+    enum class Group
     {
         Invalid = -1,
-        RegularMaterial,
+        Regular,
         Air,
         Shade,
         WindowGlass,
@@ -77,7 +77,7 @@ namespace Material {
         WindowGasMixture,
         Screen,
         EcoRoof,
-        IRTMaterial,
+        IRT,
         WindowSimpleGlazing,
         ComplexWindowShade,
         ComplexWindowGap,
@@ -184,7 +184,7 @@ namespace Material {
 
         // Members
         std::string Name = "";                        // Name of material layer
-        MaterialGroup Group = MaterialGroup::Invalid; // Material group type (see Material Parameters above.  Currently
+        Group group = Group::Invalid; // Material group type (see Material Parameters above.  Currently
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)

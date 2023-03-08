@@ -2647,7 +2647,7 @@ namespace SurfaceGeometry {
                             iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
                             auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iTmp2));
                             assert(thisMaterial != nullptr);
-                            if (thisMaterial->Group == Material::MaterialGroup::WindowBlind) {
+                            if (thisMaterial->group == Material::Group::WindowBlind) {
                                 BlNum = thisMaterial->BlindDataPtr;
                                 state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
                                 // TH 2/18/2010. CR 8010
@@ -6248,9 +6248,9 @@ namespace SurfaceGeometry {
             for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                 LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                 if (LayerPtr == 0) continue; // Error is caught already, will terminate later
-                if (state.dataMaterial->Material(LayerPtr)->Group == Material::MaterialGroup::Shade ||
-                    state.dataMaterial->Material(LayerPtr)->Group == Material::MaterialGroup::WindowBlind ||
-                    state.dataMaterial->Material(LayerPtr)->Group == Material::MaterialGroup::Screen)
+                if (state.dataMaterial->Material(LayerPtr)->group == Material::Group::Shade ||
+                    state.dataMaterial->Material(LayerPtr)->group == Material::Group::WindowBlind ||
+                    state.dataMaterial->Material(LayerPtr)->group == Material::Group::Screen)
                     ++NumShades;
             }
             if (NumShades != 0) {
@@ -6272,7 +6272,7 @@ namespace SurfaceGeometry {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                     auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(LayerPtr));
                     assert(thisMaterial != nullptr);
-                    if (thisMaterial->Group == Material::MaterialGroup::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
+                    if (thisMaterial->group == Material::Group::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, format("{}: Interior Window or GlassDoor {} has a glass layer with", cRoutineName, SubSurfaceName));
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError(state, "A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
@@ -10088,7 +10088,7 @@ namespace SurfaceGeometry {
                 getEnumerationValue(WindowShadingControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
 
             if (windowShadingControl.ShadingDevice > 0) {
-                if (state.dataMaterial->Material(windowShadingControl.ShadingDevice)->Group == Material::MaterialGroup::Screen &&
+                if (state.dataMaterial->Material(windowShadingControl.ShadingDevice)->group == Material::Group::Screen &&
                     !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn ||
                       windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
                       windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
@@ -10106,7 +10106,7 @@ namespace SurfaceGeometry {
                 if (windowShadingControl.getInputShadedConstruction > 0) {
                     state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).IsUsed = true;
                     if (state.dataMaterial->Material(state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).LayerPoint(1))
-                                ->Group == Material::MaterialGroup::Screen &&
+                                ->group == Material::Group::Screen &&
                         !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn ||
                           windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
                           windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
@@ -10253,7 +10253,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) &&
-                    state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Shade) {
+                    state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Shade) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" has {}= InteriorShade or ExteriorShade but matching shading device is not a window shade",
                                            cCurrentModuleObject,
@@ -10264,7 +10264,7 @@ namespace SurfaceGeometry {
                         format("{} in error=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(8), state.dataMaterial->Material(IShadingDevice)->Name));
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Screen) {
+                if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Screen) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" has {}= ExteriorScreen but matching shading device is not a window screen",
                                            cCurrentModuleObject,
@@ -10276,7 +10276,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
-                    state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::WindowBlind) {
+                    state.dataMaterial->Material(IShadingDevice)->group != Material::Group::WindowBlind) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" has {}= InteriorBlind or ExteriorBlind but matching shading device is not a window blind",
                                            cCurrentModuleObject,
@@ -10322,8 +10322,8 @@ namespace SurfaceGeometry {
                 if (state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers) != 0) {
                     if (windowShadingControl.ShadingType == WinShadingType::IntShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->Group !=
-                            Material::MaterialGroup::Shade) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group !=
+                            Material::Group::Shade) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10338,8 +10338,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->Group !=
-                            Material::MaterialGroup::Shade) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
+                            Material::Group::Shade) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10354,8 +10354,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtScreen) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->Group !=
-                            Material::MaterialGroup::Screen) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
+                            Material::Group::Screen) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10370,8 +10370,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::IntBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->Group !=
-                            Material::MaterialGroup::WindowBlind) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group !=
+                            Material::Group::WindowBlind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10386,8 +10386,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->Group !=
-                            Material::MaterialGroup::WindowBlind) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
+                            Material::Group::WindowBlind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10403,13 +10403,13 @@ namespace SurfaceGeometry {
                     } else if (windowShadingControl.ShadingType == WinShadingType::BGShade) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->Group !=
-                                Material::MaterialGroup::Shade)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group !=
+                                Material::Group::Shade)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->Group !=
-                                Material::MaterialGroup::Shade)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group !=
+                                Material::Group::Shade)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -10429,13 +10429,13 @@ namespace SurfaceGeometry {
                     } else if (windowShadingControl.ShadingType == WinShadingType::BGBlind) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->Group !=
-                                Material::MaterialGroup::WindowBlind)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group !=
+                                Material::Group::WindowBlind)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->Group !=
-                                Material::MaterialGroup::WindowBlind)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group !=
+                                Material::Group::WindowBlind)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -10456,7 +10456,7 @@ namespace SurfaceGeometry {
                 }
                 if (IShadingDevice > 0) {
                     if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) &&
-                        state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Shade) {
+                        state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Shade) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has {}= InteriorShade or ExteriorShade but matching shading device is not a window shade",
                                                cCurrentModuleObject,
@@ -10466,7 +10466,7 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
                     if ((ShTyp == WinShadingType::ExtScreen) &&
-                        state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Screen) {
+                        state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Screen) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has {}= ExteriorScreen but matching shading device is not an exterior window screen.",
                                                cCurrentModuleObject,
@@ -10476,7 +10476,7 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
                     if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
-                        state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::WindowBlind) {
+                        state.dataMaterial->Material(IShadingDevice)->group != Material::Group::WindowBlind) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has {}= InteriorBlind or ExteriorBlind but matching shading device is not a window blind.",
                                                cCurrentModuleObject,
@@ -10767,7 +10767,7 @@ namespace SurfaceGeometry {
                                              state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
-                    if (state.dataMaterial->Material(MatNum)->Group != Material::MaterialGroup::WindowGlass) {
+                    if (state.dataMaterial->Material(MatNum)->group != Material::Group::WindowGlass) {
                         ShowSevereError(state, format("{}=\"{}\"", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}=\"{}must be a WindowMaterial:Glazing or WindowMaterial:Glazing:RefractionExtinctionMethod",
@@ -11310,7 +11310,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11380,7 +11380,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11437,7 +11437,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11507,7 +11507,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11606,7 +11606,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11675,7 +11675,7 @@ namespace SurfaceGeometry {
                                 continue;
                             }
                             auto *m = state.dataMaterial->Material(index);
-                            if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                            if (m->group != Material::Group::Regular || m->ROnly) {
                                 ErrorsFound = true;
                                 ShowSevereError(state,
                                                 format("{}=\"{}\", invalid {}=\"{}",
@@ -12272,13 +12272,13 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Screen:EquivalentLayer",
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
-                    Material::MaterialGroup const MaterialLayerGroup = thisMaterial->Group;
-                    if ((MaterialLayerGroup == Material::MaterialGroup::WindowSimpleGlazing) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::DrapeEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::BlindEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::ScreenEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::GapEquivalentLayer)) {
+                    Material::Group const MaterialLayerGroup = thisMaterial->group;
+                    if ((MaterialLayerGroup == Material::Group::WindowSimpleGlazing) ||
+                        (MaterialLayerGroup == Material::Group::ShadeEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::DrapeEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::BlindEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::ScreenEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::GapEquivalentLayer)) {
                         ShowSevereError(state, format("Invalid movable insulation material for {}:", cCurrentModuleObject));
                         ShowSevereError(
                             state,
@@ -14110,12 +14110,12 @@ namespace SurfaceGeometry {
                 int MatBetweenGlassSh = 0; // Material number of between-glass shade or blind
                 if (TotLayers == 5) MatBetweenGlassSh = state.dataConstruction->Construct(curConstruction).LayerPoint(3);
                 if (state.dataConstruction->Construct(curConstruction).TotGlassLayers <= 3 &&
-                    (state.dataMaterial->Material(MatIntSh)->Group == Material::MaterialGroup::Shade ||
-                     state.dataMaterial->Material(MatIntSh)->Group == Material::MaterialGroup::WindowBlind))
+                    (state.dataMaterial->Material(MatIntSh)->group == Material::Group::Shade ||
+                     state.dataMaterial->Material(MatIntSh)->group == Material::Group::WindowBlind))
                     ShAndSt = true;
                 if (MatBetweenGlassSh > 0) {
-                    if (state.dataMaterial->Material(MatBetweenGlassSh)->Group == Material::MaterialGroup::Shade ||
-                        state.dataMaterial->Material(MatBetweenGlassSh)->Group == Material::MaterialGroup::WindowBlind) {
+                    if (state.dataMaterial->Material(MatBetweenGlassSh)->group == Material::Group::Shade ||
+                        state.dataMaterial->Material(MatBetweenGlassSh)->group == Material::Group::WindowBlind) {
                         ShAndSt = true;
                     } else {
                         ShowContinueError(state,
@@ -14152,7 +14152,7 @@ namespace SurfaceGeometry {
             state.dataMaterial->Material.push_back(thisMaterial);
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
-            thisMaterial->Group = Material::MaterialGroup::WindowGas;
+            thisMaterial->group = Material::Group::WindowGas;
             thisMaterial->Roughness = Material::Roughness::MediumRough;
             thisMaterial->Conductivity = 0.0;
             thisMaterial->Density = 0.0;
@@ -16080,14 +16080,14 @@ namespace SurfaceGeometry {
             auto *revMatLay(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(revConstLayer)));
             assert(revMatLay != nullptr);
             if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
-                (thisMatLay->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
-                (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||  // to have certain properties flipped from front to back
-                (thisMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer) ||
-                (revMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer)) {
+                (thisMatLay->group == Material::Group::WindowGlass) || // Not window glass or glass equivalent layer which have
+                (revMatLay->group == Material::Group::WindowGlass) ||  // to have certain properties flipped from front to back
+                (thisMatLay->group == Material::Group::GlassEquivalentLayer) ||
+                (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
                 Real64 constexpr SmallDiff = 0.0001;
-                if ((thisMatLay->Group == Material::MaterialGroup::WindowGlass) && (revMatLay->Group == Material::MaterialGroup::WindowGlass)) {
+                if ((thisMatLay->group == Material::Group::WindowGlass) && (revMatLay->group == Material::Group::WindowGlass)) {
                     // Both layers are window glass, so need to check to see if the properties are reversed
                     if ((abs(thisMatLay->Thickness - revMatLay->Thickness) > SmallDiff) ||
                         (abs(thisMatLay->ReflectSolBeamBack - revMatLay->ReflectSolBeamFront) > SmallDiff) ||
@@ -16106,8 +16106,8 @@ namespace SurfaceGeometry {
                         RevLayerDiffs = true;
                         break; // exit when diff
                     }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
-                } else if ((thisMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer) &&
-                           (revMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer)) {
+                } else if ((thisMatLay->group == Material::Group::GlassEquivalentLayer) &&
+                           (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
                     if ((abs(thisMatLay->TausBackBeamBeam - revMatLay->TausFrontBeamBeam) > SmallDiff) ||
                         (abs(thisMatLay->TausFrontBeamBeam - revMatLay->TausBackBeamBeam) > SmallDiff) ||
                         (abs(thisMatLay->ReflBackBeamBeam - revMatLay->ReflFrontBeamBeam) > SmallDiff) ||

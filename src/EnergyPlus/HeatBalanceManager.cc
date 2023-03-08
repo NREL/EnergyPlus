@@ -1674,7 +1674,7 @@ namespace HeatBalanceManager {
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
         bool EOFonW5File;                           // True if EOF encountered reading Window5 data file
-        Material::MaterialGroup MaterialLayerGroup; // window construction layer material group index
+        Material::Group MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
         Array1D_string WConstructNames;
@@ -1782,14 +1782,14 @@ namespace HeatBalanceManager {
 
                 // count number of glass layers
                 if (thisConstruct.LayerPoint(Layer) > 0) {
-                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
-                    MaterialLayerGroup = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group;
-                    if ((MaterialLayerGroup == Material::MaterialGroup::GlassEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::DrapeEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::BlindEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::ScreenEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::GapEquivalentLayer)) {
+                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->group == Material::Group::WindowGlass) ++iMatGlass;
+                    MaterialLayerGroup = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->group;
+                    if ((MaterialLayerGroup == Material::Group::GlassEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::ShadeEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::DrapeEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::BlindEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::ScreenEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::GapEquivalentLayer)) {
                         ShowSevereError(
                             state,
                             format("Invalid material layer type in window {} = {}", state.dataHeatBalMgr->CurrentModuleObject, thisConstruct.Name));
@@ -1809,7 +1809,7 @@ namespace HeatBalanceManager {
                         // reset layer pointer to the first glazing in the TC GlazingGroup
                         thisConstruct.LayerPoint(Layer) = state.dataHeatBal->TCGlazings(thisConstruct.LayerPoint(Layer)).LayerPoint(1);
                         thisConstruct.TCLayer = thisConstruct.LayerPoint(Layer);
-                        if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
+                        if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->group == Material::Group::WindowGlass) ++iMatGlass;
                         thisConstruct.TCFlag = 1;
                         thisConstruct.TCMasterConst = ConstrNum;
                         thisConstruct.TCGlassID = iMatGlass; // the TC glass layer ID
@@ -1827,7 +1827,7 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += state.dataHeatBal->NominalR(thisConstruct.LayerPoint(Layer));
-                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::RegularMaterial &&
+                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->group == Material::Group::Regular &&
                         !state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->ROnly) {
                         state.dataHeatBal->NoRegularMaterialsUsed = false;
                     }
@@ -2003,13 +2003,13 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     MaterialLayerGroup =
-                        state.dataMaterial->Material(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer))->Group;
-                    if (!((MaterialLayerGroup == Material::MaterialGroup::GlassEquivalentLayer) ||
-                          (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
-                          (MaterialLayerGroup == Material::MaterialGroup::DrapeEquivalentLayer) ||
-                          (MaterialLayerGroup == Material::MaterialGroup::BlindEquivalentLayer) ||
-                          (MaterialLayerGroup == Material::MaterialGroup::ScreenEquivalentLayer) ||
-                          (MaterialLayerGroup == Material::MaterialGroup::GapEquivalentLayer))) {
+                        state.dataMaterial->Material(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer))->group;
+                    if (!((MaterialLayerGroup == Material::Group::GlassEquivalentLayer) ||
+                          (MaterialLayerGroup == Material::Group::ShadeEquivalentLayer) ||
+                          (MaterialLayerGroup == Material::Group::DrapeEquivalentLayer) ||
+                          (MaterialLayerGroup == Material::Group::BlindEquivalentLayer) ||
+                          (MaterialLayerGroup == Material::Group::ScreenEquivalentLayer) ||
+                          (MaterialLayerGroup == Material::Group::GapEquivalentLayer))) {
                         ShowSevereError(state,
                                         format("Invalid material layer type in window {} = {}",
                                                state.dataHeatBalMgr->CurrentModuleObject,
@@ -2496,11 +2496,11 @@ namespace HeatBalanceManager {
             int MaterNum = Constr.LayerPoint(Constr.TotLayers);
             auto const *Mat = state.dataMaterial->Material(MaterNum);
             bool withNoncompatibleShades =
-                (Mat->Group == Material::MaterialGroup::Shade || Mat->Group == Material::MaterialGroup::WindowBlind ||
-                 Mat->Group == Material::MaterialGroup::Screen || Mat->Group == Material::MaterialGroup::GlassEquivalentLayer ||
-                 Mat->Group == Material::MaterialGroup::GapEquivalentLayer || Mat->Group == Material::MaterialGroup::ShadeEquivalentLayer ||
-                 Mat->Group == Material::MaterialGroup::DrapeEquivalentLayer || Mat->Group == Material::MaterialGroup::ScreenEquivalentLayer ||
-                 Mat->Group == Material::MaterialGroup::BlindEquivalentLayer || Surf.HasShadeControl);
+                (Mat->group == Material::Group::Shade || Mat->group == Material::Group::WindowBlind ||
+                 Mat->group == Material::Group::Screen || Mat->group == Material::Group::GlassEquivalentLayer ||
+                 Mat->group == Material::Group::GapEquivalentLayer || Mat->group == Material::Group::ShadeEquivalentLayer ||
+                 Mat->group == Material::Group::DrapeEquivalentLayer || Mat->group == Material::Group::ScreenEquivalentLayer ||
+                 Mat->group == Material::Group::BlindEquivalentLayer || Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                 ErrorsFound = true;
@@ -4529,7 +4529,7 @@ namespace HeatBalanceManager {
                     auto *thisMaterial = new Material::MaterialChild;
                     state.dataMaterial->Material(MaterNum) = thisMaterial;
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
-                    thisMaterial->Group = Material::MaterialGroup::WindowGlass;
+                    thisMaterial->group = Material::Group::WindowGlass;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
 
@@ -4601,8 +4601,8 @@ namespace HeatBalanceManager {
                     auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
                     assert(thisMaterial != nullptr);
                     thisMaterial->NumberOfGasesInMixture = NumGases(IGap, IGlSys);
-                    thisMaterial->Group = Material::MaterialGroup::WindowGas;
-                    if (NumGases(IGap, IGlSys) > 1) thisMaterial->Group = Material::MaterialGroup::WindowGasMixture;
+                    thisMaterial->group = Material::Group::WindowGas;
+                    if (NumGases(IGap, IGlSys) > 1) thisMaterial->group = Material::Group::WindowGasMixture;
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
@@ -4874,10 +4874,10 @@ namespace HeatBalanceManager {
                     MatNum = thisConstruct.LayerPoint(loop);
                     auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
                     assert(thisMaterial != nullptr);
-                    if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
+                    if (thisMaterial->group == Material::Group::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += thisMaterial->Thickness / thisMaterial->Conductivity;
-                    } else if (thisMaterial->Group == Material::MaterialGroup::WindowGas ||
-                               thisMaterial->Group == Material::MaterialGroup::WindowGasMixture) {
+                    } else if (thisMaterial->group == Material::Group::WindowGas ||
+                               thisMaterial->group == Material::Group::WindowGasMixture) {
                         // If mixture, use conductivity of first gas in mixture
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
                             thisMaterial->Thickness /
@@ -6220,7 +6220,7 @@ namespace HeatBalanceManager {
             ++MaterNum;
             auto *thisMaterial = new Material::MaterialChild;
             state.dataMaterial->Material(MaterNum) = thisMaterial;
-            thisMaterial->Group = Material::MaterialGroup::ComplexWindowGap;
+            thisMaterial->group = Material::Group::ComplexWindowGap;
             thisMaterial->Roughness = Material::Roughness::Rough;
             thisMaterial->ROnly = true;
 
@@ -6311,7 +6311,7 @@ namespace HeatBalanceManager {
             ++MaterNum;
             auto *thisMaterial = new Material::MaterialChild;
             state.dataMaterial->Material(MaterNum) = thisMaterial;
-            thisMaterial->Group = Material::MaterialGroup::ComplexWindowShade;
+            thisMaterial->group = Material::Group::ComplexWindowShade;
             thisMaterial->Roughness = Material::Roughness::Rough;
             thisMaterial->ROnly = true;
 

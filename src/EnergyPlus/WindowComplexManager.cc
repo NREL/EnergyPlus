@@ -2869,8 +2869,8 @@ namespace WindowComplexManager {
             auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
             assert(thisMaterial != nullptr);
 
-            if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
-                (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
+            if ((thisMaterial->group == Material::Group::WindowGlass) ||
+                (thisMaterial->group == Material::Group::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = thisMaterial->Thickness;
@@ -2881,7 +2881,7 @@ namespace WindowComplexManager {
                 tir(2 * IGlass) = thisMaterial->TransThermal;
                 YoungsMod(IGlass) = thisMaterial->YoungModulus;
                 PoissonsRat(IGlass) = thisMaterial->PoissonsRatio;
-            } else if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowShade) {
+            } else if (thisMaterial->group == Material::Group::ComplexWindowShade) {
                 ++IGlass;
                 TempInt = thisMaterial->ComplexShadePtr;
                 LayerType(IGlass) = state.dataMaterial->ComplexShade(TempInt).LayerType;
@@ -2906,7 +2906,7 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatCurve;
-            } else if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) {
+            } else if (thisMaterial->group == Material::Group::ComplexWindowGap) {
                 ++IGap;
                 gap(IGap) = thisMaterial->Thickness;
                 presure(IGap) = thisMaterial->Pressure;

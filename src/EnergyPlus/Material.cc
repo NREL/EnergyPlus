@@ -264,7 +264,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             // Load the material derived type from the input data.
             auto *thisMaterial = new MaterialChild;
             state.dataMaterial->Material(MaterNum) = thisMaterial;
-            thisMaterial->Group = MaterialGroup::RegularMaterial;
+            thisMaterial->group = Group::Regular;
             thisMaterial->Name = materialName;
 
             std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
@@ -297,7 +297,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::RegularMaterial;
+        thisMaterial->group = Group::Regular;
         thisMaterial->Name = "~FC_Concrete";
         thisMaterial->Thickness = 0.15;    // m, 0.15m = 6 inches
         thisMaterial->Conductivity = 1.95; // W/mK
@@ -343,7 +343,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::RegularMaterial;
+        thisMaterial->group = Group::Regular;
         thisMaterial->Name = MaterialNames(1);
 
         thisMaterial->Roughness =
@@ -382,7 +382,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ++MaterNum;
             auto *thisMaterial = new MaterialChild;
             state.dataMaterial->Material(MaterNum) = thisMaterial;
-            thisMaterial->Group = MaterialGroup::RegularMaterial;
+            thisMaterial->group = Group::Regular;
             thisMaterial->Name = format("~FC_Insulation_{}", Loop);
             thisMaterial->ROnly = true;
             thisMaterial->Roughness = Roughness::MediumRough;
@@ -424,7 +424,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::Air;
+        thisMaterial->group = Group::Air;
         thisMaterial->Name = MaterialNames(1);
 
         thisMaterial->Roughness = Roughness::MediumRough;
@@ -464,7 +464,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::IRTMaterial;
+        thisMaterial->group = Group::IRT;
 
         // Load the material derived type from the input data.
         thisMaterial->Name = MaterialNames(1);
@@ -513,7 +513,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::WindowGlass;
+        thisMaterial->group = Group::WindowGlass;
 
         // Load the material derived type from the input data.
 
@@ -981,7 +981,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::WindowGlass;
+        thisMaterial->group = Group::WindowGlass;
 
         // Load the material derived type from the input data.
 
@@ -1072,7 +1072,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::GlassEquivalentLayer;
+        thisMaterial->group = Group::GlassEquivalentLayer;
 
         // Load the material derived type from the input data.
         thisMaterial->Name = MaterialNames(1);
@@ -1164,7 +1164,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::WindowGas;
+        thisMaterial->group = Group::WindowGas;
         thisMaterial->gasTypes(1) = GasType::Invalid;
         thisMaterial->NumberOfGasesInMixture = 1;
         thisMaterial->GasFract(1) = 1.0;
@@ -1271,7 +1271,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::GapEquivalentLayer;
+        thisMaterial->group = Group::GapEquivalentLayer;
         thisMaterial->gasTypes(1) = GasType::Invalid;
         thisMaterial->NumberOfGasesInMixture = 1;
         thisMaterial->GasFract(1) = 1.0;
@@ -1375,7 +1375,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::WindowGasMixture;
+        thisMaterial->group = Group::WindowGasMixture;
         thisMaterial->gasTypes = GasType::Invalid;
 
         // Load the material derived type from the input data.
@@ -1447,7 +1447,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::Shade;
+        thisMaterial->group = Group::Shade;
 
         // Load the material derived type from the input data.
 
@@ -1533,7 +1533,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::ShadeEquivalentLayer;
+        thisMaterial->group = Group::ShadeEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->Roughness = Roughness::MediumRough;
@@ -1626,7 +1626,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::DrapeEquivalentLayer;
+        thisMaterial->group = Group::DrapeEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->Roughness = Roughness::MediumRough;
@@ -1715,7 +1715,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::Screen;
+        thisMaterial->group = Group::Screen;
 
         // Load the material derived type from the input data.
 
@@ -1900,7 +1900,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::ScreenEquivalentLayer;
+        thisMaterial->group = Group::ScreenEquivalentLayer;
 
         // Load the material derived type from the input data.
         // WindowMaterial:Screen:EquivalentLayer,
@@ -2042,7 +2042,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::WindowBlind;
+        thisMaterial->group = Group::WindowBlind;
 
         // Load the material derived type from the input data.
 
@@ -2335,7 +2335,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::BlindEquivalentLayer;
+        thisMaterial->group = Group::BlindEquivalentLayer;
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->Roughness = Roughness::Rough;
@@ -2511,7 +2511,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::EcoRoof;
+        thisMaterial->group = Group::EcoRoof;
 
         // this part is new for Ecoroof properties,
         // especially for the Plant Layer of the ecoroof
@@ -2642,7 +2642,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                     state.dataHeatBal->TCGlazings(Loop).LayerPoint(iTC) = iMat;
 
                     // test that named material is of the right type
-                    if (thisMaterial->Group != MaterialGroup::WindowGlass) {
+                    if (thisMaterial->group != Group::WindowGlass) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" is not defined correctly.",
                                                state.dataHeatBalMgr->CurrentModuleObject,
@@ -2690,7 +2690,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->Group = MaterialGroup::WindowSimpleGlazing;
+        thisMaterial->group = Group::WindowSimpleGlazing;
         thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
         thisMaterial->SimpleWindowUfactor = state.dataIPShortCut->rNumericArgs(1);
         thisMaterial->SimpleWindowSHGC = state.dataIPShortCut->rNumericArgs(2);
@@ -2728,8 +2728,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
             auto const *thisMaterial = dynamic_cast<const MaterialChild *>(state.dataMaterial->Material(MaterNum));
             assert(thisMaterial != nullptr);
-            switch (thisMaterial->Group) {
-            case MaterialGroup::Air: {
+            switch (thisMaterial->group) {
+            case Group::Air: {
                 print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
             } break;
             default: {
@@ -2757,7 +2757,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
             auto *thisMaterial = dynamic_cast<MaterialChild *>(state.dataMaterial->Material(MaterNum));
             assert(thisMaterial != nullptr);
-            if (thisMaterial->Group != MaterialGroup::RegularMaterial) continue;
+            if (thisMaterial->group != Group::Regular) continue;
             SetupEMSActuator(state,
                              "Material",
                              thisMaterial->Name,
@@ -2831,7 +2831,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
         auto *thisMaterial = dynamic_cast<MaterialChild *>(state.dataMaterial->Material(MaterNum));
         assert(thisMaterial != nullptr);
 
-        if (thisMaterial->Group != MaterialGroup::RegularMaterial) {
+        if (thisMaterial->group != Group::Regular) {
             ShowSevereError(
                 state,
                 format("{}: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, material={}, must have regular "

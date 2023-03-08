@@ -182,14 +182,14 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     int VBMatNum(0);
     for (int i = 1; i <= 4; i++) {
-        if (state->dataMaterial->Material(i)->Group == Material::MaterialGroup::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i)->group == Material::Group::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(VBMatNum));
     EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
-    EXPECT_TRUE(compare_enums(thisMaterial->Group, Material::MaterialGroup::BlindEquivalentLayer));
+    EXPECT_TRUE(compare_enums(thisMaterial->group, Material::Group::BlindEquivalentLayer));
     EXPECT_EQ(static_cast<int>(thisMaterial->slatAngleType), state->dataWindowEquivalentLayer->lscVBNOBM);
 
     int ConstrNum = 1;
@@ -545,7 +545,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     }
     // get venetian blind material index
     for (int i = 1; i <= 7; i++) {
-        if (state->dataMaterial->Material(i)->Group == Material::MaterialGroup::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i)->group == Material::Group::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
@@ -907,7 +907,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     }
     // get venetian blind material index
     for (int i = 1; i <= 7; i++) {
-        if (state->dataMaterial->Material(i)->Group == Material::MaterialGroup::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i)->group == Material::Group::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
@@ -949,7 +949,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, state->dataMaterial->TotMaterials);
-    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1)->Group, Material::MaterialGroup::WindowSimpleGlazing));
+    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1)->group, Material::Group::WindowSimpleGlazing));
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
@@ -1988,7 +1988,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     }
     // get venetian blind material index
     for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        if (state->dataMaterial->Material(i)->Group == Material::MaterialGroup::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i)->group == Material::Group::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }

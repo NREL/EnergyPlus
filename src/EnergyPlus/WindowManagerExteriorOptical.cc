@@ -86,13 +86,13 @@ namespace WindowManager {
         // BSDF will be created in different ways that is based on material type
 
         std::shared_ptr<CWCELayerFactory> aFactory = nullptr;
-        if (t_Material.Group == Material::MaterialGroup::WindowGlass) {
+        if (t_Material.group == Material::Group::WindowGlass) {
             aFactory = std::make_shared<CWCESpecularLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Material::MaterialGroup::WindowBlind) {
+        } else if (t_Material.group == Material::Group::WindowBlind) {
             aFactory = std::make_shared<CWCEVenetianBlindLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Material::MaterialGroup::Screen) {
+        } else if (t_Material.group == Material::Group::Screen) {
             aFactory = std::make_shared<CWCEScreenLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Material::MaterialGroup::Shade) {
+        } else if (t_Material.group == Material::Group::Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
         return aFactory->getBSDFLayer(state);
@@ -111,13 +111,13 @@ namespace WindowManager {
         // Scattering will be created in different ways that is based on material type
 
         std::shared_ptr<CWCELayerFactory> aFactory = nullptr;
-        if (t_Material.Group == Material::MaterialGroup::WindowGlass || t_Material.Group == Material::MaterialGroup::WindowSimpleGlazing) {
+        if (t_Material.group == Material::Group::WindowGlass || t_Material.group == Material::Group::WindowSimpleGlazing) {
             aFactory = std::make_shared<CWCESpecularLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Material::MaterialGroup::WindowBlind) {
+        } else if (t_Material.group == Material::Group::WindowBlind) {
             aFactory = std::make_shared<CWCEVenetianBlindLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Material::MaterialGroup::Screen) {
+        } else if (t_Material.group == Material::Group::Screen) {
             aFactory = std::make_shared<CWCEScreenLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Material::MaterialGroup::Shade) {
+        } else if (t_Material.group == Material::Group::Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
         return aFactory->getLayer(state);
@@ -139,8 +139,8 @@ namespace WindowManager {
     //         if ( construction.isGlazingConstruction() ) {
     //             for ( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
     //                 auto& material( dataMaterial.Material( construction.LayerPoint( LayNum ) ) );
-    //                 if ( material->Group != WindowGas && material->Group != WindowGasMixture &&
-    //                     material->Group != ComplexWindowGap && material->Group != ComplexWindowShade ) {
+    //                 if ( material->group != WindowGas && material->group != WindowGasMixture &&
+    //                     material->group != ComplexWindowGap && material->group != ComplexWindowShade ) {
     //                     auto aMaterial = std::make_shared< Material::MaterialBase >();
     //                     *aMaterial = material;
     //
@@ -191,9 +191,9 @@ namespace WindowManager {
                     auto *materialBase(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     auto *material = dynamic_cast<Material::MaterialChild *>(materialBase);
                     assert(material != nullptr);
-                    if (BITF_TEST_NONE(BITF(material->Group),
-                                       BITF(Material::MaterialGroup::WindowGas) | BITF(Material::MaterialGroup::WindowGasMixture) |
-                                           BITF(Material::MaterialGroup::ComplexWindowGap) | BITF(Material::MaterialGroup::ComplexWindowShade))) {
+                    if (BITF_TEST_NONE(BITF(material->group),
+                                       BITF(Material::Group::WindowGas) | BITF(Material::Group::WindowGasMixture) |
+                                           BITF(Material::Group::ComplexWindowGap) | BITF(Material::Group::ComplexWindowShade))) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.
@@ -230,11 +230,11 @@ namespace WindowManager {
             auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)));
             assert(thisMaterial != nullptr);
-            if (thisMaterial->Group == Material::MaterialGroup::Shade) {
+            if (thisMaterial->group == Material::Group::Shade) {
                 IntShade = true;
                 ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
-            if (thisMaterial->Group == Material::MaterialGroup::WindowBlind) {
+            if (thisMaterial->group == Material::Group::WindowBlind) {
                 IntBlind = true;
                 BlNum = thisMaterial->BlindDataPtr;
             }

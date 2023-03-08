@@ -8513,13 +8513,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestUpdateVariableAbsorptanc
     }
     auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
     thisMaterial_1->Name = "WALL_1";
-    thisMaterial_1->Group = Material::MaterialGroup::RegularMaterial;
+    thisMaterial_1->group = Material::Group::Regular;
     thisMaterial_1->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature;
     thisMaterial_1->absorpThermalVarFuncIdx = 2;
     thisMaterial_1->absorpSolarVarFuncIdx = 1;
     auto *thisMaterial_2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
     thisMaterial_2->Name = "WALL_2";
-    thisMaterial_2->Group = Material::MaterialGroup::RegularMaterial;
+    thisMaterial_2->group = Material::Group::Regular;
     thisMaterial_2->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::Scheduled;
     thisMaterial_2->absorpThermalVarSchedIdx = 1;
     state->dataCurveManager->allocateCurveVector(2);

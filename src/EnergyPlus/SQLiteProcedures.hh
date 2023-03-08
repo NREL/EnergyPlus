@@ -563,7 +563,7 @@ private:
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
                  EnergyPlus::Material::MaterialChild const *materialData)
-            : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->Group),
+            : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->group),
               roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
               isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance),
               rOnly(materialData->ROnly), specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef),
@@ -576,7 +576,7 @@ private:
     private:
         int const number;
         std::string const &name;
-        EnergyPlus::Material::MaterialGroup const &group;
+        EnergyPlus::Material::Group const &group;
         EnergyPlus::Material::Roughness const &roughness;
         double const &conductivity;
         double const &density;
