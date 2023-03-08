@@ -9425,7 +9425,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     // Using/Aliasing
     using Curve::CurveValue;
     auto &HPWHCrankcaseDBTemp = state.dataHVACGlobal->HPWHCrankcaseDBTemp;
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 
@@ -10521,7 +10521,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 
@@ -17092,7 +17092,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 

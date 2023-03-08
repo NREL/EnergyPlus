@@ -156,6 +156,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     // Initialize schedule values
     state->dataGlobal->TimeStep = 1;
     state->dataHVACGlobal->TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataEnvrn->Month = 1;
@@ -1453,6 +1454,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_RuntimeFraction_Initi
     // Initialize schedule values
     state->dataGlobal->TimeStep = 1;
     state->dataHVACGlobal->TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataEnvrn->Month = 1;

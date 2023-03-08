@@ -18088,6 +18088,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
 TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest)
 {
     state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataLoopNodes->Node.allocate(2);
     UnitarySys thisSys;
     thisSys.AirInNode = 1;
@@ -18097,8 +18098,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     thisSys.m_ControlType = UnitarySys::UnitarySysCtrlType::Setpoint;
     state->dataUnitarySystems = std::unique_ptr<UnitarySystemsData>(new UnitarySystemsData);
     state->dataUnitarySystems->unitarySys.push_back(thisSys);
-    Real64 onElectricEnergy = thisSys.m_AncillaryOnPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    Real64 offElectricEnergy = thisSys.m_AncillaryOffPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 onElectricEnergy = thisSys.m_AncillaryOnPower * state->dataHVACGlobal->TimeStepSysSec;
+    Real64 offElectricEnergy = thisSys.m_AncillaryOffPower * state->dataHVACGlobal->TimeStepSysSec;
 
     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
     thisSys.m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
@@ -18162,8 +18163,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTe
     // switch on-off power values, should have opposite results but uses same code
     thisSys.m_AncillaryOnPower = 50.0;
     thisSys.m_AncillaryOffPower = 100.0;
-    onElectricEnergy = thisSys.m_AncillaryOnPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    offElectricEnergy = thisSys.m_AncillaryOffPower * state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    onElectricEnergy = thisSys.m_AncillaryOnPower * state->dataHVACGlobal->TimeStepSysSec;
+    offElectricEnergy = thisSys.m_AncillaryOffPower * state->dataHVACGlobal->TimeStepSysSec;
     thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.m_HeatingPartLoadFrac = 0.0;
     state->dataUnitarySystems->HeatingLoad = false;
