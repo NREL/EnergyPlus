@@ -700,7 +700,7 @@ namespace UnitarySystems {
                                                    Real64 DesOutTemp,
                                                    Real64 ReqOutput);
 
-        void initUnitarySystems(EnergyPlusData &state, int AirLoopNum, bool FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
+        void initUnitarySystems(EnergyPlusData &state, int AirLoopNum, bool FirstHVACIteration, Real64 const OAUCoilOutTemp);
 
         bool checkNodeSetPoint(EnergyPlusData &state,
                                int const AirLoopNum,       // number of the current air loop being simulated

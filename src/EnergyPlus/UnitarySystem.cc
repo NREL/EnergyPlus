@@ -136,7 +136,7 @@ namespace UnitarySystems {
         }
         CompIndex = this->m_EquipCompNum;
         state.dataUnitarySystems->FanSpeedRatio = 1.0;
-        this->initUnitarySystems(state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+        this->initUnitarySystems(state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
         if (!this->m_OKToPrintSizing) return;
 
         // MassFlowRateMaxAvail issues are impeding non-VAV air loop equipment by limiting air flow
@@ -367,8 +367,7 @@ namespace UnitarySystems {
         return index;
     }
 
-    void UnitarySys::initUnitarySystems(
-        EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp)
+    void UnitarySys::initUnitarySystems(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration, Real64 const OAUCoilOutTemp)
     {
         static constexpr std::string_view routineName("InitUnitarySystems");
 

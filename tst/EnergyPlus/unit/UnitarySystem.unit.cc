@@ -9110,9 +9110,8 @@ Curve:Biquadratic,
     EXPECT_EQ(thisSys->m_NoHeatCoolSpeedRatio, 0.0);
 
     thisSys->m_MySizingCheckFlag = false; // don't call sizing again
-    int ZoneOAUnitNum = 0;
     Real64 OAUCoilOutTemp = 0.0;
-    thisSys->initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys->initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
 
     // expect speed ratio variables to still not be set since fan has not been sized (Init does not call fan model)
     EXPECT_EQ(thisSys->m_ActualFanVolFlowRate, DataSizing::AutoSize);
@@ -9128,7 +9127,7 @@ Curve:Biquadratic,
 
     thisSys->m_ActualFanVolFlowRate = thisSys->m_MaxHeatAirVolFlow; // set fan flow, act as if fan has been sized
 
-    thisSys->initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys->initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
 
     // expect fan to be sized and speed ratio variables set
     EXPECT_NE(thisSys->m_ActualFanVolFlowRate, DataSizing::AutoSize);
@@ -19780,7 +19779,6 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     thisSys.m_MyFanFlag = false;
     state->dataGlobal->SysSizingCalc = true;
     FirstHVACIteration = true;
-    int ZoneOAUnitNum(0);
     Real64 OAUCoilOutTemp(0.0);
 
     // Test 1: coil entering air temperature is larger than entering water temperature
@@ -19804,7 +19802,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
         expected_result_temperatureOffsetControlStatus = 1;
     }
     // run init to set control status VAR
-    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
     // check economizer is active and control status
     EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
     EXPECT_TRUE(expected_result_TemperatureOffsetControlActive);
@@ -19823,7 +19821,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
         expected_result_temperatureOffsetControlStatus = 1;
     }
     // run init to re-set control status VAR
-    thisSys.initUnitarySystems(*state, AirLoopNum, false, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys.initUnitarySystems(*state, AirLoopNum, false, OAUCoilOutTemp);
     // check economizer is active and control status
     EXPECT_TRUE(thisSys.m_TemperatureOffsetControlActive);
     EXPECT_EQ(expected_result_temperatureOffsetControlStatus, 0);
@@ -20034,7 +20032,6 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     FirstHVACIteration = true;
     bool HXUnitOn(false);
     DataHVACGlobals::CompressorOperation CompressorOn(DataHVACGlobals::CompressorOperation::Off);
-    int ZoneOAUnitNum(0);
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
     thisSys.m_DesiredOutletHumRat = 0.10;
@@ -20047,7 +20044,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
 
     // Test 1: economizer inlet water temperature is favorable, expect coil ON
     // run init and check the coil system operating condition and control status
-    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 1);
     thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 1.0);
@@ -20057,7 +20054,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
 
     // Test 2: economizer inlet water temperature is favorable, air loop economizer flag turns coil OFF
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive = true;
-    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
     thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 0.0);
@@ -20069,7 +20066,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive = false;
     state->dataWaterCoils->WaterCoil(1).InletWaterTemp = 29.5;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
-    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
     thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 0.0);
@@ -20315,7 +20312,6 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     FirstHVACIteration = true;
     bool HXUnitOn(false);
     DataHVACGlobals::CompressorOperation CompressorOn(DataHVACGlobals::CompressorOperation::Off);
-    int ZoneOAUnitNum(0);
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
     thisSys.m_DesiredOutletHumRat = 0.10;
@@ -20328,7 +20324,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
 
     // Test 1: expect coil ON
     // run init and check the coil system operating condition and control status
-    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 1);
     thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 1.0);
@@ -20362,7 +20358,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
 
     // Test 2: economizer disables heat recovery
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive = true;
-    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+    thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
     thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 0.0);
