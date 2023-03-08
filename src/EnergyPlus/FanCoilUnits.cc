@@ -3550,6 +3550,7 @@ namespace FanCoilUnits {
                                FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
                         state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
                     }
+                    Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                     if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                         PLRMax = PLR;
                         PLR *= 0.1;
@@ -3561,6 +3562,7 @@ namespace FanCoilUnits {
                                    FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
                             state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
                         }
+                        Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                         if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                             PLRMax = PLR;
                         } else {
