@@ -1933,8 +1933,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A4
             std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
             // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
-            // srand(time(NULL));
-            std::string sourceSideOutletNodeName = "DUMMY_CONDENSER_OUTLET_NODE"; // format("DUMMY_CONDENSER_{}_{}", rand(), rand());
+            std::string sourceSideOutletNodeName = format("{}_SOURCE_SIDE_OUTLET_NODE", thisPLHP.name);
 
             // A5
             auto compCoilFound = fields.find(companionCoilFieldTag);
