@@ -417,7 +417,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         bool TypeIsNotWindow =
             (thisMaterial->group == Material::Group::Invalid || thisMaterial->group == Material::Group::Air ||
              thisMaterial->group == Material::Group::Regular || thisMaterial->group == Material::Group::EcoRoof ||
-             thisMaterial->group == Material::Group::IRT);
+             thisMaterial->group == Material::Group::IRTransparent);
         if (!thisConstruct.TypeIsWindow && !TypeIsNotWindow) assert(false);
     }
 
@@ -757,7 +757,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         }
     }
 
-    if (thisMaterialOutside->group == Material::Group::IRT) {
+    if (thisMaterialOutside->group == Material::Group::IRTransparent) {
         thisConstruct.TypeIsIRT = true;
         if (thisConstruct.TotLayers != 1) {
             ShowSevereError(

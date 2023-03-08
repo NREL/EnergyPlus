@@ -464,7 +464,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->group = Group::IRT;
+        thisMaterial->group = Group::IRTransparent;
 
         // Load the material derived type from the input data.
         thisMaterial->Name = MaterialNames(1);

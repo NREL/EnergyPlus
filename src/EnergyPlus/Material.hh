@@ -77,7 +77,7 @@ namespace Material {
         WindowGasMixture,
         Screen,
         EcoRoof,
-        IRT,
+        IRTransparent,
         WindowSimpleGlazing,
         ComplexWindowShade,
         ComplexWindowGap,
