@@ -707,8 +707,7 @@ void SimHVAC(EnergyPlusData &state)
     Real64 constexpr square_sum_ConvergLogStackARR(2025);
     Real64 constexpr sum_square_ConvergLogStackARR(285);
 
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-    auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // Initialize all of the simulation flags to true for the first iteration
     state.dataHVACGlobal->SimZoneEquipmentFlag = true;
@@ -1825,9 +1824,9 @@ void SimHVAC(EnergyPlusData &state)
                     SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
             }
             state.dataHVACMgr->MySetPointInit = false;
-            DoSetPointTest = true;
+            state.dataHVACGlobal->DoSetPointTest = true;
         } else {
-            DoSetPointTest = false;
+            state.dataHVACGlobal->DoSetPointTest = false;
         }
 
         if (state.dataCoilCooingDX->stillNeedToReportStandardRatings) {
@@ -2945,7 +2944,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     // Uses program data structures AirLoopControlInfo and ZoneEquipInfo
 
     // Using/Aliasing
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     using ScheduleManager::CheckScheduleValue;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleMaxValue;

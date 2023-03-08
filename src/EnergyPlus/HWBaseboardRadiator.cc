@@ -153,7 +153,7 @@ namespace HWBaseboardRadiator {
         }
 
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
-        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
         auto &CheckEquipName = state.dataHWBaseboardRad->CheckEquipName;
         auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
 
@@ -298,8 +298,6 @@ namespace HWBaseboardRadiator {
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
 
-        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
-        auto &NumHWBaseboardDesignObjs = state.dataHWBaseboardRad->NumHWBaseboardDesignObjs;
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
         auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
         auto &CheckEquipName = state.dataHWBaseboardRad->CheckEquipName;
@@ -307,8 +305,11 @@ namespace HWBaseboardRadiator {
         auto &HWBaseboardDesignNumericFields = state.dataHWBaseboardRad->HWBaseboardDesignNumericFields;
         auto &HWBaseboardDesignNames = state.dataHWBaseboardRad->HWBaseboardDesignNames;
 
-        NumHWBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water);
-        NumHWBaseboardDesignObjs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water_Design);
+        // Update Nums in state and make local convenience copies
+        int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water);
+        int NumHWBaseboardDesignObjs = state.dataHWBaseboardRad->NumHWBaseboardDesignObjs =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water_Design);
 
         // Count total number of baseboard units
 
@@ -913,7 +914,7 @@ namespace HWBaseboardRadiator {
         auto &LastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc;
         auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
         auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
-        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
 
         // Do the one time initializations
@@ -1718,7 +1719,7 @@ namespace HWBaseboardRadiator {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
         auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
         auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
@@ -1812,7 +1813,7 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
-        auto &NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
 
         int BaseboardNum;
 

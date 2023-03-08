@@ -15496,7 +15496,7 @@ void GetFanIndexForTwoSpeedCoil(
     // This routine looks up the given TwoSpeed DX coil and returns the companion supply fan index
 
     // Using/Aliasing
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FoundBranch;

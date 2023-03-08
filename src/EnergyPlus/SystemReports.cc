@@ -1584,7 +1584,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // PURPOSE OF THIS SUBROUTINE:
     // Allocates Arrays and setup output variables related to Ventilation reports.

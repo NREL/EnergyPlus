@@ -121,7 +121,7 @@ namespace ElectricBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // Index of unit in baseboard array
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
         auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
 
         if (state.dataElectBaseboardRad->GetInputFlag) {
@@ -209,13 +209,14 @@ namespace ElectricBaseboardRadiator {
 
         cCurrentModuleObject = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
 
-        state.dataElectBaseboardRad->NumElecBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        // Update Num in state and make local convenience copy
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // object is extensible, no max args needed as IPShortCuts being used
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
         auto &ElecBaseboardNumericFields = state.dataElectBaseboardRad->ElecBaseboardNumericFields;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
 
         ElecBaseboard.allocate(NumElecBaseboards);
         CheckEquipName.allocate(NumElecBaseboards);
@@ -561,7 +562,7 @@ namespace ElectricBaseboardRadiator {
         int ZoneNode;
 
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
         auto &ZeroSourceSumHATsurf = state.dataElectBaseboardRad->ZeroSourceSumHATsurf;
         auto &QBBElecRadSource = state.dataElectBaseboardRad->QBBElecRadSource;
         auto &QBBElecRadSrcAvg = state.dataElectBaseboardRad->QBBElecRadSrcAvg;

@@ -6271,7 +6271,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     //   any additional report entries for the predefined reports.
 
     // Using/Aliasing
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     auto &iNumberOfAutoCalcedFields = state.dataOutput->iNumberOfAutoCalcedFields;
     auto &iNumberOfAutoSizedFields = state.dataOutput->iNumberOfAutoSizedFields;
     auto &iNumberOfDefaultedFields = state.dataOutput->iNumberOfDefaultedFields;
@@ -15275,7 +15275,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
     //   formula used is:
     //       SurfQRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
 
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
     auto &FinalSysSizing(state.dataSize->FinalSysSizing);

@@ -353,9 +353,10 @@ namespace HVACUnitaryBypassVAV {
         std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-        auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
 
-        NumCBVAV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        // Update Num in state and make local convenience copy
+        int NumCBVAV = state.dataHVACUnitaryBypassVAV->NumCBVAV =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         // allocate the data structures
         CBVAV.allocate(NumCBVAV);
@@ -1465,7 +1466,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 mdot;                  // heating coil fluid mass flow rate, kg/s
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-        auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
+        int NumCBVAV = state.dataHVACUnitaryBypassVAV->NumCBVAV;
 
         int InNode = CBVAV(CBVAVNum).AirInNode;
         int OutNode = CBVAV(CBVAVNum).AirOutNode;

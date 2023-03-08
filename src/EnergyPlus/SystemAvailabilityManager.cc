@@ -3797,7 +3797,6 @@ namespace SystemAvailabilityManager {
         Real64 CurveMax;         // Maximum value specified in a curve
         Real64 CurveVal;         // Curve value
 
-        auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
         auto &HybridVentSysAvailAirLoopNum = state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
         auto &HybridVentSysAvailActualZoneNum = state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
         auto &HybridVentSysAvailVentCtrl = state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
@@ -3807,7 +3806,8 @@ namespace SystemAvailabilityManager {
 
         // Get the number of occurrences of each type of System Availability Manager
         std::string_view cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::HybridVent)];
-        NumHybridVentSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs = 
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumHybridVentSysAvailMgrs == 0) return;
 
@@ -4410,7 +4410,7 @@ namespace SystemAvailabilityManager {
         int ZoneEquipType;
         int HybridVentNum;
 
-        auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
+        int NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
         auto &HybridVentSysAvailAirLoopNum = state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
         auto &HybridVentSysAvailActualZoneNum = state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
         auto &HybridVentSysAvailVentCtrl = state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
