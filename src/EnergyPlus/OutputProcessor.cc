@@ -5200,7 +5200,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                                                   state.dataGlobal->CalendarYear);
         }
 
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
                 auto &rVar(op->RVariableTypes(Loop).VarPtr);
@@ -5370,7 +5370,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0, state.dataGlobal->CalendarYear);
         }
 
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             op->TimeValue.at(thisTimeStepType).CurMinute = 0.0;
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
@@ -5474,7 +5474,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         }
 
         op->NumHoursInMonth += 24;
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType == thisTimeStepType) {
                     WriteRealVariableOutput(state, op->RVariableTypes(Loop).VarPtr, ReportingFrequency::Daily);
@@ -5524,7 +5524,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         op->NumHoursInSim += op->NumHoursInMonth;
         state.dataEnvrn->EndMonthFlag = false;
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType == thisTimeStepType) {
                     WriteRealVariableOutput(state, op->RVariableTypes(Loop).VarPtr, ReportingFrequency::Monthly);
@@ -5568,7 +5568,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.newRow(
                 state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0, state.dataGlobal->CalendarYear);
         }
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType == thisTimeStepType) {
                     WriteRealVariableOutput(state, op->RVariableTypes(Loop).VarPtr, ReportingFrequency::Simulation);
@@ -5605,7 +5605,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             state.dataResultsFramework->resultsFramework->RIYearlyTSData.newRow(
                 state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0, state.dataGlobal->CalendarYear);
         }
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType == thisTimeStepType) {
                     WriteRealVariableOutput(state, op->RVariableTypes(Loop).VarPtr, ReportingFrequency::Yearly);

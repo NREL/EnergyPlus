@@ -494,6 +494,7 @@ struct HeatRecoveryData : BaseGlobalStruct
     ErrorTracker2 error4;
     ErrorTracker2 error5;
     ErrorTracker2 error6;
+    ErrorTracker2 error7;
     std::string OutputCharProc;       // character string for warning messages
     std::string OutputCharRegen;      // character string for warning messages
     Real64 TimeStepSysLast7 = 0.0;    // last system time step (used to check for downshifting)

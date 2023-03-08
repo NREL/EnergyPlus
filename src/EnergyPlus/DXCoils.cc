@@ -9488,7 +9488,6 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     Real64 OutdoorHumRat;   // Outdoor humidity ratio at condenser (kg/kg)
     Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 
-    auto &CurrentEndTime = state.dataDXCoils->CurrentEndTime;
     int Mode;                    // Performance mode for Multimode DX coil; Always 1 for other coil types
     Real64 OutletAirTemp;        // Supply air temperature (average value if constant fan, full output if cycling fan)
     Real64 OutletAirHumRat;      // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
@@ -9614,14 +9613,14 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     }
 
     // calculate end time of current time step to determine if error messages should be printed
-    CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
+    state.dataDXCoils->CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
     //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
     //   Wait for next time step to print warnings. If simulation iterates, print out
     //   the warning for the last iteration only. Must wait for next time step to accomplish this.
     //   If a warning occurs and the simulation down shifts, the warning is not valid.
     if (state.dataDXCoils->DXCoil(DXCoilNum).PrintLowAmbMessage) { // .AND. &
-        if (CurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
+        if (state.dataDXCoils->CurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
             TimeStepSys >= state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).LowAmbErrIndex == 0) {
                 ShowWarningMessage(state, format("{}{}", RoutineName, state.dataDXCoils->DXCoil(DXCoilNum).LowAmbBuffer1));
@@ -9655,7 +9654,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     }
 
     if (state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage) {
-        if (CurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
+        if (state.dataDXCoils->CurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
             TimeStepSys >= state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).LowOutletTempIndex == 0) {
                 ShowWarningMessage(state, format("{}{}", RoutineName, state.dataDXCoils->DXCoil(DXCoilNum).LowOutTempBuffer1));
@@ -9681,7 +9680,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
 
     // save last system time step and last end time of current time step (used to determine if warning is valid)
     state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast = TimeStepSys;
-    state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast = CurrentEndTime;
+    state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast = state.dataDXCoils->CurrentEndTime;
     state.dataDXCoils->DXCoil(DXCoilNum).PrintLowAmbMessage = false;
     state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage = false;
 
@@ -10581,7 +10580,6 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     Real64 OutdoorHumRat;   // Outdoor humidity ratio at condenser (kg/kg)
     Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 
-    auto &CurrentEndTime = state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime;
     int Mode;                 // Performance mode for Multimode DX coil; Always 1 for other coil types
     Real64 OutletAirTemp;     // Supply air temperature (average value if constant fan, full output if cycling fan)
     Real64 OutletAirHumRat;   // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
@@ -10675,14 +10673,14 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     }
 
     // calculate end time of current time step to determine if error messages should be printed
-    CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
+    state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
     //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
     //   Wait for next time step to print warnings. If simulation iterates, print out
     //   the warning for the last iteration only. Must wait for next time step to accomplish this.
     //   If a warning occurs and the simulation down shifts, the warning is not valid.
     if (state.dataDXCoils->DXCoil(DXCoilNum).PrintLowAmbMessage) { // .AND. &
-        if (CurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
+        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
             TimeStepSys >= state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).LowAmbErrIndex == 0) {
                 ShowWarningMessage(state, state.dataDXCoils->DXCoil(DXCoilNum).LowAmbBuffer1);
@@ -10702,7 +10700,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     }
 
     if (state.dataDXCoils->DXCoil(DXCoilNum).PrintHighAmbMessage) { // .AND. &
-        if (CurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
+        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
             TimeStepSys >= state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).HighAmbErrIndex == 0) {
                 ShowWarningMessage(state, state.dataDXCoils->DXCoil(DXCoilNum).HighAmbBuffer1);
@@ -10722,7 +10720,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     }
 
     if (state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage) {
-        if (CurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
+        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
             TimeStepSys >= state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).LowOutletTempIndex == 0) {
                 ShowWarningMessage(state, state.dataDXCoils->DXCoil(DXCoilNum).LowOutTempBuffer1);
@@ -10747,7 +10745,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
 
     // save last system time step and last end time of current time step (used to determine if warning is valid)
     state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast = TimeStepSys;
-    state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast = CurrentEndTime;
+    state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast = state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime;
     state.dataDXCoils->DXCoil(DXCoilNum).PrintLowAmbMessage = false;
     state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage = false;
 
@@ -17125,7 +17123,6 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     Real64 OutdoorHumRat;   // Outdoor humidity ratio at condenser (kg/kg)
     Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 
-    auto &CurrentEndTime = state.dataDXCoils->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime;
     int Mode;                 // Performance mode for Multimode DX coil; Always 1 for other coil types
     Real64 OutletAirTemp;     // Supply air temperature (average value if constant fan, full output if cycling fan)
     Real64 OutletAirHumRat;   // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
@@ -17219,7 +17216,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     }
 
     // calculate end time of current time step to determine if error messages should be printed
-    CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
+    state.dataDXCoils->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
     // The following checks are not necessary for VRF-FluidTCtrl model. (1) OAT check is already performed in the VRF OU routines (2)
     // VRF-FluidTCtrl model is physics based, not system curve based, and thus doesn't require special performance curves for operations at
@@ -17257,7 +17254,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     // }
 
     if (state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage) {
-        if (CurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
+        if (state.dataDXCoils->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime > state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast &&
             TimeStepSys >= state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).LowOutletTempIndex == 0) {
                 ShowWarningMessage(state, state.dataDXCoils->DXCoil(DXCoilNum).LowOutTempBuffer1);
@@ -17282,7 +17279,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
 
     // save last system time step and last end time of current time step (used to determine if warning is valid)
     state.dataDXCoils->DXCoil(DXCoilNum).TimeStepSysLast = TimeStepSys;
-    state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast = CurrentEndTime;
+    state.dataDXCoils->DXCoil(DXCoilNum).CurrentEndTimeLast = state.dataDXCoils->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime;
     state.dataDXCoils->DXCoil(DXCoilNum).PrintLowAmbMessage = false;
     state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage = false;
 

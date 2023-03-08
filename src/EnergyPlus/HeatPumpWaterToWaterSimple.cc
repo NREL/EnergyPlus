@@ -743,8 +743,6 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     int LoadSideOutletNode;   // Load Side Outlet Node
     int SourceSideInletNode;  // Source Side Inlet Node
     int SourceSideOutletNode; // Source Side Outlet Node
-    auto &CurrentSimTime = state.dataHPWaterToWaterSimple->CurrentSimTime;
-    auto &PrevSimTime = state.dataHPWaterToWaterSimple->PrevSimTime;
 
     int LoopNum;
     DataPlant::LoopSideLocation LoopSideNum;
@@ -832,12 +830,12 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     // Reset the environment flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
-    if (PrevSimTime != CurrentSimTime) {
-        PrevSimTime = CurrentSimTime;
+    if (state.dataHPWaterToWaterSimple->PrevSimTime != state.dataHPWaterToWaterSimple->CurrentSimTime) {
+        state.dataHPWaterToWaterSimple->PrevSimTime = state.dataHPWaterToWaterSimple->CurrentSimTime;
     }
 
     // Calculate the simulation time
-    CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
+    state.dataHPWaterToWaterSimple->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                      (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
     LoopNum = this->LoadPlantLoc.loopNum;
