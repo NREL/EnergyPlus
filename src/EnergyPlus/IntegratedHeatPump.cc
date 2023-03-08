@@ -2106,7 +2106,7 @@ void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)
 
 void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
 {
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // Obtains and Allocates AS-IHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -2183,15 +2183,12 @@ void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
         break;
     }
 
-    Real64 ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
-    ihp.Energy = ihp.TotalPower * ReportingConstant;                                 // total electric energy consumption
-                                                                                     // [J]
-    ihp.EnergyLoadTotalCooling = ihp.TotalCoolingRate * ReportingConstant;           // total cooling energy [J]
-    ihp.EnergyLoadTotalHeating = ihp.TotalSpaceHeatingRate * ReportingConstant;      // total heating energy [J]
-    ihp.EnergyLoadTotalWaterHeating = ihp.TotalWaterHeatingRate * ReportingConstant; // total heating energy [J]
-    ihp.EnergyLatent = ihp.TotalLatentLoad * ReportingConstant;                      // total latent energy [J]
-    ihp.EnergySource = ihp.Qsource * ReportingConstant;                              // total source energy
+    ihp.Energy = ihp.TotalPower * TimeStepSysSec;                                 // total electric energy consumption [J]
+    ihp.EnergyLoadTotalCooling = ihp.TotalCoolingRate * TimeStepSysSec;           // total cooling energy [J]
+    ihp.EnergyLoadTotalHeating = ihp.TotalSpaceHeatingRate * TimeStepSysSec;      // total heating energy [J]
+    ihp.EnergyLoadTotalWaterHeating = ihp.TotalWaterHeatingRate * TimeStepSysSec; // total heating energy [J]
+    ihp.EnergyLatent = ihp.TotalLatentLoad * TimeStepSysSec;                      // total latent energy [J]
+    ihp.EnergySource = ihp.Qsource * TimeStepSysSec;                              // total source energy
 
     if (ihp.TotalPower > 0.0) {
         Real64 TotalDelivery = ihp.TotalCoolingRate + ihp.TotalSpaceHeatingRate + ihp.TotalWaterHeatingRate;
@@ -2217,7 +2214,7 @@ void DecideWorkMode(EnergyPlusData &state,
     using DataHVACGlobals::SmallLoad;
     using WaterThermalTanks::GetWaterThermalTankInput;
 
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     Real64 MyLoad(0.0);
     Real64 WHHeatTimeSav(0.0); // time accumulation for water heating
@@ -2293,8 +2290,8 @@ void DecideWorkMode(EnergyPlusData &state,
     // keep the water heating time and volume history
     WHHeatTimeSav = ihp.SHDWHRunTime;
     if (IHPOperationMode::SpaceClgDedicatedWaterHtg == ihp.CurMode) {
-        WHHeatVolSave = ihp.WaterFlowAccumVol + state.dataLoopNodes->Node(ihp.WaterTankoutNod).MassFlowRate / 983.0 * TimeStepSys *
-                                                    DataGlobalConstants::SecInHour; // 983 - water density at 60 C
+        WHHeatVolSave = ihp.WaterFlowAccumVol +
+                        state.dataLoopNodes->Node(ihp.WaterTankoutNod).MassFlowRate / 983.0 * TimeStepSysSec; // 983 - water density at 60 C
     } else {
         WHHeatVolSave = 0.0;
     }
@@ -2341,7 +2338,7 @@ void DecideWorkMode(EnergyPlusData &state,
     {
         ihp.CurMode = IHPOperationMode::DedicatedWaterHtg;
     } else if (SensLoad > SmallLoad) {
-        ihp.SHDWHRunTime = WHHeatTimeSav + TimeStepSys * DataGlobalConstants::SecInHour;
+        ihp.SHDWHRunTime = WHHeatTimeSav + TimeStepSysSec;
 
         if (WHHeatTimeSav > ihp.TimeLimitSHDWH) {
             ihp.CurMode = IHPOperationMode::SHDWHElecHeatOn;

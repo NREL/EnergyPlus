@@ -9130,7 +9130,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     // Using/Aliasing
     using Curve::CurveValue;
     auto &HPWHCrankcaseDBTemp = state.dataHVACGlobal->HPWHCrankcaseDBTemp;
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 
@@ -9451,8 +9451,9 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
                 thisDXCoil.ErrIndex1,
                 VolFlowperRatedTotCap,
                 VolFlowperRatedTotCap);
-        } else if (!state.dataGlobal->WarmupFlag && thisDXCoil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped &&
-                   thisDXCoil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped &&
+        } else if (!state.dataGlobal->WarmupFlag &&
+                   (thisDXCoil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
+                    thisDXCoil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) &&
                    ((VolFlowperRatedTotCap < state.dataHVACGlobal->MinOperVolFlowPerRatedTotCap(DXCT)) ||
                     (VolFlowperRatedTotCap > state.dataHVACGlobal->MaxHeatVolFlowPerRatedTotCap(DXCT)))) {
             if (thisDXCoil.ErrIndex1 == 0) {
@@ -10144,7 +10145,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 
@@ -16520,7 +16521,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
 

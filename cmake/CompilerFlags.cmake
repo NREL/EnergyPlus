@@ -55,7 +55,21 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   #    ADD_CXX_DEFINITIONS("-d2SSAOptimizer-") # this disables this optimizer which has known major issues
 
   # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/GS->) # Disable buffer overrun checks for performance in release mode
+  if (ENABLE_HARDENED_RUNTIME)
+    message(AUTHOR_WARNING "Enabling /GS and /guard:cf for hardened runtime")
+    # Enable Control Flow Guard (default: off)
+    # This is both a compiler and a linker flag
+    target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/guard:cf>)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/guard:cf>)
+
+    target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/GS>) # Explicitly enable buffer overrun checks in release mode (default: on)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/FIXED:NO>) # Explicitly generate a relocation section in the program (default: /FIXED:NO for DLL, /FIXED for others)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/DYNAMICBASE>) # Explicitly enable Address Space Layout Randomization (default: on)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/HIGHENTROPYVA>) # Explicitly enable 64-bit ASLR (default: on)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/NXCOMPAT>) # Explicitly indicate that an executable is compatible with the Windows Data Execution Prevention feature (default: on)
+  else()
+    target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/GS->) # Disable buffer overrun checks for performance in release mode
+  endif()
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Ob0>) # Disable inlining
