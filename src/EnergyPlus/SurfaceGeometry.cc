@@ -314,7 +314,6 @@ namespace SurfaceGeometry {
         int Count; // To count wall surfaces for ceiling height calculation
         Array1D_bool ZoneCeilingHeightEntered;
         Array1D<Real64> ZoneCeilingArea;
-        auto &ErrCount = state.dataSurfaceGeometry->ErrCount;
         Real64 NominalUwithConvCoeffs;
         std::string cNominalU;
         std::string cNominalUwithConvCoeffs;
@@ -553,7 +552,7 @@ namespace SurfaceGeometry {
                     ZoneCeilingHeightEntered(ZoneNum) = true;
                     if (AverageHeight > 0.0) {
                         if (std::abs(AverageHeight - thisZone.CeilingHeight) / thisZone.CeilingHeight > 0.05) {
-                            if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                            if (state.dataSurfaceGeometry->ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(
                                     state,
                                     format("{}Entered Ceiling Height for some zone(s) significantly different from calculated Ceiling Height",
@@ -1178,9 +1177,6 @@ namespace SurfaceGeometry {
         int MultSurfNum;
         std::string MultString;
         auto &WarningDisplayed = state.dataSurfaceGeometry->WarningDisplayed;
-        auto &ErrCount2 = state.dataSurfaceGeometry->ErrCount2;
-        auto &ErrCount3 = state.dataSurfaceGeometry->ErrCount3;
-        auto &ErrCount4 = state.dataSurfaceGeometry->ErrCount4;
         bool SubSurfaceSevereDisplayed;
         bool subSurfaceError(false);
         bool errFlag;
@@ -1868,8 +1864,8 @@ namespace SurfaceGeometry {
                         if (Found != SurfNum) { // Interzone surface
                             // Make sure different zones too (CR 4110)
                             if (state.dataSurface->Surface(SurfNum).spaceNum == state.dataSurface->Surface(Found).spaceNum) {
-                                ++ErrCount2;
-                                if (ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                ++state.dataSurfaceGeometry->ErrCount2;
+                                if (state.dataSurfaceGeometry->ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state,
                                                      format("{}CAUTION -- Interspace surfaces are occuring in the same space(s).", RoutineName));
                                     ShowContinueError(
@@ -1984,8 +1980,8 @@ namespace SurfaceGeometry {
                                 if (std::abs((state.dataSurface->Surface(Found).Area * MultFound -
                                               state.dataSurface->Surface(SurfNum).Area * MultSurfNum) /
                                              state.dataSurface->Surface(Found).Area * MultFound) > 0.02) { // 2% difference in areas
-                                    ++ErrCount4;
-                                    if (ErrCount4 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                    ++state.dataSurfaceGeometry->ErrCount4;
+                                    if (state.dataSurfaceGeometry->ErrCount4 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                         ShowWarningError(
                                             state,
                                             format("{}InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:",
@@ -2184,8 +2180,8 @@ namespace SurfaceGeometry {
                                           format("...OutsideFaceEnvironment is blank, in Surface={}", state.dataSurface->Surface(SurfNum).Name));
                         SurfError = true;
                     } else {
-                        ++ErrCount3;
-                        if (ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                        ++state.dataSurfaceGeometry->ErrCount3;
+                        if (state.dataSurfaceGeometry->ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, format("{}Blank name for Outside Boundary Condition Objects.", RoutineName));
                             ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                         }
@@ -2202,8 +2198,8 @@ namespace SurfaceGeometry {
                         state.dataSurface->Surface(SurfNum).ExtBoundCond = SurfNum;
                     }
                 } else {
-                    ++ErrCount3;
-                    if (ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                    ++state.dataSurfaceGeometry->ErrCount3;
+                    if (state.dataSurfaceGeometry->ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                         ShowSevereError(state, format("{}Blank name for Outside Boundary Condition Objects.", RoutineName));
                         ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                     }
@@ -12603,8 +12599,8 @@ namespace SurfaceGeometry {
             if (state.dataHeatBal->Zone(ZoneNum).Volume > 0.0) { // User entered zone volume, produce message if not near calculated
                 if (CalcVolume > 0.0) {
                     if (std::abs(CalcVolume - state.dataHeatBal->Zone(ZoneNum).Volume) / state.dataHeatBal->Zone(ZoneNum).Volume > 0.05) {
-                        ++ErrCount5;
-                        if (ErrCount5 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                        ++state.dataSurfaceGeometry->ErrCount5;
+                        if (state.dataSurfaceGeometry->ErrCount5 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                             if (initmsg) {
                                 ShowMessage(state,
                                             "Note that the following warning(s) may/will occur if you have not enclosed your zone completely.");

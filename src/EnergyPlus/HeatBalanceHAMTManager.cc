@@ -1105,8 +1105,6 @@ namespace HeatBalanceHAMTManager {
         int adj;
         int adjl;
 
-        auto &qvpErrCount = state.dataHeatBalHAMTMgr->qvpErrCount;
-        auto &qvpErrReport = state.dataHeatBalHAMTMgr->qvpErrReport;
         Real64 denominator;
 
         auto &cells(state.dataHeatBalHAMTMgr->cells);
@@ -1346,12 +1344,12 @@ namespace HeatBalanceHAMTManager {
                 }
                 if (std::abs(qvp) > qvplim) {
                     if (!state.dataGlobal->WarmupFlag) {
-                        ++qvpErrCount;
-                        if (qvpErrCount < 16) {
+                        ++state.dataHeatBalHAMTMgr->qvpErrCount;
+                        if (state.dataHeatBalHAMTMgr->qvpErrCount < 16) {
                             ShowWarningError(
                                 state, format("HeatAndMoistureTransfer: Large Latent Heat for Surface {}", state.dataSurface->Surface(sid).Name));
                         } else {
-                            ShowRecurringWarningErrorAtEnd(state, "HeatAndMoistureTransfer: Large Latent Heat Errors ", qvpErrReport);
+                            ShowRecurringWarningErrorAtEnd(state, "HeatAndMoistureTransfer: Large Latent Heat Errors ", state.dataHeatBalHAMTMgr->qvpErrReport);
                         }
                     }
                     qvp = 0.0;

@@ -168,7 +168,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     int MatNum;            // Material number at interior layer
     int ConstrNum;         // Construction number
     Array1D_bool EMPDzone; // EMPD property check for each zone
-    auto &ErrCount = state.dataMoistureBalEMPD->ErrCount;
+
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     // Load the additional EMPD Material properties
@@ -273,8 +273,8 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
         if (thisMaterial->EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {
             EMPDzone(state.dataSurface->Surface(SurfNum).Zone) = true;
         } else {
-            ++ErrCount;
-            if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+            ++state.dataMoistureBalEMPD->ErrCount;
+            if (state.dataMoistureBalEMPD->ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                 ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer of Surfaces");
                 ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
             }

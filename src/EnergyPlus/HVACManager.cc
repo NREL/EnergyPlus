@@ -683,8 +683,6 @@ void SimHVAC(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
-    auto &ErrCount = state.dataHVACMgr->ErrCount;
-    auto &MaxErrCount = state.dataHVACMgr->MaxErrCount;
     auto &ErrEnvironmentName = state.dataHVACMgr->ErrEnvironmentName;
     int LoopNum;
 
@@ -975,8 +973,8 @@ void SimHVAC(EnergyPlusData &state)
     }
 
     if ((state.dataHVACMgr->HVACManageIteration > state.dataConvergeParams->MaxIter) && (!state.dataGlobal->WarmupFlag)) {
-        ++ErrCount;
-        if (ErrCount < 15) {
+        ++state.dataHVACMgr->ErrCount;
+        if (state.dataHVACMgr->ErrCount < 15) {
             ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
             ShowWarningError(state,
                              format("SimHVAC: Maximum iterations ({}) exceeded for all HVAC loops, at {}, {} {}",
@@ -999,7 +997,7 @@ void SimHVAC(EnergyPlusData &state)
             if (state.dataHVACGlobal->SimElecCircuitsFlag) {
                 ShowContinueError(state, "The solution for on-site electric generators did not appear to converge");
             }
-            if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+            if (state.dataHVACMgr->ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                 ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded.");
             }
             if (state.dataGlobal->DisplayExtraWarnings) {
@@ -1788,16 +1786,14 @@ void SimHVAC(EnergyPlusData &state)
         } else {
             if (state.dataEnvrn->EnvironmentName == ErrEnvironmentName) {
                 ShowRecurringWarningErrorAtEnd(state,
-                                               "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " +
-                                                   state.dataEnvrn->EnvironmentName + " continues",
-                                               MaxErrCount);
+                                               format("SimHVAC: Exceeding Maximum iterations for all HVAC loops, during {} continues", state.dataEnvrn->EnvironmentName),
+                                               state.dataHVACMgr->MaxErrCount);
             } else {
-                MaxErrCount = 0;
+                state.dataHVACMgr->MaxErrCount = 0;
                 ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                 ShowRecurringWarningErrorAtEnd(state,
-                                               "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " +
-                                                   state.dataEnvrn->EnvironmentName + " continues",
-                                               MaxErrCount);
+                                               format("SimHVAC: Exceeding Maximum iterations for all HVAC loops, during {} continues", state.dataEnvrn->EnvironmentName),
+                                               state.dataHVACMgr->MaxErrCount);
             }
         }
     }
