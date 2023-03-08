@@ -183,7 +183,7 @@ namespace Material {
     {
 
         // Members
-        std::string Name = "";                        // Name of material layer
+        std::string Name = "";        // Name of material layer
         Group group = Group::Invalid; // Material group type (see Material Parameters above.  Currently
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,

@@ -144,14 +144,14 @@ namespace WindowManager {
                 Real64 EffShBlEmiss;
                 Real64 EffGlEmiss;
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    EffShBlEmiss =
-                        General::InterpGeneral(window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                               window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                                               state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
-                    EffGlEmiss =
-                        General::InterpGeneral(window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                               window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                                               state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffShBlEmiss = General::InterpGeneral(
+                        window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffGlEmiss = General::InterpGeneral(
+                        window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
                     EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                     EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
@@ -513,8 +513,8 @@ namespace WindowManager {
         Material::Group matGroup = material->group;
 
         if ((matGroup == Material::Group::WindowGlass) || (matGroup == Material::Group::WindowSimpleGlazing) ||
-            (matGroup == Material::Group::WindowBlind) || (matGroup == Material::Group::Shade) ||
-            (matGroup == Material::Group::Screen) || (matGroup == Material::Group::ComplexWindowShade)) {
+            (matGroup == Material::Group::WindowBlind) || (matGroup == Material::Group::Shade) || (matGroup == Material::Group::Screen) ||
+            (matGroup == Material::Group::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, material, m_SolidLayerIndex);
         } else if (matGroup == Material::Group::WindowGas || matGroup == Material::Group::WindowGasMixture) {
@@ -950,14 +950,12 @@ namespace WindowManager {
         } else if (TotGlassLay == 2) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->group == Material::Group::Shade)
                 ShadeFlag = WinShadingType::BGShade;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->group ==
-                Material::Group::WindowBlind)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->group == Material::Group::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         } else if (TotGlassLay == 3) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->group == Material::Group::Shade)
                 ShadeFlag = WinShadingType::BGShade;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->group ==
-                Material::Group::WindowBlind)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->group == Material::Group::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         }
 

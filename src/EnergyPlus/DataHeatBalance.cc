@@ -406,18 +406,14 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             (thisMaterial->group == Material::Group::WindowGlass || thisMaterial->group == Material::Group::WindowGas ||
              thisMaterial->group == Material::Group::WindowGasMixture || thisMaterial->group == Material::Group::Shade ||
              thisMaterial->group == Material::Group::WindowBlind || thisMaterial->group == Material::Group::Screen ||
-             thisMaterial->group == Material::Group::WindowSimpleGlazing ||
-             thisMaterial->group == Material::Group::ComplexWindowShade || thisMaterial->group == Material::Group::ComplexWindowGap ||
-             thisMaterial->group == Material::Group::GlassEquivalentLayer ||
-             thisMaterial->group == Material::Group::ShadeEquivalentLayer ||
-             thisMaterial->group == Material::Group::DrapeEquivalentLayer ||
-             thisMaterial->group == Material::Group::ScreenEquivalentLayer ||
-             thisMaterial->group == Material::Group::BlindEquivalentLayer ||
+             thisMaterial->group == Material::Group::WindowSimpleGlazing || thisMaterial->group == Material::Group::ComplexWindowShade ||
+             thisMaterial->group == Material::Group::ComplexWindowGap || thisMaterial->group == Material::Group::GlassEquivalentLayer ||
+             thisMaterial->group == Material::Group::ShadeEquivalentLayer || thisMaterial->group == Material::Group::DrapeEquivalentLayer ||
+             thisMaterial->group == Material::Group::ScreenEquivalentLayer || thisMaterial->group == Material::Group::BlindEquivalentLayer ||
              thisMaterial->group == Material::Group::GapEquivalentLayer);
-        bool TypeIsNotWindow =
-            (thisMaterial->group == Material::Group::Invalid || thisMaterial->group == Material::Group::Air ||
-             thisMaterial->group == Material::Group::Regular || thisMaterial->group == Material::Group::EcoRoof ||
-             thisMaterial->group == Material::Group::IRTransparent);
+        bool TypeIsNotWindow = (thisMaterial->group == Material::Group::Invalid || thisMaterial->group == Material::Group::Air ||
+                                thisMaterial->group == Material::Group::Regular || thisMaterial->group == Material::Group::EcoRoof ||
+                                thisMaterial->group == Material::Group::IRTransparent);
         if (!thisConstruct.TypeIsWindow && !TypeIsNotWindow) assert(false);
     }
 
@@ -440,14 +436,10 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 !((thisMaterial->group == Material::Group::WindowGlass) || (thisMaterial->group == Material::Group::WindowGas) ||
                   (thisMaterial->group == Material::Group::WindowGasMixture) || (thisMaterial->group == Material::Group::Shade) ||
                   (thisMaterial->group == Material::Group::WindowBlind) || (thisMaterial->group == Material::Group::Screen) ||
-                  (thisMaterial->group == Material::Group::WindowSimpleGlazing) ||
-                  (thisMaterial->group == Material::Group::ComplexWindowShade) ||
-                  (thisMaterial->group == Material::Group::ComplexWindowGap) ||
-                  (thisMaterial->group == Material::Group::GlassEquivalentLayer) ||
-                  (thisMaterial->group == Material::Group::ShadeEquivalentLayer) ||
-                  (thisMaterial->group == Material::Group::DrapeEquivalentLayer) ||
-                  (thisMaterial->group == Material::Group::ScreenEquivalentLayer) ||
-                  (thisMaterial->group == Material::Group::BlindEquivalentLayer) ||
+                  (thisMaterial->group == Material::Group::WindowSimpleGlazing) || (thisMaterial->group == Material::Group::ComplexWindowShade) ||
+                  (thisMaterial->group == Material::Group::ComplexWindowGap) || (thisMaterial->group == Material::Group::GlassEquivalentLayer) ||
+                  (thisMaterial->group == Material::Group::ShadeEquivalentLayer) || (thisMaterial->group == Material::Group::DrapeEquivalentLayer) ||
+                  (thisMaterial->group == Material::Group::ScreenEquivalentLayer) || (thisMaterial->group == Material::Group::BlindEquivalentLayer) ||
                   (thisMaterial->group == Material::Group::GapEquivalentLayer));
         }
 
@@ -522,8 +514,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             return;
         }
 
-        if (thisMaterialOutside->group == Material::Group::WindowGas ||
-            thisMaterialOutside->group == Material::Group::WindowGasMixture ||
+        if (thisMaterialOutside->group == Material::Group::WindowGas || thisMaterialOutside->group == Material::Group::WindowGasMixture ||
             thisMaterialInside->group == Material::Group::WindowGas || thisMaterialInside->group == Material::Group::WindowGasMixture)
             WrongWindowLayering = true;                     // Gas cannot be first or last layer
         if (TotShadeLayers > 1) WrongWindowLayering = true; // At most one shade, screen or blind allowed

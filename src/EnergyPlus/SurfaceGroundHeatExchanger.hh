@@ -257,7 +257,8 @@ namespace SurfaceGroundHeatExchanger {
 
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
-    inline std::array<Real64, DataGlobalConstants::MaxCTFTerms> eoshiftArray(std::array<Real64, DataGlobalConstants::MaxCTFTerms> const &a, int const shift, Real64 const initialValue)
+    inline std::array<Real64, DataGlobalConstants::MaxCTFTerms>
+    eoshiftArray(std::array<Real64, DataGlobalConstants::MaxCTFTerms> const &a, int const shift, Real64 const initialValue)
     {
         std::array<Real64, DataGlobalConstants::MaxCTFTerms> o = {initialValue};
         int const b(0 + std::max(shift, 0)), e(a.size() - 1 + std::min(shift, 0));

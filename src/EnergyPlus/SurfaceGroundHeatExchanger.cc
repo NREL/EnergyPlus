@@ -482,9 +482,9 @@ namespace SurfaceGroundHeatExchanger {
                     // CTF stuff
                     LayerNum = state.dataConstruction->Construct(Cons).TotLayers;
                     this->NumCTFTerms = state.dataConstruction->Construct(Cons).NumCTFTerms;
-                    this->CTFin = state.dataConstruction->Construct(Cons).CTFInside;         // Z coefficents
-                    this->CTFout = state.dataConstruction->Construct(Cons).CTFOutside;       // X coefficents
-                    this->CTFcross = state.dataConstruction->Construct(Cons).CTFCross;       // Y coefficents
+                    this->CTFin = state.dataConstruction->Construct(Cons).CTFInside;   // Z coefficents
+                    this->CTFout = state.dataConstruction->Construct(Cons).CTFOutside; // X coefficents
+                    this->CTFcross = state.dataConstruction->Construct(Cons).CTFCross; // Y coefficents
                     for (size_t i = 1; i < state.dataConstruction->Construct(Cons).CTFFlux.size(); i++) {
                         this->CTFflux[i] = state.dataConstruction->Construct(Cons).CTFFlux[i]; // F & f coefficents
                     }

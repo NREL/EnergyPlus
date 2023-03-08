@@ -1673,7 +1673,7 @@ namespace HeatBalanceManager {
         int TotWindow5Constructs; // Number of constructions from Window5 data file
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
-        bool EOFonW5File;                           // True if EOF encountered reading Window5 data file
+        bool EOFonW5File;                   // True if EOF encountered reading Window5 data file
         Material::Group MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
@@ -2496,11 +2496,10 @@ namespace HeatBalanceManager {
             int MaterNum = Constr.LayerPoint(Constr.TotLayers);
             auto const *Mat = state.dataMaterial->Material(MaterNum);
             bool withNoncompatibleShades =
-                (Mat->group == Material::Group::Shade || Mat->group == Material::Group::WindowBlind ||
-                 Mat->group == Material::Group::Screen || Mat->group == Material::Group::GlassEquivalentLayer ||
-                 Mat->group == Material::Group::GapEquivalentLayer || Mat->group == Material::Group::ShadeEquivalentLayer ||
-                 Mat->group == Material::Group::DrapeEquivalentLayer || Mat->group == Material::Group::ScreenEquivalentLayer ||
-                 Mat->group == Material::Group::BlindEquivalentLayer || Surf.HasShadeControl);
+                (Mat->group == Material::Group::Shade || Mat->group == Material::Group::WindowBlind || Mat->group == Material::Group::Screen ||
+                 Mat->group == Material::Group::GlassEquivalentLayer || Mat->group == Material::Group::GapEquivalentLayer ||
+                 Mat->group == Material::Group::ShadeEquivalentLayer || Mat->group == Material::Group::DrapeEquivalentLayer ||
+                 Mat->group == Material::Group::ScreenEquivalentLayer || Mat->group == Material::Group::BlindEquivalentLayer || Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                 ErrorsFound = true;
@@ -4876,8 +4875,7 @@ namespace HeatBalanceManager {
                     assert(thisMaterial != nullptr);
                     if (thisMaterial->group == Material::Group::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += thisMaterial->Thickness / thisMaterial->Conductivity;
-                    } else if (thisMaterial->group == Material::Group::WindowGas ||
-                               thisMaterial->group == Material::Group::WindowGasMixture) {
+                    } else if (thisMaterial->group == Material::Group::WindowGas || thisMaterial->group == Material::Group::WindowGasMixture) {
                         // If mixture, use conductivity of first gas in mixture
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
                             thisMaterial->Thickness /

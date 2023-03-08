@@ -346,8 +346,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->group = Group::Regular;
         thisMaterial->Name = MaterialNames(1);
 
-        thisMaterial->Roughness = static_cast<SurfaceRoughness>(
-            getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->Roughness =
+            static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
         thisMaterial->Resistance = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -2524,8 +2524,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Name = MaterialNames(1);
         // need to treat the A2 with is just the name of the soil(it is
         // not important)
-        thisMaterial->Roughness = static_cast<SurfaceRoughness>(
-            getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
+        thisMaterial->Roughness =
+            static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
         if (UtilityRoutines::SameString(MaterialNames(4), "Simple")) {
             thisMaterial->EcoRoofCalculationMethod = 1;
         } else if (UtilityRoutines::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {

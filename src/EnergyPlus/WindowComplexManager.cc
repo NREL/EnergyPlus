@@ -2869,8 +2869,7 @@ namespace WindowComplexManager {
             auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
             assert(thisMaterial != nullptr);
 
-            if ((thisMaterial->group == Material::Group::WindowGlass) ||
-                (thisMaterial->group == Material::Group::WindowSimpleGlazing)) {
+            if ((thisMaterial->group == Material::Group::WindowGlass) || (thisMaterial->group == Material::Group::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = thisMaterial->Thickness;
