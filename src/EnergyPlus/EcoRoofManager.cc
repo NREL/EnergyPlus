@@ -415,7 +415,7 @@ namespace EcoRoofManager {
             }
 
             // "VeryRough, Rough, MediumRough, MediumSmooth, Smooth, VerySmooth"
-            std::array<Real64, 6> zogLookup = {0.005, 0.0030, 0.0020, 0.0015, 0.0010, 0.0008};
+            std::array<Real64, static_cast<int>(Material::SurfaceRoughness::Num)> zogLookup = {0.005, 0.0030, 0.0020, 0.0015, 0.0010, 0.0008};
             state.dataEcoRoofMgr->Zog = zogLookup[static_cast<int>(RoughSurf)];
 
             Chng = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rch; // bulk transfer coefficient near ground
