@@ -1139,13 +1139,11 @@ namespace HeatBalanceManager {
                 }
             }
             if (NumAlpha == 1 && state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    ShowSevereError(state,
-                                    format("{}, {} is required and not given.",
-                                           state.dataHeatBalMgr->CurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaFieldNames(2)));
-                    ErrorsFound = true;
-                }
+                ShowSevereError(state,
+                                format("{}, {} is required and not given.",
+                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(2)));
+                ErrorsFound = true;
             } else if (NumAlpha > 1 && state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr = GetScheduleIndex(state, AlphaName(2));
                 if (state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr == 0) {
@@ -1176,13 +1174,11 @@ namespace HeatBalanceManager {
                     }
                 }
                 if (NumAlpha == 3 && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        ShowSevereError(state,
-                                        format("{}, {} is required and not given.",
-                                               state.dataHeatBalMgr->CurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaFieldNames(4)));
-                        ErrorsFound = true;
-                    }
+                    ShowSevereError(state,
+                                    format("{}, {} is required and not given.",
+                                           state.dataHeatBalMgr->CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(4)));
+                    ErrorsFound = true;
                 } else if (NumAlpha > 3 && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr = GetScheduleIndex(state, AlphaName(4));
                     if (state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr == 0) {

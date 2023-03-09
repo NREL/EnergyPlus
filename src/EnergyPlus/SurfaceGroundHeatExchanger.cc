@@ -1353,11 +1353,8 @@ namespace SurfaceGroundHeatExchanger {
         this->QSrc = state.dataSurfaceGroundHeatExchangers->SourceFlux;
 
         if (this->LastSysTimeElapsed == SysTimeElapsed) { // only update in normal mode
-            if (this->LastSysTimeElapsed == SysTimeElapsed) {
-                // Still iterating or reducing system time step, so subtract old values which were
-                // not valid
-                this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
-            }
+            // Still iterating or reducing system time step, so subtract old values which were not valid
+            this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
 
             // Update the running average and the "last" values with the current values of the appropriate variables
             this->QSrcAvg += this->QSrc * TimeStepSys / state.dataGlobal->TimeStepZone;

@@ -6872,13 +6872,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                         if ((SysHeatSizingRat != 1.0) && (finalSysSizing.loadSizingType == DataSizing::LoadSizing::Ventilation) &&
                             (termUnitFinalZoneSizing.MinOA > 0.0)) {
                             // size on ventilation load
-                            if (termUnitFinalZoneSizing.MinOA > 0.0) {
-                                ZoneOARatio =
-                                    termUnitFinalZoneSizing.MinOA / max(termUnitFinalZoneSizing.DesHeatVolFlow, termUnitFinalZoneSizing.MinOA);
-                                ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
-                            } else {
-                                ZoneOARatio = 0.0;
-                            }
+                            ZoneOARatio = termUnitFinalZoneSizing.MinOA / max(termUnitFinalZoneSizing.DesHeatVolFlow, termUnitFinalZoneSizing.MinOA);
+                            ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                             termUnitFinalZoneSizing.scaleZoneHeating(ZoneOARatio);
                         } else if ((SysHeatSizingRat > 1.0) || (SysHeatSizingRat < 1.0 && finalSysSizing.SizingOption == NonCoincident)) {
                             // size on user input system design flows
@@ -6899,13 +6894,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                         if ((SysHeatSizingRat != 1.0) && (finalSysSizing.loadSizingType == DataSizing::LoadSizing::Ventilation) &&
                             (termUnitFinalZoneSizing.MinOA > 0.0)) {
                             // size on ventilation load
-                            if (termUnitFinalZoneSizing.MinOA > 0.0) {
-                                ZoneOARatio =
-                                    termUnitFinalZoneSizing.MinOA / max(termUnitFinalZoneSizing.DesHeatVolFlow, termUnitFinalZoneSizing.MinOA);
-                                ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
-                            } else {
-                                ZoneOARatio = 0.0;
-                            }
+                            ZoneOARatio = termUnitFinalZoneSizing.MinOA / max(termUnitFinalZoneSizing.DesHeatVolFlow, termUnitFinalZoneSizing.MinOA);
+                            ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                             termUnitFinalZoneSizing.scaleZoneHeating(ZoneOARatio);
                         } else if ((SysHeatSizingRat != 1.0) && (finalSysSizing.loadSizingType == DataSizing::LoadSizing::Ventilation) &&
                                    (termUnitFinalZoneSizing.MinOA > 0.0)) {

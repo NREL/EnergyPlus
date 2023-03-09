@@ -9302,7 +9302,6 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                         ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                         ShowContinueErrorTimeStamp(state, "");
-                        if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                         ShowRecurringWarningErrorAtEnd(state,
                                                        DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                            "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
@@ -9324,7 +9323,6 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                     ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                     ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                     ShowContinueErrorTimeStamp(state, "");
-                    if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                     ShowRecurringWarningErrorAtEnd(state,
                                                    DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                        "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",

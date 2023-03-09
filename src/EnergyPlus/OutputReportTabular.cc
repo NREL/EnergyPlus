@@ -12643,10 +12643,8 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     WriteSubtitle(state, tableName);
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
-        if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "ReportingPeriodSummary", "Entire Facility", tableName);
-        }
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+            tableBody, rowHead, columnHead, "ReportingPeriodSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
