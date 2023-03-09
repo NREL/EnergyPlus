@@ -187,8 +187,12 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     ReportSystemEnergyUse(*state);
     EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).TotPropane, 200);
 }
+
 TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
 {
+
+    state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
     state->dataHVACGlobal->NumPrimaryAirSys = 0;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataGlobal->NumOfZones = 1;

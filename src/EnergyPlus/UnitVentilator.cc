@@ -3363,13 +3363,13 @@ namespace UnitVentilator {
         //       DATE WRITTEN   May 2000
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
-        unitVent.HeatEnergy = unitVent.HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        unitVent.SensCoolEnergy = unitVent.SensCoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        unitVent.TotCoolEnergy = unitVent.TotCoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        unitVent.ElecEnergy = unitVent.ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        unitVent.HeatEnergy = unitVent.HeatPower * TimeStepSysSec;
+        unitVent.SensCoolEnergy = unitVent.SensCoolPower * TimeStepSysSec;
+        unitVent.TotCoolEnergy = unitVent.TotCoolPower * TimeStepSysSec;
+        unitVent.ElecEnergy = unitVent.ElecPower * TimeStepSysSec;
 
         if (unitVent.FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!state.dataGlobal->SysSizingCalc) {
