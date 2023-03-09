@@ -750,7 +750,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                     if (this->curOASysNum) {
                         // size to supply air duct flow rate
                         if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                            auto &thisAirloopDOAS = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum];
+                            auto const &thisAirloopDOAS = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum];
                             this->autoSizedValue = thisAirloopDOAS.SizingMassFlow / state.dataEnvrn->StdRhoAir;
                         } else if (this->finalSysSizing(this->curSysNum).DesOutAirVolFlow > 0.0) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
@@ -798,7 +798,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                     auto &sysSizPeakDDNum = state.dataSize->SysSizPeakDDNum(this->curSysNum);
 
                     if (this->airLoopSysFlag) {
-                        auto &unitarysysEqSizing = this->unitarySysEqSizing(this->curSysNum);
+                        auto const &unitarysysEqSizing = this->unitarySysEqSizing(this->curSysNum);
                         if (unitarysysEqSizing.CoolingAirFlow && unitarysysEqSizing.HeatingAirFlow) {
                             this->autoSizedValue = std::max(unitarysysEqSizing.CoolingAirVolFlow, unitarysysEqSizing.HeatingAirVolFlow);
                             if (this->autoSizedValue == unitarysysEqSizing.CoolingAirVolFlow) {

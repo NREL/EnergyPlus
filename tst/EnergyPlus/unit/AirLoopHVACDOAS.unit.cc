@@ -4031,53 +4031,82 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     ZoneEquipmentManager::GetZoneEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
-    // OA inlet node
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(5).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(6).MassFlowRate = 0.1;
-    // OA relief node
-    state->dataLoopNodes->Node(62).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(63).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(64).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(65).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(66).MassFlowRate = 0.1;
-    state->dataLoopNodes->Node(62).Temp = 23.0;
-    state->dataLoopNodes->Node(63).Temp = 23.0;
-    state->dataLoopNodes->Node(64).Temp = 23.0;
-    state->dataLoopNodes->Node(65).Temp = 23.0;
-    state->dataLoopNodes->Node(66).Temp = 23.0;
-    state->dataLoopNodes->Node(62).HumRat = 0.001;
-    state->dataLoopNodes->Node(63).HumRat = 0.001;
-    state->dataLoopNodes->Node(64).HumRat = 0.001;
-    state->dataLoopNodes->Node(65).HumRat = 0.001;
-    state->dataLoopNodes->Node(66).HumRat = 0.001;
 
-    auto &thisAirLoopDOASObjec = state->dataAirLoopHVACDOAS->airloopDOAS[0];
+    auto getNodeByName = [this](std::string_view nodeName) -> NodeData & {
+        const int idx = UtilityRoutines::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        if (idx == 0) {
+            throw;
+        }
+        return state->dataLoopNodes->Node(idx);
+    };
+
+    // OA inlet node
+    auto &PSZAC_OAInNode_1 = getNodeByName("PSZ-AC:1_OAINLET NODE");
+    auto &PSZAC_OAInNode_2 = getNodeByName("PSZ-AC:2_OAINLET NODE");
+    auto &PSZAC_OAInNode_3 = getNodeByName("PSZ-AC:3_OAINLET NODE");
+    auto &PSZAC_OAInNode_4 = getNodeByName("PSZ-AC:4_OAINLET NODE");
+    auto &PSZAC_OAInNode_5 = getNodeByName("PSZ-AC:5_OAINLET NODE");
+    // set OA inlet node flow rates
+    PSZAC_OAInNode_1.MassFlowRate = 0.1;
+    PSZAC_OAInNode_2.MassFlowRate = 0.1;
+    PSZAC_OAInNode_3.MassFlowRate = 0.1;
+    PSZAC_OAInNode_4.MassFlowRate = 0.1;
+    PSZAC_OAInNode_5.MassFlowRate = 0.1;
+
+    // OA relief node
+    auto &PSZAC_OARelNode_1 = getNodeByName("PSZ-AC:1_OARELIEF NODE");
+    auto &PSZAC_OARelNode_2 = getNodeByName("PSZ-AC:2_OARELIEF NODE");
+    auto &PSZAC_OARelNode_3 = getNodeByName("PSZ-AC:3_OARELIEF NODE");
+    auto &PSZAC_OARelNode_4 = getNodeByName("PSZ-AC:4_OARELIEF NODE");
+    auto &PSZAC_OARelNode_5 = getNodeByName("PSZ-AC:5_OARELIEF NODE");
+    // set OA relief node data
+    PSZAC_OARelNode_1.MassFlowRate = 0.1;
+    PSZAC_OARelNode_2.MassFlowRate = 0.1;
+    PSZAC_OARelNode_3.MassFlowRate = 0.1;
+    PSZAC_OARelNode_4.MassFlowRate = 0.1;
+    PSZAC_OARelNode_5.MassFlowRate = 0.1;
+    PSZAC_OARelNode_1.Temp = 23.0;
+    PSZAC_OARelNode_2.Temp = 23.0;
+    PSZAC_OARelNode_3.Temp = 23.0;
+    PSZAC_OARelNode_4.Temp = 23.0;
+    PSZAC_OARelNode_5.Temp = 23.0;
+    PSZAC_OARelNode_1.HumRat = 0.001;
+    PSZAC_OARelNode_2.HumRat = 0.001;
+    PSZAC_OARelNode_3.HumRat = 0.001;
+    PSZAC_OARelNode_4.HumRat = 0.001;
+    PSZAC_OARelNode_5.HumRat = 0.001;
 
     int index = 0;
+    auto &thisAirLoopDOASObjec = state->dataAirLoopHVACDOAS->airloopDOAS[index];
     thisAirLoopDOASObjec.SizingOnceFlag = false;
-    state->dataLoopNodes->Node(11).Temp = -10.0;
-    state->dataLoopNodes->Node(11).HumRat = 0.0008;
-    state->dataLoopNodes->Node(70).TempSetPoint = 4.5;
+    auto &DOAS_OAInletNode = getNodeByName("OUTSIDE AIR INLET NODE 1");
+    auto &AirLoopDOAS_SplitterInletNode = getNodeByName("AIRLOOPDOASSPLITTERINLET");
+    DOAS_OAInletNode.Temp = -10.0;
+    DOAS_OAInletNode.HumRat = 0.0008;
+    AirLoopDOAS_SplitterInletNode.TempSetPoint = 4.5;
+
+    state->dataEnvrn->OutBaroPress = 101325.0;
+
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
+
     thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
 
     // Mixer outlet
-    EXPECT_NEAR(23.0, state->dataLoopNodes->Node(68).Temp, 0.0001);
-    EXPECT_NEAR(0.5, state->dataLoopNodes->Node(68).MassFlowRate, 0.0001);
+    auto &AirLoopDOAS_MixerOutletNode = getNodeByName("AIRLOOPDOASMIXEROUTLET");
+    EXPECT_NEAR(23.0, AirLoopDOAS_MixerOutletNode.Temp, 0.0001);
+    EXPECT_NEAR(0.5, AirLoopDOAS_MixerOutletNode.MassFlowRate, 0.0001);
     // Outlet of HX
-    EXPECT_NEAR(-8.0710884, state->dataLoopNodes->Node(67).Temp, 0.0001);
+    auto &AirLoopDOAS_hxOutletNode = getNodeByName("DOAS HEAT RECOVERY SUPPLY OUTLET");
+    EXPECT_NEAR(13.2670, AirLoopDOAS_hxOutletNode.Temp, 0.0001);
     // Outlet of Central DOAS
-    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(70).Temp, 0.0001);
-    EXPECT_NEAR(0.5, state->dataLoopNodes->Node(70).MassFlowRate, 0.0001);
+    EXPECT_NEAR(13.2670, AirLoopDOAS_SplitterInletNode.Temp, 0.0001);
+    EXPECT_NEAR(0.5, AirLoopDOAS_SplitterInletNode.MassFlowRate, 0.0001);
     // Outlet of splitter
-    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(2).Temp, 0.0001);
-    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(3).Temp, 0.0001);
-    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(4).Temp, 0.0001);
-    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(5).Temp, 0.0001);
-    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(6).Temp, 0.0001);
+    EXPECT_NEAR(13.2670, PSZAC_OAInNode_1.Temp, 0.0001);
+    EXPECT_NEAR(13.2670, PSZAC_OAInNode_2.Temp, 0.0001);
+    EXPECT_NEAR(13.2670, PSZAC_OAInNode_3.Temp, 0.0001);
+    EXPECT_NEAR(13.2670, PSZAC_OAInNode_4.Temp, 0.0001);
+    EXPECT_NEAR(13.2670, PSZAC_OAInNode_5.Temp, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
@@ -8339,17 +8368,21 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
 
     ZoneEquipmentManager::GetZoneEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
+
+    auto getNodeByName = [this](std::string_view nodeName) -> NodeData & {
+        const int idx = UtilityRoutines::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        if (idx == 0) {
+            throw;
+        }
+        return state->dataLoopNodes->Node(idx);
+    };
+
     // OA inlet node
-    auto &PSZAC_OAInNode_1 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:1_OAINLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &PSZAC_OAInNode_2 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:2_OAINLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &PSZAC_OAInNode_3 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:3_OAINLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &PSZAC_OAInNode_4 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:4_OAINLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &PSZAC_OAInNode_5 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:5_OAINLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &PSZAC_OAInNode_1 = getNodeByName("PSZ-AC:1_OAINLET NODE");
+    auto &PSZAC_OAInNode_2 = getNodeByName("PSZ-AC:2_OAINLET NODE");
+    auto &PSZAC_OAInNode_3 = getNodeByName("PSZ-AC:3_OAINLET NODE");
+    auto &PSZAC_OAInNode_4 = getNodeByName("PSZ-AC:4_OAINLET NODE");
+    auto &PSZAC_OAInNode_5 = getNodeByName("PSZ-AC:5_OAINLET NODE");
     // set OA inlet node flow rates
     PSZAC_OAInNode_1.MassFlowRate = 0.1;
     PSZAC_OAInNode_2.MassFlowRate = 0.1;
@@ -8358,16 +8391,11 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     PSZAC_OAInNode_5.MassFlowRate = 0.1;
 
     // OA relief node
-    auto &PSZAC_OARelNode_1 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:1_OARELIEF NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &PSZAC_OARelNode_2 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:2_OARELIEF NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &PSZAC_OARelNode_3 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:3_OARELIEF NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &PSZAC_OARelNode_4 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:4_OARELIEF NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &PSZAC_OARelNode_5 = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PSZ-AC:5_OARELIEF NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &PSZAC_OARelNode_1 = getNodeByName("PSZ-AC:1_OARELIEF NODE");
+    auto &PSZAC_OARelNode_2 = getNodeByName("PSZ-AC:2_OARELIEF NODE");
+    auto &PSZAC_OARelNode_3 = getNodeByName("PSZ-AC:3_OARELIEF NODE");
+    auto &PSZAC_OARelNode_4 = getNodeByName("PSZ-AC:4_OARELIEF NODE");
+    auto &PSZAC_OARelNode_5 = getNodeByName("PSZ-AC:5_OARELIEF NODE");
     // set OA relief node data
     PSZAC_OARelNode_1.MassFlowRate = 0.1;
     PSZAC_OARelNode_2.MassFlowRate = 0.1;
@@ -8389,13 +8417,13 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     int doasMainHCIndex = 6;
     auto &thisAirLoopDOASObjec = state->dataAirLoopHVACDOAS->airloopDOAS[index];
     thisAirLoopDOASObjec.SizingOnceFlag = false;
-    auto &DOAS_OAInletNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("OUTSIDE AIR INLET NODE 1", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    auto &AirLoopDOAS_SplitterInletNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("AIRLOOPDOASSPLITTERINLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &DOAS_OAInletNode = getNodeByName("OUTSIDE AIR INLET NODE 1");
+    auto &AirLoopDOAS_SplitterInletNode = getNodeByName("AIRLOOPDOASSPLITTERINLET");
     DOAS_OAInletNode.Temp = -10.0;
     DOAS_OAInletNode.HumRat = 0.0008;
-    AirLoopDOAS_SplitterInletNode.TempSetPoint = 7.5;
+    AirLoopDOAS_SplitterInletNode.TempSetPoint = 17.5;
+
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     // simulte the DOAS
@@ -8404,7 +8432,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     HeatingCoilEquipConditions &mainHtgCoil = state->dataHeatingCoils->HeatingCoil(doasMainHCIndex);
     EXPECT_EQ("OA HEATING COIL", mainHtgCoil.Name);
     EXPECT_EQ(0.5, thisAirLoopDOASObjec.SumMassFlowRate);
-    EXPECT_NEAR(7823.0, mainHtgCoil.HeatingCoilRate, 1.0);
+    EXPECT_NEAR(2130.0, mainHtgCoil.HeatingCoilRate, 1.0);
     // reset doas air flow rate to zero and verify the
     // doas heating coil heating rate is zero
     PSZAC_OAInNode_1.MassFlowRate = 0.0;
