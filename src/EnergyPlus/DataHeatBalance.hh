@@ -582,12 +582,15 @@ namespace DataHeatBalance {
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this zone
         // Calculated after input
-        Real64 FloorArea = 0.0;     // Floor area used for this zone
-        Real64 CalcFloorArea = 0.0; // Calculated floor area used for this zone
-        Real64 CeilingArea = 0.0;   // Ceiling area for the zone
-        bool HasFloor = false;      // Has "Floor" surface
-        bool HasRoof = false;       // Has "Roof" or "Ceiling" Surface
-        bool HasWindow = false;     // Window(s) present in this zone
+        Real64 FloorArea = 0.0;            // Floor area used for area based internal gains and outputs
+        Real64 CalcFloorArea = 0.0;        // Calculated floor area excluding air boundary surfaces
+        Real64 geometricFloorArea = 0.0;   // Calculated floor area including air boundary surfaces
+        Real64 CeilingArea = 0.0;          // Ceiling area excluding air boundary surfaces
+        Real64 geometricCeilingArea = 0.0; // Ceiling area area including air boundary surfaces
+        bool ceilingHeightEntered = false; // True is user input ceiling height
+        bool HasFloor = false;             // Has "Floor" surface
+        bool HasRoof = false;              // Has "Roof" or "Ceiling" Surface
+        bool HasWindow = false;            // Window(s) present in this zone
         Real64 AirCapacity = 0.0;
         Real64 ExtWindowArea = 0.0;               // Exterior Window Area for Zone
         Real64 ExtWindowArea_Multiplied = 0.0;    // Exterior Window Area for Zone with multipliers
@@ -1988,6 +1991,7 @@ struct HeatBalanceData : BaseGlobalStruct
     bool AnyKiva = false;                // Kiva used
     bool AnyAirBoundary = false;         // Construction:AirBoundary used (implies grouped solar and radiant is present)
     bool AnyBSDF = false;                // True if any WindowModelType == WindowModel:: BSDF
+    bool AnyVariableAbsorptance = false; // true if any MaterialProperty:VariableAbsorptance is present
     int MaxNumberOfWarmupDays = 25;      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays = 1;       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor = 1.0;      // Relaxation factor, for looping across all the surfaces.

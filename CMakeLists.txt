@@ -144,6 +144,11 @@ option(ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON)
 option(ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON)
 option(ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON)
 
+
+if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+  option(ENABLE_HARDENED_RUNTIME "Enable Control Flow Guard and Buffer Security Check" OFF)
+endif()
+
 mark_as_advanced(ENABLE_INSTALL_REMOTE)
 
 # Set a default build type if none was specified
@@ -329,6 +334,10 @@ if(BUILD_TESTING)
       option(VALGRIND_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via valgrind / callgrind" OFF)
       if(VALGRIND_ANALYZE_PERFORMANCE_TESTS)
         find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
+      endif()
+      option(PERF_STAT_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via `perf stat`" OFF)
+      if(PERF_STAT_ANALYZE_PERFORMANCE_TESTS)
+        find_program(PERF NAMES perf PATH /usr/bin /usr/local/bin)
       endif()
     endif()
     add_subdirectory(performance_tests)

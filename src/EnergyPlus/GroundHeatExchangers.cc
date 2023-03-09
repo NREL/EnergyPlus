@@ -346,7 +346,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                 ShowFatalError(state, format("Check references to these objects for GHE:System object: {}", this->name));
             }
 
-            auto const vars = j.at("vertical_well_locations");
+            auto const &vars = j.at("vertical_well_locations");
 
             // Calculate response factors from individual boreholes
             std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
@@ -484,7 +484,7 @@ GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string cons
     this->gRefRatio = j["g_function_reference_ratio"].get<Real64>();
     this->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
 
-    auto const vars = j.at("g_functions");
+    auto const &vars = j.at("g_functions");
     std::vector<Real64> tmpLntts;
     std::vector<Real64> tmpGvals;
     for (auto const &var : vars) {
@@ -1482,7 +1482,7 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
     }
     // file exists -- read data and load if possible
 
-    auto const cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath);
+    nlohmann::json const cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath);
 
     for (auto const &existing_data : cached_json) {
         if (myCacheData["Phys Data"] == existing_data["Phys Data"]) {

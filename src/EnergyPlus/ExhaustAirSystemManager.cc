@@ -79,10 +79,6 @@ namespace EnergyPlus {
 namespace ExhaustAirSystemManager {
     // Module containing the routines dealing with the AirLoopHVAC:ExhaustSystem
 
-    std::map<int, int> mixerIndexMap;
-
-    bool mappingDone = false;
-
     static constexpr std::array<std::string_view, static_cast<int>(ZoneExhaustControl::FlowControlType::Num)> flowControlTypeNamesUC = {
         "SCHEDULED", "FOLLOWSUPPLY"};
 
@@ -444,7 +440,7 @@ namespace ExhaustAirSystemManager {
             // get the mixer inlet node index
             int zoneMixerIndex = thisExhSys.ZoneMixerIndex;
             for (int i = 1; i <= state.dataMixerComponent->MixerCond(zoneMixerIndex).NumInletNodes; ++i) {
-                int exhLegIndex = mixerIndexMap[state.dataMixerComponent->MixerCond(zoneMixerIndex).InletNode(i)];
+                int exhLegIndex = state.dataExhAirSystemMrg->mixerIndexMap[state.dataMixerComponent->MixerCond(zoneMixerIndex).InletNode(i)];
                 CalcZoneHVACExhaustControl(state, exhLegIndex, flowRatio);
             }
 
@@ -538,8 +534,8 @@ namespace ExhaustAirSystemManager {
                                                                         DataLoopNode::ObjectIsParent);
                 thisExhCtrl.OutletNodeNum = outletNodeNum;
 
-                if (!mappingDone) {
-                    mixerIndexMap.emplace(outletNodeNum, exhCtrlNum);
+                if (!state.dataExhAirSystemMrg->mappingDone) {
+                    state.dataExhAirSystemMrg->mixerIndexMap.emplace(outletNodeNum, exhCtrlNum);
                 }
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate");
@@ -603,7 +599,7 @@ namespace ExhaustAirSystemManager {
                     }
                 }
 
-                // Deal with design exhaust auto size here;
+                // Deal with design exhaust autosize here;
                 if (thisExhCtrl.DesignExhaustFlowRate == DataSizing::AutoSize) {
                     SizeExhaustControlFlow(state, exhCtrlNum, thisExhCtrl.SuppNodeNums);
                 }
@@ -670,7 +666,7 @@ namespace ExhaustAirSystemManager {
             state.dataZoneEquip->NumZoneExhaustControls = numZoneExhaustControls; // or exhCtrlNum
 
             // Done with creating a map that contains a table of for each zone to exhasut controls
-            mappingDone = true;
+            state.dataExhAirSystemMrg->mappingDone = true;
         } else {
             // If no exhaust systems are defined, then do something <or nothing>:
         }
@@ -707,7 +703,7 @@ namespace ExhaustAirSystemManager {
         int OutletNode = thisExhCtrl.OutletNodeNum;
         auto &thisExhInlet = state.dataLoopNodes->Node(InletNode);
         auto &thisExhOutlet = state.dataLoopNodes->Node(OutletNode);
-        Real64 MassFlow = thisExhInlet.MassFlowRate;
+        Real64 MassFlow;
         Real64 Tin = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisExhCtrl.ZoneNum).ZT;
         Real64 thisExhCtrlAvailScheVal = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum);
 
@@ -740,21 +736,16 @@ namespace ExhaustAirSystemManager {
                 FlowFrac = MinFlowFrac;
             }
 
-            bool runExhaust = true;
             if (thisExhCtrlAvailScheVal > 0.0) { // available
                 if (thisExhCtrl.MinZoneTempLimitScheduleNum > 0) {
                     if (Tin >= ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
-                        runExhaust = true;
                     } else {
-                        runExhaust = false;
                         FlowFrac = MinFlowFrac;
                     }
                 } else {
-                    runExhaust = true;
                     // flow not changed
                 }
             } else {
-                runExhaust = false;
                 FlowFrac = 0.0; // directly set flow rate to zero.
             }
 

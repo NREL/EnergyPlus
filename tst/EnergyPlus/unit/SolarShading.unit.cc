@@ -682,6 +682,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SolarShading::SkyDifSolarShading(*state);
     state->dataSolarShading->CalcSkyDifShading = false;
 
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(1) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(2) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
@@ -3970,6 +3973,7 @@ TEST_F(EnergyPlusFixture, ShadowCalculation_CSV)
     WindowManager::initWindowModel(*state);
 
     state->dataSolarShading->GetInputFlag = false;
+    state->dataSolarShading->ShadowingCalcFrequency = 20; // Default IDD
     HeatBalanceManager::InitHeatBalance(*state);
 
     {

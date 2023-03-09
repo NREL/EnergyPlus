@@ -99,6 +99,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataDesiccantDehumidifiers = std::make_unique<DesiccantDehumidifiersData>();
     this->dataDispVentMgr = std::make_unique<DisplacementVentMgrData>();
     this->dataDualDuct = std::make_unique<DualDuctData>();
+    this->dataEIRFuelFiredHeatPump = std::make_unique<EIRFuelFiredHeatPumpsData>();
     this->dataEIRPlantLoopHeatPump = std::make_unique<EIRPlantLoopHeatPumpsData>();
     this->dataEMSMgr = std::make_unique<EMSManagerData>();
     this->dataEarthTube = std::make_unique<EarthTubeData>();
@@ -295,6 +296,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataWindowEquivLayer = std::make_unique<WindowEquivLayerData>();
     this->dataWindowEquivalentLayer = std::make_unique<WindowEquivalentLayerData>();
     this->dataWindowManager = std::make_unique<WindowManagerData>();
+    this->dataWindowManagerExterior = std::make_unique<WindowManagerExteriorData>();
     this->dataZoneAirLoopEquipmentManager = std::make_unique<ZoneAirLoopEquipmentManagerData>();
     this->dataZoneContaminantPredictorCorrector = std::make_unique<ZoneContaminantPredictorCorrectorData>();
     this->dataZoneCtrls = std::make_unique<DataZoneControlsData>();
@@ -356,6 +358,7 @@ void EnergyPlusData::clear_state()
     this->dataDesiccantDehumidifiers->clear_state();
     this->dataDispVentMgr->clear_state();
     this->dataDualDuct->clear_state();
+    this->dataEIRFuelFiredHeatPump->clear_state();
     this->dataEIRPlantLoopHeatPump->clear_state();
     this->dataEMSMgr->clear_state();
     this->dataEarthTube->clear_state();
@@ -552,6 +555,7 @@ void EnergyPlusData::clear_state()
     this->dataWindowEquivLayer->clear_state();
     this->dataWindowEquivalentLayer->clear_state();
     this->dataWindowManager->clear_state();
+    this->dataWindowManagerExterior->clear_state();
     this->dataZoneAirLoopEquipmentManager->clear_state();
     this->dataZoneContaminantPredictorCorrector->clear_state();
     this->dataZoneCtrls->clear_state();

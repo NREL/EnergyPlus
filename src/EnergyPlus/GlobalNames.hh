@@ -98,7 +98,7 @@ namespace GlobalNames {
                                      bool &ErrorsFound);
 
     void VerifyUniqueChillerName(EnergyPlusData &state,
-                                 std::string const &TypeToVerify,
+                                 std::string_view TypeToVerify,
                                  std::string const &NameToVerify,
                                  bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
                                  std::string const &StringToDisplay);

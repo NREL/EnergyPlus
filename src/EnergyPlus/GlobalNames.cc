@@ -136,7 +136,7 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
 }
 
 void VerifyUniqueChillerName(
-    EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    EnergyPlusData &state, std::string_view TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
 {
 
     // SUBROUTINE INFORMATION:

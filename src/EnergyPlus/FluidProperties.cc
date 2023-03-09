@@ -102,35 +102,9 @@ namespace FluidProperties {
     // supplying the same data for concentrations of 0.0 and 1.0 only.
     // Temperature data has to be supplied in ascending order only.
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS
-
-    // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
-
-    // Object Data
-
-#ifdef EP_cache_GlycolSpecificHeat
-    std::array<cached_tsh, t_sh_cache_size> cached_t_sh;
-#endif
-    // Data Initializer Forward Declarations
-    // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
-
-    // MODULE SUBROUTINES:
-
-    // Functions
-
     void InitializeGlycRoutines()
     {
-#ifdef EP_cache_GlycolSpecificHeat
-        cached_t_sh.fill({});
-#endif
+        // TODO: Delete this, the cache is now part of state and initialized with the state constructor
     }
 
     void GetFluidPropertiesData(EnergyPlusData &state)
@@ -955,7 +929,7 @@ namespace FluidProperties {
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                     ShowContinueError(state,
-                                      format("No Gas/Fluid Saturation Pressure found. Need properties with {}=\"Pressure\" and {}=\"FluidGas\".",
+                                      format(R"(No Gas/Fluid Saturation Pressure found. Need properties with {}="Pressure" and {}="FluidGas".)",
                                              cAlphaFieldNames(2),
                                              cAlphaFieldNames(3)));
                     ErrorsFound = true;
@@ -1035,11 +1009,10 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
-                    ShowContinueError(
-                        state,
-                        format("No Saturated Fluid Enthalpy found. Need properties to be entered with {}=\"Enthalpy\" and {}=\"Fluid\".",
-                               cAlphaFieldNames(2),
-                               cAlphaFieldNames(3)));
+                    ShowContinueError(state,
+                                      format(R"(No Saturated Fluid Enthalpy found. Need properties to be entered with {}="Enthalpy" and {}="Fluid".)",
+                                             cAlphaFieldNames(2),
+                                             cAlphaFieldNames(3)));
                     ErrorsFound = true;
                 }
 
@@ -1122,7 +1095,7 @@ namespace FluidProperties {
                     ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                     ShowContinueError(
                         state,
-                        format("No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with {}=\"Enthalpy\" and {}=\"FluidGas\".",
+                        format(R"(No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with {}="Enthalpy" and {}="FluidGas".)",
                                cAlphaFieldNames(2),
                                cAlphaFieldNames(3)));
                     ErrorsFound = true;
@@ -1204,7 +1177,7 @@ namespace FluidProperties {
                     ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                     ShowContinueError(
                         state,
-                        format("No Saturated Fluid Specific Heat found. Need properties to be entered with {}=\"SpecificHeat\" and {}=\"Fluid\".",
+                        format(R"(No Saturated Fluid Specific Heat found. Need properties to be entered with {}="SpecificHeat" and {}="Fluid".)",
                                cAlphaFieldNames(2),
                                cAlphaFieldNames(3)));
                     ErrorsFound = true;
@@ -1291,7 +1264,7 @@ namespace FluidProperties {
                     ShowContinueError(
                         state,
                         format(
-                            "No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with {}=\"SpecificHeat\" and {}=\"FluidGas\".",
+                            R"(No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with {}="SpecificHeat" and {}="FluidGas".)",
                             cAlphaFieldNames(2),
                             cAlphaFieldNames(3)));
                     ErrorsFound = true;
@@ -1372,7 +1345,7 @@ namespace FluidProperties {
                 if (InData == NumOfSatFluidPropArrays) {
                     ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                     ShowContinueError(state,
-                                      format("No Saturated Fluid Density found. Need properties to be entered with {}=\"Density\" and {}=\"Fluid\".",
+                                      format(R"(No Saturated Fluid Density found. Need properties to be entered with {}="Density" and {}="Fluid".)",
                                              cAlphaFieldNames(2),
                                              cAlphaFieldNames(3)));
                     ErrorsFound = true;
@@ -1457,7 +1430,7 @@ namespace FluidProperties {
                     ShowSevereError(state, format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                     ShowSevereError(
                         state,
-                        format("No Saturated Gas/Fluid Density found. Need properties to be entered with {}=\"Density\" and {}=\"FluidGas\".",
+                        format(R"(No Saturated Gas/Fluid Density found. Need properties to be entered with {}="Density" and {}="FluidGas".)",
                                cAlphaFieldNames(2),
                                cAlphaFieldNames(3)));
                     ErrorsFound = true;
@@ -1512,8 +1485,8 @@ namespace FluidProperties {
                             ShowWarningError(state,
                                              format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                             ShowContinueError(
-                                state, format("{}=\"{}\", but {}=\"{}\" is not valid.", cAlphaFieldNames(3), Fluid, cAlphaFieldNames(2), Alphas(2)));
-                            ShowContinueError(state, format("Valid choices are \"{}\", \"{}\", \"{}\".", Enthalpy, SpecificHeat, Density));
+                                state, format(R"({}="{}", but {}="{}" is not valid.)", cAlphaFieldNames(3), Fluid, cAlphaFieldNames(2), Alphas(2)));
+                            ShowContinueError(state, format(R"(Valid choices are "{}", "{}", "{}".)", Enthalpy, SpecificHeat, Density));
                             ShowContinueError(state,
                                               "This fluid property will not be processed "
                                               "mor available for the simulation.");
@@ -1527,9 +1500,9 @@ namespace FluidProperties {
                             ShowWarningError(state,
                                              format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                             ShowContinueError(
-                                state, format("{}=\"{}\", but {}=\"{}\" is not valid.", cAlphaFieldNames(3), Fluid, cAlphaFieldNames(2), Alphas(2)));
+                                state, format(R"({}="{}", but {}="{}" is not valid.)", cAlphaFieldNames(3), Fluid, cAlphaFieldNames(2), Alphas(2)));
                             ShowContinueError(state,
-                                              format("Valid choices are \"{}\", \"{}\", \"{}\", \"{}\".", Pressure, Enthalpy, SpecificHeat, Density));
+                                              format(R"(Valid choices are "{}", "{}", "{}", "{}".)", Pressure, Enthalpy, SpecificHeat, Density));
                             ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                         }
                         ++iTemp;
@@ -1539,7 +1512,7 @@ namespace FluidProperties {
                         ShowWarningError(state,
                                          format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                         ShowContinueError(state, format("{}=\"{}\" is not valid.", cAlphaFieldNames(3), Alphas(3)));
-                        ShowContinueError(state, format("Valid choices are \"{}\", \"{}\".", Fluid, GasFluid));
+                        ShowContinueError(state, format(R"(Valid choices are "{}", "{}".)", Fluid, GasFluid));
                         ShowContinueError(state,
                                           "This fluid property will not be processed nor "
                                           "available for the simulation.");
@@ -1816,7 +1789,7 @@ namespace FluidProperties {
                         ShowWarningError(state,
                                          format("{}{} Name={}", RoutineName, CurrentModuleObject, state.dataFluidProps->RefrigData(Loop).Name));
                         ShowContinueError(state, format("{}=\"{}\" is not valid.", cAlphaFieldNames(2), Alphas(2)));
-                        ShowContinueError(state, format("Valid choices are \"{}\", \"{}\".", Enthalpy, Density));
+                        ShowContinueError(state, format(R"(Valid choices are "{}", "{}".)", Enthalpy, Density));
                         ShowContinueError(state, format("Pressure value of this item=[{:.2R}].", Numbers(1)));
                         ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                     }
@@ -5127,7 +5100,7 @@ namespace FluidProperties {
         for (GlycolNum = 1; GlycolNum <= state.dataFluidProps->NumOfGlycols; ++GlycolNum) {
             GlycolIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
-            if (state.dataFluidProps->GlycolData(GlycolNum).GlycolName != "") {
+            if (!state.dataFluidProps->GlycolData(GlycolNum).GlycolName.empty()) {
                 print(state.files.debug,
                       "Glycol={}, Mixture fluid={}\n",
                       state.dataFluidProps->GlycolData(GlycolNum).Name,
@@ -7483,6 +7456,35 @@ namespace FluidProperties {
 
 //*****************************************************************************
 #ifdef EP_cache_GlycolSpecificHeat
+    Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
+                                 std::string_view const Glycol,    // carries in substance name
+                                 Real64 const Temperature,         // actual temperature given as input
+                                 int &GlycolIndex,                 // Index to Glycol Properties
+                                 std::string_view const CalledFrom // routine this function was called from (error messages)
+    )
+    {
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - t_sh_precision_bits;
+
+        double const t(Temperature + 1000 * GlycolIndex);
+
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
+        DISABLE_WARNING_UNINITIALIZED
+        // cppcheck-suppress invalidPointerCast
+        std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);
+        DISABLE_WARNING_POP
+
+        std::uint64_t const hash(T_tag & t_sh_cache_mask);
+        auto &cTsh(state.dataFluidProps->cached_t_sh[hash]);
+
+        if (cTsh.iT != T_tag) {
+            cTsh.iT = T_tag;
+            cTsh.sh = GetSpecificHeatGlycol_raw(state, Glycol, Temperature, GlycolIndex, CalledFrom);
+        }
+
+        return cTsh.sh; // saturation pressure {Pascals}
+    }
+
     Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,
                                      std::string_view const Glycol,    // carries in substance name
                                      Real64 const Temperature,         // actual temperature given as input
@@ -8202,141 +8204,6 @@ namespace FluidProperties {
         ShowFatalError(state, "GetInterpValue: Temperatures for fluid property data too close together, division by zero");
     }
 
-    //*****************************************************************************
-
-    Real64 GetQualityRefrig(EnergyPlusData &state,
-                            std::string const &Refrigerant,   // carries in substance name
-                            Real64 const Temperature,         // actual temperature given as input
-                            Real64 const Enthalpy,            // actual enthalpy given as input
-                            int &RefrigIndex,                 // Index to Refrigerant Properties
-                            std::string_view const CalledFrom // routine this function was called from (error messages)
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Rick Strand
-        //       DATE WRITTEN   May 2000
-        //       MODIFIED       Simon Rees (May 2002)
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function determines the quality of a refrigerant in the saturate
-        // region based on its temperature and enthalpy
-
-        // METHODOLOGY EMPLOYED:
-        // Just checks to see whether or not the refrigerant name coming in can
-        // be found in the refrigerant derived type.  If so, the "reverse" of the
-        // GetSatEnthalpyRefrig function is performed.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 ReturnValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 SatVapEnthalpy;  // value of enthalpy at hi index value for given Quality
-        Real64 SatLiqEnthalpy;  // value of enthalpy at TempIndex index value for given Quality
-        int RefrigNum;          // index for refrigerant under consideration
-        int HiTempIndex;        // array index for temp above input temp
-        int LoTempIndex;        // array index for temp below input temp
-        Real64 TempInterpRatio; // ratio to interpolate in temperature domain
-
-        if (state.dataFluidProps->GetInput) {
-            GetFluidPropertiesData(state);
-            state.dataFluidProps->GetInput = false;
-        }
-
-        RefrigNum = 0;
-        if (state.dataFluidProps->NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(
-                state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
-        }
-
-        // Find which refrigerant (index) is being requested and then determine
-        // where the temperature is within the temperature array
-        if (RefrigIndex > 0) {
-            RefrigNum = RefrigIndex;
-        } else {
-            // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(state, Refrigerant);
-            if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(
-                    state, state.dataFluidProps->NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
-            }
-            RefrigIndex = RefrigNum;
-        }
-        auto const &refrig(state.dataFluidProps->RefrigData(RefrigNum));
-
-        LoTempIndex = FindArrayIndex(Temperature, refrig.HTemps, refrig.HfLowTempIndex, refrig.HfHighTempIndex);
-        HiTempIndex = LoTempIndex + 1;
-
-        // check on the data bounds and adjust indices to give clamped return value
-        if (LoTempIndex == 0) {
-            SatLiqEnthalpy = refrig.HfValues(refrig.HfLowTempIndex);
-            SatVapEnthalpy = refrig.HfgValues(refrig.HfLowTempIndex);
-            // Temperature supplied is out of bounds--produce an error message...
-            if (!state.dataGlobal->WarmupFlag)
-                ShowRecurringWarningErrorAtEnd(state,
-                                               "GetQualityRefrig: ** Temperature for requested quality is below the range of data supplied **",
-                                               state.dataFluidProps->TempLoRangeErrIndexGetQualityRefrig,
-                                               Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
-                                               "{C}");
-
-        } else if (HiTempIndex > refrig.NumHPoints) {
-            SatLiqEnthalpy = refrig.HfValues(refrig.HfHighTempIndex);
-            SatVapEnthalpy = refrig.HfgValues(refrig.HfHighTempIndex);
-            // Temperature supplied is out of bounds--produce an error message...
-            if (!state.dataGlobal->WarmupFlag)
-                ShowRecurringWarningErrorAtEnd(state,
-                                               "GetQualityRefrig: ** Temperature requested quality is above the range of data supplied **",
-                                               state.dataFluidProps->TempHiRangeErrIndexGetQualityRefrig,
-                                               Temperature,
-                                               Temperature,
-                                               _,
-                                               "{C}",
-                                               "{C}");
-
-        } else { // in normal range work out interpolated liq and gas enthalpies
-            TempInterpRatio = (Temperature - refrig.HTemps(LoTempIndex)) / (refrig.HTemps(HiTempIndex) - refrig.HTemps(LoTempIndex));
-            SatLiqEnthalpy = TempInterpRatio * refrig.HfValues(HiTempIndex) + (1.0 - TempInterpRatio) * refrig.HfValues(LoTempIndex);
-            SatVapEnthalpy = TempInterpRatio * refrig.HfgValues(HiTempIndex) + (1.0 - TempInterpRatio) * refrig.HfgValues(LoTempIndex);
-        }
-
-        // calculate final quality value from enthalpy ratio
-        ReturnValue = (Enthalpy - SatLiqEnthalpy) / (SatVapEnthalpy - SatLiqEnthalpy);
-
-        // final check to bound returned quality value
-        if (ReturnValue < 0.0) {
-            //    CALL ShowRecurringWarningErrorAtEnd(state, 'GetQualityRefrig: ** '//  &
-            //                   'Quality is less than zero in GetQualityRefrig; Quality reset to 0.0 **')
-            ReturnValue = 0.0;
-        } else if (ReturnValue > 1.0) {
-            //    CALL ShowRecurringWarningErrorAtEnd(state, 'GetQualityRefrig: ** '//  &
-            //                   'Quality is greater than one in GetQualityRefrig; refrigerant is superheated **')
-            ReturnValue = 2.0;
-        }
-
-        return ReturnValue;
-    }
-
-    //*****************************************************************************
-
     int FindRefrigerant(EnergyPlusData &state, std::string_view const Refrigerant) // carries in substance name
     {
 
@@ -8521,8 +8388,8 @@ namespace FluidProperties {
         assert(LowBound >= l);
         assert(LowBound <= UpperBound);
         assert(UpperBound <= Array.u());
-        assert(Array.size() > 0u); // Empty arrays are not currently supported
-        assert(l > 0);             // Returning 0 for Value smaller than lowest doesn't make sense if l() <= 0
+        assert(!Array.empty()); // Empty arrays are not currently supported
+        assert(l > 0);          // Returning 0 for Value smaller than lowest doesn't make sense if l() <= 0
         size_type beg(LowBound - l);
         if (Value < Array[beg]) {
             return 0;
@@ -8569,8 +8436,8 @@ namespace FluidProperties {
         // Linear indexing used to assure we are bit shifting positive values where behavior is assured
         // std::lower_bound was 4x slower for the small (~100) array sizes seen in EnergyPlus use
         typedef Array1D<Real64>::size_type size_type;
-        assert(Array.size() > 0u); // Empty arrays are not currently supported
-        assert(Array.l() > 0);     // Returning 0 for Value smaller than lowest doesn't make sense if l() <= 0
+        assert(!Array.empty()); // Empty arrays are not currently supported
+        assert(Array.l() > 0);  // Returning 0 for Value smaller than lowest doesn't make sense if l() <= 0
         if (Value < Array[0]) {
             return 0;
         } else {

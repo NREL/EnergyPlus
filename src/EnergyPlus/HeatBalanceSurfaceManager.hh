@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 #include "WCETarcog.hpp"
@@ -90,6 +91,8 @@ namespace HeatBalanceSurfaceManager {
 
     // Beginning Initialization Section of the Module
     //******************************************************************************
+
+    void UpdateVariableAbsorptances(EnergyPlusData &state);
 
     void InitSurfaceHeatBalance(EnergyPlusData &state);
 
