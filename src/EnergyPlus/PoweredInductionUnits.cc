@@ -2380,33 +2380,13 @@ void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current
     // PURPOSE OF THIS SUBROUTINE:
     // Fills some of the report variables for the PIU terminal boxes
 
-    // METHODOLOGY EMPLOYED:
-    // NA
-
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    state.dataPowerInductionUnits->PIU(PIUNum).HeatingEnergy =
-        state.dataPowerInductionUnits->PIU(PIUNum).HeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
-    state.dataPowerInductionUnits->PIU(PIUNum).SensCoolEnergy =
-        state.dataPowerInductionUnits->PIU(PIUNum).SensCoolRate * TimeStepSys * DataGlobalConstants::SecInHour;
+    state.dataPowerInductionUnits->PIU(PIUNum).HeatingEnergy = state.dataPowerInductionUnits->PIU(PIUNum).HeatingRate * TimeStepSysSec;
+    state.dataPowerInductionUnits->PIU(PIUNum).SensCoolEnergy = state.dataPowerInductionUnits->PIU(PIUNum).SensCoolRate * TimeStepSysSec;
 
     // set zone OA Volume flow rate
     state.dataPowerInductionUnits->PIU(PIUNum).CalcOutdoorAirVolumeFlowRate(state);

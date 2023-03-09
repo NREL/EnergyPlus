@@ -1321,6 +1321,12 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataHVACMultiSpdHP->MSHeatPump(2).TotCoolEnergyRate = 1000.0;
     state->dataHVACMultiSpdHP->MSHeatPump(1).FlowFraction = 1.0;
     state->dataHVACMultiSpdHP->MSHeatPump(2).FlowFraction = 1.0;
+    // because sizing isn't occuring, we must set these
+    for (auto &dxCoil : state->dataDXCoils->DXCoil) {
+        for (int i = 1; i <= dxCoil.NumOfSpeeds; ++i) {
+            dxCoil.MSRatedAirMassFlowRate(i) = dxCoil.MSRatedAirVolFlowRate(i) * 1.2;
+        }
+    }
     state->dataScheduleMgr->Schedule(17).CurrentValue = 1.0;
     state->dataScheduleMgr->Schedule(9).CurrentValue = 1.0;
     state->dataEnvrn->StdRhoAir = 1.2;
@@ -1468,8 +1474,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
 
     // outlet temp should equal inlet temp since mass flow rate = 0
-    Real64 calculatedOutletTemp = state->dataLoopNodes->Node(HeatRecInNode).Temp +
-                                  state->dataHVACGlobal->MSHPWasteHeat / (state->dataLoopNodes->Node(HeatRecInNode).MassFlowRate * 4181.0);
+    Real64 calculatedOutletTemp = state->dataLoopNodes->Node(HeatRecInNode).Temp;
     EXPECT_DOUBLE_EQ(0.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryRate);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryInletTemp);
     EXPECT_DOUBLE_EQ(50.0, state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecoveryOutletTemp);

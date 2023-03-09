@@ -66,8 +66,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         return 0.0;
     }
     this->preSize(state, _originalValue);
-    std::string DDNameFanPeak = "";
-    std::string dateTimeFanPeak = "";
     Real64 DesVolFlow = 0.0;
     Real64 CoilInTemp = -999.0;
     Real64 CoilInHumRat = -999.0;

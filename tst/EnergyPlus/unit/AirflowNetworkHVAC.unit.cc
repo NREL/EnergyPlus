@@ -2161,6 +2161,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataEnvrn->OutBaroPress = 99063.0;
     state->dataEnvrn->WindSpeed = 4.9;
     state->dataEnvrn->WindDir = 270.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     int index = UtilityRoutines::FindItemInList("OA INLET NODE", state->afn->AirflowNetworkNodeData);
     for (i = 1; i <= 36; ++i) {
@@ -2206,6 +2207,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     state->afn->PressureControllerData(1).OANodeNum = state->afn->DisSysCompReliefAirData(1).OutletNode;
+    state->afn->ANZT = 26.0;
+    state->afn->ANZW = 0.0011;
     state->afn->calculate_balance();
 
     // Check indoor pressure and mass flow rate
@@ -2225,7 +2228,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_NEAR(0.0, state->afn->linkReport(50).FLOW, 0.0001);
 
     // Start a test for #6005
-    state->afn->ANZT = 26.0;
     state->afn->MultizoneSurfaceData(2).HybridVentClose = true;
     state->afn->MultizoneSurfaceData(5).HybridVentClose = true;
     state->afn->MultizoneSurfaceData(14).HybridVentClose = true;
@@ -2257,6 +2259,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(4).IsControlled = false;
     state->dataHVACGlobal->TimeStepSys = 0.1;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     state->afn->AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
     state->afn->AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
@@ -5957,6 +5960,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataEnvrn->OutBaroPress = 99063.0;
     state->dataEnvrn->WindSpeed = 4.9;
     state->dataEnvrn->WindDir = 270.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataHVACGlobal->TimeStepSys = 0.1;
 
     for (int i = 1; i <= 50; ++i) {
         state->afn->AirflowNetworkNodeSimu(i).TZ = 23.0;
@@ -5999,6 +6004,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataAirLoop->AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
     state->dataAirLoop->AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
 
+    state->afn->ANZT = 0.0;
+    state->afn->ANZW = 0.0;
     state->afn->calculate_balance();
 
     // Check mass flow rate
@@ -6042,6 +6049,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.969147, 0.001);
     // #8475
     state->dataHVACGlobal->TimeStepSys = 0.1;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataHeatBal->Zone(1).Volume = 30.0;
     // Ventilation
     state->afn->update();
@@ -7620,6 +7628,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuplicatedNodeNameTest)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataEnvrn->OutBaroPress = 101000;
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // Read AirflowNetwork inputs
     ASSERT_THROW(state->afn->get_input(), std::runtime_error);
