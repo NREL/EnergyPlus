@@ -4032,6 +4032,12 @@ Curve:Biquadratic,
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[9], 1.0000, 0.00001);
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].heatingVolFlowRatio[9], 1.0000, 0.00001);
 
+    // test system no load air volume flow rate
+    Real64 result1_expected_NoLoadAirVolFlow =
+        state->dataUnitarySystems->designSpecMSHP[0].noLoadAirFlowRateRatio * std::min(thisSys->m_MaxCoolAirVolFlow, thisSys->m_MaxHeatAirVolFlow);
+    EXPECT_EQ(0.05, state->dataUnitarySystems->designSpecMSHP[0].noLoadAirFlowRateRatio);
+    EXPECT_EQ(result1_expected_NoLoadAirVolFlow, thisSys->m_MaxNoCoolHeatAirVolFlow);
+
     // autosized air flow and capacity, unitary sytsem capacity matches coils
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.5);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.5);
@@ -4113,6 +4119,12 @@ Curve:Biquadratic,
               thisSys->m_CoolVolumeFlowRate[10] * state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[6]);
     EXPECT_EQ(thisSys->m_HeatVolumeFlowRate[7],
               thisSys->m_HeatVolumeFlowRate[10] * state->dataUnitarySystems->designSpecMSHP[0].heatingVolFlowRatio[6]);
+
+    // test system no load air volume flow rate
+    Real64 result2_expected_NoLoadAirVolFlow =
+        state->dataUnitarySystems->designSpecMSHP[0].noLoadAirFlowRateRatio * std::min(thisSys->m_MaxCoolAirVolFlow, thisSys->m_MaxHeatAirVolFlow);
+    EXPECT_EQ(0.05, state->dataUnitarySystems->designSpecMSHP[0].noLoadAirFlowRateRatio);
+    EXPECT_EQ(result2_expected_NoLoadAirVolFlow, thisSys->m_MaxNoCoolHeatAirVolFlow);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
@@ -9153,6 +9165,12 @@ Curve:Biquadratic,
     EXPECT_NEAR(1.0 / 10, thisSys->m_MSHeatingSpeedRatio[1] / thisSys->m_MSHeatingSpeedRatio[10], 0.00001);
 
     EXPECT_FALSE(thisSys->m_MyFanFlag); // fan speed variables have been set
+
+    // test system no load air volume flow rate
+    Real64 result1_expected_NoLoadAirVolFlow =
+        state->dataUnitarySystems->designSpecMSHP[0].noLoadAirFlowRateRatio * std::min(thisSys->m_MaxCoolAirVolFlow, thisSys->m_MaxHeatAirVolFlow);
+    EXPECT_EQ(1.0, state->dataUnitarySystems->designSpecMSHP[0].noLoadAirFlowRateRatio);
+    EXPECT_EQ(result1_expected_NoLoadAirVolFlow, thisSys->m_MaxNoCoolHeatAirVolFlow);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_LoadControl)
