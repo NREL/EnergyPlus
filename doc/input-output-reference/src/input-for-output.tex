@@ -2223,7 +2223,7 @@ This object controls the output of various files in a central location.~ This ob
 
 \paragraph{Field: CSV}\label{field-csv}
 
-When this field is ``\textbf{Yes}'', EnergyPlus will output the Output:Variables and Output:Meters as CSV files using native EnergyPlus.~ This functionality is equivalent to the external ReadVarsESO program, however, it does not use RVI or MVI files to filter or sort output variables.~ The native EnergyPlus CSV output has significantly higher performance than ReadVarsESO, especially for large number of output variables.~ If the ``-r'' command line flag is used to request ReadVarsESO and ``\textbf{Yes}'' is selected for native CSV, ReadVarsESO will be run instead and a warning message will be given.
+When this field is ``\textbf{Yes}'', EnergyPlus will output the Output:Variables and Output:Meters as CSV files using native EnergyPlus.~ This functionality is equivalent to the external ReadVarsESO program, however, it does not use RVI or MVI files to filter or sort output variables.~ The native EnergyPlus CSV output has significantly higher performance than ReadVarsESO, especially for large number of output variables. If the ``-r'' command line flag is used to request ReadVarsESO and ``\textbf{Yes}'' is selected for native CSV, ReadVarsESO will overwrite the narice CAV output and a warning message will be given.
 
 \paragraph{Field: MTR}\label{field-mtr}
 
@@ -2384,7 +2384,7 @@ OutputControl:Files,
 
 \subsection{OutputControl:Timestamp}\label{outputcontrol_timestamp}
 
-Controls the format of the timestamp used in the native CSV and JSON outputs. The default timestamp is formatted
+Controls the format of the timestamp used in the native CSV and JSON outputs when requested using \hyperref[outputcontrolfiles]{OutputControl:Files}. The default timestamp is formatted
 as ``$MM$/$DD$ $hh$:$mm$:$ss$'', where
 
 \begin{wherelist}
@@ -2420,7 +2420,7 @@ and a capital letter ``T'' separates the time portion of the timestamp from the 
 \item ``2022-12-07T01:00:00'' at the beginning of the interval.
 \end{itemize}
 %
-Output workflows using the ReadVars postprocessing program will not be impacted by the selections made here.
+Output workflows using the ReadVarsESO postprocessing program will not be impacted by the selections made here, because ReadVarsESO will overwrite the native CSV outputs. EP-Launch will skip ReadVarsESO if native CSV output is present. The command-line option `--readvars` will run ReadVarsESO and throw a warning.
 
 \subsubsection{Inputs}\label{inputs-for-timestamp}
 
