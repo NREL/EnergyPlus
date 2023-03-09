@@ -730,7 +730,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     using FluidProperties::GetDensityGlycol;
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::SetComponentFlowRate;
@@ -1645,7 +1645,7 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -1676,7 +1676,6 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     Real64 QLoad;         // Cooling Capacity [W]
     Real64 QSource;       // Source Side Heat Transfer Rate [W]
     Real64 PartLoadRatio; // Part-Load Ratio
-    Real64 ReportingConstant;
     Real64 rhoLoadSide;
     Real64 rhoSourceSide;
     Real64 CpLoadSide;
@@ -1788,14 +1787,12 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     LoadSideOutletTemp = LoadSideInletTemp - QLoad / (LoadSideMassFlowRate * CpLoadSide);
     SourceSideOutletTemp = SourceSideInletTemp + QSource / (SourceSideMassFlowRate * CpSourceSide);
 
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
     this->reportPower = Power;
-    this->reportEnergy = Power * ReportingConstant;
+    this->reportEnergy = Power * TimeStepSysSec;
     this->reportQSource = QSource;
     this->reportQLoad = QLoad;
-    this->reportQSourceEnergy = QSource * ReportingConstant;
-    this->reportQLoadEnergy = QLoad * ReportingConstant;
+    this->reportQSourceEnergy = QSource * TimeStepSysSec;
+    this->reportQLoadEnergy = QLoad * TimeStepSysSec;
     this->reportLoadSideOutletTemp = LoadSideOutletTemp;
     this->reportSourceSideOutletTemp = SourceSideOutletTemp;
 }
@@ -1817,7 +1814,7 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -1847,7 +1844,6 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     Real64 QLoad;                      // Cooling Capacity [W]
     Real64 QSource;                    // Source Side Heat Transfer Rate [W]
     Real64 PartLoadRatio;              // Part Load Ratio
-    Real64 ReportingConstant;
     Real64 rhoLoadSide;
     Real64 rhoSourceSide;
     Real64 CpLoadSide;
@@ -1957,14 +1953,12 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     LoadSideOutletTemp = LoadSideInletTemp + QLoad / (LoadSideMassFlowRate * CpLoadSide);
     SourceSideOutletTemp = SourceSideInletTemp - QSource / (SourceSideMassFlowRate * CpSourceSide);
 
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
     this->reportPower = Power;
-    this->reportEnergy = Power * ReportingConstant;
+    this->reportEnergy = Power * TimeStepSysSec;
     this->reportQSource = QSource;
     this->reportQLoad = QLoad;
-    this->reportQSourceEnergy = QSource * ReportingConstant;
-    this->reportQLoadEnergy = QLoad * ReportingConstant;
+    this->reportQSourceEnergy = QSource * TimeStepSysSec;
+    this->reportQLoadEnergy = QLoad * TimeStepSysSec;
     this->reportLoadSideOutletTemp = LoadSideOutletTemp;
     this->reportSourceSideOutletTemp = SourceSideOutletTemp;
 }

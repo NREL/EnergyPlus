@@ -1196,24 +1196,10 @@ namespace HighTempRadiantSystem {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // Zone index number for the current radiant system
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // First, update the running average if necessary...
         if (state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) == SysTimeElapsed) {
@@ -1434,13 +1420,13 @@ namespace HighTempRadiantSystem {
         // This subroutine simply produces output for the high temperature radiant system.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == RadHeaterType::Gas) {
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower =
                 state.dataHighTempRadSys->QHTRadSource(RadSysNum) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).CombustionEffic;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasEnergy =
-                state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower * TimeStepSys * DataGlobalConstants::SecInHour;
+                state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower * TimeStepSysSec;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower = 0.0;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecEnergy = 0.0;
         } else if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == RadHeaterType::Electric) {
@@ -1448,13 +1434,13 @@ namespace HighTempRadiantSystem {
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasEnergy = 0.0;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower = state.dataHighTempRadSys->QHTRadSource(RadSysNum);
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecEnergy =
-                state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
+                state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower * TimeStepSysSec;
         } else {
             ShowWarningError(state, "Someone forgot to add a high temperature radiant heater type to the reporting subroutine");
         }
         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatPower = state.dataHighTempRadSys->QHTRadSource(RadSysNum);
         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatEnergy =
-            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatPower * TimeStepSysSec;
     }
 
 } // namespace HighTempRadiantSystem

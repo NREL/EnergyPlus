@@ -102,6 +102,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 {
 
     state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
@@ -1657,6 +1658,7 @@ TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
 {
     Real64 PriorTimeStep = 0.25;
     state->dataHVACGlobal->TimeStepSys = 0.125;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     Real64 myVarValue = 5.0;
     Real64 HistoryValue1 = 1.0;
     Real64 HistoryValue2 = 2.0;
