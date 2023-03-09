@@ -4977,54 +4977,6 @@ namespace HeatRecovery {
         }
     }
 
-    void SetHeatExchangerData(EnergyPlusData &state,
-                              int const HXNum,                                // Index of HX
-                              bool &ErrorsFound,                              // Set to true if certain errors found
-                              std::string const &HXName,                      // Name of HX
-                              ObjexxFCL::Optional<Real64> SupplyAirVolFlow,   // HX supply air flow rate    [m3/s]
-                              ObjexxFCL::Optional<Real64> SecondaryAirVolFlow // HX secondary air flow rate [m3/s]
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Richard Raustad
-        //       DATE WRITTEN   October 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This routine was designed for to autosize the HeatExchanger:AirToAir:SensibleAndLatent using
-        // information from the ZoneHVAC:EnergyRecoveryVentilator object.
-        // This is an illustration of setting data from an outside source.
-
-        // Obtains and Allocates heat exchanger related parameters from input file
-        if (state.dataHeatRecovery->GetInputFlag) { // First time subroutine has been entered
-            GetHeatRecoveryInput(state);
-            state.dataHeatRecovery->GetInputFlag = false;
-        }
-
-        int WhichHX; // index to generic HX
-        if (HXNum == 0) {
-            WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
-        } else {
-            WhichHX = HXNum;
-        }
-
-        if (WhichHX <= 0 || WhichHX > state.dataHeatRecovery->NumHeatExchangers) {
-            ShowSevereError(state, format("SetHeatExchangerData: Could not find heat exchanger = \"{}\"", HXName));
-            ErrorsFound = true;
-            return;
-        }
-
-        if (present(SupplyAirVolFlow)) {
-            state.dataHeatRecovery->ExchCond(WhichHX).NomSupAirVolFlow = SupplyAirVolFlow;
-        }
-
-        if (present(SecondaryAirVolFlow)) {
-            state.dataHeatRecovery->ExchCond(WhichHX).NomSecAirVolFlow = SecondaryAirVolFlow;
-        }
-    }
-
 } // namespace HeatRecovery
 
 } // namespace EnergyPlus
