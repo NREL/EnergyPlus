@@ -398,6 +398,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero
 
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -510,6 +511,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
@@ -632,6 +634,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
     state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     auto &PurchAir(state->dataPurchasedAirMgr->PurchAir);
@@ -802,6 +805,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -910,6 +914,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
     state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
@@ -1058,6 +1063,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->space(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -1258,6 +1264,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
 
     state->dataLoopNodes->Node(2).Temp = 25.0;
     state->dataLoopNodes->Node(2).HumRat = 0.001;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     InitPurchasedAir(*state, 1, 1);
     Real64 SysOutputProvided;
@@ -1448,6 +1455,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
 
     state->dataLoopNodes->Node(1).Temp = 30;
     state->dataLoopNodes->Node(1).HumRat = 0.012;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1);
 

@@ -2705,7 +2705,7 @@ namespace ThermalComfort {
         // the relevant file once to initialize, and then operates within the loop.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
 
@@ -2945,7 +2945,7 @@ namespace ThermalComfort {
         // moving average of the outdoor air temperature.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
 

@@ -2876,6 +2876,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
 
     state->dataHVACGlobal->TimeStepSys = 60;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     Real64 curLoad = -10000;
 
@@ -3315,6 +3316,7 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
 
     state->dataHVACGlobal->TimeStepSys = 60;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     Real64 curLoad = -10000;
 
@@ -4102,6 +4104,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // set up the plant loops
     // first the load side

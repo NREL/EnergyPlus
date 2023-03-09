@@ -404,6 +404,14 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 
 PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
 {
+    // Now read all the actual plugins and interpret them
+    // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
+    std::string const sPlugins = "PythonPlugin:Instance";
+    int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
+    if (pluginInstances == 0) {
+        return;
+    }
+
 #if LINK_WITH_PYTHON
     // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
     Py_FrozenFlag = 1;
@@ -561,9 +569,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
 
     // Now read all the actual plugins and interpret them
     // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
-    std::string const sPlugins = "PythonPlugin:Instance";
-    int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
-    if (pluginInstances > 0) {
+    {
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(sPlugins);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             ShowSevereError(state,                                                                                // LCOV_EXCL_LINE
@@ -656,11 +662,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
     // setting up output variables deferred until later in the simulation setup process
 #else
     // need to alert only if a plugin instance is found
-    std::string const sPlugins = "PythonPlugin:Instance";
-    int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
-    if (pluginInstances > 0) {
-        EnergyPlus::ShowFatalError(state, "Python Plugin instance found, but this build of EnergyPlus is not compiled with Python.");
-    }
+    EnergyPlus::ShowFatalError(state, "Python Plugin instance found, but this build of EnergyPlus is not compiled with Python.");
 #endif
 }
 
