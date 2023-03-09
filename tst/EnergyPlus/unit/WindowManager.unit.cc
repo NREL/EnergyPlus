@@ -200,6 +200,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 60.0;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->BeginSimFlag = true;
@@ -7668,6 +7669,7 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 60.0;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->BeginSimFlag = true;
@@ -7707,6 +7709,9 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.01;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = T_in;
 
+    state->dataEnvrn->SOLCOS(1) = 0.84471127222777276;
+    state->dataEnvrn->SOLCOS(2) = -0.53484539135440257;
+    state->dataEnvrn->SOLCOS(3) = 0.020081681162033127;
     state->dataEnvrn->BeamSolarRad = I_s;
     if (I_s > 0.0) {
         state->dataEnvrn->SunIsUp = true;

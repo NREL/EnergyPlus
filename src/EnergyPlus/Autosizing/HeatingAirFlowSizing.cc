@@ -60,8 +60,6 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
         return 0.0;
     }
     this->preSize(state, _originalValue);
-    std::string DDNameFanPeak = "";
-    std::string dateTimeFanPeak = "";
 
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;
@@ -284,6 +282,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
     }
     if (this->isFanReportObject) {
+        std::string DDNameFanPeak = "";
+        std::string dateTimeFanPeak = "";
         //  fill fan peak day and time here
         if (this->dataScalableSizingON) {
             DDNameFanPeak = "Scaled size, not from any peak";

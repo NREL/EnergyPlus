@@ -415,6 +415,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
     state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux.allocate(thisData->TotSurfaces);
     state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux.allocate(thisData->TotSurfaces);
     state->dataGlobal->TimeStepZoneSec = 600.0;
+    state->dataGlobal->NumOfTimeStepInHour = 6;
 
     // call the function for initialization of finite difference calculation
     std::string const error_string = delimited_string({"   ** Severe  ** InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too "

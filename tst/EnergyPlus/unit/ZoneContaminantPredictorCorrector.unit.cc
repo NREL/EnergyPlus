@@ -285,6 +285,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataContaminantBalance->ZoneCO2GainExceptPeople.allocate(1);
     state->dataContaminantBalance->ZoneGCGain.allocate(1);
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0001;
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople(1) = 0.0001;
     state->dataContaminantBalance->ZoneGCGain(1) = 0.0001;
     state->dataContaminantBalance->MixingMassFlowCO2(1) = 0.0;
     state->dataContaminantBalance->MixingMassFlowGC(1) = 0.0;
