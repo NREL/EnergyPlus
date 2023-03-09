@@ -18167,10 +18167,12 @@ namespace UnitarySystems {
 
     void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound)
     {
-        nodeNotFound =
-            std::any_of(state.dataUnitarySystems->unitarySys.begin(), state.dataUnitarySystems->unitarySys.end(), [waterCoilNodeNum](auto const &us) {
-                return us.m_WaterHRPlantLoopModel && us.m_HRcoolCoilFluidInletNode == waterCoilNodeNum;
-            });
+        for (auto &unitarySystem : state.dataUnitarySystems->unitarySys) {
+            if (unitarySystem.m_HRcoolCoilFluidInletNode == waterCoilNodeNum && unitarySystem.m_WaterHRPlantLoopModel) {
+                nodeNotFound = false;
+                break;
+            }
+        }
     }
 
 } // namespace UnitarySystems
