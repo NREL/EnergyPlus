@@ -1246,7 +1246,6 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test2)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    Real64 WaterConnNum = 1;
     GetWaterUseInput(*state);
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->WaterMainsTemp = 15;
