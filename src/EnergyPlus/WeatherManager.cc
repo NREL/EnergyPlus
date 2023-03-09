@@ -237,7 +237,7 @@ namespace WeatherManager {
         Real64 constexpr beta = 0.000214;         // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
         Real64 constexpr assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
         Real64 const localGrashofNumber =
-            (gravity * beta * (assumedSurfaceTemp - curWaterTemp) * pow(distanceFromBottomOfHull, 3)) / pow(waterKinematicViscosity, 2);
+            (gravity * beta * std::abs(assumedSurfaceTemp - curWaterTemp) * pow(distanceFromBottomOfHull, 3)) / pow(waterKinematicViscosity, 2);
         Real64 const localNusseltFreeConvection = pow(localGrashofNumber / 4, 0.25) * prandtlCorrection;
         Real64 const localConvectionCoeffFreeConv = localNusseltFreeConvection * waterThermalConductivity / distanceFromBottomOfHull;
         return max(localConvectionCoeff, localConvectionCoeffFreeConv);

@@ -12246,6 +12246,11 @@ Schedule:Compact,
         thisSys->m_HeatVolumeFlowRate[Iter] / thisSys->m_HeatVolumeFlowRate[state->dataUnitarySystems->designSpecMSHP[0].numOfSpeedHeating];
 
     thisSys->MaxNoCoolHeatAirMassFlow = thisSys->m_CoolMassFlowRate[1];
+    // This wasn't initialized yet
+    state->dataDXCoils->DXCoil(1).MSRatedCBF = 0.000000001;
+    state->dataDXCoils->DXCoil(2).MSRatedCBF = 0.000000001;
+    // state->dataDXCoils->DXCoil(1)->MSRatedCBF(Iter) = 0.0;
+
     // flow rates are set up now, don't call getInput again
     thisSys->m_ThisSysInputShouldBeGotten = false;
 
