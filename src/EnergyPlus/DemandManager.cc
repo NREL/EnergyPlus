@@ -207,7 +207,7 @@ void SimulateDemandManagerList(EnergyPlusData &state,
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -225,8 +225,7 @@ void SimulateDemandManagerList(EnergyPlusData &state,
 
     DemandManagerList(ListNum).MeterDemand =
         GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
-        GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::System) /
-            (TimeStepSys * DataGlobalConstants::SecInHour);
+        GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::System) / TimeStepSysSec;
 
     // Calculate average demand over the averaging window including the current timestep meter demand
     AverageDemand = DemandManagerList(ListNum).AverageDemand +

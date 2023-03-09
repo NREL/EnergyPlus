@@ -3248,46 +3248,23 @@ namespace DesiccantDehumidifiers {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill remaining report variables
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         switch (state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).DehumTypeCode) {
         case DesicDehumType::Solid: {
             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemove =
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemoveRate * ReportingConstant;
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemoveRate * TimeStepSysSec;
             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenEnergy =
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).QRegen * ReportingConstant;
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).QRegen * TimeStepSysSec;
             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ElecUseEnergy =
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ElecUseRate * ReportingConstant;
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ElecUseRate * TimeStepSysSec;
         } break;
         case DesicDehumType::Generic: {
             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemove =
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemoveRate * ReportingConstant;
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).WaterRemoveRate * TimeStepSysSec;
             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ExhaustFanElecConsumption =
-                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ExhaustFanPower * ReportingConstant;
+                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).ExhaustFanPower * TimeStepSysSec;
         } break;
         default:
             break;
