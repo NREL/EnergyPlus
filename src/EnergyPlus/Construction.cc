@@ -150,10 +150,10 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     this->CTFSourceIn.fill(0.0);
     this->CTFSourceOut.fill(0.0);
     this->CTFTimeStep = 0.0;
-    this->ctftsourceout.fill(0.0);
-    this->ctftsourcein.fill(0.0);
-    this->ctftsourceq.fill(0.0);
-    this->ctftuserout.fill(0.0);
+    this->CTFTSourceOut.fill(0.0);
+    this->CTFTSourceIn.fill(0.0);
+    this->CTFTSourceQ.fill(0.0);
+    this->CTFTUserOut.fill(0.0);
     this->CTFTUserIn.fill(0.0);
     this->CTFTUserSource.fill(0.0);
     this->NumHistories = 0;
