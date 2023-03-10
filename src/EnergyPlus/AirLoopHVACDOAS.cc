@@ -213,8 +213,8 @@ namespace AirLoopHVACDOAS {
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            std::string cFieldName;
             bool errorsFound(false);
+            std::string cFieldName;
             int AirLoopMixerNum = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -362,12 +362,12 @@ namespace AirLoopHVACDOAS {
 
     void AirLoopSplitter::getAirLoopSplitter(EnergyPlusData &state)
     {
-        bool errorsFound(false);
 
         std::string const &cCurrentModuleObject = "AirLoopHVAC:Splitter";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            bool errorsFound(false);
             std::string cFieldName;
             int AirLoopSplitterNum = 0;
             auto &instancesValue = instances.value();
@@ -415,15 +415,12 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::getAirLoopDOASInput(EnergyPlusData &state)
     {
 
-        using ScheduleManager::GetScheduleIndex;
-
-
         std::string const &cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            std::string cFieldName;
             bool errorsFound(false);
+            std::string cFieldName;
             int AirLoopDOASNum = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -717,7 +714,7 @@ namespace AirLoopHVACDOAS {
                 }
 
                 thisDOAS.AvailManagerSchedName = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name").get<std::string>());
-                thisDOAS.m_AvailManagerSchedPtr = GetScheduleIndex(state, thisDOAS.AvailManagerSchedName);
+                thisDOAS.m_AvailManagerSchedPtr = ScheduleManager::GetScheduleIndex(state, thisDOAS.AvailManagerSchedName);
                 if (thisDOAS.m_AvailManagerSchedPtr == 0) {
                     cFieldName = "Availability Schedule Name";
                     ShowSevereError(
