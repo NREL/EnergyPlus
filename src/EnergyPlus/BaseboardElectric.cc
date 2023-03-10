@@ -449,12 +449,10 @@ namespace BaseboardElectric {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 TempSize; // autosized value of coil input field
-
-        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-
         state.dataSize->DataScalableCapSizingON = false;
 
         if (state.dataSize->CurZoneEqNum > 0) {
+            auto &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
 
             std::string CompType = baseboard->baseboards(BaseboardNum).EquipType;
             std::string CompName = baseboard->baseboards(BaseboardNum).EquipName;
@@ -462,37 +460,37 @@ namespace BaseboardElectric {
             state.dataSize->DataZoneNumber = baseboard->baseboards(BaseboardNum).ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
             int FieldNum = 1;
-            bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
             std::string SizingString = baseboard->baseboards(BaseboardNum).FieldNames(FieldNum) + " [W]";
             int CapSizingMethod = baseboard->baseboards(BaseboardNum).HeatingCapMethod;
-            ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+            ZoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
                 CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == DataSizing::HeatingDesignCapacity) {
                     if (baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity == DataSizing::AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
-                        ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
-                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                        ZoneEqSizing.HeatingCapacity = true;
+                        ZoneEqSizing.DesHeatingLoad =
                             state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
                     TempSize = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
                 } else if (CapSizingMethod == DataSizing::CapacityPerFloorArea) {
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                    ZoneEqSizing.HeatingCapacity = true;
+                    ZoneEqSizing.DesHeatingLoad =
                         baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad;
+                    TempSize = ZoneEqSizing.DesHeatingLoad;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                    ZoneEqSizing.HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                    ZoneEqSizing.DesHeatingLoad =
                         state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     TempSize = DataSizing::AutoSize;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else {
                     TempSize = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
                 }
+                bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
