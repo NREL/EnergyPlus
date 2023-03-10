@@ -208,15 +208,13 @@ namespace AirLoopHVACDOAS {
 
     void AirLoopMixer::getAirLoopMixer(EnergyPlusData &state)
     {
-        bool errorsFound(false);
 
         std::string const &cCurrentModuleObject = "AirLoopHVAC:Mixer";
-        std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
-        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            errorsFound = true;
-        } else {
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            std::string cFieldName;
+            bool errorsFound(false);
             int AirLoopMixerNum = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -273,10 +271,9 @@ namespace AirLoopHVACDOAS {
         Real64 outletTemp = 0.0;
         Real64 outletHumRat = 0.0;
         Real64 massSum = 0.0;
-        int InletNum;
 
         for (int i = 1; i <= this->numOfInletNodes; i++) {
-            InletNum = this->InletNodeNum[i - 1];
+            int InletNum = this->InletNodeNum[i - 1];
             massSum += state.dataLoopNodes->Node(InletNum).MassFlowRate;
             outletTemp += state.dataLoopNodes->Node(InletNum).MassFlowRate * state.dataLoopNodes->Node(InletNum).Temp;
             outletHumRat += state.dataLoopNodes->Node(InletNum).MassFlowRate * state.dataLoopNodes->Node(InletNum).HumRat;
@@ -368,12 +365,10 @@ namespace AirLoopHVACDOAS {
         bool errorsFound(false);
 
         std::string const &cCurrentModuleObject = "AirLoopHVAC:Splitter";
-        std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
-        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            errorsFound = true;
-        } else {
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            std::string cFieldName;
             int AirLoopSplitterNum = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -422,15 +417,13 @@ namespace AirLoopHVACDOAS {
 
         using ScheduleManager::GetScheduleIndex;
 
-        bool errorsFound(false);
 
         std::string const &cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
-        std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
-        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            errorsFound = true;
-        } else {
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            std::string cFieldName;
+            bool errorsFound(false);
             int AirLoopDOASNum = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -814,12 +807,11 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::initAirLoopDOAS(EnergyPlusData &state, bool const FirstHVACIteration)
     {
         int LoopOA;
-        int NodeNum;
         Real64 SchAvailValue;
         static constexpr std::string_view RoutineName = "AirLoopDOAS::initAirLoopDOAS";
-        bool ErrorsFound = false;
 
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
+            bool ErrorsFound = false;
             Real64 rho;
             state.dataSize->CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
@@ -890,7 +882,7 @@ namespace AirLoopHVACDOAS {
         this->SumMassFlowRate = 0.0;
 
         for (LoopOA = 0; LoopOA < this->m_CompPointerAirLoopSplitter->numOfOutletNodes; LoopOA++) {
-            NodeNum = this->m_CompPointerAirLoopSplitter->OutletNodeNum[LoopOA];
+            int NodeNum = this->m_CompPointerAirLoopSplitter->OutletNodeNum[LoopOA];
             this->SumMassFlowRate += state.dataLoopNodes->Node(NodeNum).MassFlowRate;
         }
 
@@ -922,10 +914,9 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::SizingAirLoopDOAS(EnergyPlusData &state)
     {
         Real64 sizingMassFlow = 0;
-        int AirLoopNum;
 
         for (int AirLoop = 1; AirLoop <= this->NumOfAirLoops; AirLoop++) {
-            AirLoopNum = this->m_AirLoopNum[AirLoop - 1];
+            int AirLoopNum = this->m_AirLoopNum[AirLoop - 1];
             this->m_OACtrlNum.push_back(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OACtrlNum);
 
             if (this->m_OACtrlNum[AirLoop - 1] > 0) {
