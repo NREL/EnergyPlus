@@ -143,19 +143,19 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     // that problems won't exist and it does not necessarily avoid any problems
     // that interpolated temperature histories might cause.
 
-    this->CTFCross = {0.0};
-    this->CTFFlux = {0.0};
-    this->CTFInside = {0.0};
-    this->CTFOutside = {0.0};
-    this->CTFSourceIn = {0.0};
-    this->CTFSourceOut = {0.0};
-    this->CTFTimeStep = {0.0};
-    this->CTFTSourceOut = {0.0};
-    this->CTFTSourceIn = {0.0};
-    this->CTFTSourceQ = {0.0};
-    this->CTFTUserOut = {0.0};
-    this->CTFTUserIn = {0.0};
-    this->CTFTUserSource = {0.0};
+    this->CTFCross.fill(0.0);
+    this->CTFFlux.fill(0.0);
+    this->CTFInside.fill(0.0);
+    this->CTFOutside.fill(0.0);
+    this->CTFSourceIn.fill(0.0);
+    this->CTFSourceOut.fill(0.0);
+    this->CTFTimeStep = 0.0;
+    this->ctftsourceout.fill(0.0);
+    this->ctftsourcein.fill(0.0);
+    this->ctftsourceq.fill(0.0);
+    this->ctftuserout.fill(0.0);
+    this->CTFTUserIn.fill(0.0);
+    this->CTFTUserSource.fill(0.0);
     this->NumHistories = 0;
     this->NumCTFTerms = 0;
     this->UValue = 0.0;

@@ -107,23 +107,23 @@ namespace SurfaceGroundHeatExchanger {
         // conventional CTF terms
         int NumCTFTerms; // number of terms for surface
         // could be allocated rather than hard dimensioning.
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFin = {0.0};    // surf flux in ctf - X
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFout = {0.0};   // surf flux in ctf - Z
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFcross = {0.0}; // surf flux in ctf - Y
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFflux = {0.0};  // surf flux in ctf - F
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFin;    // surf flux in ctf - X
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFout;   // surf flux in ctf - Z
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFcross; // surf flux in ctf - Y
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFflux;  // surf flux in ctf - F
         // QTF coefficients
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFSourceIn = {0.0};   // surf flux in ctf - Wi
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFSourceOut = {0.0};  // surf flux out ctf - Wo
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceOut = {0.0}; // surf flux in qtf - x
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceIn = {0.0};  // surf flux in qtf - y
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceQ = {0.0};   // surf flux in qtf - f
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFSourceIn;   // surf flux in ctf - Wi
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFSourceOut;  // surf flux out ctf - Wo
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceOut; // surf flux in qtf - x
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceIn;  // surf flux in qtf - y
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceQ;   // surf flux in qtf - f
         // History data
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TbtmHistory = {0.0};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TtopHistory = {0.0};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TsrcHistory = {0.0};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QbtmHistory = {0.0};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QtopHistory = {0.0};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QsrcHistory = {0.0};
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TbtmHistory;
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TtopHistory;
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TsrcHistory;
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QbtmHistory;
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QtopHistory;
+        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QsrcHistory;
         Real64 QSrc;
         Real64 QSrcAvg;
         Real64 LastQSrc;

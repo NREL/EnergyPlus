@@ -516,12 +516,13 @@ namespace SurfaceGroundHeatExchanger {
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             OutDryBulb = OutDryBulbTempAt(state, SurfaceHXHeight);
             this->CTFflux[0] = 0.0;
-            this->TbtmHistory = {OutDryBulb};
-            this->TtopHistory = {OutDryBulb};
-            this->TsrcHistory = {OutDryBulb};
-            this->QbtmHistory = {0.0};
-            this->QtopHistory = {0.0};
-            this->QsrcHistory = {0.0};
+            this->TsrcHistory.fill(OutDryBulb);
+            this->TbtmHistory.fill(OutDryBulb);
+            this->TtopHistory.fill(OutDryBulb);
+            this->TsrcHistory.fill(OutDryBulb);
+            this->QbtmHistory.fill(0.0);
+            this->QtopHistory.fill(0.0);
+            this->QsrcHistory.fill(0.0);
             this->TsrcConstCoef = 0.0;
             this->TsrcVarCoef = 0.0;
             this->QbtmConstCoef = 0.0;
