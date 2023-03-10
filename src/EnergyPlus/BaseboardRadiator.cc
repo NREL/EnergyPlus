@@ -233,7 +233,6 @@ namespace BaseboardRadiator {
         int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autosized heating capacity
 
-        bool ErrorsFound(false); // If errors detected in input
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = cCMO_BBRadiator_Water;
@@ -245,6 +244,7 @@ namespace BaseboardRadiator {
         state.dataBaseboardRadiator->baseboards.allocate(NumConvHWBaseboards);
 
         if (NumConvHWBaseboards > 0) { // Get the data for cooling schemes
+            bool ErrorsFound(false);   // If errors detected in input
             for (int ConvHWBaseboardNum = 1; ConvHWBaseboardNum <= NumConvHWBaseboards; ++ConvHWBaseboardNum) {
                 int NumAlphas = 0;
                 int NumNums = 0;
@@ -619,8 +619,6 @@ namespace BaseboardRadiator {
         bool ErrorsFound(false);             // If errors detected in input
         Real64 rho;                          // local fluid density
         Real64 Cp;                           // local fluid specific heat
-        bool FlowAutoSize(false);            // Indicator to autosizing water volume flow
-        bool UAAutoSize(false);              // Indicator to autosizing UA
         Real64 WaterVolFlowRateMaxDes(0.0);  // Design water volume flow for reproting
         Real64 WaterVolFlowRateMaxUser(0.0); // User hard-sized volume flow for reporting
         Real64 UADes(0.0);                   // Design UA value for reproting
@@ -636,7 +634,8 @@ namespace BaseboardRadiator {
 
             if (state.dataSize->CurZoneEqNum > 0) {
                 auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
-                auto &finalZoneSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum);
+                auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum);
+                bool FlowAutoSize = false; // Indicator to autosizing water volume flow
 
                 if (this->WaterVolFlowRateMax == DataSizing::AutoSize) {
                     FlowAutoSize = true;
@@ -747,6 +746,7 @@ namespace BaseboardRadiator {
                 }
 
                 // UA sizing
+                bool UAAutoSize = false; // Indicator to autosizing UA
                 // Set hard-sized values to the local variable to correct a false indication aftet SolFla function calculation
                 if (this->UA == DataSizing::AutoSize) {
                     UAAutoSize = true;
@@ -775,7 +775,6 @@ namespace BaseboardRadiator {
                     state.dataSize->DataZoneNumber = this->ZonePtr;
                     int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                     int FieldNum = 1;
-                    bool PrintFlag = false;
                     std::string SizingString = this->FieldNames(FieldNum) + " [W]";
                     int CapSizingMethod = this->HeatingCapMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
@@ -806,6 +805,7 @@ namespace BaseboardRadiator {
                         } else {
                             TempSize = this->ScaledHeatingCapacity;
                         }
+                        bool PrintFlag = false;
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);

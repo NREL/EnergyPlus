@@ -444,56 +444,53 @@ namespace BaseboardElectric {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("SizeElectricBaseboard");
 
-        auto &baseboard = state.dataBaseboardElectric;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 TempSize; // autosized value of coil input field
         state.dataSize->DataScalableCapSizingON = false;
 
         if (state.dataSize->CurZoneEqNum > 0) {
             auto &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+            auto &baseboard = state.dataBaseboardElectric->baseboards(BaseboardNum);
 
-            std::string CompType = baseboard->baseboards(BaseboardNum).EquipType;
-            std::string CompName = baseboard->baseboards(BaseboardNum).EquipName;
+            std::string CompType = baseboard.EquipType;
+            std::string CompName = baseboard.EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
-            state.dataSize->DataZoneNumber = baseboard->baseboards(BaseboardNum).ZonePtr;
+            state.dataSize->DataZoneNumber = baseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
             int FieldNum = 1;
-            std::string SizingString = baseboard->baseboards(BaseboardNum).FieldNames(FieldNum) + " [W]";
-            int CapSizingMethod = baseboard->baseboards(BaseboardNum).HeatingCapMethod;
+            std::string SizingString = baseboard.FieldNames(FieldNum) + " [W]";
+            int CapSizingMethod = baseboard.HeatingCapMethod;
             ZoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
                 CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == DataSizing::HeatingDesignCapacity) {
-                    if (baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity == DataSizing::AutoSize) {
+                    if (baseboard.ScaledHeatingCapacity == DataSizing::AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing.HeatingCapacity = true;
                         ZoneEqSizing.DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
-                    TempSize = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
+                    TempSize = baseboard.ScaledHeatingCapacity;
                 } else if (CapSizingMethod == DataSizing::CapacityPerFloorArea) {
                     ZoneEqSizing.HeatingCapacity = true;
-                    ZoneEqSizing.DesHeatingLoad =
-                        baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    ZoneEqSizing.DesHeatingLoad = baseboard.ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing.DesHeatingLoad;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing.HeatingCapacity = true;
-                    state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard.ScaledHeatingCapacity;
                     ZoneEqSizing.DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     TempSize = DataSizing::AutoSize;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else {
-                    TempSize = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
+                    TempSize = baseboard.ScaledHeatingCapacity;
                 }
                 bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                baseboard->baseboards(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
+                baseboard.NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 state.dataSize->DataScalableCapSizingON = false;
             }
         }
@@ -504,7 +501,6 @@ namespace BaseboardElectric {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE: This subroutine calculates the heat exchange rate
         // in a pure Electricconvective baseboard heater.
@@ -515,34 +511,25 @@ namespace BaseboardElectric {
         //  model might be made more sophisticated and might use some of those data structures in the future
         //  so they are left in place even though this model does not utilize them.
 
-        // Using/Aliasing
-        using DataHVACGlobals::SmallLoad;
-        using Psychrometrics::PsyCpAirFnW;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AirInletTemp;
-        Real64 CpAir;
-        Real64 AirMassFlowRate;
-        Real64 CapacitanceAir;
-        Real64 Effic;
         Real64 AirOutletTemp;
         Real64 QBBCap;
 
-        auto &baseboard = state.dataBaseboardElectric;
+        auto &baseboard = state.dataBaseboardElectric->baseboards(BaseboardNum);
 
-        AirInletTemp = baseboard->baseboards(BaseboardNum).AirInletTemp;
-        CpAir = PsyCpAirFnW(baseboard->baseboards(BaseboardNum).AirInletHumRat);
-        AirMassFlowRate = SimpConvAirFlowSpeed;
-        CapacitanceAir = CpAir * AirMassFlowRate;
+        Real64 AirInletTemp = baseboard.AirInletTemp;
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(baseboard.AirInletHumRat);
+        Real64 AirMassFlowRate = SimpConvAirFlowSpeed;
+        Real64 CapacitanceAir = CpAir * AirMassFlowRate;
         // currently only the efficiency is used to calculate the electric consumption.  There could be some
         //  thermal loss that could be accounted for with this efficiency input.
-        Effic = baseboard->baseboards(BaseboardNum).BaseboardEfficiency;
+        Real64 Effic = baseboard.BaseboardEfficiency;
 
-        if (GetCurrentScheduleValue(state, baseboard->baseboards(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
+        if (GetCurrentScheduleValue(state, baseboard.SchedPtr) > 0.0 && LoadMet >= DataHVACGlobals::SmallLoad) {
 
             // if the load exceeds the capacity than the capacity is set to the BB limit.
-            if (LoadMet > baseboard->baseboards(BaseboardNum).NominalCapacity) {
-                QBBCap = baseboard->baseboards(BaseboardNum).NominalCapacity;
+            if (LoadMet > baseboard.NominalCapacity) {
+                QBBCap = baseboard.NominalCapacity;
             } else {
                 QBBCap = LoadMet;
             }
@@ -551,17 +538,17 @@ namespace BaseboardElectric {
             AirOutletTemp = AirInletTemp + QBBCap / CapacitanceAir;
 
             // The Baseboard electric Load is calculated using the efficiency
-            baseboard->baseboards(BaseboardNum).ElecUseRate = QBBCap / Effic;
+            baseboard.ElecUseRate = QBBCap / Effic;
 
         } else {
             // if there is an off condition the BB does nothing.
             AirOutletTemp = AirInletTemp;
             QBBCap = 0.0;
-            baseboard->baseboards(BaseboardNum).ElecUseRate = 0.0;
+            baseboard.ElecUseRate = 0.0;
         }
 
-        baseboard->baseboards(BaseboardNum).AirOutletTemp = AirOutletTemp;
-        baseboard->baseboards(BaseboardNum).Power = QBBCap;
+        baseboard.AirOutletTemp = AirOutletTemp;
+        baseboard.Power = QBBCap;
     }
 
 } // namespace BaseboardElectric
