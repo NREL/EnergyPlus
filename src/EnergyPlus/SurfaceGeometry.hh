@@ -288,7 +288,7 @@ namespace SurfaceGeometry {
 
     void GetMovableInsulationData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CalculateZoneVolume(EnergyPlusData &state, const Array1D_bool &CeilingHeightEntered);
+    void CalculateZoneVolume(EnergyPlusData &state);
 
     struct EdgeOfSurf
     {

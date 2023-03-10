@@ -2495,10 +2495,10 @@ namespace OutdoorAirUnit {
             case CompType::UnitarySystemModel: { // 'CompType:UnitarySystem'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
-                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) &&
+                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) ||
                         (OpMode == Operation::HeatingMode)) {
                         Dxsystemouttemp = 100.0; // There is no cooling demand.
-                    } else if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) &&
+                    } else if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) ||
                                (OpMode == Operation::CoolingMode)) {
                         Dxsystemouttemp = -20.0; // There is no heating demand.
                     } else {
