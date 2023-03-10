@@ -265,7 +265,6 @@ namespace BaseboardRadiator {
 
                 auto &thisBaseboard = state.dataBaseboardRadiator->baseboards(ConvHWBaseboardNum);
                 thisBaseboard.FieldNames.allocate(NumNums);
-                thisBaseboard.FieldNames = "";
                 thisBaseboard.FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
