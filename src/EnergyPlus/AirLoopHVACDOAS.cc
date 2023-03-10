@@ -210,7 +210,7 @@ namespace AirLoopHVACDOAS {
     {
         bool errorsFound(false);
 
-        std::string const &cCurrentModuleObject = "AirLoopHVAC:Mixer";
+        std::string const cCurrentModuleObject = "AirLoopHVAC:Mixer";
         std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -367,7 +367,7 @@ namespace AirLoopHVACDOAS {
     {
         bool errorsFound(false);
 
-        std::string const &cCurrentModuleObject = "AirLoopHVAC:Splitter";
+        std::string const cCurrentModuleObject = "AirLoopHVAC:Splitter";
         std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -424,7 +424,7 @@ namespace AirLoopHVACDOAS {
 
         bool errorsFound(false);
 
-        std::string const &cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
+        std::string const cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
         std::string cFieldName;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
