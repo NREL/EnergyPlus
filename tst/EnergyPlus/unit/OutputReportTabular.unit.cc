@@ -3619,7 +3619,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 3600.0;
+    state->dataGlobal->MinutesPerTimeStep = state->dataGlobal->TimeStepZone * 60.0;
     state->dataOutRptTab->displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -3788,6 +3789,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataOutRptTab->displayHeatEmissionsSummary = true;
     state->dataGlobal->DoWeathSim = true;
     state->dataHVACGlobal->TimeStepSys = 10.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+
     state->dataEnvrn->OutHumRat = 0.005;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
 
@@ -3799,9 +3802,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataCondenserLoopTowers->towers(1).Qactual = 1.0;
     state->dataCondenserLoopTowers->towers(1).FanEnergy = 50.0;
 
-    Real64 TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    Real64 reliefEnergy = 2.0 * TimeStepSysSec;
-    Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
+    Real64 reliefEnergy = 2.0 * state->dataHVACGlobal->TimeStepSysSec;
+    Real64 condenserReject = 1.0 * state->dataHVACGlobal->TimeStepSysSec + 50.0;
 
     GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::System);
 
@@ -3827,7 +3829,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->DXCoil(2).FuelConsumed = 0.0;
     state->dataDXCoils->DXCoil(2).CrankcaseHeaterConsumption = 0.0;
 
-    Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
+    Real64 coilReject = 1.0 * state->dataHVACGlobal->TimeStepSysSec + 200.0 + 10.0;
     GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::System);
     EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(2 * reliefEnergy * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief);
@@ -7122,33 +7124,34 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
     int coolDDNum = 1;
     int coolTimeOfMax = 64;
-    state->dataSize->CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
-    state->dataSize->CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
+    auto &finalZoneSizing = state->dataSize->CalcFinalZoneSizing(1);
+    finalZoneSizing.CoolDDNum = coolDDNum;
+    finalZoneSizing.TimeStepNumAtCoolMax = coolTimeOfMax;
     state->dataSize->CoolPeakDateHrMin.allocate(1);
 
-    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
-    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
-    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(numTimeStepInDay);
-    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
-    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(numTimeStepInDay);
-    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq(coolTimeOfMax) = 24.;
-    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(numTimeStepInDay);
-    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
-    state->dataSize->CalcFinalZoneSizing(1).DesCoolLoad = 500.;
-    state->dataSize->CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
-    state->dataSize->CalcFinalZoneSizing(1).CoolDesTemp = 13.;
-    state->dataSize->CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
+    finalZoneSizing.CoolOutTempSeq.allocate(numTimeStepInDay);
+    finalZoneSizing.CoolOutTempSeq(coolTimeOfMax) = 38.;
+    finalZoneSizing.CoolOutHumRatSeq.allocate(numTimeStepInDay);
+    finalZoneSizing.CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
+    finalZoneSizing.CoolZoneTempSeq.allocate(numTimeStepInDay);
+    finalZoneSizing.CoolZoneTempSeq(coolTimeOfMax) = 24.;
+    finalZoneSizing.CoolZoneHumRatSeq.allocate(numTimeStepInDay);
+    finalZoneSizing.CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
+    finalZoneSizing.DesCoolLoad = 500.;
+    finalZoneSizing.ZnCoolDgnSAMethod = SupplyAirTemperature;
+    finalZoneSizing.CoolDesTemp = 13.;
+    finalZoneSizing.DesCoolVolFlow = 3.3;
 
     int heatDDNum = 2;
     int heatTimeOfMax = 4;
-    state->dataSize->CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
-    state->dataSize->CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
+    finalZoneSizing.HeatDDNum = heatDDNum;
+    finalZoneSizing.TimeStepNumAtHeatMax = heatTimeOfMax;
     state->dataSize->HeatPeakDateHrMin.allocate(1);
 
-    state->dataSize->CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
-    state->dataSize->CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;
-    state->dataSize->CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
-    state->dataSize->CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
+    finalZoneSizing.HeatOutTempSeq.allocate(numTimeStepInDay);
+    finalZoneSizing.HeatOutTempSeq(heatTimeOfMax) = -17.4;
+    finalZoneSizing.HeatOutHumRatSeq.allocate(numTimeStepInDay);
+    finalZoneSizing.HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
@@ -7162,20 +7165,24 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
-    state->dataSize->CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
-    state->dataSize->CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
-    state->dataSize->CalcFinalZoneSizing(1).HeatZoneHumRatSeq.allocate(numTimeStepInDay);
-    state->dataSize->CalcFinalZoneSizing(1).HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
-    state->dataSize->CalcFinalZoneSizing(1).DesHeatLoad = 750.;
-    state->dataSize->CalcFinalZoneSizing(1).ZnHeatDgnSAMethod = SupplyAirTemperature;
-    state->dataSize->CalcFinalZoneSizing(1).HeatDesTemp = 35.;
-    state->dataSize->CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
+    finalZoneSizing.HeatZoneTempSeq.allocate(numTimeStepInDay);
+    finalZoneSizing.HeatZoneTempSeq(heatTimeOfMax) = 20.;
+    finalZoneSizing.HeatZoneHumRatSeq.allocate(numTimeStepInDay);
+    finalZoneSizing.HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
+    finalZoneSizing.DesHeatLoad = 750.;
+    finalZoneSizing.ZnHeatDgnSAMethod = SupplyAirTemperature;
+    finalZoneSizing.HeatDesTemp = 35.;
+    finalZoneSizing.DesHeatVolFlow = 3.3;
 
     state->dataSize->CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
     state->dataSize->CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(1, 1).DOASHeatAddSeq = 0.0;
     state->dataSize->CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(1, 1).DOASLatAddSeq = 0.0;
     state->dataSize->CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASHeatAddSeq = 0.0;
     state->dataSize->CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASLatAddSeq = 0.0;
 
     state->dataAirLoop->AirToZoneNodeInfo.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
@@ -8110,7 +8117,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->MinutesPerTimeStep = state->dataGlobal->TimeStepZone * 60;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 3600.0;
     state->dataOutRptTab->displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -8548,6 +8556,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataOutRptPredefined->reportName(state->dataOutRptPredefined->pdrSensibleGain).show = true;
 
     state->dataHVACGlobal->TimeStepSys = 10.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+
     state->dataGlobal->TimeStepZone = 20.0;
 
     state->dataHeatBal->ZonePreDefRep.allocate(1);
@@ -8567,12 +8577,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataHeatBal->ZnAirRpt.allocate(1);
 
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRepEnergy = 0.0;
     state->dataHeatBal->ZoneWinHeatLossRepEnergy.allocate(1);
+    state->dataHeatBal->ZoneWinHeatLossRepEnergy = 0.0;
 
     GatherHeatGainReport(*state, OutputProcessor::TimeStepType::System);
 
-    EXPECT_EQ(1.0 * (state->dataHVACGlobal->TimeStepSys) * DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
-    EXPECT_EQ(0.0 * (state->dataHVACGlobal->TimeStepSys) * DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1.0 * state->dataHVACGlobal->TimeStepSysSec, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0 * state->dataHVACGlobal->TimeStepSysSec, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
     EXPECT_EQ(1000.0, state->dataHeatBal->ZonePreDefRep(1).SHGSAnHvacATUHt);
     EXPECT_EQ(-2000.0, state->dataHeatBal->ZonePreDefRep(1).SHGSAnHvacATUCl);
 }
@@ -9718,7 +9730,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 3600.0;
+    state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataOutRptTab->displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 

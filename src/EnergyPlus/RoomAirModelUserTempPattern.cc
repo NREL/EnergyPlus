@@ -682,8 +682,8 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
             if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                 // Use Average Z for surface, more important for roofs than floors...
                 ++FloorCount;
-                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex, &Vector::z);
+                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex, &Vector::z);
                 ZFlrAvg += (Z1 + Z2) / 2.0;
             }
             if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Wall) {
@@ -693,8 +693,8 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
                     ZMax = state.dataSurface->Surface(SurfNum).Vertex(1).z;
                     ZMin = ZMax;
                 }
-                ZMax = max(ZMax, maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
-                ZMin = min(ZMin, minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
+                ZMax = max(ZMax, maxval(state.dataSurface->Surface(SurfNum).Vertex, &Vector::z));
+                ZMin = min(ZMin, minval(state.dataSurface->Surface(SurfNum).Vertex, &Vector::z));
             }
         }
     }

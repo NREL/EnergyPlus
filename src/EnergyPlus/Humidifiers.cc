@@ -1321,26 +1321,8 @@ namespace Humidifiers {
         // PURPOSE OF THIS SUBROUTINE:
         // collect water system calculations , update and report them
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AvailTankVdot;
@@ -1361,9 +1343,9 @@ namespace Humidifiers {
                 TankSupplyVdot = AvailTankVdot;
             }
 
-            TankSupplyVol = TankSupplyVdot * (TimeStepSys * DataGlobalConstants::SecInHour);
+            TankSupplyVol = TankSupplyVdot * TimeStepSysSec;
             StarvedSupplyVdot = StarvedVdot;
-            StarvedSupplyVol = StarvedVdot * (TimeStepSys * DataGlobalConstants::SecInHour);
+            StarvedSupplyVol = StarvedVdot * TimeStepSysSec;
         }
     }
 
@@ -1414,12 +1396,12 @@ namespace Humidifiers {
         // Fill remaining report variables
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-        ElecUseEnergy = ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
-        WaterCons = WaterConsRate * TimeStepSys * DataGlobalConstants::SecInHour;
-        GasUseEnergy = GasUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
-        AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        ElecUseEnergy = ElecUseRate * TimeStepSysSec;
+        WaterCons = WaterConsRate * TimeStepSysSec;
+        GasUseEnergy = GasUseRate * TimeStepSysSec;
+        AuxElecUseEnergy = AuxElecUseRate * TimeStepSysSec;
     }
 
     int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName, bool &ErrorsFound)

@@ -3014,16 +3014,12 @@ namespace HeatingCoils {
         // This subroutine updates the report variable for the coils.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // report the HeatingCoil energy from this component
         heatingCoil.HeatingCoilRate = heatingCoil.HeatingCoilLoad;
-        heatingCoil.HeatingCoilLoad *= ReportingConstant;
+        heatingCoil.HeatingCoilLoad *= TimeStepSysSec;
 
         heatingCoil.FuelUseRate = heatingCoil.FuelUseLoad;
         heatingCoil.ElecUseRate = heatingCoil.ElecUseLoad;
@@ -3032,10 +3028,10 @@ namespace HeatingCoils {
         } else {
             state.dataHVACGlobal->ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
         }
-        heatingCoil.FuelUseLoad *= ReportingConstant;
-        heatingCoil.ElecUseLoad *= ReportingConstant;
+        heatingCoil.FuelUseLoad *= TimeStepSysSec;
+        heatingCoil.ElecUseLoad *= TimeStepSysSec;
 
-        heatingCoil.ParasiticFuelLoad = heatingCoil.ParasiticFuelRate * ReportingConstant;
+        heatingCoil.ParasiticFuelLoad = heatingCoil.ParasiticFuelRate * TimeStepSysSec;
 
         std::string coilObjClassName;
         switch (heatingCoil.HCoilType_Num) {

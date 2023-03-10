@@ -587,7 +587,7 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
 
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
     state->dataGlobal->BeginEnvrnFlag = true;
-    thisSys.initUnitarySystems(*state, 0, firstHVACIteration, 0, 0.0);
+    thisSys.initUnitarySystems(*state, 0, firstHVACIteration, 0.0);
 
     // check that an intermediate speed has the correct flow ratio
     Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
@@ -1278,7 +1278,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     bool HeatActive = false;
     bool CoolActive = false;
     Real64 latOut = 0.0;
-    thisSys.initUnitarySystems(*state, 0, FirstHVACIteration, 0, 0.0);
+    thisSys.initUnitarySystems(*state, 0, FirstHVACIteration, 0.0);
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0.0, true, QUnitOut, latOut);
     // init sets heating mode to true due to cold ventilation air
     ASSERT_TRUE(state->dataUnitarySystems->HeatingLoad);

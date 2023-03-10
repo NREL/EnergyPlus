@@ -1139,9 +1139,9 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
 
     RegisterPlantCompDesignFlow(state, ThisCP.WaterInletNode, ThisCP.WaterVolFlowRateMax);
 
-    bool SizeCoolingPanelUASuccess;
-    SizeCoolingPanelUASuccess = ThisCP.SizeCoolingPanelUA(state);
-    if (!SizeCoolingPanelUASuccess) ShowFatalError(state, "SizeCoolingPanelUA: Program terminated for previous conditions.");
+    if (!ThisCP.SizeCoolingPanelUA(state)) {
+        ShowFatalError(state, "SizeCoolingPanelUA: Program terminated for previous conditions.");
+    }
 }
 
 bool CoolingPanelParams::SizeCoolingPanelUA(EnergyPlusData &state)
@@ -1154,26 +1154,28 @@ bool CoolingPanelParams::SizeCoolingPanelUA(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine sizes UA value for the simple chilled ceiling panel.
 
-    // Return value
-    bool SizeCoolingPanelUA;
-
     // These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
-    Real64 Cp;
-    Real64 MDot;
-    Real64 MDotXCp;
-    Real64 Qrated;
-    Real64 Tinletr;
-    Real64 Tzoner;
     Real64 RatCapToTheoMax; // Ratio of unit capacity to theoretical maximum output based on rated parameters
 
-    SizeCoolingPanelUA = true;
-    Cp = 4120.0; // Just an approximation, don't need to get an exact number
-    MDot = this->RatedWaterFlowRate;
-    MDotXCp = Cp * MDot;
-    Qrated = this->ScaledCoolingCapacity;
-    Tinletr = this->RatedWaterTemp;
-    Tzoner = this->RatedZoneAirTemp;
-    if (std::abs(Tinletr - Tzoner) < 0.5) {
+    Real64 constexpr Cp = 4120.0; // Just an approximation, don't need to get an exact number
+    Real64 const MDot = this->RatedWaterFlowRate;
+    Real64 const MDotXCp = Cp * MDot;
+    Real64 const Qrated = this->ScaledCoolingCapacity;
+    Real64 const Tinletr = this->RatedWaterTemp;
+    Real64 const Tzoner = this->RatedZoneAirTemp;
+
+    if (Tinletr >= Tzoner) {
+        ShowSevereError(state,
+                        format("SizeCoolingPanelUA: Unit=[{},{}] has a rated water temperature that is higher than the rated zone temperature.",
+                               cCMO_CoolingPanel_Simple,
+                               this->EquipID));
+        ShowContinueError(state,
+                          "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted.");
+        this->UA = 1.0;
+        return false;
+    }
+
+    if ((Tzoner - Tinletr) < 0.5) {
         RatCapToTheoMax = std::abs(Qrated) / (MDotXCp * 0.5); // Avoid a divide by zero error
     } else {
         RatCapToTheoMax = std::abs(Qrated) / (MDotXCp * std::abs(Tinletr - Tzoner));
@@ -1197,31 +1199,20 @@ bool CoolingPanelParams::SizeCoolingPanelUA(EnergyPlusData &state)
                           "between the rated temperatures.");
         ShowContinueError(
             state, "If the rated capacity is higher than this product, then the cooling panel would violate the Second Law of Thermodynamics.");
-        SizeCoolingPanelUA = false;
         this->UA = 1.0;
-    }
-    if (Tinletr >= Tzoner) {
-        ShowSevereError(state,
-                        format("SizeCoolingPanelUA: Unit=[{},{}] has a rated water temperature that is higher than the rated zone temperature.",
-                               cCMO_CoolingPanel_Simple,
-                               this->EquipID));
-        ShowContinueError(state,
-                          "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted.");
-        SizeCoolingPanelUA = false;
-        this->UA = 1.0;
-    } else {
-        this->UA = -MDotXCp * log(1.0 - RatCapToTheoMax);
-        if (this->UA <= 0.0) {
-            ShowSevereError(
-                state,
-                format("SizeCoolingPanelUA: Unit=[{},{}] has a zero or negative calculated UA value.", cCMO_CoolingPanel_Simple, this->EquipID));
-            ShowContinueError(state,
-                              "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct.");
-            SizeCoolingPanelUA = false;
-        }
+        return false;
     }
 
-    return SizeCoolingPanelUA;
+    this->UA = -MDotXCp * log(1.0 - RatCapToTheoMax);
+    if (this->UA <= 0.0) {
+        ShowSevereError(
+            state, format("SizeCoolingPanelUA: Unit=[{},{}] has a zero or negative calculated UA value.", cCMO_CoolingPanel_Simple, this->EquipID));
+        ShowContinueError(state,
+                          "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct.");
+        return false;
+    }
+
+    return true;
 }
 
 void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
@@ -1564,8 +1555,8 @@ void UpdateCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     // Existing code for hot water baseboard models (radiant-convective variety)
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
     // First, update the running average if necessary...
@@ -1727,7 +1718,7 @@ void CoolingPanelParams::ReportCoolingPanel(EnergyPlusData &state)
     // REFERENCES:
     // Existing code for hot water baseboard models (radiant-convective variety)
 
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // All of the power numbers are negative for cooling.  This is because they will have a negative
     // or cooling impact on the surfaces/zones.  However, the output variables are noted as cooling.

@@ -5866,7 +5866,7 @@ namespace VariableSpeedCoils {
 
         // Using/Aliasing
         using Curve::CurveValue;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -5898,7 +5898,6 @@ namespace VariableSpeedCoils {
         Real64 SHReff;   // Effective sensible heat ratio at part-load condition
         Real64 CpSource; // Specific heat of water [J/kg_C]
         Real64 CpAir;    // Specific heat of air [J/kg_C]
-        Real64 ReportingConstant;
 
         bool LatDegradModelSimFlag;      // Latent degradation model simulation flag
         int NumIteration;                // Iteration Counter
@@ -6509,7 +6508,6 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
         QWasteHeat *= PartLoadRatio;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = state.dataVariableSpeedCoils->Winput;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal = state.dataVariableSpeedCoils->QLoadTotal;
@@ -6517,20 +6515,20 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLatent =
             state.dataVariableSpeedCoils->QLoadTotal - state.dataVariableSpeedCoils->QSensible;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource = state.dataVariableSpeedCoils->QSource;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->Winput * ReportingConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal = state.dataVariableSpeedCoils->QLoadTotal * ReportingConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible = state.dataVariableSpeedCoils->QSensible * ReportingConstant;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->Winput * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal = state.dataVariableSpeedCoils->QLoadTotal * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible = state.dataVariableSpeedCoils->QSensible * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent =
-            (state.dataVariableSpeedCoils->QLoadTotal - state.dataVariableSpeedCoils->QSensible) * ReportingConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource = state.dataVariableSpeedCoils->QSource * ReportingConstant;
+            (state.dataVariableSpeedCoils->QLoadTotal - state.dataVariableSpeedCoils->QSensible) * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource = state.dataVariableSpeedCoils->QSource * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower * ReportingConstant;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsump =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate * ReportingConstant;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterConsumption =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower * ReportingConstant;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecPower * ReportingConstant;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecPower * TimeStepSysSec;
         if (RuntimeFrac == 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP = 0.0;
         } else {
@@ -6581,7 +6579,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateVdot =
                 max(0.0, (state.dataVariableSpeedCoils->LoadSideMassFlowRate * (SpecHumIn - SpecHumOut) / RhoWater));
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateVol =
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateVdot * ReportingConstant;
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateVdot * TimeStepSysSec;
         }
     }
 
@@ -6613,6 +6611,7 @@ namespace VariableSpeedCoils {
 
         // Using/Aliasing
         using Curve::CurveValue;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("CalcVarSpeedHPWH");
@@ -6668,15 +6667,14 @@ namespace VariableSpeedCoils {
         Real64 CpAir;                 // Specific heat of air [J/kg_C]
         Real64 MaxHumRat;             // max possible humidity
         Real64 MaxOutletEnth;         // max possible outlet enthalpy
-        Real64 ReportingConstant;
-        int EvapInletNode;    // Evaporator air inlet node number
-        int EvapOutletNode;   // Evaporator air outlet node number
-        int CondInletNode;    // Condenser water inlet node number
-        int CondOutletNode;   // Condenser water outlet node number
-        int MaxSpeed;         // maximum speed level
-        int SpeedCal;         // calculated speed level
-        Real64 rhoair(0.0);   // entering air density
-        Real64 RhoWater(0.0); // water density
+        int EvapInletNode;            // Evaporator air inlet node number
+        int EvapOutletNode;           // Evaporator air outlet node number
+        int CondInletNode;            // Condenser water inlet node number
+        int CondOutletNode;           // Condenser water outlet node number
+        int MaxSpeed;                 // maximum speed level
+        int SpeedCal;                 // calculated speed level
+        Real64 rhoair(0.0);           // entering air density
+        Real64 RhoWater(0.0);         // water density
 
         // note: load side is the evaporator side, and source side is the condenser side
 
@@ -7124,7 +7122,6 @@ namespace VariableSpeedCoils {
         //+ VarSpeedCoil(DXCoilNum)%BasinHeaterPower + VarSpeedCoil(DXCoilNum)%EvapCondPumpElecPower
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
 
-        ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower =
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * RuntimeFrac; // water heating pump power
@@ -7134,19 +7131,19 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLatent =
             state.dataVariableSpeedCoils->QLoadTotal - state.dataVariableSpeedCoils->QSensible;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource = state.dataVariableSpeedCoils->QSource;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->Winput * ReportingConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal = state.dataVariableSpeedCoils->QLoadTotal * ReportingConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible = state.dataVariableSpeedCoils->QSensible * ReportingConstant;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->Winput * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal = state.dataVariableSpeedCoils->QLoadTotal * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible = state.dataVariableSpeedCoils->QSensible * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent =
-            (state.dataVariableSpeedCoils->QLoadTotal - state.dataVariableSpeedCoils->QSensible) * ReportingConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource = state.dataVariableSpeedCoils->QSource * ReportingConstant;
+            (state.dataVariableSpeedCoils->QLoadTotal - state.dataVariableSpeedCoils->QSensible) * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource = state.dataVariableSpeedCoils->QSource * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower * ReportingConstant;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsump = 0.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterConsumption = 0.0;
         // re-use EvapCondPumpElecConsumption to store WH pump energy consumption
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * ReportingConstant;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * TimeStepSysSec;
         if (RuntimeFrac == 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP = 0.0;
         } else {
@@ -7201,29 +7198,6 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFanIndex = fanIndex;
     }
 
-    void setVarSpeedFanInfo(EnergyPlusData &state, int const dXCoilNum, std::string const fanName, int const fanIndex, int const fanTypeNum)
-    {
-        state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFanIndex = fanIndex;
-        state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFan_TypeNum = fanTypeNum;
-        state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFanName = fanName;
-    }
-
-    void getCoilTypeAndName(EnergyPlusData &state, int const CoilIndex, std::string &CoilType, std::string &CoilName, bool &ErrorsFound)
-    {
-        if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput(state);
-            state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
-        }
-
-        if (CoilIndex == 0) {
-            ShowSevereError(state, "getCoilTypeAndName: Could not find Coil");
-            ErrorsFound = true;
-        } else {
-            CoilName = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).Name;
-            CoilType = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VarSpeedCoilType;
-        }
-    }
-
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
                                  int const DXCoilNum,                      // Heat Pump Number
                                  int const CyclingScheme,                  // Fan/Compressor cycling scheme indicator
@@ -7252,7 +7226,7 @@ namespace VariableSpeedCoils {
 
         // Using/Aliasing
         using Curve::CurveValue;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -7297,8 +7271,7 @@ namespace VariableSpeedCoils {
         Real64 QWasteHeat1;         // recoverable waste heat at low speed
         Real64 QWasteHeat2;         // recoverable waste heat at high speed
         Real64 PLF;                 // part-load function
-        Real64 ReportingConstant;
-        Real64 rhoair(0.0); // entering air density
+        Real64 rhoair(0.0);         // entering air density
 
         // ADDED VARIABLES FOR air source coil
         MaxSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds;
@@ -7693,21 +7666,20 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
         QWasteHeat *= PartLoadRatio;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = state.dataVariableSpeedCoils->Winput;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal = state.dataVariableSpeedCoils->QLoadTotal;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible = state.dataVariableSpeedCoils->QSensible;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource = state.dataVariableSpeedCoils->QSource;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->Winput * ReportingConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal = state.dataVariableSpeedCoils->QLoadTotal * ReportingConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible = state.dataVariableSpeedCoils->QSensible * ReportingConstant;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->Winput * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal = state.dataVariableSpeedCoils->QLoadTotal * TimeStepSysSec;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible = state.dataVariableSpeedCoils->QSensible * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent = 0.0;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource = state.dataVariableSpeedCoils->QSource * ReportingConstant;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource = state.dataVariableSpeedCoils->QSource * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower * ReportingConstant;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostConsumption =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower * ReportingConstant;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower * TimeStepSysSec;
         if (RuntimeFrac == 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP = 0.0;
         } else {
@@ -8282,6 +8254,7 @@ namespace VariableSpeedCoils {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -8289,7 +8262,6 @@ namespace VariableSpeedCoils {
         int WaterInletNode;
         int AirOutletNode;
         int WaterOutletNode;
-        Real64 ReportingConstant;
 
         auto &varSpeedCoil = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum);
 
@@ -8345,12 +8317,11 @@ namespace VariableSpeedCoils {
             state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = varSpeedCoil.OutletWaterEnthalpy;
         }
 
-        ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        varSpeedCoil.Energy = varSpeedCoil.Power * ReportingConstant;
-        varSpeedCoil.EnergyLoadTotal = varSpeedCoil.QLoadTotal * ReportingConstant;
-        varSpeedCoil.EnergySensible = varSpeedCoil.QSensible * ReportingConstant;
-        varSpeedCoil.EnergyLatent = varSpeedCoil.QLatent * ReportingConstant;
-        varSpeedCoil.EnergySource = varSpeedCoil.QSource * ReportingConstant;
+        varSpeedCoil.Energy = varSpeedCoil.Power * TimeStepSysSec;
+        varSpeedCoil.EnergyLoadTotal = varSpeedCoil.QLoadTotal * TimeStepSysSec;
+        varSpeedCoil.EnergySensible = varSpeedCoil.QSensible * TimeStepSysSec;
+        varSpeedCoil.EnergyLatent = varSpeedCoil.QLatent * TimeStepSysSec;
+        varSpeedCoil.EnergySource = varSpeedCoil.QSource * TimeStepSysSec;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
