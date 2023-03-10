@@ -469,8 +469,7 @@ namespace BaseboardElectric {
                     if (baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity == DataSizing::AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing.HeatingCapacity = true;
-                        ZoneEqSizing.DesHeatingLoad =
-                            state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
+                        ZoneEqSizing.DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
                     TempSize = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
                 } else if (CapSizingMethod == DataSizing::CapacityPerFloorArea) {
@@ -483,8 +482,7 @@ namespace BaseboardElectric {
                     CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing.HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
-                    ZoneEqSizing.DesHeatingLoad =
-                        state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
+                    ZoneEqSizing.DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     TempSize = DataSizing::AutoSize;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else {
