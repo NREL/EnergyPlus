@@ -582,12 +582,15 @@ namespace DataHeatBalance {
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this zone
         // Calculated after input
-        Real64 FloorArea = 0.0;     // Floor area used for this zone
-        Real64 CalcFloorArea = 0.0; // Calculated floor area used for this zone
-        Real64 CeilingArea = 0.0;   // Ceiling area for the zone
-        bool HasFloor = false;      // Has "Floor" surface
-        bool HasRoof = false;       // Has "Roof" or "Ceiling" Surface
-        bool HasWindow = false;     // Window(s) present in this zone
+        Real64 FloorArea = 0.0;            // Floor area used for area based internal gains and outputs
+        Real64 CalcFloorArea = 0.0;        // Calculated floor area excluding air boundary surfaces
+        Real64 geometricFloorArea = 0.0;   // Calculated floor area including air boundary surfaces
+        Real64 CeilingArea = 0.0;          // Ceiling area excluding air boundary surfaces
+        Real64 geometricCeilingArea = 0.0; // Ceiling area area including air boundary surfaces
+        bool ceilingHeightEntered = false; // True is user input ceiling height
+        bool HasFloor = false;             // Has "Floor" surface
+        bool HasRoof = false;              // Has "Roof" or "Ceiling" Surface
+        bool HasWindow = false;            // Window(s) present in this zone
         Real64 AirCapacity = 0.0;
         Real64 ExtWindowArea = 0.0;               // Exterior Window Area for Zone
         Real64 ExtWindowArea_Multiplied = 0.0;    // Exterior Window Area for Zone with multipliers
