@@ -328,7 +328,7 @@ namespace ResultsFramework {
     {
     public:
         CSVWriter() = default;
-        explicit CSVWriter(std::size_t num_output_variables)
+        explicit CSVWriter(std::size_t num_output_variables) : outputVariableIndices()
         {
             outputVariableIndices = std::vector<bool>(num_output_variables, false);
         }

@@ -894,9 +894,9 @@ namespace HVACVariableRefrigerantFlow {
 
     int GetVRFTUMixedAirNode(EnergyPlusData &state, int VRFTUNum);
 
-    int GetVRFTUOutAirNodeFromName(EnergyPlusData &state, std::string const VRFTUName, bool &errorsFound);
+    int GetVRFTUOutAirNodeFromName(EnergyPlusData &state, std::string const &VRFTUName, bool &errorsFound);
 
-    int GetVRFTUInAirNodeFromName(EnergyPlusData &state, std::string const VRFTUName, bool &errorsFound);
+    int GetVRFTUInAirNodeFromName(EnergyPlusData &state, std::string const &VRFTUName, bool &errorsFound);
 
     int GetVRFTUReturnAirNode(EnergyPlusData &state, int const VRFTUNum);
 

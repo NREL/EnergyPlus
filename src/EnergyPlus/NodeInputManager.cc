@@ -883,7 +883,7 @@ void CheckUniqueNodeNames(
 }
 
 void CheckUniqueNodeNumbers(
-    EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, int const CheckNumber, std::string const ObjectName)
+    EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, int const CheckNumber, std::string const &ObjectName)
 {
 
     // SUBROUTINE INFORMATION:
