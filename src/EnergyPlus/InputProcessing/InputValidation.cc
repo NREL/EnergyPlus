@@ -89,7 +89,7 @@ const valijson::Schema &validation_schema(const json *schema)
     assert(last_schema == schema);
 
     static const std::unique_ptr<valijson::Schema> retval = [&]() {
-        auto vs = std::make_unique<valijson::Schema>();
+        auto vs = std::make_unique<valijson::Schema>(); // (THIS_AUTO_OK)
         valijson::SchemaParser parser;
         valijson::adapters::NlohmannJsonAdapter schema_doc(*schema);
         parser.populateSchema(schema_doc, *vs);

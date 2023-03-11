@@ -191,7 +191,7 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
                 check_first_row = !check_first_row;
 
                 for (int i = 0; i < num_columns; ++i) {
-                    auto arr = std::vector<json>();
+                    auto arr = std::vector<json>(); // (THIS_AUTO_OK)
                     arr.reserve(8764 * 4);
                     columns.push_back(std::move(arr));
                 }
@@ -204,7 +204,7 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
 
             parse_line(csv, index, columns);
             if (!success) {
-                auto found_index = csv.find_first_of('\n', beginning_of_line_index);
+                size_t found_index = csv.find_first_of('\n', beginning_of_line_index);
                 std::string line;
                 if (found_index != std::string::npos) {
                     line = csv.substr(beginning_of_line_index, found_index - beginning_of_line_index);
@@ -299,7 +299,7 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
     }
 
     size_t diff = save_i - index;
-    auto value = csv.substr(index, diff);
+    std::string_view value = csv.substr(index, diff);
     index_into_cur_line += diff;
     index = save_i;
 
@@ -308,14 +308,14 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
         plus_sign = 1;
     }
 
-    auto const value_end = value.data() + value.size(); // have to do this for MSVC
+    auto const value_end = value.data() + value.size(); // have to do this for MSVC // (THIS_AUTO_OK)
 
     double val;
-    auto result = fast_float::from_chars(value.data() + plus_sign, value.data() + value.size(), val);
+    auto result = fast_float::from_chars(value.data() + plus_sign, value.data() + value.size(), val); // (THIS_AUTO_OK)
     if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
         return rtrim(value);
     } else if (result.ptr != value_end) {
-        auto const initial_ptr = result.ptr;
+        auto const initial_ptr = result.ptr; // (THIS_AUTO_OK)
         while (delimiter != ' ' && result.ptr != value_end) {
             if (*result.ptr != ' ') {
                 break;
@@ -437,7 +437,7 @@ std::string_view CsvParser::rtrim(std::string_view str)
     if (str.empty()) {
         return str;
     }
-    auto const index = str.find_last_not_of(whitespace);
+    size_t const index = str.find_last_not_of(whitespace);
     if (index == std::string::npos) {
         str.remove_suffix(str.size());
         return str;
