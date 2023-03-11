@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -412,6 +413,12 @@ TEST_F(EnergyPlusFixture, ExerciseSingleSpeedFluidCooler)
     state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
     state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
 
+    // We don't set ptr->OutdoorAirInletNodeNum to a node, so the fluid cooler uses the dataEnvrn values
+    // We don't want them as 0 to avoid a divide by zero error, when PsyRhoAirFnPbTdbW will be called with these value in CalcFluidCoolerOutlet
+    EXPECT_EQ(0, ptr->OutdoorAirInletNodeNum);
+    state->dataEnvrn->OutBaroPress = 101325;
+    state->dataEnvrn->OutHumRat = 0.0001;
+
     bool firstHVAC = true;
     Real64 curLoad = 0.0;
     ptr->plantLoc.loopNum = 1;
@@ -477,6 +484,12 @@ TEST_F(EnergyPlusFixture, ExerciseTwoSpeedFluidCooler)
     state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
     state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
 
+    // We don't set ptr->OutdoorAirInletNodeNum to a node, so the fluid cooler uses the dataEnvrn values
+    // We don't want them as 0 to avoid a divide by zero error, when PsyRhoAirFnPbTdbW will be called with these value in CalcFluidCoolerOutlet
+    EXPECT_EQ(0, ptr->OutdoorAirInletNodeNum);
+    state->dataEnvrn->OutBaroPress = 101325;
+    state->dataEnvrn->OutHumRat = 0.0001;
+
     bool firstHVAC = true;
     Real64 curLoad = 0.0;
     ptr->plantLoc.loopNum = 1;
@@ -485,6 +498,7 @@ TEST_F(EnergyPlusFixture, ExerciseTwoSpeedFluidCooler)
     ptr->plantLoc.compNum = 1;
     ptr->DesWaterMassFlowRate = 3.141;
     ptr->WaterMassFlowRate = 3.141;
+    ptr->HighSpeedAirFlowRate = 2.124; // Autosizing didn't occur so...
     state->dataSize->PlantSizData.allocate(1);
     state->dataSize->PlantSizData(1).ExitTemp = 25.0;
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
