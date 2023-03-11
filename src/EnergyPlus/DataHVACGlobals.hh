@@ -424,6 +424,7 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step
 
     Real64 TimeStepSys = 0.0;                  // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
+    Real64 TimeStepSysSec = 0.0;               // System Time Increment in seconds
     Real64 SysTimeElapsed = 0.0;               // elapsed system time in zone timestep (hours)
     Real64 FracTimeStepZone = 0.0;             // System time step divided by the zone time step
     bool ShortenTimeStepSys = false;           // Logical flag that triggers shortening of system time step

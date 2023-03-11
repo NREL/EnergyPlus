@@ -178,18 +178,6 @@ namespace HVACStandAloneERV {
                                 bool &ErrorsFound               // set to true if problem
     );
 
-    int GetSupplyAirInletNode(EnergyPlusData &state,
-                              std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
-                              std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
-                              bool &ErrorsFound               // set to true if problem
-    );
-
-    int GetExhaustAirInletNode(EnergyPlusData &state,
-                               std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
-                               std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
-                               bool &ErrorsFound               // set to true if problem
-    );
-
     int GetStandAloneERVOutAirNode(EnergyPlusData &state, int StandAloneERVNum);
 
     int GetStandAloneERVZoneInletAirNode(EnergyPlusData &state, int StandAloneERVNum);

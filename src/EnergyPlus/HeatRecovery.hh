@@ -456,14 +456,6 @@ namespace HeatRecovery {
                                       bool &ErrorsFound          // set to true if problem
     );
 
-    void SetHeatExchangerData(EnergyPlusData &state,
-                              int HXNum,                                          // Index of HX
-                              bool &ErrorsFound,                                  // Set to true if certain errors found
-                              std::string const &HXName,                          // Name of HX
-                              ObjexxFCL::Optional<Real64> SupplyAirVolFlow = _,   // HX supply air flow rate    [m3/s]
-                              ObjexxFCL::Optional<Real64> SecondaryAirVolFlow = _ // HX secondary air flow rate [m3/s]
-    );
-
 } // namespace HeatRecovery
 
 struct ErrorTracker2

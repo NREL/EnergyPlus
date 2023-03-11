@@ -1937,7 +1937,6 @@ namespace HeatingCoils {
         // Simulates a simple Electric heating coil with an efficiency
 
         // Using/Aliasing
-        auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2042,7 +2041,6 @@ namespace HeatingCoils {
         }
 
         heatingCoil.HeatingCoilLoad = HeatingCoilLoad;
-        ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
 
         // Set the outlet conditions
         heatingCoil.OutletAirTemp = TempAirOut;
@@ -2098,7 +2096,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using Curve::CurveValue;
-        auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -2174,7 +2171,6 @@ namespace HeatingCoils {
                 // Power calculation
                 heatingCoil.ElecUseLoad = SpeedRatio * HSElecHeatingPower + (1.0 - SpeedRatio) * LSElecHeatingPower;
 
-                ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
                 heatingCoil.HeatingCoilLoad = TotCapHS * SpeedRatio + TotCapLS * (1.0 - SpeedRatio);
 
                 OutletAirEnthalpy = InletAirEnthalpy + heatingCoil.HeatingCoilLoad / heatingCoil.InletAirMassFlowRate;
@@ -2238,8 +2234,6 @@ namespace HeatingCoils {
 
                 heatingCoil.ElecUseLoad = heatingCoil.HeatingCoilLoad / EffLS;
 
-                ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
-
                 heatingCoil.OutletAirTemp = OutletAirTemp;
                 heatingCoil.OutletAirHumRat = OutletAirHumRat;
                 heatingCoil.OutletAirEnthalpy = OutletAirEnthalpy;
@@ -2267,7 +2261,6 @@ namespace HeatingCoils {
             // some of these are reset in Init, can be removed to speed up code
             heatingCoil.ElecUseLoad = 0.0;
             heatingCoil.HeatingCoilLoad = 0.0;
-            ElecHeatingCoilPower = 0.0;
 
         } // end of on/off if - else
 
@@ -3021,16 +3014,12 @@ namespace HeatingCoils {
         // This subroutine updates the report variable for the coils.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // report the HeatingCoil energy from this component
         heatingCoil.HeatingCoilRate = heatingCoil.HeatingCoilLoad;
-        heatingCoil.HeatingCoilLoad *= ReportingConstant;
+        heatingCoil.HeatingCoilLoad *= TimeStepSysSec;
 
         heatingCoil.FuelUseRate = heatingCoil.FuelUseLoad;
         heatingCoil.ElecUseRate = heatingCoil.ElecUseLoad;
@@ -3039,10 +3028,10 @@ namespace HeatingCoils {
         } else {
             state.dataHVACGlobal->ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
         }
-        heatingCoil.FuelUseLoad *= ReportingConstant;
-        heatingCoil.ElecUseLoad *= ReportingConstant;
+        heatingCoil.FuelUseLoad *= TimeStepSysSec;
+        heatingCoil.ElecUseLoad *= TimeStepSysSec;
 
-        heatingCoil.ParasiticFuelLoad = heatingCoil.ParasiticFuelRate * ReportingConstant;
+        heatingCoil.ParasiticFuelLoad = heatingCoil.ParasiticFuelRate * TimeStepSysSec;
 
         std::string coilObjClassName;
         switch (heatingCoil.HCoilType_Num) {

@@ -386,15 +386,15 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData &state)
     {
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // We only run this once for each zone time step.
         const int NumTimeStepsToday_loc = state.dataGlobal->HourOfDay * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
         if (NumTimeStepsToday_ != NumTimeStepsToday_loc) {
             NumTimeStepsToday_ = NumTimeStepsToday_loc;
         } else {
-            outputDCEnergy_ = outputDCPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
-            outputACEnergy_ = outputACPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputDCEnergy_ = outputDCPower_ * TimeStepSysSec;
+            outputACEnergy_ = outputACPower_ * TimeStepSysSec;
             return;
         }
         // SSC Inputs
@@ -450,9 +450,9 @@ namespace PVWatts {
         } else {
             // Report Out
             ssc_data_get_number(pvwattsData_, "dc", &outputDCPower_);
-            outputDCEnergy_ = outputDCPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputDCEnergy_ = outputDCPower_ * TimeStepSysSec;
             ssc_data_get_number(pvwattsData_, "ac", &outputACPower_);
-            outputACEnergy_ = outputACPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputACEnergy_ = outputACPower_ * TimeStepSysSec;
             ssc_data_get_number(pvwattsData_, "tcell", &cellTemperature_);
             ssc_data_get_number(pvwattsData_, "poa", &planeOfArrayIrradiance_);
         }
