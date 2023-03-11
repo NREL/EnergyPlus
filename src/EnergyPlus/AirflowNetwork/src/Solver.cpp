@@ -7044,7 +7044,7 @@ namespace AirflowNetwork {
                 } else { // FacadeNum = 2 or 4
                     SideRatio = 1.0 / simulation_control.aspect_ratio;
                 }
-                if (UtilityRoutines::SameString(simulation_control.BldgType, "HighRise") && FacadeNum != 5) {
+                if (UtilityRoutines::SameString(simulation_control.BldgType, "HighRise")) {
                     SideRatio = 1.0 / SideRatio;
                 }
                 SideRatioFac = std::log(SideRatio);
