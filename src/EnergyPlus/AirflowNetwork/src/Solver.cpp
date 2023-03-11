@@ -1751,7 +1751,6 @@ namespace AirflowNetwork {
         lNumericBlanks.dimension(MaxNums, true);
 
         bool ErrorsFound = false;
-        bool AirflowNetworkInitFlag = false;
 
         auto &Zone(m_state.dataHeatBal->Zone);
 
@@ -1956,7 +1955,6 @@ namespace AirflowNetwork {
             ShowFatalError(m_state, format("{}Only one (\"1\") {} object per simulation is allowed.", RoutineName, CurrentModuleObject));
         }
 
-        bool SimObjectError = false;
         if (!control_defaulted) {
             m_state.dataInputProcessing->inputProcessor->getObjectItem(m_state,
                                                                        CurrentModuleObject,
@@ -2106,6 +2104,7 @@ namespace AirflowNetwork {
 
         SetOutAirNodes(m_state);
         if (!control_defaulted) {
+            bool SimObjectError = false;
             if (UtilityRoutines::SameString(simulation_control.WPCCntr, "Input")) {
                 simulation_control.iWPCCnt = iWPCCntr::Input;
                 if (lAlphaBlanks(4)) {
