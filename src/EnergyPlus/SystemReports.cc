@@ -2162,8 +2162,6 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Dan Fisher/Linda Lawrie
     //       DATE WRITTEN   June 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Creates the Energy Reporting Structure.  This routine is only called once --
@@ -2174,10 +2172,6 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     // subcomponents, etc.
 
     // Using/Aliasing
-    using BranchNodeConnections::GetChildrenData;
-    using BranchNodeConnections::GetComponentData;
-    using BranchNodeConnections::GetNumChildren;
-    using BranchNodeConnections::IsParentObject;
     using namespace DataGlobalConstants;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2233,10 +2227,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf));
                 std::string &NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
                 // Get complete list of components for complex branches
-                if (IsParentObject(state, TypeOfComp, NameOfComp)) {
+                if (BranchNodeConnections::IsParentObject(state, TypeOfComp, NameOfComp)) {
 
                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Parent = true;
-                    NumChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
+                    NumChildren = BranchNodeConnections::GetNumChildren(state, TypeOfComp, NameOfComp);
 
                     SubCompTypes.allocate(NumChildren);
                     SubCompNames.allocate(NumChildren);
@@ -2246,17 +2240,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     OutletNodeNumbers.allocate(NumChildren);
                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp.allocate(NumChildren);
 
-                    GetChildrenData(state,
-                                    TypeOfComp,
-                                    NameOfComp,
-                                    NumChildren,
-                                    SubCompTypes,
-                                    SubCompNames,
-                                    InletNodeNames,
-                                    InletNodeNumbers,
-                                    OutletNodeNames,
-                                    OutletNodeNumbers,
-                                    ErrorsFound);
+                    BranchNodeConnections::GetChildrenData(state,
+                                                           TypeOfComp,
+                                                           NameOfComp,
+                                                           NumChildren,
+                                                           SubCompTypes,
+                                                           SubCompNames,
+                                                           InletNodeNames,
+                                                           InletNodeNumbers,
+                                                           OutletNodeNames,
+                                                           OutletNodeNumbers,
+                                                           ErrorsFound);
 
                     for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                         {
@@ -2292,8 +2286,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).TypeOf));
                     std::string &NameOfSubComp =
                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).Name;
-                    if (IsParentObject(state, TypeOfSubComp, NameOfSubComp)) {
-                        NumGrandChildren = GetNumChildren(state, TypeOfSubComp, NameOfSubComp);
+                    if (BranchNodeConnections::IsParentObject(state, TypeOfSubComp, NameOfSubComp)) {
+                        NumGrandChildren = BranchNodeConnections::GetNumChildren(state, TypeOfSubComp, NameOfSubComp);
                         SubCompTypes.allocate(NumGrandChildren);
                         SubCompNames.allocate(NumGrandChildren);
                         InletNodeNames.allocate(NumGrandChildren);
@@ -2306,17 +2300,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             .SubComp(SubCompNum)
                             .SubSubComp.allocate(NumGrandChildren);
 
-                        GetChildrenData(state,
-                                        TypeOfSubComp,
-                                        NameOfSubComp,
-                                        NumGrandChildren,
-                                        SubCompTypes,
-                                        SubCompNames,
-                                        InletNodeNames,
-                                        InletNodeNumbers,
-                                        OutletNodeNames,
-                                        OutletNodeNumbers,
-                                        ErrorsFound);
+                        BranchNodeConnections::GetChildrenData(state,
+                                                               TypeOfSubComp,
+                                                               NameOfSubComp,
+                                                               NumGrandChildren,
+                                                               SubCompTypes,
+                                                               SubCompNames,
+                                                               InletNodeNames,
+                                                               InletNodeNumbers,
+                                                               OutletNodeNames,
+                                                               OutletNodeNumbers,
+                                                               ErrorsFound);
 
                         for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                             {
@@ -2332,7 +2326,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 thisSubSubComponent.NodeNameOut = OutletNodeNames(SubSubCompNum);
                                 thisSubSubComponent.NodeNumIn = InletNodeNumbers(SubSubCompNum);
                                 thisSubSubComponent.NodeNumOut = OutletNodeNumbers(SubSubCompNum);
-                                NumLeft = GetNumChildren(state, SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
+                                NumLeft = BranchNodeConnections::GetNumChildren(state, SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                 if (NumLeft > 0) {
                                     ShowSevereError(
                                         state,
@@ -2591,19 +2585,18 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             std::string &NameOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipName(CompNum);
             DataLoopNode::ConnectionObjectType TypeOfCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
                 EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfComp));
-            GetComponentData(state,
-                             TypeOfCompNum,
-                             NameOfComp,
-                             IsParent,
-                             NumInlets,
-                             InletNodeNames,
-                             InletNodeNumbers,
-                             InletFluidStreams,
-                             NumOutlets,
-                             OutletNodeNames,
-                             OutletNodeNumbers,
-                             OutletFluidStreams,
-                             ErrorsFound);
+            BranchNodeConnections::GetComponentData(state,
+                                                    TypeOfCompNum,
+                                                    NameOfComp,
+                                                    IsParent,
+                                                    NumInlets,
+                                                    InletNodeNames,
+                                                    InletNodeNumbers,
+                                                    InletFluidStreams,
+                                                    NumOutlets,
+                                                    OutletNodeNames,
+                                                    OutletNodeNumbers,
+                                                    OutletFluidStreams);
             {
                 auto &thisEquipData(state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipData(CompNum));
                 thisEquipData.TypeOf = TypeOfComp;
@@ -2688,8 +2681,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     Names.deallocate();
                 }
 
-                if (IsParentObject(state, TypeOfCompNum, NameOfComp)) {
-                    NumChildren = GetNumChildren(state, TypeOfCompNum, NameOfComp);
+                if (BranchNodeConnections::IsParentObject(state, TypeOfCompNum, NameOfComp)) {
+                    NumChildren = BranchNodeConnections::GetNumChildren(state, TypeOfCompNum, NameOfComp);
                     thisEquipData.NumSubEquip = NumChildren;
 
                     SubCompTypes.allocate(NumChildren);
@@ -2700,17 +2693,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     OutletNodeNumbers.allocate(NumChildren);
                     thisEquipData.SubEquipData.allocate(NumChildren);
 
-                    GetChildrenData(state,
-                                    TypeOfCompNum,
-                                    NameOfComp,
-                                    NumChildren,
-                                    SubCompTypes,
-                                    SubCompNames,
-                                    InletNodeNames,
-                                    InletNodeNumbers,
-                                    OutletNodeNames,
-                                    OutletNodeNumbers,
-                                    ErrorsFound);
+                    BranchNodeConnections::GetChildrenData(state,
+                                                           TypeOfCompNum,
+                                                           NameOfComp,
+                                                           NumChildren,
+                                                           SubCompTypes,
+                                                           SubCompNames,
+                                                           InletNodeNames,
+                                                           InletNodeNumbers,
+                                                           OutletNodeNames,
+                                                           OutletNodeNumbers,
+                                                           ErrorsFound);
 
                     for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                         thisEquipData.SubEquipData(SubCompNum).TypeOf =
@@ -2735,8 +2728,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     std::string &NameOfSubComp = thisEquipData.SubEquipData(SubCompNum).Name;
                     DataLoopNode::ConnectionObjectType TypeOfSubCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
                         EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfSubComp));
-                    if (IsParentObject(state, TypeOfSubCompNum, NameOfSubComp)) {
-                        NumGrandChildren = GetNumChildren(state, TypeOfSubCompNum, NameOfSubComp);
+                    if (BranchNodeConnections::IsParentObject(state, TypeOfSubCompNum, NameOfSubComp)) {
+                        NumGrandChildren = BranchNodeConnections::GetNumChildren(state, TypeOfSubCompNum, NameOfSubComp);
                         thisEquipData.SubEquipData(SubCompNum).NumSubSubEquip = NumGrandChildren;
                         SubCompTypes.allocate(NumGrandChildren);
                         SubCompNames.allocate(NumGrandChildren);
@@ -2746,17 +2739,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         OutletNodeNumbers.allocate(NumGrandChildren);
                         thisEquipData.SubEquipData(SubCompNum).SubSubEquipData.allocate(NumGrandChildren);
                         // Sankar added the array number for EquipData
-                        GetChildrenData(state,
-                                        TypeOfSubCompNum,
-                                        NameOfSubComp,
-                                        NumGrandChildren,
-                                        SubCompTypes,
-                                        SubCompNames,
-                                        InletNodeNames,
-                                        InletNodeNumbers,
-                                        OutletNodeNames,
-                                        OutletNodeNumbers,
-                                        ErrorsFound);
+                        BranchNodeConnections::GetChildrenData(state,
+                                                               TypeOfSubCompNum,
+                                                               NameOfSubComp,
+                                                               NumGrandChildren,
+                                                               SubCompTypes,
+                                                               SubCompNames,
+                                                               InletNodeNames,
+                                                               InletNodeNumbers,
+                                                               OutletNodeNames,
+                                                               OutletNodeNumbers,
+                                                               ErrorsFound);
 
                         for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).TypeOf =
@@ -2966,9 +2959,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         DataLoopNode::ConnectionObjectType TypeOfCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
                             EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfComp));
                         // Get complete list of components for complex branches
-                        if (IsParentObject(state, TypeOfCompNum, NameOfComp)) {
+                        if (BranchNodeConnections::IsParentObject(state, TypeOfCompNum, NameOfComp)) {
 
-                            NumChildren = GetNumChildren(state, TypeOfCompNum, NameOfComp);
+                            NumChildren = BranchNodeConnections::GetNumChildren(state, TypeOfCompNum, NameOfComp);
 
                             SubCompTypes.allocate(NumChildren);
                             SubCompNames.allocate(NumChildren);
@@ -2978,17 +2971,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             OutletNodeNumbers.allocate(NumChildren);
                             thisComp.SubComp.allocate(NumChildren);
 
-                            GetChildrenData(state,
-                                            TypeOfCompNum,
-                                            NameOfComp,
-                                            NumChildren,
-                                            SubCompTypes,
-                                            SubCompNames,
-                                            InletNodeNames,
-                                            InletNodeNumbers,
-                                            OutletNodeNames,
-                                            OutletNodeNumbers,
-                                            ErrorsFound);
+                            BranchNodeConnections::GetChildrenData(state,
+                                                                   TypeOfCompNum,
+                                                                   NameOfComp,
+                                                                   NumChildren,
+                                                                   SubCompTypes,
+                                                                   SubCompNames,
+                                                                   InletNodeNames,
+                                                                   InletNodeNumbers,
+                                                                   OutletNodeNames,
+                                                                   OutletNodeNumbers,
+                                                                   ErrorsFound);
 
                             for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                                 thisComp.SubComp(SubCompNum).TypeOf =
@@ -3018,8 +3011,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             std::string NameOfSubComp = thisComp.SubComp(SubCompNum).Name;
                             DataLoopNode::ConnectionObjectType TypeOfSubCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
                                 EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfSubComp));
-                            if (IsParentObject(state, TypeOfSubCompNum, NameOfSubComp)) {
-                                NumGrandChildren = GetNumChildren(state, TypeOfSubCompNum, NameOfSubComp);
+                            if (BranchNodeConnections::IsParentObject(state, TypeOfSubCompNum, NameOfSubComp)) {
+                                NumGrandChildren = BranchNodeConnections::GetNumChildren(state, TypeOfSubCompNum, NameOfSubComp);
                                 SubCompTypes.allocate(NumGrandChildren);
                                 SubCompNames.allocate(NumGrandChildren);
                                 InletNodeNames.allocate(NumGrandChildren);
@@ -3028,17 +3021,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 OutletNodeNumbers.allocate(NumGrandChildren);
                                 thisComp.SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                                GetChildrenData(state,
-                                                TypeOfSubCompNum,
-                                                NameOfSubComp,
-                                                NumGrandChildren,
-                                                SubCompTypes,
-                                                SubCompNames,
-                                                InletNodeNames,
-                                                InletNodeNumbers,
-                                                OutletNodeNames,
-                                                OutletNodeNumbers,
-                                                ErrorsFound);
+                                BranchNodeConnections::GetChildrenData(state,
+                                                                       TypeOfSubCompNum,
+                                                                       NameOfSubComp,
+                                                                       NumGrandChildren,
+                                                                       SubCompTypes,
+                                                                       SubCompNames,
+                                                                       InletNodeNames,
+                                                                       InletNodeNumbers,
+                                                                       OutletNodeNames,
+                                                                       OutletNodeNumbers,
+                                                                       ErrorsFound);
 
                                 for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                                     {
