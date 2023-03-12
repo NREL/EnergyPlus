@@ -1025,11 +1025,12 @@ namespace BranchInputManager {
         if (state.dataBranchInputManager->GetBranchInputOneTimeFlag) {
             std::string CurrentModuleObject = "Branch";
             int NumOfBranches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-            int NumNumbers; // Used to retrieve numbers from IDF
-            int NumAlphas;  // Used to retrieve names from IDF
-            int NumParams;
+
             if (NumOfBranches > 0) {
                 state.dataBranchInputManager->Branch.allocate(NumOfBranches);
+                int NumNumbers; // Used to retrieve numbers from IDF
+                int NumAlphas;  // Used to retrieve names from IDF
+                int NumParams;
                 bool ErrFound = false;
                 state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
                 NodeNums.dimension(NumParams, 0);
@@ -2517,7 +2518,6 @@ namespace BranchInputManager {
                   state.dataBranchInputManager->BranchList(BCount).LoopType,
                   state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
 
-            bool IsAirBranch = false;
             BranchFluidType = NodeFluidType::Blank;
             bool MixedFluidTypesOnBranchList = false;
             int NumNodesOnBranchList = 0;
@@ -2567,7 +2567,6 @@ namespace BranchInputManager {
                 for (Loop = 1; Loop <= state.dataBranchInputManager->Branch(Found).NumOfComponents; ++Loop) {
                     if (state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType ==
                         DataLoopNode::NodeFluidType::Air)
-                        IsAirBranch = true;
                     if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
@@ -2587,7 +2586,6 @@ namespace BranchInputManager {
                     }
                     if (state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType ==
                         DataLoopNode::NodeFluidType::Air)
-                        IsAirBranch = true;
                     if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
