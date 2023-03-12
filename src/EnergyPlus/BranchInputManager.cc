@@ -428,7 +428,7 @@ namespace BranchInputManager {
                                DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of pressure curve object
                                int &PressCurveIndex,                                      // Index of pressure curve object
                                int &NumComps,                                             // Number of Components on Branch
-                               Array1D<ComponentData> &BComponents,                       // Component data returned
+                               Array1D<ComponentData> const &BComponents,                 // Component data returned
                                bool &ErrorsFound // True when Loop Name is already assigned and this not same loop
     )
     {
@@ -1080,11 +1080,11 @@ namespace BranchInputManager {
     void GetSingleBranchInput(EnergyPlusData &state,
                               std::string_view const RoutineName,
                               int const BCount,
-                              Array1D_string &Alphas,
-                              Array1D_string &cAlphaFields,
+                              Array1D_string const &Alphas,
+                              Array1D_string const &cAlphaFields,
                               int const NumAlphas,
                               Array1D_int &NodeNums,
-                              Array1D_bool &lAlphaBlanks)
+                              Array1D_bool const &lAlphaBlanks)
     {
         // Locals
         PressureCurveType pressureCurveType;
