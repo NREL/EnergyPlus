@@ -207,16 +207,8 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TowerNum;                      // Tower number, reference counter for towers data array
-        int NumSingleSpeedTowers;          // Total number of single-speed cooling towers
-        int SingleSpeedTowerNumber;        // Specific single-speed tower of interest
-        int NumTwoSpeedTowers;             // Number of two-speed cooling towers
-        int TwoSpeedTowerNumber;           // Specific two-speed tower of interest
-        int NumVariableSpeedTowers;        // Number of variable-speed cooling towers
-        int VariableSpeedTowerNumber;      // Specific variable-speed tower of interest
         int NumVSCoolToolsModelCoeffs = 0; // Number of CoolTools VS cooling tower coefficient objects
         int NumVSYorkCalcModelCoeffs = 0;  // Number of YorkCalc VS cooling tower coefficient objects
-        int NumVSMerkelTowers;             // Number of Merkel variable speed cooling towers
-        int MerkelVSTowerNum;              // specific merkel variable speed tower of interest
         int VSModelCoeffNum;               // Specific variable-speed tower coefficient object of interest
         int NumAlphas;                     // Number of elements in the alpha array
         int NumNums;                       // Number of elements in the numeric array
@@ -238,10 +230,10 @@ namespace CondenserLoopTowers {
         constexpr std::array<std::string_view, static_cast<int>(CellCtrl::Num)> CellCtrlNamesUC = {"MINIMALCELL", "MAXIMALCELL"};
 
         // Get number of all cooling towers specified in the input data file (idf)
-        NumSingleSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
-        NumTwoSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_TwoSpeed);
-        NumVariableSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeed);
-        NumVSMerkelTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeedMerkel);
+        int NumSingleSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
+        int NumTwoSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_TwoSpeed);
+        int NumVariableSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeed);
+        int NumVSMerkelTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeedMerkel);
         int NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
 
         if (NumSimpleTowers <= 0)
@@ -263,11 +255,11 @@ namespace CondenserLoopTowers {
             NumVSYorkCalcModelCoeffs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoolingTowerPerformance:YorkCalc");
         }
 
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        std::string &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         // Load data structures with cooling tower input data
         cCurrentModuleObject = cCoolingTower_SingleSpeed;
-        for (SingleSpeedTowerNumber = 1; SingleSpeedTowerNumber <= NumSingleSpeedTowers; ++SingleSpeedTowerNumber) {
+        for (int SingleSpeedTowerNumber = 1; SingleSpeedTowerNumber <= NumSingleSpeedTowers; ++SingleSpeedTowerNumber) {
             TowerNum = SingleSpeedTowerNumber;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -614,7 +606,7 @@ namespace CondenserLoopTowers {
         } // End Single-Speed Tower Loop
 
         cCurrentModuleObject = cCoolingTower_TwoSpeed;
-        for (TwoSpeedTowerNumber = 1; TwoSpeedTowerNumber <= NumTwoSpeedTowers; ++TwoSpeedTowerNumber) {
+        for (int TwoSpeedTowerNumber = 1; TwoSpeedTowerNumber <= NumTwoSpeedTowers; ++TwoSpeedTowerNumber) {
             TowerNum = NumSingleSpeedTowers + TwoSpeedTowerNumber;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -1012,7 +1004,7 @@ namespace CondenserLoopTowers {
         } // End Two-Speed Tower Loop
 
         cCurrentModuleObject = cCoolingTower_VariableSpeed;
-        for (VariableSpeedTowerNumber = 1; VariableSpeedTowerNumber <= NumVariableSpeedTowers; ++VariableSpeedTowerNumber) {
+        for (int VariableSpeedTowerNumber = 1; VariableSpeedTowerNumber <= NumVariableSpeedTowers; ++VariableSpeedTowerNumber) {
             TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + VariableSpeedTowerNumber;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -1523,7 +1515,7 @@ namespace CondenserLoopTowers {
         } // End Variable-Speed Tower Loop
 
         cCurrentModuleObject = cCoolingTower_VariableSpeedMerkel;
-        for (MerkelVSTowerNum = 1; MerkelVSTowerNum <= NumVSMerkelTowers; ++MerkelVSTowerNum) {
+        for (int MerkelVSTowerNum = 1; MerkelVSTowerNum <= NumVSMerkelTowers; ++MerkelVSTowerNum) {
             TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + MerkelVSTowerNum;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -2390,7 +2382,6 @@ namespace CondenserLoopTowers {
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2002
         //       MODIFIED       Don Shirey, Sept/Oct 2002; Richard Raustad, Feb 2005
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing Cooling Tower Components for which capacities and flow rates
@@ -3490,12 +3481,6 @@ namespace CondenserLoopTowers {
     void CoolingTower::SizeVSMerkelTower(EnergyPlusData &state)
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIte(500);    // Maximum number of iterations
         Real64 constexpr Acc(0.0001); // Accuracy of result
@@ -3529,7 +3514,7 @@ namespace CondenserLoopTowers {
         Real64 DesTowerInletAirWBTemp = this->DesInletAirWBTemp;
         Real64 DesTowerInletAirDBTemp = this->DesInletAirDBTemp;
 
-        auto &PlantSizData(state.dataSize->PlantSizData);
+        auto const &PlantSizData(state.dataSize->PlantSizData);
 
         if (this->TowerInletCondsAutoSize) {
             if (PltSizCondNum > 0) {
@@ -4854,7 +4839,6 @@ namespace CondenserLoopTowers {
         //                      Jul. 2010, A Flament, added multi-cell capability for the 3 types of cooling tower
         //                      Jun. 2016, R Zhang, Applied the condenser supply water temperature sensor fault model
         //                      Jul. 2016, R Zhang, Applied the cooling tower fouling fault model
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // To simulate the operation of a cooling tower with a two-speed fan.
@@ -5097,7 +5081,6 @@ namespace CondenserLoopTowers {
         //                      Jul. 2010, B Griffith, general fluid props
         //                      Jun. 2016, R Zhang, Applied the condenser supply water temperature sensor fault model
         //                      Jul. 2016, R Zhang, Applied the cooling tower fouling fault model
-        //       RE-ENGINEERED
 
         // PURPOSE OF THIS SUBROUTINE:
         // To simulate the operation of a variable-speed fan cooling tower.
@@ -5435,7 +5418,6 @@ namespace CondenserLoopTowers {
         //       DATE WRITTEN   August 2013
         //       MODIFIED       Jun. 2016, R Zhang, Applied the condenser supply water temperature sensor fault model
         //                      Jul. 2016, R Zhang, Applied the cooling tower fouling fault model
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate variable speed tower model using Merkel's theory with UA adjustments developed by Scheier
@@ -5701,7 +5683,6 @@ namespace CondenserLoopTowers {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 1998
-        //       MODIFIED       na
         //       RE-ENGINEERED  Shirey, Raustad, Jan 2001
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -5891,8 +5872,6 @@ namespace CondenserLoopTowers {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb. 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // Calculate tower approach temperature (e.g. outlet water temp minus inlet air wet-bulb temp)
@@ -5960,8 +5939,6 @@ namespace CondenserLoopTowers {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Feb 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED
 
         // PURPOSE OF THIS SUBROUTINE:
         // To verify that the empirical model's independent variables are within the limits used during the
@@ -5977,11 +5954,10 @@ namespace CondenserLoopTowers {
         // routine depending on their use.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string OutputChar;     // character string for warning messages
-        std::string OutputCharLo;   // character string for warning messages
-        std::string OutputCharHi;   // character string for warning messages
-        std::string TrimValue;      // character string for warning messages
-        Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
+        std::string OutputChar;   // character string for warning messages
+        std::string OutputCharLo; // character string for warning messages
+        std::string OutputCharHi; // character string for warning messages
+        std::string TrimValue;    // character string for warning messages
         // current end time is compared with last to see if time step changed
 
         //   initialize capped variables in case independent variables are in bounds
@@ -5991,7 +5967,7 @@ namespace CondenserLoopTowers {
         WaterFlowRateRatioCapped = WaterFlowRateRatio;
 
         //   calculate end time of current time step
-        CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
@@ -6215,11 +6191,9 @@ namespace CondenserLoopTowers {
         //       DATE WRITTEN   August 2006
         //       MODIFIED       T Hong, Aug. 2008. Added fluid bypass for single speed cooling tower
         //                      A Flament, July 2010. Added multi-cell capability
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Collect tower water useage calculations for
-        // reuse by all the tower models.
+        // Collect tower water useage calculations for reuse by all the tower models.
 
         // REFERENCES:
         // Code for this routine started from VariableSpeedTower
@@ -6227,7 +6201,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("calculateWaterUsage");
 
-        Real64 EvapVdot(0.0);
+        Real64 EvapVdot = 0.0;
         Real64 AverageWaterTemp = (this->InletWaterTemp + this->OutletWaterTemp) / 2.0;
 
         // Set water and air properties
@@ -6434,8 +6408,6 @@ namespace CondenserLoopTowers {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the tower.
