@@ -225,9 +225,6 @@ namespace CondenserLoopTowers {
         int IOStat;                        // IO Status when calling get input subroutine
         int CoeffNum;                      // Index for reading user defined VS tower coefficients
         bool ErrorsFound(false);           // Logical flag set .TRUE. if errors found while getting input data
-        std::string OutputChar;            // report variable for warning messages
-        std::string OutputCharLo;          // report variable for warning messages
-        std::string OutputCharHi;          // report variable for warning messages
         Array1D<Real64> NumArray(33);      // Numeric input data array
         Array1D<Real64> NumArray2(43);     // Numeric input data array for VS tower coefficients
         Array1D_string AlphArray(16);      // Character string input data array
@@ -2416,10 +2413,6 @@ namespace CondenserLoopTowers {
         Real64 UA0;                       // Lower bound for UA [W/C]
         Real64 UA1;                       // Upper bound for UA [W/C]
         Real64 UA;                        // Calculated UA value
-        std::string OutputChar;           // report variable for warning messages
-        std::string OutputChar2;          // report variable for warning messages
-        std::string OutputCharLo;         // report variable for warning messages
-        std::string OutputCharHi;         // report variable for warning messages
         Real64 DesTowerInletWaterTemp;    // design tower inlet water temperature
         Real64 DesTowerExitWaterTemp;     // design tower exit water temperature
         Real64 DesTowerWaterDeltaT;       // design tower temperature range
@@ -5024,13 +5017,12 @@ namespace CondenserLoopTowers {
             // set local variable for tower
             Real64 UAdesign = freeConvTowerUA / this->NumCell; // where is NumCellOn?
             AirFlowRate = this->FreeConvAirFlowRate / this->NumCell;
-            Real64 OutletWaterTempOFF = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
             this->WaterMassFlowRate = state.dataLoopNodes->Node(this->WaterInletNodeNum).MassFlowRate;
             Real64 OutletWaterTemp1stStage = this->OutletWaterTemp;
             Real64 OutletWaterTemp2ndStage = this->OutletWaterTemp;
             FanModeFrac = 0.0;
 
-            OutletWaterTempOFF = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRate, UAdesign);
+            Real64 OutletWaterTempOFF = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRate, UAdesign);
 
             //     Setpoint was met using free convection regime (pump ON and fan OFF)
             this->FanPower = 0.0;
@@ -5148,14 +5140,6 @@ namespace CondenserLoopTowers {
         Real64 constexpr Acc(0.0001); // Accuracy of result
         static constexpr std::string_view RoutineName("calculateVariableSpeedTower");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla(0);           // Flag of solver
-        std::string OutputChar;  // character string used for warning messages
-        std::string OutputChar2; // character string used for warning messages
-        std::string OutputChar3; // character string used for warning messages
-        std::string OutputChar4; // character string used for warning messages
-        std::string OutputChar5; // character string used for warning messages
-
         // Added for multi-cell. Determine the number of cells operating
         Real64 WaterMassFlowRatePerCellMin = 0.0;
         Real64 WaterMassFlowRatePerCellMax;
@@ -5258,7 +5242,6 @@ namespace CondenserLoopTowers {
 
             this->airFlowRateRatio = 1.0;
             OutletWaterTempOFF = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
-            OutletWaterTempON = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
             this->OutletWaterTemp = OutletWaterTempOFF;
             FreeConvectionCapFrac = this->FreeConvectionCapacityFraction;
             OutletWaterTempON = this->calculateVariableTowerOutletTemp(state, WaterFlowRateRatioCapped, this->airFlowRateRatio, TwbCapped);
@@ -5327,6 +5310,7 @@ namespace CondenserLoopTowers {
                         Real64 TapproachActual = this->calculateVariableSpeedApproach(state, WaterFlowRateRatioCapped, FlowRatio, TwbCapped, Tr);
                         return Ta - TapproachActual;
                     };
+                    int SolFla = 0;
                     General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag)
@@ -5465,9 +5449,6 @@ namespace CondenserLoopTowers {
         Real64 constexpr Acc(1.e-3);           // Accuracy of solver result
         static constexpr std::string_view RoutineName("calculateMerkelVariableSpeedTower");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla(0); // Flag of solver
-
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                       state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp,
@@ -5554,9 +5535,8 @@ namespace CondenserLoopTowers {
         // first find free convection cooling rate
         UAdesignPerCell = freeConvTowerUA / this->NumCell;
         AirFlowRatePerCell = this->FreeConvAirFlowRate / this->NumCell;
-        Real64 OutletWaterTempOFF = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
         this->WaterMassFlowRate = state.dataLoopNodes->Node(this->WaterInletNodeNum).MassFlowRate;
-        OutletWaterTempOFF = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAdesignPerCell);
+        Real64 OutletWaterTempOFF = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAdesignPerCell);
 
         Real64 FreeConvQdot = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempOFF);
         this->FanPower = 0.0;
@@ -5647,6 +5627,7 @@ namespace CondenserLoopTowers {
                     this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempTrial);
                 return std::abs(MyLoad) - Qdot;
             };
+            int SolFla = 0;
             General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0);
 
             if (SolFla == -1) {
@@ -5837,8 +5818,6 @@ namespace CondenserLoopTowers {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb. 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // To calculate the leaving water temperature of the variable speed cooling tower.
@@ -5860,7 +5839,6 @@ namespace CondenserLoopTowers {
         Real64 constexpr Acc(0.0001); // Accuracy of result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla;                                    // Flag of solver
         Real64 constexpr VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
         //   determine tower outlet water temperature
@@ -5871,6 +5849,7 @@ namespace CondenserLoopTowers {
             // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
             return (Twb + Tapproach + Trange) - state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
         };
+        int SolFla = 0;
         General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp);
 
         Real64 OutletWaterTempLocal = this->WaterTemp - Tr;
@@ -6370,17 +6349,9 @@ namespace CondenserLoopTowers {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet water node.
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string CharErrOut;
-        std::string CharLowOutletTemp;
 
         // set node information
         state.dataLoopNodes->Node(this->WaterOutletNodeNum).Temp = this->OutletWaterTemp;
@@ -6417,7 +6388,6 @@ namespace CondenserLoopTowers {
         bool const flowIsOn = this->WaterMassFlowRate > 0.0;
         if (outletWaterTempTooLow && flowIsOn) {
             ++this->OutletWaterTempErrorCount;
-            strip(CharErrOut);
             if (this->OutletWaterTempErrorCount < 2) {
                 ShowWarningError(state, format("{} \"{}\"", DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], this->Name));
                 ShowContinueError(
