@@ -283,9 +283,9 @@ void GetGasAbsorberInput(EnergyPlusData &state)
     // This routine will get the input
     // required by the Direct Fired Absorption chiller model in the object ChillerHeater:Absorption:DirectFired
 
-    int NumAlphas;   // Number of elements in the alpha array
-    int NumNums;     // Number of elements in the numeric array
-    int IOStat;      // IO Status when calling get input subroutine
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
     std::string ChillerName;
     bool Okay;
     bool Get_ErrorsFound(false);
@@ -344,54 +344,54 @@ void GetGasAbsorberInput(EnergyPlusData &state)
 
         // Assign Node Numbers to specified nodes
         thisChiller.ChillReturnNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                           state.dataIPShortCut->cAlphaArgs(2),
-                                                           Get_ErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
-                                                           DataLoopNode::NodeFluidType::Water,
-                                                           DataLoopNode::ConnectionType::Inlet,
-                                                           NodeInputManager::CompFluidStream::Primary,
-                                                           DataLoopNode::ObjectIsNotParent);
+                                                                             state.dataIPShortCut->cAlphaArgs(2),
+                                                                             Get_ErrorsFound,
+                                                                             DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
+                                                                             state.dataIPShortCut->cAlphaArgs(1),
+                                                                             DataLoopNode::NodeFluidType::Water,
+                                                                             DataLoopNode::ConnectionType::Inlet,
+                                                                             NodeInputManager::CompFluidStream::Primary,
+                                                                             DataLoopNode::ObjectIsNotParent);
         thisChiller.ChillSupplyNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                           state.dataIPShortCut->cAlphaArgs(3),
-                                                           Get_ErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
-                                                           DataLoopNode::NodeFluidType::Water,
-                                                           DataLoopNode::ConnectionType::Outlet,
-                                                           NodeInputManager::CompFluidStream::Primary,
-                                                           DataLoopNode::ObjectIsNotParent);
+                                                                             state.dataIPShortCut->cAlphaArgs(3),
+                                                                             Get_ErrorsFound,
+                                                                             DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
+                                                                             state.dataIPShortCut->cAlphaArgs(1),
+                                                                             DataLoopNode::NodeFluidType::Water,
+                                                                             DataLoopNode::ConnectionType::Outlet,
+                                                                             NodeInputManager::CompFluidStream::Primary,
+                                                                             DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
-                    cCurrentModuleObject,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(2),
-                    state.dataIPShortCut->cAlphaArgs(3),
-                    "Chilled Water Nodes");
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaArgs(3),
+                                           "Chilled Water Nodes");
         // Condenser node processing depends on condenser type, see below
         thisChiller.HeatReturnNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                          state.dataIPShortCut->cAlphaArgs(6),
-                                                          Get_ErrorsFound,
-                                                          DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
-                                                          state.dataIPShortCut->cAlphaArgs(1),
-                                                          DataLoopNode::NodeFluidType::Water,
-                                                          DataLoopNode::ConnectionType::Inlet,
-                                                          NodeInputManager::CompFluidStream::Tertiary,
-                                                          DataLoopNode::ObjectIsNotParent);
+                                                                            state.dataIPShortCut->cAlphaArgs(6),
+                                                                            Get_ErrorsFound,
+                                                                            DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
+                                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                            DataLoopNode::ConnectionType::Inlet,
+                                                                            NodeInputManager::CompFluidStream::Tertiary,
+                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.HeatSupplyNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                          state.dataIPShortCut->cAlphaArgs(7),
-                                                          Get_ErrorsFound,
-                                                          DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
-                                                          state.dataIPShortCut->cAlphaArgs(1),
-                                                          DataLoopNode::NodeFluidType::Water,
-                                                          DataLoopNode::ConnectionType::Outlet,
-                                                          NodeInputManager::CompFluidStream::Tertiary,
-                                                          DataLoopNode::ObjectIsNotParent);
+                                                                            state.dataIPShortCut->cAlphaArgs(7),
+                                                                            Get_ErrorsFound,
+                                                                            DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
+                                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                            DataLoopNode::ConnectionType::Outlet,
+                                                                            NodeInputManager::CompFluidStream::Tertiary,
+                                                                            DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
-                    cCurrentModuleObject,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(6),
-                    state.dataIPShortCut->cAlphaArgs(7),
-                    "Hot Water Nodes");
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(6),
+                                           state.dataIPShortCut->cAlphaArgs(7),
+                                           "Hot Water Nodes");
         if (Get_ErrorsFound) {
             ShowFatalError(state,
                            format("Errors found in processing node input for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -469,41 +469,41 @@ void GetGasAbsorberInput(EnergyPlusData &state)
             }
             thisChiller.CondReturnNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
-                                                              state.dataIPShortCut->cAlphaArgs(4),
-                                                              Get_ErrorsFound,
-                                                              DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
-                                                              state.dataIPShortCut->cAlphaArgs(1),
-                                                              DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::ConnectionType::Inlet,
-                                                              NodeInputManager::CompFluidStream::Secondary,
-                                                              DataLoopNode::ObjectIsNotParent);
+                                                    state.dataIPShortCut->cAlphaArgs(4),
+                                                    Get_ErrorsFound,
+                                                    DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::ConnectionType::Inlet,
+                                                    NodeInputManager::CompFluidStream::Secondary,
+                                                    DataLoopNode::ObjectIsNotParent);
             thisChiller.CondSupplyNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
-                                                              state.dataIPShortCut->cAlphaArgs(5),
-                                                              Get_ErrorsFound,
-                                                              DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
-                                                              state.dataIPShortCut->cAlphaArgs(1),
-                                                              DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::ConnectionType::Outlet,
-                                                              NodeInputManager::CompFluidStream::Secondary,
-                                                              DataLoopNode::ObjectIsNotParent);
+                                                    state.dataIPShortCut->cAlphaArgs(5),
+                                                    Get_ErrorsFound,
+                                                    DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::ConnectionType::Outlet,
+                                                    NodeInputManager::CompFluidStream::Secondary,
+                                                    DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
-                        cCurrentModuleObject,
-                        state.dataIPShortCut->cAlphaArgs(1),
-                        state.dataIPShortCut->cAlphaArgs(4),
-                        state.dataIPShortCut->cAlphaArgs(5),
-                        "Condenser Water Nodes");
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(4),
+                                               state.dataIPShortCut->cAlphaArgs(5),
+                                               "Condenser Water Nodes");
         } else {
             thisChiller.CondReturnNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
-                                                              state.dataIPShortCut->cAlphaArgs(4),
-                                                              Get_ErrorsFound,
-                                                              DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
-                                                              state.dataIPShortCut->cAlphaArgs(1),
-                                                              DataLoopNode::NodeFluidType::Air,
-                                                              DataLoopNode::ConnectionType::OutsideAirReference,
-                                                              NodeInputManager::CompFluidStream::Secondary,
-                                                              DataLoopNode::ObjectIsNotParent);
+                                                    state.dataIPShortCut->cAlphaArgs(4),
+                                                    Get_ErrorsFound,
+                                                    DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDirectFired,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Air,
+                                                    DataLoopNode::ConnectionType::OutsideAirReference,
+                                                    NodeInputManager::CompFluidStream::Secondary,
+                                                    DataLoopNode::ObjectIsNotParent);
             // Condenser outlet node not used for air or evap cooled condenser so ignore cAlphaArgs( 5 )
             // Connection not required for air or evap cooled condenser so no call to TestCompSet here
             OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondReturnNodeNum, Okay);
