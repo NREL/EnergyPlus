@@ -939,21 +939,17 @@ namespace BranchInputManager {
         // Return value
         std::string OutletNodeName; // Outlet node name of last branch in branch list
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Found1; // Pointer to Branch List Name
-        int Found2; // Pointer to Branch data
-
         if (state.dataBranchInputManager->GetBranchListInputFlag) {
             state.dataBranchInputManager->GetBranchListInputFlag = false;
             GetBranchListInput(state);
         }
 
-        Found1 = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
+        int Found1 = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
         if (Found1 == 0) {
             ShowSevereError(state, format("GetLastBranchOutletNodeName: BranchList=\"{}\", not a valid BranchList Name", BranchListName));
             OutletNodeName = "Invalid Node Name";
         } else {
-            Found2 = UtilityRoutines::FindItemInList(
+            int Found2 = UtilityRoutines::FindItemInList(
                 state.dataBranchInputManager->BranchList(Found1).BranchNames(state.dataBranchInputManager->BranchList(Found1).NumOfBranchNames),
                 state.dataBranchInputManager->Branch);
             if (Found2 == 0) {
@@ -1025,17 +1021,16 @@ namespace BranchInputManager {
         Array1D_string cNumericFields;
         Array1D_bool lNumericBlanks;
         Array1D_bool lAlphaBlanks;
-        int NumParams;
 
         if (state.dataBranchInputManager->GetBranchInputOneTimeFlag) {
             std::string CurrentModuleObject = "Branch";
             int NumOfBranches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-            bool ErrFound;  // Flag for error detection
             int NumNumbers; // Used to retrieve numbers from IDF
             int NumAlphas;  // Used to retrieve names from IDF
+            int NumParams;
             if (NumOfBranches > 0) {
                 state.dataBranchInputManager->Branch.allocate(NumOfBranches);
-                ErrFound = false;
+                bool ErrFound = false;
                 state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
                 NodeNums.dimension(NumParams, 0);
                 state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
@@ -2475,7 +2470,6 @@ namespace BranchInputManager {
         //  LOGICAL UniqueNodeError
         int Loop2;
         NodeFluidType BranchFluidType;
-        bool MixedFluidTypesOnBranchList;
         int InitialBranchFluidNode;
         Array1D_int BranchFluidNodes;
         Array1D_int FoundBranches;
@@ -2525,7 +2519,7 @@ namespace BranchInputManager {
 
             bool IsAirBranch = false;
             BranchFluidType = NodeFluidType::Blank;
-            MixedFluidTypesOnBranchList = false;
+            bool MixedFluidTypesOnBranchList = false;
             int NumNodesOnBranchList = 0;
             FoundBranches.allocate(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
             FoundBranches = 0;
