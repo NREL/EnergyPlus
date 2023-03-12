@@ -290,7 +290,6 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    std::string ChillerName;
     bool Okay;
     bool Get_ErrorsFound(false);
 
@@ -330,7 +329,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
 
         auto &thisChiller = state.dataChillerExhaustAbsorption->ExhaustAbsorber(AbsorberNum);
         thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-        ChillerName = fmt::format("{} Named {}", cCurrentModuleObject, thisChiller.Name);
+        std::string ChillerName = fmt::format("{} Named {}", cCurrentModuleObject, thisChiller.Name);
 
         // Assign capacities
         thisChiller.NomCoolingCap = state.dataIPShortCut->rNumericArgs(1);
