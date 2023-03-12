@@ -631,7 +631,6 @@ namespace CoolTower {
         Real64 constexpr UCFactor(60000.0);  // Unit conversion factor m3/s to l/min
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum;            // Number of zone being served
         int CoolTowerNum;       // Number of coolter being served
         Real64 CVF_ZoneNum;     // Design flow rate in m3/s
         Real64 AirMassFlowRate; // Actual air mass flow rate in kg/s
@@ -649,7 +648,7 @@ namespace CoolTower {
         auto &Zone(state.dataHeatBal->Zone);
 
         for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
-            ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
+            int ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             thisZoneHB.MCPTC = 0.0;
             thisZoneHB.MCPC = 0.0;
