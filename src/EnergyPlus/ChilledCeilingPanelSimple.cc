@@ -816,7 +816,6 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
-    bool errFlag;
 
     auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
     auto &ThisInNode(state.dataLoopNodes->Node(ThisCP.WaterInletNode));
@@ -836,7 +835,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
     if (ThisCP.SetLoopIndexFlag) {
         if (allocated(state.dataPlnt->PlantLoop)) {
-            errFlag = false;
+            bool errFlag = false;
             ScanPlantLoopsForObject(state, ThisCP.EquipID, ThisCP.EquipType, ThisCP.plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "InitCoolingPanel: Program terminated for previous conditions.");
@@ -960,14 +959,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     std::string CompType;     // component type
     bool IsAutoSize(false);   // Indicator to autosize
     Real64 DesCoilLoad;       // design autosized or user specified capacity
-    int SizingMethod;         // Integer representation of sizing method name (e.g. CoolingCapacitySizing, HeatingCapacitySizing)
-    int FieldNum = 1;         // IDD numeric field number where input field description is found
-    bool PrintFlag;           // TRUE when sizing information is reported in the eio file
-    std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
     Real64 TempSize;          // autosized value of coil input field
-    int CapSizingMethod(0);   // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                              // FractionOfAutosizedHeatingCapacity )
-    int PltSizCoolNum(0);     // index of plant sizing object for 1st cooling loop
     Real64 rho;
     Real64 Cp;
     Real64 WaterVolFlowMaxCoolDes(0.0);  // Design chilled water flow for reporting
@@ -989,12 +981,10 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
 
     if (state.dataSize->CurZoneEqNum > 0) {
 
-        SizingMethod = CoolingCapacitySizing;
-        FieldNum = 4;
-        PrintFlag = true;
+        int SizingMethod = CoolingCapacitySizing;
+        bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
         bool errorsFound = false;
-        SizingString = ThisCP.FieldNames(FieldNum) + " [W]";
-        CapSizingMethod = ThisCP.CoolingCapMethod;
+        int CapSizingMethod = ThisCP.CoolingCapMethod;
         ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 
         if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
@@ -1025,16 +1015,11 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                 if (CapSizingMethod == CoolingDesignCapacity) {
                     if (state.dataSize->ZoneSizingRunDone) {
                         CheckZoneSizing(state, CompType, CompName);
-                        SizingMethod = AutoCalculateSizing;
                         state.dataSize->DataConstantUsedForSizing =
                             state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                         state.dataSize->DataFractionUsedForSizing = 1.0;
                     }
-                    if (ThisCP.ScaledCoolingCapacity == AutoSize) {
-                        TempSize = AutoSize;
-                    } else {
-                        TempSize = ThisCP.ScaledCoolingCapacity;
-                    }
+                    TempSize = ThisCP.ScaledCoolingCapacity;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     if (state.dataSize->ZoneSizingRunDone) {
                         CheckZoneSizing(state, CompType, CompName);
@@ -1081,7 +1066,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
             }
         } else { // Autosize or hard-size with sizing run
             if (ThisCP.WaterInletNode > 0 && ThisCP.WaterOutletNode > 0) {
-                PltSizCoolNum = MyPlantSizingIndex(state, CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
+                int PltSizCoolNum = MyPlantSizingIndex(state, CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
                 if (PltSizCoolNum > 0) {
                     if (DesCoilLoad >= SmallLoad) {
                         rho = GetDensityGlycol(state,
@@ -1101,7 +1086,6 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                 } else {
                     ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
                     ShowContinueError(state, format("Occurs in ZoneHVAC:CoolingPanel:RadiantConvective:Water Object={}", ThisCP.EquipID));
-                    ErrorsFound = true;
                 }
             }
 
@@ -1246,7 +1230,6 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNum;
-    int iter;
     Real64 RadHeat;
     Real64 CoolingPanelCool;
     Real64 waterInletTemp;
@@ -1276,9 +1259,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     Real64 DewPointTemp;
     Real64 LoadMet;
     bool CoolingPanelOn;
-    bool ModifiedWaterInletTemp;
 
-    ModifiedWaterInletTemp = false;
     ZoneNum = this->ZonePtr;
     QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
     waterInletTemp = this->WaterInletTemp;
@@ -1349,7 +1330,6 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             // We might not have enough flow rate to meet whatever load we have, but at least
             // the system is still running at some partial load and avoiding condensation.
             waterInletTemp = DewPointTemp + this->CondDewPtDeltaT;
-            ModifiedWaterInletTemp = true;
         }
     }
 
@@ -1392,7 +1372,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
                 waterMassFlowRate = waterMassFlowRateMax;
                 state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = waterMassFlowRateMax;
             } else {
-                for (iter = 1; iter <= Maxiter; ++iter) {
+                for (int iter = 1; iter <= Maxiter; ++iter) {
                     FracGuess = (MCpEpsAct - MCpEpsLow) / (MCpEpsHigh - MCpEpsLow);
                     MdotGuess = MdotHigh * FracGuess;
                     MCpEpsGuess = MdotGuess * Cp * (1.0 - exp(-this->UA / (MdotGuess * Cp)));
@@ -1664,7 +1644,6 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
     int CoolingPanelNum;      // Counter for the baseboard
     int SurfNum;              // Pointer to the Surface derived type
-    int ZoneNum;              // Pointer to the Zone derived type
     Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
     // Initialize arrays
@@ -1675,7 +1654,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
-        ZoneNum = ThisCP.ZonePtr;
+        int ZoneNum = ThisCP.ZonePtr;
         if (ZoneNum <= 0) continue;
         state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(ZoneNum) += ThisCP.CoolingPanelSource * ThisCP.FracDistribPerson;
 
