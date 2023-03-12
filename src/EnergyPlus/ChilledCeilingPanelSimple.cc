@@ -942,7 +942,6 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     state.dataSize->DataScalableCapSizingON = false;
 
     auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
     CompType = "ZoneHVAC:CoolingPanel:RadiantConvective:Water";
     CompName = ThisCP.EquipID;
@@ -954,11 +953,12 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
 
     if (state.dataSize->CurZoneEqNum > 0) {
 
+        auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
         int SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
         bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
         bool errorsFound = false;
         int CapSizingMethod = ThisCP.CoolingCapMethod;
-        ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+        zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
 
         if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
             if (CapSizingMethod == DataSizing::CoolingDesignCapacity && ThisCP.ScaledCoolingCapacity > 0.0) {
@@ -996,18 +996,16 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                 } else if (CapSizingMethod == DataSizing::CapacityPerFloorArea) {
                     if (state.dataSize->ZoneSizingRunDone) {
                         CheckZoneSizing(state, CompType, CompName);
-                        ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
-                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad =
-                            state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                        zoneEqSizing.CoolingCapacity = true;
+                        zoneEqSizing.DesCoolingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                     }
                     TempSize = ThisCP.ScaledCoolingCapacity * state.dataHeatBal->Zone(ThisCP.ZonePtr).FloorArea;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == DataSizing::FractionOfAutosizedCoolingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad =
-                        state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
-                    TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
+                    zoneEqSizing.CoolingCapacity = true;
+                    zoneEqSizing.DesCoolingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                    TempSize = zoneEqSizing.DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
                     state.dataSize->DataScalableCapSizingON = true;
 
                 } else {
@@ -1217,11 +1215,11 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     Real64 MassFlowFrac;
     Real64 LoadMet;
     bool CoolingPanelOn;
+    Real64 waterOutletTemp;
 
     int ZoneNum = this->ZonePtr;
     Real64 QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
     Real64 waterInletTemp = this->WaterInletTemp;
-    Real64 waterOutletTemp = waterInletTemp;
     Real64 waterMassFlowRateMax = this->WaterMassFlowRateMax;
     Real64 Xr = this->FracRadiant;
 
