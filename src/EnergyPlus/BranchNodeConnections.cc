@@ -865,14 +865,10 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     bool IsOutlet;
     bool MatchedAtLeastOne;
     int ErrorCounter;
-    int Object;
-    int EndConnect;
     Array1D_int FluidStreamInletCount;
     Array1D_int FluidStreamOutletCount;
     Array1D_int NodeObjects;
     Array1D_bool FluidStreamCounts;
-    int NumObjects;
-    int MaxFluidStream;
 
     ErrorCounter = 0;
 
@@ -1221,7 +1217,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 10 -- fluid streams cannot have multiple inlet/outlet nodes on same component
     //  can have multiple inlets with one outlet or vice versa but cannot have multiple both inlet and outlet
     if (state.dataBranchNodeConnections->NumOfNodeConnections > 0) {
-        MaxFluidStream = static_cast<int>(maxval(state.dataBranchNodeConnections->NodeConnections, &NodeConnectionDef::FluidStream));
+        int MaxFluidStream = static_cast<int>(maxval(state.dataBranchNodeConnections->NodeConnections, &NodeConnectionDef::FluidStream));
         FluidStreamInletCount.allocate(MaxFluidStream);
         FluidStreamOutletCount.allocate(MaxFluidStream);
         FluidStreamCounts.allocate(MaxFluidStream);
@@ -1231,9 +1227,9 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         NodeObjects = 0;
         FluidStreamCounts = false;
         // Following code relies on node connections for single object type/name being grouped together
-        Object = 1;
-        EndConnect = 0;
-        NumObjects = 2;
+        int Object = 1;
+        int EndConnect = 0;
+        int NumObjects = 2;
         NodeObjects(1) = 1;
         while (Object < state.dataBranchNodeConnections->NumOfNodeConnections) {
             if (state.dataBranchNodeConnections->NodeConnections(Object).ObjectType !=
