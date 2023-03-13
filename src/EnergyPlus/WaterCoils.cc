@@ -1050,7 +1050,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
     Real64 EnthCorrFrac(0.0); // enthalpy correction factor
     Real64 TempCorrFrac(0.0); // temperature correction factor
 
-    auto &Node(state.dataLoopNodes->Node);
+    auto &Node = state.dataLoopNodes->Node;
 
     if (state.dataWaterCoils->InitWaterCoilOneTimeFlag) {
         // initialize the environment and sizing flags
@@ -2337,8 +2337,8 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     Real64 CpAirStd = PsyCpAirFnW(0.0);
     std::string CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
 
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-    auto &OASysEqSizing(state.dataSize->OASysEqSizing);
+    auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
+    auto &OASysEqSizing = state.dataSize->OASysEqSizing;
 
     // cooling coils
     if (((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
@@ -3565,8 +3565,8 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
         //-
         // 1
         //);             } // CoefPointer
-        auto const &dry_fin_eff_coef(state.dataWaterCoils->WaterCoil(CoilNum).DryFinEfficncyCoef);
-        Real64 DryFinEfficncy_pow(1.0);
+        auto const &dry_fin_eff_coef = state.dataWaterCoils->WaterCoil(CoilNum).DryFinEfficncyCoef;
+        Real64 DryFinEfficncy_pow = 1.0;
         for (CoefPointer = 1; CoefPointer <= 5; ++CoefPointer) {
             DryCoilEfficiency += dry_fin_eff_coef(CoefPointer) * DryFinEfficncy_pow;
             DryFinEfficncy_pow *= DryFinEfficncy;
@@ -5613,8 +5613,8 @@ void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, A
     Real64 S1;
     Real64 S2;
 
-    auto &OrdPairSum(state.dataWaterCoils->OrdPairSum);
-    auto &OrdPairSumMatrix(state.dataWaterCoils->OrdPairSumMatrix);
+    auto &OrdPairSum = state.dataWaterCoils->OrdPairSum;
+    auto &OrdPairSumMatrix = state.dataWaterCoils->OrdPairSumMatrix;
 
     OrdPairSum = 0.0;
     OrdPairSum(1, 1) = WaterCoils::MaxOrderedPairs;
@@ -5656,8 +5656,8 @@ void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, A
         S2 = 0.0;
         for (CurrentOrdPair = 1; CurrentOrdPair <= WaterCoils::MaxOrderedPairs; ++CurrentOrdPair) {
             S1 = OrdPairSumMatrix(PolynomOrder + 2, 1);
-            auto const OrderedPair1C(OrderedPair(CurrentOrdPair, 1));
-            auto OrderedPair1C_pow(1.0);
+            auto const OrderedPair1C = OrderedPair(CurrentOrdPair, 1); // (AUTO_OK_OBJ)
+            Real64 OrderedPair1C_pow = 1.0;
             for (CurrentOrder = 1; CurrentOrder <= PolynomOrder; ++CurrentOrder) {
                 OrderedPair1C_pow *= OrderedPair1C;
                 S1 += OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder + 1) * OrderedPair1C_pow;
@@ -5674,10 +5674,10 @@ void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, A
             ++PolynomOrder;
             J = 2 * PolynomOrder;
             OrdPairSum(J, 1) = OrdPairSum(J + 1, 1) = 0.0;
-            auto OrdPairSum2P = OrdPairSum(PolynomOrder + 1, 2) = 0.0;
+            auto OrdPairSum2P = OrdPairSum(PolynomOrder + 1, 2) = 0.0; // (AUTO_OK_OBJ)
             for (I = 1; I <= WaterCoils::MaxOrderedPairs; ++I) {
-                auto const OrderedPair1I(OrderedPair(I, 1));
-                auto OrderedPair_pow(std::pow(OrderedPair1I, J - 1));
+                auto const OrderedPair1I = OrderedPair(I, 1); // (AUTO_OK_OBJ)
+                Real64 OrderedPair_pow = std::pow(OrderedPair1I, J - 1);
                 OrdPairSum(J, 1) += OrderedPair_pow;
                 OrderedPair_pow *= OrderedPair1I;
                 OrdPairSum(J + 1, 1) += OrderedPair_pow;

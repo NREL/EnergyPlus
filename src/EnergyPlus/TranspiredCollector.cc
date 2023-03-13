@@ -183,9 +183,9 @@ namespace TranspiredCollector {
         InitTranspiredCollector(state, CompIndex);
 
         // Control point of deciding if transpired collector is active or not.
-        auto &UTSC_CI(state.dataTranspiredCollector->UTSC(CompIndex));
-        auto &InletNode(UTSC_CI.InletNode);
-        auto &ControlNode(UTSC_CI.ControlNode);
+        auto &UTSC_CI = state.dataTranspiredCollector->UTSC(CompIndex);
+        auto &InletNode = UTSC_CI.InletNode;
+        auto &ControlNode = UTSC_CI.ControlNode;
         UTSC_CI.IsOn = false;
         if ((GetCurrentScheduleValue(state, UTSC_CI.SchedPtr) > 0.0) &&
             (UTSC_CI.InletMDot > 0.0)) { // availability Schedule | OA system is setting mass flow
@@ -1188,11 +1188,11 @@ namespace TranspiredCollector {
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
         //        AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        auto Area(
+        auto Area = // (AUTO_OK_OBJ)
             array_sub(state.dataSurface->Surface,
                       &SurfaceData::Area,
                       state.dataTranspiredCollector->UTSC(UTSCNum)
-                          .SurfPtrs)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+                          .SurfPtrs); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
         AreaSum = sum(Area);
         // now figure area-weighted averages from underlying surfaces.
         //        Vwind = sum( LocalWindArr * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage:
@@ -1487,12 +1487,12 @@ namespace TranspiredCollector {
             //            Node( UTSC( UTSCNum ).OutletNode ).Temp = Node( UTSC( UTSCNum ).InletNode ).Temp;
             //            Node( UTSC( UTSCNum ).OutletNode ).HumRat = Node( UTSC( UTSCNum ).InletNode ).HumRat;
             //            Node( UTSC( UTSCNum ).OutletNode ).Enthalpy = Node( UTSC( UTSCNum ).InletNode ).Enthalpy;
-            auto const &OutletNode(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode);
-            auto const &InletNode(state.dataTranspiredCollector->UTSC(UTSCNum).InletNode);
+            auto const &OutletNode = state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode;
+            auto const &InletNode = state.dataTranspiredCollector->UTSC(UTSCNum).InletNode;
             assert(OutletNode.size() == InletNode.size());
             for (int io = OutletNode.l(), ii = InletNode.l(), eo = OutletNode.u(); io <= eo; ++io, ++ii) {
-                auto &outNode(state.dataLoopNodes->Node(OutletNode(io)));
-                auto const &inNode(state.dataLoopNodes->Node(InletNode(ii)));
+                auto &outNode = state.dataLoopNodes->Node(OutletNode(io));
+                auto const &inNode = state.dataLoopNodes->Node(InletNode(ii));
                 outNode.MassFlowRate = inNode.MassFlowRate;
                 outNode.Temp = inNode.Temp;
                 outNode.HumRat = inNode.HumRat;
