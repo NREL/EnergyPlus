@@ -13361,6 +13361,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     state->dataGlobal->CurrentTime = 0.25;
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataHVACGlobal->SysTimeElapsed = 0.0;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.01;
@@ -16084,7 +16085,10 @@ TEST_F(EnergyPlusFixture, VRF_Condenser_Calc_EIRFPLR_Bound_Test)
 
     // This should be reset to zero after the fix
     EXPECT_NE(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower,
-              state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR *
+                  Curve::CurveValue(*state,
+                                    state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR1,
+                                    max(state->dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR)));
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
 
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.0);
@@ -16133,7 +16137,10 @@ TEST_F(EnergyPlusFixture, VRF_Condenser_Calc_EIRFPLR_Bound_Test)
 
     // This should be reset to zero after the fix
     EXPECT_NE(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
-              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR *
+                  Curve::CurveValue(*state,
+                                    state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1,
+                                    max(state->dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR)));
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.0);
 
     // Test warning messages
@@ -22725,6 +22732,185 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
     EXPECT_EQ("VRF HEAT PUMP FLUIDCTRL_HR", state->dataHVACVarRefFlow->VRF(3).Name);
     EXPECT_TRUE(compare_enums(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(3).VRFAlgorithmType));
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(3).HeatRecoveryUsed);
+}
+
+TEST_F(EnergyPlusFixture, VRFHP_CondenserCalc_PLR_Issue_Test)
+{
+    // Take an example to test the COP and electric cooling/heaitng power
+    // issue described in 9252
+    std::string_view constexpr idf_objects = R"IDF(
+    Curve:Biquadratic,
+      BiquadraticCurve,        !- Name
+      1.0,                     !- Coefficient1 Constant
+      0,                       !- Coefficient2 x
+      0,                       !- Coefficient3 x**2
+      0,                       !- Coefficient4 y
+      0,                       !- Coefficient5 y**2
+      0,                       !- Coefficient6 x*y
+      -100,                    !- Minimum Value of x
+      100,                     !- Maximum Value of x
+      -100,                    !- Minimum Value of y
+      100,                     !- Maximum Value of y
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Temperature,             !- Input Unit Type for X
+      Temperature,             !- Input Unit Type for Y
+      Dimensionless;           !- Output Unit Type
+
+    Curve:Cubic,
+      EIRfPLR,                 !- Name
+      0.0,                     !- Coefficient1 Constant
+      1.0,                     !- Coefficient2 x
+      0.0,                     !- Coefficient3 x**2
+      0.0,                     !- Coefficient4 x**3
+      0,                       !- Minimum Value of x
+      1,                       !- Maximum Value of x
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Dimensionless,           !- Input Unit Type for X
+      Dimensionless;           !- Output Unit Type
+    )IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    Curve::GetCurveInput(*state);
+
+    int VRFCond = 1;
+    state->dataHVACVarRefFlow->VRF.allocate(1);
+
+    auto &vrf = state->dataHVACVarRefFlow->VRF(VRFCond);
+
+    vrf.CondenserNodeNum = 0;
+    vrf.CondenserType = DataHeatBalance::RefrigCondenserType::Air;
+    vrf.ZoneTUListPtr = 1;
+    vrf.CoolingCapacity = 20000.0;
+    vrf.HeatingCapacity = 20000.0;
+    vrf.CoolingCOP = 3.0;
+    vrf.HeatingCOP = 3.0;
+    vrf.RatedCoolingPower = vrf.CoolingCapacity / vrf.CoolingCOP;
+    vrf.RatedHeatingPower = vrf.HeatingCapacity / vrf.HeatingCOP;
+    vrf.PipingCorrectionCooling = 1.0;
+    vrf.PipingCorrectionHeating = 1.0;
+    vrf.CoolCapFT = 1;
+    vrf.CoolEIRFT = 1;
+    vrf.CoolEIRFPLR1 = 2;
+    vrf.HeatEIRFPLR1 = 2;
+    state->dataHVACVarRefFlow->CoolCombinationRatio.allocate(1);
+    state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) = 1.0;
+    state->dataHVACVarRefFlow->HeatCombinationRatio.allocate(1);
+    state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) = 1.0;
+    state->dataHVACVarRefFlow->LastModeCooling.allocate(1);
+    state->dataHVACVarRefFlow->LastModeHeating.allocate(1);
+
+    state->dataHVACVarRefFlow->TerminalUnitList.allocate(1);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList = 5;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest = false;
+
+    state->dataHVACVarRefFlow->TerminalUnitList(1).CoolingCoilAvailable.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HeatingCoilAvailable.allocate(5);
+    // all TU coils are available
+    state->dataHVACVarRefFlow->TerminalUnitList(1).CoolingCoilAvailable = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HeatingCoilAvailable = true;
+
+    state->dataHVACVarRefFlow->CoolingLoad.allocate(1);
+    state->dataHVACVarRefFlow->HeatingLoad.allocate(1);
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
+
+    state->dataDXCoils->DXCoilCoolInletAirWBTemp.allocate(10);
+    state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(10);
+    state->dataDXCoils->DXCoilHeatInletAirWBTemp.allocate(10);
+
+    state->dataHVACVarRefFlow->VRFTU.allocate(5);
+    for (int NumTU = 1; NumTU <= state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList; ++NumTU) {
+        state->dataHVACVarRefFlow->VRFTU(NumTU).CoolCoilIndex = NumTU;
+        state->dataHVACVarRefFlow->VRFTU(NumTU).HeatCoilIndex = state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU;
+        state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr(NumTU) = NumTU;
+        // initialize DX coil inlet conditions
+        state->dataDXCoils->DXCoilCoolInletAirWBTemp(NumTU) = 19.4;
+        state->dataDXCoils->DXCoilHeatInletAirDBTemp(state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU) = 20.0;
+        state->dataDXCoils->DXCoilHeatInletAirWBTemp(state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU) = 17.0;
+    }
+
+    // set up environment
+    state->dataGlobal->DayOfSim = 1;
+    state->dataGlobal->CurrentTime = 0.25;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.01;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 21.1340575;
+
+    // TUs are in cooling mode only
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(5) = 0.0;
+
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_FALSE(vrf.HRHeatingActive);
+    EXPECT_FALSE(vrf.HRCoolingActive);
+    EXPECT_EQ(vrf.TotalCoolingCapacity, 5000.0);
+    EXPECT_EQ(vrf.TUCoolingLoad, 5000.0);
+    EXPECT_EQ(vrf.TotalHeatingCapacity, 0.0);
+    EXPECT_EQ(vrf.TUHeatingLoad, 0.0);
+    EXPECT_EQ(vrf.VRFCondPLR, 0.25);
+    EXPECT_EQ(vrf.VRFCondRTF, 1.0); // unit is not cycling below min PLR
+    EXPECT_EQ(vrf.SUMultiplier, 1.0);
+    EXPECT_FALSE(vrf.ModeChange);
+    EXPECT_FALSE(vrf.HRModeChange);
+    // This is a little bit out of expectation for the new test
+    EXPECT_EQ(vrf.ElecCoolingPower, vrf.RatedCoolingPower * Curve::CurveValue(*state, vrf.CoolEIRFPLR1, max(vrf.MinPLR, vrf.VRFCondPLR)));
+    EXPECT_EQ(vrf.ElecHeatingPower, 0.0);
+
+    // TU's are in heating mode only
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(2) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(4) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
+
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_FALSE(vrf.HRHeatingActive);
+    EXPECT_FALSE(vrf.HRCoolingActive);
+    EXPECT_EQ(vrf.TotalCoolingCapacity, 0.0);
+    EXPECT_EQ(vrf.TUCoolingLoad, 0.0);
+    EXPECT_EQ(vrf.TotalHeatingCapacity, 5000.0);
+    EXPECT_EQ(vrf.TUHeatingLoad, 5000.0);
+    EXPECT_EQ(vrf.VRFCondPLR, 0.25);
+    EXPECT_EQ(vrf.VRFCondRTF, 1.0); // unit is not cycling below min PLR
+    EXPECT_EQ(vrf.SUMultiplier, 1.0);
+    EXPECT_FALSE(vrf.ModeChange);
+    EXPECT_FALSE(vrf.HRModeChange);
+    EXPECT_EQ(vrf.ElecCoolingPower, 0.0);
+    // Here also need to do furthe check to see if it is expected:
+    EXPECT_EQ(vrf.ElecHeatingPower, vrf.RatedHeatingPower * Curve::CurveValue(*state, vrf.HeatEIRFPLR1, max(vrf.MinPLR, vrf.VRFCondPLR)));
 }
 
 } // end of namespace EnergyPlus

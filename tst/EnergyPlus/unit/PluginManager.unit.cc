@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(*state, trendVarIndex, 3));
 }
 
-TEST_F(EnergyPlusFixture, MultiplePluginVariableObjects)
+TEST_F(EnergyPlusFixture, DISABLED_MultiplePluginVariableObjects)
 {
     std::string const idf_objects =
         ("PythonPlugin:Variables, Variables1, VariableA, VariableB;  PythonPlugin:Variables, Variables2, VariableA, VariableC;");

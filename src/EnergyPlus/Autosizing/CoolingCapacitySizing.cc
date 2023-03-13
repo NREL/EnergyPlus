@@ -67,8 +67,6 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         return 0.0;
     }
     this->preSize(state, _originalValue);
-    std::string DDNameFanPeak = "";
-    std::string dateTimeFanPeak = "";
     Real64 DesVolFlow = 0.0;
     Real64 CoilInTemp = -999.0;
     Real64 CoilInHumRat = -999.0;
@@ -323,7 +321,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         (Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat) - Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
                 } else {
                     CheckSysSizing(state, this->compType, this->compName);
-                    auto &thisFinalSysSizing = this->finalSysSizing(this->curSysNum);
+                    auto const &thisFinalSysSizing = this->finalSysSizing(this->curSysNum);
                     DesVolFlow = this->dataFlowUsedForSizing;
                     Real64 NominalCapacityDes = 0.0;
                     if (thisFinalSysSizing.CoolingCapMethod == DataSizing::FractionOfAutosizedCoolingCapacity) {

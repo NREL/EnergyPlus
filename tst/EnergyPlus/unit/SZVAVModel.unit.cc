@@ -271,6 +271,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataBranchNodeConnections->CompSets(2).ParentCName = "AirSystem";
 
     state->dataEnvrn->OutDryBulbTemp = 30.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     Psychrometrics::InitializePsychRoutines(*state);
     createCoilSelectionReportObj(*state);

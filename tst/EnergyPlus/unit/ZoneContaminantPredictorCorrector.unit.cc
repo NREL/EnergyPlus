@@ -164,6 +164,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     Real64 PriorTimeStep;
 
     state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     PriorTimeStep = state->dataHVACGlobal->TimeStepSys;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -284,6 +285,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataContaminantBalance->ZoneCO2GainExceptPeople.allocate(1);
     state->dataContaminantBalance->ZoneGCGain.allocate(1);
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0001;
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople(1) = 0.0001;
     state->dataContaminantBalance->ZoneGCGain(1) = 0.0001;
     state->dataContaminantBalance->MixingMassFlowCO2(1) = 0.0;
     state->dataContaminantBalance->MixingMassFlowGC(1) = 0.0;
@@ -297,6 +299,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataContaminantBalance->ZoneGC1(1) = state->dataContaminantBalance->OutdoorGC;
 
     state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
@@ -425,6 +428,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     Real64 PriorTimeStep;
 
     state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     PriorTimeStep = state->dataHVACGlobal->TimeStepSys;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(3);
@@ -610,6 +614,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     Real64 PriorTimeStep;
 
     state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     PriorTimeStep = state->dataHVACGlobal->TimeStepSys;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(3);
