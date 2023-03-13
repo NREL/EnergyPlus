@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include "FileSystem.hh"
 #include "InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "InputProcessing/InputProcessor.hh"
+#include "ResultsFramework.hh"
 #include "UtilityRoutines.hh"
 
 #include <algorithm>
@@ -316,8 +317,9 @@ std::vector<std::string> InputOutputFile::getLines()
 
 void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 {
-    auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find("OutputControl:Files");
-    if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+    auto &ip = state.dataInputProcessing->inputProcessor;
+    auto const instances = ip->epJSON.find("OutputControl:Files");
+    if (instances != ip->epJSON.end()) {
 
         auto find_input = [=, &state](nlohmann::json const &fields, std::string const &field_name) -> std::string {
             std::string input;
@@ -345,7 +347,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
 
-            state.dataInputProcessing->inputProcessor->markObjectAsUsed("OutputControl:Files", instance.key());
+            ip->markObjectAsUsed("OutputControl:Files", instance.key());
 
             { // "output_csv"
                 csv = boolean_choice(find_input(fields, "output_csv"));
@@ -439,6 +441,25 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             }
             { // "sqlite"
                 sqlite = boolean_choice(find_input(fields, "output_sqlite"));
+            }
+        }
+    }
+
+    auto const timestamp_instances = ip->epJSON.find("OutputControl:Timestamp");
+    if (timestamp_instances != ip->epJSON.end()) {
+        auto const &instancesValue = timestamp_instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            ip->markObjectAsUsed("OutputControl:Timestamp", instance.key());
+
+            auto item = fields.find("iso_8601_format");
+            if (item != fields.end()) {
+                state.dataResultsFramework->resultsFramework->setISO8601(item->get<std::string>() == "Yes");
+            }
+
+            item = fields.find("timestamp_at_beginning_of_interval");
+            if (item != fields.end()) {
+                state.dataResultsFramework->resultsFramework->setBeginningOfInterval(item->get<std::string>() == "Yes");
             }
         }
     }

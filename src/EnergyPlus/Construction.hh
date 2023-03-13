@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -100,7 +100,7 @@ namespace Construction {
         Array1D<Real64> CTFOutside;   // Outside or X terms of the CTF equation
         Array1D<Real64> CTFSourceIn;  // Heat source/sink inside terms of CTF equation
         Array1D<Real64> CTFSourceOut; // Heat source/sink outside terms of CTF equation
-        Real64 CTFTimeStep;           // Time increment for stable simulation of construct (could be greater than TimeStep)
+        Real64 CTFTimeStep = 0.0;     // Time increment for stable simulation of construct (could be greater than TimeStep)
         // The next three series of terms are used to calculate the temperature at the location of a source/sink
         // in the QTF formulation.  This calculation is necessary to allow the proper simulation of a
         // radiant system.

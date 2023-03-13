@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -259,8 +259,9 @@ namespace DXFEarClipping {
             generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
                 ShowWarningError(state,
-                                 "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
-                                     "\", check surface vertex order(entry)");
+                                 format("DXFOut: Could not triangulate surface=\"{}\", type=\"{}\", check surface vertex order(entry)",
+                                        surfname,
+                                        cSurfaceClass(surfclass)));
                 ++state.dataDXFEarClipping->errcount;
                 if (state.dataDXFEarClipping->errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");

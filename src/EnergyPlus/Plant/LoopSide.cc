@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1127,7 +1127,7 @@ namespace DataPlant {
                         auto const &loop_branch(loop_branches(BranchCounter));
                         if (BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide) ++ParallelBranchIndex;
                         if (loop_branch.HasConstantSpeedBranchPump) {
-                            auto const branch_mass_flow(loop_branch.ConstantSpeedBranchMassFlow);
+                            Real64 const branch_mass_flow(loop_branch.ConstantSpeedBranchMassFlow);
                             if (loop_branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
                                 LoadedConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
                             } else {
@@ -1724,7 +1724,7 @@ namespace DataPlant {
 
                 auto &this_comp(branch.Comp(CompCounter));
                 PlantLocation this_plantLoc = {this->plantLoc.loopNum, this->plantLoc.loopSideNum, BranchCounter, CompCounter};
-                auto const CurOpSchemeType(this_comp.CurOpSchemeType);
+                DataPlant::OpScheme const CurOpSchemeType(this_comp.CurOpSchemeType);
 
                 switch (CurOpSchemeType) {
                 case DataPlant::OpScheme::WSEcon: //~ coils
@@ -1819,7 +1819,7 @@ namespace DataPlant {
             for (int CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter) {
                 PlantLocation this_plantLoc = {this->plantLoc.loopNum, this->plantLoc.loopSideNum, BranchCounter, CompCounter};
 
-                auto const CurOpSchemeType(branch.Comp(CompCounter).CurOpSchemeType);
+                DataPlant::OpScheme const CurOpSchemeType(branch.Comp(CompCounter).CurOpSchemeType);
 
                 switch (CurOpSchemeType) {
                 case DataPlant::OpScheme::NoControl: //~ pipes, for example
@@ -1894,7 +1894,7 @@ namespace DataPlant {
             int const EndingComponent = branch.TotalComponents;
             for (int CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter) {
 
-                auto const CurOpSchemeType(branch.Comp(CompCounter).CurOpSchemeType);
+                DataPlant::OpScheme const CurOpSchemeType(branch.Comp(CompCounter).CurOpSchemeType);
 
                 switch (CurOpSchemeType) {
                 case DataPlant::OpScheme::Demand: //~ coils
@@ -2071,8 +2071,8 @@ namespace DataPlant {
     }
 
     void HalfLoopData::SimulateAllLoopSidePumps(EnergyPlusData &state,
-                                                Optional<PlantLocation const> SpecificPumpLocation,
-                                                Optional<Real64 const> SpecificPumpFlowRate)
+                                                ObjexxFCL::Optional<PlantLocation const> SpecificPumpLocation,
+                                                ObjexxFCL::Optional<Real64 const> SpecificPumpFlowRate)
     {
 
         // SUBROUTINE INFORMATION:

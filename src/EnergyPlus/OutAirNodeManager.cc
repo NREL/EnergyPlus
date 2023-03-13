@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -233,7 +233,7 @@ namespace OutAirNodeManager {
                                 cAlphaFields(AlphaNum));
                     NextFluidStreamNum += NumNodes;
                     if (ErrInList) {
-                        ShowContinueError(state, "Occurred in " + CurrentModuleObject + ", " + cAlphaFields(AlphaNum) + " = " + Alphas(AlphaNum));
+                        ShowContinueError(state, format("Occurred in {}, {} = {}", CurrentModuleObject, cAlphaFields(AlphaNum), Alphas(AlphaNum)));
                         ErrorsFound = true;
                     }
                     for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
@@ -250,7 +250,7 @@ namespace OutAirNodeManager {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.");
+                ShowFatalError(state, format("{}Errors found in getting {} input.", RoutineName, CurrentModuleObject));
             }
         }
 
@@ -290,12 +290,12 @@ namespace OutAirNodeManager {
                             cAlphaFields(1));
                 NextFluidStreamNum += NumNodes;
                 if (ErrInList) {
-                    ShowContinueError(state, "Occurred in " + CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowContinueError(state, format("Occurred in {}, {} = {}", CurrentModuleObject, cAlphaFields(1), Alphas(1)));
                     ErrorsFound = true;
                 }
 
                 if (NumNodes > 1) {
-                    ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowSevereError(state, format("{}, {} = {}", CurrentModuleObject, cAlphaFields(1), Alphas(1)));
                     ShowContinueError(state, "...appears to point to a node list, not a single node.");
                     ErrorsFound = true;
                     continue;
@@ -308,8 +308,8 @@ namespace OutAirNodeManager {
                     }
                     TmpNums(ListSize) = NodeNums(1);
                 } else { // Duplicates are a problem
-                    ShowSevereError(state, CurrentModuleObject + ", duplicate " + cAlphaFields(1) + " = " + Alphas(1));
-                    ShowContinueError(state, "Duplicate " + cAlphaFields(1) + " might be found in an OutdoorAir:NodeList.");
+                    ShowSevereError(state, format("{}, duplicate {} = {}", CurrentModuleObject, cAlphaFields(1), Alphas(1)));
+                    ShowContinueError(state, format("Duplicate {} might be found in an OutdoorAir:NodeList.", cAlphaFields(1)));
                     ErrorsFound = true;
                     continue;
                 }
@@ -324,8 +324,8 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
                     state.dataLoopNodes->Node(NodeNums(1)).OutAirDryBulbSchedNum = GetScheduleIndex(state, Alphas(2));
                     if (state.dataLoopNodes->Node(NodeNums(1)).OutAirDryBulbSchedNum == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(2) + "\", invalid schedule.");
-                        ShowContinueError(state, "Dry Bulb Temperature Schedule not found=\"" + Alphas(2) + "\".");
+                        ShowSevereError(state, format("{}{}=\"{}\", invalid schedule.", RoutineName, CurrentModuleObject, cAlphaFields(2)));
+                        ShowContinueError(state, format("Dry Bulb Temperature Schedule not found=\"{}\".", Alphas(2)));
                         ErrorsFound = true;
                     }
                 }
@@ -333,8 +333,8 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 2 && !lAlphaBlanks(3)) {
                     state.dataLoopNodes->Node(NodeNums(1)).OutAirWetBulbSchedNum = GetScheduleIndex(state, Alphas(3));
                     if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWetBulbSchedNum == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(3) + "\", invalid schedule.");
-                        ShowContinueError(state, "Wet Bulb Temperature Schedule not found=\"" + Alphas(3) + "\".");
+                        ShowSevereError(state, format("{}{}=\"{}\", invalid schedule.", RoutineName, CurrentModuleObject, cAlphaFields(3)));
+                        ShowContinueError(state, format("Wet Bulb Temperature Schedule not found=\"{}\".", Alphas(3)));
                         ErrorsFound = true;
                     }
                 }
@@ -342,8 +342,8 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 3 && !lAlphaBlanks(4)) {
                     state.dataLoopNodes->Node(NodeNums(1)).OutAirWindSpeedSchedNum = GetScheduleIndex(state, Alphas(4));
                     if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWindSpeedSchedNum == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(4) + "\", invalid schedule.");
-                        ShowContinueError(state, "Wind Speed Schedule not found=\"" + Alphas(4) + "\".");
+                        ShowSevereError(state, format("{}{}=\"{}\", invalid schedule.", RoutineName, CurrentModuleObject, cAlphaFields(4)));
+                        ShowContinueError(state, format("Wind Speed Schedule not found=\"{}\".", Alphas(4)));
                         ErrorsFound = true;
                     }
                 }
@@ -351,14 +351,14 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 4 && !lAlphaBlanks(5)) {
                     state.dataLoopNodes->Node(NodeNums(1)).OutAirWindDirSchedNum = GetScheduleIndex(state, Alphas(5));
                     if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWindDirSchedNum == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\", invalid schedule.");
-                        ShowContinueError(state, "Wind Direction Schedule not found=\"" + Alphas(5) + "\".");
+                        ShowSevereError(state, format("{}{}=\"{}\", invalid schedule.", RoutineName, CurrentModuleObject, cAlphaFields(5)));
+                        ShowContinueError(state, format("Wind Direction Schedule not found=\"{}\".", Alphas(5)));
                         ErrorsFound = true;
                     }
                 }
 
                 if (NumAlphas > 8) {
-                    ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowSevereError(state, format("{}, {} = {}", CurrentModuleObject, cAlphaFields(1), Alphas(1)));
                     ShowContinueError(state, "Object Definition indicates more than 7 Alpha Objects.");
                     ErrorsFound = true;
                     continue;
@@ -369,7 +369,7 @@ namespace OutAirNodeManager {
                 }
             }
             if (ErrorsFound) {
-                ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.");
+                ShowFatalError(state, format("{}Errors found in getting {} input.", RoutineName, CurrentModuleObject));
             }
         }
 

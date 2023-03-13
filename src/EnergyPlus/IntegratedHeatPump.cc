@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,8 +87,8 @@ void SimIHP(EnergyPlusData &state,
             Real64 const SensLoad,                                   // Sensible demand load [W]
             Real64 const LatentLoad,                                 // Latent demand load [W]
             bool const IsCallbyWH, // whether the call from the water heating loop or air loop, true = from water heating loop
-            [[maybe_unused]] bool const FirstHVACIteration, // TRUE if First iteration of simulation
-            Optional<Real64 const> OnOffAirFlowRat          // ratio of comp on to comp off air flow rate
+            [[maybe_unused]] bool const FirstHVACIteration,   // TRUE if First iteration of simulation
+            ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
 )
 {
 
@@ -1443,7 +1443,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirInletNodeNum != InNode) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirOutletNodeNum != OutNode)) {
-            ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + ihp.SCWHCoilName + "-wrong coil node names.");
+            ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCWHCoilName));
             ErrorsFound = true;
         }
         SetUpCompSets(state, CurrentModuleObject, ihp.Name + " Cooling Coil", ihp.SCWHCoilType, ihp.SCWHCoilName, InNodeName, OutNodeName);
@@ -1468,7 +1468,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).AirInletNodeNum != InNode) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).AirOutletNodeNum != OutNode)) {
-            ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + ihp.SCDWHCoolCoilName + "-wrong coil node names.");
+            ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCDWHCoolCoilName));
             ErrorsFound = true;
         }
         SetUpCompSets(state, CurrentModuleObject, ihp.Name + " Cooling Coil", ihp.SCDWHCoolCoilType, ihp.SCDWHCoolCoilName, InNodeName, OutNodeName);
@@ -2106,7 +2106,7 @@ void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)
 
 void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
 {
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // Obtains and Allocates AS-IHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -2183,15 +2183,12 @@ void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
         break;
     }
 
-    Real64 ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
-    ihp.Energy = ihp.TotalPower * ReportingConstant;                                 // total electric energy consumption
-                                                                                     // [J]
-    ihp.EnergyLoadTotalCooling = ihp.TotalCoolingRate * ReportingConstant;           // total cooling energy [J]
-    ihp.EnergyLoadTotalHeating = ihp.TotalSpaceHeatingRate * ReportingConstant;      // total heating energy [J]
-    ihp.EnergyLoadTotalWaterHeating = ihp.TotalWaterHeatingRate * ReportingConstant; // total heating energy [J]
-    ihp.EnergyLatent = ihp.TotalLatentLoad * ReportingConstant;                      // total latent energy [J]
-    ihp.EnergySource = ihp.Qsource * ReportingConstant;                              // total source energy
+    ihp.Energy = ihp.TotalPower * TimeStepSysSec;                                 // total electric energy consumption [J]
+    ihp.EnergyLoadTotalCooling = ihp.TotalCoolingRate * TimeStepSysSec;           // total cooling energy [J]
+    ihp.EnergyLoadTotalHeating = ihp.TotalSpaceHeatingRate * TimeStepSysSec;      // total heating energy [J]
+    ihp.EnergyLoadTotalWaterHeating = ihp.TotalWaterHeatingRate * TimeStepSysSec; // total heating energy [J]
+    ihp.EnergyLatent = ihp.TotalLatentLoad * TimeStepSysSec;                      // total latent energy [J]
+    ihp.EnergySource = ihp.Qsource * TimeStepSysSec;                              // total source energy
 
     if (ihp.TotalPower > 0.0) {
         Real64 TotalDelivery = ihp.TotalCoolingRate + ihp.TotalSpaceHeatingRate + ihp.TotalWaterHeatingRate;
@@ -2217,7 +2214,7 @@ void DecideWorkMode(EnergyPlusData &state,
     using DataHVACGlobals::SmallLoad;
     using WaterThermalTanks::GetWaterThermalTankInput;
 
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     Real64 MyLoad(0.0);
     Real64 WHHeatTimeSav(0.0); // time accumulation for water heating
@@ -2293,8 +2290,8 @@ void DecideWorkMode(EnergyPlusData &state,
     // keep the water heating time and volume history
     WHHeatTimeSav = ihp.SHDWHRunTime;
     if (IHPOperationMode::SpaceClgDedicatedWaterHtg == ihp.CurMode) {
-        WHHeatVolSave = ihp.WaterFlowAccumVol + state.dataLoopNodes->Node(ihp.WaterTankoutNod).MassFlowRate / 983.0 * TimeStepSys *
-                                                    DataGlobalConstants::SecInHour; // 983 - water density at 60 C
+        WHHeatVolSave = ihp.WaterFlowAccumVol +
+                        state.dataLoopNodes->Node(ihp.WaterTankoutNod).MassFlowRate / 983.0 * TimeStepSysSec; // 983 - water density at 60 C
     } else {
         WHHeatVolSave = 0.0;
     }
@@ -2341,7 +2338,7 @@ void DecideWorkMode(EnergyPlusData &state,
     {
         ihp.CurMode = IHPOperationMode::DedicatedWaterHtg;
     } else if (SensLoad > SmallLoad) {
-        ihp.SHDWHRunTime = WHHeatTimeSav + TimeStepSys * DataGlobalConstants::SecInHour;
+        ihp.SHDWHRunTime = WHHeatTimeSav + TimeStepSysSec;
 
         if (WHHeatTimeSav > ihp.TimeLimitSHDWH) {
             ihp.CurMode = IHPOperationMode::SHDWHElecHeatOn;

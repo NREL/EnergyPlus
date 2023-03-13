@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -879,17 +879,17 @@ namespace PlantPipingSystemsManager {
                               Real64 DirExtentMax,
                               RegionType DirDirection,
                               bool PartitionsExist,
-                              Optional_int BasementWallXIndex = _,
-                              Optional_int BasementFloorYIndex = _,
-                              Optional_int XIndex = _,
-                              Optional_int XWallIndex = _,
-                              Optional_int InsulationXIndex = _,
-                              Optional_int YIndex = _,
-                              Optional_int YFloorIndex = _,
-                              Optional_int InsulationYIndex = _,
-                              Optional_int ZIndex = _,
-                              Optional_int ZWallIndex = _,
-                              Optional_int InsulationZIndex = _);
+                              ObjexxFCL::Optional_int BasementWallXIndex = _,
+                              ObjexxFCL::Optional_int BasementFloorYIndex = _,
+                              ObjexxFCL::Optional_int XIndex = _,
+                              ObjexxFCL::Optional_int XWallIndex = _,
+                              ObjexxFCL::Optional_int InsulationXIndex = _,
+                              ObjexxFCL::Optional_int YIndex = _,
+                              ObjexxFCL::Optional_int YFloorIndex = _,
+                              ObjexxFCL::Optional_int InsulationYIndex = _,
+                              ObjexxFCL::Optional_int ZIndex = _,
+                              ObjexxFCL::Optional_int ZWallIndex = _,
+                              ObjexxFCL::Optional_int InsulationZIndex = _);
 
         void createCellArray(std::vector<Real64> const &XBoundaryPoints,
                              std::vector<Real64> const &YBoundaryPoints,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,8 +62,6 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
         return 0.0;
     }
     this->preSize(state, _originalValue);
-    std::string DDNameFanPeak = "";
-    std::string dateTimeFanPeak = "";
     bool coolingFlow = false;
     bool heatingFlow = false;
 
@@ -383,6 +381,8 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
     }
     if (this->isFanReportObject) {
 
+        std::string DDNameFanPeak = "";
+        std::string dateTimeFanPeak = "";
         //  fill fan peak day and time here
         if (this->dataScalableSizingON) {
             DDNameFanPeak = "Scaled size, not from any peak";

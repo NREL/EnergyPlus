@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -128,10 +128,9 @@ namespace HybridModel {
         // Read hybrid model input
         CurrentModuleObject = "HybridModel:Zone";
         state.dataHybridModel->NumOfHybridModelZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
 
         if (state.dataHybridModel->NumOfHybridModelZones > 0) {
-
+            state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
             for (int HybridModelNum = 1; HybridModelNum <= state.dataHybridModel->NumOfHybridModelZones; ++HybridModelNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -196,18 +195,18 @@ namespace HybridModel {
                     if (state.dataHybridModel->FlagHybridModel_TM) {
                         if (state.dataHybridModel->FlagHybridModel_AI) {
                             ShowSevereError(state,
-                                            "Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + "\" cannot be both set to YES.");
+                                            format("Field \"{} and {}\" cannot be both set to YES.", cAlphaFieldNames(3), cAlphaFieldNames(4)));
                             ErrorsFound = true;
                         }
 
                         if (state.dataHybridModel->FlagHybridModel_PC) {
                             ShowSevereError(state,
-                                            "Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
+                                            format("Field \"{} and {}\" cannot be both set to YES.", cAlphaFieldNames(3), cAlphaFieldNames(5)));
                             ErrorsFound = true;
                         }
 
                         if (TemperatureSchPtr == 0) {
-                            ShowSevereError(state, "Measured Zone Air Tempearture Schedule is not defined for: " + CurrentModuleObject);
+                            ShowSevereError(state, format("Measured Zone Air Tempearture Schedule is not defined for: {}", CurrentModuleObject));
                             ErrorsFound = true;
                         } else {
                             state.dataHybridModel->HybridModelZone(ZonePtr).InternalThermalMassCalc_T = true;
@@ -218,35 +217,37 @@ namespace HybridModel {
                     if (state.dataHybridModel->FlagHybridModel_AI) {
                         if (state.dataHybridModel->FlagHybridModel_PC) {
                             ShowSevereError(state,
-                                            "Field \"" + cAlphaFieldNames(4) + "\" and \"" + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
+                                            format("Field \"{}\" and \"{}\" cannot be both set to YES.", cAlphaFieldNames(4), cAlphaFieldNames(5)));
                             ErrorsFound = true;
                         }
                         if (TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0 && CO2ConcentrationSchPtr == 0) {
                             // Show fatal error if no measurement schedule is provided
-                            ShowSevereError(state, "No measured envrionmental parameter is provided for: " + CurrentModuleObject);
+                            ShowSevereError(state, format("No measured envrionmental parameter is provided for: {}", CurrentModuleObject));
                             ShowContinueError(state,
-                                              "One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
-                                                  cAlphaFieldNames(8) + "\" must be provided for the HybridModel:Zone.");
+                                              format("One of the field \"{}\", \"{}\", or {}\" must be provided for the HybridModel:Zone.",
+                                                     cAlphaFieldNames(6),
+                                                     cAlphaFieldNames(7),
+                                                     cAlphaFieldNames(8)));
                             ErrorsFound = true;
                         } else {
                             if (TemperatureSchPtr > 0 && !state.dataHybridModel->FlagHybridModel_TM) {
                                 // Temperature schedule is provided, igonore humidity ratio and CO2 concentration schedules.
                                 state.dataHybridModel->HybridModelZone(ZonePtr).InfiltrationCalc_T = true;
                                 if (HumidityRatioSchPtr > 0) {
-                                    ShowWarningError(state, "Field \"" + cAlphaFieldNames(6) + "\" is provided.");
-                                    ShowContinueError(state, "Field \"" + cAlphaFieldNames(7) + "\" will not be used.");
+                                    ShowWarningError(state, format("Field \"{}\" is provided.", cAlphaFieldNames(6)));
+                                    ShowContinueError(state, format("Field \"{}\" will not be used.", cAlphaFieldNames(7)));
                                 }
                                 if (CO2ConcentrationSchPtr > 0) {
-                                    ShowWarningError(state, "Field \"" + cAlphaFieldNames(6) + "\" is provided.");
-                                    ShowContinueError(state, "Field \"" + cAlphaFieldNames(8) + "\" will not be used.");
+                                    ShowWarningError(state, format("Field \"{}\" is provided.", cAlphaFieldNames(6)));
+                                    ShowContinueError(state, format("Field \"{}\" will not be used.", cAlphaFieldNames(8)));
                                 }
                             }
                             if (HumidityRatioSchPtr > 0 && TemperatureSchPtr == 0) {
                                 // Humidity ratio schedule is provided, ignore CO2 concentration schedule.
                                 state.dataHybridModel->HybridModelZone(ZonePtr).InfiltrationCalc_H = true;
                                 if (CO2ConcentrationSchPtr > 0) {
-                                    ShowWarningError(state, "Field \"" + cAlphaFieldNames(7) + "\" is provided.");
-                                    ShowContinueError(state, "Field \"" + cAlphaFieldNames(8) + "\" will not be used.");
+                                    ShowWarningError(state, format("Field \"{}\" is provided.", cAlphaFieldNames(7)));
+                                    ShowContinueError(state, format("Field \"{}\" will not be used.", cAlphaFieldNames(8)));
                                 }
                             }
                             if (CO2ConcentrationSchPtr > 0 && TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0) {
@@ -260,10 +261,12 @@ namespace HybridModel {
                     if (state.dataHybridModel->FlagHybridModel_PC) {
                         if (TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0 && CO2ConcentrationSchPtr == 0) {
                             // Show fatal error if no measurement schedule is provided
-                            ShowSevereError(state, "No measured envrionmental parameter is provided for: " + CurrentModuleObject);
+                            ShowSevereError(state, format("No measured envrionmental parameter is provided for: {}", CurrentModuleObject));
                             ShowContinueError(state,
-                                              "One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
-                                                  cAlphaFieldNames(8) + "\" must be provided for the HybridModel:Zone.");
+                                              format("One of the field \"{}\", \"{}\", or {}\" must be provided for the HybridModel:Zone.",
+                                                     cAlphaFieldNames(6),
+                                                     cAlphaFieldNames(7),
+                                                     cAlphaFieldNames(8)));
                             ErrorsFound = true;
                         } else {
                             if (TemperatureSchPtr > 0 && !state.dataHybridModel->FlagHybridModel_TM) {
@@ -303,8 +306,10 @@ namespace HybridModel {
                             state.dataHybridModel->HybridModelZone(ZonePtr).IncludeSystemSupplyParameters = true;
                         } else {
                             ShowWarningError(state,
-                                             "Field \"" + cAlphaFieldNames(13) + "\", " + cAlphaFieldNames(14) + ", and \"" + cAlphaFieldNames(15) +
-                                                 "\" will not be used in the inverse balance euqation.");
+                                             format("Field \"{}\", {}, and \"{}\" will not be used in the inverse balance euqation.",
+                                                    cAlphaFieldNames(13),
+                                                    cAlphaFieldNames(14),
+                                                    cAlphaFieldNames(15)));
                         }
                     }
 
@@ -314,8 +319,9 @@ namespace HybridModel {
                             state.dataHybridModel->HybridModelZone(ZonePtr).IncludeSystemSupplyParameters = true;
                         } else {
                             ShowWarningError(state,
-                                             "Field \"" + cAlphaFieldNames(15) + "\" and \"" + cAlphaFieldNames(14) +
-                                                 "\" will not be used in the inverse balance euqation.");
+                                             format("Field \"{}\" and \"{}\" will not be used in the inverse balance euqation.",
+                                                    cAlphaFieldNames(15),
+                                                    cAlphaFieldNames(14)));
                         }
                     }
 
@@ -325,8 +331,9 @@ namespace HybridModel {
                             state.dataHybridModel->HybridModelZone(ZonePtr).IncludeSystemSupplyParameters = true;
                         } else {
                             ShowWarningError(state,
-                                             "Field \"" + cAlphaFieldNames(16) + "\" and \"" + cAlphaFieldNames(14) +
-                                                 "\" will not be used in the inverse balance euqation.");
+                                             format("Field \"{}\" and \"{}\" will not be used in the inverse balance euqation.",
+                                                    cAlphaFieldNames(16),
+                                                    cAlphaFieldNames(14)));
                         }
                     }
 
@@ -374,34 +381,36 @@ namespace HybridModel {
                             state.dataHybridModel->HybridModelZone(ZonePtr).ZonePeopleActivityLevelSchedulePtr =
                                 GetScheduleIndex(state, cAlphaArgs(9));
                         } else {
-                            ShowWarningError(state,
-                                             "Field \"" + cAlphaFieldNames(9) +
-                                                 "\": default people activity level is not provided, default value of 130W/person will be used.");
+                            ShowWarningError(
+                                state,
+                                format("Field \"{}\": default people activity level is not provided, default value of 130W/person will be used.",
+                                       cAlphaFieldNames(9)));
                         }
                         if (PeopleSensibleFractionSchPtr > 0) {
                             state.dataHybridModel->HybridModelZone(ZonePtr).ZonePeopleSensibleFractionSchedulePtr =
                                 GetScheduleIndex(state, cAlphaArgs(10));
                         } else {
-                            ShowWarningError(state,
-                                             "Field \"" + cAlphaFieldNames(10) +
-                                                 "\": default people sensible heat rate is not provided, default value of 0.6 will be used.");
+                            ShowWarningError(
+                                state,
+                                format("Field \"{}\": default people sensible heat rate is not provided, default value of 0.6 will be used.",
+                                       cAlphaFieldNames(10)));
                         }
                         if (PeopleRadiantFractionSchPtr > 0) {
                             state.dataHybridModel->HybridModelZone(ZonePtr).ZonePeopleRadiationFractionSchedulePtr =
                                 GetScheduleIndex(state, cAlphaArgs(11));
                         } else {
-                            ShowWarningError(
-                                state,
-                                "Field \"" + cAlphaFieldNames(11) +
-                                    "\": default people radiant heat portion (of sensible heat) is not provided, default value of 0.7 will be used.");
+                            ShowWarningError(state,
+                                             format("Field \"{}\": default people radiant heat portion (of sensible heat) is not provided, default "
+                                                    "value of 0.7 will be used.",
+                                                    cAlphaFieldNames(11)));
                         }
                         if (PeopleCO2GenRateSchPtr > 0) {
                             state.dataHybridModel->HybridModelZone(ZonePtr).ZonePeopleCO2GenRateSchedulePtr = GetScheduleIndex(state, cAlphaArgs(12));
                         } else {
-                            ShowWarningError(
-                                state,
-                                "Field \"" + cAlphaFieldNames(12) +
-                                    "\": default people CO2 generation rate is not provided, default value of 0.0000000382 kg/W will be used.");
+                            ShowWarningError(state,
+                                             format("Field \"{}\": default people CO2 generation rate is not provided, default value of 0.0000000382 "
+                                                    "kg/W will be used.",
+                                                    cAlphaFieldNames(12)));
                         }
                     }
 
@@ -468,9 +477,9 @@ namespace HybridModel {
                     }
 
                 } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
-                                        "\" not found.");
+                    ShowSevereError(
+                        state,
+                        format("{}=\"{}\" invalid {}=\"{}\" not found.", CurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                     ErrorsFound = true;
                 }
             }
@@ -490,6 +499,10 @@ namespace HybridModel {
                         state.dataRoomAirMod->AirModel(ZonePtr).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                         ShowWarningError(state, "Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone.");
                     }
+                }
+                if (state.dataHeatBal->doSpaceHeatBalanceSimulation || state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                    ShowSevereError(state, "Hybrid Modeling is not supported with ZoneAirHeatBalanceAlgorithm Space Heat Balance.");
+                    ErrorsFound = true;
                 }
             }
 

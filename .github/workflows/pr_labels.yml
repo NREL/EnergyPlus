@@ -6,10 +6,10 @@ on:
 
 jobs:
   check_pr_labels:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Verify PR label action
-        uses: mheap/github-action-required-labels@v1
+        uses: mheap/github-action-required-labels@v3
         with:
           mode: minimum
           count: 1

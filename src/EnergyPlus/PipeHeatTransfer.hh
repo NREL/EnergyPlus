@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/Plant/Enums.hh>
@@ -236,7 +237,7 @@ namespace PipeHeatTransfer {
 
         void CalcBuriedPipeSoil(EnergyPlusData &state);
 
-        void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
+        void CalcPipesHeatTransfer(EnergyPlusData &state, ObjexxFCL::Optional_int_const LengthIndex = _);
 
         Real64 OutsidePipeHeatTransCoef(EnergyPlusData &state);
 

@@ -85,7 +85,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,22.2;
+  Version,23.1;
 
   AirLoopHVAC:UnitarySystem,
     Zone1WTAHP,              !- Name

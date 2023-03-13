@@ -144,6 +144,11 @@ option(ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON)
 option(ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON)
 option(ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON)
 
+
+if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+  option(ENABLE_HARDENED_RUNTIME "Enable Control Flow Guard and Buffer Security Check" OFF)
+endif()
+
 mark_as_advanced(ENABLE_INSTALL_REMOTE)
 
 # Set a default build type if none was specified
@@ -330,6 +335,10 @@ if(BUILD_TESTING)
       if(VALGRIND_ANALYZE_PERFORMANCE_TESTS)
         find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
       endif()
+      option(PERF_STAT_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via `perf stat`" OFF)
+      if(PERF_STAT_ANALYZE_PERFORMANCE_TESTS)
+        find_program(PERF NAMES perf PATH /usr/bin /usr/local/bin)
+      endif()
     endif()
     add_subdirectory(performance_tests)
   endif()
@@ -362,9 +371,9 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V22-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V22-2-0-Energy+.idd")
-  file(COPY "src/Transition/SupportFiles/Report Variables 22-1-0 to 22-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  file(COPY "idd/V22-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V23-1-0-Energy+.idd")
+  file(COPY "src/Transition/SupportFiles/Report Variables 22-2-0 to 23-1-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
     PROJECT Basement

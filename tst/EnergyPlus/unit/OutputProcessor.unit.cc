@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1041,13 +1041,13 @@ namespace OutputProcessor {
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
         WriteReportIntegerData(*state, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
         WriteReportIntegerData(*state, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0, 0, 0, 0);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
         WriteReportIntegerData(*state, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0, 0, 0, 0);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
         WriteReportIntegerData(
             *state, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460);
@@ -1062,31 +1062,31 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60"}, "\n")));
 
         WriteReportIntegerData(*state, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 0, 0, 0, 0);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
         WriteReportIntegerData(*state, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 0, 0, 0, 0);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
         WriteReportIntegerData(*state, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 0, 0, 0, 0);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
         WriteReportIntegerData(
             *state, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027,4283136, 1,10,4283196,24,60"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136, 1,10,4283196,24,60"}, "\n")));
 
         WriteReportIntegerData(
             *state, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027,4283136,21, 1,10,4283196,21,24,60"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136,21, 1,10,4283196,21,24,60"}, "\n")));
 
         WriteReportIntegerData(
             *state, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136,12,21, 1,10,4283196,12,21,24,60"}, "\n")));
 
         WriteReportIntegerData(*state, 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
         WriteReportIntegerData(*state, 1, "1", 25.75, StoreType::Averaged, 720, ReportingFrequency::Monthly, 0, 4010115, 1, 4011560);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.3E-01,0, 1, 1,15,1, 1,15,60"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.035764,0, 1, 1,15,1, 1,15,60"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");

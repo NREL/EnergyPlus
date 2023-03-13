@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Vectors.hh>
+#include <WCEMultiLayerOptics.hpp>
 
 namespace EnergyPlus {
 
@@ -140,21 +141,18 @@ namespace WindowManager {
     class CWindowConstructionsSimplified
     {
     public:
-        static CWindowConstructionsSimplified &instance();
+        static CWindowConstructionsSimplified &instance(EnergyPlusData &state);
 
-        void pushLayer(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum, const SingleLayerOptics::CScatteringLayer &t_Layer);
+        void pushLayer(FenestrationCommon::WavelengthRange const t_Range, int t_ConstrNum, const SingleLayerOptics::CScatteringLayer &t_Layer);
 
         std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>
-        getEquivalentLayer(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum);
+        getEquivalentLayer(EnergyPlusData &state, FenestrationCommon::WavelengthRange t_Range, int t_ConstrNum);
 
         static void clearState();
-
-    private:
         CWindowConstructionsSimplified();
 
-        IGU_Layers getLayers(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
-
-        static std::unique_ptr<CWindowConstructionsSimplified> p_inst;
+    private:
+        IGU_Layers getLayers(EnergyPlusData &state, FenestrationCommon::WavelengthRange t_Range, int t_ConstrNum) const;
 
         // Need separate layer properties for Solar and Visible range
         std::map<FenestrationCommon::WavelengthRange, Layers_Map> m_Layers;
@@ -162,6 +160,15 @@ namespace WindowManager {
     };
 
 } // namespace WindowManager
+
+struct WindowManagerExteriorData : BaseGlobalStruct
+{
+    std::unique_ptr<WindowManager::CWindowConstructionsSimplified> p_inst;
+    void clear_state() override
+    {
+        new (this) WindowManagerExteriorData();
+    }
+};
 
 } // namespace EnergyPlus
 

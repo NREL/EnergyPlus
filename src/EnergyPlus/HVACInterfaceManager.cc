@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -545,8 +545,8 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // tank. Note that this routine is called repeatedly to re calculate
     // loop capacitance based on current plant conditions
 
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
@@ -666,8 +666,8 @@ void UpdateCommonPipe(EnergyPlusData &state,
     // loop capacitance based on current plant conditions
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateCommonPipe");
@@ -787,7 +787,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
     // accordingly.
 
-    auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
+    auto &PlantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe;
 
     // One time call to set up report variables and set common pipe 'type' flag
     if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
@@ -798,7 +798,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     int NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
     int NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
-    auto &MyEnvrnFlag(PlantCommonPipe(LoopNum).MyEnvrnFlag);
+    auto &MyEnvrnFlag = PlantCommonPipe(LoopNum).MyEnvrnFlag;
     if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         PlantCommonPipe(LoopNum).Flow = 0.0;
         PlantCommonPipe(LoopNum).Temp = 0.0;
@@ -1120,8 +1120,8 @@ void SetupCommonPipes(EnergyPlusData &state)
         // reference to easily lookup the first item once
         auto &thisPlantLoop = state.dataPlnt->PlantLoop(CurLoopNum);
         auto &thisCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(CurLoopNum);
-        auto &first_demand_component_type(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type);
-        auto &first_supply_component_type(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type);
+        auto const &first_demand_component_type = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type;
+        auto const &first_supply_component_type = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type;
 
         switch (thisPlantLoop.CommonPipeType) {
         case DataPlant::CommonPipeType::No:
@@ -1154,7 +1154,7 @@ void SetupCommonPipes(EnergyPlusData &state)
             if (first_supply_component_type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
                 // If/when the model supports variable-pumping primary, this can be removed.
                 ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
-                ShowContinueError(state, "Occurs on plant loop name = " + thisPlantLoop.Name);
+                ShowContinueError(state, format("Occurs on plant loop name = {}", thisPlantLoop.Name));
                 ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
                 ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
             }
@@ -1197,7 +1197,7 @@ void SetupCommonPipes(EnergyPlusData &state)
                 thisCommonPipe.SupplySideInletPumpType = FlowType::Variable;
                 // If/when the model supports variable-pumping primary, this can be removed.
                 ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
-                ShowContinueError(state, "Occurs on plant loop name = " + thisPlantLoop.Name);
+                ShowContinueError(state, format("Occurs on plant loop name = {}", thisPlantLoop.Name));
                 ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
                 ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
             }

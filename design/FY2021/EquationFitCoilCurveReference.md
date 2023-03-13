@@ -49,7 +49,7 @@ As described above, both quad-linear and quint-linear curves are needed for  Coi
 
 Once the above decision are made:
 
- - A new curve type will be added or current curve type will be modified in CurveManager and other curve related codes/data structures. The curve will be very similar to current quad-linear curve, eg.
+ - A new curve type will be added or current curve type will be modified in Curve and other curve related codes/data structures. The curve will be very similar to current quad-linear curve, eg.
  ```
 CURVE:QUINTLINEAR,
   SensCapCurve, ! Curve Name

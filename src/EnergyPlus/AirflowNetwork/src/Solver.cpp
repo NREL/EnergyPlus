@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -104,6 +104,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -130,8 +131,8 @@ namespace AirflowNetwork {
     // NISTIR 89-4072, National Institute of Standards and Technology, Gaithersburg, Maryland
 
     // Using/Aliasing
-    using CurveManager::CurveValue;
-    using CurveManager::GetCurveIndex;
+    using Curve::CurveValue;
+    using Curve::GetCurveIndex;
     using DataEnvironment::OutDryBulbTempAt;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
@@ -160,9 +161,9 @@ namespace AirflowNetwork {
 
     int constexpr NumOfVentCtrTypes(6); // Number of zone level venting control types
 
-    void Solver::manage_balance(Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
-                                Optional_int_const Iter,                // Iteration number
-                                Optional_bool ResimulateAirZone         // True when solution technique on third iteration
+    void Solver::manage_balance(ObjexxFCL::Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
+                                ObjexxFCL::Optional_int_const Iter,                // Iteration number
+                                ObjexxFCL::Optional_bool ResimulateAirZone         // True when solution technique on third iteration
     )
     {
 
@@ -1637,7 +1638,7 @@ namespace AirflowNetwork {
         // This subroutine reads inputs of air distribution system
 
         // Using/Aliasing
-        using CurveManager::GetCurveIndex;
+        using Curve::GetCurveIndex;
         using DataLoopNode::ObjectIsParent;
         using HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent;
         using MixedAir::GetOAMixerNumber;
@@ -1828,26 +1829,26 @@ namespace AirflowNetwork {
                             m_state,
                             "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues.");
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(m_state,
-                                                                    OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
-                                                                    {1},                                                  // Valid dimensions
-                                                                    RoutineName,                                          // Routine name
-                                                                    CurrentModuleObject,                                  // Object Type
-                                                                    OccupantVentilationControl(i).Name,                   // Object Name
-                                                                    cAlphaFields(2));                                     // Field Name
+                        ErrorsFound |= Curve::CheckCurveDims(m_state,
+                                                             OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
+                                                             {1},                                                  // Valid dimensions
+                                                             RoutineName,                                          // Routine name
+                                                             CurrentModuleObject,                                  // Object Type
+                                                             OccupantVentilationControl(i).Name,                   // Object Name
+                                                             cAlphaFields(2));                                     // Field Name
                     }
                 }
                 if (!lAlphaBlanks(3)) {
                     OccupantVentilationControl(i).ComfortHighTempCurveName = Alphas(3);
                     OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(m_state, Alphas(3)); // convert curve name to number
                     if (OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
-                        ErrorsFound |= CurveManager::CheckCurveDims(m_state,
-                                                                    OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
-                                                                    {1},                                                   // Valid dimensions
-                                                                    RoutineName,                                           // Routine name
-                                                                    CurrentModuleObject,                                   // Object Type
-                                                                    OccupantVentilationControl(i).Name,                    // Object Name
-                                                                    cAlphaFields(3));                                      // Field Name
+                        ErrorsFound |= Curve::CheckCurveDims(m_state,
+                                                             OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
+                                                             {1},                                                   // Valid dimensions
+                                                             RoutineName,                                           // Routine name
+                                                             CurrentModuleObject,                                   // Object Type
+                                                             OccupantVentilationControl(i).Name,                    // Object Name
+                                                             cAlphaFields(3));                                      // Field Name
                     } else {
                         ShowWarningError(m_state,
                                          format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(3) +
@@ -2588,8 +2589,8 @@ namespace AirflowNetwork {
                                              " is required, but a blank is found.");
                         ShowContinueError(m_state, format("The default value is assigned as {:.1R}", Numbers(1)));
                     }
-                    MultizoneExternalNodeData(i).ExtNum = AirflowNetworkNumOfZones + i;                   // External node number
-                    MultizoneExternalNodeData(i).curve = CurveManager::GetCurveIndex(m_state, Alphas(2)); // Wind pressure curve
+                    MultizoneExternalNodeData(i).ExtNum = AirflowNetworkNumOfZones + i;            // External node number
+                    MultizoneExternalNodeData(i).curve = Curve::GetCurveIndex(m_state, Alphas(2)); // Wind pressure curve
                     if (MultizoneExternalNodeData(i).curve == 0) {
                         ShowSevereError(m_state, format(RoutineName) + "Invalid " + cAlphaFields(2) + "=" + Alphas(2));
                         ShowContinueError(m_state, "Entered in " + CurrentModuleObject + '=' + Alphas(1));
@@ -3485,12 +3486,12 @@ namespace AirflowNetwork {
             curves.insert(MultizoneExternalNodeData(i).curve);
         }
         for (auto index : curves) {
-            print(m_state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(m_state, index));
+            print(m_state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", Curve::GetCurveName(m_state, index));
 
             for (j = 0; j < numWinDirs; ++j) {
-                print(m_state.files.eio, "{:.2R},", CurveManager::CurveValue(m_state, index, j * angleDelta));
+                print(m_state.files.eio, "{:.2R},", Curve::CurveValue(m_state, index, j * angleDelta));
             }
-            print(m_state.files.eio, "{:.2R}\n", CurveManager::CurveValue(m_state, index, numWinDirs * angleDelta));
+            print(m_state.files.eio, "{:.2R}\n", Curve::CurveValue(m_state, index, numWinDirs * angleDelta));
         }
 
         if (AirflowNetworkNumOfSingleSideZones > 0) {
@@ -5423,8 +5424,8 @@ namespace AirflowNetwork {
             }
 
             for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
-                ANZT(i) = m_state.dataHeatBalFanSys->MAT(i);
-                ANZW(i) = m_state.dataHeatBalFanSys->ZoneAirHumRat(i);
+                ANZT(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
+                ANZW(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
                 if (m_state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     ANCO(i) = m_state.dataContaminantBalance->ZoneAirCO2(i);
                 }
@@ -5452,16 +5453,16 @@ namespace AirflowNetwork {
             if (simulation_control.type != ControlType::NoMultizoneOrDistribution) {
                 if (RollBackFlag) {
                     for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
-                        ANZT(i) = m_state.dataHeatBalFanSys->XMAT(i);
-                        ANZW(i) = m_state.dataHeatBalFanSys->WZoneTimeMinus1(i);
+                        ANZT(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).XMAT[0];
+                        ANZW(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).WPrevZoneTS[0];
                         if (m_state.dataContaminantBalance->Contaminant.CO2Simulation) ANCO(i) = m_state.dataContaminantBalance->CO2ZoneTimeMinus1(i);
                         if (m_state.dataContaminantBalance->Contaminant.GenericContamSimulation)
                             ANGC(i) = m_state.dataContaminantBalance->GCZoneTimeMinus1(i);
                     }
                 } else {
                     for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
-                        ANZT(i) = m_state.dataHeatBalFanSys->MAT(i);
-                        ANZW(i) = m_state.dataHeatBalFanSys->ZoneAirHumRat(i);
+                        ANZT(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
+                        ANZW(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
                         if (m_state.dataContaminantBalance->Contaminant.CO2Simulation) ANCO(i) = m_state.dataContaminantBalance->ZoneAirCO2(i);
                         if (m_state.dataContaminantBalance->Contaminant.GenericContamSimulation)
                             ANGC(i) = m_state.dataContaminantBalance->ZoneAirGC(i);
@@ -6642,16 +6643,12 @@ namespace AirflowNetwork {
                     }
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
-                    Par(1) = PressureSet;
-                    General::SolveRoot(m_state,
-                                       ErrorToler,
-                                       MaxIte,
-                                       SolFla,
-                                       ExhaustFanMassFlowRate,
-                                       AFNPressureResidual,
-                                       MinExhaustMassFlowrate,
-                                       MaxExhaustMassFlowrate,
-                                       Par);
+                    auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                    auto f = [&thisState, PressureSet](Real64 const ControllerMassFlowRate) {
+                        return AFNPressureResidual(thisState, ControllerMassFlowRate, PressureSet);
+                    };
+                    General::SolveRoot(
+                        m_state, ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, f, MinExhaustMassFlowrate, MaxExhaustMassFlowrate);
                     if (SolFla == -1) {
                         if (!m_state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -6736,16 +6733,11 @@ namespace AirflowNetwork {
                     }
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
-                    Par(1) = PressureSet;
-                    General::SolveRoot(m_state,
-                                       ErrorToler,
-                                       MaxIte,
-                                       SolFla,
-                                       ReliefMassFlowRate,
-                                       AFNPressureResidual,
-                                       MinReliefMassFlowrate,
-                                       MaxReliefMassFlowrate,
-                                       Par);
+                    auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                    auto f = [&thisState, PressureSet](Real64 const ControllerMassFlowRate) {
+                        return AFNPressureResidual(thisState, ControllerMassFlowRate, PressureSet);
+                    };
+                    General::SolveRoot(m_state, ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, f, MinReliefMassFlowrate, MaxReliefMassFlowrate);
                     if (SolFla == -1) {
                         if (!m_state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -6773,8 +6765,7 @@ namespace AirflowNetwork {
 
     Real64 AFNPressureResidual(EnergyPlusData &state,
                                Real64 const ControllerMassFlowRate, // Pressure setpoint
-                               Array1D<Real64> const &Par           // par(1) = PressureSet
-    )
+                               Real64 PressureSet)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -6792,10 +6783,7 @@ namespace AirflowNetwork {
         Real64 AFNPressureResidual;
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 PressureSet;
         Real64 ZonePressure;
-
-        PressureSet = Par(1);
 
         if (state.afn->PressureSetFlag == PressureCtrlExhaust) {
             state.afn->ExhaustFanMassFlowRate = ControllerMassFlowRate;
@@ -6823,24 +6811,23 @@ namespace AirflowNetwork {
         // Add a new table and performance curve
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
+        Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
 
         int CurveNum = static_cast<int>(state.dataCurveManager->PerfCurve.size()) + 1;
-        state.dataCurveManager->PerfCurve.push_back(CurveManager::PerformanceCurveData());
+        state.dataCurveManager->PerfCurve.push_back(new Curve::Curve());
 
-        state.dataCurveManager->PerfCurve(CurveNum).Name = name;
-        state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
-        state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
+        state.dataCurveManager->PerfCurve(CurveNum)->Name = name;
+        state.dataCurveManager->PerfCurve(CurveNum)->numDims = 1;
 
-        state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpType::BtwxtMethod;
+        state.dataCurveManager->PerfCurve(CurveNum)->interpolationType = Curve::InterpType::BtwxtMethod;
 
-        state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-        state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
-        state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 360.0;
-        state.dataCurveManager->PerfCurve(CurveNum).Var1MaxPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].min = 0.0;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].minPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].max = 360.0;
+        state.dataCurveManager->PerfCurve(CurveNum)->inputLimits[0].maxPresent = true;
 
-        state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
-        state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
+        state.dataCurveManager->PerfCurve(CurveNum)->TableIndex = gridIndex;
+        state.dataCurveManager->PerfCurve(CurveNum)->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
 
         state.dataCurveManager->NumCurves += 1;
         return CurveNum;
@@ -7202,7 +7189,7 @@ namespace AirflowNetwork {
                 angle = 360.0 - angle;
             }
         }
-        Cp = CurveManager::CurveValue(m_state, curve, angle);
+        Cp = Curve::CurveValue(m_state, curve, angle);
 
         return Cp * 0.5 * rho * windSpeed * windSpeed;
     }
@@ -8738,7 +8725,8 @@ namespace AirflowNetwork {
                 ZN2 = AirflowNetworkNodeData(M).EPlusZoneNum;
                 // Find a linkage from a zone to outdoors
                 if (ZN1 > 0 && ZN2 == 0) {
-                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfHasLinkedOutAirNode) {
+                    auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
+                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfLinkedOutAirNode > 0) {
                         Tamb = m_state.dataSurface->SurfOutDryBulbTemp(MultizoneSurfaceData(i).SurfNum);
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(m_state,
                                                                            Tamb,
@@ -8748,67 +8736,56 @@ namespace AirflowNetwork {
                         Tamb = Zone(ZN1).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(m_state.dataEnvrn->OutHumRat);
                     }
-                    hg = Psychrometrics::PsyHgAirFnWTdb(m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1), m_state.dataHeatBalFanSys->MAT(ZN1));
+                    hg = Psychrometrics::PsyHgAirFnWTdb(zn1HB.ZoneAirHumRat, zn1HB.MAT);
 
                     if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
                         AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
-                        if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN1)) {
-                            AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainW +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1)));
+                        if (Tamb > zn1HB.MAT) {
+                            AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - zn1HB.MAT));
                             AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1))) * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - zn1HB.MAT)) * ReportingConstant;
                         } else {
-                            AirflowNetworkReportData(ZN1).MultiZoneInfiSenLossW +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - Tamb));
+                            AirflowNetworkReportData(ZN1).MultiZoneInfiSenLossW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (zn1HB.MAT - Tamb));
                             AirflowNetworkReportData(ZN1).MultiZoneInfiSenLossJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - Tamb)) * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (zn1HB.MAT - Tamb)) * ReportingConstant;
                         }
-                        if (m_state.dataEnvrn->OutHumRat > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1)) {
+                        if (m_state.dataEnvrn->OutHumRat > zn1HB.ZoneAirHumRat) {
                             AirflowNetworkReportData(ZN1).MultiZoneInfiLatGainW +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                hg;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataEnvrn->OutHumRat - zn1HB.ZoneAirHumRat)) * hg;
                             AirflowNetworkReportData(ZN1).MultiZoneInfiLatGainJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                hg * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataEnvrn->OutHumRat - zn1HB.ZoneAirHumRat)) * hg * ReportingConstant;
                         } else {
                             AirflowNetworkReportData(ZN1).MultiZoneInfiLatLossW +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataEnvrn->OutHumRat)) *
-                                hg;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * (zn1HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * hg;
                             AirflowNetworkReportData(ZN1).MultiZoneInfiLatLossJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataEnvrn->OutHumRat)) *
-                                hg * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * (zn1HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * hg * ReportingConstant;
                         }
                     } else {
-                        if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN1)) {
-                            AirflowNetworkReportData(ZN1).MultiZoneVentSenGainW +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1)));
+                        if (Tamb > zn1HB.MAT) {
+                            AirflowNetworkReportData(ZN1).MultiZoneVentSenGainW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - zn1HB.MAT));
                             AirflowNetworkReportData(ZN1).MultiZoneVentSenGainJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1))) * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - zn1HB.MAT)) * ReportingConstant;
                         } else {
-                            AirflowNetworkReportData(ZN1).MultiZoneVentSenLossW +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - Tamb));
+                            AirflowNetworkReportData(ZN1).MultiZoneVentSenLossW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (zn1HB.MAT - Tamb));
                             AirflowNetworkReportData(ZN1).MultiZoneVentSenLossJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - Tamb)) * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (zn1HB.MAT - Tamb)) * ReportingConstant;
                         }
-                        if (m_state.dataEnvrn->OutHumRat > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1)) {
+                        if (m_state.dataEnvrn->OutHumRat > zn1HB.ZoneAirHumRat) {
                             AirflowNetworkReportData(ZN1).MultiZoneVentLatGainW +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                hg;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataEnvrn->OutHumRat - zn1HB.ZoneAirHumRat)) * hg;
                             AirflowNetworkReportData(ZN1).MultiZoneVentLatGainJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                hg * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataEnvrn->OutHumRat - zn1HB.ZoneAirHumRat)) * hg * ReportingConstant;
                         } else {
                             AirflowNetworkReportData(ZN1).MultiZoneVentLatLossW +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataEnvrn->OutHumRat)) *
-                                hg;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * (zn1HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * hg;
                             AirflowNetworkReportData(ZN1).MultiZoneVentLatLossJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW2 * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataEnvrn->OutHumRat)) *
-                                hg * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW2 * (zn1HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * hg * ReportingConstant;
                         }
                     }
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
-                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfHasLinkedOutAirNode) {
+                    auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
+                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfLinkedOutAirNode > 0) {
                         Tamb = m_state.dataSurface->SurfOutDryBulbTemp(MultizoneSurfaceData(i).SurfNum);
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(m_state,
                                                                            Tamb,
@@ -8818,134 +8795,98 @@ namespace AirflowNetwork {
                         Tamb = Zone(ZN2).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(m_state.dataEnvrn->OutHumRat);
                     }
-                    hg = Psychrometrics::PsyHgAirFnWTdb(m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2), m_state.dataHeatBalFanSys->MAT(ZN2));
+                    hg = Psychrometrics::PsyHgAirFnWTdb(zn2HB.ZoneAirHumRat, zn2HB.MAT);
 
                     if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
                         AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
-                        if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN2)) {
-                            AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainW +=
-                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2)));
+                        if (Tamb > zn2HB.MAT) {
+                            AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - zn2HB.MAT));
                             AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2))) * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - zn2HB.MAT)) * ReportingConstant;
                         } else {
-                            AirflowNetworkReportData(ZN2).MultiZoneInfiSenLossW +=
-                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - Tamb));
+                            AirflowNetworkReportData(ZN2).MultiZoneInfiSenLossW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (zn2HB.MAT - Tamb));
                             AirflowNetworkReportData(ZN2).MultiZoneInfiSenLossJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - Tamb)) * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (zn2HB.MAT - Tamb)) * ReportingConstant;
                         }
-                        if (m_state.dataEnvrn->OutHumRat > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) {
+                        if (m_state.dataEnvrn->OutHumRat > zn2HB.ZoneAirHumRat) {
                             AirflowNetworkReportData(ZN2).MultiZoneInfiLatGainW +=
-                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                hg;
+                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataEnvrn->OutHumRat - zn2HB.ZoneAirHumRat)) * hg;
                             AirflowNetworkReportData(ZN2).MultiZoneInfiLatGainJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                hg * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataEnvrn->OutHumRat - zn2HB.ZoneAirHumRat)) * hg * ReportingConstant;
                         } else {
                             AirflowNetworkReportData(ZN2).MultiZoneInfiLatLossW +=
-                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataEnvrn->OutHumRat)) *
-                                hg;
+                                (AirflowNetworkLinkSimu(i).FLOW * (zn2HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * hg;
                             AirflowNetworkReportData(ZN2).MultiZoneInfiLatLossJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataEnvrn->OutHumRat)) *
-                                hg * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW * (zn2HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * hg * ReportingConstant;
                         }
                     } else {
-                        if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN2)) {
-                            AirflowNetworkReportData(ZN2).MultiZoneVentSenGainW +=
-                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2)));
+                        if (Tamb > zn2HB.MAT) {
+                            AirflowNetworkReportData(ZN2).MultiZoneVentSenGainW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - zn2HB.MAT));
                             AirflowNetworkReportData(ZN2).MultiZoneVentSenGainJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2))) * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - zn2HB.MAT)) * ReportingConstant;
                         } else {
-                            AirflowNetworkReportData(ZN2).MultiZoneVentSenLossW +=
-                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - Tamb));
+                            AirflowNetworkReportData(ZN2).MultiZoneVentSenLossW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (zn2HB.MAT - Tamb));
                             AirflowNetworkReportData(ZN2).MultiZoneVentSenLossJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - Tamb)) * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW * CpAir * (zn2HB.MAT - Tamb)) * ReportingConstant;
                         }
-                        if (m_state.dataEnvrn->OutHumRat > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) {
+                        if (m_state.dataEnvrn->OutHumRat > zn2HB.ZoneAirHumRat) {
                             AirflowNetworkReportData(ZN2).MultiZoneVentLatGainW +=
-                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                hg;
+                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataEnvrn->OutHumRat - zn2HB.ZoneAirHumRat)) * hg;
                             AirflowNetworkReportData(ZN2).MultiZoneVentLatGainJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                hg * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataEnvrn->OutHumRat - zn2HB.ZoneAirHumRat)) * hg * ReportingConstant;
                         } else {
                             AirflowNetworkReportData(ZN2).MultiZoneVentLatLossW +=
-                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataEnvrn->OutHumRat)) *
-                                hg;
+                                (AirflowNetworkLinkSimu(i).FLOW * (zn2HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * hg;
                             AirflowNetworkReportData(ZN2).MultiZoneVentLatLossJ +=
-                                (AirflowNetworkLinkSimu(i).FLOW * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataEnvrn->OutHumRat)) *
-                                hg * ReportingConstant;
+                                (AirflowNetworkLinkSimu(i).FLOW * (zn2HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * hg * ReportingConstant;
                         }
                     }
                 }
 
                 if (ZN1 > 0 && ZN2 > 0) {
-                    CpAir = PsyCpAirFnW((m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) + m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) / 2.0);
-                    hg = Psychrometrics::PsyHgAirFnWTdb(
-                        (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) + m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) / 2.0,
-                        (m_state.dataHeatBalFanSys->MAT(ZN1) + m_state.dataHeatBalFanSys->MAT(ZN2)) / 2.0);
-                    if (m_state.dataHeatBalFanSys->MAT(ZN1) > m_state.dataHeatBalFanSys->MAT(ZN2)) {
-                        AirflowNetworkReportData(ZN2).MultiZoneMixSenGainW +=
-                            (AirflowNetworkLinkSimu(i).FLOW * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - m_state.dataHeatBalFanSys->MAT(ZN2)));
+                    auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
+                    auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
+                    CpAir = PsyCpAirFnW((zn1HB.ZoneAirHumRat + zn2HB.ZoneAirHumRat) / 2.0);
+                    hg = Psychrometrics::PsyHgAirFnWTdb((zn1HB.ZoneAirHumRat + zn2HB.ZoneAirHumRat) / 2.0, (zn1HB.MAT + zn2HB.MAT) / 2.0);
+                    if (zn1HB.MAT > zn2HB.MAT) {
+                        AirflowNetworkReportData(ZN2).MultiZoneMixSenGainW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (zn1HB.MAT - zn2HB.MAT));
                         AirflowNetworkReportData(ZN2).MultiZoneMixSenGainJ +=
-                            (AirflowNetworkLinkSimu(i).FLOW * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - m_state.dataHeatBalFanSys->MAT(ZN2))) *
-                            ReportingConstant;
+                            (AirflowNetworkLinkSimu(i).FLOW * CpAir * (zn1HB.MAT - zn2HB.MAT)) * ReportingConstant;
                     } else {
-                        AirflowNetworkReportData(ZN2).MultiZoneMixSenLossW +=
-                            (AirflowNetworkLinkSimu(i).FLOW * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - m_state.dataHeatBalFanSys->MAT(ZN1)));
+                        AirflowNetworkReportData(ZN2).MultiZoneMixSenLossW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (zn2HB.MAT - zn1HB.MAT));
                         AirflowNetworkReportData(ZN2).MultiZoneMixSenLossJ +=
-                            (AirflowNetworkLinkSimu(i).FLOW * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - m_state.dataHeatBalFanSys->MAT(ZN1))) *
-                            ReportingConstant;
+                            (AirflowNetworkLinkSimu(i).FLOW * CpAir * (zn2HB.MAT - zn1HB.MAT)) * ReportingConstant;
                     }
-                    if (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) {
+                    if (zn1HB.ZoneAirHumRat > zn2HB.ZoneAirHumRat) {
                         AirflowNetworkReportData(ZN2).MultiZoneMixLatGainW +=
-                            (AirflowNetworkLinkSimu(i).FLOW *
-                             (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                            hg;
+                            (AirflowNetworkLinkSimu(i).FLOW * (zn1HB.ZoneAirHumRat - zn2HB.ZoneAirHumRat)) * hg;
                         AirflowNetworkReportData(ZN2).MultiZoneMixLatGainJ +=
-                            (AirflowNetworkLinkSimu(i).FLOW *
-                             (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                            hg * ReportingConstant;
+                            (AirflowNetworkLinkSimu(i).FLOW * (zn1HB.ZoneAirHumRat - zn2HB.ZoneAirHumRat)) * hg * ReportingConstant;
                     } else {
                         AirflowNetworkReportData(ZN2).MultiZoneMixLatLossW +=
-                            (AirflowNetworkLinkSimu(i).FLOW *
-                             (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                            hg;
+                            (AirflowNetworkLinkSimu(i).FLOW * (zn2HB.ZoneAirHumRat - zn1HB.ZoneAirHumRat)) * hg;
                         AirflowNetworkReportData(ZN2).MultiZoneMixLatLossJ +=
-                            (AirflowNetworkLinkSimu(i).FLOW *
-                             (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                            hg * ReportingConstant;
+                            (AirflowNetworkLinkSimu(i).FLOW * (zn2HB.ZoneAirHumRat - zn1HB.ZoneAirHumRat)) * hg * ReportingConstant;
                     }
-                    if (m_state.dataHeatBalFanSys->MAT(ZN2) > m_state.dataHeatBalFanSys->MAT(ZN1)) {
-                        AirflowNetworkReportData(ZN1).MultiZoneMixSenGainW +=
-                            (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - m_state.dataHeatBalFanSys->MAT(ZN1)));
+                    if (zn2HB.MAT > zn1HB.MAT) {
+                        AirflowNetworkReportData(ZN1).MultiZoneMixSenGainW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (zn2HB.MAT - zn1HB.MAT));
                         AirflowNetworkReportData(ZN1).MultiZoneMixSenGainJ +=
-                            (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - m_state.dataHeatBalFanSys->MAT(ZN1))) *
-                            ReportingConstant;
+                            (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (zn2HB.MAT - zn1HB.MAT)) * ReportingConstant;
                     } else {
-                        AirflowNetworkReportData(ZN1).MultiZoneMixSenLossW +=
-                            (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - m_state.dataHeatBalFanSys->MAT(ZN2)));
+                        AirflowNetworkReportData(ZN1).MultiZoneMixSenLossW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (zn1HB.MAT - zn2HB.MAT));
                         AirflowNetworkReportData(ZN1).MultiZoneMixSenLossJ +=
-                            (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - m_state.dataHeatBalFanSys->MAT(ZN2))) *
-                            ReportingConstant;
+                            (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (zn1HB.MAT - zn2HB.MAT)) * ReportingConstant;
                     }
-                    if (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1)) {
+                    if (zn2HB.ZoneAirHumRat > zn1HB.ZoneAirHumRat) {
                         AirflowNetworkReportData(ZN1).MultiZoneMixLatGainW +=
-                            (AirflowNetworkLinkSimu(i).FLOW2 *
-                             (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                            hg;
+                            (AirflowNetworkLinkSimu(i).FLOW2 * (zn2HB.ZoneAirHumRat - zn1HB.ZoneAirHumRat)) * hg;
                         AirflowNetworkReportData(ZN1).MultiZoneMixLatGainJ +=
-                            (AirflowNetworkLinkSimu(i).FLOW2 *
-                             (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                            hg * ReportingConstant;
+                            (AirflowNetworkLinkSimu(i).FLOW2 * (zn2HB.ZoneAirHumRat - zn1HB.ZoneAirHumRat)) * hg * ReportingConstant;
                     } else {
                         AirflowNetworkReportData(ZN1).MultiZoneMixLatLossW +=
-                            std::abs(AirflowNetworkLinkSimu(i).FLOW2 *
-                                     (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                            hg;
+                            std::abs(AirflowNetworkLinkSimu(i).FLOW2 * (zn1HB.ZoneAirHumRat - zn2HB.ZoneAirHumRat)) * hg;
                         AirflowNetworkReportData(ZN1).MultiZoneMixLatLossJ +=
-                            (AirflowNetworkLinkSimu(i).FLOW2 *
-                             (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                            hg * ReportingConstant;
+                            (AirflowNetworkLinkSimu(i).FLOW2 * (zn1HB.ZoneAirHumRat - zn2HB.ZoneAirHumRat)) * hg * ReportingConstant;
                     }
                 }
             }
@@ -9074,6 +9015,7 @@ namespace AirflowNetwork {
                     ZN2 = AirflowNetworkNodeData(M).EPlusZoneNum;
                     // Find a linkage from a zone to outdoors
                     if (ZN1 > 0 && ZN2 == 0) {
+                        auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
                         if (AirflowNetworkNodeData(n).AirLoopNum > 0 && AirflowNetworkNodeData(n).AirLoopNum != AirLoopNum) continue;
                         if (AirflowNetworkNodeData(n).AirLoopNum == AirLoopNum) {
                             RepOnOffFanRunTimeFraction = LoopOnOffFanRunTimeFraction(AirLoopNum);
@@ -9087,66 +9029,54 @@ namespace AirflowNetwork {
                         CpAir = PsyCpAirFnW(m_state.dataEnvrn->OutHumRat);
                         if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
                             AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
-                            if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN1)) {
+                            if (Tamb > zn1HB.MAT) {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainW +=
-                                    (linkReport1(i).FLOW2OFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1))) *
-                                    (1.0 - RepOnOffFanRunTimeFraction);
+                                    (linkReport1(i).FLOW2OFF * CpAir * (Tamb - zn1HB.MAT)) * (1.0 - RepOnOffFanRunTimeFraction);
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainJ +=
-                                    (linkReport1(i).FLOW2OFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1))) * ReportingConstant *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * CpAir * (Tamb - zn1HB.MAT)) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenLossW +=
-                                    (linkReport1(i).FLOW2OFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - Tamb)) *
-                                    (1.0 - RepOnOffFanRunTimeFraction);
+                                    (linkReport1(i).FLOW2OFF * CpAir * (zn1HB.MAT - Tamb)) * (1.0 - RepOnOffFanRunTimeFraction);
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenLossJ +=
-                                    (linkReport1(i).FLOW2OFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - Tamb)) * ReportingConstant *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * CpAir * (zn1HB.MAT - Tamb)) * ReportingConstant * ReportingFraction;
                             }
-                            if (m_state.dataEnvrn->OutHumRat > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1)) {
+                            if (m_state.dataEnvrn->OutHumRat > zn1HB.ZoneAirHumRat) {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiLatGainW +=
-                                    (linkReport1(i).FLOW2OFF * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * (m_state.dataEnvrn->OutHumRat - zn1HB.ZoneAirHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiLatGainJ +=
-                                    (linkReport1(i).FLOW2OFF * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                    ReportingConstant * ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * (m_state.dataEnvrn->OutHumRat - zn1HB.ZoneAirHumRat)) * ReportingConstant *
+                                    ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiLatLossW +=
-                                    (linkReport1(i).FLOW2OFF * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataEnvrn->OutHumRat)) *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * (zn1HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiLatLossJ +=
-                                    (linkReport1(i).FLOW2OFF * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataEnvrn->OutHumRat)) *
-                                    ReportingConstant * ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * (zn1HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * ReportingConstant *
+                                    ReportingFraction;
                             }
                         } else {
-                            if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN1)) {
+                            if (Tamb > zn1HB.MAT) {
                                 AirflowNetworkReportData(ZN1).MultiZoneVentSenGainW +=
-                                    (linkReport1(i).FLOW2OFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1))) *
-                                    (1.0 - RepOnOffFanRunTimeFraction);
+                                    (linkReport1(i).FLOW2OFF * CpAir * (Tamb - zn1HB.MAT)) * (1.0 - RepOnOffFanRunTimeFraction);
                                 AirflowNetworkReportData(ZN1).MultiZoneVentSenGainJ +=
-                                    (linkReport1(i).FLOW2OFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1))) * ReportingConstant *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * CpAir * (Tamb - zn1HB.MAT)) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN1).MultiZoneVentSenLossW +=
-                                    (linkReport1(i).FLOW2OFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - Tamb)) *
-                                    (1.0 - RepOnOffFanRunTimeFraction);
+                                    (linkReport1(i).FLOW2OFF * CpAir * (zn1HB.MAT - Tamb)) * (1.0 - RepOnOffFanRunTimeFraction);
                                 AirflowNetworkReportData(ZN1).MultiZoneVentSenLossJ +=
-                                    (linkReport1(i).FLOW2OFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - Tamb)) * ReportingConstant *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * CpAir * (zn1HB.MAT - Tamb)) * ReportingConstant * ReportingFraction;
                             }
-                            if (m_state.dataEnvrn->OutHumRat > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1)) {
+                            if (m_state.dataEnvrn->OutHumRat > zn1HB.ZoneAirHumRat) {
                                 AirflowNetworkReportData(ZN1).MultiZoneVentLatGainW +=
-                                    (linkReport1(i).FLOW2OFF * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * (m_state.dataEnvrn->OutHumRat - zn1HB.ZoneAirHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN1).MultiZoneVentLatGainJ +=
-                                    (linkReport1(i).FLOW2OFF * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                    ReportingConstant * ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * (m_state.dataEnvrn->OutHumRat - zn1HB.ZoneAirHumRat)) * ReportingConstant *
+                                    ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN1).MultiZoneVentLatLossW +=
-                                    (linkReport1(i).FLOW2OFF * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataEnvrn->OutHumRat)) *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * (zn1HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN1).MultiZoneVentLatLossJ +=
-                                    (linkReport1(i).FLOW2OFF * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataEnvrn->OutHumRat)) *
-                                    ReportingConstant * ReportingFraction;
+                                    (linkReport1(i).FLOW2OFF * (zn1HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * ReportingConstant *
+                                    ReportingFraction;
                             }
                         }
                         if (AirflowNetworkNodeData(n).AirLoopNum == 0) {
@@ -9154,6 +9084,7 @@ namespace AirflowNetwork {
                         }
                     }
                     if (ZN1 == 0 && ZN2 > 0) {
+                        auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
                         if (AirflowNetworkNodeData(M).AirLoopNum > 0 && AirflowNetworkNodeData(M).AirLoopNum != AirLoopNum) continue;
                         if (AirflowNetworkNodeData(M).AirLoopNum == AirLoopNum) {
                             RepOnOffFanRunTimeFraction = LoopOnOffFanRunTimeFraction(AirLoopNum);
@@ -9167,62 +9098,54 @@ namespace AirflowNetwork {
                         CpAir = PsyCpAirFnW(m_state.dataEnvrn->OutHumRat);
                         if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
                             AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
-                            if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN2)) {
+                            if (Tamb > zn2HB.MAT) {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainW +=
-                                    (linkReport1(i).FLOWOFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2))) * ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * CpAir * (Tamb - zn2HB.MAT)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainJ +=
-                                    (linkReport1(i).FLOWOFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2))) * ReportingConstant *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * CpAir * (Tamb - zn2HB.MAT)) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenLossW +=
-                                    (linkReport1(i).FLOWOFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - Tamb)) * ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * CpAir * (zn2HB.MAT - Tamb)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenLossJ +=
-                                    (linkReport1(i).FLOWOFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - Tamb)) * ReportingConstant *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * CpAir * (zn2HB.MAT - Tamb)) * ReportingConstant * ReportingFraction;
                             }
-                            if (m_state.dataEnvrn->OutHumRat > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) {
+                            if (m_state.dataEnvrn->OutHumRat > zn2HB.ZoneAirHumRat) {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiLatGainW +=
-                                    (linkReport1(i).FLOWOFF * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * (m_state.dataEnvrn->OutHumRat - zn2HB.ZoneAirHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiLatGainJ +=
-                                    (linkReport1(i).FLOWOFF * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                    ReportingConstant * ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * (m_state.dataEnvrn->OutHumRat - zn2HB.ZoneAirHumRat)) * ReportingConstant *
+                                    ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiLatLossW +=
-                                    (linkReport1(i).FLOWOFF * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataEnvrn->OutHumRat)) *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * (zn2HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiLatLossJ +=
-                                    (linkReport1(i).FLOWOFF * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataEnvrn->OutHumRat)) *
-                                    ReportingConstant * ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * (zn2HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * ReportingConstant *
+                                    ReportingFraction;
                             }
                         } else {
-                            if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN2)) {
+                            if (Tamb > zn2HB.MAT) {
                                 AirflowNetworkReportData(ZN2).MultiZoneVentSenGainW +=
-                                    (linkReport1(i).FLOWOFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2))) * ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * CpAir * (Tamb - zn2HB.MAT)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneVentSenGainJ +=
-                                    (linkReport1(i).FLOWOFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2))) * ReportingConstant *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * CpAir * (Tamb - zn2HB.MAT)) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN2).MultiZoneVentSenLossW +=
-                                    (linkReport1(i).FLOWOFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - Tamb)) * ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * CpAir * (zn2HB.MAT - Tamb)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneVentSenLossJ +=
-                                    (linkReport1(i).FLOWOFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - Tamb)) * ReportingConstant *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * CpAir * (zn2HB.MAT - Tamb)) * ReportingConstant * ReportingFraction;
                             }
-                            if (m_state.dataEnvrn->OutHumRat > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) {
+                            if (m_state.dataEnvrn->OutHumRat > zn2HB.ZoneAirHumRat) {
                                 AirflowNetworkReportData(ZN2).MultiZoneVentLatGainW +=
-                                    (linkReport1(i).FLOWOFF * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * (m_state.dataEnvrn->OutHumRat - zn2HB.ZoneAirHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneVentLatGainJ +=
-                                    (linkReport1(i).FLOWOFF * (m_state.dataEnvrn->OutHumRat - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                    ReportingConstant * ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * (m_state.dataEnvrn->OutHumRat - zn2HB.ZoneAirHumRat)) * ReportingConstant *
+                                    ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN2).MultiZoneVentLatLossW +=
-                                    (linkReport1(i).FLOWOFF * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataEnvrn->OutHumRat)) *
-                                    ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * (zn2HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneVentLatLossJ +=
-                                    (linkReport1(i).FLOWOFF * (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataEnvrn->OutHumRat)) *
-                                    ReportingConstant * ReportingFraction;
+                                    (linkReport1(i).FLOWOFF * (zn2HB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat)) * ReportingConstant *
+                                    ReportingFraction;
                             }
                         }
                         if (AirflowNetworkNodeData(M).AirLoopNum == 0) {
@@ -9231,77 +9154,55 @@ namespace AirflowNetwork {
                     }
 
                     if (ZN1 > 0 && ZN2 > 0) {
+                        auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
+                        auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
                         ReportingFraction = (1.0 - MaxOnOffFanRunTimeFraction);
-                        CpAir = PsyCpAirFnW(m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1));
-                        if (m_state.dataHeatBalFanSys->MAT(ZN1) > m_state.dataHeatBalFanSys->MAT(ZN2)) {
+                        CpAir = PsyCpAirFnW(zn1HB.ZoneAirHumRat);
+                        if (zn1HB.MAT > zn2HB.MAT) {
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenGainW +=
-                                (linkReport1(i).FLOWOFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - m_state.dataHeatBalFanSys->MAT(ZN2))) *
-                                ReportingFraction;
+                                (linkReport1(i).FLOWOFF * CpAir * (zn1HB.MAT - zn2HB.MAT)) * ReportingFraction;
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenGainJ +=
-                                (linkReport1(i).FLOWOFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - m_state.dataHeatBalFanSys->MAT(ZN2))) *
-                                ReportingConstant * ReportingFraction;
+                                (linkReport1(i).FLOWOFF * CpAir * (zn1HB.MAT - zn2HB.MAT)) * ReportingConstant * ReportingFraction;
                         } else {
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenLossW +=
-                                (linkReport1(i).FLOWOFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - m_state.dataHeatBalFanSys->MAT(ZN1))) *
-                                ReportingFraction;
+                                (linkReport1(i).FLOWOFF * CpAir * (zn2HB.MAT - zn1HB.MAT)) * ReportingFraction;
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenLossJ +=
-                                (linkReport1(i).FLOWOFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - m_state.dataHeatBalFanSys->MAT(ZN1))) *
-                                ReportingConstant * ReportingFraction;
+                                (linkReport1(i).FLOWOFF * CpAir * (zn2HB.MAT - zn1HB.MAT)) * ReportingConstant * ReportingFraction;
                         }
-                        if (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) {
+                        if (zn1HB.ZoneAirHumRat > zn2HB.ZoneAirHumRat) {
                             AirflowNetworkReportData(ZN2).MultiZoneMixLatGainW +=
-                                (linkReport1(i).FLOWOFF *
-                                 (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                ReportingFraction;
+                                (linkReport1(i).FLOWOFF * (zn1HB.ZoneAirHumRat - zn2HB.ZoneAirHumRat)) * ReportingFraction;
                             AirflowNetworkReportData(ZN2).MultiZoneMixLatGainJ +=
-                                (linkReport1(i).FLOWOFF *
-                                 (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                ReportingConstant * ReportingFraction;
+                                (linkReport1(i).FLOWOFF * (zn1HB.ZoneAirHumRat - zn2HB.ZoneAirHumRat)) * ReportingConstant * ReportingFraction;
                         } else {
                             AirflowNetworkReportData(ZN2).MultiZoneMixLatLossW +=
-                                (linkReport1(i).FLOWOFF *
-                                 (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                ReportingFraction;
+                                (linkReport1(i).FLOWOFF * (zn2HB.ZoneAirHumRat - zn1HB.ZoneAirHumRat)) * ReportingFraction;
                             AirflowNetworkReportData(ZN2).MultiZoneMixLatLossJ +=
-                                (linkReport1(i).FLOWOFF *
-                                 (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                ReportingConstant * ReportingFraction;
+                                (linkReport1(i).FLOWOFF * (zn2HB.ZoneAirHumRat - zn1HB.ZoneAirHumRat)) * ReportingConstant * ReportingFraction;
                         }
-                        CpAir = PsyCpAirFnW(m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2));
-                        if (m_state.dataHeatBalFanSys->MAT(ZN2) > m_state.dataHeatBalFanSys->MAT(ZN1)) {
+                        CpAir = PsyCpAirFnW(zn2HB.ZoneAirHumRat);
+                        if (zn2HB.MAT > zn1HB.MAT) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenGainW +=
-                                (linkReport1(i).FLOW2OFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - m_state.dataHeatBalFanSys->MAT(ZN1))) *
-                                ReportingFraction;
+                                (linkReport1(i).FLOW2OFF * CpAir * (zn2HB.MAT - zn1HB.MAT)) * ReportingFraction;
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenGainJ +=
-                                (linkReport1(i).FLOW2OFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN2) - m_state.dataHeatBalFanSys->MAT(ZN1))) *
-                                ReportingConstant * ReportingFraction;
+                                (linkReport1(i).FLOW2OFF * CpAir * (zn2HB.MAT - zn1HB.MAT)) * ReportingConstant * ReportingFraction;
                         } else {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenLossW +=
-                                (linkReport1(i).FLOW2OFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - m_state.dataHeatBalFanSys->MAT(ZN2))) *
-                                ReportingFraction;
+                                (linkReport1(i).FLOW2OFF * CpAir * (zn1HB.MAT - zn2HB.MAT)) * ReportingFraction;
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenLossJ +=
-                                (linkReport1(i).FLOW2OFF * CpAir * (m_state.dataHeatBalFanSys->MAT(ZN1) - m_state.dataHeatBalFanSys->MAT(ZN2))) *
-                                ReportingConstant * ReportingFraction;
+                                (linkReport1(i).FLOW2OFF * CpAir * (zn1HB.MAT - zn2HB.MAT)) * ReportingConstant * ReportingFraction;
                         }
 
-                        if (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) > m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1)) {
+                        if (zn2HB.ZoneAirHumRat > zn1HB.ZoneAirHumRat) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatGainW +=
-                                (linkReport1(i).FLOW2OFF *
-                                 (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                ReportingFraction;
+                                (linkReport1(i).FLOW2OFF * (zn2HB.ZoneAirHumRat - zn1HB.ZoneAirHumRat)) * ReportingFraction;
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatGainJ +=
-                                (linkReport1(i).FLOW2OFF *
-                                 (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1))) *
-                                ReportingConstant * ReportingFraction;
+                                (linkReport1(i).FLOW2OFF * (zn2HB.ZoneAirHumRat - zn1HB.ZoneAirHumRat)) * ReportingConstant * ReportingFraction;
                         } else {
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatLossW +=
-                                std::abs(linkReport1(i).FLOW2OFF *
-                                         (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                ReportingFraction;
+                                std::abs(linkReport1(i).FLOW2OFF * (zn1HB.ZoneAirHumRat - zn2HB.ZoneAirHumRat)) * ReportingFraction;
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatLossJ +=
-                                (linkReport1(i).FLOW2OFF *
-                                 (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) - m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2))) *
-                                ReportingConstant * ReportingFraction;
+                                (linkReport1(i).FLOW2OFF * (zn1HB.ZoneAirHumRat - zn2HB.ZoneAirHumRat)) * ReportingConstant * ReportingFraction;
                         }
                     }
                 }
@@ -9313,10 +9214,10 @@ namespace AirflowNetwork {
         }
 
         for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) { // Start of zone loads report variable update loop ...
+            auto &thisZoneHB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i);
             Tamb = Zone(i).OutDryBulbTemp;
-            CpAir = PsyCpAirFnW(m_state.dataHeatBalFanSys->ZoneAirHumRatAvg(i));
-            AirDensity = PsyRhoAirFnPbTdbW(
-                m_state, m_state.dataEnvrn->OutBaroPress, m_state.dataHeatBalFanSys->MAT(i), m_state.dataHeatBalFanSys->ZoneAirHumRatAvg(i));
+            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRatAvg);
+            AirDensity = PsyRhoAirFnPbTdbW(m_state, m_state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRatAvg);
 
             AirflowNetworkZnRpt(i).InfilMass = (exchangeData(i).SumMCp / CpAir) * ReportingConstant;
             AirflowNetworkZnRpt(i).InfilVolume = AirflowNetworkZnRpt(i).InfilMass / AirDensity;
@@ -9363,10 +9264,9 @@ namespace AirflowNetwork {
             }
             AirflowNetworkZnRpt(i).ExfilMass = AirflowNetworkZnRpt(i).InfilMass + AirflowNetworkZnRpt(i).VentilMass + AirflowNetworkZnRpt(i).MixMass +
                                                AirflowNetworkZnRpt(i).InletMass - AirflowNetworkZnRpt(i).OutletMass;
-            AirflowNetworkZnRpt(i).ExfilSensiLoss =
-                AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (m_state.dataHeatBalFanSys->MAT(i) - Tamb) * CpAir;
-            AirflowNetworkZnRpt(i).ExfilLatentLoss = AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant *
-                                                     (m_state.dataHeatBalFanSys->ZoneAirHumRat(i) - m_state.dataEnvrn->OutHumRat) * H2OHtOfVap;
+            AirflowNetworkZnRpt(i).ExfilSensiLoss = AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (thisZoneHB.MAT - Tamb) * CpAir;
+            AirflowNetworkZnRpt(i).ExfilLatentLoss =
+                AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (thisZoneHB.ZoneAirHumRat - m_state.dataEnvrn->OutHumRat) * H2OHtOfVap;
             AirflowNetworkZnRpt(i).ExfilTotalLoss = AirflowNetworkZnRpt(i).ExfilSensiLoss + AirflowNetworkZnRpt(i).ExfilLatentLoss;
 
             m_state.dataHeatBal->ZoneTotalExfiltrationHeatLoss += AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
@@ -9423,7 +9323,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::update(Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
+    void Solver::update(ObjexxFCL::Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
     {
 
         // SUBROUTINE INFORMATION:
@@ -11210,13 +11110,12 @@ namespace AirflowNetwork {
 
         // Check number of fans specified in an AirLoop #6748
         int BranchNum;
-        int CompNum;
         int NumOfFans;
         std::string FanNames;
         for (BranchNum = 1; BranchNum <= m_state.dataAirSystemsData->PrimaryAirSystems(1).NumBranches; ++BranchNum) {
             NumOfFans = 0;
             FanNames = "";
-            for (CompNum = 1; CompNum <= m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).TotalComponents; ++CompNum) {
+            for (int CompNum = 1; CompNum <= m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).TotalComponents; ++CompNum) {
                 if (UtilityRoutines::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                 "Fan:ConstantVolume") ||
                     UtilityRoutines::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf,
@@ -11885,29 +11784,18 @@ namespace AirflowNetwork {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May. 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This function outputs air change per hour in a given zone
 
-        // Using/Aliasing
         auto &TimeStepSys = m_state.dataHVACGlobal->TimeStepSys;
+        auto &thisZoneHB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
-        // Return value
-        Real64 ACH; // Zone air change rate [ACH]
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 InfilVolume; // Zone infiltration volume
-        Real64 RhoAir;      // Zone air density [kg/m3]
-        Real64 CpAir;       // Zone air specific heat
-
-        CpAir = PsyCpAirFnW(m_state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-        RhoAir = PsyRhoAirFnPbTdbW(
-            m_state, m_state.dataEnvrn->OutBaroPress, m_state.dataHeatBalFanSys->MAT(ZoneNum), m_state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-        InfilVolume =
+        Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+        Real64 RhoAir = PsyRhoAirFnPbTdbW(m_state, m_state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
+        Real64 InfilVolume =
             ((exchangeData(ZoneNum).SumMCp + exchangeData(ZoneNum).SumMVCp) / CpAir / RhoAir) * TimeStepSys * DataGlobalConstants::SecInHour;
-        ACH = InfilVolume / (TimeStepSys * m_state.dataHeatBal->Zone(ZoneNum).Volume);
+        Real64 ACH = InfilVolume / (TimeStepSys * m_state.dataHeatBal->Zone(ZoneNum).Volume);
 
         return ACH;
     }
@@ -12259,7 +12147,6 @@ namespace AirflowNetwork {
         bool DuctSizingRTFlag;
         bool DuctSizingRBFlag;
         Real64 hydraulicDiameter = 0.0;
-        Array1D<Real64> Par(9); // Parameters passed to RegulaFalsi
         Real64 SupplyTrunkD = 0.0;
         Real64 SupplyTrunkArea = 0.0;
         Real64 SupplyBranchD = 0.0;
@@ -12384,13 +12271,13 @@ namespace AirflowNetwork {
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.supply_trunk_pressure_loss;
-                        Par(2) = DisSysCompCVFData(1).FlowRate;
-                        Par(3) = SumLength;
-                        Par(4) = DynamicLoss;
-                        Par(5) = MaxRough;
-
-                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                        auto &deltaP = simulation_control.ductSizing.supply_trunk_pressure_loss;
+                        auto &MassFlowRate = DisSysCompCVFData(1).FlowRate;
+                        auto f = [&thisState, deltaP, MassFlowRate, SumLength, DynamicLoss, MaxRough](Real64 const D) {
+                            return DuctDResidual(thisState, D, deltaP, MassFlowRate, SumLength, DynamicLoss, MaxRough);
+                        };
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, f, MinDiameter, MaxDiameter);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (ErrCountDuct == 0) {
@@ -12503,13 +12390,12 @@ namespace AirflowNetwork {
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.supply_branch_pressure_loss;
-                        Par(2) = MdotBranch;
-                        Par(3) = SumLength;
-                        Par(4) = DynamicLoss;
-                        Par(5) = MaxRough;
-
-                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                        auto &deltaP = simulation_control.ductSizing.supply_branch_pressure_loss;
+                        auto f = [&thisState, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough](Real64 const D) {
+                            return DuctDResidual(thisState, D, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough);
+                        };
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, f, MinDiameter, MaxDiameter);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (ErrCountDuct == 0) {
@@ -12626,13 +12512,13 @@ namespace AirflowNetwork {
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.return_trunk_pressure_loss;
-                        Par(2) = DisSysCompCVFData(1).FlowRate;
-                        Par(3) = SumLength;
-                        Par(4) = DynamicLoss;
-                        Par(5) = MaxRough;
-
-                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                        auto &deltaP = simulation_control.ductSizing.return_trunk_pressure_loss;
+                        auto &massFlowRate = DisSysCompCVFData(1).FlowRate;
+                        auto f = [&thisState, deltaP, massFlowRate, SumLength, DynamicLoss, MaxRough](Real64 const D) {
+                            return DuctDResidual(thisState, D, deltaP, massFlowRate, SumLength, DynamicLoss, MaxRough);
+                        };
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, f, MinDiameter, MaxDiameter);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (ErrCountDuct == 0) {
@@ -12746,13 +12632,12 @@ namespace AirflowNetwork {
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.return_branch_pressure_loss;
-                        Par(2) = MdotBranch;
-                        Par(3) = SumLength;
-                        Par(4) = DynamicLoss;
-                        Par(5) = MaxRough;
-
-                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                        auto &deltaP = simulation_control.ductSizing.return_branch_pressure_loss;
+                        auto f = [&thisState, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough](Real64 const D) {
+                            return DuctDResidual(thisState, D, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough);
+                        };
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, f, MinDiameter, MaxDiameter);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (ErrCountDuct == 0) {
@@ -12953,20 +12838,14 @@ namespace AirflowNetwork {
 
     Real64 DuctDResidual(EnergyPlusData &state,
                          Real64 D, // duct diameter
-                         Array1D<Real64> const &Par)
+                         Real64 DeltaP,
+                         Real64 MassFlowrate,
+                         Real64 TotalL,
+                         Real64 TotalLossCoe,
+                         Real64 MaxRough)
     {
-        Real64 DuctDResidual;
-        Real64 CalcDeltaP;
-        Real64 DeltaP = Par(1);
-        Real64 MassFlowrate = Par(2);
-        Real64 TotalL = Par(3);
-        Real64 TotalLossCoe = Par(4);
-        Real64 MaxRough = Par(5);
-
-        CalcDeltaP = state.afn->CalcDuctDiameter(D, DeltaP, MassFlowrate, TotalL, TotalLossCoe, MaxRough);
-
-        DuctDResidual = (CalcDeltaP - DeltaP) / DeltaP;
-        return DuctDResidual;
+        Real64 CalcDeltaP = state.afn->CalcDuctDiameter(D, DeltaP, MassFlowrate, TotalL, TotalLossCoe, MaxRough);
+        return (CalcDeltaP - DeltaP) / DeltaP;
     }
 
     void OccupantVentilationControlProp::calc(EnergyPlusData &state,
@@ -13002,7 +12881,7 @@ namespace AirflowNetwork {
 
         if (MinTimeControlOnly) return;
 
-        if (Zone(ZoneNum).HasLinkedOutAirNode) {
+        if (Zone(ZoneNum).LinkedOutAirNode > 0) {
             OutDryBulb = Zone(ZoneNum).OutDryBulbTemp;
         } else {
             OutDryBulb = OutDryBulbTempAt(state, Zone(ZoneNum).Centroid.z);
@@ -13014,7 +12893,7 @@ namespace AirflowNetwork {
             Tcomfort = CurveValue(state, ComfortHighTempCurveNum, OutDryBulb);
         }
         ComfortBand = -0.0028 * (100 - MaxPPD) * (100 - MaxPPD) + 0.3419 * (100 - MaxPPD) - 6.6275;
-        Toperative = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+        Toperative = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
 
         if (Toperative > (Tcomfort + ComfortBand)) {
             if (opening_probability(state, ZoneNum, TimeCloseDuration)) {
@@ -13045,6 +12924,7 @@ namespace AirflowNetwork {
     {
         Real64 SchValue;
         Real64 RandomValue;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         if (TimeCloseDuration < MinClosingTime) {
             return false;
@@ -13057,20 +12937,20 @@ namespace AirflowNetwork {
 
         switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
         case DataHVACGlobals::ThermostatType::SingleHeating:
-            if (state.dataHeatBalFanSys->MAT(ZoneNum) <= state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) {
+            if (thisZoneHB.MAT <= state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) {
                 return false;
             }
             break;
         case DataHVACGlobals::ThermostatType::SingleCooling:
-            if (state.dataHeatBalFanSys->MAT(ZoneNum) >= state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
+            if (thisZoneHB.MAT >= state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                 return false;
             }
             break;
         case DataHVACGlobals::ThermostatType::SingleHeatCool:
             return false;
         case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
-            if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) ||
-                state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
+            if (thisZoneHB.MAT < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) ||
+                thisZoneHB.MAT > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                 return false;
             }
             break;

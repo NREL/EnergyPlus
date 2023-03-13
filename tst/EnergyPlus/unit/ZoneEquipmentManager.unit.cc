@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,11 +69,13 @@
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -392,28 +394,18 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 
     EXPECT_FALSE(ErrorsFound);
 
-    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPM.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTM.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->OAMFL.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTI.allocate(state->dataGlobal->NumOfZones);
-
-    state->dataHeatBalFanSys->MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
-
-    state->dataHeatBalFanSys->MAT(1) = 21.0;
-    state->dataHeatBalFanSys->MAT(2) = 22.0;
-    state->dataHeatBalFanSys->MAT(3) = 23.0;
-    state->dataHeatBalFanSys->MAT(4) = 24.0;
-    state->dataHeatBalFanSys->MAT(5) = 25.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.001;
-    state->dataHeatBalFanSys->ZoneAirHumRat(5) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 22.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).MAT = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).ZoneAirHumRat = 0.001;
 
     state->dataHeatBal->AirFlowFlag = true;
     state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
@@ -428,35 +420,22 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 
     CalcAirFlowSimple(*state, 2);
 
-    EXPECT_NEAR(720.738493, state->dataHeatBalFanSys->MCPM(1), 0.00001);
-    EXPECT_NEAR(119.818784, state->dataHeatBalFanSys->MCPM(2), 0.00001);
-    EXPECT_NEAR(599.907893, state->dataHeatBalFanSys->MCPM(3), 0.00001);
-    EXPECT_NEAR(719.116710, state->dataHeatBalFanSys->MCPM(4), 0.00001);
-    EXPECT_NEAR(16937.0496, state->dataHeatBalFanSys->MCPTM(1), 0.001);
-    EXPECT_NEAR(2875.6508, state->dataHeatBalFanSys->MCPTM(2), 0.001);
-    EXPECT_NEAR(13315.7667, state->dataHeatBalFanSys->MCPTM(3), 0.001);
-    EXPECT_NEAR(15699.7370, state->dataHeatBalFanSys->MCPTM(4), 0.001);
-    EXPECT_NEAR(0.71594243, state->dataHeatBalFanSys->MixingMassFlowZone(1), 0.00001);
-    EXPECT_NEAR(0.11902146, state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.00001);
-    EXPECT_NEAR(0.59591588, state->dataHeatBalFanSys->MixingMassFlowZone(3), 0.00001);
-    EXPECT_NEAR(0.71433143, state->dataHeatBalFanSys->MixingMassFlowZone(4), 0.00001);
-    EXPECT_NEAR(0.00071594243, state->dataHeatBalFanSys->MixingMassFlowXHumRat(1), 0.0000001);
-    EXPECT_NEAR(0.00011902146, state->dataHeatBalFanSys->MixingMassFlowXHumRat(2), 0.0000001);
-    EXPECT_NEAR(0.00059591588, state->dataHeatBalFanSys->MixingMassFlowXHumRat(3), 0.0000001);
-    EXPECT_NEAR(0.00071433143, state->dataHeatBalFanSys->MixingMassFlowXHumRat(4), 0.0000001);
-
-    // Deallocate everything - should all be taken care of in clear_states
-
-    state->dataHeatBalFanSys->MAT.deallocate();
-    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    state->dataHeatBalFanSys->MCPM.deallocate();
-    state->dataHeatBalFanSys->MCPTM.deallocate();
-    state->dataHeatBalFanSys->MCPI.deallocate();
-    state->dataHeatBalFanSys->OAMFL.deallocate();
-    state->dataHeatBalFanSys->MCPTI.deallocate();
-    state->dataHeatBalFanSys->MixingMassFlowZone.deallocate();
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat.deallocate();
-    state->dataHeatBalFanSys->ZoneReOrder.deallocate();
+    EXPECT_NEAR(720.738493, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPM, 0.00001);
+    EXPECT_NEAR(119.818784, state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MCPM, 0.00001);
+    EXPECT_NEAR(599.907893, state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MCPM, 0.00001);
+    EXPECT_NEAR(719.116710, state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MCPM, 0.00001);
+    EXPECT_NEAR(16937.0496, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTM, 0.001);
+    EXPECT_NEAR(2875.6508, state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MCPTM, 0.001);
+    EXPECT_NEAR(13315.7667, state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MCPTM, 0.001);
+    EXPECT_NEAR(15699.7370, state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MCPTM, 0.001);
+    EXPECT_NEAR(0.71594243, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MixingMassFlowZone, 0.00001);
+    EXPECT_NEAR(0.11902146, state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 0.00001);
+    EXPECT_NEAR(0.59591588, state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MixingMassFlowZone, 0.00001);
+    EXPECT_NEAR(0.71433143, state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MixingMassFlowZone, 0.00001);
+    EXPECT_NEAR(0.00071594243, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MixingMassFlowXHumRat, 0.0000001);
+    EXPECT_NEAR(0.00011902146, state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowXHumRat, 0.0000001);
+    EXPECT_NEAR(0.00059591588, state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MixingMassFlowXHumRat, 0.0000001);
+    EXPECT_NEAR(0.00071433143, state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MixingMassFlowXHumRat, 0.0000001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
@@ -2206,9 +2185,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType.ZnCoolDgnSAMethod = 1;
             thisSizingType.ZnHeatDgnSAMethod = 1;
             thisSizingType.ZoneDesignSpecOAIndex = 1;
-            thisSizingType.CoolAirDesMethod = 1;
-            thisSizingType.HeatAirDesMethod = 1;
-            thisSizingType.DOASControlStrategy = 1;
+            thisSizingType.CoolAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
+            thisSizingType.HeatAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
+            thisSizingType.DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
             thisSizingType.ZoneNum = 1;
             thisSizingType.TimeStepNumAtHeatMax = 1;
             thisSizingType.TimeStepNumAtCoolMax = 1;
@@ -2401,9 +2380,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType2.ZnCoolDgnSAMethod = 1;
             thisSizingType2.ZnHeatDgnSAMethod = 1;
             thisSizingType2.ZoneDesignSpecOAIndex = 1;
-            thisSizingType2.CoolAirDesMethod = 1;
-            thisSizingType2.HeatAirDesMethod = 1;
-            thisSizingType2.DOASControlStrategy = 1;
+            thisSizingType2.CoolAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
+            thisSizingType2.HeatAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
+            thisSizingType2.DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
             thisSizingType2.ZoneNum = 1;
             thisSizingType2.TimeStepNumAtHeatMax = 1;
             thisSizingType2.TimeStepNumAtCoolMax = 1;
@@ -3085,7 +3064,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     // set airloop number to zero
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 0;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 0;
-    ;
+
     // Test 1: set receiving zone exhaust fan flow to supply air flow rate
     // set supply air flow rates for SZone and RZone
     for (ZoneNum = 1; ZoneNum <= state->dataGlobal->NumOfZones; ++ZoneNum) {
@@ -3099,7 +3078,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving zone
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
-    ;
+
     InitAirHeatBalance(*state);
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -3111,7 +3090,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 0.578961, 0.000001); // source zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);                        // receiving zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0);                  // zone infiltration mass flow rate
-    ;
+
     // zone 2, receiving zone mass conservation results
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);                      // zone supply air mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 1.0);                     // zone exhaust air mass flow rate
@@ -3119,7 +3098,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);            // source zone mixing mass flow rate
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.578961, 0.000001); // receiving zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);            // zone infiltration mass flow rate
-    ;
+
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set zone exhaust nodes to zero and exhaust fan node flow to 2.0 for receiving zone
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
@@ -3135,7 +3114,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 1.0); // source zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);       // receiving zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0); // zone infiltration mass flow rate
-    ;
+
     // zone 2, receiving zone mass conservation results
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);           // zone supply air mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 2.0);          // zone exhaust air mass flow rate
@@ -3143,12 +3122,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0); // source zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0);       // receiving zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0); // zone infiltration mass flow rate
-    ;
+
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set zone exhaust nodes to zero and exhaust fan node flow to 3.0 for receiving zone
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
-    ;
+
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
@@ -3159,7 +3138,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 2.0); // source zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);       // receiving zone mixing mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 1.0); // zone infiltration mass flow rate
-    ;
+
     // zone 2, receiving zone mass conservation results
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);           // zone supply air mass flow rate
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 3.0);          // zone exhaust air mass flow rate
@@ -3339,8 +3318,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     // set airloop numbers
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 2;
-    ;
-    ;
+
     // Test 1: set receiving zone exhaust fan flow to supply air flow rate
     // set source zone (RZone) exhaust fan flow to zero
     // set supply air flow rates for source (SZone) and receiving (RZone) zones
@@ -3355,7 +3333,6 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving zone
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
-    ;
 
     InitAirHeatBalance(*state);
     CalcAirFlowSimple(*state);
@@ -3375,10 +3352,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.586632, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 0.586632, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
-    ;
-    ;
+
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 2.0
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
@@ -3401,10 +3377,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.586632, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 0.586632, 0.000001);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.413368, 0.000001);
-    ;
-    ;
+
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 3.0
     // double zone mixing flow rate to trigger infiltration air flow in the source zone
@@ -3412,7 +3387,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRate = 1.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRateSaved = 1.0;
-    ;
+
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
@@ -3430,7 +3405,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.173265, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 1.173265, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 1.173265, 0.000001);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.826735, 0.000001);
 }
 
@@ -3604,8 +3579,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     // set airloop numbers
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 2;
-    ;
-    ;
+
     // Test 1: set receiving zone exhaust fan flow to supply air flow rate
     // set source zone (RZone) exhaust fan flow to zero
     // set supply air flow rates for source (SZone) and receiving (RZone) zones
@@ -3620,7 +3594,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving zone
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
-    ;
+
     InitAirHeatBalance(*state);
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -3640,10 +3614,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.586632, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 0.586632, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
-    ;
-    ;
+
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 2.0
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
@@ -3667,10 +3640,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
     // zone mixing object flow is modified
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 1.0, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 1.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
-    ;
-    ;
+
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 3.0
     // double zone mixing flow rate to trigger infiltration air flow in the source zone
@@ -3678,7 +3650,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRate = 1.0;
     state->dataHeatBal->Mixing(1).DesiredAirFlowRateSaved = 1.0;
-    ;
+
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
     CalcAirFlowSimple(*state, 0, true, true);
@@ -3697,7 +3669,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 2.0, 0.000001);
     // zone mixing object flow is modified
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 2.0, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 2.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
 }
 
@@ -3872,8 +3844,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     // set airloop numbers
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 2;
-    ;
-    ;
+
     // Test 1: set receiving zone exhaust fan flow to supply air flow rate
     // set source zone (RZone) exhaust fan flow to zero
     // set supply air flow rates for source (SZone) and receiving (RZone) zones
@@ -3888,7 +3859,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving zone
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 1.0;
-    ;
+
     InitAirHeatBalance(*state);
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -3908,10 +3879,9 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.586632, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 0.586632, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
-    ;
-    ;
+
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 2.0
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
@@ -3935,7 +3905,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
     // zone mixing object flow is modified
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 1.0, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 1.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
 
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
@@ -3964,7 +3934,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 2.0, 0.000001);
     // zone mixing object flow is modified
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 2.0, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 2.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
 }
 
@@ -4183,8 +4153,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wSourceAndReceivingZone)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(3).ReturnNodeAirLoopNum(1) = 1;
-    ;
-    ;
+
     // Test 1: set receiving zone exhaust fan flow to supply air flow rate
     // set source zone exhaust fan flow to zero
     // set supply air mass flow rates for SZone, SRZone and RZone to 1.0 [kg/s]
@@ -4202,7 +4171,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wSourceAndReceivingZone)
     // set zone exhaust nodes to zero and exhaust fan node flow to 1.0 for receiving only zone
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(3).ExhaustNode(1)).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(3).ExhaustNode(2)).MassFlowRate = 1.0;
-    ;
+
     InitAirHeatBalance(*state);
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
@@ -4222,7 +4191,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wSourceAndReceivingZone)
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 1.0, 0.000001);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 1.0, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 1.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     EXPECT_TRUE(state->dataHeatBal->MassConservation(2).IsSourceAndReceivingZone);
     // zone 2, receiving only zone mass conservation results
@@ -4232,7 +4201,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wSourceAndReceivingZone)
     EXPECT_NEAR(state->dataHeatBal->MassConservation(3).MixingSourceMassFlowRate, 0.0, 0.000001);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(3).MixingMassFlowRate, 1.0, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(3), 1.0, 0.000001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MixingMassFlowZone, 1.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(3).InfiltrationMassFlowRate, 0.0);
     EXPECT_FALSE(state->dataHeatBal->MassConservation(3).IsOnlySourceZone);
     EXPECT_FALSE(state->dataHeatBal->MassConservation(3).IsSourceAndReceivingZone);
@@ -4419,25 +4388,12 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
 
     state->dataEnvrn->OutBaroPress = 101400.;
 
-    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPM.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTM.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->OAMFL.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPThermChim.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
-
-    state->dataHeatBalFanSys->MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
-
-    state->dataHeatBalFanSys->MAT(1) = 21.0;
-    state->dataHeatBalFanSys->MAT(2) = 22.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0021;
-    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0022;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 22.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.0021;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0022;
 
     state->dataHeatBal->TotRefDoorMixing = 1;
     state->dataHeatBal->TotMixing = 0;
@@ -4546,6 +4502,7 @@ TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataZoneEquip->ZoneEquipList.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     CalcZoneLeavingConditions(*state, true);
     // Zone node temperature is the same as input
@@ -4570,9 +4527,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataSize->CalcZoneSizing.allocate(1, state->dataGlobal->NumOfZones);
     state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->SysDepZoneLoads.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->TempControlType.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(state->dataGlobal->NumOfZones);
@@ -4731,4 +4686,117 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     EXPECT_NEAR(calcZoneSizing.CoolLoadNoDOAS, 0.0, 0.000001);
     EXPECT_NEAR(calcZoneSizing.HeatLatentLoadNoDOAS, 0.0, 0.000001);
     EXPECT_NEAR(calcZoneSizing.CoolLatentLoadNoDOAS, 2543.7, 0.1);
+}
+
+TEST_F(EnergyPlusFixture, CalcAirFlowSimple_WindAndStackArea)
+{
+    state->dataGlobal->NumOfZones = 1;
+
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    auto &thisZone = state->dataHeatBal->Zone(1);
+    thisZone.OutDryBulbTemp = 5.0;
+    thisZone.WindSpeed = 10.0;
+
+    state->dataEnvrn->OutBaroPress = 101400.;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.012;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+
+    Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
+        *state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, "Test"); // Density of air (kg/m^3)
+    Real64 CpAir = Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat);
+
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.MAT = 21.0;
+    thisZoneHB.ZoneAirHumRat = 0.0021;
+    thisZoneHB.MixingMAT = 20.0;
+
+    state->dataHeatBal->TotRefDoorMixing = 0;
+    state->dataHeatBal->TotMixing = 0;
+    state->dataHeatBal->TotCrossMixing = 0;
+    state->dataHeatBal->TotInfiltration = 0;
+    state->dataHeatBal->TotZoneAirBalance = 0;
+
+    state->dataHeatBal->TotVentilation = 1;
+    state->dataHeatBal->AirFlowFlag = true;
+
+    state->dataHeatBal->Ventilation.allocate(1);
+    auto &thisVentilation = state->dataHeatBal->Ventilation(1);
+    // Parameters we really care about
+    thisVentilation.ModelType = DataHeatBalance::VentilationModelType::WindAndStack;
+    thisVentilation.OpenEff = DataGlobalConstants::AutoCalculate;
+    thisVentilation.EffAngle = 135; // Effective angle
+    thisVentilation.OpenArea = 1.0;
+    thisVentilation.OpenAreaSchedPtr = -1; // Always on
+    thisVentilation.ZonePtr = 1;
+
+    thisVentilation.DiscCoef = 0.5;
+
+    // Height Difference. **This zeroes out the Volumetric flow driven by stack effect, leaving only the wind-driven one**
+    thisVentilation.DH = 0.0;
+
+    thisVentilation.MinIndoorTemperature = -99.0;
+    thisVentilation.MaxOutdoorTemperature = 99.0;
+    thisVentilation.DelTemperature = -100.0;
+
+    state->dataEarthTube->GetInputFlag = false;
+    state->dataCoolTower->GetInputFlag = false;
+    state->dataThermalChimneys->ThermalChimneyGetInputFlag = false;
+    state->dataThermalChimneys->TotThermalChimney = 0;
+
+    auto calcQw = [&AirDensity, &CpAir](Real64 MCP) {
+        // Since the stack effect is null, VVF (Design Ventilation Flow Rate m3/s) = Qw
+        //     MCP = AirDensity * CpAir * VVF
+        // <=> Qw = MCP / (AirDensity * CpAir)
+        return MCP / (AirDensity * CpAir);
+    };
+    Real64 areaTimesScheduleValueTimesWind = thisVentilation.OpenArea * 1 * thisZone.WindSpeed;
+    auto calcCw = [&calcQw, &areaTimesScheduleValueTimesWind](Real64 MCP) {
+        auto thisQw = calcQw(MCP);
+        // Qw = Cw * areaTimesScheduleValueTimesWind
+        return thisQw / areaTimesScheduleValueTimesWind;
+    };
+
+    // Initial test, for case where winds are "perpendicular" (ASHRAE terminology, meaning blowing directly towards the effective angle)
+    auto formatFailure = [&]() {
+        Real64 angle = 180.0 - std::abs(std::abs(thisZone.WindDir - thisVentilation.EffAngle) - 180);
+        return fmt::format("Failed for WindDir={} and EffAngle={}, absolute angle between opening and wind dir={}",
+                           thisZone.WindDir,
+                           thisVentilation.EffAngle,
+                           angle);
+    };
+    thisZone.WindDir = thisVentilation.EffAngle;
+    CalcAirFlowSimple(*state);
+    EXPECT_NEAR(0.55, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
+
+    // Diagonal winds
+    thisZone.WindDir = thisVentilation.EffAngle + 45;
+    CalcAirFlowSimple(*state);
+    EXPECT_NEAR(0.30, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
+
+    thisZone.WindDir = thisVentilation.EffAngle - 45;
+    CalcAirFlowSimple(*state);
+    EXPECT_NEAR(0.30, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
+
+    // Test at different orientations
+    std::vector<std::pair<Real64, Real64>> tests{
+        // Angle, Calculated Cw
+        {0, 0.0},    // -135°, blowing on the opposite side
+        {45, 0.05},  // -90, parallel wind
+        {90, 0.3},   // -45°, diagonal wind
+        {135, 0.55}, // 0°, "perpendicular" wind
+        {180, 0.3},  // 45°, diagonal wind
+        {225, 0.05}, // 90, parallel wind
+        {270, 0.0},  // 135°, opposite side
+        {315, 0.0},  // opposite side
+        {360, 0.0},  // opposite side
+    };
+
+    for (auto &[windDir, expectedCw] : tests) {
+        thisZone.WindDir = windDir;
+
+        CalcAirFlowSimple(*state);
+        EXPECT_NEAR(expectedCw, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
+    }
 }

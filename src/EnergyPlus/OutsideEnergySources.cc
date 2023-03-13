@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -241,20 +241,23 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                 ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name +
-                                    "\", is not valid");
+                                format("{}=\"{}\", is not valid",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name));
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" was not found.");
+                                  format("{}=\"{}\" was not found.", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 ErrorsFound = true;
             }
             if (!ScheduleManager::CheckScheduleValueMinMax(
                     state, state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
                 ShowWarningError(state,
-                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                     state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name + "\", is not valid");
+                                 format("{}=\"{}\", is not valid",
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name));
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
-                                      "\" should not have negative values.");
+                                  format("{}=\"{}\" should not have negative values.",
+                                         state.dataIPShortCut->cAlphaFieldNames(4),
+                                         state.dataIPShortCut->cAlphaArgs(4)));
                 ShowContinueError(state, "Negative values will be treated as zero, and the simulation continues.");
             }
         } else {
@@ -263,9 +266,9 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state,
-                       "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject +
-                           ", Preceding condition caused termination.");
+        ShowFatalError(
+            state,
+            format("Errors found in processing input for {}, Preceding condition caused termination.", state.dataIPShortCut->cCurrentModuleObject));
     }
 }
 
@@ -370,7 +373,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
                                                      NomCapUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, format("SizeDistrict{}: Potential issue with equipment sizing for {}", typeName, this->Name));
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                 ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NomCapDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -383,8 +386,8 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
         }
     } else {
         if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in District" + typeName + " object=" + this->Name);
+            ShowSevereError(state, format("Autosizing of District {} nominal capacity requires a loop Sizing:Plant object", typeName));
+            ShowContinueError(state, format("Occurs in District{} object={}", typeName, this->Name));
             ErrorsFound = true;
         }
         if (!this->NomCapWasAutoSized && this->NomCap > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport) {

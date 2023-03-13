@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -279,10 +279,10 @@ namespace DesiccantDehumidifiers {
     void ReportDesiccantDehumidifier(EnergyPlusData &state, int DesicDehumNum); // number of the current dehumidifier being simulated
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
-                               int DesicDehumNum,                    // Desiccant dehumidifier unit index
-                               bool FirstHVACIteration,              // flag for first HVAC iteration in the time step
-                               Real64 RegenCoilLoad,                 // heating coil load to be met (Watts)
-                               Optional<Real64> RegenCoilLoadmet = _ // heating load met
+                               int DesicDehumNum,                               // Desiccant dehumidifier unit index
+                               bool FirstHVACIteration,                         // flag for first HVAC iteration in the time step
+                               Real64 RegenCoilLoad,                            // heating coil load to be met (Watts)
+                               ObjexxFCL::Optional<Real64> RegenCoilLoadmet = _ // heating load met
     );
 
     int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -171,7 +171,7 @@ namespace WaterToAirHeatPumpSimple {
                                DataHVACGlobals::CompressorOperation CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
-                               Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
+                               ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
     // MODULE SUBROUTINES:
@@ -264,11 +264,11 @@ namespace WaterToAirHeatPumpSimple {
     );
 
     void SetSimpleWSHPData(EnergyPlusData &state,
-                           int const SimpleWSHPNum,                  // Number of OA Controller
-                           bool &ErrorsFound,                        // Set to true if certain errors found
-                           int const WaterCyclingMode,               // the coil water flow mode (cycling, constant or constantondemand)
-                           Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
-                           Optional_int CompanionHeatingCoilNum = _  // Index to heating coil for cooling coil = SimpleWSHPNum
+                           int const SimpleWSHPNum,                             // Number of OA Controller
+                           bool &ErrorsFound,                                   // Set to true if certain errors found
+                           int const WaterCyclingMode,                          // the coil water flow mode (cycling, constant or constantondemand)
+                           ObjexxFCL::Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
+                           ObjexxFCL::Optional_int CompanionHeatingCoilNum = _  // Index to heating coil for cooling coil = SimpleWSHPNum
     );
 
     void CheckSimpleWAHPRatedCurvesOutputs(EnergyPlusData &state,

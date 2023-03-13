@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -64,6 +63,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -71,12 +71,12 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
-using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::InternalHeatGains;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
@@ -1124,7 +1124,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, localErrorsFound);
+    Material::GetMaterialData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetConstructData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
@@ -1152,16 +1152,15 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 26.99;
     surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 22.99;
-    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MAT = 23.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat = 0.01;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
+        thisZoneHB.MAT = 23.0;
+        thisZoneHB.ZoneAirHumRat = 0.01;
+    }
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
-    state->dataHeatBalFanSys->MCPThermChim.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     // No EMS

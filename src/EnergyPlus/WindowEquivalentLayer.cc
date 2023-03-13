@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -208,117 +207,118 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     for (Layer = 1; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Layer) {
 
         MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
+        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
 
-        if (BITF_TEST_NONE(BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group),
-                           BITF(DataHeatBalance::MaterialGroup::GlassEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) |
-                               BITF(DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) |
-                               BITF(DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) |
-                               BITF(DataHeatBalance::MaterialGroup::BlindEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::GapEquivalentLayer)))
+        if (BITF_TEST_NONE(BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group),
+                           BITF(Material::MaterialGroup::GlassEquivalentLayer) | BITF(Material::MaterialGroup::ShadeEquivalentLayer) |
+                               BITF(Material::MaterialGroup::DrapeEquivalentLayer) | BITF(Material::MaterialGroup::ScreenEquivalentLayer) |
+                               BITF(Material::MaterialGroup::BlindEquivalentLayer) | BITF(Material::MaterialGroup::GapEquivalentLayer)))
             continue;
 
-        if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer) {
+        if (thisMaterial->Group == Material::MaterialGroup::GapEquivalentLayer) {
             // Gap or Gas Layer
             ++gLayer;
         } else {
             // Solid (Glazing or Shade) Layer
             ++sLayer;
-            CFS(EQLNum).L(sLayer).Name = state.dataMaterial->Material(MaterNum).Name;
+            CFS(EQLNum).L(sLayer).Name = thisMaterial->Name;
             // longwave property input
-            CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = state.dataMaterial->Material(MaterNum).EmissThermalFront;
-            CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = state.dataMaterial->Material(MaterNum).EmissThermalBack;
-            CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = state.dataMaterial->Material(MaterNum).TausThermal;
+            CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = thisMaterial->EmissThermalFront;
+            CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = thisMaterial->EmissThermalBack;
+            CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = thisMaterial->TausThermal;
         }
 
-        if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
+        if (thisMaterial->Group == Material::MaterialGroup::BlindEquivalentLayer) {
             CFS(EQLNum).VBLayerPtr = sLayer;
-            if (state.dataMaterial->Material(MaterNum).SlatOrientation == DataWindowEquivalentLayer::Orientation::Horizontal) {
+            if (thisMaterial->SlatOrientation == DataWindowEquivalentLayer::Orientation::Horizontal) {
                 CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBHOR;
-            } else if (state.dataMaterial->Material(MaterNum).SlatOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
+            } else if (thisMaterial->SlatOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
                 CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBVER;
             }
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
 
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = state.dataMaterial->Material(MaterNum).ReflFrontDiffDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = state.dataMaterial->Material(MaterNum).ReflBackDiffDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = state.dataMaterial->Material(MaterNum).TausDiffDiff;
-            CFS(EQLNum).L(sLayer).PHI_DEG = state.dataMaterial->Material(MaterNum).SlatAngle;
-            CFS(EQLNum).L(sLayer).CNTRL = state.dataMaterial->Material(MaterNum).SlatAngleType;
-            CFS(EQLNum).L(sLayer).S = state.dataMaterial->Material(MaterNum).SlatSeparation;
-            CFS(EQLNum).L(sLayer).W = state.dataMaterial->Material(MaterNum).SlatWidth;
-            CFS(EQLNum).L(sLayer).C = state.dataMaterial->Material(MaterNum).SlatCrown;
-        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = thisMaterial->ReflFrontDiffDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = thisMaterial->ReflBackDiffDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = thisMaterial->TausDiffDiff;
+            CFS(EQLNum).L(sLayer).PHI_DEG = thisMaterial->SlatAngle;
+            CFS(EQLNum).L(sLayer).CNTRL = static_cast<int>(thisMaterial->slatAngleType);
+            CFS(EQLNum).L(sLayer).S = thisMaterial->SlatSeparation;
+            CFS(EQLNum).L(sLayer).W = thisMaterial->SlatWidth;
+            CFS(EQLNum).L(sLayer).C = thisMaterial->SlatCrown;
+        } else if (thisMaterial->Group == Material::MaterialGroup::GlassEquivalentLayer) {
             // glazing
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::GLAZE;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = state.dataMaterial->Material(MaterNum).ReflFrontBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = state.dataMaterial->Material(MaterNum).ReflBackBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = thisMaterial->ReflFrontBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = thisMaterial->ReflBackBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
 
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
 
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = state.dataMaterial->Material(MaterNum).ReflFrontDiffDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = state.dataMaterial->Material(MaterNum).ReflBackDiffDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = state.dataMaterial->Material(MaterNum).TausDiffDiff;
-        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) {
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = thisMaterial->ReflFrontDiffDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = thisMaterial->ReflBackDiffDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = thisMaterial->TausDiffDiff;
+        } else if (thisMaterial->Group == Material::MaterialGroup::ShadeEquivalentLayer) {
             // roller blind
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::ROLLB;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TausBackBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
 
-        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) {
+        } else if (thisMaterial->Group == Material::MaterialGroup::DrapeEquivalentLayer) {
             // drapery fabric
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::DRAPE;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TausBackBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
 
-            CFS(EQLNum).L(sLayer).S = state.dataMaterial->Material(MaterNum).PleatedDrapeLength;
-            CFS(EQLNum).L(sLayer).W = state.dataMaterial->Material(MaterNum).PleatedDrapeWidth;
+            CFS(EQLNum).L(sLayer).S = thisMaterial->PleatedDrapeLength;
+            CFS(EQLNum).L(sLayer).W = thisMaterial->PleatedDrapeWidth;
             // init diffuse SWP to force default derivation
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = -1.0;
-        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) {
+        } else if (thisMaterial->Group == Material::MaterialGroup::ScreenEquivalentLayer) {
             // insect screen
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::INSCRN;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = thisMaterial->TausBackBeamBeam;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = thisMaterial->ReflFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = thisMaterial->ReflBackBeamDiff;
 
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
-            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
+            CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
             // wire geometry
-            CFS(EQLNum).L(sLayer).S = state.dataMaterial->Material(MaterNum).ScreenWireSpacing;
-            CFS(EQLNum).L(sLayer).W = state.dataMaterial->Material(MaterNum).ScreenWireDiameter;
-        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer) {
+            CFS(EQLNum).L(sLayer).S = thisMaterial->ScreenWireSpacing;
+            CFS(EQLNum).L(sLayer).W = thisMaterial->ScreenWireDiameter;
+        } else if (thisMaterial->Group == Material::MaterialGroup::GapEquivalentLayer) {
             // This layer is a gap.  Fill in the parameters
-            CFS(EQLNum).G(gLayer).Name = state.dataMaterial->Material(MaterNum).Name;
-            CFS(EQLNum).G(gLayer).GTYPE = state.dataMaterial->Material(MaterNum).GapVentType;
-            CFS(EQLNum).G(gLayer).TAS = state.dataMaterial->Material(MaterNum).Thickness;
-            CFS(EQLNum).G(gLayer).FG.Name = state.dataMaterial->Material(MaterNum).GasName;
-            CFS(EQLNum).G(gLayer).FG.AK = state.dataMaterial->Material(MaterNum).GasCon(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BK = state.dataMaterial->Material(MaterNum).GasCon(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CK = state.dataMaterial->Material(MaterNum).GasCon(3, 1);
-            CFS(EQLNum).G(gLayer).FG.ACP = state.dataMaterial->Material(MaterNum).GasCp(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BCP = state.dataMaterial->Material(MaterNum).GasCp(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CCP = state.dataMaterial->Material(MaterNum).GasCp(3, 1);
-            CFS(EQLNum).G(gLayer).FG.AVISC = state.dataMaterial->Material(MaterNum).GasVis(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BVISC = state.dataMaterial->Material(MaterNum).GasVis(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CVISC = state.dataMaterial->Material(MaterNum).GasVis(3, 1);
-            CFS(EQLNum).G(gLayer).FG.MHAT = state.dataMaterial->Material(MaterNum).GasWght(1);
+            CFS(EQLNum).G(gLayer).Name = thisMaterial->Name;
+            // previously the values of the levels are 1-3, now it's 0-2
+            CFS(EQLNum).G(gLayer).GTYPE = static_cast<int>(thisMaterial->gapVentType) + 1;
+            CFS(EQLNum).G(gLayer).TAS = thisMaterial->Thickness;
+            CFS(EQLNum).G(gLayer).FG.Name = Material::gasTypeNames[static_cast<int>(thisMaterial->gasTypes(1))];
+            CFS(EQLNum).G(gLayer).FG.AK = thisMaterial->GasCon(1, 1);
+            CFS(EQLNum).G(gLayer).FG.BK = thisMaterial->GasCon(2, 1);
+            CFS(EQLNum).G(gLayer).FG.CK = thisMaterial->GasCon(3, 1);
+            CFS(EQLNum).G(gLayer).FG.ACP = thisMaterial->GasCp(1, 1);
+            CFS(EQLNum).G(gLayer).FG.BCP = thisMaterial->GasCp(2, 1);
+            CFS(EQLNum).G(gLayer).FG.CCP = thisMaterial->GasCp(3, 1);
+            CFS(EQLNum).G(gLayer).FG.AVISC = thisMaterial->GasVis(1, 1);
+            CFS(EQLNum).G(gLayer).FG.BVISC = thisMaterial->GasVis(2, 1);
+            CFS(EQLNum).G(gLayer).FG.CVISC = thisMaterial->GasVis(3, 1);
+            CFS(EQLNum).G(gLayer).FG.MHAT = thisMaterial->GasWght(1);
             // fills gas density and effective gap thickness
             BuildGap(state, CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
         } else {
@@ -447,7 +447,7 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
         }
     }
     if (!CFSURated) {
-        ShowWarningMessage(state, std::string{RoutineName} + "Fenestration U-Value calculation failed for " + FS.Name);
+        ShowWarningMessage(state, format("{}Fenestration U-Value calculation failed for {}", RoutineName, FS.Name));
         ShowContinueError(state, format("...Calculated U-value = {:.4T}", U));
         ShowContinueError(state, "...Check consistency of inputs");
     }
@@ -559,7 +559,7 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
                                     true);
 
     if (!CFSSHGC) {
-        ShowWarningMessage(state, std::string{RoutineName} + "Solar heat gain coefficient calculation failed for " + FS.Name);
+        ShowWarningMessage(state, format("{}Solar heat gain coefficient calculation failed for {}", RoutineName, FS.Name));
         ShowContinueError(state, format("...Calculated SHGC = {:.4T}", SHGC));
         ShowContinueError(state, format("...Calculated U-Value = {:.4T}", UCG));
         ShowContinueError(state, "...Check consistency of inputs.");
@@ -663,11 +663,9 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
-    using General::InterpSw;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyTdpFnWPb;
     using ScheduleManager::GetCurrentScheduleValue;
-    using namespace DataHeatBalFanSys;
 
     Real64 constexpr TOL(0.0001); // convergence tolerance
 
@@ -900,7 +898,7 @@ Real64 P01(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("P01: ");
 
     if (P < -0.05 || P > 1.05) {
-        ShowWarningMessage(state, std::string{RoutineName} + "property value should have been between 0 and 1");
+        ShowWarningMessage(state, format("{}property value should have been between 0 and 1", RoutineName));
         ShowContinueError(state, format("{}=:  property value is ={:.4T}", WHAT, P));
         if (P < 0.0) {
             ShowContinueError(state, "property value is reset to 0.0");
@@ -1026,7 +1024,7 @@ void RB_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, std::string{RoutineName} + "Roller blind diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, format("{}Roller blind diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -1169,7 +1167,7 @@ void IS_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, std::string{RoutineName} + "Calculated insect screen diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, format("{}Calculated insect screen diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -1361,7 +1359,7 @@ void FM_DIFF(EnergyPlusData &state,
 
     if (RHO_DD + TAU_DD > 1.0) {
         SumRefAndTran = RHO_DD + TAU_DD;
-        ShowWarningMessage(state, std::string{RoutineName} + "Calculated drape fabric diffuse-diffuse properties are inconsistent");
+        ShowWarningMessage(state, format("{}Calculated drape fabric diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
         ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
         ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
@@ -4734,8 +4732,8 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
 
         if (FS.WEQLSolverErrorIndex < 1) {
             ++FS.WEQLSolverErrorIndex;
-            ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-            ShowContinueError(state, std::string{RoutineName} + "Net radiation analysis did not converge");
+            ShowSevereError(state, format("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"{}\"", FS.Name));
+            ShowContinueError(state, format("{}Net radiation analysis did not converge", RoutineName));
             ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
             ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
             ShowContinueErrorTimeStamp(state, "");
@@ -5209,8 +5207,8 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
 
     //    if (FS.WEQLSolverErrorIndex < 1) {
     //        ++FS.WEQLSolverErrorIndex;
-    //        ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-    //        ShowContinueError(state, std::string{RoutineName} + "Net radiation analysis did not converge");
+    //        ShowSevereError(state, format("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"{}\"", FS.Name));
+    //        ShowContinueError(state, format("{}Net radiation analysis did not converge", RoutineName));
     //        ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
     //        ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
     //        ShowContinueErrorTimeStamp(state, "");
@@ -6388,14 +6386,14 @@ bool CFSUFactor(EnergyPlusData &state,
     return CFSUFactor;
 }
 
-void ASHWAT_Solar(int const NL,                      // # of layers
-                  Array1S<CFSSWP> const LSWP_ON,     // layer SW (solar) properties (off-normal adjusted)
-                  CFSSWP const &SWP_ROOM,            // effective SW (solar) properties of room
-                  Real64 const IBEAM,                // incident beam insolation (W/m2 aperture)
-                  Real64 const IDIFF,                // incident diffuse insolation (W/m2 aperture)
-                  Real64 const ILIGHTS,              // incident diffuse insolation (W/m2 aperture)
-                  Array1S<Real64> SOURCE,            // returned: layer-by-layer flux of absorbed
-                  Optional<Array1S<Real64>> SourceBD // returned: layer-by-layer flux of absorbed
+void ASHWAT_Solar(int const NL,                                 // # of layers
+                  Array1S<CFSSWP> const LSWP_ON,                // layer SW (solar) properties (off-normal adjusted)
+                  CFSSWP const &SWP_ROOM,                       // effective SW (solar) properties of room
+                  Real64 const IBEAM,                           // incident beam insolation (W/m2 aperture)
+                  Real64 const IDIFF,                           // incident diffuse insolation (W/m2 aperture)
+                  Real64 const ILIGHTS,                         // incident diffuse insolation (W/m2 aperture)
+                  Array1S<Real64> SOURCE,                       // returned: layer-by-layer flux of absorbed
+                  ObjexxFCL::Optional<Array1S<Real64>> SourceBD // returned: layer-by-layer flux of absorbed
 )
 {
     // SUBROUTINE INFORMATION:
@@ -6948,12 +6946,12 @@ void Specular_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP) // short 
     Real64 RAT_TAU;
     Real64 RAT_1MR;
 
-    //#if 1
+    // #if 1
     Specular_RATDiff(state, RAT_1MR, RAT_TAU);
-    //#else
-    //    ! estimate diffuse properties as 60 deg angle of incidence
-    //    CALL Specular_RAT60( RAT_TAU, RAT_1MR)
-    //#endif
+    // #else
+    //     ! estimate diffuse properties as 60 deg angle of incidence
+    //     CALL Specular_RAT60( RAT_TAU, RAT_1MR)
+    // #endif
     SWP.TAUS_DD = RAT_TAU * SWP.TAUSFBB;
     SWP.RHOSFDD = 1.0 - RAT_1MR * (1.0 - SWP.RHOSFBB);
     SWP.RHOSBDD = 1.0 - RAT_1MR * (1.0 - SWP.RHOSBBB);
@@ -6993,59 +6991,76 @@ bool RB_LWP(CFSLAYER const &L, // RB layer
 }
 
 bool RB_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // RB layer
-            CFSSWP &LSWP,                // returned: equivalent layer properties set
-            Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
+            CFSLAYER const &L, // RB layer
+            CFSSWP &LSWP,      // returned: equivalent layer properties set
+            const Real64 THETA // incident angle, 0 <= theta <= PI/2
 )
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
+    //       MODIFIED       Jason W. DeGraw 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     //  Modifies roller blind shortwave properties. If not roller blind layer
     //  returns False.
 
-    // Return value
-    bool RB_SWP;
+    // FUNCTION ARGUMENT DEFINITIONS:
+    //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
+    //  if missing, derive diffuse properties
+
+    if (L.LTYPE != LayerType::ROLLB) return false;
+
+    // normal beam-total properties of fabric
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+
+    Real64 TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
+    Real64 TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
+
+    RB_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
+
+    RB_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
+
+    return true;
+}
+
+bool RB_SWP(EnergyPlusData &state,
+            CFSLAYER const &L, // RB layer
+            CFSSWP &LSWP       // returned: equivalent layer properties set
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       Jason W. DeGraw 2023
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    //  Modifies roller blind shortwave properties. If not roller blind layer
+    //  returns False.
 
     // FUNCTION ARGUMENT DEFINITIONS:
     //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
     //  if missing, derive diffuse properties
 
-    bool DODIFFUSE;
-    Real64 RHOBF_BT0;
-    Real64 RHOFF_BT0;
-    Real64 TAUBF_BT0;
-    Real64 TAUFF_BT0;
-    Real64 TAUX;
-
-    RB_SWP = false;
-    if (L.LTYPE != LayerType::ROLLB) return RB_SWP;
-
-    DODIFFUSE = !present(THETA);
+    if (L.LTYPE != LayerType::ROLLB) return false;
 
     // normal beam-total properties of fabric
-    RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
-    RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
 
-    TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
-    TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
+    Real64 TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
+    Real64 TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
 
-    if (DODIFFUSE) {
-        // front
-        RB_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
-        // back
-        RB_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
-    } else {
-        RB_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
+    // front
+    RB_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
+    // back
+    Real64 TAUX; // This gets used as output of RB_DIFF and is then discarded
+    RB_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
 
-        RB_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
-    }
-    RB_SWP = true;
-    return RB_SWP;
+    return true;
 }
 
 bool IS_LWP(CFSLAYER const &L, // IS layer
@@ -7081,62 +7096,78 @@ bool IS_LWP(CFSLAYER const &L, // IS layer
 }
 
 bool IS_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // PD layer
-            CFSSWP &LSWP,                // returned: equivalent layer properties set
-            Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
+            CFSLAYER const &L, // PD layer
+            CFSSWP &LSWP,      // returned: equivalent layer properties set
+            const Real64 THETA // incident angle, 0 <= theta <= PI/2
 )
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
+    //       MODIFIED       Jason W. DeGraw 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Modifies Insect Screen shortwave properties. If not Insect Screen layer
     // returns False.
 
-    // Return value
-    bool IS_SWP;
+    // FUNCTION ARGUMENT DEFINITIONS:
+    //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
+    //  if missing, derive diffuse properties
+
+    if (L.LTYPE != LayerType::INSCRN) return false;
+
+    // normal beam-total properties
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+
+    Real64 TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
+    Real64 TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
+
+    // front
+    IS_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
+
+    // back -- call with reverse material properies
+    IS_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
+
+    return true;
+}
+
+bool IS_SWP(EnergyPlusData &state,
+            CFSLAYER const &L, // PD layer
+            CFSSWP &LSWP       // returned: equivalent layer properties set
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       Jason W. DeGraw 2023
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Modifies Insect Screen shortwave properties. If not Insect Screen layer
+    // returns False.
 
     // FUNCTION ARGUMENT DEFINITIONS:
     //   sets ONLY RHOSFDD, RHOSBDD, TAUS_DD
     //  if missing, derive diffuse properties
 
-    bool DODIFFUSE;
-    Real64 RHOBF_BT0;
-    Real64 RHOFF_BT0;
-    Real64 TAUBF_BT0;
-    Real64 TAUFF_BT0;
-    Real64 TAUX;
-
-    IS_SWP = false;
-    if (L.LTYPE != LayerType::INSCRN) return IS_SWP;
-
-    DODIFFUSE = !present(THETA);
+    if (L.LTYPE != LayerType::INSCRN) return false;
 
     // normal beam-total properties
-    RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
-    RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
 
-    TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
-    TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
+    Real64 TAUFF_BT0 = L.SWP_MAT.TAUSFBB + L.SWP_MAT.TAUSFBD; // front tau
+    Real64 TAUBF_BT0 = L.SWP_MAT.TAUSBBB + L.SWP_MAT.TAUSBBD; // back tau
 
-    if (DODIFFUSE) {
+    // front
+    IS_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
+    // back
+    Real64 TAUX; // This gets used as output of IS_DIFF and is then discarded
+    IS_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
 
-        // front
-        IS_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
-        // back
-        IS_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
-    } else {
-        // front
-        IS_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
-
-        // back -- call with reverse material properies
-        IS_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
-    }
-    IS_SWP = true;
-    return IS_SWP;
+    return true;
 }
 
 void Fabric_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP) // fabric short wave properties
@@ -7201,86 +7232,95 @@ bool PD_LWP(EnergyPlusData &state,
 }
 
 bool PD_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,                // PD layer
-            CFSSWP &LSWP,                     // returned: equivalent layer properties set
-            Optional<Real64 const> OHM_V_RAD, // vertical VB profile angles, radians
-            Optional<Real64 const> OHM_H_RAD  // horizonatl VB profile angles, radians
+            CFSLAYER const &L,      // PD layer
+            CFSSWP &LSWP,           // returned: equivalent layer properties set
+            const Real64 OHM_V_RAD, // vertical VB profile angles, radians
+            const Real64 OHM_H_RAD  // horizonatl VB profile angles, radians
 )
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
+    //       MODIFIED       Jason W. DeGraw 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Modifies drape fabric shortwave properties for openness. If not drape Fabric layer
     // returns false. If profile angles not specified diffuse properties are returned.
 
-    // Return value
-    bool PD_SWP;
+    if (!(L.LTYPE == LayerType::DRAPE)) return false;
 
-    bool DODIFFUSE;
-    Real64 RHOBF_BT0;
-    Real64 RHOFF_BT0;
-    Real64 TAUX;
+    // normal beam-total properties of fabric
+    Real64 RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
+    Real64 RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
 
-    PD_SWP = false;
-    if (!(L.LTYPE == LayerType::DRAPE)) return PD_SWP;
+    // drape front properties
+    PD_BEAM(state,
+            L.S,
+            L.W,
+            OHM_V_RAD,
+            OHM_H_RAD,
+            RHOFF_BT0,
+            L.SWP_MAT.TAUSFBB,
+            L.SWP_MAT.TAUSFBD,
+            L.SWP_MAT.RHOSFDD,
+            L.SWP_MAT.TAUS_DD,
+            RHOBF_BT0,
+            L.SWP_MAT.TAUSBBB,
+            L.SWP_MAT.TAUSBBD,
+            L.SWP_MAT.RHOSBDD,
+            L.SWP_MAT.TAUS_DD,
+            LSWP.RHOSFBD,
+            LSWP.TAUSFBB,
+            LSWP.TAUSFBD);
 
-    DODIFFUSE = !(present(OHM_V_RAD) && present(OHM_H_RAD));
+    // drape back properties: call with reversed fabric properies
+    PD_BEAM(state,
+            L.S,
+            L.W,
+            OHM_V_RAD,
+            OHM_H_RAD,
+            RHOBF_BT0,
+            L.SWP_MAT.TAUSBBB,
+            L.SWP_MAT.TAUSBBD,
+            L.SWP_MAT.RHOSBDD,
+            L.SWP_MAT.TAUS_DD,
+            RHOFF_BT0,
+            L.SWP_MAT.TAUSFBB,
+            L.SWP_MAT.TAUSFBD,
+            L.SWP_MAT.RHOSFDD,
+            L.SWP_MAT.TAUS_DD,
+            LSWP.RHOSBBD,
+            LSWP.TAUSBBB,
+            LSWP.TAUSBBD);
 
-    if (DODIFFUSE) {
-        PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSFDD, L.SWP_MAT.RHOSBDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
+    return true;
+}
 
-        PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
-    } else {
-        // normal beam-total properties of fabric
-        RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
-        RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
+bool PD_SWP(EnergyPlusData &state,
+            CFSLAYER const &L, // PD layer
+            CFSSWP &LSWP       // returned: equivalent layer properties set
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       Jason W. DeGraw
+    //       RE-ENGINEERED  na
 
-        // drape front properties
-        PD_BEAM(state,
-                L.S,
-                L.W,
-                OHM_V_RAD,
-                OHM_H_RAD,
-                RHOFF_BT0,
-                L.SWP_MAT.TAUSFBB,
-                L.SWP_MAT.TAUSFBD,
-                L.SWP_MAT.RHOSFDD,
-                L.SWP_MAT.TAUS_DD,
-                RHOBF_BT0,
-                L.SWP_MAT.TAUSBBB,
-                L.SWP_MAT.TAUSBBD,
-                L.SWP_MAT.RHOSBDD,
-                L.SWP_MAT.TAUS_DD,
-                LSWP.RHOSFBD,
-                LSWP.TAUSFBB,
-                LSWP.TAUSFBD);
+    // PURPOSE OF THIS FUNCTION:
+    // Modifies drape fabric shortwave properties for openness. If not drape Fabric layer
+    // returns false. If profile angles not specified diffuse properties are returned.
 
-        // drape back properties: call with reversed fabric properies
-        PD_BEAM(state,
-                L.S,
-                L.W,
-                OHM_V_RAD,
-                OHM_H_RAD,
-                RHOBF_BT0,
-                L.SWP_MAT.TAUSBBB,
-                L.SWP_MAT.TAUSBBD,
-                L.SWP_MAT.RHOSBDD,
-                L.SWP_MAT.TAUS_DD,
-                RHOFF_BT0,
-                L.SWP_MAT.TAUSFBB,
-                L.SWP_MAT.TAUSFBD,
-                L.SWP_MAT.RHOSFDD,
-                L.SWP_MAT.TAUS_DD,
-                LSWP.RHOSBBD,
-                LSWP.TAUSBBB,
-                LSWP.TAUSBBD);
-    }
-    PD_SWP = true;
-    return PD_SWP;
+    Real64 TAUX; // This gets used as output of PD_DIFF and is then discarded
+
+    if (!(L.LTYPE == LayerType::DRAPE)) return false;
+
+    PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSFDD, L.SWP_MAT.RHOSBDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
+
+    PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
+
+    return true;
 }
 
 bool VB_LWP(EnergyPlusData &state,
@@ -7326,88 +7366,97 @@ bool VB_LWP(EnergyPlusData &state,
 }
 
 bool VB_SWP(EnergyPlusData &state,
-            CFSLAYER const &L,           // VB layer
-            CFSSWP &LSWP,                // returned: equivalent off-normal properties
-            Optional<Real64 const> OMEGA // incident profile angle (radians)
+            CFSLAYER const &L, // VB layer
+            CFSSWP &LSWP,      // returned: equivalent off-normal properties
+            const Real64 OMEGA // incident profile angle (radians)
 )
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       na
+    //       MODIFIED       Jason W. DeGraw
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Returns venetian blind off-normal short wave properties. If not VB layer
     // returns False.
-    // Return value
-    bool VB_SWP;
+
+    // FUNCTION ARGUMENT DEFINITIONS:
+    //   sets: RHOSFBD, TAUSFBB, TAUSFBD
+
+    if (!IsVBLayer(L)) return false;
+
+    Real64 SL_WR = VB_SLAT_RADIUS_RATIO(L.W, L.C);
+
+    // modify angle-dependent values for actual profile angle
+    VB_SOL46_CURVE(state,
+                   L.S,
+                   L.W,
+                   SL_WR,
+                   DataGlobalConstants::DegToRadians * L.PHI_DEG,
+                   OMEGA,
+                   L.SWP_MAT.RHOSBDD,
+                   L.SWP_MAT.RHOSFDD,
+                   L.SWP_MAT.TAUS_DD,
+                   LSWP.RHOSFBD,
+                   LSWP.TAUSFBB,
+                   LSWP.TAUSFBD);
+
+    VB_SOL46_CURVE(state,
+                   L.S,
+                   L.W,
+                   SL_WR,
+                   -DataGlobalConstants::DegToRadians * L.PHI_DEG,
+                   OMEGA,
+                   L.SWP_MAT.RHOSBDD,
+                   L.SWP_MAT.RHOSFDD,
+                   L.SWP_MAT.TAUS_DD,
+                   LSWP.RHOSBBD,
+                   LSWP.TAUSBBB,
+                   LSWP.TAUSBBD);
+
+    return true;
+}
+
+bool VB_SWP(EnergyPlusData &state,
+            CFSLAYER const &L, // VB layer
+            CFSSWP &LSWP       // returned: equivalent off-normal properties
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         ASHRAE 1311-RP
+    //       DATE WRITTEN   unknown
+    //       MODIFIED       Jason W. DeGraw
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Returns venetian blind off-normal short wave properties. If not VB layer
+    // returns False.
 
     // FUNCTION ARGUMENT DEFINITIONS:
     //   sets: RHOSFBD, TAUSFBB, TAUSFBD
 
     Real64 SL_WR;
-    Real64 TAUX;
-    bool DODIFFUSE;
+    Real64 TAUX; // This gets used as output of VB_DIFF and is then discarded
 
-    VB_SWP = false;
-    if (!IsVBLayer(L)) return VB_SWP;
+    if (!IsVBLayer(L)) return false;
 
     SL_WR = VB_SLAT_RADIUS_RATIO(L.W, L.C);
 
-    DODIFFUSE = !present(OMEGA);
+    VB_DIFF(state,
+            L.S,
+            L.W,
+            DataGlobalConstants::DegToRadians * L.PHI_DEG,
+            L.SWP_MAT.RHOSBDD,
+            L.SWP_MAT.RHOSFDD,
+            L.SWP_MAT.TAUS_DD,
+            LSWP.RHOSFDD,
+            LSWP.TAUS_DD);
 
-    if (DODIFFUSE) {
+    VB_DIFF(
+        state, L.S, L.W, -DataGlobalConstants::DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
 
-        VB_DIFF(state,
-                L.S,
-                L.W,
-                DataGlobalConstants::DegToRadians * L.PHI_DEG,
-                L.SWP_MAT.RHOSBDD,
-                L.SWP_MAT.RHOSFDD,
-                L.SWP_MAT.TAUS_DD,
-                LSWP.RHOSFDD,
-                LSWP.TAUS_DD);
-
-        VB_DIFF(state,
-                L.S,
-                L.W,
-                -DataGlobalConstants::DegToRadians * L.PHI_DEG,
-                L.SWP_MAT.RHOSBDD,
-                L.SWP_MAT.RHOSFDD,
-                L.SWP_MAT.TAUS_DD,
-                LSWP.RHOSBDD,
-                TAUX);
-    } else {
-        // modify angle-dependent values for actual profile angle
-        VB_SOL46_CURVE(state,
-                       L.S,
-                       L.W,
-                       SL_WR,
-                       DataGlobalConstants::DegToRadians * L.PHI_DEG,
-                       OMEGA,
-                       L.SWP_MAT.RHOSBDD,
-                       L.SWP_MAT.RHOSFDD,
-                       L.SWP_MAT.TAUS_DD,
-                       LSWP.RHOSFBD,
-                       LSWP.TAUSFBB,
-                       LSWP.TAUSFBD);
-
-        VB_SOL46_CURVE(state,
-                       L.S,
-                       L.W,
-                       SL_WR,
-                       -DataGlobalConstants::DegToRadians * L.PHI_DEG,
-                       OMEGA,
-                       L.SWP_MAT.RHOSBDD,
-                       L.SWP_MAT.RHOSFDD,
-                       L.SWP_MAT.TAUS_DD,
-                       LSWP.RHOSBBD,
-                       LSWP.TAUSBBB,
-                       LSWP.TAUSBBD);
-    }
-    VB_SWP = true;
-    return VB_SWP;
+    return true;
 }
 
 bool VB_ShadeControl(EnergyPlusData &state,
@@ -7677,18 +7726,16 @@ bool IsVBLayer(CFSLAYER const &L)
 }
 
 void BuildGap(EnergyPlusData &state,
-              CFSGAP &G,                    // returned
-              int const GType,              // gap type (gtyOPENin, gtyOPENout or gtySEALED)
-              Real64 &TAS,                  // gap thickness, m
-              Optional<Real64 const> xTMan, // re density calc -- temp (C) and pressure (Pa)
-              Optional<Real64 const> xPMan  // re density calc -- temp (C) and pressure (Pa)
+              CFSGAP &G,       // returned
+              int const GType, // gap type (gtyOPENin, gtyOPENout or gtySEALED)
+              Real64 &TAS      // gap thickness, m
 )
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     //       DATE WRITTEN   unknown
-    //       MODIFIED       Bereket Nigusse, June 2013
+    //       MODIFIED       Bereket Nigusse, June 2013, Jason W. DeGraw 2023
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -7703,11 +7750,8 @@ void BuildGap(EnergyPlusData &state,
     constexpr Real64 GapThickMin(0.0001); // Minimum gap thickness allowed, m
     static constexpr std::string_view RoutineName("BuildGap: ");
 
-    Real64 PMan;
-    Real64 TMan;
-
     if (TAS < GapThickMin) {
-        ShowSevereError(state, std::string{RoutineName} + G.Name);
+        ShowSevereError(state, format("{}{}", RoutineName, G.Name));
         ShowContinueError(state, "...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m");
         TAS = GapThickMin;
     }
@@ -7717,12 +7761,7 @@ void BuildGap(EnergyPlusData &state,
     // venetian blind, see AdjustVBGap() routine
 
     G.GTYPE = GType;
-    TMan = 21.0;
-    if (present(xTMan)) TMan = xTMan;
-    PMan = state.dataWindowEquivalentLayer->PAtmSeaLevel;
-    if (present(xPMan)) PMan = xPMan;
-
-    G.RHOGAS = DensityCFSFillGas(G.FG, PMan, TMan + DataGlobalConstants::KelvinConv);
+    G.RHOGAS = DensityCFSFillGas(G.FG, state.dataWindowEquivalentLayer->PAtmSeaLevel, 294.15);
 }
 
 void AdjustVBGap(CFSGAP &G,        // gap, returned updated
@@ -7893,7 +7932,7 @@ void FillDefaultsSWP(EnergyPlusData &state,
     } else if (L.LTYPE == LayerType::NONE || L.LTYPE == LayerType::ROOM) {
         // none or room: do nothing
     } else {
-        ShowSevereError(state, std::string{RoutineName} + L.Name + '.');
+        ShowSevereError(state, format("{}{}.", RoutineName, L.Name));
         ShowContinueError(state, "...invalid layer type specified.");
     }
 }
@@ -7927,7 +7966,7 @@ void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
         if (!IsVBLayer(FS.L(iL))) {
             LVBPREV = false;
         } else if (LVBPREV) {
-            ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name + "\", illegal.");
+            ShowSevereError(state, format("{}=\"{}\", illegal.", CurrentModuleObject, FS.Name));
             ShowContinueError(state, "...adjacent VB layers are specified.");
             ErrorsFound = true;
         } else {
@@ -7938,19 +7977,19 @@ void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
         if (iL < FS.NL) {
             gType = FS.G(iL).GTYPE;
             if (gType == state.dataWindowEquivalentLayer->gtyOPENout && iL != 1) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name);
-                ShowContinueError(state, "...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.');
+                ShowSevereError(state, format("{}=\"{}", CurrentModuleObject, FS.Name));
+                ShowContinueError(state, format("...invalid EquivalentLayer window gap type specified ={}.", FS.G(iL).Name));
                 ShowContinueError(state, "...VentedOutDoor gap is not outermost.");
             }
             if (gType == state.dataWindowEquivalentLayer->gtyOPENin && iL != FS.NL - 1) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name);
-                ShowContinueError(state, "...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.');
+                ShowSevereError(state, format("{}=\"{}", CurrentModuleObject, FS.Name));
+                ShowContinueError(state, format("...invalid EquivalentLayer window gap type specified ={}.", FS.G(iL).Name));
                 ShowContinueError(state, "...VentedIndoor gap is not innermost.");
             }
         }
     }
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Program terminates for preceding reason(s).");
+        ShowFatalError(state, format("{}Program terminates for preceding reason(s).", RoutineName));
     }
 }
 
@@ -8023,7 +8062,7 @@ Real64 EffectiveEPSLB(CFSTY const &FS) // Complex Fenestration
 bool FEQX(Real64 const a, // values to compare, fractional tolerance
           Real64 const b,
           Real64 const tolF,
-          Optional<Real64> tolAbs // absolute tolerance
+          const Real64 tolAbs // absolute tolerance
 )
 {
     // FUNCTION INFORMATION:
@@ -8041,11 +8080,8 @@ bool FEQX(Real64 const a, // values to compare, fractional tolerance
     Real64 d;
     Real64 tolAbsX;
 
-    if (present(tolAbs)) {
-        tolAbsX = max(tolAbs, 1.e-10);
-    } else {
-        tolAbsX = 1.e-10;
-    }
+    tolAbsX = max(tolAbs, 1.e-10);
+
     d = std::abs(a - b);
     if (d < tolAbsX) {
         FEQX = true;

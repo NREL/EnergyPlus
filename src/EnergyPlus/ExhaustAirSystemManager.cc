@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -73,15 +72,12 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
 namespace ExhaustAirSystemManager {
     // Module containing the routines dealing with the AirLoopHVAC:ExhaustSystem
-
-    std::map<int, int> mixerIndexMap;
-
-    bool mappingDone = false;
 
     static constexpr std::array<std::string_view, static_cast<int>(ZoneExhaustControl::FlowControlType::Num)> flowControlTypeNamesUC = {
         "SCHEDULED", "FOLLOWSUPPLY"};
@@ -112,7 +108,7 @@ namespace ExhaustAirSystemManager {
         bool ErrorsFound = false;
 
         constexpr std::string_view RoutineName("GetExhaustAirSystemInput: ");
-        std::string cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
+        std::string const &cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
         if (instances != ip->epJSON.end()) {
@@ -334,7 +330,7 @@ namespace ExhaustAirSystemManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem. Preceding condition(s) causes termination.");
+            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
         }
     }
 
@@ -347,7 +343,7 @@ namespace ExhaustAirSystemManager {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
 
         constexpr std::string_view RoutineName = "CalExhaustAirSystem: ";
-        std::string cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
+        constexpr std::string_view cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
         bool ErrorsFound = false;
         if (!(state.afn->AirflowNetworkFanActivated && state.afn->distribution_simulated)) {
             MixerComponent::SimAirMixer(state, thisExhSys.ZoneMixerName, thisExhSys.ZoneMixerIndex);
@@ -444,7 +440,7 @@ namespace ExhaustAirSystemManager {
             // get the mixer inlet node index
             int zoneMixerIndex = thisExhSys.ZoneMixerIndex;
             for (int i = 1; i <= state.dataMixerComponent->MixerCond(zoneMixerIndex).NumInletNodes; ++i) {
-                int exhLegIndex = mixerIndexMap[state.dataMixerComponent->MixerCond(zoneMixerIndex).InletNode(i)];
+                int exhLegIndex = state.dataExhAirSystemMrg->mixerIndexMap[state.dataMixerComponent->MixerCond(zoneMixerIndex).InletNode(i)];
                 CalcZoneHVACExhaustControl(state, exhLegIndex, flowRatio);
             }
 
@@ -470,7 +466,7 @@ namespace ExhaustAirSystemManager {
 
         // Use the json helper to process input
         constexpr std::string_view RoutineName("GetZoneExhaustControlInput: ");
-        std::string cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
+        std::string const &cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
         if (instances != ip->epJSON.end()) {
@@ -538,8 +534,8 @@ namespace ExhaustAirSystemManager {
                                                                         DataLoopNode::ObjectIsParent);
                 thisExhCtrl.OutletNodeNum = outletNodeNum;
 
-                if (!mappingDone) {
-                    mixerIndexMap.emplace(outletNodeNum, exhCtrlNum);
+                if (!state.dataExhAirSystemMrg->mappingDone) {
+                    state.dataExhAirSystemMrg->mixerIndexMap.emplace(outletNodeNum, exhCtrlNum);
                 }
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate");
@@ -603,7 +599,7 @@ namespace ExhaustAirSystemManager {
                     }
                 }
 
-                // Deal with design exhaust auto size here;
+                // Deal with design exhaust autosize here;
                 if (thisExhCtrl.DesignExhaustFlowRate == DataSizing::AutoSize) {
                     SizeExhaustControlFlow(state, exhCtrlNum, thisExhCtrl.SuppNodeNums);
                 }
@@ -670,7 +666,7 @@ namespace ExhaustAirSystemManager {
             state.dataZoneEquip->NumZoneExhaustControls = numZoneExhaustControls; // or exhCtrlNum
 
             // Done with creating a map that contains a table of for each zone to exhasut controls
-            mappingDone = true;
+            state.dataExhAirSystemMrg->mappingDone = true;
         } else {
             // If no exhaust systems are defined, then do something <or nothing>:
         }
@@ -697,7 +693,7 @@ namespace ExhaustAirSystemManager {
         // report results if needed
     }
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Optional<bool const> FlowRatio)
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, ObjexxFCL::Optional<bool const> FlowRatio)
     {
         // Calculate a zonehvac exhaust control system
 
@@ -707,8 +703,8 @@ namespace ExhaustAirSystemManager {
         int OutletNode = thisExhCtrl.OutletNodeNum;
         auto &thisExhInlet = state.dataLoopNodes->Node(InletNode);
         auto &thisExhOutlet = state.dataLoopNodes->Node(OutletNode);
-        Real64 MassFlow = thisExhInlet.MassFlowRate;
-        Real64 Tin = state.dataHeatBalFanSys->ZT(thisExhCtrl.ZoneNum);
+        Real64 MassFlow;
+        Real64 Tin = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisExhCtrl.ZoneNum).ZT;
         Real64 thisExhCtrlAvailScheVal = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum);
 
         if (present(FlowRatio)) {
@@ -740,21 +736,16 @@ namespace ExhaustAirSystemManager {
                 FlowFrac = MinFlowFrac;
             }
 
-            bool runExhaust = true;
             if (thisExhCtrlAvailScheVal > 0.0) { // available
                 if (thisExhCtrl.MinZoneTempLimitScheduleNum > 0) {
                     if (Tin >= ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
-                        runExhaust = true;
                     } else {
-                        runExhaust = false;
                         FlowFrac = MinFlowFrac;
                     }
                 } else {
-                    runExhaust = true;
                     // flow not changed
                 }
             } else {
-                runExhaust = false;
                 FlowFrac = 0.0; // directly set flow rate to zero.
             }
 

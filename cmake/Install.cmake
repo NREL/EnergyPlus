@@ -203,6 +203,9 @@ endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
   set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}${SYSTEM_VERSION}-${TARGET_ARCH}")
+  if (ENABLE_HARDENED_RUNTIME)
+    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}-HardenedRuntime")
+  endif()
 else()
   set(CPACK_PACKAGE_FILE_NAME
       "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}${SYSTEM_VERSION}-${TARGET_ARCH}-${CMAKE_BUILD_TYPE}")
@@ -358,7 +361,7 @@ install(
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
-set(RULES_XLS Rules22-1-0-to-22-2-0.md)
+set(RULES_XLS Rules22-2-0-to-22-3-0.md)
 install(FILES "${PROJECT_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
 configure_file("${PROJECT_SOURCE_DIR}/release/readme.in.html" "${PROJECT_BINARY_DIR}/release/readme.html" @ONLY)
@@ -372,8 +375,8 @@ set(CPACK_RESOURCE_FILE_README "${PROJECT_BINARY_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/CurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${PROJECT_SOURCE_DIR}/idd/V22-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V22-2-0-Energy+.idd")
+install(FILES "${PROJECT_SOURCE_DIR}/idd/V22-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V23-1-0-Energy+.idd")
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)

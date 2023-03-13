@@ -292,6 +292,13 @@ IF EXIST SLABSurfaceTemps.TXT DEL SLABSurfaceTemps.TXT
  IF NOT EXIST expandedidf.err  "%program_path%%program_name%"
  if %pausing%==Y pause
  
+:  6.0 If native csv output is present, then skip convertESOMTR and ReadVarsESO post-processing
+IF EXIST eplusout.csv GOTO skipReadVars
+IF EXIST eplusout.tab GOTO skipReadVars
+IF EXIST eplusout.txt GOTO skipReadVars
+IF EXIST eplusmtr.csv GOTO skipReadVars
+IF EXIST eplusmtr.tab GOTO skipReadVars
+IF EXIST eplusmtr.txt GOTO skipReadVars
 
 :  6&8. Copy Post Processing Program command file(s) to working directory
  IF EXIST "%input_path%%~1.rvi" copy "%input_path%%~1.rvi" eplusout.inp
@@ -309,6 +316,8 @@ IF EXIST eplusmtr.inp %post_proc%ReadVarsESO.exe eplusmtr.inp %rvset%
 IF NOT EXIST eplusmtr.inp echo eplusout.mtr >test.mvi
 IF NOT EXIST eplusmtr.inp echo eplusmtr.csv >>test.mvi
 IF NOT EXIST eplusmtr.inp %post_proc%ReadVarsESO.exe test.mvi %rvset%
+:skipReadVars
+
 IF EXIST eplusout.bnd %post_proc%HVAC-Diagram.exe
 :if %pausing%==Y pause
 

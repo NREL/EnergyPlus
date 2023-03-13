@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -408,7 +408,7 @@ json IdfParser::parse_object(
                 return root;
             }
             auto const &legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
-            auto const size = legacy_idd_extensibles_array.size();
+            size_t const size = legacy_idd_extensibles_array.size();
             std::string const &field_name = legacy_idd_extensibles_array[extensible_index % size].get<std::string>();
             auto val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
             if (!success) return root;
@@ -471,7 +471,7 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
         }
     }
 
-    auto diff = save_i - index;
+    size_t diff = save_i - index;
     auto value = idf.substr(index, diff);
     index_into_cur_line += diff;
     index = save_i;
@@ -561,7 +561,7 @@ json IdfParser::parse_integer(std::string_view idf, size_t &index)
         }
     }
 
-    auto diff = save_i - index;
+    size_t diff = save_i - index;
     auto string_value = idf.substr(index, diff);
     index_into_cur_line += diff;
     index = save_i;
