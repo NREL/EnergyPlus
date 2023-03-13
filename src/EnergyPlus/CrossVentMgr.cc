@@ -78,8 +78,6 @@ namespace CrossVentMgr {
     // MODULE INFORMATION:
     //       AUTHOR         G. Carrilho da Graca
     //       DATE WRITTEN   October 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // Routines that implement the UCSD Cross Ventilation
