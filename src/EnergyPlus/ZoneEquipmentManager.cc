@@ -3670,7 +3670,7 @@ void initOutputRequired(EnergyPlusData &state,
             moisture.SequencedOutputRequiredToHumidSP = moisture.OutputRequiredToHumidifyingSP;     // array assignment
             moisture.SequencedOutputRequiredToDehumidSP = moisture.OutputRequiredToDehumidifyingSP; // array assignment
         } else if (FirstHVACIteration) {
-            auto loadDistType = state.dataZoneEquip->ZoneEquipList(ZoneNum).LoadDistScheme;
+            DataZoneEquipment::LoadDist loadDistType = state.dataZoneEquip->ZoneEquipList(ZoneNum).LoadDistScheme;
             if ((loadDistType == DataZoneEquipment::LoadDist::Sequential) || (loadDistType == DataZoneEquipment::LoadDist::Uniform)) {
                 // init each sequenced demand to the full output
                 energy.SequencedOutputRequired = energy.TotalOutputRequired;                        // array assignment

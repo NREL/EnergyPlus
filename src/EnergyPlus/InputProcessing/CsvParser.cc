@@ -308,10 +308,10 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
         plus_sign = 1;
     }
 
-    auto const value_end = value.data() + value.size(); // have to do this for MSVC // (THIS_AUTO_OK)
+    auto const value_end = value.data() + value.size(); // have to do this for MSVC // (AUTO_OK_ITER)
 
     double val;
-    auto result = fast_float::from_chars(value.data() + plus_sign, value.data() + value.size(), val); // (THIS_AUTO_OK)
+    auto result = fast_float::from_chars(value.data() + plus_sign, value.data() + value.size(), val); // (AUTO_OK_OBJ)
     if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
         return rtrim(value);
     } else if (result.ptr != value_end) {
@@ -338,7 +338,7 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
 
     //    auto const convert_double = [](std::string_view str) -> json {
     //        double val;
-    //        auto result = fast_float::from_chars(str.data(), str.data() + str.size(), val);
+    //        auto result = fast_float::from_chars(str.data(), str.data() + str.size(), val); // (AUTO_OK_OBJ)
     //        if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range || result.ptr != str.end()) {
     //            return rtrim(str);
     //        }
@@ -347,7 +347,7 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
     //
     //    auto const convert_int = [&convert_double](std::string_view str) -> json {
     //        int val;
-    //        auto result = std::from_chars(str.data(), str.data() + str.size(), val);
+    //        auto result = std::from_chars(str.data(), str.data() + str.size(), val); // (AUTO_OK_OBJ)
     //        if (result.ec == std::errc::result_out_of_range) {
     //            return convert_double(str);
     //        } else if (result.ec == std::errc::invalid_argument) {
