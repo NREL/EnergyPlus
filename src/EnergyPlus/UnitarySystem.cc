@@ -1177,6 +1177,7 @@ namespace UnitarySystems {
             state.dataHVACGlobal->DXElecCoolingPower = 0.0;
             state.dataHVACGlobal->DXElecHeatingPower = 0.0;
             state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
+            state.dataHVACGlobal->DefrostElecPower = 0.0;
         }
     }
 
@@ -15767,6 +15768,7 @@ namespace UnitarySystems {
         Real64 elecCoolingPower = 0.0;
         Real64 elecHeatingPower = 0.0;
         Real64 suppHeatingPower = 0.0;
+        Real64 defrostElecPower = 0.0;
 
         switch (this->m_CoolingCoilType_Num) {
         case DataHVACGlobals::CoilDX_CoolingTwoSpeed: {
@@ -15901,6 +15903,7 @@ namespace UnitarySystems {
                 this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
             }
             elecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+            defrostElecPower = state.dataHVACGlobal->DefrostElecPower;
         } break;
         case DataHVACGlobals::Coil_HeatingGas_MultiStage:
         case DataHVACGlobals::Coil_HeatingElectric_MultiStage: {
@@ -15933,6 +15936,7 @@ namespace UnitarySystems {
             }
 
             elecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+            defrostElecPower = state.dataHVACGlobal->DefrostElecPower;
         } break;
         case DataHVACGlobals::Coil_UserDefined:
         case DataHVACGlobals::Coil_HeatingWater:
@@ -15968,13 +15972,13 @@ namespace UnitarySystems {
         }
 
         if (this->m_SuppCoilExists) {
-            if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
-                this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
+            if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
+                this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
                 suppHeatingPower = state.dataHVACGlobal->SuppHeatingCoilPower;
             }
         }
 
-        this->m_ElecPower = locFanElecPower + elecCoolingPower + elecHeatingPower + suppHeatingPower + this->m_TotalAuxElecPower;
+        this->m_ElecPower = locFanElecPower + elecCoolingPower + elecHeatingPower + suppHeatingPower + defrostElecPower + this->m_TotalAuxElecPower;
         this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
 
         if (state.afn->distribution_simulated) {
