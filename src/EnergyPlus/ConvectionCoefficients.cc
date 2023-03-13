@@ -3203,7 +3203,7 @@ void CalcASHRAESimpleIntConvCoeff(EnergyPlusData &state,
                                   Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
 )
 {
-    auto &surface = state.dataSurface->Surface(SurfNum);
+    auto const &surface = state.dataSurface->Surface(SurfNum);
     if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
         state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
             return CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, cosTilt);
@@ -3381,8 +3381,8 @@ Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int const ZoneNum)
     using namespace DataZoneEquipment;
 
     int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
-    int thisZoneInletNode = 0;
     if (ZoneNode > 0) {
+        int thisZoneInletNode = 0;
         Real64 SumMdotTemp = 0.0;
         Real64 SumMdot = 0.0;
         for (int EquipNum = 1;
