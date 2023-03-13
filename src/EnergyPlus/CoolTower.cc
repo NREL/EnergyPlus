@@ -224,12 +224,12 @@ namespace CoolTower {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode = WaterSupplyMode::FromMains;
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 WaterManager::SetupTankDemandComponent(state,
-                                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name,
-                                         CurrentModuleObject,
-                                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyName,
-                                         ErrorsFound,
-                                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupTankID,
-                                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterTankDemandARRID);
+                                                       state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name,
+                                                       CurrentModuleObject,
+                                                       state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyName,
+                                                       ErrorsFound,
+                                                       state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupTankID,
+                                                       state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterTankDemandARRID);
             }
 
             {

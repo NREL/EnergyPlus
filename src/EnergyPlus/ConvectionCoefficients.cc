@@ -4333,8 +4333,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
 
         BldgVolumeSum += Zone(ZoneLoop).Volume * Zone(ZoneLoop).Multiplier * Zone(ZoneLoop).ListMultiplier;
         Real64 PerimExtLengthSum = 0.0; // init
-        int ExtWallCount = 0;        // init
-        int ExtWindowCount = 0;      // init
+        int ExtWallCount = 0;           // init
+        int ExtWindowCount = 0;         // init
         // model perimeter of bounding horizontal rectangle from max and min x and y values
         Real64 thisZoneSimplePerim =
             2.0 * (Zone(ZoneLoop).MaximumY - Zone(ZoneLoop).MinimumY) + 2.0 * (Zone(ZoneLoop).MaximumX - Zone(ZoneLoop).MinimumX);
@@ -6910,8 +6910,8 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
                                   .EquipData(EquipNum)
                                   .OutletNodeNums)) {
                     int thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
-                                            .EquipData(EquipNum)
-                                            .OutletNodeNums(1);
+                                                .EquipData(EquipNum)
+                                                .OutletNodeNums(1);
                     if ((thisZoneInletNode > 0) && (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0)) {
                         SumMdotTemp += state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate * state.dataLoopNodes->Node(thisZoneInletNode).Temp;
                     }
