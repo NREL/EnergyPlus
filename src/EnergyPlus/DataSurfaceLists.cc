@@ -75,14 +75,9 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   September 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Gets the surface lists for the Radiant System Surface Groups input.
-
-    // Using/Aliasing
-    using namespace DataSurfaces;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr std::string_view CurrentModuleObject1("ZoneHVAC:LowTemperatureRadiant:SurfaceGroup");
@@ -102,16 +97,10 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
     int NumArgs;                   // Unused variable that is part of a subroutine call
     int NumNumbers;                // Number of Numbers for each GetObjectItem call
     Real64 SumOfAllFractions;      // Summation of all of the fractions for splitting flow (must sum to 1)
-    int SurfNum;                   // DO loop counter for surfaces
-    int ZoneForSurface;            // Zone number that a particular surface is attached to
     Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
     Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-    int Item;
     bool ErrorsFound;
     int IOStatus;
-    int AlphaArray;
-    int NumArray;
-    int SrfList;
 
     // Obtain all of the user data related to surface lists.  Need to get
     // this before getting the radiant system or ventilated slab data.
@@ -138,7 +127,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
         cNumericFields.allocate(MaxNumbers);
         lNumericBlanks.dimension(MaxNumbers, false);
 
-        for (Item = 1; Item <= NumOfSurfaceLists; ++Item) {
+        for (int Item = 1; Item <= NumOfSurfaceLists; ++Item) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject1,
@@ -176,7 +165,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
 
             SumOfAllFractions = 0.0;
             bool showSameZoneWarning = true;
-            for (SurfNum = 1; SurfNum <= SurfList(Item).NumOfSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= SurfList(Item).NumOfSurfaces; ++SurfNum) {
                 SurfList(Item).SurfName(SurfNum) = Alphas(SurfNum + 1);
                 SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), state.dataSurface->Surface);
                 if (SurfList(Item).SurfPtr(SurfNum) == 0) {
@@ -187,6 +176,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                     ErrorsFound = true;
                 } else { // Make sure that all of the surfaces are located in the same zone
                     state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfList(Item).SurfPtr(SurfNum)) = true;
+                    int ZoneForSurface; // Zone number that a particular surface is attached to
                     if (SurfNum == 1) {
                         ZoneForSurface = state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
                     }
@@ -245,7 +235,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
         cNumericFields.allocate(MaxNumbers);
         lNumericBlanks.dimension(MaxNumbers, false);
 
-        for (Item = 1; Item <= NumOfSurfListVentSlab; ++Item) {
+        for (int Item = 1; Item <= NumOfSurfListVentSlab; ++Item) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject2,
@@ -286,9 +276,9 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                 SlabList(Item).SlabOutNodeName.allocate(SlabList(Item).NumOfSurfaces);
             }
 
-            AlphaArray = 2;
-            NumArray = 1;
-            for (SurfNum = 1; SurfNum <= SlabList(Item).NumOfSurfaces; ++SurfNum) {
+            int AlphaArray = 2;
+            int NumArray = 1;
+            for (int SurfNum = 1; SurfNum <= SlabList(Item).NumOfSurfaces; ++SurfNum) {
                 SlabList(Item).ZoneName(SurfNum) = Alphas(AlphaArray);
                 SlabList(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(AlphaArray), state.dataHeatBal->Zone);
                 if (SlabList(Item).ZonePtr(SurfNum) == 0) {
@@ -309,7 +299,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                                                 SlabList(Item).SurfName(SurfNum)));
                     ErrorsFound = true;
                 }
-                for (SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList) {
+                for (int SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList) {
                     NameConflict = UtilityRoutines::FindItemInList(
                         SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
                     if (NameConflict > 0) { // A slab list includes a surface on a surface list--not allowed

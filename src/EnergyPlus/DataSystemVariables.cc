@@ -190,7 +190,7 @@ namespace DataSystemVariables {
                 std::pair<fs::path, std::string> currentPath(FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
                                                              pathsToCheck[i].second);
                 bool found = false;
-                for (auto &path : pathsChecked) {
+                for (auto const &path : pathsChecked) {
                     if (path.first == currentPath.first) {
                         found = true;
                     }
