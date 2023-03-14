@@ -422,7 +422,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     int NumTUInList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).NumTUInList;
     int NumTUInCoolingMode = 0;            // number of terminal units actually cooling
     int NumTUInHeatingMode = 0;            // number of terminal units actually heating
-    Real64 TUCoolingLoad = 0.0;            // sum of TU's cooling coil load {W}
+    Real64 TUCoolingLoad = 0.0;            // sum of TU's cooling coil load (W)
     Real64 TUHeatingLoad = 0.0;            // sum of TU's heating coil load (W)
     Real64 TUParasiticPower = 0.0;         // total terminal unit parasitic power (W)
     Real64 TUFanPower = 0.0;               // total terminal unit fan power (W)
@@ -12240,7 +12240,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                this->EvapCondPumpElecPower + this->DefrostPower;
     if (TotPower > 0.0) {
         this->OperatingCOP = (this->TUCoolingLoad + this->TUHeatingLoad) / TotPower;
-        this->SCHE = this->OperatingCOP * 3.412;
+        this->SCHE = this->OperatingCOP * 3.412141633; // see StandardRatings::ConvFromSIToIP
     }
 
     // limit the TU capacity when the condenser is maxed out on capacity
