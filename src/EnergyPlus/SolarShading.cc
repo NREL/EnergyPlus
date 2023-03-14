@@ -2739,7 +2739,7 @@ void CHKGSS(EnergyPlusData &state,
 
     auto const &surface_R = state.dataSurface->Surface(NRS);
     auto const &vertex_R = surface_R.Vertex;
-    auto const vertex_R_2 = vertex_R(2);
+    Vector const &vertex_R_2 = vertex_R(2);
     Vector const AVec = (vertex_R(1) - vertex_R_2); // Vector from vertex 2 to vertex 1 of receiving surface
     Vector const BVec = (vertex_R(3) - vertex_R_2); // Vector from vertex 2 to vertex 3 of receiving surface
 
@@ -2756,7 +2756,7 @@ void CHKGSS(EnergyPlusData &state,
 
     if (DOTP > state.dataSolarShading->TolValue) {
 
-        auto const vertex_C_2(vertex_C(2));
+        Vector const &vertex_C_2 = vertex_C(2);
         Vector const AVec(vertex_C(1) - vertex_C_2);
         Vector const BVec(vertex_C(3) - vertex_C_2);
 
