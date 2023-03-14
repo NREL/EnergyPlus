@@ -1587,7 +1587,6 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int WaterOutletNode;
-        auto &Iter = state.dataHWBaseboardRad->Iter;
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
         auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
         auto &QBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg;
@@ -1596,7 +1595,7 @@ namespace HWBaseboardRadiator {
         auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag2) {
-            Iter = 0;
+            state.dataHWBaseboardRad->Iter = 0;
             state.dataHWBaseboardRad->MyEnvrnFlag2 = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
