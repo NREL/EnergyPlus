@@ -100,7 +100,7 @@ namespace Construction {
         std::array<Real64, MaxCTFTerms> CTFOutside{};   // Outside or X terms of the CTF equation
         std::array<Real64, MaxCTFTerms> CTFSourceIn{};  // Heat source/sink inside terms of CTF equation
         std::array<Real64, MaxCTFTerms> CTFSourceOut{}; // Heat source/sink outside terms of CTF equation
-        Real64 CTFTimeStep;                           // Time increment for stable simulation of construct (could be greater than TimeStep)
+        Real64 CTFTimeStep;                             // Time increment for stable simulation of construct (could be greater than TimeStep)
         // The next three series of terms are used to calculate the temperature at the location of a source/sink
         // in the QTF formulation.  This calculation is necessary to allow the proper simulation of a
         // radiant system.
