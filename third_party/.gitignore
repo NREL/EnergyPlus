@@ -9,16 +9,12 @@ kiva/src/libgroundplot
 kiva/templates
 kiva/test/bestest
 kiva/test/Rakefile
-kiva/vendor/boost-1.61.0/CMakeLists.txt
-kiva/vendor/boost-1.61.0/boost/date_time*
-kiva/vendor/boost-1.61.0/boost/filesystem*
-kiva/vendor/boost-1.61.0/boost/program_options*
-kiva/vendor/boost-1.61.0/boost/system
-kiva/vendor/boost-1.61.0/boost/typeof/vector*
+kiva/vendor/boost-1.77.0/boost/date_time
+kiva/vendor/boost-1.77.0/boost/program_options
+kiva/vendor/boost-1.77.0/libs
 kiva/vendor/eigen
 kiva/vendor/fmt
 kiva/vendor/googletest
-kiva/vendor/libpng-1.6.23
 kiva/vendor/mathgl-2.4.4
 kiva/vendor/yaml-cpp
 kiva/vendor/zlib-ng
@@ -26,8 +22,6 @@ kiva/vendor/libpng
 kiva/weather
 kiva/.codecov.yml
 kiva/.gitignore
-kiva/.travis.yml
-kiva/appveyor.yml
 kiva/ChangeLog.md
 kiva/README.md
 
