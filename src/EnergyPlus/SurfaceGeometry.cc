@@ -716,7 +716,7 @@ namespace SurfaceGeometry {
             std::string String2;
             std::string String3;
             {
-                auto const SELECT_CASE_var(state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo);
+                int const SELECT_CASE_var = state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo;
                 if (SELECT_CASE_var == ConvectionConstants::HcInt_ASHRAESimple) {
                     String1 = "Simple";
                 } else if (SELECT_CASE_var == ConvectionConstants::HcInt_ASHRAETARP) {
@@ -733,7 +733,7 @@ namespace SurfaceGeometry {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo);
+                int const SELECT_CASE_var = state.dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo;
                 if (SELECT_CASE_var == ConvectionConstants::HcExt_ASHRAESimple) {
                     String2 = "Simple";
                 } else if (SELECT_CASE_var == ConvectionConstants::HcExt_ASHRAETARP) {
@@ -3182,7 +3182,7 @@ namespace SurfaceGeometry {
         OutMsg = " Surface Geometry,";
 
         {
-            auto const SELECT_CASE_var(NumStmt);
+            int const SELECT_CASE_var = NumStmt;
 
             if (SELECT_CASE_var == 1) {
                 // This is the valid case
@@ -7635,7 +7635,7 @@ namespace SurfaceGeometry {
                   state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Fin))
                 continue;
 
-            constexpr auto fmt{"ShadingProperty Reflectance,{},{},{:.2R},{:.2R},{:.2R}, {}\n"};
+            constexpr std::string_view fmt = "ShadingProperty Reflectance,{},{},{:.2R},{:.2R},{:.2R}, {}\n";
             if (state.dataSurface->SurfShadowGlazingConstruct(SurfNum) != 0) {
                 print(state.files.eio,
                       fmt,
@@ -8536,36 +8536,36 @@ namespace SurfaceGeometry {
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 auto groundSurfaces = fields.find("ground_surfaces");
                 if (groundSurfaces != fields.end()) {
-                    auto groundSurfacesArray = groundSurfaces.value();
+                    auto &groundSurfacesArray = groundSurfaces.value();
                     thisGndSurfsObj.NumGndSurfs = groundSurfacesArray.size();
-                    for (auto groundSurface : groundSurfacesArray) {
+                    for (auto &groundSurface : groundSurfacesArray) {
                         GroundSurfacesData thisGndSurf;
                         auto GndSurfName = groundSurface.find("ground_surface_name");
                         if (GndSurfName != groundSurface.end()) {
-                            auto ground_surf_name = groundSurface.at("ground_surface_name").get<std::string>();
+                            std::string ground_surf_name = GndSurfName.value().get<std::string>();
                             if (!ground_surf_name.empty()) {
-                                thisGndSurf.Name = EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_name);
+                                thisGndSurf.Name = UtilityRoutines::MakeUPPERCase(ground_surf_name);
                             }
                         }
                         auto groundSurfViewFactor = groundSurface.find("ground_surface_view_factor");
                         if (groundSurfViewFactor != groundSurface.end()) {
-                            thisGndSurf.ViewFactor = groundSurface.at("ground_surface_view_factor").get<Real64>();
+                            thisGndSurf.ViewFactor = groundSurfViewFactor.value().get<Real64>();
                             thisGndSurfsObj.IsGroundViewFactorSet = true;
                         }
                         auto TempSchName = groundSurface.find("ground_surface_temperature_schedule_name");
                         if (TempSchName != groundSurface.end()) {
-                            auto gnd_surf_TempSchName = groundSurface.at("ground_surface_temperature_schedule_name").get<std::string>();
+                            std::string gnd_surf_TempSchName = TempSchName.value().get<std::string>();
                             if (!gnd_surf_TempSchName.empty()) {
                                 thisGndSurf.TempSchPtr =
-                                    ScheduleManager::GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(gnd_surf_TempSchName));
+                                    ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(gnd_surf_TempSchName));
                             }
                         }
                         auto ReflSchName = groundSurface.find("ground_surface_reflectance_schedule_name");
                         if (ReflSchName != groundSurface.end()) {
-                            auto gnd_surf_ReflSchName = groundSurface.at("ground_surface_reflectance_schedule_name").get<std::string>();
+                            std::string gnd_surf_ReflSchName = ReflSchName.value().get<std::string>();
                             if (!gnd_surf_ReflSchName.empty()) {
                                 thisGndSurf.ReflSchPtr =
-                                    ScheduleManager::GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(gnd_surf_ReflSchName));
+                                    ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(gnd_surf_ReflSchName));
                             }
                         }
                         thisGndSurfsObj.GndSurfs.push_back(thisGndSurf);
@@ -8687,7 +8687,7 @@ namespace SurfaceGeometry {
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule =
-                    EnergyPlus::ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 state.dataSurface->AnyHeatBalanceInsideSourceTerm = true;
                 if (state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
@@ -8702,7 +8702,7 @@ namespace SurfaceGeometry {
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule =
-                    EnergyPlus::ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 state.dataSurface->AnyHeatBalanceOutsideSourceTerm = true;
                 if (state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
@@ -8761,7 +8761,7 @@ namespace SurfaceGeometry {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(2);
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = DataSurfaces::HeatTransferModel::CTF;
@@ -8811,7 +8811,7 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ErrorsFoundMultiSurf = false;
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(3);
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = DataSurfaces::HeatTransferModel::CTF;
@@ -8837,7 +8837,7 @@ namespace SurfaceGeometry {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(2);
 
                 if (SELECT_CASE_var == "ALLEXTERIORSURFACES") {
                     SurfacesOfType = false;
@@ -8975,7 +8975,7 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ErrorsFoundSurfList = false;
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(2);
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = DataSurfaces::HeatTransferModel::CTF;
@@ -9037,7 +9037,7 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ErrorsFoundByConstruct = false;
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
+		    std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(2);
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = DataSurfaces::HeatTransferModel::CTF;
@@ -9169,7 +9169,7 @@ namespace SurfaceGeometry {
         static constexpr std::string_view Format_725("Surface Heat Transfer Algorithm, {},{:.0R},{:.2R},{:.1R}\n");
 
         if (state.dataHeatBal->AnyCTF) {
-            const auto AlgoName = "CTF - ConductionTransferFunction";
+            constexpr std::string_view AlgoName = "CTF - ConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
             print(state.files.eio,
                   Format_725,
@@ -9180,7 +9180,7 @@ namespace SurfaceGeometry {
         }
         if (state.dataHeatBal->AnyEMPD) {
             state.dataHeatBal->AllCTF = false;
-            const auto AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
+            constexpr std::string_view AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
             print(state.files.eio,
                   Format_725,
@@ -9197,7 +9197,7 @@ namespace SurfaceGeometry {
         }
         if (state.dataHeatBal->AnyCondFD) {
             state.dataHeatBal->AllCTF = false;
-            const auto AlgoName = "CondFD - ConductionFiniteDifference";
+            constexpr std::string_view AlgoName = "CondFD - ConductionFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
             print(state.files.eio,
                   Format_725,
@@ -9208,7 +9208,7 @@ namespace SurfaceGeometry {
         }
         if (state.dataHeatBal->AnyHAMT) {
             state.dataHeatBal->AllCTF = false;
-            const auto AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
+            constexpr std::string_view AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
             ++numberOfHeatTransferAlgosUsed;
             print(state.files.eio,
                   Format_725,
@@ -9223,7 +9223,7 @@ namespace SurfaceGeometry {
         }
         if (state.dataHeatBal->AnyKiva) {
             state.dataHeatBal->AllCTF = false;
-            const auto AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
+            constexpr std::string_view AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
             print(state.files.eio,
                   Format_725,
@@ -10557,8 +10557,8 @@ namespace SurfaceGeometry {
     bool isWindowShadingControlSimilar(EnergyPlusData &state, int a, int b)
     {
         // Compares two window shading controls are the same except for the name, schedule name, construction, and material
-        auto &WindowShadingControlA(state.dataSurface->WindowShadingControl(a));
-        auto &WindowShadingControlB(state.dataSurface->WindowShadingControl(b));
+        auto &WindowShadingControlA = state.dataSurface->WindowShadingControl(a);
+        auto &WindowShadingControlB = state.dataSurface->WindowShadingControl(b);
         return (WindowShadingControlA.ZoneIndex == WindowShadingControlB.ZoneIndex &&
                 WindowShadingControlA.ShadingType == WindowShadingControlB.ShadingType &&
                 WindowShadingControlA.shadingControlType == WindowShadingControlB.shadingControlType &&
@@ -11925,7 +11925,7 @@ namespace SurfaceGeometry {
             }
             if (state.dataSurface->OSC(Loop).ConstTempScheduleIndex != 0) {
                 state.dataIPShortCut->cAlphaArgs(2) = state.dataSurface->OSC(Loop).ConstTempScheduleName;
-                constexpr auto format{"Other Side Coefficients,{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{}\n"};
+                constexpr std::string_view format = "Other Side Coefficients,{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{}\n";
                 print(state.files.eio,
                       format,
                       state.dataSurface->OSC(Loop).Name,
@@ -11943,7 +11943,7 @@ namespace SurfaceGeometry {
                       cOSCLimitsString);
             } else {
                 state.dataIPShortCut->cAlphaArgs(2) = "N/A";
-                constexpr auto format{"Other Side Coefficients,{},{},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{}\n"};
+                constexpr std::string_view format = "Other Side Coefficients,{},{},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{}\n";
                 print(state.files.eio,
                       format,
                       state.dataSurface->OSC(Loop).Name,
@@ -12857,8 +12857,8 @@ namespace SurfaceGeometry {
                         itnext = std::begin(vertices);
                     }
 
-                    auto curVertex = *it;
-                    auto nextVertex = *itnext;
+                    auto curVertex = *it; // (AUTO_OK_OBJ) can't tell if a copy is the intended behavior here
+                    auto nextVertex = *itnext; // (AUTO_OK_OBJ) 
 
                     // now go through all the vertices and see if they are colinear with start and end vertices
                     for (const auto &testVertex : uniqVertices) {
@@ -12927,7 +12927,7 @@ namespace SurfaceGeometry {
         // if they are then the ceiling and floor are (almost certainly) the same x and y coordinates.
         bool areFlrAndClgSame = true;
         if (floorCeilingXY.size() > 0) {
-            for (auto curFloorCeiling : floorCeilingXY) {
+            for (auto const &curFloorCeiling : floorCeilingXY) {
                 if (curFloorCeiling.count % 2 != 0) {
                     areFlrAndClgSame = false;
                     break;
@@ -13021,7 +13021,7 @@ namespace SurfaceGeometry {
                 std::vector<int> facesAtAz = listOfFacesFacingAzimuth(state, zonePoly, state.dataSurface->Surface(curSurfNum).Azimuth);
                 bool allFacesEquidistant = true;
                 oppositeWallArea = 0.;
-                for (auto curFace : facesAtAz) {
+                for (int curFace : facesAtAz) {
                     int possOppFace = findPossibleOppositeFace(state, zonePoly, curFace);
                     if (possOppFace > 0) { // an opposite fact was found
                         oppositeWallArea += state.dataSurface->Surface(zonePoly.SurfaceFace(curFace).SurfNum).Area;
@@ -13828,7 +13828,7 @@ namespace SurfaceGeometry {
             ShowSevereError(state,
                             format("CalcCoordinateTransformation: Invalid dot product, surface=\"{}\":", state.dataSurface->Surface(SurfNum).Name));
             for (I = 1; I <= state.dataSurface->Surface(SurfNum).Sides; ++I) {
-                auto const &point{state.dataSurface->Surface(SurfNum).Vertex(I)};
+                auto const &point = state.dataSurface->Surface(SurfNum).Vertex(I);
                 ShowContinueError(state, format(" ({:8.3F},{:8.3F},{:8.3F})", point.x, point.y, point.z));
             }
             ShowFatalError(
@@ -14011,7 +14011,7 @@ namespace SurfaceGeometry {
             }
 
             // create unshaded construction with storm window
-            const auto ChrNum = fmt::to_string(StormWinNum);
+            const std::string ChrNum = fmt::to_string(StormWinNum);
             std::string ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum; // Name of unshaded construction with storm window
             // If this construction name already exists, set the surface's storm window construction number to it
             int ConstrNewSt =
@@ -15011,11 +15011,11 @@ namespace SurfaceGeometry {
 
         // loop through all the surfaces
         for (int ThisSurf = 1; ThisSurf <= state.dataSurface->TotSurfaces; ++ThisSurf) {
-            auto &surface(state.dataSurface->Surface(ThisSurf));
+            auto &surface = state.dataSurface->Surface(ThisSurf);
 
             if (surface.Class == SurfaceClass::IntMass) continue;
 
-            auto const &vertex(surface.Vertex);
+            auto const &vertex = surface.Vertex;
 
             if (surface.Sides == 3) { // 3-sided polygon
 
@@ -15310,9 +15310,9 @@ namespace SurfaceGeometry {
                         [](Construction::ConstructionProps const &e) { return e.TypeIsAirBoundary; })) {
             int errorCount = 0;
             for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
-                auto &surf(state.dataSurface->Surface(surfNum));
+                auto &surf = state.dataSurface->Surface(surfNum);
                 if (surf.Construction == 0) continue;
-                auto &constr(state.dataConstruction->Construct(surf.Construction));
+                auto &constr = state.dataConstruction->Construct(surf.Construction);
                 if (!constr.TypeIsAirBoundary) continue;
                 surf.IsAirBoundarySurf = true;
 
@@ -15352,7 +15352,7 @@ namespace SurfaceGeometry {
                         if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
                             // Neither zone is assigned to an enclosure, so increment the counter and assign to both
                             ++enclosureNum;
-                            auto &thisEnclosure(Enclosures(enclosureNum));
+                            auto &thisEnclosure = Enclosures(enclosureNum);
                             thisSideEnclosureNum = enclosureNum;
                             thisEnclosure.Name = format("{} Enclosure {}", RadiantOrSolar, enclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(surf.spaceNum).Name);
@@ -15383,7 +15383,7 @@ namespace SurfaceGeometry {
                         } else if (thisSideEnclosureNum == 0) {
                             // Other side is assigned, so use that one for both
                             thisSideEnclosureNum = otherSideEnclosureNum;
-                            auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
+                            auto &thisEnclosure = Enclosures(thisSideEnclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(surf.spaceNum).Name);
                             thisEnclosure.spaceNums.push_back(surf.spaceNum);
                             thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).floorArea;
@@ -15397,7 +15397,7 @@ namespace SurfaceGeometry {
                         } else if (otherSideEnclosureNum == 0) {
                             // This side is assigned, so use that one for both
                             otherSideEnclosureNum = thisSideEnclosureNum;
-                            auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
+                            auto &thisEnclosure = Enclosures(thisSideEnclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).Name);
                             thisEnclosure.spaceNums.push_back(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
                             thisEnclosure.FloorArea += state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).floorArea;
@@ -15414,12 +15414,12 @@ namespace SurfaceGeometry {
                             }
                         } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
                             // If both sides are already assigned to an enclosure, then merge the two enclosures
-                            auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
-                            auto &otherEnclosure(Enclosures(otherSideEnclosureNum));
+                            auto &thisEnclosure = Enclosures(thisSideEnclosureNum);
+                            auto &otherEnclosure = Enclosures(otherSideEnclosureNum);
                             for (const auto &zName : thisEnclosure.spaceNames) {
                                 otherEnclosure.spaceNames.push_back(zName);
                             }
-                            for (const auto &zNum : thisEnclosure.spaceNums) {
+                            for (int zNum : thisEnclosure.spaceNums) {
                                 otherEnclosure.spaceNums.push_back(zNum);
                                 if (radiantSetup) {
                                     state.dataHeatBal->space(zNum).radiantEnclosureNum = otherSideEnclosureNum;
@@ -15468,7 +15468,7 @@ namespace SurfaceGeometry {
                         int spaceNum2 = max(surf.spaceNum, state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
                         // This pair already saved?
                         bool found = false;
-                        for (auto thisAirBoundaryMixing : state.dataHeatBal->airBoundaryMixing) {
+                        for (auto const &thisAirBoundaryMixing : state.dataHeatBal->airBoundaryMixing) {
                             if ((spaceNum1 == thisAirBoundaryMixing.space1) && (spaceNum2 == thisAirBoundaryMixing.space2)) {
                                 found = true;
                                 break;
@@ -15527,7 +15527,7 @@ namespace SurfaceGeometry {
                     } else {
                         state.dataHeatBal->space(spaceNum).solarEnclosureNum = enclosureNum;
                     }
-                    auto &thisEnclosure(Enclosures(enclosureNum));
+                    auto &thisEnclosure = Enclosures(enclosureNum);
                     // Give this enclosure the zone name and assign this to the zone-remainder space if it exists
                     thisEnclosure.Name = zone.Name;
                     thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
@@ -15565,7 +15565,7 @@ namespace SurfaceGeometry {
                     } else {
                         curSpace.solarEnclosureNum = spaceEnclosureNum;
                     }
-                    auto &thisEnclosure(Enclosures(spaceEnclosureNum));
+                    auto &thisEnclosure = Enclosures(spaceEnclosureNum);
                     thisEnclosure.spaceNames.push_back(curSpace.Name);
                     thisEnclosure.spaceNums.push_back(spaceNum);
                     thisEnclosure.FloorArea += curSpace.floorArea;
@@ -15581,7 +15581,7 @@ namespace SurfaceGeometry {
         } else {
             // There are no grouped radiant air boundaries, assign each space to it's own radiant enclosure
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-                auto &thisEnclosure(Enclosures(spaceNum));
+                auto &thisEnclosure = Enclosures(spaceNum);
                 thisEnclosure.Name = state.dataHeatBal->space(spaceNum).Name;
                 thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
                 thisEnclosure.spaceNums.push_back(spaceNum);
@@ -15740,9 +15740,9 @@ namespace SurfaceGeometry {
                     ShowSevereError(state, format("CheckConvexity: Surface=\"{}\" is non-planar.", surfaceTmp.Name));
                     ShowContinueError(state, "Coincident Vertices will be removed as possible.");
                     for (int n = 1; n <= surfaceTmp.Sides; ++n) {
-                        auto const &point(vertices(n));
-                        static constexpr std::string_view ErrFmt(" ({:8.3F},{:8.3F},{:8.3F})");
-                        ShowContinueError(state, EnergyPlus::format(ErrFmt, point.x, point.y, point.z));
+                        auto const &point = vertices(n);
+                        static constexpr std::string_view ErrFmt = " ({:8.3F},{:8.3F},{:8.3F})";
+                        ShowContinueError(state, format(ErrFmt, point.x, point.y, point.z));
                     }
                 }
             }
@@ -16004,10 +16004,10 @@ namespace SurfaceGeometry {
         RevLayerDiffs = false;
 
         for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
-            auto &thisConstLayer(state.dataConstruction->Construct(ConstrNum).LayerPoint(LayerNo));
-            auto &revConstLayer(state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
-            auto *thisMatLay(state.dataMaterial->Material(thisConstLayer));
-            auto *revMatLay(state.dataMaterial->Material(revConstLayer));
+            int thisConstLayer = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayerNo);
+            int revConstLayer = state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1);
+            auto *thisMatLay = state.dataMaterial->Material(thisConstLayer);
+            auto *revMatLay = state.dataMaterial->Material(revConstLayer);
             if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
                 (thisMatLay->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
                 (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||  // to have certain properties flipped from front to back
