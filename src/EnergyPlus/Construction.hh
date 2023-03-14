@@ -94,30 +94,30 @@ namespace Construction {
         int W5FrameDivider = 0; // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
         // Conductive properties for the construction
-        std::array<Real64, MaxCTFTerms> CTFCross;     // Cross or Y terms of the CTF equation
-        std::array<Real64, MaxCTFTerms> CTFFlux;      // Flux history terms of the CTF equation
-        std::array<Real64, MaxCTFTerms> CTFInside;    // Inside or Z terms of the CTF equation
-        std::array<Real64, MaxCTFTerms> CTFOutside;   // Outside or X terms of the CTF equation
-        std::array<Real64, MaxCTFTerms> CTFSourceIn;  // Heat source/sink inside terms of CTF equation
-        std::array<Real64, MaxCTFTerms> CTFSourceOut; // Heat source/sink outside terms of CTF equation
+        std::array<Real64, MaxCTFTerms> CTFCross{};     // Cross or Y terms of the CTF equation
+        std::array<Real64, MaxCTFTerms> CTFFlux{};      // Flux history terms of the CTF equation
+        std::array<Real64, MaxCTFTerms> CTFInside{};    // Inside or Z terms of the CTF equation
+        std::array<Real64, MaxCTFTerms> CTFOutside{};   // Outside or X terms of the CTF equation
+        std::array<Real64, MaxCTFTerms> CTFSourceIn{};  // Heat source/sink inside terms of CTF equation
+        std::array<Real64, MaxCTFTerms> CTFSourceOut{}; // Heat source/sink outside terms of CTF equation
         Real64 CTFTimeStep;                           // Time increment for stable simulation of construct (could be greater than TimeStep)
         // The next three series of terms are used to calculate the temperature at the location of a source/sink
         // in the QTF formulation.  This calculation is necessary to allow the proper simulation of a
         // radiant system.
-        std::array<Real64, MaxCTFTerms> CTFTSourceOut; // Outside terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTSourceOut{}; // Outside terms of the CTF equation for interior temp
         // calc@source location
-        std::array<Real64, MaxCTFTerms> CTFTSourceIn; // Inside terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTSourceIn{}; // Inside terms of the CTF equation for interior temp
         // calc@source location
-        std::array<Real64, MaxCTFTerms> CTFTSourceQ; // Source/sink terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTSourceQ{}; // Source/sink terms of the CTF equation for interior temp
         // calc@source location
         // The next three series of terms are used to calculate the temperature at a location specified by the user.
         // This location must be between two layers and is intended to allow the user to evaluate whether or not
         // condensation is a possibility between material layers.
-        std::array<Real64, MaxCTFTerms> CTFTUserOut; // Outside terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTUserOut{}; // Outside terms of the CTF equation for interior temp
         // calc@user location
-        std::array<Real64, MaxCTFTerms> CTFTUserIn; // Inside terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTUserIn{}; // Inside terms of the CTF equation for interior temp
         // calc@user location
-        std::array<Real64, MaxCTFTerms> CTFTUserSource; // Source/sink terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTUserSource{}; // Source/sink terms of the CTF equation for interior temp
         // calc@user location
         int NumHistories = 0; // CTFTimeStep/TimeStepZone or the number of temp/flux history series
         // for the construction
