@@ -14245,7 +14245,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
         // calculate and report condensation rates  (how much water extracted from the air stream)
         // water flow of water in m3/s for water system interactions
         //  put here to catch all types of DX coils
-        Real64 Tavg = (thisDXCoil.InletAirTemp - thisDXCoil.OutletAirTemp) / 2.0;
+        Real64 Tavg = (thisDXCoil.InletAirTemp + thisDXCoil.OutletAirTemp) / 2.0;
         // CR9155 Remove specific humidity calculations
         //  mdot * del HumRat / rho water
         thisDXCoil.CondensateVdot =
