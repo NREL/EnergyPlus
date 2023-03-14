@@ -193,13 +193,6 @@ namespace DXFEarClipping {
         Array1D<Vector_2d> vertex(nsides);
         Array1D<dTriangle> Triangle(nsides);
 
-        bool errFlag = false;
-        //  vertex=polygon
-        //  if (surfname == 'BOTTOM:OFFICE_E_3') THEN
-        //    trackit=.TRUE.
-        //  else
-        //    trackit=.FALSE.
-        //  endif
         if (surfclass == DataSurfaces::SurfaceClass::Floor || surfclass == DataSurfaces::SurfaceClass::Roof ||
             surfclass == DataSurfaces::SurfaceClass::Overhang) {
             CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);

@@ -180,9 +180,15 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
     struct EquipListAudit
     {
+        // Members
         std::string ObjectType;
         std::string ObjectName;
-        int OnListNum = 0;
+        int OnListNum;
+
+        // Default Constructor
+        EquipListAudit() : OnListNum(0)
+        {
+        }
     };
     // Object Data
     Array1D<EquipListAudit> ZoneEquipListAcct;
