@@ -2608,18 +2608,20 @@ namespace SurfaceGeometry {
                         // Use the new generic code (assuming only one blind) as follows
                         for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                             iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
-                            if (state.dataMaterial->Material(iTmp2)->Group == Material::MaterialGroup::WindowBlind) {
-                                BlNum = state.dataMaterial->Material(iTmp2)->BlindDataPtr;
+                            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iTmp2));
+                            assert(thisMaterial != nullptr);
+                            if (thisMaterial->group == Material::Group::WindowBlind) {
+                                BlNum = thisMaterial->BlindDataPtr;
                                 state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
                                 // TH 2/18/2010. CR 8010
                                 // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
                                 //  the new blind is created only once, it can be shared by multiple windows though.
                                 if (state.dataSurface->SurfWinMovableSlats(SurfNum) &&
-                                    state.dataHeatBal->Blind(BlNum).SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
+                                    state.dataMaterial->Blind(BlNum).SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
                                     errFlag = false;
                                     AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
                                     // point to the new blind
-                                    state.dataMaterial->Material(iTmp2)->BlindDataPtr = BlNumNew;
+                                    thisMaterial->BlindDataPtr = BlNumNew;
                                     // window surface points to new blind
                                     state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNumNew;
                                 }
@@ -6002,11 +6004,11 @@ namespace SurfaceGeometry {
                                                        cRoutineName,
                                                        state.dataConstruction->Construct(ConstrNum).Name));
                                 ShowContinueError(state,
-                                                  format("are inconsistent with the gap widths for shaded window construction {}",
-                                                         state.dataConstruction->Construct(ConstrNumSh).Name));
-                                ShowContinueError(
-                                    state,
-                                    format("for window {}, which has a between-glass blind.", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name));
+                                                  "are inconsistent with the gap widths for shaded window construction " +
+                                                      state.dataConstruction->Construct(ConstrNumSh).Name);
+                                ShowContinueError(state,
+                                                  "for window " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
+                                                      ", which has a between-glass blind.");
                                 ShowContinueError(state,
                                                   format("..Material={} thickness={:.3R} -",
                                                          state.dataMaterial->Material(MatGap)->Name,
@@ -6033,11 +6035,11 @@ namespace SurfaceGeometry {
                                                        cRoutineName,
                                                        state.dataConstruction->Construct(ConstrNum).Name));
                                 ShowContinueError(state,
-                                                  format("are inconsistent with the gap widths for shaded window construction {}",
-                                                         state.dataConstruction->Construct(ConstrNumSh).Name));
-                                ShowContinueError(
-                                    state,
-                                    format("for window {}, which has a between-glass shade.", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name));
+                                                  "are inconsistent with the gap widths for shaded window construction " +
+                                                      state.dataConstruction->Construct(ConstrNumSh).Name);
+                                ShowContinueError(state,
+                                                  "for window " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
+                                                      ", which has a between-glass shade.");
                                 ShowContinueError(state,
                                                   format("..Material={} thickness={:.3R} -",
                                                          state.dataMaterial->Material(MatGap)->Name,
@@ -6211,9 +6213,9 @@ namespace SurfaceGeometry {
             for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                 LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                 if (LayerPtr == 0) continue; // Error is caught already, will terminate later
-                if (state.dataMaterial->Material(LayerPtr)->Group == Material::MaterialGroup::Shade ||
-                    state.dataMaterial->Material(LayerPtr)->Group == Material::MaterialGroup::WindowBlind ||
-                    state.dataMaterial->Material(LayerPtr)->Group == Material::MaterialGroup::Screen)
+                if (state.dataMaterial->Material(LayerPtr)->group == Material::Group::Shade ||
+                    state.dataMaterial->Material(LayerPtr)->group == Material::Group::WindowBlind ||
+                    state.dataMaterial->Material(LayerPtr)->group == Material::Group::Screen)
                     ++NumShades;
             }
             if (NumShades != 0) {
@@ -6233,8 +6235,9 @@ namespace SurfaceGeometry {
             if (ConstrNum > 0) {
                 for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-                    if (state.dataMaterial->Material(LayerPtr)->Group == Material::MaterialGroup::WindowGlass &&
-                        state.dataMaterial->Material(LayerPtr)->GlassTransDirtFactor < 1.0) {
+                    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(LayerPtr));
+                    assert(thisMaterial != nullptr);
+                    if (thisMaterial->group == Material::Group::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, format("{}: Interior Window or GlassDoor {} has a glass layer with", cRoutineName, SubSurfaceName));
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError(state, "A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
@@ -7704,7 +7707,7 @@ namespace SurfaceGeometry {
 
         state.dataSurface->TotExtVentCav = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        state.dataSurface->ExtVentedCavity.allocate(state.dataSurface->TotExtVentCav);
+        state.dataHeatBal->ExtVentedCavity.allocate(state.dataSurface->TotExtVentCav);
 
         for (Item = 1; Item <= state.dataSurface->TotExtVentCav; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -7725,7 +7728,7 @@ namespace SurfaceGeometry {
 
             UtilityRoutines::VerifyName(state,
                                         state.dataIPShortCut->cAlphaArgs(1),
-                                        state.dataSurface->ExtVentedCavity,
+                                        state.dataHeatBal->ExtVentedCavity,
                                         Item - 1,
                                         ErrorInName,
                                         IsBlank,
@@ -7735,17 +7738,17 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
                 continue;
             }
-            state.dataSurface->ExtVentedCavity(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataHeatBal->ExtVentedCavity(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-            state.dataSurface->ExtVentedCavity(Item).OSCMName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataHeatBal->ExtVentedCavity(Item).OSCMName = state.dataIPShortCut->cAlphaArgs(2);
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 Found = UtilityRoutines::FindItemInList(
-                    state.dataSurface->ExtVentedCavity(Item).OSCMName, state.dataSurface->OSCM, state.dataSurface->TotOSCM);
+                    state.dataHeatBal->ExtVentedCavity(Item).OSCMName, state.dataSurface->OSCM, state.dataSurface->TotOSCM);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}\".",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(2),
                                            state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
@@ -7755,59 +7758,59 @@ namespace SurfaceGeometry {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {} cannot be blank.",
                                        cCurrentModuleObject,
-                                       state.dataSurface->ExtVentedCavity(Item).Name,
+                                       state.dataHeatBal->ExtVentedCavity(Item).Name,
                                        state.dataIPShortCut->cAlphaFieldNames(2)));
                 ErrorsFound = true;
             }
-            state.dataSurface->ExtVentedCavity(Item).OSCMPtr = Found;
+            state.dataHeatBal->ExtVentedCavity(Item).OSCMPtr = Found;
 
             Roughness = state.dataIPShortCut->cAlphaArgs(3);
             // Select the correct Number for the associated ascii name for the roughness type
             if (UtilityRoutines::SameString(Roughness, "VerySmooth")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VerySmooth;
             } else if (UtilityRoutines::SameString(Roughness, "Smooth")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Smooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Smooth;
             } else if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumSmooth;
             } else if (UtilityRoutines::SameString(Roughness, "MediumRough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumRough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::MediumRough;
             } else if (UtilityRoutines::SameString(Roughness, "Rough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Rough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::Rough;
             } else if (UtilityRoutines::SameString(Roughness, "VeryRough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VeryRough;
+                state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness = Material::SurfaceRoughness::VeryRough;
             } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             // Was it set?
-            if (state.dataSurface->ExtVentedCavity(Item).BaffleRoughness == DataSurfaces::SurfaceRoughness::Invalid) {
+            if (state.dataHeatBal->ExtVentedCavity(Item).BaffleRoughness == Material::SurfaceRoughness::Invalid) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {}=\"{}",
                                        cCurrentModuleObject,
-                                       state.dataSurface->ExtVentedCavity(Item).Name,
+                                       state.dataHeatBal->ExtVentedCavity(Item).Name,
                                        state.dataIPShortCut->cAlphaFieldNames(3),
                                        state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
 
             AlphaOffset = 3;
-            state.dataSurface->ExtVentedCavity(Item).NumSurfs = NumAlphas - AlphaOffset;
-            if (state.dataSurface->ExtVentedCavity(Item).NumSurfs == 0) {
+            state.dataHeatBal->ExtVentedCavity(Item).NumSurfs = NumAlphas - AlphaOffset;
+            if (state.dataHeatBal->ExtVentedCavity(Item).NumSurfs == 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", no underlying surfaces specified. Must have at least one.",
                                        cCurrentModuleObject,
-                                       state.dataSurface->ExtVentedCavity(Item).Name));
+                                       state.dataHeatBal->ExtVentedCavity(Item).Name));
                 ErrorsFound = true;
                 continue;
             }
-            state.dataSurface->ExtVentedCavity(Item).SurfPtrs.allocate(state.dataSurface->ExtVentedCavity(Item).NumSurfs);
-            state.dataSurface->ExtVentedCavity(Item).SurfPtrs = 0;
-            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
+            state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs.allocate(state.dataHeatBal->ExtVentedCavity(Item).NumSurfs);
+            state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs = 0;
+            for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
                 Found = UtilityRoutines::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
                                            state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset)));
                     ErrorsFound = true;
@@ -7818,7 +7821,7 @@ namespace SurfaceGeometry {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
                                            state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset)));
                     ShowContinueError(state, "...because it is not a Heat Transfer Surface.");
@@ -7829,7 +7832,7 @@ namespace SurfaceGeometry {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
                                            state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset)));
                     ShowContinueError(state, "...because it is not exposed to Sun.");
@@ -7840,7 +7843,7 @@ namespace SurfaceGeometry {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->ExtVentedCavity(Item).Name,
+                                           state.dataHeatBal->ExtVentedCavity(Item).Name,
                                            state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
                                            state.dataIPShortCut->cAlphaArgs(ThisSurf + AlphaOffset)));
                     ShowContinueError(state, "...because it is not exposed to Wind.");
@@ -7848,7 +7851,7 @@ namespace SurfaceGeometry {
                     continue;
                 }
                 if (state.dataSurface->Surface(Found).ExtBoundCond != OtherSideCondModeledExt) {
-                    ShowSevereError(state, format("{}=\"{}\", is invalid", cCurrentModuleObject, state.dataSurface->ExtVentedCavity(Item).Name));
+                    ShowSevereError(state, format("{}=\"{}\", is invalid", cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
                     ShowContinueError(state,
                                       format("...because {}=\"{}\".",
                                              state.dataIPShortCut->cAlphaFieldNames(ThisSurf + AlphaOffset),
@@ -7857,7 +7860,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                     continue;
                 }
-                state.dataSurface->ExtVentedCavity(Item).SurfPtrs(ThisSurf) = Found;
+                state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs(ThisSurf) = Found;
 
                 // now set info in Surface structure
                 state.dataSurface->SurfExtCavNum(Found) = Item;
@@ -7869,7 +7872,7 @@ namespace SurfaceGeometry {
             // now that we should have all the surfaces, do some preperations and checks.
 
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
-            Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataSurface->ExtVentedCavity(Item).SurfPtrs));
+            Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs));
             //            AvgAzimuth = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Azimuth * Surface( ExtVentedCavity( Item ).SurfPtrs
             //).Area
             //)
@@ -7877,28 +7880,28 @@ namespace SurfaceGeometry {
             AvgAzimuth = sum_product_sub(state.dataSurface->Surface,
                                          &SurfaceData::Azimuth,
                                          &SurfaceData::Area,
-                                         state.dataSurface->ExtVentedCavity(Item).SurfPtrs) /
+                                         state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs) /
                          surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
             //            AvgTilt = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Tilt * Surface( ExtVentedCavity( Item ).SurfPtrs ).Area )
             //            /
             // sum(  Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             AvgTilt = sum_product_sub(
-                          state.dataSurface->Surface, &SurfaceData::Tilt, &SurfaceData::Area, state.dataSurface->ExtVentedCavity(Item).SurfPtrs) /
+                          state.dataSurface->Surface, &SurfaceData::Tilt, &SurfaceData::Area, state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs) /
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
-                SurfID = state.dataSurface->ExtVentedCavity(Item).SurfPtrs(ThisSurf);
+            for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
+                SurfID = state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs(ThisSurf);
                 if (std::abs(state.dataSurface->Surface(SurfID).Azimuth - AvgAzimuth) > 15.0) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Azimuth different from others in the associated group.",
                                             cCurrentModuleObject,
-                                            state.dataSurface->ExtVentedCavity(Item).Name,
+                                            state.dataHeatBal->ExtVentedCavity(Item).Name,
                                             state.dataSurface->Surface(SurfID).Name));
                 }
                 if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > 10.0) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Tilt different from others in the associated group.",
                                             cCurrentModuleObject,
-                                            state.dataSurface->ExtVentedCavity(Item).Name,
+                                            state.dataHeatBal->ExtVentedCavity(Item).Name,
                                             state.dataSurface->Surface(SurfID).Name));
                 }
 
@@ -7908,30 +7911,30 @@ namespace SurfaceGeometry {
                 //         //'subtracted in the group of surfaces associated with '//TRIM(ExtVentedCavity(Item)%Name))
                 // endif
             }
-            state.dataSurface->ExtVentedCavity(Item).Tilt = AvgTilt;
-            state.dataSurface->ExtVentedCavity(Item).Azimuth = AvgAzimuth;
+            state.dataHeatBal->ExtVentedCavity(Item).Tilt = AvgTilt;
+            state.dataHeatBal->ExtVentedCavity(Item).Azimuth = AvgAzimuth;
 
             // find area weighted centroid.
             //            ExtVentedCavity( Item ).Centroid.z = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Centroid.z * Surface(
             // ExtVentedCavity(  Item
             //).SurfPtrs ).Area ) / sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced
             // by below
-            state.dataSurface->ExtVentedCavity(Item).Centroid.z = sum_product_sub(state.dataSurface->Surface,
+            state.dataHeatBal->ExtVentedCavity(Item).Centroid.z = sum_product_sub(state.dataSurface->Surface,
                                                                                   &SurfaceData::Centroid,
                                                                                   &Vector::z,
                                                                                   state.dataSurface->Surface,
                                                                                   &SurfaceData::Area,
-                                                                                  state.dataSurface->ExtVentedCavity(Item).SurfPtrs) /
+                                                                                  state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs) /
                                                                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
             // now handle rNumericArgs from input object
-            state.dataSurface->ExtVentedCavity(Item).Porosity = state.dataIPShortCut->rNumericArgs(1);
-            state.dataSurface->ExtVentedCavity(Item).LWEmitt = state.dataIPShortCut->rNumericArgs(2);
-            state.dataSurface->ExtVentedCavity(Item).SolAbsorp = state.dataIPShortCut->rNumericArgs(3);
-            state.dataSurface->ExtVentedCavity(Item).HdeltaNPL = state.dataIPShortCut->rNumericArgs(4);
-            state.dataSurface->ExtVentedCavity(Item).PlenGapThick = state.dataIPShortCut->rNumericArgs(5);
-            if (state.dataSurface->ExtVentedCavity(Item).PlenGapThick <= 0.0) {
-                ShowSevereError(state, format("{}=\"{}\", invalid .", cCurrentModuleObject, state.dataSurface->ExtVentedCavity(Item).Name));
+            state.dataHeatBal->ExtVentedCavity(Item).Porosity = state.dataIPShortCut->rNumericArgs(1);
+            state.dataHeatBal->ExtVentedCavity(Item).LWEmitt = state.dataIPShortCut->rNumericArgs(2);
+            state.dataHeatBal->ExtVentedCavity(Item).SolAbsorp = state.dataIPShortCut->rNumericArgs(3);
+            state.dataHeatBal->ExtVentedCavity(Item).HdeltaNPL = state.dataIPShortCut->rNumericArgs(4);
+            state.dataHeatBal->ExtVentedCavity(Item).PlenGapThick = state.dataIPShortCut->rNumericArgs(5);
+            if (state.dataHeatBal->ExtVentedCavity(Item).PlenGapThick <= 0.0) {
+                ShowSevereError(state, format("{}=\"{}\", invalid .", cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
                 ErrorsFound = true;
                 ShowContinueError(state,
                                   format("...because field \"{}\" must be greater than Zero=[{:.2T}].",
@@ -7939,68 +7942,68 @@ namespace SurfaceGeometry {
                                          state.dataIPShortCut->rNumericArgs(5)));
                 continue;
             }
-            state.dataSurface->ExtVentedCavity(Item).AreaRatio = state.dataIPShortCut->rNumericArgs(6);
-            state.dataSurface->ExtVentedCavity(Item).Cv = state.dataIPShortCut->rNumericArgs(7);
-            state.dataSurface->ExtVentedCavity(Item).Cd = state.dataIPShortCut->rNumericArgs(8);
+            state.dataHeatBal->ExtVentedCavity(Item).AreaRatio = state.dataIPShortCut->rNumericArgs(6);
+            state.dataHeatBal->ExtVentedCavity(Item).Cv = state.dataIPShortCut->rNumericArgs(7);
+            state.dataHeatBal->ExtVentedCavity(Item).Cd = state.dataIPShortCut->rNumericArgs(8);
 
             // Fill out data we now know
             // sum areas of HT surface areas
             //            ExtVentedCavity( Item ).ProjArea = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array
             // subscript  usage: Replaced by below
-            state.dataSurface->ExtVentedCavity(Item).ProjArea = surfaceArea;
-            if (state.dataSurface->ExtVentedCavity(Item).ProjArea <= 0.0) {
-                ShowSevereError(state, format("{}=\"{}\", invalid .", cCurrentModuleObject, state.dataSurface->ExtVentedCavity(Item).Name));
+            state.dataHeatBal->ExtVentedCavity(Item).ProjArea = surfaceArea;
+            if (state.dataHeatBal->ExtVentedCavity(Item).ProjArea <= 0.0) {
+                ShowSevereError(state, format("{}=\"{}\", invalid .", cCurrentModuleObject, state.dataHeatBal->ExtVentedCavity(Item).Name));
                 ErrorsFound = true;
                 ShowContinueError(state,
                                   format("...because gross area of underlying surfaces must be greater than Zero=[{:.2T}].",
-                                         state.dataSurface->ExtVentedCavity(Item).ProjArea));
+                                         state.dataHeatBal->ExtVentedCavity(Item).ProjArea));
                 continue;
             }
-            state.dataSurface->ExtVentedCavity(Item).ActualArea =
-                state.dataSurface->ExtVentedCavity(Item).ProjArea * state.dataSurface->ExtVentedCavity(Item).AreaRatio;
+            state.dataHeatBal->ExtVentedCavity(Item).ActualArea =
+                state.dataHeatBal->ExtVentedCavity(Item).ProjArea * state.dataHeatBal->ExtVentedCavity(Item).AreaRatio;
 
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Baffle Surface Temperature",
                                 OutputProcessor::Unit::C,
-                                state.dataSurface->ExtVentedCavity(Item).Tbaffle,
+                                state.dataHeatBal->ExtVentedCavity(Item).Tbaffle,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Air Drybulb Temperature",
                                 OutputProcessor::Unit::C,
-                                state.dataSurface->ExtVentedCavity(Item).TAirCav,
+                                state.dataHeatBal->ExtVentedCavity(Item).TAirCav,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Total Natural Ventilation Air Change Rate",
                                 OutputProcessor::Unit::ach,
-                                state.dataSurface->ExtVentedCavity(Item).PassiveACH,
+                                state.dataHeatBal->ExtVentedCavity(Item).PassiveACH,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataSurface->ExtVentedCavity(Item).PassiveMdotVent,
+                                state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotVent,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataSurface->ExtVentedCavity(Item).PassiveMdotWind,
+                                state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotWind,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataSurface->ExtVentedCavity(Item).PassiveMdotTherm,
+                                state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotTherm,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataSurface->ExtVentedCavity(Item).Name);
+                                state.dataHeatBal->ExtVentedCavity(Item).Name);
         }
     }
 
@@ -10050,7 +10053,7 @@ namespace SurfaceGeometry {
                 getEnumerationValue(WindowShadingControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
 
             if (windowShadingControl.ShadingDevice > 0) {
-                if (state.dataMaterial->Material(windowShadingControl.ShadingDevice)->Group == Material::MaterialGroup::Screen &&
+                if (state.dataMaterial->Material(windowShadingControl.ShadingDevice)->group == Material::Group::Screen &&
                     !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn ||
                       windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
                       windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
@@ -10068,7 +10071,7 @@ namespace SurfaceGeometry {
                 if (windowShadingControl.getInputShadedConstruction > 0) {
                     state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).IsUsed = true;
                     if (state.dataMaterial->Material(state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).LayerPoint(1))
-                                ->Group == Material::MaterialGroup::Screen &&
+                                ->group == Material::Group::Screen &&
                         !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn ||
                           windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
                           windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
@@ -10215,7 +10218,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) &&
-                    state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Shade) {
+                    state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Shade) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" has {}= InteriorShade or ExteriorShade but matching shading device is not a window shade",
                                            cCurrentModuleObject,
@@ -10226,7 +10229,7 @@ namespace SurfaceGeometry {
                         format("{} in error=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(8), state.dataMaterial->Material(IShadingDevice)->Name));
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Screen) {
+                if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Screen) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" has {}= ExteriorScreen but matching shading device is not a window screen",
                                            cCurrentModuleObject,
@@ -10238,7 +10241,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
-                    state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::WindowBlind) {
+                    state.dataMaterial->Material(IShadingDevice)->group != Material::Group::WindowBlind) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" has {}= InteriorBlind or ExteriorBlind but matching shading device is not a window blind",
                                            cCurrentModuleObject,
@@ -10284,8 +10287,8 @@ namespace SurfaceGeometry {
                 if (state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers) != 0) {
                     if (windowShadingControl.ShadingType == WinShadingType::IntShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->Group !=
-                            Material::MaterialGroup::Shade) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group !=
+                            Material::Group::Shade) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10300,8 +10303,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->Group !=
-                            Material::MaterialGroup::Shade) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
+                            Material::Group::Shade) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10316,8 +10319,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtScreen) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->Group !=
-                            Material::MaterialGroup::Screen) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
+                            Material::Group::Screen) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10332,8 +10335,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::IntBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->Group !=
-                            Material::MaterialGroup::WindowBlind) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers))->group !=
+                            Material::Group::WindowBlind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10348,8 +10351,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (windowShadingControl.ShadingType == WinShadingType::ExtBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->Group !=
-                            Material::MaterialGroup::WindowBlind) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1))->group !=
+                            Material::Group::WindowBlind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             format("{}=\"{}\" the {}=\"{}\"",
@@ -10365,13 +10368,13 @@ namespace SurfaceGeometry {
                     } else if (windowShadingControl.ShadingType == WinShadingType::BGShade) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->Group !=
-                                Material::MaterialGroup::Shade)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group !=
+                                Material::Group::Shade)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->Group !=
-                                Material::MaterialGroup::Shade)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group !=
+                                Material::Group::Shade)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -10391,13 +10394,13 @@ namespace SurfaceGeometry {
                     } else if (windowShadingControl.ShadingType == WinShadingType::BGBlind) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->Group !=
-                                Material::MaterialGroup::WindowBlind)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3))->group !=
+                                Material::Group::WindowBlind)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->Group !=
-                                Material::MaterialGroup::WindowBlind)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5))->group !=
+                                Material::Group::WindowBlind)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -10418,7 +10421,7 @@ namespace SurfaceGeometry {
                 }
                 if (IShadingDevice > 0) {
                     if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) &&
-                        state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Shade) {
+                        state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Shade) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has {}= InteriorShade or ExteriorShade but matching shading device is not a window shade",
                                                cCurrentModuleObject,
@@ -10427,8 +10430,7 @@ namespace SurfaceGeometry {
                         ShowContinueError(state, format("Shading Device in error=\"{}\".", state.dataMaterial->Material(IShadingDevice)->Name));
                         ErrorsFound = true;
                     }
-                    if ((ShTyp == WinShadingType::ExtScreen) &&
-                        state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Screen) {
+                    if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice)->group != Material::Group::Screen) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has {}= ExteriorScreen but matching shading device is not an exterior window screen.",
                                                cCurrentModuleObject,
@@ -10438,7 +10440,7 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
                     if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
-                        state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::WindowBlind) {
+                        state.dataMaterial->Material(IShadingDevice)->group != Material::Group::WindowBlind) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has {}= InteriorBlind or ExteriorBlind but matching shading device is not a window blind.",
                                                cCurrentModuleObject,
@@ -10729,7 +10731,7 @@ namespace SurfaceGeometry {
                                              state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
-                    if (state.dataMaterial->Material(MatNum)->Group != Material::MaterialGroup::WindowGlass) {
+                    if (state.dataMaterial->Material(MatNum)->group != Material::Group::WindowGlass) {
                         ShowSevereError(state, format("{}=\"{}\"", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           format("{}=\"{}must be a WindowMaterial:Glazing or WindowMaterial:Glazing:RefractionExtinctionMethod",
@@ -11044,7 +11046,7 @@ namespace SurfaceGeometry {
                     MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(2);
                     if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers == 3)
                         MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(4);
-                    if (state.dataMaterial->Material(MatGapFlow)->gasTypes(1) != Material::GasType::Air) {
+                    if (dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow))->gasTypes(1) != Material::GasType::Air) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", Gas type not air in airflow gap of construction {}",
@@ -11066,8 +11068,10 @@ namespace SurfaceGeometry {
                                     MatGapFlow1 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(4);
                                     MatGapFlow2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(6);
                                 }
-                                if (state.dataMaterial->Material(MatGapFlow1)->gasTypes(1) != Material::GasType::Air ||
-                                    state.dataMaterial->Material(MatGapFlow2)->gasTypes(1) != Material::GasType::Air) {
+                                if (dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow1))->gasTypes(1) !=
+                                        Material::GasType::Air ||
+                                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow2))->gasTypes(1) !=
+                                        Material::GasType::Air) {
                                     ErrorsFound = true;
                                     ShowSevereError(state,
                                                     format("{}=\"{}\", gas type must be air on either side of the shade/blind",
@@ -11270,7 +11274,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11340,7 +11344,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11397,7 +11401,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11467,7 +11471,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11566,7 +11570,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto *m = state.dataMaterial->Material(index);
-                    if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                    if (m->group != Material::Group::Regular || m->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid {}=\"{}",
@@ -11635,7 +11639,7 @@ namespace SurfaceGeometry {
                                 continue;
                             }
                             auto *m = state.dataMaterial->Material(index);
-                            if (m->Group != Material::MaterialGroup::RegularMaterial || m->ROnly) {
+                            if (m->group != Material::Group::Regular || m->ROnly) {
                                 ErrorsFound = true;
                                 ShowSevereError(state,
                                                 format("{}=\"{}\", invalid {}=\"{}",
@@ -12232,13 +12236,13 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Screen:EquivalentLayer",
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
-                    Material::MaterialGroup const MaterialLayerGroup = thisMaterial->Group;
-                    if ((MaterialLayerGroup == Material::MaterialGroup::WindowSimpleGlazing) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::DrapeEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::BlindEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::ScreenEquivalentLayer) ||
-                        (MaterialLayerGroup == Material::MaterialGroup::GapEquivalentLayer)) {
+                    Material::Group const MaterialLayerGroup = thisMaterial->group;
+                    if ((MaterialLayerGroup == Material::Group::WindowSimpleGlazing) ||
+                        (MaterialLayerGroup == Material::Group::ShadeEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::DrapeEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::BlindEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::ScreenEquivalentLayer) ||
+                        (MaterialLayerGroup == Material::Group::GapEquivalentLayer)) {
                         ShowSevereError(state, format("Invalid movable insulation material for {}:", cCurrentModuleObject));
                         ShowSevereError(
                             state,
@@ -12312,15 +12316,13 @@ namespace SurfaceGeometry {
                             case InsulationType::Inside:
                                 if (state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
                                     ShowSevereError(state,
-                                                    format("{}, {}=\"{}\", already assigned.",
-                                                           cCurrentModuleObject,
-                                                           state.dataIPShortCut->cAlphaFieldNames(2),
-                                                           state.dataIPShortCut->cAlphaArgs(2)));
-                                    ShowContinueError(
-                                        state,
-                                        format("\"Inside\", was already assigned Material=\"{}\".",
-                                               state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name));
-                                    ShowContinueError(state, format("attempting to assign Material=\"{}\".", thisMaterial->Name));
+                                                    cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                                        state.dataIPShortCut->cAlphaArgs(2) + "\", already assigned.");
+                                    ShowContinueError(state,
+                                                      "\"Inside\", was already assigned Material=\"" +
+                                                          state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name +
+                                                          "\".");
+                                    ShowContinueError(state, "attempting to assign Material=\"" + thisMaterial->Name + "\".");
                                     ErrorsFound = true;
                                 }
                                 state.dataSurface->SurfMaterialMovInsulInt(SurfNum) = MaterNum;
@@ -13905,84 +13907,87 @@ namespace SurfaceGeometry {
 
             state.dataConstruction->Construct(ConstrNewSh).LayerPoint = 0;
 
+            auto const *thisMaterialSh = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShDevNum));
+            auto &thisConstructNewSh = state.dataConstruction->Construct(ConstrNewSh);
             if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntShade ||
                 state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntBlind) {
                 // Interior shading device
-                state.dataConstruction->Construct(ConstrNewSh).LayerPoint({1, TotLayersOld}) =
-                    state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
-                state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew) = ShDevNum;
-                state.dataConstruction->Construct(ConstrNewSh).InsideAbsorpSolar = state.dataMaterial->Material(ShDevNum)->AbsorpSolar;
-                state.dataConstruction->Construct(ConstrNewSh).OutsideAbsorpSolar =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1))->AbsorpSolar;
-                state.dataConstruction->Construct(ConstrNewSh).OutsideAbsorpThermal =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1))->AbsorpThermalFront;
+                thisConstructNewSh.LayerPoint({1, TotLayersOld}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
+                thisConstructNewSh.LayerPoint(TotLayersNew) = ShDevNum;
+                thisConstructNewSh.InsideAbsorpSolar = thisMaterialSh->AbsorpSolar;
+                auto const *thisMaterialShLayer1 = dynamic_cast<const Material::MaterialChild *>(
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1)));
+                thisConstructNewSh.OutsideAbsorpSolar = thisMaterialShLayer1->AbsorpSolar;
+                thisConstructNewSh.OutsideAbsorpThermal = thisMaterialShLayer1->AbsorpThermalFront;
             } else {
                 // Exterior shading device
-                state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1) = ShDevNum;
-                state.dataConstruction->Construct(ConstrNewSh).LayerPoint({2, TotLayersNew}) =
-                    state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
-                state.dataConstruction->Construct(ConstrNewSh).InsideAbsorpSolar =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew))->AbsorpSolar;
-                state.dataConstruction->Construct(ConstrNewSh).OutsideAbsorpSolar = state.dataMaterial->Material(ShDevNum)->AbsorpSolar;
-                state.dataConstruction->Construct(ConstrNewSh).OutsideAbsorpThermal = state.dataMaterial->Material(ShDevNum)->AbsorpThermalFront;
+                thisConstructNewSh.LayerPoint(1) = ShDevNum;
+                thisConstructNewSh.LayerPoint({2, TotLayersNew}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
+                auto const *thisMaterialShInside = dynamic_cast<const Material::MaterialChild *>(
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew)));
+                thisConstructNewSh.InsideAbsorpSolar = thisMaterialShInside->AbsorpSolar;
+                thisConstructNewSh.OutsideAbsorpSolar = thisMaterialSh->AbsorpSolar;
+                thisConstructNewSh.OutsideAbsorpThermal = thisMaterialSh->AbsorpThermalFront;
             }
             // The following InsideAbsorpThermal applies only to inside glass; it is corrected
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
-            state.dataConstruction->Construct(ConstrNewSh).InsideAbsorpThermal =
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld))->AbsorpThermalBack;
-            state.dataConstruction->Construct(ConstrNewSh).OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-            state.dataConstruction->Construct(ConstrNewSh).DayltPropPtr = 0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFCross = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFFlux = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFInside = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFOutside = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFSourceIn = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFSourceOut = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTimeStep = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTSourceOut = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTSourceIn = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTSourceQ = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTUserOut = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTUserIn = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).CTFTUserSource = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).NumHistories = 0;
-            state.dataConstruction->Construct(ConstrNewSh).NumCTFTerms = 0;
-            state.dataConstruction->Construct(ConstrNewSh).UValue = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).SourceSinkPresent = false;
-            state.dataConstruction->Construct(ConstrNewSh).SolutionDimensions = 0;
-            state.dataConstruction->Construct(ConstrNewSh).SourceAfterLayer = 0;
-            state.dataConstruction->Construct(ConstrNewSh).TempAfterLayer = 0;
-            state.dataConstruction->Construct(ConstrNewSh).ThicknessPerpend = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsDiff = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsDiffBack = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsDiffShade = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsDiffBackShade = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ShadeAbsorpThermal = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).AbsBeamShadeCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).TransDiff = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).TransDiffVis = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflectSolDiffBack = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflectSolDiffFront = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflectVisDiffBack = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflectVisDiffFront = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).TransSolBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).TransVisBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflSolBeamFrontCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).ReflSolBeamBackCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNewSh).W5FrameDivider = 0;
-            state.dataConstruction->Construct(ConstrNewSh).FromWindow5DataFile = false;
+            thisConstructNewSh.InsideAbsorpThermal =
+                dynamic_cast<Material::MaterialChild *>(
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld)))
+                    ->AbsorpThermalBack;
+            thisConstructNewSh.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
+            thisConstructNewSh.DayltPropPtr = 0;
+            thisConstructNewSh.CTFCross.fill(0.0);
+            thisConstructNewSh.CTFFlux.fill(0.0);
+            thisConstructNewSh.CTFInside.fill(0.0);
+            thisConstructNewSh.CTFOutside.fill(0.0);
+            thisConstructNewSh.CTFSourceIn.fill(0.0);
+            thisConstructNewSh.CTFSourceOut.fill(0.0);
+            thisConstructNewSh.CTFTimeStep = 0.0;
+            thisConstructNewSh.CTFTSourceOut.fill(0.0);
+            thisConstructNewSh.CTFTSourceIn.fill(0.0);
+            thisConstructNewSh.CTFTSourceQ.fill(0.0);
+            thisConstructNewSh.CTFTUserOut.fill(0.0);
+            thisConstructNewSh.CTFTUserIn.fill(0.0);
+            thisConstructNewSh.CTFTUserSource.fill(0.0);
+            thisConstructNewSh.NumHistories = 0;
+            thisConstructNewSh.NumCTFTerms = 0;
+            thisConstructNewSh.UValue = 0.0;
+            thisConstructNewSh.SourceSinkPresent = false;
+            thisConstructNewSh.SolutionDimensions = 0;
+            thisConstructNewSh.SourceAfterLayer = 0;
+            thisConstructNewSh.TempAfterLayer = 0;
+            thisConstructNewSh.ThicknessPerpend = 0.0;
+            thisConstructNewSh.AbsDiff = 0.0;
+            thisConstructNewSh.AbsDiffBack = 0.0;
+            thisConstructNewSh.AbsDiffShade = 0.0;
+            thisConstructNewSh.AbsDiffBackShade = 0.0;
+            thisConstructNewSh.ShadeAbsorpThermal = 0.0;
+            thisConstructNewSh.AbsBeamShadeCoef = 0.0;
+            thisConstructNewSh.TransDiff = 0.0;
+            thisConstructNewSh.TransDiffVis = 0.0;
+            thisConstructNewSh.ReflectSolDiffBack = 0.0;
+            thisConstructNewSh.ReflectSolDiffFront = 0.0;
+            thisConstructNewSh.ReflectVisDiffBack = 0.0;
+            thisConstructNewSh.ReflectVisDiffFront = 0.0;
+            thisConstructNewSh.TransSolBeamCoef = 0.0;
+            thisConstructNewSh.TransVisBeamCoef = 0.0;
+            thisConstructNewSh.ReflSolBeamFrontCoef = 0.0;
+            thisConstructNewSh.ReflSolBeamBackCoef = 0.0;
+            thisConstructNewSh.W5FrameDivider = 0;
+            thisConstructNewSh.FromWindow5DataFile = false;
 
-            state.dataConstruction->Construct(ConstrNewSh).Name = ConstrNameSh;
-            state.dataConstruction->Construct(ConstrNewSh).TotLayers = TotLayersNew;
-            state.dataConstruction->Construct(ConstrNewSh).TotSolidLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers + 1;
-            state.dataConstruction->Construct(ConstrNewSh).TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
-            state.dataConstruction->Construct(ConstrNewSh).TypeIsWindow = true;
-            state.dataConstruction->Construct(ConstrNewSh).IsUsed = true;
+            thisConstructNewSh.Name = ConstrNameSh;
+            thisConstructNewSh.TotLayers = TotLayersNew;
+            thisConstructNewSh.TotSolidLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers + 1;
+            thisConstructNewSh.TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
+            thisConstructNewSh.TypeIsWindow = true;
+            thisConstructNewSh.IsUsed = true;
 
             for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
                 for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
-                    state.dataConstruction->Construct(ConstrNewSh).AbsBeamCoef(Layer)(index) = 0.0;
-                    state.dataConstruction->Construct(ConstrNewSh).AbsBeamBackCoef(Layer)(index) = 0.0;
+                    thisConstructNewSh.AbsBeamCoef(Layer)(index) = 0.0;
+                    thisConstructNewSh.AbsBeamBackCoef(Layer)(index) = 0.0;
                 }
             }
         }
@@ -14038,12 +14043,12 @@ namespace SurfaceGeometry {
                 int MatBetweenGlassSh = 0; // Material number of between-glass shade or blind
                 if (TotLayers == 5) MatBetweenGlassSh = state.dataConstruction->Construct(curConstruction).LayerPoint(3);
                 if (state.dataConstruction->Construct(curConstruction).TotGlassLayers <= 3 &&
-                    (state.dataMaterial->Material(MatIntSh)->Group == Material::MaterialGroup::Shade ||
-                     state.dataMaterial->Material(MatIntSh)->Group == Material::MaterialGroup::WindowBlind))
+                    (state.dataMaterial->Material(MatIntSh)->group == Material::Group::Shade ||
+                     state.dataMaterial->Material(MatIntSh)->group == Material::Group::WindowBlind))
                     ShAndSt = true;
                 if (MatBetweenGlassSh > 0) {
-                    if (state.dataMaterial->Material(MatBetweenGlassSh)->Group == Material::MaterialGroup::Shade ||
-                        state.dataMaterial->Material(MatBetweenGlassSh)->Group == Material::MaterialGroup::WindowBlind) {
+                    if (state.dataMaterial->Material(MatBetweenGlassSh)->group == Material::Group::Shade ||
+                        state.dataMaterial->Material(MatBetweenGlassSh)->group == Material::Group::WindowBlind) {
                         ShAndSt = true;
                     } else {
                         ShowContinueError(state,
@@ -14076,13 +14081,12 @@ namespace SurfaceGeometry {
             // Create new material
             state.dataMaterial->TotMaterials = state.dataMaterial->TotMaterials + 1;
             newAirMaterial = state.dataMaterial->TotMaterials;
-            Material::MaterialProperties *p = new Material::MaterialProperties;
-            state.dataMaterial->Material.push_back(p);
-            auto *thisMaterial = state.dataMaterial->Material(state.dataMaterial->TotMaterials);
+            auto *thisMaterial = new Material::MaterialChild;
+            state.dataMaterial->Material.push_back(thisMaterial);
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
-            thisMaterial->Group = Material::MaterialGroup::WindowGas;
-            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
+            thisMaterial->group = Material::Group::WindowGas;
+            thisMaterial->Roughness = Material::SurfaceRoughness::MediumRough;
             thisMaterial->Conductivity = 0.0;
             thisMaterial->Density = 0.0;
             thisMaterial->IsoMoistCap = 0.0;
@@ -14157,82 +14161,78 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
+            auto &thisConstruct = state.dataConstruction->Construct(state.dataHeatBal->TotConstructs);
             // these Construct arrays dimensioned based on MaxSolidWinLayers
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
+            thisConstruct.setArraysBasedOnMaxSolidWinLayers(state);
 
             int TotLayersOld = state.dataConstruction->Construct(oldConstruction).TotLayers;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint({1, Construction::MaxLayersInConstruct}) = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(1) = stormMaterial;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(2) = gapMaterial;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint({3, TotLayersOld + 2}) =
-                state.dataConstruction->Construct(oldConstruction).LayerPoint({1, TotLayersOld});
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).Name = name;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotLayers = TotLayersOld + 2;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotSolidLayers =
-                state.dataConstruction->Construct(oldConstruction).TotSolidLayers + 1;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotGlassLayers =
-                state.dataConstruction->Construct(oldConstruction).TotGlassLayers + 1;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TypeIsWindow = true;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).InsideAbsorpVis = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideAbsorpVis = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).InsideAbsorpSolar = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideAbsorpSolar = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).InsideAbsorpThermal =
-                state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideAbsorpThermal =
-                state.dataMaterial->Material(stormMaterial)->AbsorpThermalFront;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).DayltPropPtr = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFCross = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFFlux = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFInside = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFOutside = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFSourceIn = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFSourceOut = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTimeStep = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTSourceOut = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTSourceIn = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTSourceQ = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTUserOut = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTUserIn = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFTUserSource = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).NumHistories = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).NumCTFTerms = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).UValue = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).SourceSinkPresent = false;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).SolutionDimensions = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).SourceAfterLayer = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TempAfterLayer = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ThicknessPerpend = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffIn = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffOut = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiff = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffBack = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffShade = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffBackShade = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ShadeAbsorpThermal = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamShadeCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransDiff = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransDiffVis = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflectSolDiffBack = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflectSolDiffFront = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflectVisDiffBack = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflectVisDiffFront = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransSolBeamCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TransVisBeamCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflSolBeamFrontCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).ReflSolBeamBackCoef = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FrameDivider = 0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).FromWindow5DataFile = false;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionWidth = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionOrientation =
-                DataWindowEquivalentLayer::Orientation::Invalid;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysWidth = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysHeight = 0.0;
+            thisConstruct.LayerPoint({1, Construction::MaxLayersInConstruct}) = 0;
+            thisConstruct.LayerPoint(1) = stormMaterial;
+            thisConstruct.LayerPoint(2) = gapMaterial;
+            thisConstruct.LayerPoint({3, TotLayersOld + 2}) = state.dataConstruction->Construct(oldConstruction).LayerPoint({1, TotLayersOld});
+            thisConstruct.Name = name;
+            thisConstruct.TotLayers = TotLayersOld + 2;
+            thisConstruct.TotSolidLayers = state.dataConstruction->Construct(oldConstruction).TotSolidLayers + 1;
+            thisConstruct.TotGlassLayers = state.dataConstruction->Construct(oldConstruction).TotGlassLayers + 1;
+            thisConstruct.TypeIsWindow = true;
+            thisConstruct.InsideAbsorpVis = 0.0;
+            thisConstruct.OutsideAbsorpVis = 0.0;
+            thisConstruct.InsideAbsorpSolar = 0.0;
+            thisConstruct.OutsideAbsorpSolar = 0.0;
+            thisConstruct.InsideAbsorpThermal = state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
+            thisConstruct.OutsideAbsorpThermal =
+                dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(stormMaterial))->AbsorpThermalFront;
+            thisConstruct.OutsideRoughness = Material::SurfaceRoughness::VerySmooth;
+            thisConstruct.DayltPropPtr = 0;
+            thisConstruct.CTFCross.fill(0.0);
+            thisConstruct.CTFFlux.fill(0.0);
+            thisConstruct.CTFInside.fill(0.0);
+            thisConstruct.CTFOutside.fill(0.0);
+            thisConstruct.CTFSourceIn.fill(0.0);
+            thisConstruct.CTFSourceOut.fill(0.0);
+            thisConstruct.CTFTimeStep = 0.0;
+            thisConstruct.CTFTSourceOut.fill(0.0);
+            thisConstruct.CTFTSourceIn.fill(0.0);
+            thisConstruct.CTFTSourceQ.fill(0.0);
+            thisConstruct.CTFTUserOut.fill(0.0);
+            thisConstruct.CTFTUserIn.fill(0.0);
+            thisConstruct.CTFTUserSource.fill(0.0);
+            thisConstruct.NumHistories = 0;
+            thisConstruct.NumCTFTerms = 0;
+            thisConstruct.UValue = 0.0;
+            thisConstruct.SourceSinkPresent = false;
+            thisConstruct.SolutionDimensions = 0;
+            thisConstruct.SourceAfterLayer = 0;
+            thisConstruct.TempAfterLayer = 0;
+            thisConstruct.ThicknessPerpend = 0.0;
+            thisConstruct.AbsDiffIn = 0.0;
+            thisConstruct.AbsDiffOut = 0.0;
+            thisConstruct.AbsDiff = 0.0;
+            thisConstruct.AbsDiffBack = 0.0;
+            thisConstruct.AbsDiffShade = 0.0;
+            thisConstruct.AbsDiffBackShade = 0.0;
+            thisConstruct.ShadeAbsorpThermal = 0.0;
+            thisConstruct.AbsBeamShadeCoef = 0.0;
+            thisConstruct.TransDiff = 0.0;
+            thisConstruct.TransDiffVis = 0.0;
+            thisConstruct.ReflectSolDiffBack = 0.0;
+            thisConstruct.ReflectSolDiffFront = 0.0;
+            thisConstruct.ReflectVisDiffBack = 0.0;
+            thisConstruct.ReflectVisDiffFront = 0.0;
+            thisConstruct.TransSolBeamCoef = 0.0;
+            thisConstruct.TransVisBeamCoef = 0.0;
+            thisConstruct.ReflSolBeamFrontCoef = 0.0;
+            thisConstruct.ReflSolBeamBackCoef = 0.0;
+            thisConstruct.W5FrameDivider = 0;
+            thisConstruct.FromWindow5DataFile = false;
+            thisConstruct.W5FileMullionWidth = 0.0;
+            thisConstruct.W5FileMullionOrientation = DataWindowEquivalentLayer::Orientation::Invalid;
+            thisConstruct.W5FileGlazingSysWidth = 0.0;
+            thisConstruct.W5FileGlazingSysHeight = 0.0;
             for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
                 for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
-                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamCoef(Layer)(index) = 0.0;
-                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamBackCoef(Layer)(index) = 0.0;
+                    thisConstruct.AbsBeamCoef(Layer)(index) = 0.0;
+                    thisConstruct.AbsBeamBackCoef(Layer)(index) = 0.0;
                 }
             }
         }
@@ -16002,17 +16002,18 @@ namespace SurfaceGeometry {
         for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
             auto &thisConstLayer(state.dataConstruction->Construct(ConstrNum).LayerPoint(LayerNo));
             auto &revConstLayer(state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
-            auto *thisMatLay(state.dataMaterial->Material(thisConstLayer));
-            auto *revMatLay(state.dataMaterial->Material(revConstLayer));
-            if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
-                (thisMatLay->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
-                (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||  // to have certain properties flipped from front to back
-                (thisMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer) ||
-                (revMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer)) {
+            auto *thisMatLay(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(thisConstLayer)));
+            assert(thisMatLay != nullptr);
+            auto *revMatLay(dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(revConstLayer)));
+            assert(revMatLay != nullptr);
+            if ((thisConstLayer != revConstLayer) ||                   // Not pointing to the same layer
+                (thisMatLay->group == Material::Group::WindowGlass) || // Not window glass or glass equivalent layer which have
+                (revMatLay->group == Material::Group::WindowGlass) ||  // to have certain properties flipped from front to back
+                (thisMatLay->group == Material::Group::GlassEquivalentLayer) || (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
                 Real64 constexpr SmallDiff = 0.0001;
-                if ((thisMatLay->Group == Material::MaterialGroup::WindowGlass) && (revMatLay->Group == Material::MaterialGroup::WindowGlass)) {
+                if ((thisMatLay->group == Material::Group::WindowGlass) && (revMatLay->group == Material::Group::WindowGlass)) {
                     // Both layers are window glass, so need to check to see if the properties are reversed
                     if ((abs(thisMatLay->Thickness - revMatLay->Thickness) > SmallDiff) ||
                         (abs(thisMatLay->ReflectSolBeamBack - revMatLay->ReflectSolBeamFront) > SmallDiff) ||
@@ -16031,8 +16032,8 @@ namespace SurfaceGeometry {
                         RevLayerDiffs = true;
                         break; // exit when diff
                     }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
-                } else if ((thisMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer) &&
-                           (revMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer)) {
+                } else if ((thisMatLay->group == Material::Group::GlassEquivalentLayer) &&
+                           (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
                     if ((abs(thisMatLay->TausBackBeamBeam - revMatLay->TausFrontBeamBeam) > SmallDiff) ||
                         (abs(thisMatLay->TausFrontBeamBeam - revMatLay->TausBackBeamBeam) > SmallDiff) ||
                         (abs(thisMatLay->ReflBackBeamBeam - revMatLay->ReflFrontBeamBeam) > SmallDiff) ||
