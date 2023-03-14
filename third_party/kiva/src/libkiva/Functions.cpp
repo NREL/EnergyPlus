@@ -50,6 +50,7 @@ bool isEven(int N) { return (N % 2 == 0); }
 void solveTDM(const std::vector<double> &a1, const std::vector<double> &a2, std::vector<double> &a3,
               std::vector<double> &b, std::vector<double> &x) {
   std::size_t N = b.size();
+  std::size_t i_max = N - 1;
   std::size_t i;
 
   double const *a1_(&a1[0]);
@@ -65,8 +66,10 @@ void solveTDM(const std::vector<double> &a1, const std::vector<double> &a2, std:
     a3_[i] /= a2_[i] - a1_[i] * a3_[i - 1];
     b_[i] = (b_[i] - a1_[i] * b_[i - 1]) / (a2_[i] - a1_[i] * a3_[i - 1]);
   }
-  x_[N - 1] = b_[N - 1];
-  for (i = N - 2; /* i >= 0 && */ i < N; --i) {
+  x_[i_max] = b_[i_max];
+  // Exploit post-decrement for efficiency:
+  // First loop will be i = (i_max - 1) and last loop will be i = 0
+  for (i = i_max; i-- > 0;) {
     x_[i] = b_[i] - a3_[i] * x_[i + 1];
   }
 }

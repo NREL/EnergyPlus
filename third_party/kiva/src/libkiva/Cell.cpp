@@ -112,7 +112,7 @@ void Cell::setZeroThicknessCellProperties(std::vector<std::shared_ptr<Cell>> poi
   std::vector<double> capacities;
   std::vector<double> weightedConductivity;
 
-  for (auto p_cell : pointSet) {
+  for (const auto &p_cell : pointSet) {
     // Do not add air cell properties into the weighted average
     if (p_cell->cellType != CellType::INTERIOR_AIR && p_cell->cellType != CellType::EXTERIOR_AIR) {
       double vol = p_cell->volume;

@@ -41,12 +41,12 @@ bool isRectilinear(Polygon poly) {
   return true;
 }
 
-Polygon offset(Polygon poly, double dist) {
-  boost::geometry::strategy::buffer::join_miter join_strategy;
+Polygon offset(const Polygon &poly, const double dist) {
+  static const boost::geometry::strategy::buffer::join_miter join_strategy;
   boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(dist);
-  boost::geometry::strategy::buffer::end_flat end_strategy;
-  boost::geometry::strategy::buffer::side_straight side_strategy;
-  boost::geometry::strategy::buffer::point_square point_strategy;
+  static const boost::geometry::strategy::buffer::end_flat end_strategy;
+  static const boost::geometry::strategy::buffer::side_straight side_strategy;
+  static const boost::geometry::strategy::buffer::point_square point_strategy;
 
   MultiPolygon offset;
 

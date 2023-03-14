@@ -13,6 +13,7 @@
 #elif defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations" // sprintf in lexical_cast
 #elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -54,7 +55,7 @@ enum Turn { LEFT, RIGHT };
 } // namespace geom
 
 bool isRectilinear(Polygon poly);
-Polygon offset(Polygon poly, double dist);
+Polygon offset(const Polygon &poly, const double dist);
 geom::Direction getDirectionIn(Polygon poly, std::size_t vertex);
 geom::Direction getDirectionOut(Polygon poly, std::size_t vertex);
 geom::Turn getTurn(Polygon poly, std::size_t vertex);

@@ -136,6 +136,11 @@ void Foundation::createMeshData() {
   }
 
   if (!isCounterClockWise(polygon)) {
+    if (useDetailedExposedPerimeter) {
+      showMessage(MSG_ERR,
+                  "Foundation floor polygon was entered as clockwise using detailed exposed "
+                  "perimeter. Unable to automatically reassign perimeter exposures.");
+    }
     boost::geometry::correct(polygon);
     showMessage(
         MSG_WARN,
@@ -620,6 +625,36 @@ void Foundation::createMeshData() {
 
   zRanges.ranges.push_back(zNearRange);
 
+  // Calculate area and perimeter
+  double area = boost::geometry::area(polygon);           // [m2] Area of foundation
+  double perimeter = boost::geometry::perimeter(polygon); // [m] Perimeter of foundation
+
+  double interiorPerimeter = 0.0;
+
+  if (useDetailedExposedPerimeter) {
+    for (std::size_t v = 0; v < nV; v++) {
+      std::size_t vNext;
+      if (v == nV - 1) {
+        vNext = 0;
+      } else {
+        vNext = v + 1;
+      }
+
+      Point a = polygon.outer()[v];
+      Point b = polygon.outer()[vNext];
+
+      if (!isExposedPerimeter[v]) {
+        interiorPerimeter += getDistance(a, b);
+      }
+    }
+  } else {
+    interiorPerimeter = perimeter * (1.0 - exposedFraction);
+  }
+
+  netArea = area;
+  netPerimeter = (perimeter - interiorPerimeter);
+  exposedFraction = netPerimeter / perimeter;
+
   // Set 3D foundation areas (for calculation of total heat transfer rates)
 
   Box boundingBox;
@@ -705,32 +740,18 @@ void Foundation::createMeshData() {
       Polygon poly;
       poly = offset(polygon, s.xMin);
 
-      for (std::size_t v = 0; v < nV; v++) {
-        if (useDetailedExposedPerimeter) {
-          if (isExposedPerimeter[v]) {
-            std::size_t vNext;
-            if (v == nV - 1) {
-              vNext = 0;
-            } else {
-              vNext = v + 1;
-            }
-
-            Point a = poly.outer()[v];
-            Point b = poly.outer()[vNext];
-            surfaceAreas[s.type] += (s.zMax - s.zMin) * getDistance(a, b);
-          }
+      auto nV_poly = poly.outer().size();
+      for (std::size_t v = 0; v < nV_poly; v++) {
+        std::size_t vNext;
+        if (v == nV_poly - 1) {
+          vNext = 0;
         } else {
-          std::size_t vNext;
-          if (v == nV - 1) {
-            vNext = 0;
-          } else {
-            vNext = v + 1;
-          }
-
-          Point a = poly.outer()[v];
-          Point b = poly.outer()[vNext];
-          surfaceAreas[s.type] += (s.zMax - s.zMin) * getDistance(a, b);
+          vNext = v + 1;
         }
+
+        Point a = poly.outer()[v];
+        Point b = poly.outer()[vNext];
+        surfaceAreas[s.type] += (s.zMax - s.zMin) * getDistance(a, b) * exposedFraction;
       }
 
     } else {
@@ -751,34 +772,6 @@ void Foundation::createMeshData() {
   for (auto &s : surfaceAreas) {
     hasSurface[s.first] = s.second > 0.0;
   }
-
-  double area = boost::geometry::area(polygon);           // [m2] Area of foundation
-  double perimeter = boost::geometry::perimeter(polygon); // [m] Perimeter of foundation
-
-  double interiorPerimeter = 0.0;
-
-  if (useDetailedExposedPerimeter) {
-    for (std::size_t v = 0; v < nV; v++) {
-      std::size_t vNext;
-      if (v == nV - 1) {
-        vNext = 0;
-      } else {
-        vNext = v + 1;
-      }
-
-      Point a = polygon.outer()[v];
-      Point b = polygon.outer()[vNext];
-
-      if (!isExposedPerimeter[v]) {
-        interiorPerimeter += getDistance(a, b);
-      }
-    }
-  } else {
-    interiorPerimeter = perimeter * (1.0 - exposedFraction);
-  }
-
-  netArea = area;
-  netPerimeter = (perimeter - interiorPerimeter);
 
   if (isEqual(netPerimeter, 0.0)) {
     // TODO: 1D (i.e., cases with no exposed perimeter)
@@ -1330,12 +1323,13 @@ void Foundation::createMeshData() {
         double xPosition = xRef2;
 
         // Foundation Wall
-        for (int n = static_cast<int>(wall.layers.size()) - 1; n >= 0; n--) {
+        for (size_t n = wall.layers.size(); n > 0; n--) {
+          size_t index = n - 1;
           Block block;
-          block.material = wall.layers[n].material;
+          block.material = wall.layers[index].material;
           block.blockType = Block::SOLID;
           block.xMin = xPosition;
-          block.xMax = xPosition + wall.layers[n].thickness;
+          block.xMax = xPosition + wall.layers[index].thickness;
           block.yMin = 0.0;
           block.yMax = 1.0;
           block.setSquarePolygon();
@@ -1350,11 +1344,12 @@ void Foundation::createMeshData() {
         double xPosition = xRef1;
 
         // Foundation Wall
-        for (int n = static_cast<int>(wall.layers.size()) - 1; n >= 0; n--) {
+        for (size_t n = wall.layers.size(); n > 0; n--) {
+          size_t index = n - 1;
           Block block;
-          block.material = wall.layers[n].material;
+          block.material = wall.layers[index].material;
           block.blockType = Block::SOLID;
-          block.xMin = xPosition - wall.layers[n].thickness;
+          block.xMin = xPosition - wall.layers[index].thickness;
           block.xMax = xPosition;
           block.yMin = 0.0;
           block.yMax = 1.0;
@@ -1856,9 +1851,10 @@ void Foundation::createMeshData() {
       double xyPosition = 0.0;
 
       // Foundation Wall
-      for (int n = static_cast<int>(wall.layers.size() - 1); n >= 0; n--) {
+      for (size_t n = wall.layers.size(); n > 0; n--) {
+        size_t index = n - 1;
         Polygon poly;
-        poly = offset(polygon, xyPosition + wall.layers[n].thickness);
+        poly = offset(polygon, xyPosition + wall.layers[index].thickness);
 
         Polygon temp;
         temp = offset(polygon, xyPosition);
@@ -1869,12 +1865,12 @@ void Foundation::createMeshData() {
         poly.inners().push_back(ring);
 
         Block block;
-        block.material = wall.layers[n].material;
+        block.material = wall.layers[index].material;
         block.blockType = Block::SOLID;
         block.polygon = poly;
         block.zMin = zWall;
         block.zMax = zMax;
-        xyPosition += wall.layers[n].thickness;
+        xyPosition += wall.layers[index].thickness;
         blocks.push_back(block);
       }
     }
@@ -2426,9 +2422,10 @@ void Foundation::createMeshData() {
       double xyPosition = 0.0;
 
       // Foundation Wall
-      for (int n = static_cast<int>(wall.layers.size() - 1); n >= 0; n--) {
+      for (size_t n = wall.layers.size(); n > 0; n--) {
+        size_t index = n - 1;
         Polygon tempPoly;
-        tempPoly = offset(polygon, xyPosition + wall.layers[n].thickness);
+        tempPoly = offset(polygon, xyPosition + wall.layers[index].thickness);
 
         Polygon temp;
         temp = offset(polygon, xyPosition);
@@ -2442,12 +2439,12 @@ void Foundation::createMeshData() {
         boost::geometry::intersection(domainBox, tempPoly, poly);
 
         Block block;
-        block.material = wall.layers[n].material;
+        block.material = wall.layers[index].material;
         block.blockType = Block::SOLID;
         block.polygon = poly[0];
         block.zMin = zWall;
         block.zMax = zMax;
-        xyPosition += wall.layers[n].thickness;
+        xyPosition += wall.layers[index].thickness;
         blocks.push_back(block);
       }
     }

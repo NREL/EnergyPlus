@@ -375,6 +375,39 @@ TEST_F(FoundationFixture, clockwiseSurface) {
   EXPECT_TRUE(isCounterClockWise(fnd.polygon));
 }
 
+TEST_F(FoundationFixture, verticalSurfaceAreas) {
+  fnd.foundationDepth = 2.0;
+  fnd.useDetailedExposedPerimeter = true;
+  Material insulation(0.0288, 28.0, 1450.0);
+  InputBlock intIns;
+  intIns.z = 0.0;
+  intIns.x = 0.0;
+  intIns.depth = 2.0;
+  intIns.width = -1.0;
+  intIns.material = insulation;
+  fnd.inputBlocks.push_back(intIns);
+  fnd.polygon.clear();
+  fnd.polygon.outer().push_back(Point(-6.0, -6.0));
+  fnd.polygon.outer().push_back(Point(-6.0, 3.0));
+  fnd.polygon.outer().push_back(Point(3.0, 3.0));
+  fnd.polygon.outer().push_back(Point(3.0, 6.0));
+  fnd.polygon.outer().push_back(Point(6.0, 6.0));
+  fnd.polygon.outer().push_back(Point(6.0, -6.0));
+  fnd.isExposedPerimeter.clear();
+  fnd.isExposedPerimeter.push_back(true);
+  fnd.isExposedPerimeter.push_back(true);
+  fnd.isExposedPerimeter.push_back(true);
+  fnd.isExposedPerimeter.push_back(false);
+  fnd.isExposedPerimeter.push_back(false);
+  fnd.isExposedPerimeter.push_back(true);
+  fnd.createMeshData();
+  Polygon offset_polygon = offset(fnd.polygon, intIns.width);
+  EXPECT_NEAR(fnd.surfaceAreas[Surface::SurfaceType::ST_WALL_INT],
+              fnd.foundationDepth * boost::geometry::perimeter(offset_polygon) *
+                  fnd.exposedFraction,
+              0.00001);
+}
+
 // Google Test main
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

@@ -103,14 +103,15 @@ void Ground::calculateADEUpwardSweep() {
 
 void Ground::calculateADEDownwardSweep() {
   // Downward sweep (Solve V Matrix starting from I, K)
-  for (int index = static_cast<int>(num_cells) - 1; index >= 0; index--) {
+  for (std::size_t n = num_cells; n > 0; n--) {
+    std::size_t index = n - 1;
     auto this_cell = domain.cell[index];
     this_cell->calcCellADEDown(timestep, foundation, bcs, V[index]);
   }
 }
 
 void Ground::calculateExplicit() {
-  for (size_t index = 0; index < num_cells; index++) {
+  for (std::size_t index = 0; index < num_cells; index++) {
     auto this_cell = domain.cell[index];
     TNew[index] = this_cell->calcCellExplicit(timestep, foundation, bcs);
   }
@@ -303,7 +304,7 @@ double Ground::getSurfaceArea(Surface::SurfaceType surfaceType) {
   double totalArea = 0;
 
   // Find surface(s)
-  for (auto surface : foundation.surfaces) {
+  for (const auto &surface : foundation.surfaces) {
     if (surface.type == surfaceType) {
       totalArea += surface.area;
     }
@@ -745,7 +746,7 @@ void Ground::setBoundaryConditions() {
 }
 
 void Ground::link_cells_to_temp() {
-  for (auto this_cell : domain.cell) {
+  for (const auto &this_cell : domain.cell) {
     this_cell->told_ptr = &TOld[this_cell->index];
   }
 }
@@ -782,8 +783,9 @@ void Ground::writeCSV(std::string path) {
 
   output << "\n";
 
-  for (std::size_t k = nZ - 1; k < nZ /*k >= 0*/; k--) {
+  for (std::size_t n = nZ; n > 0; n--) {
 
+    std::size_t k = n - 1;
     output << k << ", " << domain.mesh[2].centers[k];
 
     for (std::size_t i = 0; i < nX; i++) {
