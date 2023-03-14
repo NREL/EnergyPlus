@@ -151,7 +151,7 @@ set(KIVA_3D OFF CACHE BOOL "" FORCE)
 set(KIVA_GROUND_PLOT ${BUILD_GROUND_PLOT} CACHE BOOL "" FORCE)
 set(KIVA_COVERAGE OFF CACHE BOOL "" FORCE)
 
-add_subdirectory("kiva-ep")
+add_subdirectory("kiva")
 set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
 
 if(NOT APPLE)
