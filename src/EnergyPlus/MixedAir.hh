@@ -125,17 +125,21 @@ namespace MixedAir {
     };
 
     // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
-    // can't change these to enum class since these are used in SetupOutputVariable()
-    constexpr int limitFactorNone = 0;        // No limit other than fixed OA amount
-    constexpr int limitFactorLimits = 1;      // Limits and scheduled limits
-    constexpr int limitFactorEconomizer = 2;  // Economizer operation
-    constexpr int limitFactorExhaust = 3;     // Exhaust flow
-    constexpr int limitFactorMixedAir = 4;    // Mixed air flow rate
-    constexpr int limitFactorHighHum = 5;     // High humidity economizer control
-    constexpr int limitFactorDCV = 6;         // Demand-controlled ventilation
-    constexpr int limitFactorNightVent = 7;   // Night ventilation
-    constexpr int limitFactorDemandLimit = 8; // Demand-limiting
-    constexpr int limitFactorEMS = 9;         // EMS override
+    // stored as int since it is used in SetupOutputVariable()
+    enum class OALimitFactor
+    {
+        None = 0,        // No limit other than fixed OA amount
+        Limits = 1,      // Limits and scheduled limits
+        Economizer = 2,  // Economizer operation
+        Exhaust = 3,     // Exhaust flow
+        MixedAir = 4,    // Mixed air flow rate
+        HighHum = 5,     // High humidity economizer control
+        DCV = 6,         // Demand-controlled ventilation
+        NightVent = 7,   // Night ventilation
+        DemandLimit = 8, // Demand-limiting
+        EMS = 9,         // EMS override
+        Num
+    };
 
     extern const std::array<std::string_view, static_cast<int>(CMO::Num)> CurrentModuleObjects;
 
