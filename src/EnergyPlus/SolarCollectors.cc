@@ -1043,7 +1043,7 @@ namespace SolarCollectors {
                 this->SavedTempOfInnerCover = this->TempOfInnerCover;
                 this->SavedTempOfOuterCover = this->TempOfOuterCover;
                 if (this->OSCM_ON) {
-                    this->SavedTempCollectorOSCM = state.dataSurface->ExtVentedCavity(this->VentCavIndex).Tbaffle;
+                    this->SavedTempCollectorOSCM = state.dataHeatBal->ExtVentedCavity(this->VentCavIndex).Tbaffle;
                 }
                 this->TimeElapsed = timeElapsed;
             }
@@ -2177,8 +2177,8 @@ namespace SolarCollectors {
         int CavNum = 0;
         Found = false;
         for (int thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
-            for (int ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
-                if (SurfacePtr == state.dataSurface->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
+            for (int ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
+                if (SurfacePtr == state.dataHeatBal->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
                     Found = true;
                     CavNum = thisCav;
                 }

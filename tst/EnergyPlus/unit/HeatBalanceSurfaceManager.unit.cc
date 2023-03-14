@@ -114,10 +114,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     state->dataConstruction->Construct.allocate(ConstrNum);
     state->dataConstruction->Construct(ConstrNum).Name = "TestConstruct";
-    state->dataConstruction->Construct(ConstrNum).CTFCross(0) = 0.0;
-    state->dataConstruction->Construct(ConstrNum).CTFOutside(0) = 1.0;
+    state->dataConstruction->Construct(ConstrNum).CTFCross[0] = 0.0;
+    state->dataConstruction->Construct(ConstrNum).CTFOutside[0] = 1.0;
     state->dataConstruction->Construct(ConstrNum).SourceSinkPresent = true;
-    Material::MaterialProperties *p = new Material::MaterialProperties;
+    Material::MaterialBase *p = new Material::MaterialBase;
     state->dataMaterial->Material.push_back(p);
     state->dataMaterial->Material(1)->Name = "TestMaterial";
 
@@ -299,7 +299,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        Material::MaterialProperties *p = new Material::MaterialProperties;
+        Material::MaterialBase *p = new Material::MaterialBase;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataSurface->SurfaceWindow(1).EffShBlindEmiss(1) = 0.1;
@@ -355,9 +355,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
     state->dataConstruction->Construct(1).NumHistories = 1;
-    state->dataConstruction->Construct(1).CTFTUserOut(0) = 0.5;
-    state->dataConstruction->Construct(1).CTFTUserIn(0) = 0.25;
-    state->dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
+    state->dataConstruction->Construct(1).CTFTUserOut[0] = 0.5;
+    state->dataConstruction->Construct(1).CTFTUserIn[0] = 0.25;
+    state->dataConstruction->Construct(1).CTFTUserSource[0] = 0.25;
 
     state->dataHeatBalSurf->SurfCurrNumHist(1) = 0;
     state->dataHeatBalSurf->SurfOutsideTempHist(1)(1) = 20.0;
@@ -1917,8 +1917,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
         state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = -1;
     }
     CalcHeatBalanceOutsideSurf(*state);
-    Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness::Smooth, 1.5);
-    Real64 HExt_Expect_Surf2 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness::Smooth, 0.0);
+    Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(Material::SurfaceRoughness::Smooth, 1.5);
+    Real64 HExt_Expect_Surf2 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(Material::SurfaceRoughness::Smooth, 0.0);
     EXPECT_EQ(HExt_Expect_Surf1, state->dataHeatBalSurf->SurfHcExt(1));
     EXPECT_EQ(HExt_Expect_Surf2, state->dataHeatBalSurf->SurfHcExt(2));
 }
@@ -2541,9 +2541,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
     state->dataConstruction->Construct(1).NumHistories = 1;
-    state->dataConstruction->Construct(1).CTFTUserOut(0) = 0.5;
-    state->dataConstruction->Construct(1).CTFTUserIn(0) = 0.25;
-    state->dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
+    state->dataConstruction->Construct(1).CTFTUserOut[0] = 0.5;
+    state->dataConstruction->Construct(1).CTFTUserIn[0] = 0.25;
+    state->dataConstruction->Construct(1).CTFTUserSource[0] = 0.25;
     SurfaceGeometry::AllocateSurfaceArrays(*state);
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
     OutputProcessor::GetReportVariableInput(*state);
@@ -8518,18 +8518,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestUpdateVariableAbsorptanc
     state->dataConstruction->Construct(2).LayerPoint.allocate(1);
     state->dataConstruction->Construct(2).LayerPoint(1) = 2;
     for (int i = 0; i < 2; i++) {
-        Material::MaterialProperties *p = new Material::MaterialProperties;
+        Material::MaterialBase *p = new Material::MaterialChild;
         state->dataMaterial->Material.push_back(p);
     }
-    state->dataMaterial->Material(1)->Name = "WALL_1";
-    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::RegularMaterial;
-    state->dataMaterial->Material(1)->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature;
-    state->dataMaterial->Material(1)->absorpThermalVarFuncIdx = 2;
-    state->dataMaterial->Material(1)->absorpSolarVarFuncIdx = 1;
-    state->dataMaterial->Material(2)->Name = "WALL_2";
-    state->dataMaterial->Material(2)->Group = Material::MaterialGroup::RegularMaterial;
-    state->dataMaterial->Material(2)->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::Scheduled;
-    state->dataMaterial->Material(2)->absorpThermalVarSchedIdx = 1;
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    thisMaterial_1->Name = "WALL_1";
+    thisMaterial_1->group = Material::Group::Regular;
+    thisMaterial_1->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::SurfaceTemperature;
+    thisMaterial_1->absorpThermalVarFuncIdx = 2;
+    thisMaterial_1->absorpSolarVarFuncIdx = 1;
+    auto *thisMaterial_2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
+    thisMaterial_2->Name = "WALL_2";
+    thisMaterial_2->group = Material::Group::Regular;
+    thisMaterial_2->absorpVarCtrlSignal = Material::VariableAbsCtrlSignal::Scheduled;
+    thisMaterial_2->absorpThermalVarSchedIdx = 1;
     state->dataCurveManager->allocateCurveVector(2);
     state->dataHeatBalSurf->SurfTempOut.allocate(2);
     state->dataHeatBalSurf->SurfTempOut(1) = 10;

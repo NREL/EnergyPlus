@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -71,6 +72,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -4121,6 +4123,22 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
+
+    // set storage tank for testing
+    state->dataWaterData->NumWaterStorageTanks = 1;
+    state->dataWaterData->WaterStorage.allocate(state->dataWaterData->NumWaterStorageTanks);
+    Coil.CondensateCollectMode = CondensateCollectAction::ToTank;
+    state->dataWaterData->WaterStorage(1).VdotAvailSupply.allocate(1);
+    state->dataWaterData->WaterStorage(1).TwaterSupply.allocate(1);
+    Coil.CondensateTankID = 1;
+    Coil.CondensateTankSupplyARRID = 1;
+    // calculate condensate vol flow rate
+    Real64 waterDensity = Psychrometrics::RhoH2O((Coil.InletAirTemp + Coil.OutletAirTemp) / 2.0);
+    Real64 results_condenstateVdot = Coil.InletAirMassFlowRate * (Coil.InletAirHumRat - Coil.OutletAirHumRat) / waterDensity;
+    Coil.DXCoilType = "Coil:Cooling:DX:SingleSpeed";
+    ReportDXCoil(*state, DXCoilNum);
+    // check condensate volume flow rate
+    EXPECT_NEAR(results_condenstateVdot, Coil.CondensateVdot, 1.0E-11);
 }
 
 TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
@@ -4330,6 +4348,21 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
+
+    // set storage tank for testing
+    state->dataWaterData->NumWaterStorageTanks = 1;
+    state->dataWaterData->WaterStorage.allocate(state->dataWaterData->NumWaterStorageTanks);
+    Coil.CondensateCollectMode = CondensateCollectAction::ToTank;
+    state->dataWaterData->WaterStorage(1).VdotAvailSupply.allocate(1);
+    state->dataWaterData->WaterStorage(1).TwaterSupply.allocate(1);
+    Coil.CondensateTankID = 1;
+    Coil.CondensateTankSupplyARRID = 1;
+    // calculate condensate vol flow rate
+    Real64 waterDensity = Psychrometrics::RhoH2O((Coil.InletAirTemp + Coil.OutletAirTemp) / 2.0);
+    Real64 results_condenstateVdot = Coil.InletAirMassFlowRate * (Coil.InletAirHumRat - Coil.OutletAirHumRat) / waterDensity;
+    ReportDXCoil(*state, DXCoilNum);
+    // check condensate volume flow rate
+    EXPECT_NEAR(results_condenstateVdot, Coil.CondensateVdot, 1.0E-11);
 }
 
 TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
