@@ -201,7 +201,7 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
     // loop and updates the arrays of data that will later being put
     // into the tabular reports.
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (t_timeStepType != OutputProcessor::TimeStepType::Zone && t_timeStepType != OutputProcessor::TimeStepType::System) {
         ShowFatalError(state, "Invalid reporting requested -- UpdateTabularReports");
@@ -334,7 +334,7 @@ void GetInputTabularMonthly(EnergyPlusData &state)
     Array1D<Real64> NumArray; // numeric data
     int IOStat;               // IO Status when calling get input subroutine
     bool ErrorsFound(false);
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
         ort->WriteTabularFiles = false;
@@ -445,7 +445,7 @@ int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int constexpr SizeAdder(25);
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!allocated(ort->MonthlyInput)) {
         ort->MonthlyInput.allocate(SizeAdder);
@@ -490,7 +490,7 @@ void AddMonthlyFieldSetInput(
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr sizeIncrement(50);
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // INTERFACE BLOCK SPECIFICATIONS:
     // na
@@ -594,7 +594,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     int ColumnsRecount;
     int TablesRecount;
     bool environmentKeyFound;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // if not a running a weather simulation do not create reports
     if (!state.dataGlobal->DoWeathSim) return;
@@ -978,7 +978,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
 
 bool isInvalidAggregationOrder(EnergyPlusData &state)
 {
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     bool foundError = false;
     if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
         return foundError;
@@ -1082,7 +1082,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
 
     Array1D_string objNames;
     Array1D_int objVarIDs;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
         ort->WriteTabularFiles = false;
@@ -1310,7 +1310,7 @@ void GetInputTabularStyle(EnergyPlusData &state)
     Array1D_string AlphArray; // character string data
     Array1D<Real64> NumArray; // numeric data
     int IOStat;               // IO Status when calling get input subroutine
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
     AlphArray.allocate(NumAlphas);
@@ -1504,7 +1504,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
     int jReport;
     bool nameFound;
     bool ErrorsFound;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
         ort->WriteTabularFiles = false;
@@ -2066,7 +2066,7 @@ void InitializePredefinedMonthlyTitles(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int xcount;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     ort->namedMonthly.allocate(numNamedMonthly);
     ort->namedMonthly(1).title = "ZoneCoolingSummaryMonthly";
@@ -2185,7 +2185,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int curReport;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // ----------------------------------------------------------------------------------------
     // If any variable are added to these reports they also need to be added to the
@@ -2869,7 +2869,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     bool fuelFactorUsed;
     bool fFScheduleUsed;
     int ffScheduleIndex;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // set the default factors for source energy - they will be overwritten if the user sets any values
     ort->sourceFactorElectric = 3.167;
@@ -3087,7 +3087,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int iStyle;
     std::string curDel;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // get a new file unit number
     // create a file to hold the results
@@ -3239,7 +3239,7 @@ void CloseOutputTabularFile(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int iStyle;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (ort->WriteTabularFiles) {
         for (iStyle = 1; iStyle <= ort->numStyles; ++iStyle) {
@@ -3306,7 +3306,7 @@ void WriteTableOfContents(EnergyPlusData &state)
     std::string origName;
     std::string curName;
     int indexUnitConv;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // normally do not add to the table of contents here but the order of calls is different for the life-cycle costs
     if (ort->displayLifeCycleCostReport && state.dataEconLifeCycleCost->LCCparamPresent) {
@@ -3516,7 +3516,7 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     int binNum;
     int repIndex;
     OutputProcessor::TimeStepType curStepType;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!state.dataGlobal->DoWeathSim) return;
     elapsedTime = TimeStepSys;
@@ -3644,7 +3644,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
     // profiling showed that they were slow.
 
     if (!state.dataGlobal->DoWeathSim) return;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     assert(state.dataGlobal->TimeStepZoneSec > 0.0);
 
     // create temporary arrays to speed processing of these arrays
@@ -3655,7 +3655,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
         state.dataOutRptTab->MonthlyColumnsAggType.allocate(ort->MonthlyColumns.I());
         state.dataOutRptTab->MonthlyColumnsVarNum.allocate(ort->MonthlyColumns.I());
         for (int i = ort->MonthlyColumns.l(), e = ort->MonthlyColumns.u(); i <= e; ++i) {
-            auto const &col(ort->MonthlyColumns(i));
+            auto const &col = ort->MonthlyColumns(i);
             state.dataOutRptTab->MonthlyColumnsTypeOfVar(i) = col.typeOfVar;
             state.dataOutRptTab->MonthlyColumnsStepType(i) = col.stepType;
             state.dataOutRptTab->MonthlyColumnsAggType(i) = col.aggType;
@@ -3979,7 +3979,7 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
     using DataStringGlobals::CharSpace;
     using DataStringGlobals::CharTab;
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // if no beps report is called then skip
 
@@ -4147,7 +4147,7 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
     int iResource;
     Real64 curMeterValue;
     int curMeterNumber;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // if no beps by source report is called then skip
 
@@ -4270,7 +4270,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     int minuteCalculated;
     int timestepTimeStamp;
     assert(state.dataGlobal->TimeStepZoneSec > 0.0);
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if ((ort->displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
         // loop through all of the resources and end uses for the entire facility
@@ -4344,7 +4344,7 @@ void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepTy
 
     state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
     state.dataHeatBal->SysTotalHVACRejectHeatLoss = 0;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!ort->displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
 
@@ -4398,45 +4398,45 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                                                          state.dataCondenserLoopTowers->towers(iCooler).FanEnergy +
                                                          state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
     }
-    for (auto &thisCooler : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
+    for (auto const &thisCooler : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCooler.Qactual * TimeStepSysSec + thisCooler.FanEnergy;
     }
-    for (auto &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
+    for (auto const &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
     }
 
     // Air- and Evap-cooled chiller
-    auto &ElectricChiller(state.dataPlantChillers->ElectricChiller);
+    auto &ElectricChiller = state.dataPlantChillers->ElectricChiller;
     for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumElectricChillers; ++iChiller) {
         if (ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
         }
     }
-    auto &EngineDrivenChiller(state.dataPlantChillers->EngineDrivenChiller);
+    auto &EngineDrivenChiller = state.dataPlantChillers->EngineDrivenChiller;
     for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumEngineDrivenChillers; ++iChiller) {
         if (EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
         }
     }
-    auto &GTChiller(state.dataPlantChillers->GTChiller);
+    auto &GTChiller = state.dataPlantChillers->GTChiller;
     for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumGTChillers; ++iChiller) {
         if (GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
         }
     }
-    auto &ConstCOPChiller(state.dataPlantChillers->ConstCOPChiller);
+    auto &ConstCOPChiller = state.dataPlantChillers->ConstCOPChiller;
     for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumConstCOPChillers; ++iChiller) {
         if (ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
         }
     }
-    auto &ElectricEIRChiller(state.dataChillerElectricEIR->ElectricEIRChiller);
+    auto &ElectricEIRChiller = state.dataChillerElectricEIR->ElectricEIRChiller;
     for (int iChiller = 1; iChiller <= (int)state.dataChillerElectricEIR->ElectricEIRChiller.size(); ++iChiller) {
         if (ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
         }
     }
-    auto &ElecReformEIRChiller(state.dataChillerReformulatedEIR->ElecReformEIRChiller);
+    auto &ElecReformEIRChiller = state.dataChillerReformulatedEIR->ElecReformEIRChiller;
     for (int iChiller = 1; iChiller <= (int)state.dataChillerReformulatedEIR->ElecReformEIRChiller.size(); ++iChiller) {
         if (ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
@@ -4451,7 +4451,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     }
 
     // DX Coils air to air
-    auto &DXCoil(state.dataDXCoils->DXCoil);
+    auto &DXCoil = state.dataDXCoils->DXCoil;
     for (int iCoil = 1; iCoil <= state.dataDXCoils->NumDXCoils; ++iCoil) {
         if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
             DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
@@ -4475,7 +4475,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
         }
     }
     // VAV coils - air to air
-    auto &VarSpeedCoil(state.dataVariableSpeedCoils->VarSpeedCoil);
+    auto &VarSpeedCoil = state.dataVariableSpeedCoils->VarSpeedCoil;
     for (int iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
         if (VarSpeedCoil(iCoil).VSCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             if (VarSpeedCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
@@ -4503,7 +4503,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     }
 
     // Packaged TES
-    auto &TESCoil(state.dataPackagedThermalStorageCoil->TESCoil);
+    auto &TESCoil = state.dataPackagedThermalStorageCoil->TESCoil;
     for (int iCoil = 1; iCoil <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++iCoil) {
         if (TESCoil(iCoil).CondenserType == PackagedThermalStorageCoil::TESCondenserType::Air) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
@@ -4516,7 +4516,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     }
 
     // Water heater and thermal storage
-    auto &WaterThermalTank(state.dataWaterThermalTanks->WaterThermalTank);
+    auto &WaterThermalTank = state.dataWaterThermalTanks->WaterThermalTank;
     for (int iTank = 1; iTank <= state.dataWaterThermalTanks->numWaterThermalTank; ++iTank) {
         if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::WTTAmbientTemp::OutsideAir) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
@@ -4524,7 +4524,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     }
 
     // Variable Refrigerant Flow
-    auto &VRF(state.dataHVACVarRefFlow->VRF);
+    auto &VRF = state.dataHVACVarRefFlow->VRF;
     for (int iCoil = 1; iCoil <= state.dataHVACVarRefFlow->NumVRFCond; ++iCoil) {
         if (VRF(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
@@ -4631,8 +4631,8 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
 
     using General::EncodeMonDayHrMin;
 
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &ZonePreDefRep(state.dataHeatBal->ZonePreDefRep);
+    auto &Zone = state.dataHeatBal->Zone;
+    auto &ZonePreDefRep = state.dataHeatBal->ZonePreDefRep;
 
     Real64 mult; // zone list and group multipliers
 
@@ -4645,7 +4645,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
 
     if (t_timeStepType == OutputProcessor::TimeStepType::Zone) return; // only add values over the HVAC timestep basis
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (ort->GatherHeatGainReportfirstTime) {
         state.dataOutRptTab->radiantHeat.allocate(state.dataGlobal->NumOfZones);
@@ -5314,7 +5314,7 @@ void WriteTabularReports(EnergyPlusData &state)
     FillWeatherPredefinedEntries(state);
     FillRemainingPredefinedEntries(state);
     WaterManager::ReportRainfall(state);
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
     // when ort->unitsStyle inputs should have been concretely processed and assigned.
@@ -5366,8 +5366,8 @@ void WriteTabularReports(EnergyPlusData &state)
         }
     }
 
-    constexpr static auto variable_fmt{" {}={:12}\n"};
-    constexpr static auto variable_fmt_syntax = check_syntax(variable_fmt);
+    constexpr static std::string_view variable_fmt = " {}={:12}\n";
+    constexpr static auto variable_fmt_syntax = check_syntax(variable_fmt); // (AUTO_OK) not sure what this is
     state.files.audit.ensure_open(state, "WriteTabularReports", state.files.outputControl.audit);
     print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyInputCount", ort->MonthlyInputCount);
     print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeMonthlyInput", ort->sizeMonthlyInput);
@@ -5521,7 +5521,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const degChar("°");
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -5853,7 +5853,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 sposlt = index(lineIn, "of");
                 eposlt = index(lineIn, 'C');
                 sposlt += 2;
-                auto deg_index = index(lineIn, degChar);
+                size_t deg_index = index(lineIn, degChar);
                 if (deg_index != std::string::npos) {
                     eposlt = deg_index - 1;
                 } else {
@@ -5889,7 +5889,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 sposlt = index(lineIn, "of");
                 eposlt = index(lineIn, 'C');
                 sposlt += 2;
-                auto deg_index = index(lineIn, degChar);
+                size_t deg_index = index(lineIn, degChar);
                 if (deg_index != std::string::npos) {
                     eposlt = deg_index - 1;
                 } else {
@@ -5925,7 +5925,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 sposlt = index(lineIn, "of");
                 eposlt = index(lineIn, 'C');
                 sposlt += 2;
-                auto deg_index = index(lineIn, degChar);
+                size_t deg_index = index(lineIn, degChar);
                 if (deg_index != std::string::npos) {
                     eposlt = deg_index - 1;
                 } else {
@@ -5961,7 +5961,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 sposlt = index(lineIn, "of");
                 eposlt = index(lineIn, 'C');
                 sposlt += 2;
-                auto deg_index = index(lineIn, degChar);
+                size_t deg_index = index(lineIn, degChar);
                 if (deg_index != std::string::npos) {
                     eposlt = deg_index - 1;
                 } else {
@@ -6230,7 +6230,7 @@ std::string GetColumnUsingTabs(std::string const &inString, // Input String
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string::size_type startPos = 0;
 
-    auto endPos = inString.find_first_of(tb);
+    size_t endPos = inString.find_first_of(tb);
     if (colNum == 1) {
         if (endPos == std::string::npos) return inString;
         return inString.substr(startPos, endPos - startPos);
@@ -6263,13 +6263,13 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
 
     // Using/Aliasing
     int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-    auto &iNumberOfAutoCalcedFields = state.dataOutput->iNumberOfAutoCalcedFields;
-    auto &iNumberOfAutoSizedFields = state.dataOutput->iNumberOfAutoSizedFields;
-    auto &iNumberOfDefaultedFields = state.dataOutput->iNumberOfDefaultedFields;
-    auto &iNumberOfRecords = state.dataOutput->iNumberOfRecords;
-    auto &iTotalAutoCalculatableFields = state.dataOutput->iTotalAutoCalculatableFields;
-    auto &iTotalAutoSizableFields = state.dataOutput->iTotalAutoSizableFields;
-    auto &iTotalFieldsWithDefaults = state.dataOutput->iTotalFieldsWithDefaults;
+    int iNumberOfAutoCalcedFields = state.dataOutput->iNumberOfAutoCalcedFields;
+    int iNumberOfAutoSizedFields = state.dataOutput->iNumberOfAutoSizedFields;
+    int iNumberOfDefaultedFields = state.dataOutput->iNumberOfDefaultedFields;
+    int iNumberOfRecords = state.dataOutput->iNumberOfRecords;
+    int iTotalAutoCalculatableFields = state.dataOutput->iTotalAutoCalculatableFields;
+    int iTotalAutoSizableFields = state.dataOutput->iTotalAutoSizableFields;
+    int iTotalFieldsWithDefaults = state.dataOutput->iTotalFieldsWithDefaults;
 
     using ScheduleManager::GetScheduleName;
     using ScheduleManager::ScheduleAverageHoursPerWeek;
@@ -6281,10 +6281,10 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     int StartOfWeek;
     Real64 consumptionTotal;
 
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &ZonePreDefRep(state.dataHeatBal->ZonePreDefRep);
+    auto &Zone = state.dataHeatBal->Zone;
+    auto &ZonePreDefRep = state.dataHeatBal->ZonePreDefRep;
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     StartOfWeek = state.dataEnvrn->RunPeriodStartDayOfWeek;
     if (StartOfWeek == 0) StartOfWeek = 2; // if the first day of the week has not been set yet, assume monday
@@ -7266,7 +7266,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
     veryLarge = 1.0E280;
     verySmall = -1.0E280;
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
         UnitsStyle unitsStyle_cur = ort->unitsStyle;
@@ -7662,7 +7662,7 @@ void WriteTimeBinTables(EnergyPlusData &state)
     std::string curNameAndUnits;
     int indexUnitConv;
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
         UnitsStyle unitsStyle_cur = ort->unitsStyle;
@@ -7925,7 +7925,7 @@ void WriteBEPSTable(EnergyPlusData &state)
     int constexpr colPurchHeat(12);
 
     Real64 constexpr SmallValue(1.e-14);
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -9770,7 +9770,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
                                         const bool produceTabular,
                                         const bool produceSQLite)
 {
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     int numCol = 14;
     Array1D_string columnHead;
     Array1D_int columnWidth;
@@ -10023,7 +10023,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
     int iResource;
     Real64 largeConversionFactor;
     Real64 areaConversionFactor;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (ort->displaySourceEnergyEndUseSummary) {
 
@@ -10411,7 +10411,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
     Real64 unconvert;
     std::string subCatName;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (ort->displayDemandEndUse) {
         // show the headers of the report
@@ -10932,7 +10932,7 @@ void WriteCompCostTable(EnergyPlusData &state)
     Real64 IPsingleValue;
     Real64 IPvaluePer;
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!state.dataCostEstimateManager->DoCostEstimate) return;
 
@@ -11292,8 +11292,8 @@ void WriteVeriSumTable(EnergyPlusData &state)
     Array1D<Real64> zoneGlassArea;
     zoneGlassArea.allocate(state.dataGlobal->NumOfZones);
     // zoneGlassArea = 0.0;
-    auto &ort(state.dataOutRptTab);
-    auto &Zone(state.dataHeatBal->Zone);
+    auto &ort = state.dataOutRptTab;
+    auto &Zone = state.dataHeatBal->Zone;
 
     // all arrays are in the format: (row, columnm)
     if (ort->displayTabularVeriSum) {
@@ -12494,7 +12494,7 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
     Array2D_string tableBody;
     int i;
     Array1D_int peopleInd; // Index the relevant people
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // Should deallocate after writing table. - LKL
 
@@ -12657,7 +12657,7 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
 void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const periodIdx)
 {
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     if (ort->WriteTabularFiles) {
 
         Real64 degreeHourConversion;
@@ -13385,7 +13385,7 @@ void WriteHourOfSafetyTable(EnergyPlusData &state,
                             Array1D<std::vector<Real64>> const &ZoneBins,
                             int const dateColIdx)
 {
-    auto &Zone(state.dataHeatBal->Zone);
+    auto &Zone = state.dataHeatBal->Zone;
 
     std::vector<Real64> columnMax(columnNum, 0);
     std::vector<Real64> columnMin(columnNum, 0);
@@ -13426,7 +13426,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
 {
 
     // Using/Aliasing
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (state.dataGlobal->NumOfZones <= 0) return;
 
@@ -13650,7 +13650,7 @@ void WriteCO2ResilienceTables(EnergyPlusData &state)
 
 void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx)
 {
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     if (ort->WriteTabularFiles) return;
     WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
     std::string periodTitle = state.dataWeatherManager->CO2ReportPeriodInput(periodIdx).title;
@@ -13751,7 +13751,7 @@ void WriteVisualResilienceTables(EnergyPlusData &state)
 
 void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx)
 {
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     if (!ort->WriteTabularFiles) return;
     WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
     std::string periodTitle = state.dataWeatherManager->VisualReportPeriodInput(periodIdx).title;
@@ -13818,7 +13818,7 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
     Array1D_int columnWidth;
     Array1D_string rowHead;
     Array2D_string tableBody;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (state.dataOutRptTab->displayHeatEmissionsSummary) {
 
@@ -13949,7 +13949,7 @@ void WritePredefinedTables(EnergyPlusData &state)
     int columnUnitConv;
     std::string repTableTag;
     Real64 IPvalue;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
         UnitsStyle unitsStyle_cur = ort->unitsStyle;
@@ -14188,7 +14188,7 @@ void WriteComponentSizing(EnergyPlusData &state)
     int loopLimit;
     int iTableEntry;
     int jUnique;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (ort->displayComponentSizing) {
         WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
@@ -14435,7 +14435,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
     int numreceivingfields;
     int HTS;
     int NGSS;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // displaySurfaceShadowing = false  for debugging
     if (ort->displaySurfaceShadowing) {
@@ -14477,7 +14477,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
                 if (state.dataOutRptPredefined->ShadowRelate(iShadRel).recKind == iKindRec) {
                     curRecSurf = state.dataOutRptPredefined->ShadowRelate(iShadRel).recSurf;
                     std::string const &name(state.dataSurface->Surface(state.dataOutRptPredefined->ShadowRelate(iShadRel).castSurf).Name);
-                    auto &elem(shadow_map[curRecSurf]);            // Creates the entry if not present (and zero-initializes the int in the pair)
+                    auto &elem = shadow_map[curRecSurf];            // Creates the entry if not present (and zero-initializes the int in the pair)
                     elem.first += static_cast<int>(name.length()); // Accumulate total of name lengths
                     elem.second.push_back(&name);                  // Add this name
                 }
@@ -14557,7 +14557,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
 void WriteEioTables(EnergyPlusData &state)
 {
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (ort->displayEioSummary) {
 
@@ -14591,14 +14591,14 @@ void WriteEioTables(EnergyPlusData &state)
             if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             // now go through each header and create a report for each one
-            for (auto headerLine : headerLines) {
+            for (std::string const &headerLine : headerLines) {
                 std::vector<std::string> headerFields = splitCommaString(headerLine);
                 std::string tableNameWithSigns = headerFields.at(0);
                 std::string tableName =
                     tableNameWithSigns.substr(3, tableNameWithSigns.size() - 4); // get rid of the '! <' from the beginning and the '>' from the end
                 // first count the number of matching lines
                 int countOfMatchingLines = 0;
-                for (auto bodyLine : bodyLines) {
+                for (std::string const &bodyLine : bodyLines) {
                     if (bodyLine.size() > tableName.size()) {
                         if (bodyLine.substr(0, tableName.size() + 1) ==
                             tableName + ",") { // this needs to match the test used to populate the body of table below
@@ -14628,7 +14628,7 @@ void WriteEioTables(EnergyPlusData &state)
                     }
                     // look for data lines
                     int rowNum = 0;
-                    for (auto bodyLine : bodyLines) {
+                    for (std::string const &bodyLine : bodyLines) {
                         if (bodyLine.size() > tableName.size()) {
                             if (bodyLine.substr(0, tableName.size() + 1) ==
                                 tableName + ",") { // this needs to match the test used in the original counting
@@ -14691,7 +14691,7 @@ void WriteEioTables(EnergyPlusData &state)
 // Glazer Nov 2016
 int unitsFromHeading(EnergyPlusData &state, std::string &heading)
 {
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     std::string curHeading = "";
     int unitConv = 0;
@@ -14711,8 +14711,6 @@ int unitsFromHeading(EnergyPlusData &state, std::string &heading)
 // Glazer Nov 2016
 int unitsFromHeading(EnergyPlusData &state, std::string &heading, UnitsStyle unitsStyle_para)
 {
-    // auto &ort(state.dataOutRptTab);
-
     std::string curHeading = "";
     int unitConv = 0;
     if (unitsStyle_para == UnitsStyle::InchPound) {
@@ -14755,7 +14753,7 @@ void AddTOCLoadComponentTableSummaries(EnergyPlusData &state)
     //   Call the AddTOCEntry routine for each zone.
 
     int iZone;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (state.dataGlobal->CompLoadReportIsReq) {
         if (ort->displayZoneComponentLoadSummary) {
@@ -14787,7 +14785,7 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
     //   Allocate the arrays related to the load component report
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (ort->AllocateLoadComponentArraysDoAllocate) {
         // For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
@@ -14944,7 +14942,7 @@ void DeallocateLoadComponentArrays(EnergyPlusData &state)
     //   be needed in the reporting.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     ort->radiantPulseTimestep.deallocate();
     ort->radiantPulseReceived.deallocate();
     ort->loadConvectedWithPulse.deallocate();
@@ -14969,8 +14967,8 @@ void ComputeLoadComponentDecayCurve(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int i;
     Real64 diff;
-    auto &ort(state.dataOutRptTab);
-    auto &Zone(state.dataHeatBal->Zone);
+    auto &ort = state.dataOutRptTab;
+    auto &Zone = state.dataHeatBal->Zone;
 
     for (state.dataOutRptTab->SurfNumCLCDC = 1; state.dataOutRptTab->SurfNumCLCDC <= state.dataSurface->TotSurfaces;
          ++state.dataOutRptTab->SurfNumCLCDC) {
@@ -15096,7 +15094,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
     //   Save sequence of values for report during sizing.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
         state.dataOutRptTab->TimeStepInDayGCLS =
@@ -15143,7 +15141,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
         state.dataOutRptTab->TimeStepInDayGCLH =
@@ -15269,11 +15267,11 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
 
     int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
-    auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &ort(state.dataOutRptTab);
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &CalcFinalFacilitySizing(state.dataSize->CalcFinalFacilitySizing);
+    auto &SysSizPeakDDNum = state.dataSize->SysSizPeakDDNum;
+    auto &FinalSysSizing = state.dataSize->FinalSysSizing;
+    auto &ort = state.dataOutRptTab;
+    auto &Zone = state.dataHeatBal->Zone;
+    auto &CalcFinalFacilitySizing = state.dataSize->CalcFinalFacilitySizing;
 
     if (!((ort->displayZoneComponentLoadSummary || ort->displayAirLoopComponentLoadSummary || ort->displayFacilityComponentLoadSummary) &&
           state.dataGlobal->CompLoadReportIsReq))
@@ -15934,7 +15932,7 @@ void GetDelaySequences(EnergyPlusData &state,
 {
 
     // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!ort->initAdjFenDone) {
         state.dataOutRptTab->adjFenDone.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
@@ -16481,7 +16479,7 @@ void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType
         areas(iZone).floor = state.dataHeatBal->Zone(iZone).FloorArea;
     }
 
-    for (auto curSurface : state.dataSurface->Surface) {
+    for (auto const &curSurface : state.dataSurface->Surface) {
         if (!curSurface.HeatTransSurf) continue;
         bool isExterior = curSurface.ExtBoundCond == ExternalEnvironment || curSurface.ExtBoundCond == OtherSideCondModeledExt;
         bool isTouchingGround =
@@ -16682,7 +16680,7 @@ void ComputePeakDifference(CompLoadTablesType &compLoad)
 // apply unit conversions to the load components summary tables
 void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal)
 {
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (ort->unitsStyle == UnitsStyle::InchPound) {
         Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
@@ -16741,8 +16739,6 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 // apply unit conversions to the load components summary tables
 void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, UnitsStyle unitsStyle_para)
 {
-    // auto &ort(state.dataOutRptTab);
-
     if (unitsStyle_para == UnitsStyle::InchPound) {
         Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
         Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
@@ -16828,7 +16824,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
     std::string reportName;
     std::string zoneAirLoopFacilityName;
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (kind == OutputType::Zone && ort->displayZoneComponentLoadSummary) {
         reportName = "Zone Component Load Summary";
@@ -17154,12 +17150,12 @@ void WriteReportHeaders(EnergyPlusData &state,
     //   file for tabular reports.
 
     std::string const modifiedReportName(reportName + (averageOrSum == OutputProcessor::StoreType::Summed ? " per second" : ""));
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     for (int iStyle = 1; iStyle <= ort->numStyles; ++iStyle) {
         std::ostream &tbl_stream(*ort->TabularOutputFile(iStyle));
         std::string const &curDel(ort->del(iStyle));
-        auto const style(ort->TableStyle(iStyle));
+        TableStyle const style = ort->TableStyle(iStyle);
         if ((style == TableStyle::Comma) || (style == TableStyle::Tab)) {
             tbl_stream << "----------------------------------------------------------------------------------------------------\n";
             tbl_stream << "REPORT:" << curDel << modifiedReportName << '\n';
@@ -17219,10 +17215,10 @@ void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int iStyle;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     for (iStyle = 1; iStyle <= ort->numStyles; ++iStyle) {
-        auto const style(ort->TableStyle(iStyle));
+        TableStyle const style = ort->TableStyle(iStyle);
         if ((style == TableStyle::Comma) || (style == TableStyle::Tab) || (style == TableStyle::Fixed)) {
             std::ostream &tbl_stream(*ort->TabularOutputFile(iStyle));
             tbl_stream << subtitle << "\n\n";
@@ -17263,7 +17259,7 @@ void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, ObjexxF
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int iStyle;
     bool useBold;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (present(isBold)) {
         useBold = isBold;
@@ -17272,7 +17268,7 @@ void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, ObjexxF
     }
 
     for (iStyle = 1; iStyle <= ort->numStyles; ++iStyle) {
-        auto const style(ort->TableStyle(iStyle));
+        TableStyle const style = ort->TableStyle(iStyle);
         if ((style == TableStyle::Comma) || (style == TableStyle::Tab) || (style == TableStyle::Fixed)) {
             std::ostream &tbl_stream(*ort->TabularOutputFile(iStyle));
             tbl_stream << lineOfText << '\n';
@@ -17366,7 +17362,7 @@ void WriteTable(EnergyPlusData &state,
     std::string::size_type col1start;
     bool isTableBlank;
     bool isRecordBlank;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // create blank string
     spaces = blank; // REPEAT(' ',1000)
@@ -17446,7 +17442,7 @@ void WriteTable(EnergyPlusData &state,
         }
 
         // output depending on style of format
-        auto const style(ort->TableStyle(iStyle));
+        TableStyle const style = ort->TableStyle(iStyle);
         if ((style == TableStyle::Comma) || (style == TableStyle::Tab)) {
             // column headers
             for (jRow = 1; jRow <= maxNumColLabelRows; ++jRow) {
@@ -17712,13 +17708,13 @@ std::string MakeAnchorName(std::string const &reportString, std::string const &o
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    for (auto const i : reportString) {
+    for (char const i : reportString) {
         if (has(validChars, i)) {
             StringOut += i;
         }
     }
     StringOut += "::";
-    for (auto const i : objectString) {
+    for (char const i : objectString) {
         if (has(validChars, i)) {
             StringOut += i;
         }
@@ -17881,9 +17877,9 @@ std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input S
     if (inString.empty()) return "";
 
     std::string s;
-    auto const inputSize = inString.size();
+    size_t const inputSize = inString.size();
     s.reserve(inputSize);
-    size_t index(0);
+    size_t index = 0;
     char c;
 
     while (true) {
@@ -17932,7 +17928,7 @@ std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input S
                     codePoint = std::stoul(inString.substr(index, 2), nullptr, 16);
                     index += 2;
                 }
-                auto const unicodeString = ConvertUnicodeToUTF8(codePoint);
+                std::string const unicodeString = ConvertUnicodeToUTF8(codePoint);
                 if (unicodeString == "\xC2\xB0") { // only check for degree at this point
                     s += "&deg;";
                 } else {
@@ -17984,8 +17980,8 @@ void DetermineBuildingFloorArea(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 curZoneArea;
     int iZone;
-    auto &ort(state.dataOutRptTab);
-    auto &Zone(state.dataHeatBal->Zone);
+    auto &ort = state.dataOutRptTab;
+    auto &Zone = state.dataHeatBal->Zone;
 
     ort->buildingGrossFloorArea = 0.0;
     ort->buildingConditionedFloorArea = 0.0;
@@ -18069,7 +18065,7 @@ void ResetMonthlyGathering(EnergyPlusData &state)
     int kColumn;
     int curTable;
     int curCol;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     for (iInput = 1; iInput <= ort->MonthlyInputCount; ++iInput) {
         for (jTable = 1; jTable <= ort->MonthlyInput(iInput).numTables; ++jTable) {
@@ -18098,7 +18094,7 @@ void ResetBinGathering(EnergyPlusData &state)
     // Reset all timebins gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
     Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     // clear the binning arrays to zeros
     for (auto &e : ort->BinResults) {
@@ -18129,7 +18125,7 @@ void ResetBEPSGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all ABUPS gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     ort->gatherTotalsBEPS = 0.0;
     ort->gatherEndUseBEPS = 0.0;
     ort->gatherEndUseSubBEPS = 0.0;
@@ -18162,7 +18158,7 @@ void ResetSourceEnergyEndUseGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all source energy end use table gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     ort->gatherTotalsBySourceBEPS = 0.0;
     ort->gatherEndUseBySourceBEPS = 0.0;
 }
@@ -18172,7 +18168,7 @@ void ResetPeakDemandGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all demand end use components table gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     ort->gatherDemandTotal = 0.0;
     ort->gatherDemandTimeStamp = 0;
     ort->gatherDemandEndUse = 0.0;
@@ -18186,7 +18182,7 @@ void ResetHeatGainGathering(EnergyPlusData &state)
     // so that only last year is reported in tabular reports
     int iZone;
 
-    auto &ZonePreDefRep(state.dataHeatBal->ZonePreDefRep);
+    auto &ZonePreDefRep = state.dataHeatBal->ZonePreDefRep;
     for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
         ZonePreDefRep(iZone).SHGSAnPeoplAdd = 0.;
         ZonePreDefRep(iZone).SHGSAnLiteAdd = 0.;
@@ -18300,8 +18296,8 @@ void ResetRemainingPredefinedEntries(EnergyPlusData &state)
     Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
     int iLight;
     int iZone;
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &ZonePreDefRep(state.dataHeatBal->ZonePreDefRep);
+    auto &Zone = state.dataHeatBal->Zone;
+    auto &ZonePreDefRep = state.dataHeatBal->ZonePreDefRep;
 
     for (iLight = 1; iLight <= state.dataHeatBal->TotLights; ++iLight) {
         state.dataHeatBal->Lights(iLight).SumTimeNotZeroCons = 0.;
@@ -18336,7 +18332,7 @@ void ResetAdaptiveComfort(EnergyPlusData &state)
     // Reset accumulation variable for adaptive comfort report to zero for multi-year simulations
     // so that only last year is reported in tabular reports
     int i;
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
     if (ort->displayAdaptiveComfort && state.dataHeatBal->TotPeople > 0) {
         for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
             if (state.dataHeatBal->People(i).AdaptiveASH55) {
@@ -18552,13 +18548,13 @@ Real64 StrToReal(std::string_view stringIn)
     // PURPOSE OF THIS SUBROUTINE:
     //   Abstract away the internal read concept
 
-    auto first_char = stringIn.find_first_not_of(' ');
+    size_t first_char = stringIn.find_first_not_of(' ');
     if (first_char != std::string_view::npos) {
         stringIn.remove_prefix(first_char);
     }
 
     Real64 realValue = -99999.0;
-    auto answer = fast_float::from_chars(stringIn.data(), stringIn.data() + stringIn.size(), realValue);
+    auto answer = fast_float::from_chars(stringIn.data(), stringIn.data() + stringIn.size(), realValue); // (AUTO_OK_OBJ)
     if (answer.ec != std::errc()) {
         return -99999.0;
     }
@@ -18666,7 +18662,7 @@ void AddTOCEntry(EnergyPlusData &state, std::string const &nameSection, std::str
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     //    na
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (!allocated(ort->TOCEntries)) {
         ort->TOCEntriesSize = 20;
@@ -18716,7 +18712,7 @@ void SetupUnitConversions(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     //    na
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     ort->UnitConvSize = 118;
     ort->UnitConv.allocate(ort->UnitConvSize);
@@ -19220,7 +19216,7 @@ void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int 
     int constexpr misBrce(3);
     int constexpr misNoHint(4);
     std::string const stringInUpper(UtilityRoutines::MakeUPPERCase(stringInWithSI));
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     stringOutWithIP = "";
     // check if string has brackets or parentheses
@@ -19373,7 +19369,7 @@ Real64 ConvertIP(EnergyPlusData &state, int const unitConvIndex, Real64 const SI
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     //    na
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (unitConvIndex == 0 || SIvalue == -999.0 || SIvalue == -99999.0) { // don't convert unknown data to IP
         ConvertIP = SIvalue;
@@ -19425,7 +19421,7 @@ Real64 ConvertIPdelta(EnergyPlusData &state, int const unitConvIndex, Real64 con
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     //    na
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if (unitConvIndex == 0) {
         ConvertIPdelta = SIvalue;
@@ -19475,7 +19471,7 @@ void GetUnitConversion(EnergyPlusData &state, int const unitConvIndex, Real64 &m
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     //    na
 
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     if ((unitConvIndex > 0) && (unitConvIndex <= ort->UnitConvSize)) {
         multiplier = ort->UnitConv(unitConvIndex).mult;
@@ -19530,7 +19526,7 @@ Real64 getSpecificUnitMultiplier(EnergyPlusData &state, std::string const &SIuni
     //    na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     for (state.dataOutRptTab->iUnitGsum = 1; state.dataOutRptTab->iUnitGsum <= ort->UnitConvSize; ++state.dataOutRptTab->iUnitGsum) {
         if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsum).siName, SIunit)) {
@@ -19644,7 +19640,7 @@ Real64 getSpecificUnitIndex(EnergyPlusData &state, std::string const &SIunit, st
     //    na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &ort(state.dataOutRptTab);
+    auto &ort = state.dataOutRptTab;
 
     for (state.dataOutRptTab->iUnitGsui = 1; state.dataOutRptTab->iUnitGsui <= ort->UnitConvSize; ++state.dataOutRptTab->iUnitGsui) {
         if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsui).siName, SIunit)) {
