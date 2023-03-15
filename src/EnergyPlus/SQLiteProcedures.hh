@@ -120,7 +120,7 @@ public:
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, Material::MaterialProperties const *materialData);
+    void addMaterialData(int const number, Material::MaterialBase const *materialData);
     void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
@@ -562,8 +562,8 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 EnergyPlus::Material::MaterialProperties const *materialData)
-            : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->Group),
+                 EnergyPlus::Material::MaterialChild const *materialData)
+            : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->group),
               roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
               isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance),
               rOnly(materialData->ROnly), specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef),
@@ -576,8 +576,8 @@ private:
     private:
         int const number;
         std::string const &name;
-        EnergyPlus::Material::MaterialGroup const &group;
-        DataSurfaces::SurfaceRoughness const &roughness;
+        EnergyPlus::Material::Group const &group;
+        EnergyPlus::Material::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -628,7 +628,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        DataSurfaces::SurfaceRoughness const &outsideRoughness;
+        EnergyPlus::Material::SurfaceRoughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 

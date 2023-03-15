@@ -110,29 +110,32 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     for (int i = 0; i < 3; i++) {
-        Material::MaterialProperties *p = new Material::MaterialProperties;
+        Material::MaterialBase *p = new Material::MaterialChild;
         state->dataMaterial->Material.push_back(p);
     }
-    state->dataMaterial->Material(1)->Name = "WALL_1";
-    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::RegularMaterial;
-    state->dataMaterial->Material(2)->Name = "WALL_2";
-    state->dataMaterial->Material(2)->Group = Material::MaterialGroup::RegularMaterial;
-    state->dataMaterial->Material(3)->Name = "WALL_3";
-    state->dataMaterial->Material(3)->Group = Material::MaterialGroup::RegularMaterial;
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    thisMaterial_1->Name = "WALL_1";
+    thisMaterial_1->group = Material::Group::Regular;
+    auto *thisMaterial_2 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(2));
+    thisMaterial_2->Name = "WALL_2";
+    thisMaterial_2->group = Material::Group::Regular;
+    auto *thisMaterial_3 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(3));
+    thisMaterial_3->Name = "WALL_3";
+    thisMaterial_3->group = Material::Group::Regular;
     state->dataCurveManager->allocateCurveVector(2);
     state->dataCurveManager->PerfCurve(1)->Name = "THERMAL_ABSORPTANCE_TABLE";
     state->dataCurveManager->PerfCurve(2)->Name = "SOLAR_ABSORPTANCE_CURVE";
     state->dataCurveManager->GetCurvesInputFlag = false;
     bool errors_found(false);
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1)->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceTemperature));
-    EXPECT_EQ(state->dataMaterial->Material(1)->absorpThermalVarFuncIdx, 1);
-    EXPECT_EQ(state->dataMaterial->Material(1)->absorpSolarVarFuncIdx, 2);
-    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(2)->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation));
-    EXPECT_EQ(state->dataMaterial->Material(2)->absorpSolarVarFuncIdx, 2);
-    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(3)->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled));
-    EXPECT_EQ(state->dataMaterial->Material(3)->absorpThermalVarSchedIdx, 1);
-    EXPECT_EQ(state->dataMaterial->Material(3)->absorpSolarVarSchedIdx, 1);
+    EXPECT_TRUE(compare_enums(thisMaterial_1->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceTemperature));
+    EXPECT_EQ(thisMaterial_1->absorpThermalVarFuncIdx, 1);
+    EXPECT_EQ(thisMaterial_1->absorpSolarVarFuncIdx, 2);
+    EXPECT_TRUE(compare_enums(thisMaterial_2->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation));
+    EXPECT_EQ(thisMaterial_2->absorpSolarVarFuncIdx, 2);
+    EXPECT_TRUE(compare_enums(thisMaterial_3->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled));
+    EXPECT_EQ(thisMaterial_3->absorpThermalVarSchedIdx, 1);
+    EXPECT_EQ(thisMaterial_3->absorpSolarVarSchedIdx, 1);
 
     std::string idf_objects_bad_inputs = delimited_string({
         "MaterialProperty:VariableAbsorptance,",
@@ -236,7 +239,7 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
         ";                        !- Solar Absorptance Schedule Name",
     });
     ASSERT_TRUE(process_idf(idf_objects_bad_inputs));
-    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::WindowGlass;
+    thisMaterial_1->group = Material::Group::WindowGlass;
     Material::GetVariableAbsorptanceInput(*state, errors_found);
     compare_err_stream(
         "   ** Severe  ** MaterialProperty:VariableAbsorptance: Reference Material is not appropriate type for Thermal/Solar Absorptance properties, "
