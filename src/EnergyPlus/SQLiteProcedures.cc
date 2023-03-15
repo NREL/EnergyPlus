@@ -101,7 +101,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
             int numNumbers;
             int status;
 
-            auto &sql_ort(state.dataOutRptTab);
+            auto &sql_ort = state.dataOutRptTab;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
             if (numAlphas > 0) {
