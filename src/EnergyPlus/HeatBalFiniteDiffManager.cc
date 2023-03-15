@@ -431,7 +431,6 @@ namespace HeatBalFiniteDiffManager {
         // This subroutine sets the initial values for the FD moisture calculation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &MyEnvrnFlag = state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag;
         int SurfNum;
         int ConstrNum; // Loop counter
         bool ErrorsFound;
@@ -446,7 +445,7 @@ namespace HeatBalFiniteDiffManager {
         ErrorsFound = false;
 
         // now do begin environment inits.
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag) {
             for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
                 if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
@@ -491,10 +490,10 @@ namespace HeatBalFiniteDiffManager {
                 state.dataMstBal->HAirFD(SurfNum) = 0.0;
             }
             state.dataHeatBalFiniteDiffMgr->WarmupSurfTemp = 0;
-            MyEnvrnFlag = false;
+            state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag = true;
         }
 
         // now do every timestep inits
