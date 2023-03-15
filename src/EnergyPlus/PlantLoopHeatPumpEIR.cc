@@ -254,11 +254,10 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     Real64 currentLoadConsolidated = currentLoad;
     this->oriLoopLoad = currentLoad;
-    if (this->validConcurrentRunFlag) {
+    if (this->validConcurrentRunFlag && this->consolidateLoadsFlag == true) {
         currentLoadConsolidated = abs(this->oriLoopLoad) > abs(this->companionHeatPumpCoil->oriLoopLoad)
                                       ? this->oriLoopLoad
                                       : (-1.0) * this->companionHeatPumpCoil->oriLoopLoad;
-        this->consolidateLoadsFlag = false; // this may not be needed
     }
 
     // get setpoint on the load side outlet
@@ -1114,19 +1113,24 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
             int thisSourceSideLoopNum = thisPLHP.sourceSidePlantLoc.loopNum;
             int compSourceSideLoopNum = thisPLHP.companionHeatPumpCoil->sourceSidePlantLoc.loopNum;
 
-            // Assuming this is the only concurrent scenarios allowed
+            // Assuming this is the only concurrent scenarios that needs consolidate loads
             if (thisLoadSideLoopNum == compSourceSideLoopNum && thisSourceSideLoopNum == compLoadSideLoopNum) {
                 // here check the load and reset the loads here based on the bigger of the loads
                 // or set the flag here and let the doPysics code to process this situation
                 thisPLHP.validConcurrentRunFlag = true;
                 thisPLHP.consolidateLoadsFlag = true;
                 continue;
-            } else {
+            } else if (thisLoadSideLoopNum == compLoadSideLoopNum) {
+                thisPLHP.validConcurrentRunFlag = false;
+                thisPLHP.consolidateLoadsFlag = false;
                 ShowRecurringWarningErrorAtEnd(
                     state,
                     "Companion heat pump objects running concurrently in an invalid configuration, check operation.  Base object name: " +
                         thisPLHP.name,
                     thisPLHP.recurringConcurrentOperationWarningIndex);
+            } else {
+                thisPLHP.validConcurrentRunFlag = true;
+                thisPLHP.consolidateLoadsFlag = false;
             }
         }
     }
