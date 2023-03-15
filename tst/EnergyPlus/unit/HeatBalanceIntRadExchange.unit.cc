@@ -393,7 +393,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     int SurfNum;
 
     state->dataConstruction->Construct.allocate(1);
-    Material::MaterialProperties *mat = new Material::MaterialProperties;
+    Material::MaterialBase *mat = new Material::MaterialChild;
     state->dataMaterial->Material.push_back(mat);
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->SurfMaterialMovInsulInt.allocate(1);
@@ -408,9 +408,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     state->dataSurface->SurfMaterialMovInsulInt(1) = 1;
 
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
-    state->dataMaterial->Material(1)->AbsorpThermal = 0.5;
-    state->dataMaterial->Material(1)->Resistance = 1.25;
-    state->dataMaterial->Material(1)->AbsorpSolar = 0.25;
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    thisMaterial_1->AbsorpThermal = 0.5;
+    thisMaterial_1->Resistance = 1.25;
+    thisMaterial_1->AbsorpSolar = 0.25;
 
     // Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
     //         This should result in a true value from the algorithm which will cause interior radiant exchange matrices to be recalculated
@@ -425,7 +426,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     // Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
     // 		   construction are the same so nothing has actually changed.  This should result in a false value.
     state->dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(1) = true;
-    state->dataMaterial->Material(1)->AbsorpThermal = state->dataConstruction->Construct(1).InsideAbsorpThermal;
+    thisMaterial_1->AbsorpThermal = state->dataConstruction->Construct(1).InsideAbsorpThermal;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(*state, DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);
 }

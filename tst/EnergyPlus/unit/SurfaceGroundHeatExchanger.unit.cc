@@ -45,86 +45,33 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MoistureBalanceEMPDManager_hh_INCLUDED
-#define MoistureBalanceEMPDManager_hh_INCLUDED
+// EnergyPlus::SurfaceGroundHeatExchanger Unit Tests
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Material.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
 
-namespace EnergyPlus {
+using namespace EnergyPlus;
 
-// Forward declarations
-struct EnergyPlusData;
-
-namespace MoistureBalanceEMPDManager {
-
-    struct EMPDReportVarsData
-    {
-        Real64 rv_surface;
-        Real64 RH_surface_layer;
-        Real64 RH_deep_layer;
-        Real64 w_surface_layer;
-        Real64 w_deep_layer;
-        Real64 mass_flux_zone;
-        Real64 mass_flux_deep;
-        Real64 u_surface_layer;
-        Real64 u_deep_layer;
-
-        // Default constructor
-        EMPDReportVarsData()
-            : rv_surface(0.015), RH_surface_layer(0.0), RH_deep_layer(0.0), w_surface_layer(0.015), w_deep_layer(0.015), mass_flux_zone(0.0),
-              mass_flux_deep(0.0), u_surface_layer(0.0), u_deep_layer(0.0)
-        {
-        }
-    };
-
-    // Functions
-    Real64 CalcDepthFromPeriod(EnergyPlusData &state,
-                               Real64 period,                    // in seconds
-                               Material::MaterialBase const *mat // material
-    );
-
-    void GetMoistureBalanceEMPDInput(EnergyPlusData &state);
-
-    void InitMoistureBalanceEMPD(EnergyPlusData &state);
-
-    void CalcMoistureBalanceEMPD(EnergyPlusData &state,
-                                 int SurfNum,
-                                 Real64 SurfTempIn, // INSIDE SURFACE TEMPERATURE at current time step
-                                 Real64 TempZone,   // Zone temperature at current time step.
-                                 Real64 &TempSat    // Saturated surface temperature.
-    );
-
-    void UpdateMoistureBalanceEMPD(EnergyPlusData &state, int SurfNum); // Surface number
-
-    void ReportMoistureBalanceEMPD(EnergyPlusData &state);
-
-} // namespace MoistureBalanceEMPDManager
-
-struct MoistureBalanceEMPDManagerData : BaseGlobalStruct
+TEST_F(EnergyPlusFixture, test_eoshiftArrayPos)
 {
-
-    // Array of structs that hold the empd report vars data, one for each surface.
-    EPVector<MoistureBalanceEMPDManager::EMPDReportVarsData> EMPDReportVars;
-    bool InitEnvrnFlag = true;
-    int ErrCount = 0;
-    bool OneTimeFlag = true;
-
-    void clear_state() override
-    {
-        this->EMPDReportVars.deallocate();
-        this->InitEnvrnFlag = true;
-        this->ErrCount = 0;
-        this->OneTimeFlag = true;
+    const std::array<Real64, 19> A({1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0});
+    std::array<Real64, 19> B = SurfaceGroundHeatExchanger::eoshiftArray(A, 2, 0.0);
+    std::array<Real64, 19> target = {3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 0.0, 0.0};
+    for (size_t i = 0; i < B.size(); i++) {
+        EXPECT_EQ(B[i], target[i]);
     }
-};
+}
 
-} // namespace EnergyPlus
-
-#endif
+TEST_F(EnergyPlusFixture, test_eoshiftArrayNeg)
+{
+    const std::array<Real64, 19> A({1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0});
+    std::array<Real64, 19> B = SurfaceGroundHeatExchanger::eoshiftArray(A, -1, 0.0);
+    std::array<Real64, 19> target = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0};
+    for (size_t i = 0; i < B.size(); i++) {
+        EXPECT_EQ(B[i], target[i]);
+    }
+}

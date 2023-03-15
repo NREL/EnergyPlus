@@ -148,17 +148,17 @@ namespace EcoRoofManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
 
-        Real64 AbsThermSurf;                      // Thermal absoptance of the exterior surface
-        DataSurfaces::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
-        Real64 HMovInsul;                         // "Convection" coefficient of movable insulation
-        Real64 Tgk;                               // Ground temperature in Kelvin
-        Real64 Ta;                                // current air temperature
-        Real64 Ws;                                // Wind Speed (m/s)
-        Real64 Waf;                               // Windspeed within canopy (m/s)
-        Real64 Latm;                              // Long Wave Radiation (W/m^2)
-        Real64 qaf;                               // mixing ratio of air near canopy
-        Real64 qg;                                // mixing ratio of air at surface.
-        Real64 RS;                                // shortwave radiation
+        Real64 AbsThermSurf;                  // Thermal absoptance of the exterior surface
+        Material::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
+        Real64 HMovInsul;                     // "Convection" coefficient of movable insulation
+        Real64 Tgk;                           // Ground temperature in Kelvin
+        Real64 Ta;                            // current air temperature
+        Real64 Ws;                            // Wind Speed (m/s)
+        Real64 Waf;                           // Windspeed within canopy (m/s)
+        Real64 Latm;                          // Long Wave Radiation (W/m^2)
+        Real64 qaf;                           // mixing ratio of air near canopy
+        Real64 qg;                            // mixing ratio of air at surface.
+        Real64 RS;                            // shortwave radiation
         Real64 EpsilonOne;
         Real64 eair;
         Real64 Rhoa;
@@ -223,7 +223,8 @@ namespace EcoRoofManager {
         }
 
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-        auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)));
+        assert(thisMaterial != nullptr);
         RoughSurf = thisMaterial->Roughness;
         AbsThermSurf = thisMaterial->AbsorpThermal;
         HMovInsul = 0.0;
@@ -271,23 +272,23 @@ namespace EcoRoofManager {
             state.dataEcoRoofMgr->Tg = state.dataEcoRoofMgr->Tgold;
             state.dataEcoRoofMgr->Tf = state.dataEcoRoofMgr->Tfold;
 
-            if (thisConstruct.CTFCross(0) > 0.01) {
+            if (thisConstruct.CTFCross[0] > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
-                F1temp = thisConstruct.CTFCross(0) / (thisConstruct.CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
+                F1temp = thisConstruct.CTFCross[0] / (thisConstruct.CTFInside[0] + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
                 Qsoilpart1 =
                     -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
                     F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                               state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
-                              state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
+                              state.dataConstruction->Construct(ConstrNum).CTFSourceIn[0] * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
                               state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
                               state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
                 Qsoilpart1 =
-                    -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + thisConstruct.CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                    -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + thisConstruct.CTFCross[0] * state.dataHeatBalSurf->SurfTempIn(SurfNum);
                 F1temp = 0.0;
             }
 
-            Qsoilpart2 = thisConstruct.CTFOutside(0) - F1temp * thisConstruct.CTFCross(0);
+            Qsoilpart2 = thisConstruct.CTFOutside[0] - F1temp * thisConstruct.CTFCross[0];
 
             state.dataEcoRoofMgr->Pa = state.dataEnvrn->StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
             Tgk = state.dataEcoRoofMgr->Tg + DataGlobalConstants::KelvinConv;
@@ -413,19 +414,9 @@ namespace EcoRoofManager {
                 Gammah = std::pow(1.0 - 5.0 * Rib, -0.5);
             }
 
-            if (RoughSurf == DataSurfaces::SurfaceRoughness::VerySmooth) {
-                state.dataEcoRoofMgr->Zog = 0.0008;
-            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::Smooth) {
-                state.dataEcoRoofMgr->Zog = 0.0010;
-            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::MediumSmooth) {
-                state.dataEcoRoofMgr->Zog = 0.0015;
-            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::MediumRough) {
-                state.dataEcoRoofMgr->Zog = 0.0020;
-            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::Rough) {
-                state.dataEcoRoofMgr->Zog = 0.0030;
-            } else { // VeryRough
-                state.dataEcoRoofMgr->Zog = 0.005;
-            } // TODO: fix this after creating FindEnumeratedValueIndex()
+            // "VeryRough, Rough, MediumRough, MediumSmooth, Smooth, VerySmooth"
+            std::array<Real64, static_cast<int>(Material::SurfaceRoughness::Num)> zogLookup = {0.005, 0.0030, 0.0020, 0.0015, 0.0010, 0.0008};
+            state.dataEcoRoofMgr->Zog = zogLookup[static_cast<int>(RoughSurf)];
 
             Chng = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rch; // bulk transfer coefficient near ground
             Chg = Gammah * ((1.0 - sigmaf) * Chng + sigmaf * Cfhn);
@@ -542,7 +533,9 @@ namespace EcoRoofManager {
 
     void initEcoRoofFirstTime(EnergyPlusData &state, int const SurfNum, int const ConstrNum)
     {
-        auto const *thisMat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        auto const *thisMat =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+        assert(thisMat != nullptr);
         auto &thisEcoRoof = state.dataEcoRoofMgr;
 
         thisEcoRoof->EcoRoofbeginFlag = false;
@@ -704,7 +697,9 @@ namespace EcoRoofManager {
         // Using/Aliasing
         using namespace DataEnvironment;
 
-        auto const *thisMat = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        auto const *thisMat =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+        assert(thisMat != nullptr);
         auto &thisEcoRoof = state.dataEcoRoofMgr;
         auto &thisSurf = state.dataSurface->Surface(SurfNum);
 
@@ -823,7 +818,9 @@ namespace EcoRoofManager {
         RatioMax = 1.0 + 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
         RatioMin = 1.0 - 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
 
-        auto *thisMaterial = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1));
+        auto *thisMaterial =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
+        assert(thisMaterial != nullptr);
         if (state.dataEcoRoofMgr->UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE
