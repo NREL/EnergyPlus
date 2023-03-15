@@ -273,7 +273,7 @@ namespace DaylightingManager {
         bool const hitIntObs,                         // True iff interior obstruction hit
         bool const hitExtObs,                         // True iff ray from ref pt to ext win hits an exterior obstruction
         DataDaylighting::CalledFor const CalledFrom,  // indicate  which type of routine called this routine
-        Real64 &TVISIntWin,                           // Visible transmittance of int win at COSBIntWin for light from ext win
+        Real64 TVISIntWin,                            // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk,                       // Visible transmittance of int win at COSBIntWin for sun
         int const MapNum = 0);
 
@@ -319,8 +319,8 @@ namespace DaylightingManager {
     int findWinShadingStatus(int const IWin);
 
     void DayltgGlare(EnergyPlusData &state,
-                     int &IL,                  // Reference point index: 1=first ref pt, 2=second ref pt
-                     Real64 &BLUM,             // Window background (surround) luminance (cd/m2)
+                     int IL,                   // Reference point index: 1=first ref pt, 2=second ref pt
+                     Real64 BLUM,              // Window background (surround) luminance (cd/m2)
                      Real64 &GLINDX,           // Glare index
                      int const daylightCtrlNum // Current daylighting control number
     );
@@ -368,8 +368,8 @@ namespace DaylightingManager {
 
     void DayltgElecLightingControl(EnergyPlusData &state);
 
-    Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of luminous window element from
-                                     Real64 &Y);
+    Real64 DayltgGlarePositionFactor(Real64 X, // Lateral and vertical distance of luminous window element from
+                                     Real64 Y);
 
     void DayltgInterReflectedIllum(EnergyPlusData &state,
                                    int const ISunPos, // Sun position counter; used to avoid calculating various
