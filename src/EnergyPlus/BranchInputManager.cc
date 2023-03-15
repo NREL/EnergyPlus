@@ -2581,8 +2581,7 @@ namespace BranchInputManager {
                     if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
-                        BranchFluidType =
-                            state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType;
+                        BranchFluidType = state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType;
                         InitialBranchFluidNode = state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode;
                         OriginalBranchFluidType = DataLoopNode::NodeFluidTypeNames[static_cast<int>(BranchFluidType)];
                     } else if (BranchFluidType !=
