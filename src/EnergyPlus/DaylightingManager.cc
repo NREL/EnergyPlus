@@ -1252,8 +1252,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     bool hitExtObs;        // True iff ray from ref pt to ext win hits an exterior obstruction
     Real64 TVISIntWin;     // Visible transmittance of int win at COSBIntWin for light from ext win
     Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
-    auto &MySunIsUpFlag(state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag);
-    int WinEl; // window elements counter
+    int WinEl;             // window elements counter
 
     auto &W2 = state.dataDaylightingManager->W2;
     auto &W3 = state.dataDaylightingManager->W3;
@@ -1467,15 +1466,15 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                                      mapNum);
                         } // End of hourly sun position loop, IHR
                     } else {
-                        if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                        if (state.dataEnvrn->SunIsUp && !state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag) {
                             ISunPos = 0;
-                            MySunIsUpFlag = true;
-                        } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
+                            state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag = true;
+                        } else if (state.dataEnvrn->SunIsUp && state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag) {
                             ISunPos = 1;
-                        } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
-                            MySunIsUpFlag = false;
+                        } else if (!state.dataEnvrn->SunIsUp && state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag) {
+                            state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag = false;
                             ISunPos = -1;
-                        } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                        } else if (!state.dataEnvrn->SunIsUp && !state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag) {
                             ISunPos = -1;
                         }
                         // daylightingCtrlNum parameter is unused for map points
@@ -9658,22 +9657,19 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    auto &FirstTimeMaps = state.dataDaylightingManager->FirstTimeMaps;
-    auto &EnvrnPrint = state.dataDaylightingManager->EnvrnPrint;
-    auto &SavedMnDy = state.dataDaylightingManager->SavedMnDy;
     std::string MapNoString;
     int linelen;
 
     if (state.dataDaylightingManager->ReportIllumMap_firstTime) {
         state.dataDaylightingManager->ReportIllumMap_firstTime = false;
-        FirstTimeMaps.dimension((int)state.dataDaylightingData->IllumMap.size(), true);
-        EnvrnPrint.dimension((int)state.dataDaylightingData->IllumMap.size(), true);
-        SavedMnDy.allocate((int)state.dataDaylightingData->IllumMap.size());
+        state.dataDaylightingManager->FirstTimeMaps.dimension((int)state.dataDaylightingData->IllumMap.size(), true);
+        state.dataDaylightingManager->EnvrnPrint.dimension((int)state.dataDaylightingData->IllumMap.size(), true);
+        state.dataDaylightingManager->SavedMnDy.allocate((int)state.dataDaylightingData->IllumMap.size());
     }
 
-    if (FirstTimeMaps(MapNum)) {
+    if (state.dataDaylightingManager->FirstTimeMaps(MapNum)) {
 
-        FirstTimeMaps(MapNum) = false;
+        state.dataDaylightingManager->FirstTimeMaps(MapNum) = false;
 
         auto openMapFile = [&](const fs::path &filePath) -> InputOutputFile & {
             auto &outputFile = *state.dataDaylightingData->IllumMap(MapNum).mapFile;
@@ -9692,14 +9688,14 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
             //                CommaDelimited = false; //Unused Set but never used
         }
 
-        SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);
+        state.dataDaylightingManager->SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);
 
         state.dataDaylightingData->IllumMap(MapNum).Name =
             format("{} at {:.2R}m", state.dataDaylightingData->IllumMap(MapNum).Name, state.dataDaylightingData->IllumMap(MapNum).Z);
     }
-    if (SavedMnDy(MapNum) != state.dataEnvrn->CurMnDyHr.substr(0, 5)) {
-        EnvrnPrint(MapNum) = true;
-        SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);
+    if (state.dataDaylightingManager->SavedMnDy(MapNum) != state.dataEnvrn->CurMnDyHr.substr(0, 5)) {
+        state.dataDaylightingManager->EnvrnPrint(MapNum) = true;
+        state.dataDaylightingManager->SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);
     }
 
     state.dataDaylightingData->IllumMap(MapNum).pointsHeader = "";
@@ -9723,7 +9719,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
         // Remove trailing comma
         state.dataDaylightingData->IllumMap(MapNum).pointsHeader.pop_back();
     }
-    if (EnvrnPrint(MapNum)) {
+    if (state.dataDaylightingManager->EnvrnPrint(MapNum)) {
         WriteDaylightMapTitle(state,
                               MapNum,
                               *state.dataDaylightingData->IllumMap(MapNum).mapFile,
@@ -9732,14 +9728,14 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                               state.dataDaylightingData->IllumMap(MapNum).zoneIndex,
                               state.dataDaylightingData->IllumMap(MapNum).pointsHeader,
                               state.dataDaylightingData->IllumMap(MapNum).Z);
-        EnvrnPrint(MapNum) = false;
+        state.dataDaylightingManager->EnvrnPrint(MapNum) = false;
     }
 
     if (!state.dataGlobal->WarmupFlag) {
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) { // Report only hourly
 
             // Write X scale column header
-            std::string mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), state.dataGlobal->HourOfDay);
+            std::string mapLine = format(" {} {:02}:00", state.dataDaylightingManager->SavedMnDy(MapNum), state.dataGlobal->HourOfDay);
             if (state.dataDaylightingData->IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
             int RefPt = 1;
             for (int X = 1; X <= state.dataDaylightingData->IllumMap(MapNum).Xnum; ++X) {
@@ -9798,9 +9794,9 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                 if (state.dataDaylightingManager->SQFirstTime) {
                     int const nX(maxval(state.dataDaylightingData->IllumMap, &DataDaylighting::IllumMapData::Xnum));
                     int const nY(maxval(state.dataDaylightingData->IllumMap, &DataDaylighting::IllumMapData::Ynum));
-                    XValue.allocate(nX);
-                    YValue.allocate(nY);
-                    IllumValue.allocate(nX, nY);
+                    state.dataDaylightingManager->XValue.allocate(nX);
+                    state.dataDaylightingManager->YValue.allocate(nY);
+                    state.dataDaylightingManager->IllumValue.allocate(nX, nY);
                     state.dataDaylightingManager->SQFirstTime = false;
                 }
 
@@ -9811,13 +9807,16 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                 int SQDayOfMonth = state.dataEnvrn->DayOfMonth;
 
                 for (int Y = 1; Y <= state.dataDaylightingData->IllumMap(MapNum).Ynum; ++Y) {
-                    YValue(Y) = state.dataDaylightingData->IllumMap(MapNum).Ymin + (Y - 1) * state.dataDaylightingData->IllumMap(MapNum).Yinc;
+                    state.dataDaylightingManager->YValue(Y) =
+                        state.dataDaylightingData->IllumMap(MapNum).Ymin + (Y - 1) * state.dataDaylightingData->IllumMap(MapNum).Yinc;
                     for (int X = 1; X <= state.dataDaylightingData->IllumMap(MapNum).Xnum; ++X) {
-                        XValue(X) = state.dataDaylightingData->IllumMap(MapNum).Xmin + (X - 1) * state.dataDaylightingData->IllumMap(MapNum).Xinc;
+                        state.dataDaylightingManager->XValue(X) =
+                            state.dataDaylightingData->IllumMap(MapNum).Xmin + (X - 1) * state.dataDaylightingData->IllumMap(MapNum).Xinc;
                         int IllumIndex = X + (Y - 1) * state.dataDaylightingData->IllumMap(MapNum).Xnum;
-                        IllumValue(X, Y) = nint(state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllumAtMapPtHr(IllumIndex));
+                        state.dataDaylightingManager->IllumValue(X, Y) =
+                            nint(state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllumAtMapPtHr(IllumIndex));
                         if (!state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtInBounds(IllumIndex)) {
-                            IllumValue(X, Y) = -IllumValue(X, Y);
+                            state.dataDaylightingManager->IllumValue(X, Y) = -state.dataDaylightingManager->IllumValue(X, Y);
                         }
                     } // X Loop
                 }     // Y Loop
@@ -9828,10 +9827,10 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                                                                             SQDayOfMonth,
                                                                             state.dataGlobal->HourOfDay,
                                                                             state.dataDaylightingData->IllumMap(MapNum).Xnum,
-                                                                            XValue,
+                                                                            state.dataDaylightingManager->XValue,
                                                                             state.dataDaylightingData->IllumMap(MapNum).Ynum,
-                                                                            YValue,
-                                                                            IllumValue);
+                                                                            state.dataDaylightingManager->YValue,
+                                                                            state.dataDaylightingManager->IllumValue);
 
             } // WriteOutputToSQLite
         }     // end time step

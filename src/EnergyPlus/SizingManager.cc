@@ -1152,7 +1152,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             }
 
             auto &IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
-            auto &NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
+            int NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
 
             // sum up heating and max flows for any four pipe induction units
             // dual path for std 62.1

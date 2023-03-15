@@ -1835,17 +1835,17 @@ namespace DaylightingDevices {
         // intialize zone gains at begin new environment
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &MyEnvrnFlag = state.dataDaylightingDevices->MyEnvrnFlag;
+
 
         if ((int)state.dataDaylightingDevicesData->TDDPipe.size() == 0) return;
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataDaylightingDevices->MyEnvrnFlag) {
             for (int Loop = 1; Loop <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++Loop) {
                 state.dataDaylightingDevicesData->TDDPipe(Loop).TZoneHeatGain = 0.0;
             }
-            MyEnvrnFlag = false;
+            state.dataDaylightingDevices->MyEnvrnFlag = false;
         }
-        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataDaylightingDevices->MyEnvrnFlag = true;
     }
 
 } // namespace DaylightingDevices

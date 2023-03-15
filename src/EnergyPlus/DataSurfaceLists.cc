@@ -118,12 +118,14 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
 
     auto &SurfList(state.dataSurfLists->SurfList);
     auto &SlabList(state.dataSurfLists->SlabList);
-    auto &NumOfSurfaceLists(state.dataSurfLists->NumOfSurfaceLists);
-    auto &NumOfSurfListVentSlab(state.dataSurfLists->NumOfSurfListVentSlab);
 
     ErrorsFound = false;
-    NumOfSurfaceLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
-    NumOfSurfListVentSlab = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject2);
+
+    // Update Num in state and make local convenience copy
+    int NumOfSurfaceLists = state.dataSurfLists->NumOfSurfaceLists =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
+    int NumOfSurfListVentSlab = state.dataSurfLists->NumOfSurfListVentSlab =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject2);
 
     SurfList.allocate(NumOfSurfaceLists);
     SlabList.allocate(NumOfSurfListVentSlab);
@@ -357,16 +359,12 @@ int GetNumberOfSurfaceLists(EnergyPlusData &state)
     // PURPOSE OF THIS FUNCTION:
     // Acts as a target for outside routines to make sure data is gotten before using.
 
-    // Return value
-    int NumberOfSurfaceLists;
-
     if (!state.dataSurfLists->SurfaceListInputsFilled) {
         GetSurfaceListsInputs(state);
         state.dataSurfLists->SurfaceListInputsFilled = true;
     }
 
-    NumberOfSurfaceLists = state.dataSurfLists->NumOfSurfaceLists;
-    return NumberOfSurfaceLists;
+    return state.dataSurfLists->NumOfSurfaceLists;
 }
 
 int GetNumberOfSurfListVentSlab(EnergyPlusData &state)
