@@ -213,31 +213,31 @@ namespace HVACUnitaryBypassVAV {
         // METHODOLOGY EMPLOYED:
         // Calls ControlCBVAVOutput to obtain the desired unit output
 
-        QSensUnitOut = 0.0;  // probably don't need this initialization
-        Real64 HeatingPower; // Power consumption of DX heating coil or electric heating coil [W]
+        QSensUnitOut = 0.0; // probably don't need this initialization
 
-        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+        auto &changeOverByPassVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
 
         // zero the fan and DX coils electricity consumption
         state.dataHVACGlobal->DXElecCoolingPower = 0.0;
         state.dataHVACGlobal->DXElecHeatingPower = 0.0;
         state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
         state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = 0.0;
+        state.dataHVACGlobal->DefrostElecPower = 0.0;
 
         // initialize local variables
         bool UnitOn = true;
-        int OutletNode = CBVAV(CBVAVNum).AirOutNode;
-        int InletNode = CBVAV(CBVAVNum).AirInNode;
+        int OutletNode = changeOverByPassVAV.AirOutNode;
+        int InletNode = changeOverByPassVAV.AirInNode;
         Real64 AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         Real64 PartLoadFrac = 0.0;
 
         // set the on/off flags
-        if (CBVAV(CBVAVNum).OpMode == DataHVACGlobals::CycFanCycCoil) {
+        if (changeOverByPassVAV.OpMode == DataHVACGlobals::CycFanCycCoil) {
             // cycling unit only runs if there is a cooling or heating load.
-            if (CBVAV(CBVAVNum).HeatCoolMode == 0 || AirMassFlow < DataHVACGlobals::SmallMassFlow) {
+            if (changeOverByPassVAV.HeatCoolMode == 0 || AirMassFlow < DataHVACGlobals::SmallMassFlow) {
                 UnitOn = false;
             }
-        } else if (CBVAV(CBVAVNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
+        } else if (changeOverByPassVAV.OpMode == DataHVACGlobals::ContFanCycCoil) {
             // continuous unit: fan runs if scheduled on; coil runs only if there is a cooling or heating load
             if (AirMassFlow < DataHVACGlobals::SmallMassFlow) {
                 UnitOn = false;
@@ -251,11 +251,11 @@ namespace HVACUnitaryBypassVAV {
         } else {
             CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, OnOffAirFlowRatio, HXUnitOn);
         }
-        if (CBVAV(CBVAVNum).modeChanged) {
+        if (changeOverByPassVAV.modeChanged) {
             // set outlet node SP for mixed air SP manager
-            state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).TempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
-            if (CBVAV(CBVAVNum).OutNodeSPMIndex > 0) { // update mixed air SPM if exists
-                state.dataSetPointManager->MixedAirSetPtMgr(CBVAV(CBVAVNum).OutNodeSPMIndex)
+            state.dataLoopNodes->Node(changeOverByPassVAV.AirOutNode).TempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
+            if (changeOverByPassVAV.OutNodeSPMIndex > 0) { // update mixed air SPM if exists
+                state.dataSetPointManager->MixedAirSetPtMgr(changeOverByPassVAV.OutNodeSPMIndex)
                     .calculate(state);                           // update mixed air SP based on new mode
                 SetPointManager::UpdateMixedAirSetPoints(state); // need to know control node to fire off just one of these, do this later
             }
@@ -272,38 +272,42 @@ namespace HVACUnitaryBypassVAV {
                                       Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, MinOutletHumRat));
 
         // report variables
-        CBVAV(CBVAVNum).CompPartLoadRatio = state.dataHVACUnitaryBypassVAV->SaveCompressorPLR;
+        changeOverByPassVAV.CompPartLoadRatio = state.dataHVACUnitaryBypassVAV->SaveCompressorPLR;
         if (UnitOn) {
-            CBVAV(CBVAVNum).FanPartLoadRatio = 1.0;
+            changeOverByPassVAV.FanPartLoadRatio = 1.0;
         } else {
-            CBVAV(CBVAVNum).FanPartLoadRatio = 0.0;
+            changeOverByPassVAV.FanPartLoadRatio = 0.0;
         }
 
-        CBVAV(CBVAVNum).TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
-        CBVAV(CBVAVNum).TotHeatEnergyRate = std::abs(max(0.0, QTotUnitOut));
-        CBVAV(CBVAVNum).SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOut));
-        CBVAV(CBVAVNum).SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOut));
-        CBVAV(CBVAVNum).LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
-        CBVAV(CBVAVNum).LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
+        changeOverByPassVAV.TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
+        changeOverByPassVAV.TotHeatEnergyRate = std::abs(max(0.0, QTotUnitOut));
+        changeOverByPassVAV.SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOut));
+        changeOverByPassVAV.SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOut));
+        changeOverByPassVAV.LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
+        changeOverByPassVAV.LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
 
-        if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
+        Real64 HeatingPower = 0.0; // DX Htg coil Plus CrankCase electric power use or electric heating coil [W]
+        Real64 locDefrostPower = 0.0;
+        if (changeOverByPassVAV.HeatCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
             HeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
-        } else if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+            locDefrostPower = state.dataHVACGlobal->DefrostElecPower;
+        } else if (changeOverByPassVAV.HeatCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
             HeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
-        } else if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric) {
+            locDefrostPower = state.dataHVACGlobal->DefrostElecPower;
+        } else if (changeOverByPassVAV.HeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric) {
             HeatingPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         } else {
             HeatingPower = 0.0;
         }
 
         Real64 locFanElecPower = 0.0;
-        if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            locFanElecPower = state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->fanPower();
+        if (changeOverByPassVAV.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            locFanElecPower = state.dataHVACFan->fanObjs[changeOverByPassVAV.FanIndex]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(state, CBVAV(CBVAVNum).FanIndex);
+            locFanElecPower = Fans::GetFanPower(state, changeOverByPassVAV.FanIndex);
         }
 
-        CBVAV(CBVAVNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + HeatingPower;
+        changeOverByPassVAV.ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + HeatingPower + locDefrostPower;
     }
 
     void GetCBVAV(EnergyPlusData &state)
@@ -353,9 +357,10 @@ namespace HVACUnitaryBypassVAV {
         std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-        auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
 
-        NumCBVAV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        // Update Num in state and make local convenience copy
+        int NumCBVAV = state.dataHVACUnitaryBypassVAV->NumCBVAV =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         // allocate the data structures
         CBVAV.allocate(NumCBVAV);
@@ -1465,7 +1470,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 mdot;                  // heating coil fluid mass flow rate, kg/s
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-        auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
+        int NumCBVAV = state.dataHVACUnitaryBypassVAV->NumCBVAV;
 
         int InNode = CBVAV(CBVAVNum).AirInNode;
         int OutNode = CBVAV(CBVAVNum).AirOutNode;

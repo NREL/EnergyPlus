@@ -113,13 +113,12 @@ namespace MundtSimMgr {
         // PURPOSE OF THIS SUBROUTINE:
         //   manage the Mundt model
 
-        auto &MundtFirstTimeFlag = state.dataHeatBal->MundtFirstTimeFlag;
         bool ErrorsFound;
 
         // initialize Mundt model data
-        if (MundtFirstTimeFlag) {
+        if (state.dataHeatBal->MundtFirstTimeFlag) {
             InitMundtModel(state);
-            MundtFirstTimeFlag = false;
+            state.dataHeatBal->MundtFirstTimeFlag = false;
         }
 
         // identify the current zone index for zones using Mundt model

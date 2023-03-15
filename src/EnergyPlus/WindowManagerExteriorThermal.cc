@@ -144,14 +144,14 @@ namespace WindowManager {
                 Real64 EffShBlEmiss;
                 Real64 EffGlEmiss;
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    EffShBlEmiss =
-                        General::InterpGeneral(window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                               window.EffShBlindEmiss(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                                               state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
-                    EffGlEmiss =
-                        General::InterpGeneral(window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                               window.EffGlassEmiss(std::min(MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                                               state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffShBlEmiss = General::InterpGeneral(
+                        window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffGlEmiss = General::InterpGeneral(
+                        window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
                     EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                     EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
@@ -485,7 +485,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    Material::MaterialProperties *CWCEHeatTransferFactory::getLayerMaterial(EnergyPlusData &state, int const t_Index) const
+    Material::MaterialBase *CWCEHeatTransferFactory::getLayerMaterial(EnergyPlusData &state, int const t_Index) const
     {
         auto ConstrNum = m_ConstructionNumber;
 
@@ -499,7 +499,8 @@ namespace WindowManager {
 
         auto &construction(state.dataConstruction->Construct(ConstrNum));
         const auto LayPtr = construction.LayerPoint(t_Index);
-        return state.dataMaterial->Material(LayPtr);
+        auto *result = state.dataMaterial->Material(LayPtr);
+        return result;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -509,16 +510,16 @@ namespace WindowManager {
 
         auto *material = getLayerMaterial(state, t_Index);
 
-        Material::MaterialGroup matGroup = material->Group;
+        Material::Group matGroup = material->group;
 
-        if ((matGroup == Material::MaterialGroup::WindowGlass) || (matGroup == Material::MaterialGroup::WindowSimpleGlazing) ||
-            (matGroup == Material::MaterialGroup::WindowBlind) || (matGroup == Material::MaterialGroup::Shade) ||
-            (matGroup == Material::MaterialGroup::Screen) || (matGroup == Material::MaterialGroup::ComplexWindowShade)) {
+        if ((matGroup == Material::Group::WindowGlass) || (matGroup == Material::Group::WindowSimpleGlazing) ||
+            (matGroup == Material::Group::WindowBlind) || (matGroup == Material::Group::Shade) || (matGroup == Material::Group::Screen) ||
+            (matGroup == Material::Group::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, material, m_SolidLayerIndex);
-        } else if (matGroup == Material::MaterialGroup::WindowGas || matGroup == Material::MaterialGroup::WindowGasMixture) {
+        } else if (matGroup == Material::Group::WindowGas || matGroup == Material::Group::WindowGasMixture) {
             aLayer = getGapLayer(material);
-        } else if (matGroup == Material::MaterialGroup::ComplexWindowGap) {
+        } else if (matGroup == Material::Group::ComplexWindowGap) {
             aLayer = getComplexGapLayer(state, material);
         }
 
@@ -533,7 +534,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer>
-    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const *material, int const t_Index)
+    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, Material::MaterialBase const *materialBase, int const t_Index)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -556,7 +557,9 @@ namespace WindowManager {
         Real64 Aright = 0.0;
         Real64 Afront = 0.0;
 
-        if (material->Group == Material::MaterialGroup::WindowGlass || material->Group == Material::MaterialGroup::WindowSimpleGlazing) {
+        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
+        assert(material != nullptr);
+        if (material->group == Material::Group::WindowGlass || material->group == Material::Group::WindowSimpleGlazing) {
             emissFront = material->AbsorpThermalFront;
             emissBack = material->AbsorpThermalBack;
             transThermalFront = material->TransThermal;
@@ -564,9 +567,9 @@ namespace WindowManager {
             thickness = material->Thickness;
             conductivity = material->Conductivity;
         }
-        if (material->Group == Material::MaterialGroup::WindowBlind) {
+        if (material->group == Material::Group::WindowBlind) {
             int blNum = state.dataSurface->SurfWinBlindNumber(m_SurfNum);
-            auto blind = state.dataHeatBal->Blind(blNum);
+            auto blind = state.dataMaterial->Blind(blNum);
             thickness = blind.SlatThickness;
             conductivity = blind.SlatConductivity;
             Atop = blind.BlindTopOpeningMult;
@@ -586,7 +589,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material->Group == Material::MaterialGroup::Shade) {
+        if (material->group == Material::Group::Shade) {
             emissFront = material->AbsorpThermal;
             emissBack = material->AbsorpThermal;
             transThermalFront = material->TransThermal;
@@ -602,7 +605,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material->Group == Material::MaterialGroup::Screen) {
+        if (material->group == Material::Group::Screen) {
             // Simon: Existing code already takes into account geometry of Woven and scales down
             // emissivity for openning area.
             emissFront = material->AbsorpThermal;
@@ -620,9 +623,9 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material->Group == Material::MaterialGroup::ComplexWindowShade) {
+        if (material->group == Material::Group::ComplexWindowShade) {
             auto shdPtr = material->ComplexShadePtr;
-            auto &shade(state.dataHeatBal->ComplexShade(shdPtr));
+            auto &shade(state.dataMaterial->ComplexShade(shdPtr));
             thickness = shade.Thickness;
             conductivity = shade.Conductivity;
             emissFront = shade.FrontEmissivity;
@@ -666,7 +669,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const *material) const
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialBase const *material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -701,10 +704,11 @@ namespace WindowManager {
         const auto ShadeFlag{getShadeType(state, m_ConstructionNumber)};
 
         if (ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind) {
-            thickness = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
+            thickness = state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
         if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
-            const auto *material = getLayerMaterial(state, t_Index);
+            const auto *material = dynamic_cast<Material::MaterialChild *>(getLayerMaterial(state, t_Index));
+            assert(material != nullptr);
             thickness = material->WinShadeToGlassDist;
         }
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
@@ -713,7 +717,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(EnergyPlusData &state,
-                                                                                                 Material::MaterialProperties const *material) const
+                                                                                                 Material::MaterialBase const *materialBase) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -724,6 +728,8 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
         Real64 constexpr pres = 1e5; // Old code uses this constant pressure
+        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
+        assert(material != nullptr);
         Real64 thickness = material->Thickness;
         Real64 gasPointer = material->GasPointer;
         auto *gasMaterial(state.dataMaterial->Material(gasPointer));
@@ -733,7 +739,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialProperties const *material) const
+    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialBase const *materialBase) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -744,6 +750,8 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
+        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
+        assert(material != nullptr);
         const int numGases = material->NumberOfGasesInMixture;
         double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
         std::string const &gasName = material->Name;
@@ -926,30 +934,28 @@ namespace WindowManager {
         const auto MatOutside = state.dataConstruction->Construct(ConstrNum).LayerPoint(1);
         const auto MatInside = state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay);
 
-        if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Shade) { // Exterior shade present
+        if (state.dataMaterial->Material(MatOutside)->group == Material::Group::Shade) { // Exterior shade present
             ShadeFlag = WinShadingType::ExtShade;
-        } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Screen) { // Exterior screen present
+        } else if (state.dataMaterial->Material(MatOutside)->group == Material::Group::Screen) { // Exterior screen present
             const auto MatShade = MatOutside;
-            const auto ScNum = state.dataMaterial->Material(MatShade)->ScreenDataPtr;
+            const auto ScNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatShade))->ScreenDataPtr;
             // Orphaned constructs with exterior screen are ignored
             if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
-        } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::WindowBlind) { // Exterior blind present
+        } else if (state.dataMaterial->Material(MatOutside)->group == Material::Group::WindowBlind) { // Exterior blind present
             ShadeFlag = WinShadingType::ExtBlind;
-        } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::Shade) { // Interior shade present
+        } else if (state.dataMaterial->Material(MatInside)->group == Material::Group::Shade) { // Interior shade present
             ShadeFlag = WinShadingType::IntShade;
-        } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::WindowBlind) { // Interior blind present
+        } else if (state.dataMaterial->Material(MatInside)->group == Material::Group::WindowBlind) { // Interior blind present
             ShadeFlag = WinShadingType::IntBlind;
         } else if (TotGlassLay == 2) {
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group == Material::MaterialGroup::Shade)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->group == Material::Group::Shade)
                 ShadeFlag = WinShadingType::BGShade;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group ==
-                Material::MaterialGroup::WindowBlind)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->group == Material::Group::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         } else if (TotGlassLay == 3) {
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group == Material::MaterialGroup::Shade)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->group == Material::Group::Shade)
                 ShadeFlag = WinShadingType::BGShade;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group ==
-                Material::MaterialGroup::WindowBlind)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->group == Material::Group::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         }
 

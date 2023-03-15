@@ -429,7 +429,7 @@ namespace CostEstimateManager {
                 }
                 thisChil = 0;
                 int chillNum = 0;
-                for (auto &ch : state.dataPlantChillers->ElectricChiller) {
+                for (auto const &ch : state.dataPlantChillers->ElectricChiller) {
                     chillNum++;
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == ch.Name) {
                         thisChil = chillNum;
@@ -764,7 +764,7 @@ namespace CostEstimateManager {
                     if (WildcardObjNames) {
                         Real64 Qty(0.0);
                         for (auto const &e : state.dataCoilCooingDX->coilCoolingDXs) {
-                            auto &maxSpeed = e.performance.normalMode.speeds.back();
+                            auto const &maxSpeed = e.performance.normalMode.speeds.back();
                             Real64 COP = maxSpeed.original_input_specs.gross_rated_cooling_COP;
                             Qty += COP * e.performance.normalMode.ratedGrossTotalCap;
                         }
@@ -775,7 +775,7 @@ namespace CostEstimateManager {
                             state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
                     }
                     if (coilFound) {
-                        auto &maxSpeed = state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance.normalMode.speeds.back();
+                        auto const &maxSpeed = state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance.normalMode.speeds.back();
                         Real64 COP = maxSpeed.original_input_specs.gross_rated_cooling_COP;
                         state.dataCostEstimateManager->CostLineItem(Item).Qty =
                             COP * state.dataCoilCooingDX->coilCoolingDXs[thisCoil].performance.normalMode.ratedGrossTotalCap / 1000.0;
@@ -852,7 +852,7 @@ namespace CostEstimateManager {
             case ParentObject::ChillerElectric: {
                 thisChil = 0;
                 int chillNum = 0;
-                for (auto &ch : state.dataPlantChillers->ElectricChiller) {
+                for (auto const &ch : state.dataPlantChillers->ElectricChiller) {
                     chillNum++;
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == ch.Name) {
                         thisChil = chillNum;

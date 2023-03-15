@@ -742,15 +742,12 @@ namespace StandardRatings {
         using namespace OutputReportPredefined;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &StandardRatingsMyOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyOneTimeFlag;
 
-        // Formats
-
-        if (StandardRatingsMyOneTimeFlag) {
+        if (state.dataHVACGlobal->StandardRatingsMyOneTimeFlag) {
             print(state.files.eio,
                   "{}\n",
                   "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
-            StandardRatingsMyOneTimeFlag = false;
+            state.dataHVACGlobal->StandardRatingsMyOneTimeFlag = false;
         }
 
         {
@@ -4071,21 +4068,19 @@ namespace StandardRatings {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &MyCoolOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag;
-        auto &MyHeatOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyHeatOneTimeFlag;
 
         switch (CompTypeNum) {
 
         case CoilDX_CoolingSingleSpeed: {
             if (!AHRI2023StandardRatings) {
-                if (MyCoolOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
                     print(state.files.eio,
                           "{}",
                           "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                           "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
                           "IEER "
                           "{Btu/W-h}\n");
-                    MyCoolOneTimeFlag = false;
+                    state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
                 }
 
                 static constexpr std::string_view Format_991(
@@ -4108,14 +4103,14 @@ namespace StandardRatings {
                                     "is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");
             } else {
                 // ANSI/AHRI 210/240 Standard 2023 Ratings | SEER2
-                if (MyCoolOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
                     print(state.files.eio,
                           "{}",
                           "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                           "Cooling Capacity {W}, Standard Rated Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "
                           "IEER2 "
                           "{Btu/W-h}\n");
-                    MyCoolOneTimeFlag = false;
+                    state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
                 }
 
                 static constexpr std::string_view Format_991_(
@@ -4144,13 +4139,13 @@ namespace StandardRatings {
         case CoilDX_HeatingEmpirical:
         case CoilDX_MultiSpeedHeating: {
             if (!AHRI2023StandardRatings) {
-                if (MyHeatOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyHeatOneTimeFlag) {
                     static constexpr std::string_view Format_992(
                         "! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating "
                         "(net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region "
                         "Number\n");
                     print(state.files.eio, "{}", Format_992);
-                    MyHeatOneTimeFlag = false;
+                    state.dataHVACGlobal->StandardRatingsMyHeatOneTimeFlag = false;
                 }
 
                 static constexpr std::string_view Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
@@ -4166,13 +4161,13 @@ namespace StandardRatings {
                     state, state.dataOutRptPredefined->pdstDXHeatCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
             } else {
                 // ANSI/AHRI 210/240 Standard 2023 Ratings | HSPF2
-                if (MyHeatOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyHeatOneTimeFlag) {
                     static constexpr std::string_view Format_992_(
                         "! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating "
                         "(net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF2 {Btu/W-h}, Region "
                         "Number\n");
                     print(state.files.eio, "{}", Format_992_);
-                    MyHeatOneTimeFlag = false;
+                    state.dataHVACGlobal->StandardRatingsMyHeatOneTimeFlag = false;
                 }
 
                 static constexpr std::string_view Format_993_(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
@@ -4192,14 +4187,14 @@ namespace StandardRatings {
         }
         case CoilDX_MultiSpeedCooling: {
             if (!AHRI2023StandardRatings) {
-                if (MyCoolOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
                     static constexpr std::string_view Format_994(
                         "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                         "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
                         "IEER "
                         "{Btu/W-h}");
                     print(state.files.eio, "{}\n", Format_994);
-                    MyCoolOneTimeFlag = false;
+                    state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
                 }
 
                 static constexpr std::string_view Format_995(
@@ -4217,14 +4212,14 @@ namespace StandardRatings {
                                     "is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");
             } else {
                 // ANSI/AHRI 210/240 Standard 2023 Ratings | SEER2
-                if (MyCoolOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
                     static constexpr std::string_view Format_994_(
                         "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                         "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "
                         "IEER2 "
                         "{Btu/W-h}");
                     print(state.files.eio, "{}\n", Format_994_);
-                    MyCoolOneTimeFlag = false;
+                    state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
                 }
 
                 static constexpr std::string_view Format_995_(
@@ -4296,14 +4291,13 @@ namespace StandardRatings {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &MyCoolOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2;
         int ClassNum; // class number (Class I, II, II, IV)
         int Num;      // text number counter
 
         // Formats
 
         if (CompTypeNum == CoilDX_CoolingSingleSpeed) {
-            if (MyCoolOneTimeFlag) {
+            if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2) {
                 static constexpr std::string_view Format_101(
                     "! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
                     "Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net "
@@ -4311,7 +4305,7 @@ namespace StandardRatings {
                     "Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric "
                     "Power Test D {W} \n");
                 print(state.files.eio, "{}", Format_101);
-                MyCoolOneTimeFlag = false;
+                state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2 = false;
             }
             for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
                 Num = (ClassNum - 1) * 4;

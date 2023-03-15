@@ -428,7 +428,7 @@ namespace BranchInputManager {
                                DataBranchAirLoopPlant::PressureCurveType &PressCurveType, // Index of pressure curve object
                                int &PressCurveIndex,                                      // Index of pressure curve object
                                int &NumComps,                                             // Number of Components on Branch
-                               Array1D<ComponentData> &BComponents,                       // Component data returned
+                               Array1D<ComponentData> const &BComponents,                 // Component data returned
                                bool &ErrorsFound // True when Loop Name is already assigned and this not same loop
     )
     {
@@ -529,8 +529,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains connector data for requested connector list.  Also,
@@ -552,16 +550,13 @@ namespace BranchInputManager {
         //         \key Connector:Mixer
         //     A5; \field Connector 2 Name
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Count; // Loop Counter
-
         if (state.dataBranchInputManager->GetConnectorListInputFlag) {
             GetConnectorListInput(state);
             state.dataBranchInputManager->GetConnectorListInputFlag = false;
         }
 
         if (not_blank(ConnectorListName)) {
-            Count = UtilityRoutines::FindItemInList(ConnectorListName, state.dataBranchInputManager->ConnectorLists);
+            int Count = UtilityRoutines::FindItemInList(ConnectorListName, state.dataBranchInputManager->ConnectorLists);
             if (Count == 0) {
                 ShowFatalError(state, format("GetConnectorList: Connector List not found={}", ConnectorListName));
             }
@@ -602,24 +597,14 @@ namespace BranchInputManager {
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
         //       MODIFIED       October 2001, Automatic Extensibility
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine gets the data for the requested Connector List and returns values indicating
         // if this connector list name is a mixer or not.
 
-        // Using/Aliasing
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Count;    // Loop Counter
-        int Loop;     // Loop Counter
-        int NumComps; // Number of Components on this Branch
+        int Count; // Loop Counter
         DataBranchAirLoopPlant::PressureCurveType PressCurveType;
-        int PressCurveIndex;
-        bool errFlag; // Error flag from RegisterNodeConnection
-        int NumParams;
-        int NumAlphas;
-        int NumNumbers;
 
         // Object Data
         ConnectorData Connectoid;           // Connector Data
@@ -657,6 +642,9 @@ namespace BranchInputManager {
 
         if (Count != 0) { // Build up Output list(s). For each component(?)
 
+            int NumParams;
+            int NumAlphas;
+            int NumNumbers;
             // The inlet nodes for the mixer will be the last "outlet" node of
             // each corresponding inlet branch.  The outlet node for the mixer
             // will be the first "inlet" node of the outlet branch since that
@@ -666,7 +654,9 @@ namespace BranchInputManager {
             // The number of "components" on a Mixer is the number of branches.  This is the number of alpha arguments -1.
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Branch", NumParams, NumAlphas, NumNumbers);
             BComponents.allocate(NumAlphas - 1);
-            errFlag = false;
+            bool errFlag = false;
+            int PressCurveIndex;
+            int NumComps; // Number of Components on this Branch
             GetInternalBranchData(state,
                                   LoopName,
                                   state.dataBranchInputManager->Mixers(Count).OutletBranchName,
@@ -703,7 +693,7 @@ namespace BranchInputManager {
                 InletNodeNums = 0;
                 InletNodeNames = "";
 
-                for (Loop = 1; Loop <= state.dataBranchInputManager->Mixers(Count).NumInletBranches; ++Loop) {
+                for (int Loop = 1; Loop <= state.dataBranchInputManager->Mixers(Count).NumInletBranches; ++Loop) {
                     GetInternalBranchData(state,
                                           LoopName,
                                           state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop),
@@ -756,24 +746,14 @@ namespace BranchInputManager {
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
         //       MODIFIED       October 2001, Automatic Extensibility
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine gets the data for the requested Connector List and returns values indicating
         // if this connector list name is a splitter or not.
 
-        // Using/Aliasing
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Count;    // Loop Counter
-        int Loop;     // Loop Counter
-        int NumComps; // Number of Components on this Branch
+        int Count; // Loop Counter
         DataBranchAirLoopPlant::PressureCurveType PressCurveType;
-        int PressCurveIndex;
-        bool errFlag; // Error flag from RegisterNodeConnection
-        int NumParams;
-        int NumAlphas;
-        int NumNumbers;
 
         // Object Data
         ConnectorData Connectoid;           // Connector Data
@@ -815,6 +795,12 @@ namespace BranchInputManager {
 
         if (Count != 0) { // Build up Output list(s). For each component(?)
 
+            int NumComps; // Number of Components on this Branch
+            int NumParams;
+            int NumAlphas;
+            int NumNumbers;
+            int PressCurveIndex;
+
             // The inlet node for the splitter will be the last "outlet" node of the inlet
             // branch. The outlet nodes for the splitter will be the first "inlet" node of
             // each corresponding outlet branch since that would be the first node on the branch.
@@ -824,7 +810,7 @@ namespace BranchInputManager {
             // The number of "components" on a Splitter is the number of branches.  This is the number of alpha arguments -1.
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Branch", NumParams, NumAlphas, NumNumbers);
             BComponents.allocate(NumAlphas - 1);
-            errFlag = false;
+            bool errFlag = false;
             GetInternalBranchData(state,
                                   LoopName,
                                   state.dataBranchInputManager->Splitters(Count).InletBranchName,
@@ -862,7 +848,7 @@ namespace BranchInputManager {
                 OutletNodeNums = 0;
                 OutletNodeNames = "";
 
-                for (Loop = 1; Loop <= state.dataBranchInputManager->Splitters(Count).NumOutletBranches; ++Loop) {
+                for (int Loop = 1; Loop <= state.dataBranchInputManager->Splitters(Count).NumOutletBranches; ++Loop) {
                     GetInternalBranchData(state,
                                           LoopName,
                                           state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop),
@@ -901,8 +887,6 @@ namespace BranchInputManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function uses the branch structure to obtain the inlet node
@@ -911,22 +895,18 @@ namespace BranchInputManager {
         // Return value
         std::string InletNodeName; // Inlet node name of first branch in branch list
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Found1; // Pointer to Branch List Name
-        int Found2; // Pointer to Branch data
-
         if (state.dataBranchInputManager->GetBranchListInputFlag) {
             state.dataBranchInputManager->GetBranchListInputFlag = false;
             GetBranchListInput(state);
         }
 
-        Found1 = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
+        int Found1 = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
         if (Found1 == 0) {
             ShowSevereError(state, format("GetFirstBranchInletNodeName: BranchList=\"{}\", not a valid BranchList Name", BranchListName));
             InletNodeName = "Invalid Node Name";
         } else {
-            Found2 = UtilityRoutines::FindItemInList(state.dataBranchInputManager->BranchList(Found1).BranchNames(1),
-                                                     state.dataBranchInputManager->Branch);
+            int Found2 = UtilityRoutines::FindItemInList(state.dataBranchInputManager->BranchList(Found1).BranchNames(1),
+                                                         state.dataBranchInputManager->Branch);
             if (Found2 == 0) {
                 ShowSevereError(state,
                                 format("GetFirstBranchInletNodeName: BranchList=\"{}\", Branch=\"{}\" not a valid Branch Name",
@@ -947,8 +927,6 @@ namespace BranchInputManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function uses the branch structure to obtain the outlet node
@@ -957,21 +935,17 @@ namespace BranchInputManager {
         // Return value
         std::string OutletNodeName; // Outlet node name of last branch in branch list
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Found1; // Pointer to Branch List Name
-        int Found2; // Pointer to Branch data
-
         if (state.dataBranchInputManager->GetBranchListInputFlag) {
             state.dataBranchInputManager->GetBranchListInputFlag = false;
             GetBranchListInput(state);
         }
 
-        Found1 = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
+        int Found1 = UtilityRoutines::FindItemInList(BranchListName, state.dataBranchInputManager->BranchList);
         if (Found1 == 0) {
             ShowSevereError(state, format("GetLastBranchOutletNodeName: BranchList=\"{}\", not a valid BranchList Name", BranchListName));
             OutletNodeName = "Invalid Node Name";
         } else {
-            Found2 = UtilityRoutines::FindItemInList(
+            int Found2 = UtilityRoutines::FindItemInList(
                 state.dataBranchInputManager->BranchList(Found1).BranchNames(state.dataBranchInputManager->BranchList(Found1).NumOfBranchNames),
                 state.dataBranchInputManager->Branch);
             if (Found2 == 0) {
@@ -1002,7 +976,6 @@ namespace BranchInputManager {
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
         //       MODIFIED       October 2001, Automatic Extensibility
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the input for the following IDD structure:
@@ -1037,26 +1010,24 @@ namespace BranchInputManager {
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
-        int BCount;              // Actual Num of Branches
-        bool ErrFound;           // Flag for error detection
-        int NumAlphas;           // Used to retrieve names from IDF
         Array1D_string Alphas;   // Used to retrieve names from IDF
         Array1D_int NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
-        int NumNumbers;          // Used to retrieve numbers from IDF
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
         Array1D_bool lNumericBlanks;
         Array1D_bool lAlphaBlanks;
-        int IOStat; // Could be used in the Get Routines, not currently checked
-        int NumParams;
 
         if (state.dataBranchInputManager->GetBranchInputOneTimeFlag) {
             std::string CurrentModuleObject = "Branch";
             int NumOfBranches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+
             if (NumOfBranches > 0) {
                 state.dataBranchInputManager->Branch.allocate(NumOfBranches);
-                ErrFound = false;
+                int NumNumbers; // Used to retrieve numbers from IDF
+                int NumAlphas;  // Used to retrieve names from IDF
+                int NumParams;
+                bool ErrFound = false;
                 state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
                 NodeNums.dimension(NumParams, 0);
                 state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
@@ -1066,7 +1037,8 @@ namespace BranchInputManager {
                 cNumericFields.allocate(NumNumbers);
                 lAlphaBlanks.dimension(NumAlphas, true);
                 lNumericBlanks.dimension(NumNumbers, true);
-                BCount = 0;
+                int BCount = 0; // Actual Num of Branches
+                int IOStat;     // Could be used in the Get Routines, not currently checked
                 for (int Count = 1; Count <= NumOfBranches; ++Count) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                              CurrentModuleObject,
@@ -1108,15 +1080,12 @@ namespace BranchInputManager {
     void GetSingleBranchInput(EnergyPlusData &state,
                               std::string_view const RoutineName,
                               int const BCount,
-                              Array1D_string &Alphas,
-                              Array1D_string &cAlphaFields,
+                              Array1D_string const &Alphas,
+                              Array1D_string const &cAlphaFields,
                               int const NumAlphas,
                               Array1D_int &NodeNums,
-                              Array1D_bool &lAlphaBlanks)
+                              Array1D_bool const &lAlphaBlanks)
     {
-        // Using
-        using Curve::GetPressureCurveTypeAndIndex;
-
         // Locals
         PressureCurveType pressureCurveType;
         int PressureCurveIndex;
@@ -1130,7 +1099,7 @@ namespace BranchInputManager {
         std::string CurrentModuleObject = "Branch";
 
         state.dataBranchInputManager->Branch(BCount).Name = Alphas(1);
-        GetPressureCurveTypeAndIndex(state, Alphas(2), pressureCurveType, PressureCurveIndex);
+        Curve::GetPressureCurveTypeAndIndex(state, Alphas(2), pressureCurveType, PressureCurveIndex);
         if (pressureCurveType == DataBranchAirLoopPlant::PressureCurveType::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, format("..Invalid {}=\"{}\".", cAlphaFields(2), Alphas(2)));
@@ -1268,8 +1237,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the branch list input and fills up the structures for
@@ -1422,8 +1389,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains connector list input from IDF.
@@ -1445,27 +1410,6 @@ namespace BranchInputManager {
         //     A5; \field Connector 2 Name
         //  This is in the process of possibly being extended, thus the code herein.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;               // Loop Counter
         int NumAlphas;           // Used to retrieve names from IDF
@@ -1478,8 +1422,6 @@ namespace BranchInputManager {
         Array1D_bool lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
         int NumParams;
-        int NumConnectors;
-        int CCount;
         int Arg;
         int SplitNum;
         int MixerNum;
@@ -1526,7 +1468,7 @@ namespace BranchInputManager {
                                                                      cAlphaFields,
                                                                      cNumericFields);
             state.dataBranchInputManager->ConnectorLists(Count).Name = Alphas(1);
-            NumConnectors = (NumAlphas - 1) / 2; // potential problem if puts in type but not name
+            int NumConnectors = (NumAlphas - 1) / 2; // potential problem if puts in type but not name
             if (mod(NumAlphas - 1, 2) != 0) ++NumConnectors;
             state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors = NumConnectors;
             state.dataBranchInputManager->ConnectorLists(Count).ConnectorType.allocate(NumConnectors);
@@ -1538,7 +1480,7 @@ namespace BranchInputManager {
             state.dataBranchInputManager->ConnectorLists(Count).NumOfSplitters = 0;
             state.dataBranchInputManager->ConnectorLists(Count).NumOfMixers = 0;
 
-            CCount = 0;
+            int CCount = 0;
             for (Arg = 2; Arg <= NumAlphas; Arg += 2) {
                 ++CCount;
                 if (UtilityRoutines::SameString(Alphas(Arg), cSPLITTER)) {
@@ -1702,8 +1644,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sept 2005 (moved from GetLoopSplitter)
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the Splitter data that is used in Loops.
@@ -1727,8 +1667,6 @@ namespace BranchInputManager {
         //         \type object-list
         //         \object-list Branches
 
-        // Using/Aliasing
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;           // Used to retrieve names from IDF
         Array1D_string Alphas;   // Used to retrieve names from IDF
@@ -1743,10 +1681,8 @@ namespace BranchInputManager {
         int Loop;
         int Loop1;
         int Count;
-        int Found;
         bool ErrorsFound(false);
         std::string TestName;
-        std::string BranchListName;
         std::string FoundSupplyDemandAir;
         std::string SaveSupplyDemandAir;
         std::string FoundLoop;
@@ -1800,7 +1736,7 @@ namespace BranchInputManager {
             state.dataBranchInputManager->GetBranchInputFlag = false;
         }
         for (Count = 1; Count <= NumSplitters; ++Count) {
-            Found =
+            int Found =
                 UtilityRoutines::FindItemInList(state.dataBranchInputManager->Splitters(Count).InletBranchName, state.dataBranchInputManager->Branch);
             if (Found == 0) {
                 ShowSevereError(state,
@@ -1865,7 +1801,7 @@ namespace BranchInputManager {
         for (Count = 1; Count <= NumSplitters; ++Count) {
             // 2.  Find the branch name in branchlist
             TestName = state.dataBranchInputManager->Splitters(Count).InletBranchName;
-            BranchListName = std::string();
+            std::string BranchListName = std::string();
             for (Loop1 = 1; Loop1 <= (int)state.dataBranchInputManager->BranchList.size(); ++Loop1) {
                 if (any_eq(state.dataBranchInputManager->BranchList(Loop1).BranchNames, TestName)) {
                     BranchListName = state.dataBranchInputManager->BranchList(Loop1).Name;
@@ -1954,8 +1890,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sept 2005 (moved from GetLoopMixer)
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the Mixer data that is used in Loops.
@@ -1995,10 +1929,8 @@ namespace BranchInputManager {
         int Loop;
         int Loop1;
         int Count;
-        int Found;
         bool ErrorsFound(false);
         std::string TestName;
-        std::string BranchListName;
         std::string FoundSupplyDemandAir;
         std::string SaveSupplyDemandAir;
         std::string FoundLoop;
@@ -2053,7 +1985,7 @@ namespace BranchInputManager {
             state.dataBranchInputManager->GetBranchInputFlag = false;
         }
         for (Count = 1; Count <= NumMixers; ++Count) {
-            Found =
+            int Found =
                 UtilityRoutines::FindItemInList(state.dataBranchInputManager->Mixers(Count).OutletBranchName, state.dataBranchInputManager->Branch);
             if (Found == 0) {
                 ShowSevereError(state,
@@ -2117,7 +2049,7 @@ namespace BranchInputManager {
         for (Count = 1; Count <= NumMixers; ++Count) {
             // 2.  Find the branch name in branchlist
             TestName = state.dataBranchInputManager->Mixers(Count).OutletBranchName;
-            BranchListName = std::string();
+            std::string BranchListName = std::string();
             for (Loop1 = 1; Loop1 <= (int)state.dataBranchInputManager->BranchList.size(); ++Loop1) {
                 if (any_eq(state.dataBranchInputManager->BranchList(Loop1).BranchNames, TestName)) {
                     BranchListName = state.dataBranchInputManager->BranchList(Loop1).Name;
@@ -2212,8 +2144,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // An auxiliary routine locate a plant loop and type from a BranchListName
@@ -2275,8 +2205,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // An auxiliary routine locate a condenser loop and type from a BranchListName
@@ -2335,8 +2263,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // An auxiliary routine locate a Airenser loop and type from a BranchListName
@@ -2389,8 +2315,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Assist in validating Loop Splitter/Mixer connections.
@@ -2455,27 +2379,23 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine will point out any "dangling branches" that are not included on a BranchList.
         // Warnings are produced as the user might clutter up the input file with unused branches.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumDanglingCount;        // when mustprint not true, count and report
-        int BlNum;                   // Branch List Counter
-        int BrN;                     // Branch Counter
-        int CpN;                     // Components on Branch
-        int Found;                   // non-zero when found
-        std::string FoundBranchName; // Branch matching compname/type
+        int NumDanglingCount; // when mustprint not true, count and report
+        int BlNum;            // Branch List Counter
+        int BrN;              // Branch Counter
+        int CpN;              // Components on Branch
         bool NeverFound;
 
         NumDanglingCount = 0;
         NeverFound = true;
         for (BrN = 1; BrN <= (int)state.dataBranchInputManager->Branch.size(); ++BrN) {
-            Found = 0;
-            FoundBranchName = "";
+            int Found = 0;
+            std::string FoundBranchName = "";
             if (present(CompType) && present(CompName)) {
                 for (CpN = 1; CpN <= state.dataBranchInputManager->Branch(BrN).NumOfComponents; ++CpN) {
                     if (!UtilityRoutines::SameString(CompType(), state.dataBranchInputManager->Branch(BrN).Component(CpN).CType) ||
@@ -2524,8 +2444,6 @@ namespace BranchInputManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine tests branch integrity and displays the loop for each branch.
@@ -2547,18 +2465,12 @@ namespace BranchInputManager {
         int BCount;
         int Found;
         //  LOGICAL UniqueNodeError
-        int NodeNum;
         int Loop2;
-        bool IsAirBranch;
         NodeFluidType BranchFluidType;
-        bool MixedFluidTypesOnBranchList;
         int InitialBranchFluidNode;
         Array1D_int BranchFluidNodes;
         Array1D_int FoundBranches;
         Array1D_int BranchPtrs;
-        int NumNodesOnBranchList;
-        int NumFluidNodes;
-        std::string OriginalBranchFluidType;
         std::string cBranchFluidType;
         int Ptr;
         int EndPtr;
@@ -2602,10 +2514,9 @@ namespace BranchInputManager {
                   state.dataBranchInputManager->BranchList(BCount).LoopType,
                   state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
 
-            IsAirBranch = false;
             BranchFluidType = NodeFluidType::Blank;
-            MixedFluidTypesOnBranchList = false;
-            NumNodesOnBranchList = 0;
+            bool MixedFluidTypesOnBranchList = false;
+            int NumNodesOnBranchList = 0;
             FoundBranches.allocate(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
             FoundBranches = 0;
             BranchPtrs.allocate(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames + 2);
@@ -2625,8 +2536,8 @@ namespace BranchInputManager {
             BranchPtrs(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames + 1) =
                 BranchPtrs(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames) + 1;
             BranchFluidNodes.dimension(NumNodesOnBranchList, 0);
-            OriginalBranchFluidType = std::string();
-            NumFluidNodes = 0;
+            std::string OriginalBranchFluidType = std::string();
+            int NumFluidNodes = 0;
             for (Count = 1; Count <= state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames; ++Count) {
                 Found = FoundBranches(Count);
                 if (Found == 0) {
@@ -2650,9 +2561,6 @@ namespace BranchInputManager {
                 }
                 NumErr = 0;
                 for (Loop = 1; Loop <= state.dataBranchInputManager->Branch(Found).NumOfComponents; ++Loop) {
-                    if (state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType ==
-                        DataLoopNode::NodeFluidType::Air)
-                        IsAirBranch = true;
                     if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
@@ -2670,9 +2578,6 @@ namespace BranchInputManager {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                     }
-                    if (state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType ==
-                        DataLoopNode::NodeFluidType::Air)
-                        IsAirBranch = true;
                     if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
@@ -2760,7 +2665,7 @@ namespace BranchInputManager {
         // Build node names in branches
         for (Count = 1; Count <= (int)state.dataBranchInputManager->Branch.size(); ++Count) {
             BranchNodes(Count).UniqueNodeNames.allocate(state.dataBranchInputManager->Branch(Count).NumOfComponents * 2);
-            NodeNum = 0;
+            int NodeNum = 0;
             for (Loop = 1; Loop <= state.dataBranchInputManager->Branch(Count).NumOfComponents; ++Loop) {
                 Found = UtilityRoutines::FindItemInList(
                     state.dataBranchInputManager->Branch(Count).Component(Loop).InletNodeName, BranchNodes(Count).UniqueNodeNames, NodeNum);

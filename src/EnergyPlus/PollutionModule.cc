@@ -6185,7 +6185,7 @@ void ReadEnergyMeters(EnergyPlusData &state)
     // This routine reads the meters for the energy used
 
     // Using/Aliasing
-    auto &FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
+    Real64 FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &Pollution = state.dataPollutionModule->Pollution;

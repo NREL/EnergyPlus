@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Shape.hh>
 
 namespace EnergyPlus {
@@ -81,8 +82,6 @@ namespace DataSurfaces {
     using DataVectorTypes::Vector;
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr int MaxSlatAngs(19);
-    constexpr int MaxProfAngs(37);
     constexpr int MaxPolyCoeff(6);
 
     // Parameters to indicate surface shape for use with the Surface
@@ -251,23 +250,6 @@ namespace DataSurfaces {
         "KivaFoundation - TwoDimensionalFiniteDifference",
         "Air Boundary - No Heat Transfer"};
 
-    // Parameters to indicate surface roughness for use with the Material
-    // derived type:
-    enum class SurfaceRoughness
-    {
-        Invalid = -1,
-        VeryRough,
-        Rough,
-        MediumRough,
-        MediumSmooth,
-        Smooth,
-        VerySmooth,
-        Num
-    };
-
-    constexpr std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> SurfaceRoughnessUC{
-        "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
-
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
     constexpr bool NOT_SHADED(WinShadingType const ShadingFlag)
@@ -332,16 +314,6 @@ namespace DataSurfaces {
         Fixed,
         Scheduled,
         BlockBeamSolar,
-        Num
-    };
-
-    // Parameter for window screens beam reflectance accounting
-    enum class ScreenBeamReflectanceModel
-    {
-        Invalid = -1,
-        DoNotModel,
-        DirectBeam,
-        Diffuse,
         Num
     };
 
@@ -820,8 +792,9 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceWindowCalc()
-            : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(MaxSlatAngs, 0.0),
-              EffGlassEmiss(MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0), EnclAreaReflProdMinusThisSurf(3, 0.0)
+            : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0),
+              EffShBlindEmiss(Material::MaxSlatAngs, 0.0), EffGlassEmiss(Material::MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0),
+              EnclAreaReflProdMinusThisSurf(3, 0.0)
         {
         }
     };
@@ -1135,55 +1108,6 @@ namespace DataSurfaces {
 
         // Default Constructor
         ShadingVertexData()
-        {
-        }
-    };
-
-    struct ExtVentedCavityStruct
-    {
-        // Members
-        // from input data
-        std::string Name;
-        std::string OSCMName;             // OtherSideConditionsModel
-        int OSCMPtr;                      // OtherSideConditionsModel index
-        Real64 Porosity;                  // fraction of absorber plate [--]
-        Real64 LWEmitt;                   // Thermal Emissivity of Baffle Surface [dimensionless]
-        Real64 SolAbsorp;                 // Solar Absorbtivity of Baffle Surface [dimensionless]
-        SurfaceRoughness BaffleRoughness; // surface roughness for exterior convection calcs.
-        Real64 PlenGapThick;              // Depth of Plenum Behind Baffle [m]
-        int NumSurfs;                     // a single baffle can have multiple surfaces underneath it
-        Array1D_int SurfPtrs;             // = 0  ! array of pointers for participating underlying surfaces
-        Real64 HdeltaNPL;                 // Height scale for Cavity buoyancy  [m]
-        Real64 AreaRatio;                 // Ratio of actual surface are to projected surface area [dimensionless]
-        Real64 Cv;                        // volume-based effectiveness of openings for wind-driven vent when Passive
-        Real64 Cd;                        // discharge coefficient of openings for buoyancy-driven vent when Passive
-        // data from elsewhere and calculated
-        Real64 ActualArea;  // Overall Area of Collect with surface corrugations.
-        Real64 ProjArea;    // Overall Area of Collector projected, as if flat [m2]
-        Vector Centroid;    // computed centroid
-        Real64 TAirCav;     // modeled drybulb temperature for air between baffle and wall [C]
-        Real64 Tbaffle;     // modeled surface temperature for baffle[C]
-        Real64 TairLast;    // Old Value for modeled drybulb temp of air between baffle and wall [C]
-        Real64 TbaffleLast; // Old value for modeled surface temperature for baffle [C]
-        Real64 HrPlen;      // Modeled radiation coef for OSCM [W/m2-C]
-        Real64 HcPlen;      // Modeled Convection coef for OSCM [W/m2-C]
-        Real64 MdotVent;    // air mass flow exchanging with ambient when passive.
-        Real64 Tilt;        // Tilt from area weighted average of underlying surfaces
-        Real64 Azimuth;     // Azimuth from area weighted average of underlying surfaces
-        Real64 QdotSource;  // Source/sink term
-        // reporting data
-        Real64 Isc;              // total incident solar on baffle [W]
-        Real64 PassiveACH;       // air changes per hour when passive [1/hr]
-        Real64 PassiveMdotVent;  // Total Nat Vent air change rate  [kg/s]
-        Real64 PassiveMdotWind;  // Nat Vent air change rate from Wind-driven [kg/s]
-        Real64 PassiveMdotTherm; // Nat. Vent air change rate from buoyancy-driven flow [kg/s]
-
-        // Default Constructor
-        ExtVentedCavityStruct()
-            : OSCMPtr(0), Porosity(0.0), LWEmitt(0.0), SolAbsorp(0.0), BaffleRoughness(SurfaceRoughness::VeryRough), PlenGapThick(0.0), NumSurfs(0),
-              HdeltaNPL(0.0), AreaRatio(0.0), Cv(0.0), Cd(0.0), ActualArea(0.0), ProjArea(0.0), Centroid(0.0, 0.0, 0.0), TAirCav(0.0), Tbaffle(0.0),
-              TairLast(20.0), TbaffleLast(20.0), HrPlen(0.0), HcPlen(0.0), MdotVent(0.0), Tilt(0.0), Azimuth(0.0), QdotSource(0.0), Isc(0.0),
-              PassiveACH(0.0), PassiveMdotVent(0.0), PassiveMdotWind(0.0), PassiveMdotTherm(0.0)
         {
         }
     };
@@ -1721,7 +1645,6 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::ConvectionCoefficient> UserIntConvectionCoeffs;
     EPVector<DataSurfaces::ConvectionCoefficient> UserExtConvectionCoeffs;
     EPVector<DataSurfaces::ShadingVertexData> ShadeV;
-    EPVector<DataSurfaces::ExtVentedCavityStruct> ExtVentedCavity;
     EPVector<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
     EPVector<DataSurfaces::SurfaceIncidentSolarMultiplier> SurfIncSolMultiplier;
     EPVector<DataSurfaces::FenestrationSolarAbsorbed> FenLayAbsSSG;
@@ -1730,7 +1653,7 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::IntMassObject> IntMassObjects;
     EPVector<DataSurfaces::GroundSurfacesProperty> GroundSurfsProperty;
 
-    int actualMaxSlatAngs = DataSurfaces::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
+    int actualMaxSlatAngs = Material::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
 
     void clear_state() override
     {
@@ -2067,14 +1990,13 @@ struct SurfacesData : BaseGlobalStruct
         this->UserIntConvectionCoeffs.deallocate();
         this->UserExtConvectionCoeffs.deallocate();
         this->ShadeV.deallocate();
-        this->ExtVentedCavity.deallocate();
         this->SurfIncSolSSG.deallocate();
         this->SurfIncSolMultiplier.deallocate();
         this->FenLayAbsSSG.deallocate();
         this->SurfLocalEnvironment.deallocate();
         this->SurroundingSurfsProperty.deallocate();
         this->IntMassObjects.deallocate();
-        this->actualMaxSlatAngs = DataSurfaces::MaxSlatAngs;
+        this->actualMaxSlatAngs = Material::MaxSlatAngs;
         this->GroundSurfsProperty.deallocate();
     }
 };

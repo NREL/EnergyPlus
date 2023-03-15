@@ -236,7 +236,6 @@ namespace HeatBalFiniteDiffManager {
 
                 // Load the material derived type from the input data.
                 MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
-                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {} entered={}, must match to a valid Material name.",
@@ -246,8 +245,9 @@ namespace HeatBalFiniteDiffManager {
                     ErrorsFound = true;
                     continue;
                 }
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
 
-                if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
+                if (thisMaterial->group != Material::Group::Regular) {
                     ShowSevereError(state,
                                     format("{}: Reference Material is not appropriate type for CondFD properties, material={}, must have regular "
                                            "properties (L,Cp,K,D)",
@@ -337,7 +337,6 @@ namespace HeatBalFiniteDiffManager {
 
                 // Load the material derived type from the input data.
                 MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
-                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {} entered={}, must match to a valid Material name.",
@@ -347,8 +346,9 @@ namespace HeatBalFiniteDiffManager {
                     ErrorsFound = true;
                     continue;
                 }
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
 
-                if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
+                if (thisMaterial->group != Material::Group::Regular) {
                     ShowSevereError(state,
                                     format("{}: Reference Material is not appropriate type for CondFD properties, material={}, must have regular "
                                            "properties (L,Cp,K,D)",
@@ -431,7 +431,6 @@ namespace HeatBalFiniteDiffManager {
         // This subroutine sets the initial values for the FD moisture calculation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &MyEnvrnFlag = state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag;
         int SurfNum;
         int ConstrNum; // Loop counter
         bool ErrorsFound;
@@ -446,7 +445,7 @@ namespace HeatBalFiniteDiffManager {
         ErrorsFound = false;
 
         // now do begin environment inits.
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag) {
             for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
                 if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
@@ -491,10 +490,10 @@ namespace HeatBalFiniteDiffManager {
                 state.dataMstBal->HAirFD(SurfNum) = 0.0;
             }
             state.dataHeatBalFiniteDiffMgr->WarmupSurfTemp = 0;
-            MyEnvrnFlag = false;
+            state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            state.dataHeatBalFiniteDiffMgr->MyEnvrnFlag = true;
         }
 
         // now do every timestep inits
@@ -641,7 +640,8 @@ namespace HeatBalFiniteDiffManager {
                 // now there are special equations for R-only layers.
 
                 CurrentLayer = thisConstruct.LayerPoint(Layer);
-                auto *thisMaterial = state.dataMaterial->Material(CurrentLayer);
+                auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(CurrentLayer));
+                assert(thisMaterial != nullptr);
 
                 thisConstructFD.Name(Layer) = thisMaterial->Name;
                 thisConstructFD.Thickness(Layer) = thisMaterial->Thickness;
@@ -669,7 +669,7 @@ namespace HeatBalFiniteDiffManager {
 
                     mAlpha = 0.0;
 
-                } else if (thisMaterial->Group == Material::MaterialGroup::Air) { //  Group 1 = Air
+                } else if (thisMaterial->group == Material::Group::Air) { //  Group 1 = Air
 
                     //  Again, these values are only needed temporarily and to calculate flux,
                     //   Air layer will be handled
@@ -757,7 +757,7 @@ namespace HeatBalFiniteDiffManager {
                 Ipts1 = int(thisMaterial->Thickness / dxn);
                 //  set high conductivity layers to a single full size node thickness. (two half nodes)
                 if (Ipts1 <= 1) Ipts1 = 1;
-                if (thisMaterial->ROnly || thisMaterial->Group == Material::MaterialGroup::Air) {
+                if (thisMaterial->ROnly || thisMaterial->group == Material::Group::Air) {
 
                     Ipts1 = 1; //  single full node in R layers- surfaces of adjacent material or inside/outside layer
                 }
@@ -1613,7 +1613,7 @@ namespace HeatBalFiniteDiffManager {
 
                 int const ConstrNum(surface.Construction);
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-                auto const *mat(state.dataMaterial->Material(MatLay));
+                auto const *mat(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay)));
                 auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
                 auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
                 auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
@@ -1622,7 +1622,7 @@ namespace HeatBalFiniteDiffManager {
 
                 // Calculate the Dry Heat Conduction Equation
 
-                if (mat->ROnly || mat->Group == Material::MaterialGroup::Air) { // R Layer or Air Layer  **********
+                if (mat->ROnly || mat->group == Material::Group::Air) { // R Layer or Air Layer  **********
                     // Use algebraic equation for TDT based on R
                     Real64 const Rlayer(mat->Resistance);
                     TDT_i = (TDT_p + (QRadSWOutFD + hgnd * Tgnd + (hconvo + hrad) * Toa + hsky * Tsky) * Rlayer) /
@@ -1785,7 +1785,7 @@ namespace HeatBalFiniteDiffManager {
         int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
 
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-        auto const *mat(state.dataMaterial->Material(MatLay));
+        auto const *mat(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay)));
         auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
         auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
         auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
@@ -1915,10 +1915,10 @@ namespace HeatBalFiniteDiffManager {
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
             int const MatLay(construct.LayerPoint(Lay));
-            auto const *mat(state.dataMaterial->Material(MatLay));
+            auto const *mat(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay)));
 
             int const MatLay2(construct.LayerPoint(Lay + 1));
-            auto const *mat2(state.dataMaterial->Material(MatLay2));
+            auto const *mat2(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay2)));
 
             auto const &condActuator1(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
             auto const &condActuator2(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay + 1));
@@ -1931,8 +1931,8 @@ namespace HeatBalFiniteDiffManager {
             Real64 const TDT_m(TDT(i - 1));
             Real64 const TDT_p(TDT(i + 1));
 
-            bool const RLayerPresent(mat->ROnly || mat->Group == Material::MaterialGroup::Air);
-            bool const RLayer2Present(mat2->ROnly || mat2->Group == Material::MaterialGroup::Air);
+            bool const RLayerPresent(mat->ROnly || mat->group == Material::Group::Air);
+            bool const RLayer2Present(mat2->ROnly || mat2->group == Material::Group::Air);
 
             Real64 const Rlayer(mat->Resistance);   // Resistance value of R Layer
             Real64 const Rlayer2(mat2->Resistance); // Resistance value of next layer to inside
@@ -2323,14 +2323,14 @@ namespace HeatBalFiniteDiffManager {
         Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
         if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-            auto const *mat(state.dataMaterial->Material(MatLay));
+            auto const *mat(dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatLay)));
             auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
             auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
             auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
 
             // Calculate the Dry Heat Conduction Equation
 
-            if (mat->ROnly || mat->Group == Material::MaterialGroup::Air) { // R Layer or Air Layer
+            if (mat->ROnly || mat->group == Material::Group::Air) { // R Layer or Air Layer
                 // Use algebraic equation for TDT based on R
                 Real64 constexpr IterDampConst(
                     5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls
@@ -2629,13 +2629,14 @@ namespace HeatBalFiniteDiffManager {
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,
                                         int finiteDifferenceLayerIndex,
                                         int surfaceIndex,
-                                        const Material::MaterialProperties *materialDefinition,
+                                        const Material::MaterialBase *materialDefinitionBase,
                                         Real64 temperaturePrevious,
                                         Real64 temperatureUpdated,
                                         Real64 &updatedSpecificHeat,
                                         Real64 &updatedDensity,
                                         Real64 &updatedThermalConductivity)
     {
+        auto const *materialDefinition = dynamic_cast<const Material::MaterialChild *>(materialDefinitionBase);
         updatedSpecificHeat = materialDefinition->phaseChange->getCurrentSpecificHeat(
             temperaturePrevious,
             temperatureUpdated,

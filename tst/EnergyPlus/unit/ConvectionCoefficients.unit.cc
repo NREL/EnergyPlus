@@ -606,7 +606,7 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     EXPECT_FALSE(ErrorsFound);
 
     Real64 HMovInsul = 1.0;
-    DataSurfaces::SurfaceRoughness RoughSurf = DataSurfaces::SurfaceRoughness::VerySmooth;
+    Material::SurfaceRoughness RoughSurf = Material::SurfaceRoughness::VerySmooth;
     Real64 AbsThermSurf = 0.84;
     Real64 TempExt = -20.0;
     Real64 HExt;
