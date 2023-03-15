@@ -146,7 +146,6 @@ namespace EnergyPlus::DaylightingManager {
 // DLUMEF      DayltgLuminousEfficacy          WeatherManager     WeatherManager
 
 // Using/Aliasing
-using namespace DataHeatBalance;
 using namespace DataSurfaces;
 
 void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // Enclosure number
@@ -2248,8 +2247,8 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
             state.dataDaylightingManager->GroundHitPt(1) = RWIN2(1) + HorDis * std::cos(Beta);
             state.dataDaylightingManager->GroundHitPt(2) = RWIN2(2) + HorDis * std::sin(Beta);
 
-            SkyObstructionMult =
-                CalcObstrMultiplier(state, state.dataDaylightingManager->GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
+            SkyObstructionMult = CalcObstrMultiplier(
+                state, state.dataDaylightingManager->GroundHitPt, AltAngStepsForSolReflCalc, DataSurfaces::AzimAngStepsForSolReflCalc);
         } // End of check if solar reflection calculation is in effect
 
     } // End of check if COSB > 0
@@ -2629,7 +2628,8 @@ void InitializeCFSStateData(EnergyPlusData &state,
                         // for solar reflectance calculations, need to precalculate obstruction multipliers
                         if (state.dataSurface->CalcSolRefl) {
                             GroundHitPt = TmpGndPt(NGnd);
-                            TmpGndMultiplier(NGnd) = CalcObstrMultiplier(state, GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
+                            TmpGndMultiplier(NGnd) =
+                                CalcObstrMultiplier(state, GroundHitPt, AltAngStepsForSolReflCalc, DataSurfaces::AzimAngStepsForSolReflCalc);
                         }
                     } else {
                         // A sky ray
@@ -2841,9 +2841,6 @@ void CFSRefPointPosFactor(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate position factor for given reference point.
 
-    // Using/Aliasing
-    using WindowComplexManager::DaylghtAltAndAzimuth;
-
     // SUBROUTINE LOCAL VARIABLES
     int iTrnRay;
     Real64 XR;
@@ -2863,7 +2860,7 @@ void CFSRefPointPosFactor(EnergyPlusData &state,
         if (hit) {
             RefPointMap.RefPointIntersection(iTrnRay) = true;
 
-            elPos = DaylghtAltAndAzimuth(V);
+            elPos = WindowComplexManager::DaylghtAltAndAzimuth(V);
 
             XR = std::tan(std::abs(DataGlobalConstants::PiOvr2 - AZVIEW - elPos.Azimuth) + 0.001);
             YR = std::tan(elPos.Altitude + 0.001);
@@ -2892,9 +2889,6 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     // azimuth Theta and create upward-going ground ray unit vector at each Phi,Theta pair.
     // Phi = 0 at the horizon; Phi = Pi/2 at the zenith.
 
-    // USE STATEMENTS:
-    using DataSurfaces::AzimAngStepsForSolReflCalc;
-
     // Return value
     Real64 ObstrMultiplier;
 
@@ -2922,7 +2916,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     auto &sin_Theta = state.dataDaylightingManager->sin_Theta;         // Unit vector in (Phi,Theta) direction
     auto &AzimSteps_last = state.dataDaylightingManager->AzimSteps_last;
 
-    assert(AzimSteps <= AzimAngStepsForSolReflCalc);
+    assert(AzimSteps <= DataSurfaces::AzimAngStepsForSolReflCalc);
 
     DPhi = DataGlobalConstants::PiOvr2 / (AltSteps / 2.0);
     DTheta = DataGlobalConstants::Pi / AzimSteps;
@@ -3056,7 +3050,6 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
     // METHODOLOGY EMPLOYED:
     // switch as need to serve both reference points and map points based on calledFrom
-    using General::POLYF;
 
     if (state.dataSurface->SurfSunCosHourly(iHour)(3) < DataEnvironment::SunIsUpValue) return;
 
@@ -3386,7 +3379,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                             IntWinDiskHitNum = 0;
                                             continue;
                                         }
-                                        TVISIntWinDisk = POLYF(
+                                        TVISIntWinDisk = General::POLYF(
                                             COSBIntWin,
                                             state.dataConstruction->Construct(state.dataSurface->Surface(IntWinDisk).Construction).TransVisBeamCoef);
                                         break;
@@ -3447,8 +3440,8 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         TVISS = 0.0;
                     } else {
                         // Beam transmittance for bare window and all types of blinds
-                        TVISS = POLYF(COSI, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                                state.dataSurface->SurfWinLightWellEff(IWin);
+                        TVISS = General::POLYF(COSI, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                                state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                         if (ExtWinType == DataDaylighting::ExtWinType::AdjZoneExtWin && hitIntWinDisk) TVISS *= TVISIntWinDisk;
                     }
 
@@ -3480,10 +3473,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         //                          pass angle from sun to window normal here using PHSUN and THSUN from above and surface angles
                         //                          SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                         //                          SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
-                        CalcScreenTransmittance(state,
-                                                IWin,
-                                                (state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin)),
-                                                (state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin)));
+                        DataHeatBalance::CalcScreenTransmittance(state,
+                                                                 IWin,
+                                                                 (state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin)),
+                                                                 (state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin)));
                         TransBmBmMult(1) = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTrans;
                         state.dataDaylightingManager->EDIRSUdisk(iHour, 2) = RAYCOS(3) * TVISS * TransBmBmMult(1) * ObTransDisk;
                     }
@@ -3624,14 +3617,15 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window) {
                                 int const ConstrNumRefl = state.dataSurface->SurfActiveConstruction(ReflSurfNum);
                                 SpecReflectance =
-                                    POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                    General::POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                             }
                             if (state.dataSurface->Surface(ReflSurfNum).IsShadowing && state.dataSurface->SurfShadowGlazingConstruct(ReflSurfNum) > 0)
-                                SpecReflectance = state.dataSurface->SurfShadowGlazingFrac(ReflSurfNum) *
-                                                  POLYF(std::abs(CosIncAngRefl),
-                                                        state.dataConstruction->Construct(state.dataSurface->SurfShadowGlazingConstruct(ReflSurfNum))
-                                                            .ReflSolBeamFrontCoef);
-                            TVisRefl = POLYF(CosIncAngRec, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                                SpecReflectance =
+                                    state.dataSurface->SurfShadowGlazingFrac(ReflSurfNum) *
+                                    General::POLYF(std::abs(CosIncAngRefl),
+                                                   state.dataConstruction->Construct(state.dataSurface->SurfShadowGlazingConstruct(ReflSurfNum))
+                                                       .ReflSolBeamFrontCoef);
+                            TVisRefl = General::POLYF(CosIncAngRec, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
                                        state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                             state.dataDaylightingManager->EDIRSUdisk(iHour, 1) += SunVecMir(3) * SpecReflectance * TVisRefl; // Bare window
 
@@ -3661,10 +3655,11 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 //                             pass angle from sun to window normal here using PHSUN and THSUN from above and
                                 //                             surface angles SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                                 //                             SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
-                                CalcScreenTransmittance(state,
-                                                        IWin,
-                                                        (state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin)),
-                                                        (state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin)));
+                                DataHeatBalance::CalcScreenTransmittance(
+                                    state,
+                                    IWin,
+                                    (state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin)),
+                                    (state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin)));
                                 TransBmBmMultRefl(1) = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTrans;
                                 state.dataDaylightingManager->EDIRSUdisk(iHour, 2) +=
                                     SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(1);
@@ -3974,8 +3969,6 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     // This subroutine provides a simple structure to get all daylighting
     // parameters.
 
-    using namespace DElightManagerF; // Module for managing DElight subroutines
-
     if (!state.dataDaylightingManager->getDaylightingParametersInputFlag) return;
     state.dataDaylightingManager->getDaylightingParametersInputFlag = false;
 
@@ -4190,12 +4183,12 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     if (doesDayLightingUseDElight(state)) {
         Real64 dLatitude = state.dataEnvrn->Latitude;
         DisplayString(state, "Calculating DElight Daylighting Factors");
-        DElightInputGenerator(state);
+        DElightManagerF::DElightInputGenerator(state);
         // Init Error Flag to 0 (no Warnings or Errors)
         DisplayString(state, "ReturnFrom DElightInputGenerator");
         int iErrorFlag = 0;
         DisplayString(state, "Calculating DElight DaylightCoefficients");
-        GenerateDElightDaylightCoefficients(dLatitude, iErrorFlag);
+        DElightManagerF::GenerateDElightDaylightCoefficients(dLatitude, iErrorFlag);
         // Check Error Flag for Warnings or Errors returning from DElight
         // RJH 2008-03-07: open file for READWRITE and DELETE file after processing
         DisplayString(state, "ReturnFrom DElight DaylightCoefficients Calc");
@@ -4279,9 +4272,6 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 {
     // Perform the GetInput function for the Output:IlluminanceMap
     // Glazer - June 2016 (moved from GetDaylightingControls)
-    using DataStringGlobals::CharComma;
-    using DataStringGlobals::CharSpace;
-    using DataStringGlobals::CharTab;
 
     int AddMapPoints;
     int RefPt;
@@ -4440,7 +4430,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 
         if (MapStyleIn == 0) {
             state.dataIPShortCut->cAlphaArgs(1) = "COMMA";
-            state.dataDaylightingData->MapColSep = CharComma; // comma
+            state.dataDaylightingData->MapColSep = DataStringGlobals::CharComma; // comma
         } else if (MapStyleIn == 1) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -4455,13 +4445,13 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (state.dataIPShortCut->cAlphaArgs(1) == "COMMA") {
-                state.dataDaylightingData->MapColSep = CharComma; // comma
+                state.dataDaylightingData->MapColSep = DataStringGlobals::CharComma; // comma
             } else if (state.dataIPShortCut->cAlphaArgs(1) == "TAB") {
-                state.dataDaylightingData->MapColSep = CharTab; // tab
+                state.dataDaylightingData->MapColSep = DataStringGlobals::CharTab; // tab
             } else if (state.dataIPShortCut->cAlphaArgs(1) == "FIXED" || state.dataIPShortCut->cAlphaArgs(1) == "SPACE") {
-                state.dataDaylightingData->MapColSep = CharSpace; // space
+                state.dataDaylightingData->MapColSep = DataStringGlobals::CharSpace; // space
             } else {
-                state.dataDaylightingData->MapColSep = CharComma; // comma
+                state.dataDaylightingData->MapColSep = DataStringGlobals::CharComma; // comma
                 ShowWarningError(state,
                                  format("{}: invalid {}=\"{}\", Commas will be used to separate fields.",
                                         cCurrentModuleObject,
@@ -5071,11 +5061,6 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
     //       MODIFIED       Glazer - July 2016 - separated this from GetInput function
     // For splitflux daylighting, transform the geometry
 
-    using InternalHeatGains::CheckLightsReplaceableMinMaxForZone;
-    using InternalHeatGains::GetDesignLightingLevelForZone;
-    using namespace OutputReportPredefined;
-    using ScheduleManager::GetScheduleIndex;
-
     int refPtNum;
     std::string refName;
     Real64 CosBldgRelNorth;         // Cosine of Building rotation
@@ -5119,8 +5104,8 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
         CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
         SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
 
-        rLightLevel = GetDesignLightingLevelForZone(state, daylCntrl.zoneIndex);
-        CheckLightsReplaceableMinMaxForZone(state, daylCntrl.zoneIndex);
+        rLightLevel = InternalHeatGains::GetDesignLightingLevelForZone(state, daylCntrl.zoneIndex);
+        InternalHeatGains::CheckLightsReplaceableMinMaxForZone(state, daylCntrl.zoneIndex);
 
         for (refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum) {
             auto &curRefPt(state.dataDaylightingData->DaylRefPt(daylCntrl.DaylRefPtNum(refPtNum))); // get the active daylighting:referencepoint
@@ -5153,24 +5138,25 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
                 }
             }
             refName = curRefPt.Name;
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
             if (daylCntrl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
             } else {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
             }
             // ( 1=continuous, 2=stepped, 3=continuous/off )
             if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::Continuous) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous");
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous");
             } else if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::Stepped) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Stepped");
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Stepped");
             } else if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::ContinuousOff) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous/Off");
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous/Off");
             }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWInst, refName, rLightLevel);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWInst, refName, rLightLevel);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
 
             if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(1, refPtNum) > zone.MaximumX) {
                 daylCntrl.DaylRefPtInBounds(refPtNum) = false;
@@ -5700,9 +5686,6 @@ void DayltgHitObstruction(EnergyPlusData &state,
     // REFERENCES:
     // Based on DOE-2.1E subroutine DHITSH.
 
-    // Using/Aliasing
-    using ScheduleManager::LookUpScheduleValue;
-
     // Local declarations
     SurfaceClass IType; // Surface type/class:  mirror surfaces of shading surfaces
     bool hit;           // True iff a particular obstruction is hit
@@ -5730,7 +5713,8 @@ void DayltgHitObstruction(EnergyPlusData &state,
                 PierceSurface(state, ISurf, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);
                 if (hit) { // Shading surface is hit
                     // Get solar transmittance of the shading surface
-                    Real64 const Trans(surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue(state, surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
+                    Real64 const Trans(
+                        surface.SchedShadowSurfIndex > 0 ? ScheduleManager::LookUpScheduleValue(state, surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
                     if (Trans < 1.e-6) {
                         ObTrans = 0.0;
                         break;
@@ -5760,7 +5744,8 @@ void DayltgHitObstruction(EnergyPlusData &state,
                 PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);
                 if (hit) { // Shading surface is hit
                     // Get solar transmittance of the shading surface
-                    Real64 const Trans(surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue(state, surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
+                    Real64 const Trans(
+                        surface.SchedShadowSurfIndex > 0 ? ScheduleManager::LookUpScheduleValue(state, surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
                     if (Trans < 1.e-6) {
                         ObTrans = 0.0;
                         return true;
@@ -6282,7 +6267,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     // Three arrays to save original clear and dark (fully switched) states'
     //  zone/window daylighting properties.
     if (state.dataDaylightingManager->DayltgInteriorIllum_firstTime) {
-        int const d1(max(maxval(state.dataHeatBal->Zone, &ZoneData::NumSubSurfaces),
+        int const d1(max(maxval(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::NumSubSurfaces),
                          maxval(state.dataDaylightingData->enclDaylight, &DataDaylighting::EnclDaylightCalc::NumOfDayltgExtWins)));
         tmpIllumFromWinAtRefPt.allocate(d1, 2, state.dataDaylightingManager->maxNumRefPtInAnyDaylCtrl);
         tmpBackLumFromWinAtRefPt.allocate(d1, 2, state.dataDaylightingManager->maxNumRefPtInAnyDaylCtrl);
@@ -7582,10 +7567,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // REFERENCES:
     // Based on DOE-2.1E subroutine DREFLT.
 
-    // Using/Aliasing
-    using DaylightingDevices::TransTDD;
-    using General::POLYF;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // In the following I,J arrays:
     // I = sky type;
@@ -7849,8 +7830,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     DayltgInterReflectedIllumGroundHitPt(1) = state.dataSurface->SurfaceWindow(IWin).WinCenter(1) + HorDis * std::cos(Beta);
                     DayltgInterReflectedIllumGroundHitPt(2) = state.dataSurface->SurfaceWindow(IWin).WinCenter(2) + HorDis * std::sin(Beta);
 
-                    SkyObstructionMult(IPH, ITH) =
-                        CalcObstrMultiplier(state, DayltgInterReflectedIllumGroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
+                    SkyObstructionMult(IPH, ITH) = CalcObstrMultiplier(
+                        state, DayltgInterReflectedIllumGroundHitPt, AltAngStepsForSolReflCalc, DataSurfaces::AzimAngStepsForSolReflCalc);
                 } // End of check if solar reflection calc is in effect
                 for (ISky = 1; ISky <= 4; ++ISky) {
                     // Below, luminance of ground in cd/m2 is illuminance on ground in lumens/m2
@@ -7946,7 +7927,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
             if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                 // Unshaded visible transmittance of TDD for a single ray from sky/ground element
-                TVISBR = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
+                TVISBR = DaylightingDevices::TransTDD(state, PipeNum, COSB, DataDaylightingDevices::RadType::VisibleBeam) *
+                         state.dataSurface->SurfWinGlazedFrac(IWin);
 
                 // Make all transmitted light diffuse for a TDD with a bare diffuser
                 for (ISky = 1; ISky <= 4; ++ISky) {
@@ -7971,8 +7953,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
             } else { // Bare window
                 // Transmittance of bare window for this sky/ground element
-                TVISBR = POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                         state.dataSurface->SurfWinLightWellEff(IWin);
+                TVISBR = General::POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                         state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                 if (InShelfSurf > 0) { // Inside daylighting shelf
                     // Daylighting shelf simplification:  All light is diffuse
@@ -8006,9 +7988,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                 COSBintWin = SPH * std::sin(state.dataSurface->SurfWinPhi(IntWinNum)) +
                                              CPH * std::cos(state.dataSurface->SurfWinPhi(IntWinNum)) *
                                                  std::cos(TH - state.dataSurface->SurfWinTheta(IntWinNum));
-                                TVISBR *=
-                                    POLYF(COSBintWin,
-                                          state.dataConstruction->Construct(state.dataSurface->Surface(IntWinNum).Construction).TransVisBeamCoef);
+                                TVISBR *= General::POLYF(
+                                    COSBintWin,
+                                    state.dataConstruction->Construct(state.dataSurface->Surface(IntWinNum).Construction).TransVisBeamCoef);
                                 break;
                             }
                         }
@@ -8074,16 +8056,17 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 if (ShadeOn) { // Shade
                     if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                         // Shaded visible transmittance of TDD for a single ray from sky/ground element
-                        TransMult(1) =
-                            TransTDD(state, PipeNum, COSB, DataDaylightingDevices::RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
+                        TransMult(1) = DaylightingDevices::TransTDD(state, PipeNum, COSB, DataDaylightingDevices::RadType::VisibleBeam) *
+                                       state.dataSurface->SurfWinGlazedFrac(IWin);
                     } else { // Shade only, no TDD
                         // Calculate transmittance of the combined window and shading device for this sky/ground element
-                        TransMult(1) = POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
+                        TransMult(1) = General::POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
                                        state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                     }
 
                 } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
-                    CalcScreenTransmittance(state, IWin, (PH - state.dataSurface->SurfWinPhi(IWin)), (TH - state.dataSurface->SurfWinTheta(IWin)));
+                    DataHeatBalance::CalcScreenTransmittance(
+                        state, IWin, (PH - state.dataSurface->SurfWinPhi(IWin)), (TH - state.dataSurface->SurfWinTheta(IWin)));
                     ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
                     ReflScDiffDiffBack = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).DifReflectVis;
                     TransScBmDiffFront = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmDifTransVis;
@@ -8122,7 +8105,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                             (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
+                            t1 = General::POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
                             td2 = state.dataConstruction->Construct(IConst).tBareVisDiff(2);
                             rbd1 = state.dataConstruction->Construct(IConst).rbBareVisDiff(1);
                             rfd2 = state.dataConstruction->Construct(IConst).rfBareVisDiff(2);
@@ -8134,7 +8117,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                 TransMult(JB) =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
+                                t2 = General::POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
                                 td3 = state.dataConstruction->Construct(IConst).tBareVisDiff(3);
                                 rfd3 = state.dataConstruction->Construct(IConst).rfBareVisDiff(3);
                                 rbd2 = state.dataConstruction->Construct(IConst).rbBareVisDiff(2);
@@ -8157,7 +8140,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     } // End of loop over slat angles
 
                 } else { // Diffusing glass
-                    TransMult(1) = POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
+                    TransMult(1) = General::POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
                                    state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                 } // End of check if shade, blind or diffusing glass
 
@@ -8262,8 +8245,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
             if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                 // Unshaded visible transmittance of TDD for collimated beam from the sun
-                TVISBSun =
-                    TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
+                TVISBSun = DaylightingDevices::TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::RadType::VisibleBeam) *
+                           state.dataSurface->SurfWinGlazedFrac(IWin);
                 state.dataDaylightingManager->TDDTransVisBeam(IHR, PipeNum) = TVISBSun;
 
                 FLFWSUdisk(1) = 0.0; // Diffuse light only
@@ -8273,8 +8256,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 FLCWSU(1) += ZSU1 * TVISBSun * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
             } else { // Bare window
-                TVISBSun = POLYF(COSBSun, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                           state.dataSurface->SurfWinLightWellEff(IWin);
+                TVISBSun = General::POLYF(COSBSun, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                           state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                 // Daylighting shelf simplification:  No beam makes it past end of shelf, all light is diffuse
                 if (InShelfSurf > 0) {   // Inside daylighting shelf
@@ -8304,7 +8287,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     if (ShadeOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) { // Shade or screen on or diffusing glass
                         if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                             // Shaded visible transmittance of TDD for collimated beam from the sun
-                            TransMult(1) = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::RadType::VisibleBeam) *
+                            TransMult(1) = DaylightingDevices::TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::RadType::VisibleBeam) *
                                            state.dataSurface->SurfWinGlazedFrac(IWin);
                         } else {
                             if (ScreenOn) {
@@ -8313,7 +8296,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             } else {
                                 int IConstShaded = state.dataSurface->SurfWinActiveShadedConstruction(IWin);
                                 if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = state.dataSurface->Surface(IWin).Construction;
-                                TransMult(1) = POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
+                                TransMult(1) = General::POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
                                                state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                             }
                         }
@@ -8346,14 +8329,14 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                             state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
+                            t1 = General::POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
                             tfshBd = WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
                             rfshB = WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                             if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                 TransMult(JB) =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
+                                t2 = General::POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
                                 TransMult(JB) = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
                                                 state.dataSurface->SurfWinLightWellEff(IWin);
                             }
@@ -9133,9 +9116,6 @@ void ProfileAngle(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates profile angle for a surface.
 
-    // Using/Aliasing
-    using namespace DataSurfaces;
-
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
     // For HorOrVert = HORIZONTAL,
@@ -9383,9 +9363,6 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
     // REFERENCES:
     // Based on DOE-2.1E subroutine DINTIL.
 
-    // Using/Aliasing
-    using General::POLYF;
-
     // Locals
     auto &daylight_illum = state.dataDaylightingManager->daylight_illum;
 
@@ -9463,9 +9440,9 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                     //  based on the master construction. They need to be adjusted by the VTRatio, including:
                     //  ZoneDaylight()%DaylIllFacSky, DaylIllFacSun, DaylIllFacSunDisk; DaylBackFacSky,
                     //  DaylBackFacSun, DaylBackFacSunDisk, DaylSourceFacSky, DaylSourceFacSun, DaylSourceFacSunDisk
-                    VTNow = POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef);
-                    VTMaster =
-                        POLYF(1.0, state.dataConstruction->Construct(state.dataConstruction->Construct(IConst).TCMasterConst).TransVisBeamCoef);
+                    VTNow = General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef);
+                    VTMaster = General::POLYF(
+                        1.0, state.dataConstruction->Construct(state.dataConstruction->Construct(IConst).TCMasterConst).TransVisBeamCoef);
                     VTRatio = VTNow / VTMaster;
                 }
             }
@@ -9619,8 +9596,8 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                     //  get its intermediate VT calculated in DayltgInteriorIllum
                     IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
                     if (IConstShaded > 0)
-                        VTDark =
-                            POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
+                        VTDark = General::POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
+                                 state.dataSurface->SurfWinGlazedFrac(IWin);
                     if (VTDark > 0) VTMULT = state.dataSurface->SurfWinVisTransSelected(IWin) / VTDark;
                 }
             }
@@ -9650,11 +9627,6 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     // is placed on a temporary file and later (see CloseReportIllumMaps) coallesced into a single
     // output file.
 
-    // Using/Aliasing
-    using DataStringGlobals::CharComma;
-    using DataStringGlobals::CharSpace;
-    using DataStringGlobals::CharTab;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     std::string MapNoString;
@@ -9677,10 +9649,10 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
             outputFile.ensure_open(state, "ReportIllumMap");
             return outputFile;
         };
-        if (state.dataDaylightingData->MapColSep == CharTab) {
+        if (state.dataDaylightingData->MapColSep == DataStringGlobals::CharTab) {
             if (!openMapFile(state.files.outputMapTabFilePath).good()) return;
             //                CommaDelimited = false; //Unused Set but never used
-        } else if (state.dataDaylightingData->MapColSep == CharComma) {
+        } else if (state.dataDaylightingData->MapColSep == DataStringGlobals::CharComma) {
             if (!openMapFile(state.files.outputMapCsvFilePath).good()) return;
             //                CommaDelimited = true; //Unused Set but never used
         } else {
@@ -9788,9 +9760,6 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
             } // X
 
             if (state.dataSQLiteProcedures->sqlite) {
-                auto &XValue = state.dataDaylightingManager->XValue;
-                auto &YValue = state.dataDaylightingManager->YValue;
-                auto &IllumValue = state.dataDaylightingManager->IllumValue;
                 if (state.dataDaylightingManager->SQFirstTime) {
                     int const nX(maxval(state.dataDaylightingData->IllumMap, &DataDaylighting::IllumMapData::Xnum));
                     int const nY(maxval(state.dataDaylightingData->IllumMap, &DataDaylighting::IllumMapData::Ynum));
@@ -9799,12 +9768,6 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                     state.dataDaylightingManager->IllumValue.allocate(nX, nY);
                     state.dataDaylightingManager->SQFirstTime = false;
                 }
-
-                // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
-                // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
-                int SQYear = state.dataGlobal->CalendarYear;
-                int SQMonth = state.dataEnvrn->Month;
-                int SQDayOfMonth = state.dataEnvrn->DayOfMonth;
 
                 for (int Y = 1; Y <= state.dataDaylightingData->IllumMap(MapNum).Ynum; ++Y) {
                     state.dataDaylightingManager->YValue(Y) =
@@ -9821,10 +9784,12 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                     } // X Loop
                 }     // Y Loop
 
+                // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
+                // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
                 state.dataSQLiteProcedures->sqlite->createSQLiteDaylightMap(MapNum,
-                                                                            SQYear,
-                                                                            SQMonth,
-                                                                            SQDayOfMonth,
+                                                                            state.dataGlobal->CalendarYear,
+                                                                            state.dataEnvrn->Month,
+                                                                            state.dataEnvrn->DayOfMonth,
                                                                             state.dataGlobal->HourOfDay,
                                                                             state.dataDaylightingData->IllumMap(MapNum).Xnum,
                                                                             state.dataDaylightingManager->XValue,
@@ -9848,17 +9813,12 @@ void CloseReportIllumMaps(EnergyPlusData &state)
     // This subroutine "closes" out the created daylight illuminance maps by merging them
     // into the "eplusout.map" file.
 
-    // Using/Aliasing
-    using DataStringGlobals::CharComma;
-    using DataStringGlobals::CharSpace;
-    using DataStringGlobals::CharTab;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     if ((int)state.dataDaylightingData->IllumMap.size() > 0) {
         // Write map header
-        if (state.dataDaylightingData->MapColSep == CharTab) {
+        if (state.dataDaylightingData->MapColSep == DataStringGlobals::CharTab) {
             state.files.map.filePath = state.files.outputMapTabFilePath;
-        } else if (state.dataDaylightingData->MapColSep == CharComma) {
+        } else if (state.dataDaylightingData->MapColSep == DataStringGlobals::CharComma) {
             state.files.map.filePath = state.files.outputMapCsvFilePath;
         } else {
             state.files.map.filePath = state.files.outputMapTxtFilePath;
