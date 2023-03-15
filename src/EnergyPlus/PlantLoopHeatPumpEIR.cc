@@ -252,6 +252,15 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         return;
     }
 
+    Real64 currentLoadConsolidated = currentLoad;
+    this->oriLoopLoad = currentLoad;
+    if (this->validConcurrentRunFlag) {
+        currentLoadConsolidated = abs(this->oriLoopLoad) > abs(this->companionHeatPumpCoil->oriLoopLoad)
+                                      ? this->oriLoopLoad
+                                      : (-1.0) * this->companionHeatPumpCoil->oriLoopLoad;
+        this->consolidateLoadsFlag = false; // this may not be needed
+    }
+
     // get setpoint on the load side outlet
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
 
@@ -282,7 +291,8 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
     Real64 partLoadRatio = 0.0;
     if (availableCapacity > 0) {
-        partLoadRatio = max(0.0, min(std::abs(currentLoad) / availableCapacity, 1.0));
+        // partLoadRatio = max(0.0, min(std::abs(currentLoadConsolidated) / availableCapacity, 1.0));
+        partLoadRatio = std::clamp(std::abs(currentLoadConsolidated) / availableCapacity, 0.0, 1.0);
     }
 
     // evaluate the actual current operating load side heat transfer rate
@@ -1099,9 +1109,25 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
             continue;
         }
         if (thisPLHP.running && thisPLHP.companionHeatPumpCoil->running) {
-            ShowRecurringWarningErrorAtEnd(state,
-                                           "Companion heat pump objects running concurrently, check operation.  Base object name: " + thisPLHP.name,
-                                           thisPLHP.recurringConcurrentOperationWarningIndex);
+            int thisLoadSideLoopNum = thisPLHP.loadSidePlantLoc.loopNum;
+            int compLoadSideLoopNum = thisPLHP.companionHeatPumpCoil->loadSidePlantLoc.loopNum;
+            int thisSourceSideLoopNum = thisPLHP.sourceSidePlantLoc.loopNum;
+            int compSourceSideLoopNum = thisPLHP.companionHeatPumpCoil->sourceSidePlantLoc.loopNum;
+
+            // Assuming this is the only concurrent scenarios allowed
+            if (thisLoadSideLoopNum == compSourceSideLoopNum && thisSourceSideLoopNum == compLoadSideLoopNum) {
+                // here check the load and reset the loads here based on the bigger of the loads
+                // or set the flag here and let the doPysics code to process this situation
+                thisPLHP.validConcurrentRunFlag = true;
+                thisPLHP.consolidateLoadsFlag = true;
+                continue;
+            } else {
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    "Companion heat pump objects running concurrently in an invalid configuration, check operation.  Base object name: " +
+                        thisPLHP.name,
+                    thisPLHP.recurringConcurrentOperationWarningIndex);
+            }
         }
     }
 }

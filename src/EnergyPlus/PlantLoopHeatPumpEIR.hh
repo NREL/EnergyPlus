@@ -133,6 +133,10 @@ namespace EIRPlantLoopHeatPumps {
         // logic flags
         bool oneTimeInitFlag = true;
         bool envrnInit = true;
+        bool validConcurrentRunFlag = false;
+        bool consolidateLoadsFlag = false; // may not need this one
+
+        Real64 oriLoopLoad = 0.0;
 
         // recurrent warning messages index integers
         int capModFTErrorIndex = 0;
