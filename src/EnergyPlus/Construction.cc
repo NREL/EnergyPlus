@@ -1587,7 +1587,6 @@ void ConstructionProps::calculateFinalCoefficients()
     Real64 rat;            // Intermediate calculation variable (ratio of flux history terms)
     Array2D<Real64> Rnew;  // Current R matrix
     Array2D<Real64> Rold;  // R matrix from the last iteration
-    int SurfNode;          // Loop counter (for nodes at a surface)
     Real64 SurfNodeFac;    // Multiplying factor applied to various surface nodes
     Real64 trace;          // Trace of the product of Phi( = AExp) and R0
 
