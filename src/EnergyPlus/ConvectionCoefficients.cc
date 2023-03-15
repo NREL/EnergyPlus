@@ -1770,11 +1770,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         if (state.dataSurface->UserIntConvectionCoeffs(Loop).OverrideType != ConvectionConstants::ConvCoefOverrideType::Schedule) continue;
         if (state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
         if (ScheduleManager::CheckScheduleValueMinMax(state,
-                                     state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex,
-                                     ">=",
-                                     state.dataHeatBal->LowHConvLimit,
-                                     "<=",
-                                     state.dataHeatBal->HighHConvLimit))
+                                                      state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex,
+                                                      ">=",
+                                                      state.dataHeatBal->LowHConvLimit,
+                                                      "<=",
+                                                      state.dataHeatBal->HighHConvLimit))
             continue;
         ShowSevereError(
             state,
@@ -1793,11 +1793,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         if (state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvectionConstants::ConvCoefOverrideType::Schedule) continue;
         if (state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
         if (ScheduleManager::CheckScheduleValueMinMax(state,
-                                     state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex,
-                                     ">=",
-                                     state.dataHeatBal->LowHConvLimit,
-                                     "<=",
-                                     state.dataHeatBal->HighHConvLimit))
+                                                      state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex,
+                                                      ">=",
+                                                      state.dataHeatBal->LowHConvLimit,
+                                                      "<=",
+                                                      state.dataHeatBal->HighHConvLimit))
             continue;
         ShowSevereError(
             state,
@@ -3401,10 +3401,10 @@ Real64 CalcZoneSystemVolFlowRate(EnergyPlusData &state, int const ZoneNum)
     int ZoneNode = zone.SystemZoneNodeNumber;
     if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
         int ZoneMult = zone.Multiplier * zone.ListMultiplier;
-        Real64 AirDensity =
-            Psychrometrics::PsyRhoAirFnPbTdbW(state,
-                                              state.dataEnvrn->OutBaroPress,
-                                              state.dataLoopNodes->Node(ZoneNode).Temp,
+        Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
+            state,
+            state.dataEnvrn->OutBaroPress,
+            state.dataLoopNodes->Node(ZoneNode).Temp,
             Psychrometrics::PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
         return state.dataLoopNodes->Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
     } else {
@@ -3572,9 +3572,10 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
         ZoneVolume = Zone(ZoneNum).Volume;
         int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
         ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
-                                       state.dataEnvrn->OutBaroPress,
-                                       state.dataLoopNodes->Node(ZoneNode).Temp,
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
+            state,
+            state.dataEnvrn->OutBaroPress,
+            state.dataLoopNodes->Node(ZoneNode).Temp,
             Psychrometrics::PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
         ZoneMassFlowRate = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / ZoneMult;
 
