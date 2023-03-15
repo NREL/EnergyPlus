@@ -1045,7 +1045,7 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // Uses the status flags to trigger events.
 
     // Using/Aliasing
-    auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
+    bool DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool localSetPointCheck(false);

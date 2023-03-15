@@ -229,13 +229,13 @@ namespace HVACCooledBeam {
         bool AirNodeFound;
         int ADUNum;
 
-        auto &NumCB = state.dataHVACCooledBeam->NumCB;
         auto &CoolBeam = state.dataHVACCooledBeam->CoolBeam;
         auto &CheckEquipName = state.dataHVACCooledBeam->CheckEquipName;
 
         // find the number of cooled beam units
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
-        NumCB = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        // Update Num in state and make local convenience copy
+        int NumCB = state.dataHVACCooledBeam->NumCB = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // allocate the data structures
         CoolBeam.allocate(NumCB);
         CheckEquipName.dimension(NumCB, true);
@@ -536,7 +536,7 @@ namespace HVACCooledBeam {
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
         auto &CoolBeam = state.dataHVACCooledBeam->CoolBeam;
         auto &ZoneEquipmentListChecked = state.dataHVACCooledBeam->ZoneEquipmentListChecked;
-        auto &NumCB = state.dataHVACCooledBeam->NumCB;
+        int NumCB = state.dataHVACCooledBeam->NumCB;
 
         if (CoolBeam(CBNum).PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
