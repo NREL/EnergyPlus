@@ -141,7 +141,7 @@ namespace HVACDXHeatPumpSystem {
         }
 
         int NumDXHeatPumpSystems = state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems;
-	
+
         // Find the correct DXSystemNumber
         if (CompIndex == 0) {
             DXSystemNum = UtilityRoutines::FindItemInList(DXHeatPumpSystemName, DXHeatPumpSystem);

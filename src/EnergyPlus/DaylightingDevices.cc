@@ -1882,7 +1882,7 @@ namespace DaylightingDevices {
         // intialize zone gains at begin new environment
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        
+
         int Loop;
 
         if ((int)state.dataDaylightingDevicesData->TDDPipe.size() == 0) return;

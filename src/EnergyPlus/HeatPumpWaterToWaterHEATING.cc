@@ -580,11 +580,8 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
 
     // CALCULATE THE SIMULATION TIME
     Real64 constexpr hoursInDay = 24.0;
-    state.dataHPWaterToWaterHtg->CurrentSimTime =
-        (state.dataGlobal->DayOfSim - 1) * hoursInDay +
-        state.dataGlobal->HourOfDay - 1 +
-        (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-        SysTimeElapsed;
+    state.dataHPWaterToWaterHtg->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 +
+                                                  (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
     if (MyLoad > 0.0) {
         this->MustRun = true;

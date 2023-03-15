@@ -234,9 +234,8 @@ namespace HVACCooledBeam {
 
         // find the number of cooled beam units
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
-	// Update Num in state and make local convenience copy
-        int NumCB = state.dataHVACCooledBeam->NumCB =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        // Update Num in state and make local convenience copy
+        int NumCB = state.dataHVACCooledBeam->NumCB = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // allocate the data structures
         CoolBeam.allocate(NumCB);
         CheckEquipName.dimension(NumCB, true);

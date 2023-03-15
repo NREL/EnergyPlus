@@ -836,7 +836,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
 
     // Calculate the simulation time
     state.dataHPWaterToWaterSimple->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+                                                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
     LoopNum = this->LoadPlantLoc.loopNum;
     LoopSideNum = this->LoadPlantLoc.loopSideNum;

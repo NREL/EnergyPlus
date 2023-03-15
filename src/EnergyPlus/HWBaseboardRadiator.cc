@@ -143,7 +143,7 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // Index of unit in baseboard array
-        Real64 QZnReq; // Zone load not yet satisfied
+        Real64 QZnReq;    // Zone load not yet satisfied
         Real64 MaxWaterFlow;
         Real64 MinWaterFlow;
 
@@ -959,8 +959,7 @@ namespace HWBaseboardRadiator {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc &&
-            state.dataHWBaseboardRad->MySizeFlag(BaseboardNum) &&
+        if (!state.dataGlobal->SysSizingCalc && state.dataHWBaseboardRad->MySizeFlag(BaseboardNum) &&
             !state.dataHWBaseboardRad->SetLoopIndexFlag(BaseboardNum)) {
             // For each coil, do the sizing once
             SizeHWBaseboard(state, BaseboardNum);

@@ -3806,7 +3806,7 @@ namespace SystemAvailabilityManager {
 
         // Get the number of occurrences of each type of System Availability Manager
         std::string_view cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::HybridVent)];
-        int NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs = 
+        int NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumHybridVentSysAvailMgrs == 0) return;
@@ -4419,8 +4419,8 @@ namespace SystemAvailabilityManager {
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
         // One time initializations
-        if (state.dataSystemAvailabilityManager->MyOneTimeFlag &&
-	    allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataAirSystemsData->PrimaryAirSystems)) {
+        if (state.dataSystemAvailabilityManager->MyOneTimeFlag && allocated(state.dataZoneEquip->ZoneEquipConfig) &&
+            allocated(state.dataAirSystemsData->PrimaryAirSystems)) {
 
             // Ensure the controlled zone is listed and defined in an HVAC Air Loop
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {

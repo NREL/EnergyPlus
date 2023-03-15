@@ -1388,7 +1388,8 @@ namespace HVACHXAssistedCoolingCoil {
                                                                          errFlag);
                 }
                 if (errFlag) {
-                    ShowRecurringWarningErrorAtEnd(state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", state.dataHVACAssistedCC->ErrCount);
+                    ShowRecurringWarningErrorAtEnd(
+                        state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", state.dataHVACAssistedCC->ErrCount);
                 }
             }
         } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
@@ -1399,7 +1400,8 @@ namespace HVACHXAssistedCoolingCoil {
                                                                 state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
                                                                 errFlag);
                 if (errFlag) {
-                    ShowRecurringWarningErrorAtEnd(state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", state.dataHVACAssistedCC->ErrCount);
+                    ShowRecurringWarningErrorAtEnd(
+                        state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", state.dataHVACAssistedCC->ErrCount);
                 }
             }
         } else {
@@ -1931,8 +1933,9 @@ namespace HVACHXAssistedCoolingCoil {
                 if (WhichCoil != 0) {
                     // coil does not specify MaxWaterFlowRate
                     MaxWaterFlowRate = 0.0;
-                    ShowRecurringWarningErrorAtEnd(
-                        state, "Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A",         state.dataHVACAssistedCC->ErrCount2);
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   "Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A",
+                                                   state.dataHVACAssistedCC->ErrCount2);
                 }
             } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {

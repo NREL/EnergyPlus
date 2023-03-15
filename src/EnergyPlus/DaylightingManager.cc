@@ -1257,7 +1257,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     bool hitExtObs;        // True iff ray from ref pt to ext win hits an exterior obstruction
     Real64 TVISIntWin;     // Visible transmittance of int win at COSBIntWin for light from ext win
     Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
-    int WinEl; // window elements counter
+    int WinEl;             // window elements counter
 
     auto &W2 = state.dataDaylightingManager->W2;
     auto &W3 = state.dataDaylightingManager->W3;
@@ -9923,11 +9923,14 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                 SQDayOfMonth = state.dataEnvrn->DayOfMonth;
 
                 for (Y = 1; Y <= state.dataDaylightingData->IllumMap(MapNum).Ynum; ++Y) {
-                    state.dataDaylightingManager->YValue(Y) = state.dataDaylightingData->IllumMap(MapNum).Ymin + (Y - 1) * state.dataDaylightingData->IllumMap(MapNum).Yinc;
+                    state.dataDaylightingManager->YValue(Y) =
+                        state.dataDaylightingData->IllumMap(MapNum).Ymin + (Y - 1) * state.dataDaylightingData->IllumMap(MapNum).Yinc;
                     for (X = 1; X <= state.dataDaylightingData->IllumMap(MapNum).Xnum; ++X) {
-                        state.dataDaylightingManager->XValue(X) = state.dataDaylightingData->IllumMap(MapNum).Xmin + (X - 1) * state.dataDaylightingData->IllumMap(MapNum).Xinc;
+                        state.dataDaylightingManager->XValue(X) =
+                            state.dataDaylightingData->IllumMap(MapNum).Xmin + (X - 1) * state.dataDaylightingData->IllumMap(MapNum).Xinc;
                         IllumIndex = X + (Y - 1) * state.dataDaylightingData->IllumMap(MapNum).Xnum;
-                        state.dataDaylightingManager->IllumValue(X, Y) = nint(state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllumAtMapPtHr(IllumIndex));
+                        state.dataDaylightingManager->IllumValue(X, Y) =
+                            nint(state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllumAtMapPtHr(IllumIndex));
                         if (!state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtInBounds(IllumIndex)) {
                             state.dataDaylightingManager->IllumValue(X, Y) = -state.dataDaylightingManager->IllumValue(X, Y);
                         }

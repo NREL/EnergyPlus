@@ -817,7 +817,7 @@ void InitPIU(EnergyPlusData &state,
 
     // Do the one time initializations
     if (state.dataPowerInductionUnits->MyOneTimeFlag) {
-	state.dataPowerInductionUnits->MyEnvrnFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
+        state.dataPowerInductionUnits->MyEnvrnFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
         state.dataPowerInductionUnits->MySizeFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
         state.dataPowerInductionUnits->MyPlantScanFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
         state.dataPowerInductionUnits->MyOneTimeFlag = false;
@@ -860,8 +860,8 @@ void InitPIU(EnergyPlusData &state,
         }
     }
 
-    if (!state.dataGlobal->SysSizingCalc &&
-        state.dataPowerInductionUnits->MySizeFlag(PIUNum) && !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
+    if (!state.dataGlobal->SysSizingCalc && state.dataPowerInductionUnits->MySizeFlag(PIUNum) &&
+        !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
 
         SizePIU(state, PIUNum);
 
@@ -911,7 +911,7 @@ void InitPIU(EnergyPlusData &state,
         }
 
         if (((thisPIU.HCoilType == HtgCoilType::SimpleHeating) || (thisPIU.HCoilType == HtgCoilType::SteamAirHeating)) &&
-	    !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
+            !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
             InitComponentNodes(state, thisPIU.MinHotWaterFlow, thisPIU.MaxHotWaterFlow, thisPIU.HotControlNode, thisPIU.HotCoilOutNodeNum);
         }
 

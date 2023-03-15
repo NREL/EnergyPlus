@@ -3291,7 +3291,7 @@ namespace HeatRecovery {
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	auto &thisError = state.dataHeatRecovery->error1;
+        auto &thisError = state.dataHeatRecovery->error1;
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
@@ -3460,7 +3460,8 @@ namespace HeatRecovery {
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", T_RegenInTemp);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.buffer3 =
-                    format("...Regeneration outlet air temperature equation: regeneration inlet air temperature passed to the model = {}", thisError.CharValue);
+                    format("...Regeneration outlet air temperature equation: regeneration inlet air temperature passed to the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.print = false;
             }
@@ -3496,8 +3497,9 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", T_RegenInHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.buffer3 = format(
-                    "...Regeneration outlet air temperature equation: regeneration inlet air humidity ratio passed to the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.buffer3 =
+                    format("...Regeneration outlet air temperature equation: regeneration inlet air humidity ratio passed to the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.print = false;
             }
@@ -3535,8 +3537,8 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", T_ProcInTemp);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.buffer3 =
-                    format("...Regeneration outlet air temperature equation: process inlet air temperature passed to the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.buffer3 = format(
+                    "...Regeneration outlet air temperature equation: process inlet air temperature passed to the model = {}", thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.print = false;
             }
@@ -3575,7 +3577,8 @@ namespace HeatRecovery {
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", T_ProcInHumRat);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.buffer3 =
-                    format("...Regeneration outlet air temperature equation: process inlet air humidity ratio passed to the model = {}", thisError.CharValue);
+                    format("...Regeneration outlet air temperature equation: process inlet air humidity ratio passed to the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.print = false;
             }
@@ -3611,8 +3614,8 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", T_FaceVel);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.buffer3 =
-                    format("...Regeneration outlet air temperature equation: process and regen face velocity passed to the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.buffer3 = format(
+                    "...Regeneration outlet air temperature equation: process and regen face velocity passed to the model = {}", thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.print = false;
             }
@@ -3652,7 +3655,7 @@ namespace HeatRecovery {
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	auto &thisError = state.dataHeatRecovery->error2;
+        auto &thisError = state.dataHeatRecovery->error2;
 
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
@@ -3820,8 +3823,9 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.2R}", H_RegenInTemp);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.buffer3 = format(
-                    "...Regeneration outlet air humidity ratio equation: regeneration inlet air temperature passed to the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.buffer3 =
+                    format("...Regeneration outlet air humidity ratio equation: regeneration inlet air temperature passed to the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.print = false;
             }
@@ -3857,8 +3861,9 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", H_RegenInHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.buffer3 = format(
-                    "...Regeneration outlet air humidity ratio equation: regeneration inlet air humidity ratio passed to the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.buffer3 =
+                    format("...Regeneration outlet air humidity ratio equation: regeneration inlet air humidity ratio passed to the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.print = false;
             }
@@ -3897,7 +3902,8 @@ namespace HeatRecovery {
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", H_ProcInTemp);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.buffer3 =
-                    format("...Regeneration outlet air humidity ratio equation: process inlet air temperature passed to the model = {}", thisError.CharValue);
+                    format("...Regeneration outlet air humidity ratio equation: process inlet air temperature passed to the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.print = false;
             }
@@ -3936,8 +3942,9 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", H_ProcInHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.buffer3 = format(
-                    "...Regeneration outlet air humidity ratio equation: process inlet air humidity ratio passed to the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.buffer3 =
+                    format("...Regeneration outlet air humidity ratio equation: process inlet air humidity ratio passed to the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.print = false;
             }
@@ -3973,8 +3980,9 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", H_FaceVel);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.buffer3 = format(
-                    "...Regeneration outlet air humidity ratio equation: process and regeneration face velocity passed to the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.buffer3 =
+                    format("...Regeneration outlet air humidity ratio equation: process and regeneration face velocity passed to the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.print = false;
             }
@@ -4096,8 +4104,8 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", RegenOutTemp);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.buffer3 =
-                    format("...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.buffer3 = format(
+                    "...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = {}", thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.print = false;
             }
@@ -4134,8 +4142,8 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", RegenOutTemp);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.buffer3 =
-                    format("...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.buffer3 = format(
+                    "...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = {}", thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.print = false;
             }
@@ -4174,7 +4182,7 @@ namespace HeatRecovery {
         using General::CreateSysTimeIntervalString;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	auto &thisError = state.dataHeatRecovery->error4; // (THIS_AUTO_OK)
+        auto &thisError = state.dataHeatRecovery->error4; // (THIS_AUTO_OK)
 
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
@@ -4259,8 +4267,9 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", RegenOutHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.buffer3 = format(
-                    "...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.buffer3 =
+                    format("...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.print = false;
             }
@@ -4297,8 +4306,9 @@ namespace HeatRecovery {
                            state.dataEnvrn->CurMnDy,
                            CreateSysTimeIntervalString(state));
                 thisError.CharValue = format("{:.6R}", RegenOutHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.buffer3 = format(
-                    "...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = {}", thisError.CharValue);
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.buffer3 =
+                    format("...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = {}",
+                           thisError.CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.print = false;
             }
@@ -4344,7 +4354,7 @@ namespace HeatRecovery {
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH2;
         auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH2;
-	auto &thisError = state.dataHeatRecovery->error6;
+        auto &thisError = state.dataHeatRecovery->error6;
         // current end time is compared with last to see if time step changed
 
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
@@ -4519,7 +4529,7 @@ namespace HeatRecovery {
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &RegenInletRH = state.dataHeatRecovery->RegenInletRH;
         auto &ProcInletRH = state.dataHeatRecovery->ProcInletRH;
-	auto &thisError = state.dataHeatRecovery->error5;
+        auto &thisError = state.dataHeatRecovery->error5;
         // current end time is compared with last to see if time step changed
 
         if (state.dataGlobal->WarmupFlag || FirstHVACIteration) return;
@@ -4684,7 +4694,7 @@ namespace HeatRecovery {
         // Using/Aliasing
         using General::CreateSysTimeIntervalString;
 
-	auto &thisError = state.dataHeatRecovery->error7;
+        auto &thisError = state.dataHeatRecovery->error7;
 
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
@@ -4742,9 +4752,8 @@ namespace HeatRecovery {
 
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer1 =
                 format("{} \"{}\" - unbalanced air flow rate is limited to 2%.", DataHVACGlobals::cHXTypes(this->ExchType), this->Name);
-            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer2 =
-                format("...Regeneration air mass flow rate is {} and process air mass flow rate is {}.",
-                       thisError.OutputCharLo, thisError.OutputCharHi);
+            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer2 = format(
+                "...Regeneration air mass flow rate is {} and process air mass flow rate is {}.", thisError.OutputCharLo, thisError.OutputCharHi);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer3 = format(
                 "...Occurrence info = {}, {}, {}", state.dataEnvrn->EnvironmentName, state.dataEnvrn->CurMnDy, CreateSysTimeIntervalString(state));
         } else {

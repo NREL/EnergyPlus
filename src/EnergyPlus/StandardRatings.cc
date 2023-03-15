@@ -4212,7 +4212,7 @@ namespace StandardRatings {
                                     "is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");
             } else {
                 // ANSI/AHRI 210/240 Standard 2023 Ratings | SEER2
-	        if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
                     static constexpr std::string_view Format_994_(
                         "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                         "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "

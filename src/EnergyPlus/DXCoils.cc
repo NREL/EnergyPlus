@@ -6660,17 +6660,17 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
     static constexpr std::string_view RoutineName("InitDXCoil");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RatedHeatPumpIndoorAirTemp;                  // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
-    Real64 RatedHeatPumpIndoorHumRat;                   // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
-    Real64 RatedVolFlowPerRatedTotCap;                  // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
-    Real64 HPInletAirHumRat;                            // Rated inlet air humidity ratio for heat pump water heater [kgWater/kgDryAir]
-    bool ErrorsFound(false);                            // TRUE when errors found
-    int CapacityStageNum;                               // Loop index for 1,Number of capacity stages
-    int DehumidModeNum;                                 // Loop index for 1,Number of enhanced dehumidification modes
-    int Mode;                                           // Performance mode for MultiMode DX coil; Always 1 for other coil types
-    int DXCoilNumTemp;                                  // Counter for crankcase heater report variable DO loop
-    int AirInletNode;                                   // Air inlet node number
-    int SpeedNum;                                       // Speed number for multispeed coils
+    Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
+    Real64 RatedHeatPumpIndoorHumRat;  // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
+    Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
+    Real64 HPInletAirHumRat;           // Rated inlet air humidity ratio for heat pump water heater [kgWater/kgDryAir]
+    bool ErrorsFound(false);           // TRUE when errors found
+    int CapacityStageNum;              // Loop index for 1,Number of capacity stages
+    int DehumidModeNum;                // Loop index for 1,Number of enhanced dehumidification modes
+    int Mode;                          // Performance mode for MultiMode DX coil; Always 1 for other coil types
+    int DXCoilNumTemp;                 // Counter for crankcase heater report variable DO loop
+    int AirInletNode;                  // Air inlet node number
+    int SpeedNum;                      // Speed number for multispeed coils
 
     auto &DXCT = state.dataHVACGlobal->DXCT;
 
@@ -6690,8 +6690,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
         DXCT = 1;
     }
 
-    if ((thisDXCoil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
-	 thisDXCoil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) &&
+    if ((thisDXCoil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || thisDXCoil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) &&
         state.dataDXCoils->MyEnvrnFlag(DXCoilNum)) {
 
         SizeDXCoil(state, DXCoilNum);
@@ -10310,8 +10309,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     //   the warning for the last iteration only. Must wait for next time step to accomplish this.
     //   If a warning occurs and the simulation down shifts, the warning is not valid.
     if (thisDXCoil.PrintLowAmbMessage) { // .AND. &
-        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > thisDXCoil.CurrentEndTimeLast &&
-            TimeStepSys >= thisDXCoil.TimeStepSysLast) {
+        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > thisDXCoil.CurrentEndTimeLast && TimeStepSys >= thisDXCoil.TimeStepSysLast) {
             if (thisDXCoil.LowAmbErrIndex == 0) {
                 ShowWarningMessage(state, thisDXCoil.LowAmbBuffer1);
                 ShowContinueError(state, thisDXCoil.LowAmbBuffer2);
@@ -10330,8 +10328,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     }
 
     if (thisDXCoil.PrintHighAmbMessage) { // .AND. &
-        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > thisDXCoil.CurrentEndTimeLast &&
-	    TimeStepSys >= thisDXCoil.TimeStepSysLast) {
+        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > thisDXCoil.CurrentEndTimeLast && TimeStepSys >= thisDXCoil.TimeStepSysLast) {
             if (thisDXCoil.HighAmbErrIndex == 0) {
                 ShowWarningMessage(state, thisDXCoil.HighAmbBuffer1);
                 ShowContinueError(state, thisDXCoil.HighAmbBuffer2);
@@ -10350,8 +10347,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     }
 
     if (thisDXCoil.PrintLowOutTempMessage) {
-        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > thisDXCoil.CurrentEndTimeLast &&
-            TimeStepSys >= thisDXCoil.TimeStepSysLast) {
+        if (state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime > thisDXCoil.CurrentEndTimeLast && TimeStepSys >= thisDXCoil.TimeStepSysLast) {
             if (thisDXCoil.LowOutletTempIndex == 0) {
                 ShowWarningMessage(state, thisDXCoil.LowOutTempBuffer1);
                 ShowContinueError(state, thisDXCoil.LowOutTempBuffer2);
@@ -16680,7 +16676,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
 
     if (thisDXCoil.PrintLowOutTempMessage) {
         if ((state.dataDXCoils->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime > thisDXCoil.CurrentEndTimeLast) &&
-	    (TimeStepSys >= thisDXCoil.TimeStepSysLast)) {
+            (TimeStepSys >= thisDXCoil.TimeStepSysLast)) {
             if (thisDXCoil.LowOutletTempIndex == 0) {
                 ShowWarningMessage(state, thisDXCoil.LowOutTempBuffer1);
                 ShowContinueError(state, thisDXCoil.LowOutTempBuffer2);

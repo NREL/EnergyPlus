@@ -7592,41 +7592,41 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     static constexpr std::string_view RoutineName("SizeVRF: "); // include trailing blank space
 
     auto &CheckVRFCombinationRatio = state.dataHVACVarRefFlow->CheckVRFCombinationRatio;
-    bool FoundAll;                                                       // temporary variable used to check all terminal units
-    bool errFlag;                                                        // temporary variable used for error checking
-    Real64 TUCoolingCapacity;                                            // total terminal unit cooling capacity
-    Real64 TUHeatingCapacity;                                            // total terminal unit heating capacity
-    int VRFCond;                                                         // index to VRF condenser
-    int TUListNum;                                                       // index to terminal unit list
-    int TUIndex;                                                         // index to terminal unit
-    int NumTU;                                                           // DO Loop index counter
-    Real64 OnOffAirFlowRat;                                              // temporary variable used when sizing coils
-    Real64 DXCoilCap;                                                    // capacity of DX cooling coil (W)
-    bool IsAutoSize;                                                     // Indicator to autosize
-    Real64 MaxCoolAirVolFlowDes;                                         // Autosized supply air during cooling for reporting
-    Real64 MaxCoolAirVolFlowUser;                                        // Hardsized supply air during cooling for reporting
-    Real64 MaxHeatAirVolFlowDes;                                         // Autosized supply air during heating for reporting
-    Real64 MaxHeatAirVolFlowUser;                                        // Hardsized supply air during heating for reporting
-    Real64 MaxNoCoolAirVolFlowDes;                                       // Autosized supply air flow when no cooling is needed for reporting
-    Real64 MaxNoCoolAirVolFlowUser;                                      // Hardsized supply air flow when no cooling is needed for reporting
-    Real64 MaxNoHeatAirVolFlowDes;                                       // Autosized supply air flow when no heating is needed for reporting
-    Real64 MaxNoHeatAirVolFlowUser;                                      // Hardsized supply air flow when no heating is needed for reporting
-    Real64 CoolOutAirVolFlowDes;                                         // Autosized outdoor air flow during cooling for reporting
-    Real64 CoolOutAirVolFlowUser;                                        // Hardsized outdoor air flow during cooling for reporting
-    Real64 HeatOutAirVolFlowDes;                                         // Autosized outdoor air flow during heating for reporting
-    Real64 HeatOutAirVolFlowUser;                                        // Hardsized outdoor air flow during heating for reporting
-    Real64 NoCoolHeatOutAirVolFlowDes;                                   // Autosized outdoor air when unconditioned for reporting
-    Real64 NoCoolHeatOutAirVolFlowUser;                                  // Hardsized outdoor air when unconditioned for reporting
-    Real64 CoolingCapacityDes;                                           // Autosized cooling capacity for reporting
-    Real64 CoolingCapacityUser;                                          // Hardsized cooling capacity for reporting
-    Real64 HeatingCapacityDes;                                           // Autosized heating capacity for reporting
-    Real64 HeatingCapacityUser;                                          // Hardsized heating capacity for reporting
-    Real64 DefrostCapacityDes;                                           // Autosized defrost heater capacity for reporting
-    Real64 DefrostCapacityUser;                                          // Hardsized defrost heater capacity for reporting
-    Real64 EvapCondAirVolFlowRateDes;                                    // Autosized evaporative condenser flow for reporting
-    Real64 EvapCondAirVolFlowRateUser;                                   // Hardsized evaporative condenser flow for reporting
-    Real64 EvapCondPumpPowerDes;                                         // Autosized evaporative condenser pump power for reporting
-    Real64 EvapCondPumpPowerUser;                                        // Hardsized evaporative condenser pump power for reporting
+    bool FoundAll;                      // temporary variable used to check all terminal units
+    bool errFlag;                       // temporary variable used for error checking
+    Real64 TUCoolingCapacity;           // total terminal unit cooling capacity
+    Real64 TUHeatingCapacity;           // total terminal unit heating capacity
+    int VRFCond;                        // index to VRF condenser
+    int TUListNum;                      // index to terminal unit list
+    int TUIndex;                        // index to terminal unit
+    int NumTU;                          // DO Loop index counter
+    Real64 OnOffAirFlowRat;             // temporary variable used when sizing coils
+    Real64 DXCoilCap;                   // capacity of DX cooling coil (W)
+    bool IsAutoSize;                    // Indicator to autosize
+    Real64 MaxCoolAirVolFlowDes;        // Autosized supply air during cooling for reporting
+    Real64 MaxCoolAirVolFlowUser;       // Hardsized supply air during cooling for reporting
+    Real64 MaxHeatAirVolFlowDes;        // Autosized supply air during heating for reporting
+    Real64 MaxHeatAirVolFlowUser;       // Hardsized supply air during heating for reporting
+    Real64 MaxNoCoolAirVolFlowDes;      // Autosized supply air flow when no cooling is needed for reporting
+    Real64 MaxNoCoolAirVolFlowUser;     // Hardsized supply air flow when no cooling is needed for reporting
+    Real64 MaxNoHeatAirVolFlowDes;      // Autosized supply air flow when no heating is needed for reporting
+    Real64 MaxNoHeatAirVolFlowUser;     // Hardsized supply air flow when no heating is needed for reporting
+    Real64 CoolOutAirVolFlowDes;        // Autosized outdoor air flow during cooling for reporting
+    Real64 CoolOutAirVolFlowUser;       // Hardsized outdoor air flow during cooling for reporting
+    Real64 HeatOutAirVolFlowDes;        // Autosized outdoor air flow during heating for reporting
+    Real64 HeatOutAirVolFlowUser;       // Hardsized outdoor air flow during heating for reporting
+    Real64 NoCoolHeatOutAirVolFlowDes;  // Autosized outdoor air when unconditioned for reporting
+    Real64 NoCoolHeatOutAirVolFlowUser; // Hardsized outdoor air when unconditioned for reporting
+    Real64 CoolingCapacityDes;          // Autosized cooling capacity for reporting
+    Real64 CoolingCapacityUser;         // Hardsized cooling capacity for reporting
+    Real64 HeatingCapacityDes;          // Autosized heating capacity for reporting
+    Real64 HeatingCapacityUser;         // Hardsized heating capacity for reporting
+    Real64 DefrostCapacityDes;          // Autosized defrost heater capacity for reporting
+    Real64 DefrostCapacityUser;         // Hardsized defrost heater capacity for reporting
+    Real64 EvapCondAirVolFlowRateDes;   // Autosized evaporative condenser flow for reporting
+    Real64 EvapCondAirVolFlowRateUser;  // Hardsized evaporative condenser flow for reporting
+    Real64 EvapCondPumpPowerDes;        // Autosized evaporative condenser pump power for reporting
+    Real64 EvapCondPumpPowerUser;       // Hardsized evaporative condenser pump power for reporting
 
     std::string CompName;     // component name
     std::string CompType;     // component type

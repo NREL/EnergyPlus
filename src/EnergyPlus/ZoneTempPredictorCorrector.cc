@@ -326,7 +326,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         "Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
     static constexpr std::string_view Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
 
-
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     auto &TStatObjects = state.dataZoneCtrls->TStatObjects;
     auto &Zone = state.dataHeatBal->Zone;
@@ -350,8 +349,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TStat));
     // Update Num in state and make local convenience copy
-    int NumTStatStatements = state.dataZoneCtrls->NumTStatStatements =
-        inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int NumTStatStatements = state.dataZoneCtrls->NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     TStatObjects.allocate(NumTStatStatements);
 
     // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)

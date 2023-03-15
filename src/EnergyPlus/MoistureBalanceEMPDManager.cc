@@ -503,7 +503,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     Real64 RHaver; // Average zone relative humidity {0-1} between current time and previous time
     Real64 RVaver; // Average zone vapor density
     Real64 dU_dRH;
-    int Flag; // Convergence flag (0 - converged)
+    int Flag;             // Convergence flag (0 - converged)
     Real64 PVsurf;        // Surface vapor pressure
     Real64 PV_surf_layer; // Vapor pressure of surface layer
     Real64 PV_deep_layer;

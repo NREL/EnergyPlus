@@ -1203,13 +1203,13 @@ namespace OutdoorAirUnit {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
-        int InNode;                                                  // inlet node number in outdoor air unit
-        int OutNode;                                                 // outlet node number in outdoor air unit
-        int OutsideAirNode;                                          // outside air node number outdoor air unit
-        Real64 OAFrac;                                               // possible outside air fraction
-        Real64 EAFrac;                                               // possible exhaust air fraction
-        Real64 RhoAir;                                               // air density at InNode
-        int compLoop;                                                // local do loop index
+        int InNode;         // inlet node number in outdoor air unit
+        int OutNode;        // outlet node number in outdoor air unit
+        int OutsideAirNode; // outside air node number outdoor air unit
+        Real64 OAFrac;      // possible outside air fraction
+        Real64 EAFrac;      // possible exhaust air fraction
+        Real64 RhoAir;      // air density at InNode
+        int compLoop;       // local do loop index
         Real64 rho;
         bool errFlag;
 
@@ -1287,7 +1287,8 @@ namespace OutdoorAirUnit {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && state.dataOutdoorAirUnit->MySizeFlag(OAUnitNum) && !state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataOutdoorAirUnit->MySizeFlag(OAUnitNum) &&
+            !state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum)) {
 
             SizeOutdoorAirUnit(state, OAUnitNum);
 

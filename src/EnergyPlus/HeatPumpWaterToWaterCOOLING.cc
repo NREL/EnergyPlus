@@ -606,11 +606,9 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     }
 
     // CALCULATE THE SIMULATION TIME
-    state.dataHPWaterToWaterClg->CurrentSimTime =
-        (state.dataGlobal->DayOfSim - 1) * 24 +
-        state.dataGlobal->HourOfDay - 1 +
-        (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-        state.dataHVACGlobal->SysTimeElapsed;
+    state.dataHPWaterToWaterClg->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
+                                                  (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
+                                                  state.dataHVACGlobal->SysTimeElapsed;
 
     if (MyLoad < 0.0) {
         this->MustRun = true;

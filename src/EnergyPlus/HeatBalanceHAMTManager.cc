@@ -1325,7 +1325,8 @@ namespace HeatBalanceHAMTManager {
                             ShowWarningError(
                                 state, format("HeatAndMoistureTransfer: Large Latent Heat for Surface {}", state.dataSurface->Surface(sid).Name));
                         } else {
-                            ShowRecurringWarningErrorAtEnd(state, "HeatAndMoistureTransfer: Large Latent Heat Errors ", state.dataHeatBalHAMTMgr->qvpErrReport);
+                            ShowRecurringWarningErrorAtEnd(
+                                state, "HeatAndMoistureTransfer: Large Latent Heat Errors ", state.dataHeatBalHAMTMgr->qvpErrReport);
                         }
                     }
                     qvp = 0.0;
