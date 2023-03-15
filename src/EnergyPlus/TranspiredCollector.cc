@@ -875,8 +875,7 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
-        auto &SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
+        bool DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
         using namespace DataLoopNode;
         using DataSurfaces::SurfaceData;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -931,12 +930,12 @@ namespace TranspiredCollector {
                                 ShowSevereError(
                                     state, format("Missing temperature setpoint for UTSC {}", state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name));
                                 ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
                                 CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                    state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(
                                         state,
                                         format("Missing temperature setpoint for UTSC {}", state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name));

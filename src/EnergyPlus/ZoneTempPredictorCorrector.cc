@@ -328,15 +328,13 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     auto &TStatObjects = state.dataZoneCtrls->TStatObjects;
-    auto &NumTStatStatements = state.dataZoneCtrls->NumTStatStatements;
-    auto &NumTempControlledZones = state.dataZoneCtrls->NumTempControlledZones;
     auto &Zone = state.dataHeatBal->Zone;
     auto &ZoneList = state.dataHeatBal->ZoneList;
     auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
     auto &HumidityControlZone = state.dataZoneCtrls->HumidityControlZone;
     auto &ComfortTStatObjects = state.dataZoneCtrls->ComfortTStatObjects;
     auto &ComfortControlledZone = state.dataZoneCtrls->ComfortControlledZone;
-    auto &NumOfZones = state.dataGlobal->NumOfZones;
+    int NumOfZones = state.dataGlobal->NumOfZones;
     auto &StageControlledZone = state.dataZoneCtrls->StageControlledZone;
     auto &SetPointSingleHeating = state.dataZoneTempPredictorCorrector->SetPointSingleHeating;
     auto &SetPointSingleCooling = state.dataZoneTempPredictorCorrector->SetPointSingleCooling;
@@ -350,11 +348,12 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &SetPointDualHeatCool = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool;
 
     cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TStat));
-    NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    // Update Num in state and make local convenience copy
+    int NumTStatStatements = state.dataZoneCtrls->NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     TStatObjects.allocate(NumTStatStatements);
 
     // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
-    NumTempControlledZones = 0;
+    state.dataZoneCtrls->NumTempControlledZones = 0;
     for (Item = 1; Item <= NumTStatStatements; ++Item) {
         inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
@@ -375,14 +374,14 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         ZLItem = 0;
         if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
         if (Item1 > 0) {
-            TStatObjects(Item).TempControlledZoneStartPtr = NumTempControlledZones + 1;
-            ++NumTempControlledZones;
+            TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
+            ++state.dataZoneCtrls->NumTempControlledZones;
             TStatObjects(Item).NumOfZones = 1;
             TStatObjects(Item).ZoneListActive = false;
             TStatObjects(Item).ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
-            TStatObjects(Item).TempControlledZoneStartPtr = NumTempControlledZones + 1;
-            NumTempControlledZones += ZoneList(ZLItem).NumOfZones;
+            TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
+            state.dataZoneCtrls->NumTempControlledZones += ZoneList(ZLItem).NumOfZones;
             TStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
             TStatObjects(Item).ZoneListActive = true;
             TStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -396,13 +395,13 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     if (ErrorsFound) {
         ShowSevereError(state, format("GetZoneAirSetpoints: Errors with invalid names in {} objects.", cCurrentModuleObject));
         ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-        NumTempControlledZones = 0;
+        state.dataZoneCtrls->NumTempControlledZones = 0;
     }
 
-    if (NumTempControlledZones > 0) {
-        TempControlledZone.allocate(NumTempControlledZones);
-        TStatControlTypes.allocate(NumTempControlledZones); // Number of set point types
-        CTSchedMapToControlledZone.dimension(NumTempControlledZones, 0);
+    if (state.dataZoneCtrls->NumTempControlledZones > 0) {
+        TempControlledZone.allocate(state.dataZoneCtrls->NumTempControlledZones);
+        TStatControlTypes.allocate(state.dataZoneCtrls->NumTempControlledZones); // Number of set point types
+        CTSchedMapToControlledZone.dimension(state.dataZoneCtrls->NumTempControlledZones, 0);
 
         TempControlledZoneNum = 0;
         state.dataZoneTempPredictorCorrector->NumOnOffCtrZone = 0;
@@ -694,7 +693,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     // Finish filling in Schedule pointing indexes
     int setPointObjectArrayIndex;
-    for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+    for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
         for (int ct = 1; ct <= state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).NumControlTypes; ct++) {
             switch (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ct)) {
             case DataHVACGlobals::ThermostatType::SingleHeating:
@@ -731,7 +730,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     // Now, Check the schedule values/indices for validity
 
-    for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+    for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
 
         ActualZoneNum = TempControlledZone(TempControlledZoneNum).ActualZoneNum;
         CTIndex = TempControlledZone(TempControlledZoneNum).CTSchedIndex;
@@ -740,7 +739,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         SchedMax = GetScheduleMaxValue(state, CTIndex);
 
         if (SchedMin == 0 && SchedMax == 0) {
-            if (FindNumberInList(CTIndex, CTSchedMapToControlledZone, NumTempControlledZones) == 0) {
+            if (FindNumberInList(CTIndex, CTSchedMapToControlledZone, state.dataZoneCtrls->NumTempControlledZones) == 0) {
                 ShowSevereError(state, format("Control Type Schedule={}", TempControlledZone(TempControlledZoneNum).ControlTypeSchedName));
                 ShowContinueError(state, "..specifies control type 0 for all entries.");
                 ShowContinueError(state, "All zones using this Control Type Schedule have no heating or cooling available.");
@@ -835,7 +834,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         }
     }
 
-    for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+    for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
 
         ActualZoneNum = TempControlledZone(TempControlledZoneNum).ActualZoneNum;
         CTIndex = TempControlledZone(TempControlledZoneNum).CTSchedIndex;
@@ -1995,7 +1994,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             } else {
                 for (Item = 1; Item <= TStatObjects(found).NumOfZones; ++Item) {
                     TempControlledZoneNum = TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
-                    if (NumTempControlledZones == 0) continue;
+                    if (state.dataZoneCtrls->NumTempControlledZones == 0) continue;
                     TempControlledZone(TempControlledZoneNum).OperativeTempControl = true;
                     if (UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled")) {
                         TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled = true;
@@ -2810,7 +2809,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     auto &ComfortControlledZone = state.dataZoneCtrls->ComfortControlledZone;
     auto &ZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo;
     auto &ZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi;
-    auto &NumOfZones = state.dataGlobal->NumOfZones;
+    int NumOfZones = state.dataGlobal->NumOfZones;
 
     if (state.dataZoneTempPredictorCorrector->InitZoneAirSetPointsOneTimeFlag) {
         TempZoneThermostatSetPoint.dimension(NumOfZones, 0.0);
@@ -3692,7 +3691,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
     auto &TempControlTypeRpt = state.dataHeatBalFanSys->TempControlTypeRpt;
     auto &ZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo;
     auto &ZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi;
-    auto &NumOfZones = state.dataGlobal->NumOfZones;
+    int NumOfZones = state.dataGlobal->NumOfZones;
 
     TempControlType = DataHVACGlobals::ThermostatType::Uncontrolled; // Default
 

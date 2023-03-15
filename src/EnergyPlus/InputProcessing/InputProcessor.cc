@@ -109,7 +109,7 @@ const json &InputProcessor::schema()
 {
     // avoid re-parsing embedded JSON schema by making this into a static const singleton
     // because it is const, we don't have to worry about threading issues for creation or access
-    static const auto json_schema = json::from_cbor(EmbeddedEpJSONSchema::embeddedEpJSONSchema()); // (THIS_AUTO_OK)
+    static const auto json_schema = json::from_cbor(EmbeddedEpJSONSchema::embeddedEpJSONSchema()); // (AUTO_OK_OBJ)
     return json_schema;
 }
 
@@ -266,7 +266,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
 
     try {
         if (!state.dataGlobal->isEpJSON) {
-            auto input_file = FileSystem::readFile(state.dataStrGlobals->inputFilePath); // (THIS_AUTO_OK)
+            auto input_file = FileSystem::readFile(state.dataStrGlobals->inputFilePath); // (AUTO_OK_OBJ)
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema(), success);
@@ -467,22 +467,16 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
 
 bool InputProcessor::processErrors(EnergyPlusData &state)
 {
-    auto const &idf_parser_errors = idf_parser->errors();
-    auto const &idf_parser_warnings = idf_parser->warnings();
-
-    auto const &validation_errors = validation->errors();
-    auto const &validation_warnings = validation->warnings();
-
-    for (auto const &error : idf_parser_errors) {
+    for (auto const &error : idf_parser->errors()) {
         ShowSevereError(state, error);
     }
-    for (auto const &warning : idf_parser_warnings) {
+    for (auto const &warning : idf_parser->warnings()) {
         ShowWarningError(state, warning);
     }
-    for (auto const &error : validation_errors) {
+    for (auto const &error : validation->errors()) {
         ShowSevereError(state, error);
     }
-    for (auto const &warning : validation_warnings) {
+    for (auto const &warning : validation->warnings()) {
         ShowWarningError(state, warning);
     }
 
@@ -636,7 +630,7 @@ std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const
     if (it != ep_object.end()) {
         auto const &field_value = it.value();
         if (field_value.is_string()) {
-            auto valuePair = getObjectItemValue(field_value.get<std::string>(), schema_field_obj); // (THIS_AUTO_OK)
+            auto const valuePair = getObjectItemValue(field_value.get<std::string>(), schema_field_obj); // (AUTO_OK_OBJ)
             value = valuePair.first;
             isDefaulted = valuePair.second;
         } else {
@@ -834,7 +828,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
         if (field_type == "a") {
             // process alpha value
             if (field_value.is_string()) {
-                auto value = getObjectItemValue(field_value.get<std::string>(), schema_field_obj); // (AUTO_OK)
+                auto const value = getObjectItemValue(field_value.get<std::string>(), schema_field_obj); // (AUTO_OK_OBJ)
 
                 Alphas(alpha_index) = value.first;
                 if (is_AlphaBlank) AlphaBlank()(alpha_index) = value.second;
@@ -899,9 +893,12 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
 
 const json &InputProcessor::getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName)
 {
-    auto objectInfo = ObjectInfo(std::string{ObjType}, std::string{ObjName}); // (THIS_AUTO_OK)
+    std::string objTypeStr(ObjType);
+    std::string objNameStr(ObjName);
+    
+    auto objectInfo = ObjectInfo(objTypeStr, objNameStr); // (AUTO_OK_OBJ)
 
-    auto obj_iter = epJSON.find(std::string(ObjType));
+    auto obj_iter = epJSON.find(objTypeStr);
     if (obj_iter == epJSON.end() || obj_iter.value().find(objectInfo.objectName) == obj_iter.value().end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectInfo.objectType));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
@@ -954,7 +951,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
 
     int adjustedNumber = getJSONObjNum(state, std::string(Object), Number); // if incoming input is idf, then use idf object order
 
-    auto objectInfo = ObjectInfo(); // (THIS_AUTO_OK)
+    auto objectInfo = ObjectInfo(); // (AUTO_OK_OBJ)
     objectInfo.objectType = Object;
     // auto sorted_iterators = find_iterators;
 
@@ -1587,7 +1584,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
     auto const &schema_properties = schema().at("properties");
 
     // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
-    auto processField = [&state](const std::string &field, const json &epJSONObj, const json &schema_field_obj) { // (THIS_AUTO_OK)
+    auto processField = [&state](const std::string &field, const json &epJSONObj, const json &schema_field_obj) { 
         bool hasDefault = false;
         bool canBeAutosized = false;
         bool canBeAutocalculated = false;

@@ -3797,7 +3797,6 @@ namespace SystemAvailabilityManager {
         Real64 CurveMax;         // Maximum value specified in a curve
         Real64 CurveVal;         // Curve value
 
-        auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
         auto &HybridVentSysAvailAirLoopNum = state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
         auto &HybridVentSysAvailActualZoneNum = state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
         auto &HybridVentSysAvailVentCtrl = state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
@@ -3807,7 +3806,8 @@ namespace SystemAvailabilityManager {
 
         // Get the number of occurrences of each type of System Availability Manager
         std::string_view cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::HybridVent)];
-        NumHybridVentSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumHybridVentSysAvailMgrs == 0) return;
 
@@ -4401,8 +4401,6 @@ namespace SystemAvailabilityManager {
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &MyOneTimeFlag = state.dataSystemAvailabilityManager->MyOneTimeFlag;
-        auto &MyEnvrnFlag = state.dataSystemAvailabilityManager->MyEnvrnFlag;
         int SysAvailNum;         // DO loop index for Sys Avail Manager objects
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int AirLoopNum;          // Air loop number
@@ -4412,7 +4410,7 @@ namespace SystemAvailabilityManager {
         int ZoneEquipType;
         int HybridVentNum;
 
-        auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
+        int NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
         auto &HybridVentSysAvailAirLoopNum = state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
         auto &HybridVentSysAvailActualZoneNum = state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
         auto &HybridVentSysAvailVentCtrl = state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
@@ -4421,7 +4419,8 @@ namespace SystemAvailabilityManager {
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
         // One time initializations
-        if (MyOneTimeFlag && allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataAirSystemsData->PrimaryAirSystems)) {
+        if (state.dataSystemAvailabilityManager->MyOneTimeFlag && allocated(state.dataZoneEquip->ZoneEquipConfig) &&
+            allocated(state.dataAirSystemsData->PrimaryAirSystems)) {
 
             // Ensure the controlled zone is listed and defined in an HVAC Air Loop
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
@@ -4550,7 +4549,7 @@ namespace SystemAvailabilityManager {
                 ShowFatalError(state, "Errors found in getting AvailabilityManager:* inputs");
             }
 
-            MyOneTimeFlag = false;
+            state.dataSystemAvailabilityManager->MyOneTimeFlag = false;
 
         } // end 1 time initializations
 
@@ -4575,15 +4574,15 @@ namespace SystemAvailabilityManager {
             }
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataSystemAvailabilityManager->MyEnvrnFlag) {
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                 state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).TimeVentDuration = 0.0;
                 state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).TimeOperDuration = 0.0;
             }
-            MyEnvrnFlag = false;
+            state.dataSystemAvailabilityManager->MyEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            state.dataSystemAvailabilityManager->MyEnvrnFlag = true;
         }
         // check minimum operation time
         state.dataSystemAvailabilityManager->CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;

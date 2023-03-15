@@ -1066,7 +1066,7 @@ void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &A
                      state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).TotalComponents;
                      ++SupplySideCompNum) {
                     {
-                        auto &thisVentRepComp =
+                        auto const &thisVentRepComp =
                             state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(
                                 SupplySideCompNum);
                         DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
@@ -1117,7 +1117,7 @@ void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &A
                      state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).TotalComponents;
                      ++SupplySideCompNum) {
                     {
-                        auto &thisVentRepComp = state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(
+                        auto const &thisVentRepComp = state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(
                             SupplySideCompNum);
                         DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
                         DemandSideLoopNum = thisVentRepComp.ConnectPlant.LoopNum;
@@ -1584,7 +1584,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // PURPOSE OF THIS SUBROUTINE:
     // Allocates Arrays and setup output variables related to Ventilation reports.

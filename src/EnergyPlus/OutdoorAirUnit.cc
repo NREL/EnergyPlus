@@ -1203,16 +1203,13 @@ namespace OutdoorAirUnit {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
-        auto &MyEnvrnFlag = state.dataOutdoorAirUnit->MyEnvrnFlag;
-        auto &MyPlantScanFlag = state.dataOutdoorAirUnit->MyPlantScanFlag;
-        auto &MyZoneEqFlag = state.dataOutdoorAirUnit->MyZoneEqFlag; // used to set up zone equipment availability managers
-        int InNode;                                                  // inlet node number in outdoor air unit
-        int OutNode;                                                 // outlet node number in outdoor air unit
-        int OutsideAirNode;                                          // outside air node number outdoor air unit
-        Real64 OAFrac;                                               // possible outside air fraction
-        Real64 EAFrac;                                               // possible exhaust air fraction
-        Real64 RhoAir;                                               // air density at InNode
-        int compLoop;                                                // local do loop index
+        int InNode;         // inlet node number in outdoor air unit
+        int OutNode;        // outlet node number in outdoor air unit
+        int OutsideAirNode; // outside air node number outdoor air unit
+        Real64 OAFrac;      // possible outside air fraction
+        Real64 EAFrac;      // possible exhaust air fraction
+        Real64 RhoAir;      // air density at InNode
+        int compLoop;       // local do loop index
         Real64 rho;
         bool errFlag;
 
@@ -1222,28 +1219,24 @@ namespace OutdoorAirUnit {
 
         if (state.dataOutdoorAirUnit->MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(state.dataOutdoorAirUnit->NumOfOAUnits);
-            state.dataOutdoorAirUnit->MySizeFlag.allocate(state.dataOutdoorAirUnit->NumOfOAUnits);
-            MyPlantScanFlag.allocate(state.dataOutdoorAirUnit->NumOfOAUnits);
-            MyZoneEqFlag.allocate(state.dataOutdoorAirUnit->NumOfOAUnits);
-            MyEnvrnFlag = true;
-            state.dataOutdoorAirUnit->MySizeFlag = true;
-            MyPlantScanFlag = true;
-            MyZoneEqFlag = true;
+            state.dataOutdoorAirUnit->MyEnvrnFlag.dimension(state.dataOutdoorAirUnit->NumOfOAUnits, true);
+            state.dataOutdoorAirUnit->MySizeFlag.dimension(state.dataOutdoorAirUnit->NumOfOAUnits, true);
+            state.dataOutdoorAirUnit->MyPlantScanFlag.dimension(state.dataOutdoorAirUnit->NumOfOAUnits, true);
+            state.dataOutdoorAirUnit->MyZoneEqFlag.dimension(state.dataOutdoorAirUnit->NumOfOAUnits, true);
             state.dataOutdoorAirUnit->MyOneTimeFlag = false;
         }
 
         if (allocated(ZoneComp)) {
-            if (MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
+            if (state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
                 ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName =
                     OutAirUnit(OAUnitNum).AvailManagerListName;
                 ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
-                MyZoneEqFlag(OAUnitNum) = false;
+                state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum) = false;
             }
             OutAirUnit(OAUnitNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
         }
 
-        if (MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {
             for (compLoop = 1; compLoop <= OutAirUnit(OAUnitNum).NumComponents; ++compLoop) {
 
                 CompType Type = OutAirUnit(OAUnitNum).OAEquip(compLoop).Type;
@@ -1276,9 +1269,9 @@ namespace OutdoorAirUnit {
                 }
             }
 
-            MyPlantScanFlag(OAUnitNum) = false;
-        } else if (MyPlantScanFlag(OAUnitNum) && !state.dataGlobal->AnyPlantInModel) {
-            MyPlantScanFlag(OAUnitNum) = false;
+            state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum) = false;
+        } else if (state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum) && !state.dataGlobal->AnyPlantInModel) {
+            state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum) = false;
         }
 
         // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
@@ -1294,7 +1287,8 @@ namespace OutdoorAirUnit {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && state.dataOutdoorAirUnit->MySizeFlag(OAUnitNum) && !MyPlantScanFlag(OAUnitNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataOutdoorAirUnit->MySizeFlag(OAUnitNum) &&
+            !state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum)) {
 
             SizeOutdoorAirUnit(state, OAUnitNum);
 
@@ -1302,7 +1296,7 @@ namespace OutdoorAirUnit {
         }
 
         // Do the one time initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(OAUnitNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataOutdoorAirUnit->MyEnvrnFlag(OAUnitNum)) {
             // Node Conditions
 
             OutNode = OutAirUnit(OAUnitNum).AirOutletNode;
@@ -1332,7 +1326,7 @@ namespace OutdoorAirUnit {
             state.dataLoopNodes->Node(OutsideAirNode).MassFlowRateMin = 0.0;
             state.dataLoopNodes->Node(OutNode).MassFlowRate = OutAirUnit(OAUnitNum).EMaxAirMassFlow;
 
-            if (!MyPlantScanFlag(OAUnitNum)) {
+            if (!state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum)) {
                 for (compLoop = 1; compLoop <= OutAirUnit(OAUnitNum).NumComponents; ++compLoop) {
                     if ((OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::WaterCoil_Cooling) ||
                         (OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::WaterCoil_DetailedCool)) {
@@ -1413,11 +1407,11 @@ namespace OutdoorAirUnit {
                     }
                 }
             }
-            MyEnvrnFlag(OAUnitNum) = false;
+            state.dataOutdoorAirUnit->MyEnvrnFlag(OAUnitNum) = false;
 
         } // ...end start of environment inits
 
-        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(OAUnitNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataOutdoorAirUnit->MyEnvrnFlag(OAUnitNum) = true;
 
         // These initializations are done every iteration...
         // Set all the output variable

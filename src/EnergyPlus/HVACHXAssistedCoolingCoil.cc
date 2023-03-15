@@ -1352,9 +1352,6 @@ namespace HVACHXAssistedCoolingCoil {
         // Return value
         Real64 CoilCapacity; // returned capacity of matched coil
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        auto &ErrCount = state.dataHVACAssistedCC->ErrCount;
-
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
@@ -1391,7 +1388,8 @@ namespace HVACHXAssistedCoolingCoil {
                                                                          errFlag);
                 }
                 if (errFlag) {
-                    ShowRecurringWarningErrorAtEnd(state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(
+                        state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", state.dataHVACAssistedCC->ErrCount);
                 }
             }
         } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
@@ -1402,7 +1400,8 @@ namespace HVACHXAssistedCoolingCoil {
                                                                 state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
                                                                 errFlag);
                 if (errFlag) {
-                    ShowRecurringWarningErrorAtEnd(state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(
+                        state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", state.dataHVACAssistedCC->ErrCount);
                 }
             }
         } else {
@@ -1918,9 +1917,6 @@ namespace HVACHXAssistedCoolingCoil {
         // Return value
         Real64 MaxWaterFlowRate; // returned max water flow rate of matched coil
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        auto &ErrCount = state.dataHVACAssistedCC->ErrCount2;
-
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
@@ -1937,8 +1933,9 @@ namespace HVACHXAssistedCoolingCoil {
                 if (WhichCoil != 0) {
                     // coil does not specify MaxWaterFlowRate
                     MaxWaterFlowRate = 0.0;
-                    ShowRecurringWarningErrorAtEnd(
-                        state, "Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   "Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A",
+                                                   state.dataHVACAssistedCC->ErrCount2);
                 }
             } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {

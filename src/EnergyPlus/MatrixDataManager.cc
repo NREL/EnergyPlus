@@ -215,11 +215,10 @@ namespace MatrixDataManager {
         int MatrixIndexPtr; // Function result
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        auto &GetMatrixInputFlag = state.dataUtilityRoutines->GetMatrixInputFlag;
 
-        if (GetMatrixInputFlag) {
+        if (state.dataUtilityRoutines->GetMatrixInputFlag) {
             GetMatrixInput(state);
-            GetMatrixInputFlag = false;
+            state.dataUtilityRoutines->GetMatrixInputFlag = false;
         }
 
         if (state.dataMatrixDataManager->NumMats > 0) {

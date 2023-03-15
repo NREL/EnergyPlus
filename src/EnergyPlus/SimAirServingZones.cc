@@ -395,10 +395,9 @@ void GetAirPathData(EnergyPlusData &state)
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
     NodeNums.dimension(NumParams, 0);
 
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-
-    // Find number of primary air systems
-    NumPrimaryAirSys = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
+    // Find number of primary air systems, update Num in state and make local convenience copy
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
     TestUniqueNodes.allocate(NumPrimaryAirSys * 4); // used to look at specific nodes that must be unique, fields A6-A9
 
     state.dataAirSystemsData->PrimaryAirSystems.allocate(NumPrimaryAirSys); // allocate the primary air sys data array
@@ -2289,7 +2288,7 @@ void ConnectReturnNodes(EnergyPlusData &state)
     // (same zone, same airloop)
 
     auto &AirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo;
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     if (!state.dataZoneEquip->ZoneEquipInputsFilled) return;
 

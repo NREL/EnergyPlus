@@ -912,8 +912,7 @@ namespace SimulationManager {
 
                     auto diagnosticsExtensibles = fields.find("diagnostics");
                     if (diagnosticsExtensibles != fields.end()) {
-                        auto &diagnosticsExtensiblesArray = diagnosticsExtensibles.value();
-                        for (auto &diagnosticsExtensible : diagnosticsExtensiblesArray) {
+                        for (auto &diagnosticsExtensible : diagnosticsExtensibles.value()) {
 
                             // We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
                             // Which happens if you put an "empty" entry in the extensible portion
