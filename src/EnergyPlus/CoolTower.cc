@@ -97,8 +97,6 @@ namespace CoolTower {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Aug 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages the simulation of Cooltower component.
@@ -127,17 +125,10 @@ namespace CoolTower {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Aug 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets input data for cooltower components
         // and stores it in the Cooltower data structure.
-
-        // Using/Aliasing
-
-        using ScheduleManager::GetScheduleIndex;
-        using WaterManager::SetupTankDemandComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("ZoneCoolTower:Shower");
@@ -152,7 +143,6 @@ namespace CoolTower {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
-        int CoolTowerNum;        // Cooltower number
         int NumAlphas;           // Number of Alphas for each GetobjectItem call
         int NumNumbers;          // Number of Numbers for each GetobjectItem call
         int NumArgs;
@@ -180,7 +170,7 @@ namespace CoolTower {
         state.dataCoolTower->CoolTowerSys.allocate(NumCoolTowers);
 
         // Obtain inputs
-        for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
+        for (int CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -200,7 +190,8 @@ namespace CoolTower {
             if (lAlphaBlanks(2)) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr =
+                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr == 0) {
                     ShowSevereError(state, format("{}=\"{}\" invalid data", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, format("Invalid-Schedule not found {}=\"{}\".", cAlphaFields(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -232,13 +223,13 @@ namespace CoolTower {
             if (lAlphaBlanks(4)) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode = WaterSupplyMode::FromMains;
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
-                SetupTankDemandComponent(state,
-                                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name,
-                                         CurrentModuleObject,
-                                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyName,
-                                         ErrorsFound,
-                                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupTankID,
-                                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterTankDemandARRID);
+                WaterManager::SetupTankDemandComponent(state,
+                                                       state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name,
+                                                       CurrentModuleObject,
+                                                       state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyName,
+                                                       ErrorsFound,
+                                                       state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupTankID,
+                                                       state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterTankDemandARRID);
             }
 
             {
@@ -255,7 +246,8 @@ namespace CoolTower {
                 }
             }
 
-            state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+            state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr =
+                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(state,
@@ -442,7 +434,7 @@ namespace CoolTower {
 
         if (ErrorsFound) ShowFatalError(state, format("{} errors occurred in input.  Program terminates.", CurrentModuleObject));
 
-        for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
+        for (int CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
             SetupOutputVariable(state,
                                 "Zone Cooltower Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
@@ -610,20 +602,10 @@ namespace CoolTower {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Aug 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // REFERENCES:
         // Baruch Givoni. 1994. Passive and Low Energy Cooling of Buildings. Chapter 5: Evaporative Cooling Systems.
         //     John Wiley & Sons, Inc.
-
-        // Using/Aliasing
-        using Psychrometrics::PsyCpAirFnW;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using Psychrometrics::PsyWFnTdbH;
-        using Psychrometrics::PsyWFnTdbTwbPb;
-        using Psychrometrics::RhoH2O;
-        using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr MinWindSpeed(0.1);  // Minimum limit of outdoor air wind speed in m/s
@@ -631,31 +613,29 @@ namespace CoolTower {
         Real64 constexpr UCFactor(60000.0);  // Unit conversion factor m3/s to l/min
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum;            // Number of zone being served
-        int CoolTowerNum;       // Number of coolter being served
-        Real64 CVF_ZoneNum;     // Design flow rate in m3/s
-        Real64 AirMassFlowRate; // Actual air mass flow rate in kg/s
-        Real64 AirSpecHeat;     // Specific heat of air
-        Real64 AirDensity;      // Density of air
-        Real64 RhoWater;        // Density of water
-        Real64 PumpPartLoadRat; // Pump part load ratio (based on user schedule, or 1.0 for no schedule)
-        Real64 WaterFlowRate;   // Calculated water flow rate in m3/s
-        Real64 AirVolFlowRate;  // Calculated air volume flow rate in m3/s
-        Real64 InletHumRat;     // Humidity ratio of outdoor air
-        Real64 OutletHumRat;    // Humidity ratio of air at the cooltower outlet
-        Real64 OutletTemp;      // Dry bulb temperature of air at the cooltower outlet
-        Real64 IntHumRat;       // Humidity ratio of initialized air
+        Real64 CVF_ZoneNum;          // Design flow rate in m3/s
+        Real64 AirMassFlowRate;      // Actual air mass flow rate in kg/s
+        Real64 AirSpecHeat;          // Specific heat of air
+        Real64 AirDensity;           // Density of air
+        Real64 RhoWater;             // Density of water
+        Real64 PumpPartLoadRat;      // Pump part load ratio (based on user schedule, or 1.0 for no schedule)
+        Real64 WaterFlowRate = 0.0;  // Calculated water flow rate in m3/s
+        Real64 AirVolFlowRate = 0.0; // Calculated air volume flow rate in m3/s
+        Real64 InletHumRat;          // Humidity ratio of outdoor air
+        Real64 OutletHumRat;         // Humidity ratio of air at the cooltower outlet
+        Real64 OutletTemp = 0.0;     // Dry bulb temperature of air at the cooltower outlet
+        Real64 IntHumRat;            // Humidity ratio of initialized air
 
         auto &Zone(state.dataHeatBal->Zone);
 
-        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
-            ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
+        for (int CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
+            int const ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             thisZoneHB.MCPTC = 0.0;
             thisZoneHB.MCPC = 0.0;
             thisZoneHB.CTMFL = 0.0;
 
-            if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
                 // check component operation
                 if (state.dataEnvrn->WindSpeed < MinWindSpeed || state.dataEnvrn->WindSpeed > MaxWindSpeed) continue;
                 if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp)
@@ -713,26 +693,27 @@ namespace CoolTower {
                 }
 
                 // Determine pump power
-                if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr) > 0) {
-                    PumpPartLoadRat = GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr);
+                if (ScheduleManager::GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr) > 0) {
+                    PumpPartLoadRat = ScheduleManager::GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr);
                 } else {
                     PumpPartLoadRat = 1.0;
                 }
 
                 // Determine air mass flow rate and volume flow rate
-                InletHumRat = PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
+                InletHumRat = Psychrometrics::PsyWFnTdbTwbPb(
+                    state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
                 // Assume no pressure drops and no changes in enthalpy between inlet and outlet air
-                IntHumRat = PsyWFnTdbH(state, OutletTemp, state.dataEnvrn->OutEnthalpy); // Initialized humidity ratio
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, IntHumRat);
+                IntHumRat = Psychrometrics::PsyWFnTdbH(state, OutletTemp, state.dataEnvrn->OutEnthalpy); // Initialized humidity ratio
+                AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, IntHumRat);
                 AirMassFlowRate = AirDensity * state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate;
                 // From the mass balance W_in*(m_air + m_water) = W_out*m_air
-                RhoWater = RhoH2O(OutletTemp); // Assume T_water = T_outlet
+                RhoWater = Psychrometrics::RhoH2O(OutletTemp); // Assume T_water = T_outlet
                 OutletHumRat = (InletHumRat * (AirMassFlowRate + (state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualWaterFlowRate * RhoWater))) /
                                AirMassFlowRate;
-                AirSpecHeat = PsyCpAirFnW(OutletHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
+                AirSpecHeat = Psychrometrics::PsyCpAirFnW(OutletHumRat);
+                AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
                 CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate *
-                              GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
+                              ScheduleManager::GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
                 thisZoneHB.MCPC = CVF_ZoneNum * AirDensity * AirSpecHeat;
                 thisZoneHB.MCPTC = thisZoneHB.MCPC * OutletTemp;
                 thisZoneHB.CTMFL = thisZoneHB.MCPC / AirSpecHeat;
@@ -776,15 +757,8 @@ namespace CoolTower {
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   October 2000
         //       MODIFIED       Aug 2008 Daeho Kang
-        //       RE-ENGINEERED  na
 
-        // Using/Aliasing
-        using namespace DataWater;
-
-        int CoolTowerNum;
-        Real64 AvailWaterRate;
-
-        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
+        for (int CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
 
             // Set the demand request for supply water from water storage tank (if needed)
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
@@ -795,8 +769,8 @@ namespace CoolTower {
 
             // check if should be starved by restricted flow from tank
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
-                AvailWaterRate = state.dataWaterData->WaterStorage(state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupTankID)
-                                     .VdotAvailDemand(state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterTankDemandARRID);
+                Real64 AvailWaterRate = state.dataWaterData->WaterStorage(state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupTankID)
+                                            .VdotAvailDemand(state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterTankDemandARRID);
                 if (AvailWaterRate < state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate) {
                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeupRate =
                         state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate - AvailWaterRate;
@@ -812,16 +786,10 @@ namespace CoolTower {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Aut 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int CoolTowerNum;
-        Real64 TSMult;
+        Real64 const TSMult = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
-        TSMult = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-
-        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
+        for (int CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirVol = state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate * TSMult;
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirMass = state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate * TSMult;
