@@ -3347,14 +3347,13 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
         bool hit;    // True if ray from ref point thru window element hits an obstruction
         bool hitWin; // True if ray passes thru window
         auto &HP = state.dataDaylightingManager->HP;
-        auto &TransBmBmMult = state.dataDaylightingManager->TransBmBmMult;
         if (COSI > 0.0) {
 
             // Does RAYCOS pass thru exterior window? HP is point that RAYCOS intersects window plane.
             PierceSurface(state, IWin2, RREF2, RAYCOS, HP, hitWin);
             // True if ray from ref pt to sun hits an interior obstruction
-            bool hitIntObsDisk = false;
             if (hitWin) {
+                bool hitIntObsDisk = false;
                 if (ExtWinType == DataDaylighting::ExtWinType::InZoneExtWin) {
                     // Check for interior obstructions between reference point and HP.
                     DayltgHitInteriorObstruction(state, IWin2, RREF2, HP, hitIntObsDisk);
@@ -3456,6 +3455,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
                     state.dataDaylightingManager->EDIRSUdisk(iHour, 1) = RAYCOS(3) * TVISS * ObTransDisk; // Bare window
 
+                    auto &TransBmBmMult = state.dataDaylightingManager->TransBmBmMult;
                     TransBmBmMult = 0.0;
                     if (ANY_BLIND(ShType)) {
                         ProfileAngle(state, IWin, RAYCOS, state.dataMaterial->Blind(BlNum).SlatOrientation, ProfAng);
@@ -3531,20 +3531,18 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
         if (state.dataSurface->CalcSolRefl) {
             // Receiving surface number corresponding this window
             int RecSurfNum = state.dataSurface->SurfShadowRecSurfNum(IWin2);
-            auto &TransBmBmMultRefl = state.dataDaylightingManager->TransBmBmMultRefl;
             if (RecSurfNum > 0) { // interior windows do not apply
                 if (state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs > 0) {
-                    int ReflSurfNum; // Reflecting surface number
-                    int ReflSurfNumX;
                     bool hitRefl;                                              // True iff ray hits reflecting surface
                     auto &HitPtRefl = state.dataDaylightingManager->HitPtRefl; // Point that ray hits reflecting surface
                     auto &SunVecMir = state.dataDaylightingManager->SunVecMir; // Sun ray mirrored in reflecting surface
                     auto &ReflNorm = state.dataDaylightingManager->ReflNorm;   // Normal vector to reflecting surface
+                    auto &TransBmBmMultRefl = state.dataDaylightingManager->TransBmBmMultRefl;
                     // This window has associated obstructions that could reflect beam onto the window
                     for (int loop = 1, loop_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs; loop <= loop_end;
                          ++loop) {
-                        ReflSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop);
-                        ReflSurfNumX = ReflSurfNum;
+                        int ReflSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop);
+                        int ReflSurfNumX = ReflSurfNum;
                         // Each shadowing surface has a "mirror" duplicate surface facing in the opposite direction.
                         // The following gets the correct side of a shadowing surface for reflection.
                         if (state.dataSurface->Surface(ReflSurfNum).IsShadowing) {
@@ -5436,8 +5434,8 @@ void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors fou
 
         // Check that associated surface is an exterior window
         // True if associated surface is not an exterior window
-        bool WrongSurfaceType = false;
         if (SurfNum != 0) {
+            bool WrongSurfaceType = false;
             if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window &&
                 state.dataSurface->Surface(SurfNum).ExtBoundCond != ExternalEnvironment)
                 WrongSurfaceType = true;
@@ -5802,10 +5800,8 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
     assert(magnitude(R2 - R1) > 0.0); // Protect normalize() from divide by zero
 
     // Local declarations
-    SurfaceClass IType; // Surface type/class
-    auto &DayltgHitInteriorObstructionHP =
-        state.dataDaylightingManager->DayltgHitInteriorObstructionHP; // Hit coordinates, if ray hits an obstruction
-    auto &RN = state.dataDaylightingManager->RN;                      // Unit vector along ray
+    SurfaceClass IType;                          // Surface type/class
+    auto &RN = state.dataDaylightingManager->RN; // Unit vector along ray
 
     hit = false;
     RN = (R2 - R1).normalize();         // Make unit vector
@@ -5819,6 +5815,8 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
 
     // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
+        // Hit coordinates, if ray hits an obstruction
+        auto &DayltgHitInteriorObstructionHP = state.dataDaylightingManager->DayltgHitInteriorObstructionHP;
 
         for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
             auto const &surface(state.dataSurface->Surface(ISurf));
@@ -7093,11 +7091,11 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         }
 
                         if (GlareOK) {
-                            Real64 &tmpSWSL1 = state.dataDaylightingManager->tmpSWSL1;
-                            Real64 &tmpSWSL2 = state.dataDaylightingManager->tmpSWSL2;
-                            Real64 &tmpSWFactor = state.dataDaylightingManager->tmpSWFactor;
                             if (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::SwitchableGlazing &&
                                 state.dataSurface->WindowShadingControl(ICtrl).shadingControlType == WindowShadingControlType::MeetDaylIlumSetp) {
+                                Real64 &tmpSWSL1 = state.dataDaylightingManager->tmpSWSL1;
+                                Real64 &tmpSWSL2 = state.dataDaylightingManager->tmpSWSL2;
+                                Real64 &tmpSWFactor = state.dataDaylightingManager->tmpSWFactor;
                                 // Added TH 1/14/2010
                                 // Only for switchable glazings with MeetDaylightIlluminanceSetpoint control
                                 // The glazing is in fully dark state, it might lighten a bit to provide more daylight
@@ -7825,6 +7823,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 // if no obstructions are hit.
                 DayltgHitObstruction(state, IHR, IWin, state.dataSurface->SurfaceWindow(IWin).WinCenter, U, ObTrans);
                 ObTransM(IPH, ITH) = ObTrans;
+                SkyObstructionMult(IPH, ITH) = 1.0;
             }
 
             // SKY AND GROUND RADIATION ON WINDOW
@@ -7833,7 +7832,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             // (There may also be contributions from reflection from obstructions; see 'BEAM SOLAR AND SKY SOLAR
             // REFLECTED FROM NEAREST OBSTRUCTION,' below.)
 
-            if (ISunPos == 1) SkyObstructionMult(IPH, ITH) = 1.0;
             if (PH > 0.0) { // Contribution is from sky
                 for (ISky = 1; ISky <= 4; ++ISky) {
                     ZSK(ISky) = DayltgSkyLuminance(state, ISky, TH, PH) * COSB * DA * ObTransM(IPH, ITH);
