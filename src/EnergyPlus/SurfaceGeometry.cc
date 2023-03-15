@@ -1152,10 +1152,6 @@ namespace SurfaceGeometry {
         int MultFound;
         int MultSurfNum;
         std::string MultString;
-        auto &WarningDisplayed = state.dataSurfaceGeometry->WarningDisplayed;
-        auto &ErrCount2 = state.dataSurfaceGeometry->ErrCount2;
-        auto &ErrCount3 = state.dataSurfaceGeometry->ErrCount3;
-        auto &ErrCount4 = state.dataSurfaceGeometry->ErrCount4;
         bool SubSurfaceSevereDisplayed;
         bool subSurfaceError(false);
         bool errFlag;
@@ -1184,14 +1180,14 @@ namespace SurfaceGeometry {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataHeatBal->Zone(ZoneNum).RelNorth != 0.0) RelWarning = true;
             }
-            if (RelWarning && !WarningDisplayed) {
+            if (RelWarning && !state.dataSurfaceGeometry->WarningDisplayed) {
                 ShowWarningError(
                     state,
                     format("{}World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.",
                            RoutineName));
                 ShowContinueError(state,
                                   "These may be used in daylighting reference point coordinate calculations but not in normal geometry inputs.");
-                WarningDisplayed = true;
+                state.dataSurfaceGeometry->WarningDisplayed = true;
             }
             RelWarning = false;
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -1199,14 +1195,14 @@ namespace SurfaceGeometry {
                 if (state.dataHeatBal->Zone(ZoneNum).OriginY != 0.0) RelWarning = true;
                 if (state.dataHeatBal->Zone(ZoneNum).OriginZ != 0.0) RelWarning = true;
             }
-            if (RelWarning && !WarningDisplayed) {
+            if (RelWarning && !state.dataSurfaceGeometry->WarningDisplayed) {
                 ShowWarningError(
                     state,
                     format("{}World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.",
                            RoutineName));
                 ShowContinueError(state,
                                   "These may be used in daylighting reference point coordinate calculations but not in normal geometry inputs.");
-                WarningDisplayed = true;
+                state.dataSurfaceGeometry->WarningDisplayed = true;
             }
         }
 
@@ -1843,8 +1839,8 @@ namespace SurfaceGeometry {
                         if (Found != SurfNum) { // Interzone surface
                             // Make sure different zones too (CR 4110)
                             if (state.dataSurface->Surface(SurfNum).spaceNum == state.dataSurface->Surface(Found).spaceNum) {
-                                ++ErrCount2;
-                                if (ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                ++state.dataSurfaceGeometry->ErrCount2;
+                                if (state.dataSurfaceGeometry->ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state,
                                                      format("{}CAUTION -- Interspace surfaces are occuring in the same space(s).", RoutineName));
                                     ShowContinueError(
@@ -1959,8 +1955,8 @@ namespace SurfaceGeometry {
                                 if (std::abs((state.dataSurface->Surface(Found).Area * MultFound -
                                               state.dataSurface->Surface(SurfNum).Area * MultSurfNum) /
                                              state.dataSurface->Surface(Found).Area * MultFound) > 0.02) { // 2% difference in areas
-                                    ++ErrCount4;
-                                    if (ErrCount4 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                    ++state.dataSurfaceGeometry->ErrCount4;
+                                    if (state.dataSurfaceGeometry->ErrCount4 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                         ShowWarningError(
                                             state,
                                             format("{}InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:",
@@ -2159,8 +2155,8 @@ namespace SurfaceGeometry {
                                           format("...OutsideFaceEnvironment is blank, in Surface={}", state.dataSurface->Surface(SurfNum).Name));
                         SurfError = true;
                     } else {
-                        ++ErrCount3;
-                        if (ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                        ++state.dataSurfaceGeometry->ErrCount3;
+                        if (state.dataSurfaceGeometry->ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, format("{}Blank name for Outside Boundary Condition Objects.", RoutineName));
                             ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                         }
@@ -2177,8 +2173,8 @@ namespace SurfaceGeometry {
                         state.dataSurface->Surface(SurfNum).ExtBoundCond = SurfNum;
                     }
                 } else {
-                    ++ErrCount3;
-                    if (ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                    ++state.dataSurfaceGeometry->ErrCount3;
+                    if (state.dataSurfaceGeometry->ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                         ShowSevereError(state, format("{}Blank name for Outside Boundary Condition Objects.", RoutineName));
                         ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                     }

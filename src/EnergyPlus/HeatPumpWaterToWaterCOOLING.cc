@@ -598,19 +598,17 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     Real64 DutyFactor;
     int IterationCount;
 
-    auto &CurrentSimTime = state.dataHPWaterToWaterClg->CurrentSimTime;
-    auto &PrevSimTime = state.dataHPWaterToWaterClg->PrevSimTime;
-
     Real64 CpSourceSide; // local temporary for fluid specific heat
     Real64 CpLoadSide;   // local temporary for fluid specific heat
 
-    if (PrevSimTime != CurrentSimTime) {
-        PrevSimTime = CurrentSimTime;
+    if (state.dataHPWaterToWaterClg->PrevSimTime != state.dataHPWaterToWaterClg->CurrentSimTime) {
+        state.dataHPWaterToWaterClg->PrevSimTime = state.dataHPWaterToWaterClg->CurrentSimTime;
     }
 
     // CALCULATE THE SIMULATION TIME
-    CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
-                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
+    state.dataHPWaterToWaterClg->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
+                                                  (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
+                                                  state.dataHVACGlobal->SysTimeElapsed;
 
     if (MyLoad < 0.0) {
         this->MustRun = true;

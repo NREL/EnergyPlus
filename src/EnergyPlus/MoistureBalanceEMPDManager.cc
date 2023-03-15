@@ -170,7 +170,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     int MatNum;            // Material number at interior layer
     int ConstrNum;         // Construction number
     Array1D_bool EMPDzone; // EMPD property check for each zone
-    auto &ErrCount = state.dataMoistureBalEMPD->ErrCount;
+
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     // Load the additional EMPD Material properties
@@ -277,8 +277,8 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
         if (thisMaterial->EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {
             EMPDzone(state.dataSurface->Surface(SurfNum).Zone) = true;
         } else {
-            ++ErrCount;
-            if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+            ++state.dataMoistureBalEMPD->ErrCount;
+            if (state.dataMoistureBalEMPD->ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                 ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer of Surfaces");
                 ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
             }
@@ -503,8 +503,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     Real64 RHaver; // Average zone relative humidity {0-1} between current time and previous time
     Real64 RVaver; // Average zone vapor density
     Real64 dU_dRH;
-    int Flag; // Convergence flag (0 - converged)
-    auto &OneTimeFlag = state.dataMoistureBalEMPD->OneTimeFlag;
+    int Flag;             // Convergence flag (0 - converged)
     Real64 PVsurf;        // Surface vapor pressure
     Real64 PV_surf_layer; // Vapor pressure of surface layer
     Real64 PV_deep_layer;
@@ -517,13 +516,13 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     Real64 RH_surf_layer_tmp;
     Real64 RH_deep_layer;
 
-    if (state.dataGlobal->BeginEnvrnFlag && OneTimeFlag) {
+    if (state.dataGlobal->BeginEnvrnFlag && state.dataMoistureBalEMPD->OneTimeFlag) {
         InitMoistureBalanceEMPD(state);
-        OneTimeFlag = false;
+        state.dataMoistureBalEMPD->OneTimeFlag = false;
     }
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        OneTimeFlag = true;
+        state.dataMoistureBalEMPD->OneTimeFlag = true;
     }
 
     auto const &surface(state.dataSurface->Surface(SurfNum));                // input

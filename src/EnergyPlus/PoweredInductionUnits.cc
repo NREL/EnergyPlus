@@ -815,25 +815,15 @@ void InitPIU(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("InitPIU");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    auto &MyEnvrnFlag = state.dataPowerInductionUnits->MyEnvrnFlag;
-    auto &MySizeFlag = state.dataPowerInductionUnits->MySizeFlag;
-    auto &MyPlantScanFlag = state.dataPowerInductionUnits->MyPlantScanFlag;
-
     // Do the one time initializations
     if (state.dataPowerInductionUnits->MyOneTimeFlag) {
-
-        MyEnvrnFlag.allocate(state.dataPowerInductionUnits->NumPIUs);
-        MySizeFlag.allocate(state.dataPowerInductionUnits->NumPIUs);
-        MyPlantScanFlag.allocate(state.dataPowerInductionUnits->NumPIUs);
-        MyEnvrnFlag = true;
-        MySizeFlag = true;
-        MyPlantScanFlag = true;
+        state.dataPowerInductionUnits->MyEnvrnFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
+        state.dataPowerInductionUnits->MySizeFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
+        state.dataPowerInductionUnits->MyPlantScanFlag.dimension(state.dataPowerInductionUnits->NumPIUs, true);
         state.dataPowerInductionUnits->MyOneTimeFlag = false;
     }
 
-    if (MyPlantScanFlag(PIUNum) && allocated(state.dataPlnt->PlantLoop)) {
+    if (state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) && allocated(state.dataPlnt->PlantLoop)) {
         if ((thisPIU.HCoil_PlantType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
             (thisPIU.HCoil_PlantType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
             bool errFlag = false;
@@ -843,9 +833,9 @@ void InitPIU(EnergyPlusData &state,
             }
             thisPIU.HotCoilOutNodeNum = DataPlant::CompData::getPlantComponent(state, thisPIU.HWplantLoc).NodeNumOut;
         }
-        MyPlantScanFlag(PIUNum) = false;
-    } else if (MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
-        MyPlantScanFlag(PIUNum) = false;
+        state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) = false;
+    } else if (state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
+        state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) = false;
     }
 
     if (!state.dataPowerInductionUnits->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -870,7 +860,8 @@ void InitPIU(EnergyPlusData &state,
         }
     }
 
-    if (!state.dataGlobal->SysSizingCalc && MySizeFlag(PIUNum) && !MyPlantScanFlag(PIUNum)) {
+    if (!state.dataGlobal->SysSizingCalc && state.dataPowerInductionUnits->MySizeFlag(PIUNum) &&
+        !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
 
         SizePIU(state, PIUNum);
 
@@ -889,14 +880,14 @@ void InitPIU(EnergyPlusData &state,
             InitComponentNodes(state, thisPIU.MinHotWaterFlow, thisPIU.MaxHotWaterFlow, thisPIU.HotControlNode, thisPIU.HotCoilOutNodeNum);
         }
 
-        MySizeFlag(PIUNum) = false;
+        state.dataPowerInductionUnits->MySizeFlag(PIUNum) = false;
     }
 
     int const PriNode = thisPIU.PriAirInNode;
     int const SecNode = thisPIU.SecAirInNode;
 
     // Do the Begin Environment initializations
-    if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PIUNum)) {
+    if (state.dataGlobal->BeginEnvrnFlag && state.dataPowerInductionUnits->MyEnvrnFlag(PIUNum)) {
         Real64 const RhoAir = state.dataEnvrn->StdRhoAir;
         int const OutletNode = thisPIU.OutAirNode;
         // set the mass flow rates from the input volume flow rates
@@ -919,7 +910,8 @@ void InitPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
         }
 
-        if (((thisPIU.HCoilType == HtgCoilType::SimpleHeating) || (thisPIU.HCoilType == HtgCoilType::SteamAirHeating)) && !MyPlantScanFlag(PIUNum)) {
+        if (((thisPIU.HCoilType == HtgCoilType::SimpleHeating) || (thisPIU.HCoilType == HtgCoilType::SteamAirHeating)) &&
+            !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
             InitComponentNodes(state, thisPIU.MinHotWaterFlow, thisPIU.MaxHotWaterFlow, thisPIU.HotControlNode, thisPIU.HotCoilOutNodeNum);
         }
 
@@ -930,11 +922,11 @@ void InitPIU(EnergyPlusData &state,
             }
         }
 
-        MyEnvrnFlag(PIUNum) = false;
+        state.dataPowerInductionUnits->MyEnvrnFlag(PIUNum) = false;
     } // end one time inits
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag(PIUNum) = true;
+        state.dataPowerInductionUnits->MyEnvrnFlag(PIUNum) = true;
     }
 
     // Do the start of HVAC time step initializations
