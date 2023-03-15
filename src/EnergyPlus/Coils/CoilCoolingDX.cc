@@ -730,7 +730,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
         if (speedNum > 0) {
             // calculate and report condensation rates  (how much water extracted from the air stream)
             // water flow of water in m3/s for water system interactions
-            Real64 averageTemp = (evapInletNode.Temp - evapOutletNode.Temp) / 2.0;
+            Real64 averageTemp = (evapInletNode.Temp + evapOutletNode.Temp) / 2.0;
             Real64 waterDensity = Psychrometrics::RhoH2O(averageTemp);
             Real64 inHumidityRatio = evapInletNode.HumRat;
             Real64 outHumidityRatio = evapOutletNode.HumRat;

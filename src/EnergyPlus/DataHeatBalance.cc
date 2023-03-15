@@ -92,7 +92,6 @@ namespace EnergyPlus::DataHeatBalance {
 // SolarShading, etc. Modules.
 
 // Using/Aliasing
-using DataSurfaces::MaxSlatAngs;
 using namespace DataVectorTypes;
 using DataBSDFWindow::BSDFLayerAbsorpStruct;
 using DataBSDFWindow::BSDFWindowInputStruct;
@@ -354,7 +353,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     thisConstruct.DayltPropPtr = 0;
     int InsideMaterNum = thisConstruct.LayerPoint(InsideLayer); // Material "number" of the Inside layer
     if (InsideMaterNum != 0) {
-        auto const *thisMaterialInside = state.dataMaterial->Material(InsideMaterNum);
+        auto const *thisMaterialInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
         thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
         thisConstruct.InsideAbsorpSolar = thisMaterialInside->AbsorpSolar;
 
@@ -363,8 +362,9 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     }
 
     int OutsideMaterNum = thisConstruct.LayerPoint(1); // Material "number" of the Outside layer
-    auto const *thisMaterialOutside = state.dataMaterial->Material(OutsideMaterNum);
     if (OutsideMaterNum != 0) {
+        auto const *thisMaterialOutside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(OutsideMaterNum));
+        assert(thisMaterialOutside != nullptr);
         thisConstruct.OutsideAbsorpVis = thisMaterialOutside->AbsorpVisible;
         thisConstruct.OutsideAbsorpSolar = thisMaterialOutside->AbsorpSolar;
     }
@@ -379,29 +379,27 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     thisConstruct.TypeIsWindow = false;
     for (int Layer = 1; Layer <= TotLayers; ++Layer) {
         int const MaterNum = thisConstruct.LayerPoint(Layer);
-        auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
         if (MaterNum == 0) continue; // error -- has been caught will stop program later
+        auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
         thisConstruct.TypeIsWindow =
-            (thisMaterial->Group == Material::MaterialGroup::WindowGlass || thisMaterial->Group == Material::MaterialGroup::WindowGas ||
-             thisMaterial->Group == Material::MaterialGroup::WindowGasMixture || thisMaterial->Group == Material::MaterialGroup::Shade ||
-             thisMaterial->Group == Material::MaterialGroup::WindowBlind || thisMaterial->Group == Material::MaterialGroup::Screen ||
-             thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing ||
-             thisMaterial->Group == Material::MaterialGroup::ComplexWindowShade || thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap ||
-             thisMaterial->Group == Material::MaterialGroup::GlassEquivalentLayer ||
-             thisMaterial->Group == Material::MaterialGroup::ShadeEquivalentLayer ||
-             thisMaterial->Group == Material::MaterialGroup::DrapeEquivalentLayer ||
-             thisMaterial->Group == Material::MaterialGroup::ScreenEquivalentLayer ||
-             thisMaterial->Group == Material::MaterialGroup::BlindEquivalentLayer ||
-             thisMaterial->Group == Material::MaterialGroup::GapEquivalentLayer);
-        bool TypeIsNotWindow =
-            (thisMaterial->Group == Material::MaterialGroup::Invalid || thisMaterial->Group == Material::MaterialGroup::Air ||
-             thisMaterial->Group == Material::MaterialGroup::RegularMaterial || thisMaterial->Group == Material::MaterialGroup::EcoRoof ||
-             thisMaterial->Group == Material::MaterialGroup::IRTMaterial);
+            (thisMaterial->group == Material::Group::WindowGlass || thisMaterial->group == Material::Group::WindowGas ||
+             thisMaterial->group == Material::Group::WindowGasMixture || thisMaterial->group == Material::Group::Shade ||
+             thisMaterial->group == Material::Group::WindowBlind || thisMaterial->group == Material::Group::Screen ||
+             thisMaterial->group == Material::Group::WindowSimpleGlazing || thisMaterial->group == Material::Group::ComplexWindowShade ||
+             thisMaterial->group == Material::Group::ComplexWindowGap || thisMaterial->group == Material::Group::GlassEquivalentLayer ||
+             thisMaterial->group == Material::Group::ShadeEquivalentLayer || thisMaterial->group == Material::Group::DrapeEquivalentLayer ||
+             thisMaterial->group == Material::Group::ScreenEquivalentLayer || thisMaterial->group == Material::Group::BlindEquivalentLayer ||
+             thisMaterial->group == Material::Group::GapEquivalentLayer);
+        bool TypeIsNotWindow = (thisMaterial->group == Material::Group::Invalid || thisMaterial->group == Material::Group::Air ||
+                                thisMaterial->group == Material::Group::Regular || thisMaterial->group == Material::Group::EcoRoof ||
+                                thisMaterial->group == Material::Group::IRTransparent);
         if (!thisConstruct.TypeIsWindow && !TypeIsNotWindow) assert(false);
     }
 
     if (InsideMaterNum == 0) return;
+    auto const *thisMaterialInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
     if (OutsideMaterNum == 0) return;
+    auto const *thisMaterialOutside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(OutsideMaterNum));
 
     if (thisConstruct.TypeIsWindow) {
 
@@ -410,21 +408,17 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         thisConstruct.NumHistories = 0;
         for (int Layer = 1; Layer <= TotLayers; ++Layer) {
             int const MaterNum = thisConstruct.LayerPoint(Layer);
-            auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
+            auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             WrongMaterialsMix =
-                !((thisMaterial->Group == Material::MaterialGroup::WindowGlass) || (thisMaterial->Group == Material::MaterialGroup::WindowGas) ||
-                  (thisMaterial->Group == Material::MaterialGroup::WindowGasMixture) || (thisMaterial->Group == Material::MaterialGroup::Shade) ||
-                  (thisMaterial->Group == Material::MaterialGroup::WindowBlind) || (thisMaterial->Group == Material::MaterialGroup::Screen) ||
-                  (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing) ||
-                  (thisMaterial->Group == Material::MaterialGroup::ComplexWindowShade) ||
-                  (thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) ||
-                  (thisMaterial->Group == Material::MaterialGroup::GlassEquivalentLayer) ||
-                  (thisMaterial->Group == Material::MaterialGroup::ShadeEquivalentLayer) ||
-                  (thisMaterial->Group == Material::MaterialGroup::DrapeEquivalentLayer) ||
-                  (thisMaterial->Group == Material::MaterialGroup::ScreenEquivalentLayer) ||
-                  (thisMaterial->Group == Material::MaterialGroup::BlindEquivalentLayer) ||
-                  (thisMaterial->Group == Material::MaterialGroup::GapEquivalentLayer));
+                !((thisMaterial->group == Material::Group::WindowGlass) || (thisMaterial->group == Material::Group::WindowGas) ||
+                  (thisMaterial->group == Material::Group::WindowGasMixture) || (thisMaterial->group == Material::Group::Shade) ||
+                  (thisMaterial->group == Material::Group::WindowBlind) || (thisMaterial->group == Material::Group::Screen) ||
+                  (thisMaterial->group == Material::Group::WindowSimpleGlazing) || (thisMaterial->group == Material::Group::ComplexWindowShade) ||
+                  (thisMaterial->group == Material::Group::ComplexWindowGap) || (thisMaterial->group == Material::Group::GlassEquivalentLayer) ||
+                  (thisMaterial->group == Material::Group::ShadeEquivalentLayer) || (thisMaterial->group == Material::Group::DrapeEquivalentLayer) ||
+                  (thisMaterial->group == Material::Group::ScreenEquivalentLayer) || (thisMaterial->group == Material::Group::BlindEquivalentLayer) ||
+                  (thisMaterial->group == Material::Group::GapEquivalentLayer));
         }
 
         if (WrongMaterialsMix) { // Illegal material for a window construction
@@ -444,11 +438,11 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
 
         } else if (TotLayers == 1) {
             auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
-            Material::MaterialGroup thisMaterialGroup = thisMaterial->Group;
-            if ((thisMaterialGroup == Material::MaterialGroup::Shade) || (thisMaterialGroup == Material::MaterialGroup::WindowGas) ||
-                (thisMaterialGroup == Material::MaterialGroup::WindowGasMixture) || (thisMaterialGroup == Material::MaterialGroup::WindowBlind) ||
-                (thisMaterialGroup == Material::MaterialGroup::Screen) || (thisMaterialGroup == Material::MaterialGroup::ComplexWindowShade) ||
-                (thisMaterialGroup == Material::MaterialGroup::ComplexWindowGap)) {
+            Material::Group thisMaterialGroup = thisMaterial->group;
+            if ((thisMaterialGroup == Material::Group::Shade) || (thisMaterialGroup == Material::Group::WindowGas) ||
+                (thisMaterialGroup == Material::Group::WindowGasMixture) || (thisMaterialGroup == Material::Group::WindowBlind) ||
+                (thisMaterialGroup == Material::Group::Screen) || (thisMaterialGroup == Material::Group::ComplexWindowShade) ||
+                (thisMaterialGroup == Material::Group::ComplexWindowGap)) {
                 ShowSevereError(state,
                                 format("CheckAndSetConstructionProperties: The single-layer window construction={} has a gas, complex gap, shade, "
                                        "complex shade, screen or blind material; it should be glass of simple glazing system.",
@@ -465,21 +459,21 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         int TotGasLayers = 0;
         for (int Layer = 1; Layer <= TotLayers; ++Layer) {
             int const MaterNum = thisConstruct.LayerPoint(Layer);
-            auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
-            if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) ++TotGlassLayers;
-            if (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing) ++TotGlassLayers;
-            if (thisMaterial->Group == Material::MaterialGroup::Shade || thisMaterial->Group == Material::MaterialGroup::WindowBlind ||
-                thisMaterial->Group == Material::MaterialGroup::Screen || thisMaterial->Group == Material::MaterialGroup::ComplexWindowShade)
+            auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
+            if (thisMaterial->group == Material::Group::WindowGlass) ++TotGlassLayers;
+            if (thisMaterial->group == Material::Group::WindowSimpleGlazing) ++TotGlassLayers;
+            if (thisMaterial->group == Material::Group::Shade || thisMaterial->group == Material::Group::WindowBlind ||
+                thisMaterial->group == Material::Group::Screen || thisMaterial->group == Material::Group::ComplexWindowShade)
                 ++TotShadeLayers;
-            if (thisMaterial->Group == Material::MaterialGroup::WindowGas || thisMaterial->Group == Material::MaterialGroup::WindowGasMixture ||
-                thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap)
+            if (thisMaterial->group == Material::Group::WindowGas || thisMaterial->group == Material::Group::WindowGasMixture ||
+                thisMaterial->group == Material::Group::ComplexWindowGap)
                 ++TotGasLayers;
             if (Layer < TotLayers) {
                 int const MaterNumNext = thisConstruct.LayerPoint(Layer + 1);
                 // Adjacent layers of same type not allowed
                 if (MaterNumNext == 0) continue;
-                if (thisMaterial->Group == state.dataMaterial->Material(MaterNumNext)->Group) WrongWindowLayering = true;
+                if (thisMaterial->group == state.dataMaterial->Material(MaterNumNext)->group) WrongWindowLayering = true;
             }
         }
 
@@ -488,29 +482,28 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         if (thisConstruct.WindowTypeBSDF) {
             thisConstruct.TotGlassLayers = TotGlassLayers;
             thisConstruct.TotSolidLayers = TotGlassLayers + TotShadeLayers;
-            thisConstruct.InsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->AbsorpThermalBack;
-            thisConstruct.OutsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(1))->AbsorpThermalFront;
+            thisConstruct.InsideAbsorpThermal = thisMaterialInside->AbsorpThermalBack;
+            thisConstruct.OutsideAbsorpThermal = thisMaterialOutside->AbsorpThermalFront;
             return;
         }
 
         if (thisConstruct.WindowTypeEQL) {
-            thisConstruct.InsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->AbsorpThermalBack;
-            thisConstruct.OutsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(1))->AbsorpThermalFront;
+            thisConstruct.InsideAbsorpThermal = thisMaterialInside->AbsorpThermalBack;
+            thisConstruct.OutsideAbsorpThermal = thisMaterialOutside->AbsorpThermalFront;
             return;
         }
 
-        if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::WindowGas ||
-            state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::WindowGasMixture ||
-            state.dataMaterial->Material(thisConstruct.LayerPoint(TotLayers))->Group == Material::MaterialGroup::WindowGas ||
-            state.dataMaterial->Material(thisConstruct.LayerPoint(TotLayers))->Group == Material::MaterialGroup::WindowGasMixture)
+        if (thisMaterialOutside->group == Material::Group::WindowGas || thisMaterialOutside->group == Material::Group::WindowGasMixture ||
+            thisMaterialInside->group == Material::Group::WindowGas || thisMaterialInside->group == Material::Group::WindowGasMixture)
             WrongWindowLayering = true;                     // Gas cannot be first or last layer
         if (TotShadeLayers > 1) WrongWindowLayering = true; // At most one shade, screen or blind allowed
 
         // If there is a diffusing glass layer no shade, screen or blind is allowed
         for (int Layer = 1; Layer <= TotLayers; ++Layer) {
             int const MaterNum = thisConstruct.LayerPoint(Layer);
-            auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
+            auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+            assert(thisMaterial != nullptr);
             if (thisMaterial->SolarDiffusing && TotShadeLayers > 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("CheckAndSetConstructionProperties: Window construction={}", thisConstruct.Name));
@@ -524,9 +517,10 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             int GlassLayNum = 0;
             for (int Layer = 1; Layer <= TotLayers; ++Layer) {
                 int const MaterNum = thisConstruct.LayerPoint(Layer);
-                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
+                auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
+                assert(thisMaterial != nullptr);
+                if (thisMaterial->group == Material::Group::WindowGlass) {
                     ++GlassLayNum;
                     if (GlassLayNum < TotGlassLayers && thisMaterial->SolarDiffusing) {
                         ErrorsFound = true;
@@ -538,20 +532,16 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         }
 
         // interior window screen is not allowed. Check for invalid between-glass screen is checked below.
-        if (TotShadeLayers == 1 && state.dataMaterial->Material(thisConstruct.LayerPoint(TotLayers))->Group == Material::MaterialGroup::Screen &&
-            TotLayers != 1) {
+        if (TotShadeLayers == 1 && thisMaterialInside->group == Material::Group::Screen && TotLayers != 1) {
             WrongWindowLayering = true;
         }
 
         // Consistency checks for a construction with a between-glass shade or blind
 
-        if (TotShadeLayers == 1 && state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group != Material::MaterialGroup::Shade &&
-            state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group != Material::MaterialGroup::WindowBlind &&
-            state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group != Material::MaterialGroup::Screen &&
-            state.dataMaterial->Material(thisConstruct.LayerPoint(TotLayers))->Group != Material::MaterialGroup::Shade &&
-            state.dataMaterial->Material(thisConstruct.LayerPoint(TotLayers))->Group != Material::MaterialGroup::WindowBlind &&
-            state.dataMaterial->Material(thisConstruct.LayerPoint(TotLayers))->Group != Material::MaterialGroup::ComplexWindowShade &&
-            !WrongWindowLayering) {
+        if (TotShadeLayers == 1 && thisMaterialOutside->group != Material::Group::Shade &&
+            thisMaterialOutside->group != Material::Group::WindowBlind && thisMaterialOutside->group != Material::Group::Screen &&
+            thisMaterialInside->group != Material::Group::Shade && thisMaterialInside->group != Material::Group::WindowBlind &&
+            thisMaterialInside->group != Material::Group::ComplexWindowShade && !WrongWindowLayering) {
 
             // This is a construction with a between-glass shade or blind
 
@@ -564,33 +554,33 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                     if (TotLayers != 5) {
                         WrongWindowLayering = true;
                     } else {
-                        if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::WindowGlass &&
-                            (state.dataMaterial->Material(thisConstruct.LayerPoint(2))->Group == Material::MaterialGroup::WindowGas ||
-                             state.dataMaterial->Material(thisConstruct.LayerPoint(2))->Group == Material::MaterialGroup::WindowGasMixture) &&
-                            ((state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group == Material::MaterialGroup::Shade ||
-                              state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group == Material::MaterialGroup::WindowBlind) &&
-                             state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group != Material::MaterialGroup::Screen) &&
-                            (state.dataMaterial->Material(thisConstruct.LayerPoint(4))->Group == Material::MaterialGroup::WindowGas ||
-                             state.dataMaterial->Material(thisConstruct.LayerPoint(4))->Group == Material::MaterialGroup::WindowGasMixture) &&
-                            state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group == Material::MaterialGroup::WindowGlass)
+                        if (thisMaterialOutside->group == Material::Group::WindowGlass &&
+                            (state.dataMaterial->Material(thisConstruct.LayerPoint(2))->group == Material::Group::WindowGas ||
+                             state.dataMaterial->Material(thisConstruct.LayerPoint(2))->group == Material::Group::WindowGasMixture) &&
+                            ((state.dataMaterial->Material(thisConstruct.LayerPoint(3))->group == Material::Group::Shade ||
+                              state.dataMaterial->Material(thisConstruct.LayerPoint(3))->group == Material::Group::WindowBlind) &&
+                             state.dataMaterial->Material(thisConstruct.LayerPoint(3))->group != Material::Group::Screen) &&
+                            (state.dataMaterial->Material(thisConstruct.LayerPoint(4))->group == Material::Group::WindowGas ||
+                             state.dataMaterial->Material(thisConstruct.LayerPoint(4))->group == Material::Group::WindowGasMixture) &&
+                            state.dataMaterial->Material(thisConstruct.LayerPoint(5))->group == Material::Group::WindowGlass)
                             ValidBGShadeBlindConst = true;
                     }
                 } else { // TotGlassLayers = 3
                     if (TotLayers != 7) {
                         WrongWindowLayering = true;
                     } else {
-                        if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::WindowGlass &&
-                            (state.dataMaterial->Material(thisConstruct.LayerPoint(2))->Group == Material::MaterialGroup::WindowGas ||
-                             state.dataMaterial->Material(thisConstruct.LayerPoint(2))->Group == Material::MaterialGroup::WindowGasMixture) &&
-                            state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group == Material::MaterialGroup::WindowGlass &&
-                            (state.dataMaterial->Material(thisConstruct.LayerPoint(4))->Group == Material::MaterialGroup::WindowGas ||
-                             state.dataMaterial->Material(thisConstruct.LayerPoint(4))->Group == Material::MaterialGroup::WindowGasMixture) &&
-                            ((state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group == Material::MaterialGroup::Shade ||
-                              state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group == Material::MaterialGroup::WindowBlind) &&
-                             state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group != Material::MaterialGroup::Screen) &&
-                            (state.dataMaterial->Material(thisConstruct.LayerPoint(6))->Group == Material::MaterialGroup::WindowGas ||
-                             state.dataMaterial->Material(thisConstruct.LayerPoint(6))->Group == Material::MaterialGroup::WindowGasMixture) &&
-                            state.dataMaterial->Material(thisConstruct.LayerPoint(7))->Group == Material::MaterialGroup::WindowGlass)
+                        if (thisMaterialOutside->group == Material::Group::WindowGlass &&
+                            (state.dataMaterial->Material(thisConstruct.LayerPoint(2))->group == Material::Group::WindowGas ||
+                             state.dataMaterial->Material(thisConstruct.LayerPoint(2))->group == Material::Group::WindowGasMixture) &&
+                            state.dataMaterial->Material(thisConstruct.LayerPoint(3))->group == Material::Group::WindowGlass &&
+                            (state.dataMaterial->Material(thisConstruct.LayerPoint(4))->group == Material::Group::WindowGas ||
+                             state.dataMaterial->Material(thisConstruct.LayerPoint(4))->group == Material::Group::WindowGasMixture) &&
+                            ((state.dataMaterial->Material(thisConstruct.LayerPoint(5))->group == Material::Group::Shade ||
+                              state.dataMaterial->Material(thisConstruct.LayerPoint(5))->group == Material::Group::WindowBlind) &&
+                             state.dataMaterial->Material(thisConstruct.LayerPoint(5))->group != Material::Group::Screen) &&
+                            (state.dataMaterial->Material(thisConstruct.LayerPoint(6))->group == Material::Group::WindowGas ||
+                             state.dataMaterial->Material(thisConstruct.LayerPoint(6))->group == Material::Group::WindowGasMixture) &&
+                            state.dataMaterial->Material(thisConstruct.LayerPoint(7))->group == Material::Group::WindowGlass)
                             ValidBGShadeBlindConst = true;
                     }
                 } // End of check if TotGlassLayers = 2 or 3
@@ -598,18 +588,19 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 if (!WrongWindowLayering) {
                     int const LayNumSh = 2 * TotGlassLayers - 1;
                     int const MatSh = thisConstruct.LayerPoint(LayNumSh);
-                    auto const *thisMaterialSh = state.dataMaterial->Material(MatSh);
+                    auto const *thisMaterialSh = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatSh));
+                    assert(thisMaterialSh != nullptr);
                     // For double pane, shade/blind must be layer #3.
                     // For triple pane, it must be layer #5 (i.e., between two inner panes).
-                    if (thisMaterialSh->Group != Material::MaterialGroup::Shade && thisMaterialSh->Group != Material::MaterialGroup::WindowBlind)
+                    if (thisMaterialSh->group != Material::Group::Shade && thisMaterialSh->group != Material::Group::WindowBlind)
                         WrongWindowLayering = true;
                     if (TotLayers != 2 * TotGlassLayers + 1) WrongWindowLayering = true;
                     if (!WrongWindowLayering) {
                         // Gas on either side of a between-glass shade/blind must be the same
                         int const MatGapL = thisConstruct.LayerPoint(LayNumSh - 1);
                         int const MatGapR = thisConstruct.LayerPoint(LayNumSh + 1);
-                        auto const *thisMaterialGapL = state.dataMaterial->Material(MatGapL);
-                        auto const *thisMaterialGapR = state.dataMaterial->Material(MatGapR);
+                        auto const *thisMaterialGapL = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatGapL));
+                        auto const *thisMaterialGapR = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatGapR));
                         for (int IGas = 1; IGas <= 5; ++IGas) {
                             if ((thisMaterialGapL->gasTypes(IGas) != thisMaterialGapR->gasTypes(IGas)) ||
                                 (thisMaterialGapL->GasFract(IGas) != thisMaterialGapR->GasFract(IGas)))
@@ -617,10 +608,10 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                         }
                         // Gap width on either side of a between-glass shade/blind must be the same
                         if (std::abs(thisMaterialGapL->Thickness - thisMaterialGapR->Thickness) > 0.0005) WrongWindowLayering = true;
-                        if (thisMaterialSh->Group == Material::MaterialGroup::WindowBlind) {
+                        if (thisMaterialSh->group == Material::Group::WindowBlind) {
                             int const BlNum = thisMaterialSh->BlindDataPtr;
                             if (BlNum > 0) {
-                                if ((thisMaterialGapL->Thickness + thisMaterialGapR->Thickness) < state.dataHeatBal->Blind(BlNum).SlatWidth) {
+                                if ((thisMaterialGapL->Thickness + thisMaterialGapR->Thickness) < state.dataMaterial->Blind(BlNum).SlatWidth) {
                                     ErrorsFound = true;
                                     ShowSevereError(state,
                                                     format("CheckAndSetConstructionProperties: For window construction {}", thisConstruct.Name));
@@ -635,19 +626,19 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         }                     // End of check if construction has between-glass shade/blind
 
         // Check Simple Windows,
-        if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::WindowSimpleGlazing) {
+        if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->group == Material::Group::WindowSimpleGlazing) {
             if (TotLayers > 1) {
                 // check that none of the other layers are glazing or gas
                 for (int Layer = 1; Layer <= TotLayers; ++Layer) {
                     int const MaterNum = thisConstruct.LayerPoint(Layer);
-                    auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                     if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                    if (thisMaterial->Group == Material::MaterialGroup::WindowGlass) {
+                    auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
+                    if (thisMaterial->group == Material::Group::WindowGlass) {
                         ErrorsFound = true;
                         ShowSevereError(state, format("CheckAndSetConstructionProperties: Error in window construction {}--", thisConstruct.Name));
                         ShowContinueError(state, "For simple window constructions, no other glazing layers are allowed.");
                     }
-                    if (thisMaterial->Group == Material::MaterialGroup::WindowGas) {
+                    if (thisMaterial->group == Material::Group::WindowGas) {
                         ErrorsFound = true;
                         ShowSevereError(state, format("CheckAndSetConstructionProperties: Error in window construction {}--", thisConstruct.Name));
                         ShowContinueError(state, "For simple window constructions, no other gas layers are allowed.");
@@ -683,52 +674,51 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         // In following, InsideLayer is layer number of inside glass and InsideAbsorpThermal applies
         // only to inside glass; it is corrected later in InitGlassOpticalCalculations
         // if construction has inside shade or blind.
-        if (state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->Group == Material::MaterialGroup::Shade ||
-            state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->Group == Material::MaterialGroup::WindowBlind) {
+        if (thisMaterialInside->group == Material::Group::Shade || thisMaterialInside->group == Material::Group::WindowBlind) {
             --InsideLayer;
         }
         if (InsideLayer > 0) {
             InsideMaterNum = thisConstruct.LayerPoint(InsideLayer);
-            thisConstruct.InsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->AbsorpThermalBack;
+            thisConstruct.InsideAbsorpThermal = thisMaterialInside->AbsorpThermalBack;
         }
         if (InsideMaterNum != 0) {
-            auto const *thisMaterialInside = state.dataMaterial->Material(InsideMaterNum);
+            auto const *thisMaterialInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
             thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
             thisConstruct.InsideAbsorpSolar = thisMaterialInside->AbsorpSolar;
         }
 
-        if ((state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::WindowGlass) ||
-            (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::WindowSimpleGlazing)) { // Glass
-            thisConstruct.OutsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(1))->AbsorpThermalFront;
+        if ((thisMaterialOutside->group == Material::Group::WindowGlass) ||
+            (thisMaterialOutside->group == Material::Group::WindowSimpleGlazing)) { // Glass
+            thisConstruct.OutsideAbsorpThermal = thisMaterialOutside->AbsorpThermalFront;
         } else { // Exterior shade, blind or screen
-            thisConstruct.OutsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(1))->AbsorpThermal;
+            thisConstruct.OutsideAbsorpThermal = thisMaterialOutside->AbsorpThermal;
         }
 
     } else { // Opaque surface
-        thisConstruct.InsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->AbsorpThermal;
-        thisConstruct.OutsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(1))->AbsorpThermal;
+        thisConstruct.InsideAbsorpThermal = thisMaterialInside->AbsorpThermal;
+        thisConstruct.OutsideAbsorpThermal = thisMaterialOutside->AbsorpThermal;
     }
 
-    thisConstruct.OutsideRoughness = state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Roughness;
+    thisConstruct.OutsideRoughness = thisMaterialOutside->Roughness;
 
-    if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::Air) {
+    if (thisMaterialOutside->group == Material::Group::Air) {
         ShowSevereError(state, format("CheckAndSetConstructionProperties: Outside Layer is Air for construction {}", thisConstruct.Name));
-        ShowContinueError(state, format("  Error in material {}", state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Name));
+        ShowContinueError(state, format("  Error in material {}", thisMaterialOutside->Name));
         ErrorsFound = true;
     }
     if (InsideLayer > 0) {
-        if (state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->Group == Material::MaterialGroup::Air) {
+        if (thisMaterialInside->group == Material::Group::Air) {
             ShowSevereError(state, format("CheckAndSetConstructionProperties: Inside Layer is Air for construction {}", thisConstruct.Name));
-            ShowContinueError(state, format("  Error in material {}", state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->Name));
+            ShowContinueError(state, format("  Error in material {}", thisMaterialInside->Name));
             ErrorsFound = true;
         }
     }
 
-    if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::EcoRoof) {
+    if (thisMaterialOutside->group == Material::Group::EcoRoof) {
         thisConstruct.TypeIsEcoRoof = true;
         // need to check EcoRoof is not non-outside layer
         for (int Layer = 2; Layer <= TotLayers; ++Layer) {
-            if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::EcoRoof) {
+            if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->group == Material::Group::EcoRoof) {
                 ShowSevereError(state,
                                 format("CheckAndSetConstructionProperties: Interior Layer is EcoRoof for construction {}", thisConstruct.Name));
                 ShowContinueError(state, format("  Error in material {}", state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Name));
@@ -737,7 +727,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         }
     }
 
-    if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::IRTMaterial) {
+    if (thisMaterialOutside->group == Material::Group::IRTransparent) {
         thisConstruct.TypeIsIRT = true;
         if (thisConstruct.TotLayers != 1) {
             ShowSevereError(
@@ -869,21 +859,22 @@ void AddVariableSlatBlind(EnergyPlusData &state,
 
     // maybe it's already there
     errFlag = false;
-    Found = UtilityRoutines::FindItemInList("~" + state.dataHeatBal->Blind(inBlindNumber).Name, state.dataHeatBal->Blind);
+    Found = UtilityRoutines::FindItemInList("~" + state.dataMaterial->Blind(inBlindNumber).Name, state.dataMaterial->Blind);
     if (Found == 0) {
         // Add a new blind
-        state.dataHeatBal->Blind.redimension(++state.dataHeatBal->TotBlinds);
-        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds) = state.dataHeatBal->Blind(inBlindNumber);
-        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).Name = "~" + state.dataHeatBal->Blind(inBlindNumber).Name;
+        state.dataHeatBal->TotBlinds += 1;
+        state.dataMaterial->Blind.push_back(Material::WindowBlindProperties());
+        state.dataMaterial->Blind(state.dataHeatBal->TotBlinds) = state.dataMaterial->Blind(inBlindNumber);
+        state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).Name = "~" + state.dataMaterial->Blind(inBlindNumber).Name;
         outBlindNumber = state.dataHeatBal->TotBlinds;
-        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngleType = DataWindowEquivalentLayer::AngleType::Variable;
+        state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngleType = DataWindowEquivalentLayer::AngleType::Variable;
 
         // Minimum and maximum slat angles allowed by slat geometry
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatWidth >
-            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatSeparation) {
-            MinSlatAngGeom = std::asin(state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatThickness /
-                                       (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatThickness +
-                                        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) /
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatWidth >
+            state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatSeparation) {
+            MinSlatAngGeom = std::asin(state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatThickness /
+                                       (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatThickness +
+                                        state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) /
                              DataGlobalConstants::DegToRadians;
         } else {
             MinSlatAngGeom = 0.0;
@@ -892,55 +883,56 @@ void AddVariableSlatBlind(EnergyPlusData &state,
 
         // Error if maximum slat angle less than minimum
 
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle <
-            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle) {
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle <
+            state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle) {
             errFlag = true;
-            ShowSevereError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataHeatBal->Blind(inBlindNumber).Name));
+            ShowSevereError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataMaterial->Blind(inBlindNumber).Name));
             ShowContinueError(state,
                               format("Minimum Slat Angle=[{:.1R}], is greater than Maximum Slat Angle=[{:.1R}] deg.",
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
         }
 
         // Error if input slat angle not in input min/max range
 
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle >
-                state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
-            (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle < state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle ||
-             state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle >
-                 state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle >
+                state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
+            (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle <
+                 state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle ||
+             state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle >
+                 state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
             errFlag = true;
-            ShowSevereError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataHeatBal->Blind(inBlindNumber).Name));
+            ShowSevereError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataMaterial->Blind(inBlindNumber).Name));
             ShowContinueError(state,
                               format("Slat Angle=[{:.1R}] is outside of the input min/max range, min=[{:.1R}], max=[{:.1R}] deg.",
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle,
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatAngle,
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
         }
 
         // Warning if input minimum slat angle is less than that allowed by slat geometry
 
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle < MinSlatAngGeom) {
-            ShowWarningError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataHeatBal->Blind(inBlindNumber).Name));
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle < MinSlatAngGeom) {
+            ShowWarningError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataMaterial->Blind(inBlindNumber).Name));
             ShowContinueError(
                 state,
                 format("Minimum Slat Angle=[{:.1R}] is less than the smallest allowed by slat dimensions and spacing, min=[{:.1R}] deg.",
-                       state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                       state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
                        MinSlatAngGeom));
             ShowContinueError(state, format("Minimum Slat Angle will be set to {:.1R} deg.", MinSlatAngGeom));
-            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle = MinSlatAngGeom;
+            state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle = MinSlatAngGeom;
         }
 
         // Warning if input maximum slat angle is greater than that allowed by slat geometry
 
-        if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
-            ShowWarningError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataHeatBal->Blind(inBlindNumber).Name));
+        if (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
+            ShowWarningError(state, format("WindowMaterial:Blind=\"{}\", Illegal value combination.", state.dataMaterial->Blind(inBlindNumber).Name));
             ShowContinueError(state,
                               format("Maximum Slat Angle=[{:.1R}] is greater than the largest allowed by slat dimensions and spacing, [{:.1R}] deg.",
-                                     state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle,
+                                     state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle,
                                      MaxSlatAngGeom));
             ShowContinueError(state, format("Maximum Slat Angle will be set to {:.1R} deg.", MaxSlatAngGeom));
-            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
+            state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
         }
     } else {
         outBlindNumber = Found;
@@ -976,7 +968,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     //  CALL CalcScreenTransmittance(SurfaceNum)
     //  Since a single Material:WindowScreen object may be used for multiple windows, the
     //  screen's direct beam properties are calculated for the screen material attached to this surface.
-    //  If a single Material:WindowScreen object is used for 3 windows then SurfaceScreens(3) is allocated.
+    //  If a single Material:WindowScreen object is used for 3 windows then Screens(3) is allocated.
 
     //  CALLs to CalcScreenTransmittance may be done by using the optional arguments as follows:
     //  CALLs to CalcScreenTransmittance at normal incidence are:
@@ -1039,7 +1031,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 ReflectCyl;            // Screen material reflectance
     Real64 ReflectCylVis;         // Screen material visible reflectance
 
-    // SurfaceScreens structure may be accessed using either the surface or screen index
+    // Screens structure may be accessed using either the surface or screen index
     // The screen index is based on the number of Surface:HeatTransfer:Sub objects using any Material:WindowScreen object
     if (present(ScreenNumber)) {
         ScNum = ScreenNumber;
@@ -1104,7 +1096,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         IncidentAngle = 0.0;
     }
 
-    auto &thisScreen = state.dataHeatBal->SurfaceScreens(ScNum);
+    auto &thisScreen = state.dataMaterial->Screens(ScNum);
 
     // ratio of screen material diameter to screen material spacing
     Gamma = thisScreen.ScreenDiameterToSpacingRatio;
@@ -1198,7 +1190,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Tscattered = max(0.0, Tscattered);
     TscatteredVis = max(0.0, TscatteredVis);
 
-    if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::DoNotModel) {
+    if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::DoNotModel) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect;
             thisScreen.BmBmTransVis = Tdirect;
@@ -1210,7 +1202,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::DirectBeam) {
+    } else if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::DirectBeam) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect + Tscattered;
             thisScreen.BmBmTransVis = Tdirect + TscatteredVis;
@@ -1222,7 +1214,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::Diffuse) {
+    } else if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::Diffuse) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect;
             thisScreen.BmBmTransVis = Tdirect;
@@ -1255,49 +1247,6 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         thisScreen.ReflectVisBeamFront = 0.0;
         thisScreen.AbsorpSolarBeamFront = 0.0;
     }
-}
-
-std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness const Roughness) // Roughness String
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   October 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine is given a roughness value and returns the character representation.
-
-    // Return value
-    std::string cRoughness; // Character representation of Roughness
-
-    // Select the correct Number for the associated ascii name for the roughness type
-    switch (Roughness) {
-    case DataSurfaces::SurfaceRoughness::VeryRough: {
-        cRoughness = "VeryRough";
-    } break;
-    case DataSurfaces::SurfaceRoughness::Rough: {
-        cRoughness = "Rough";
-    } break;
-    case DataSurfaces::SurfaceRoughness::MediumRough: {
-        cRoughness = "MediumRough";
-    } break;
-    case DataSurfaces::SurfaceRoughness::MediumSmooth: {
-        cRoughness = "MediumSmooth";
-    } break;
-    case DataSurfaces::SurfaceRoughness::Smooth: {
-        cRoughness = "Smooth";
-    } break;
-    case DataSurfaces::SurfaceRoughness::VerySmooth: {
-        cRoughness = "VerySmooth";
-    } break;
-    default: {
-        cRoughness = "";
-    } break;
-    }
-
-    return cRoughness;
 }
 
 Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
@@ -1425,9 +1374,9 @@ void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
             NumLayers = thisConstruct.TotLayers;
             for (Layer = 1; Layer <= NumLayers; ++Layer) {
                 MaterNum = thisConstruct.LayerPoint(Layer);
-                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) continue;
-                if (thisMaterial->Group == Material::MaterialGroup::Shade || thisMaterial->Group == Material::MaterialGroup::WindowBlind)
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
+                if (thisMaterial->group == Material::Group::Shade || thisMaterial->group == Material::Group::WindowBlind)
                     state.dataSurface->SurfWinHasShadeOrBlindLayer(loopSurfNum) = true;
             }
         }
