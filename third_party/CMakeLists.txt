@@ -144,6 +144,7 @@ set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP)
 # Kiva
 option(BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging only)" OFF)
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
+mark_as_advanced(FORCE KIVA_WERROR)
 
 set(KIVA_TESTING OFF CACHE BOOL "" FORCE)
 set(KIVA_EXE_BUILD OFF CACHE BOOL "" FORCE)
@@ -151,7 +152,7 @@ set(KIVA_3D OFF CACHE BOOL "" FORCE)
 set(KIVA_GROUND_PLOT ${BUILD_GROUND_PLOT} CACHE BOOL "" FORCE)
 set(KIVA_COVERAGE OFF CACHE BOOL "" FORCE)
 
-add_subdirectory("kiva-ep")
+add_subdirectory("kiva")
 set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
 
 if(NOT APPLE)
