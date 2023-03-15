@@ -1836,7 +1836,6 @@ namespace DaylightingDevices {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-
         if ((int)state.dataDaylightingDevicesData->TDDPipe.size() == 0) return;
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataDaylightingDevices->MyEnvrnFlag) {
