@@ -299,7 +299,7 @@ namespace WindowManager {
         for (bool isSummer : {false, true}) {
             constexpr Real64 framehExtConvCoeff = 30.0;
             constexpr Real64 framehIntConvCoeff = 8.0;
-            const Real64 tilt = 90.0;
+            constexpr Real64 tilt = 90.0;
 
             auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, isSummer, windowWidth, windowHeight, tilt); // (AUTO_OK_SHARED_PTR)
 
