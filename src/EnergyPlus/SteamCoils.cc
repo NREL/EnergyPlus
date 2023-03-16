@@ -336,7 +336,7 @@ namespace SteamCoils {
                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
-            std::string const &controlMode = UtilityRoutines::MakeUPPERCase(AlphArray(7));
+            std::string controlMode = UtilityRoutines::MakeUPPERCase(AlphArray(7));
             state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil =
                 static_cast<CoilControlType>(getEnumerationValue(coilControlTypeNames, controlMode));
             switch (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil) {
