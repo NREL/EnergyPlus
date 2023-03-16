@@ -524,7 +524,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
                         state,
                         "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable was empty, skipping.");
                 } else {
-                    std::string epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
+                    fs::path epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
                     if (FileSystem::pathExists(epinRootDir)) {
                         fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinRootDir);
                         PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
