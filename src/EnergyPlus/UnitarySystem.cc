@@ -280,20 +280,20 @@ namespace UnitarySystems {
 
                 auto speedFlowRatios = fields.find("flow_ratios");
                 if (speedFlowRatios != fields.end()) {
-                    auto flowRatioArray = speedFlowRatios.value();
+                    auto &flowRatioArray = speedFlowRatios.value();
                     int numSpeedInputs = flowRatioArray.size();
                     if (numSpeedInputs >= maxSpeeds) {
                         int speedNum = -1;
-                        for (auto flowRatio : flowRatioArray) {
+                        for (auto const &flowRatio : flowRatioArray) {
                             speedNum += 1;
-                            auto m_CoolingSpeedRatioObject = flowRatio.at("cooling_speed_supply_air_flow_ratio");
+                            auto &m_CoolingSpeedRatioObject = flowRatio.at("cooling_speed_supply_air_flow_ratio");
                             if (m_CoolingSpeedRatioObject == "Autosize") {
                                 if (speedNum < (maxSpeeds + 1)) thisDesignSpec.coolingVolFlowRatio[speedNum] = -99999;
                             } else {
                                 if (speedNum < (maxSpeeds + 1))
                                     thisDesignSpec.coolingVolFlowRatio[speedNum] = m_CoolingSpeedRatioObject.get<Real64>();
                             }
-                            auto m_HeatingSpeedRatioObject = flowRatio.at("heating_speed_supply_air_flow_ratio");
+                            auto &m_HeatingSpeedRatioObject = flowRatio.at("heating_speed_supply_air_flow_ratio");
                             if (m_HeatingSpeedRatioObject == "Autosize") {
                                 if (speedNum < (maxSpeeds + 1)) thisDesignSpec.heatingVolFlowRatio[speedNum] = -99999;
                             } else {
@@ -1375,9 +1375,9 @@ namespace UnitarySystems {
         // static int NumUnitarySystemsSized( 0 ); // counter used to delete UnitarySystemNumericFields array after last system is sized
         ////////////////////////////////////////////////////////////////////////////////////
         // References
-        DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
+        DataSizing::ZoneEqSizingData *select_EqSizing = nullptr;
 
-        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
+        auto &OASysEqSizing = state.dataSize->OASysEqSizing;
 
         // sweep specific data into one pointer to avoid if statements throughout this subroutine
         if (state.dataSize->CurOASysNum > 0) {
@@ -7398,7 +7398,7 @@ namespace UnitarySystems {
                     thisSys.input_specs.use_doas_dx_cooling_coil = "No";
                 }
                 if (fields.find("minimum_supply_air_temperature") != fields.end()) { // not required field, has default (2C), and autosizable
-                    auto tempFieldVal = fields.at("minimum_supply_air_temperature");
+                    auto &tempFieldVal = fields.at("minimum_supply_air_temperature");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.minimum_supply_air_temperature = DataSizing::AutoSize;
                     } else {
@@ -7423,7 +7423,7 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("cooling_supply_air_flow_rate_method").get<std::string>());
                 }
                 if (fields.find("cooling_supply_air_flow_rate") != fields.end()) { // not required field, autosizable
-                    auto tempFieldVal = fields.at("cooling_supply_air_flow_rate");
+                    auto &tempFieldVal = fields.at("cooling_supply_air_flow_rate");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.cooling_supply_air_flow_rate = DataSizing::AutoSize;
                     } else {
@@ -7447,7 +7447,7 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("heating_supply_air_flow_rate_method").get<std::string>());
                 }
                 if (fields.find("heating_supply_air_flow_rate") != fields.end()) { // not required field
-                    auto tempFieldVal = fields.at("heating_supply_air_flow_rate");
+                    auto &tempFieldVal = fields.at("heating_supply_air_flow_rate");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.heating_supply_air_flow_rate = DataSizing::AutoSize;
                     } else {
@@ -7471,7 +7471,7 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("no_load_supply_air_flow_rate_method").get<std::string>());
                 }
                 if (fields.find("no_load_supply_air_flow_rate") != fields.end()) { // not required field
-                    auto tempFieldVal = fields.at("no_load_supply_air_flow_rate");
+                    auto &tempFieldVal = fields.at("no_load_supply_air_flow_rate");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.no_load_supply_air_flow_rate = DataSizing::AutoSize;
                     } else {
@@ -7499,7 +7499,7 @@ namespace UnitarySystems {
                         fields.at("no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation").get<Real64>();
                 }
                 if (fields.find("maximum_supply_air_temperature") != fields.end()) { // not required field, has default of 80 C
-                    auto tempFieldVal = fields.at("maximum_supply_air_temperature");
+                    auto &tempFieldVal = fields.at("maximum_supply_air_temperature");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.maximum_supply_air_temperature = DataSizing::AutoSize;
                     } else {
@@ -9353,7 +9353,7 @@ namespace UnitarySystems {
                                                                   CompressorONFlag);
                                 }
                                 // Now solve again with tighter PLR limits
-                                auto f2 =
+                                auto f2 = // (AUTO_OK_LAMBDA)
                                     [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
                                         Real64 const PartLoadRatio) {
                                         return UnitarySys::calcUnitarySystemLoadResidual(state,
@@ -9433,7 +9433,7 @@ namespace UnitarySystems {
                                     TempSysOutput = TempSensOutput;
                                 }
                                 // Now solve again with tighter PLR limits
-                                auto f2 =
+                                auto f2 = // (AUTO_OK_LAMBDA)
                                     [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
                                         Real64 const PartLoadRatio) {
                                         return UnitarySys::calcUnitarySystemLoadResidual(state,
@@ -15633,8 +15633,8 @@ namespace UnitarySystems {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variable for the coils.
 
-        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
-        auto &CurOASysNum(state.dataSize->CurOASysNum);
+        auto &OASysEqSizing = state.dataSize->OASysEqSizing;
+        auto &CurOASysNum = state.dataSize->CurOASysNum;
 
         Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
@@ -18160,12 +18160,11 @@ namespace UnitarySystems {
 
     void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound)
     {
-        for (auto &unitarySystem : state.dataUnitarySystems->unitarySys) {
-            if (unitarySystem.m_HRcoolCoilFluidInletNode == waterCoilNodeNum && unitarySystem.m_WaterHRPlantLoopModel) {
-                nodeNotFound = false;
-                break;
-            }
-        }
+        if (!nodeNotFound) return;
+        nodeNotFound = std::none_of(
+            state.dataUnitarySystems->unitarySys.cbegin(), state.dataUnitarySystems->unitarySys.cend(), [waterCoilNodeNum](auto const &us) {
+                return us.m_WaterHRPlantLoopModel && us.m_HRcoolCoilFluidInletNode == waterCoilNodeNum;
+            });
     }
 
 } // namespace UnitarySystems

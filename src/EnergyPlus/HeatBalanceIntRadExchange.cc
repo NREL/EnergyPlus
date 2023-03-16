@@ -1516,17 +1516,17 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void FixViewFactors(EnergyPlusData &state,
-                        int const N,                      // NUMBER OF SURFACES
-                        const Array1D<Real64> &A,         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                        Array2A<Real64> F,                // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                        std::string &enclName,            // Name of Enclosure being fixed
-                        std::vector<int> const spaceNums, // Zones which are part of this enclosure
-                        Real64 &OriginalCheckValue,       // check of SUM(F) - N
-                        Real64 &FixedCheckValue,          // check after fixed of SUM(F) - N
-                        Real64 &FinalCheckValue,          // the one to go with
-                        int &NumIterations,               // number of iterations to fixed
-                        Real64 &RowSum,                   // RowSum of Fixed
-                        bool const anyIntMassInZone       // are there any internal mass surfaces in the zone
+                        int const N,                       // NUMBER OF SURFACES
+                        const Array1D<Real64> &A,          // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                        Array2A<Real64> F,                 // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+                        std::string &enclName,             // Name of Enclosure being fixed
+                        std::vector<int> const &spaceNums, // Zones which are part of this enclosure
+                        Real64 &OriginalCheckValue,        // check of SUM(F) - N
+                        Real64 &FixedCheckValue,           // check after fixed of SUM(F) - N
+                        Real64 &FinalCheckValue,           // the one to go with
+                        int &NumIterations,                // number of iterations to fixed
+                        Real64 &RowSum,                    // RowSum of Fixed
+                        bool const anyIntMassInZone        // are there any internal mass surfaces in the zone
     )
     {
 

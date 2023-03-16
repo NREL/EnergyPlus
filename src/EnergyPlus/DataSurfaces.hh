@@ -689,7 +689,7 @@ namespace DataSurfaces {
         Real64 Multiplier;                               // Multiplies glazed area, frame area and divider area (windows only)
 
         // Air boundaries and spaces
-        int RadEnclIndex;       // Pointer to raidant enclosure this surface belongs to
+        int RadEnclIndex = 0;   // Pointer to raidant enclosure this surface belongs to
         int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
         int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, EnclSolInfo(n).SurfacePtr(SolarEnclSurfIndex) points to this surface
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
@@ -1101,7 +1101,7 @@ namespace DataSurfaces {
     struct ShadingVertexData
     {
         // Members
-        int NVert;
+        int NVert = 0;
         Array1D<Real64> XV;
         Array1D<Real64> YV;
         Array1D<Real64> ZV;

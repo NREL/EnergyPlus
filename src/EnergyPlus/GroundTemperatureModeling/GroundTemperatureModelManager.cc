@@ -107,7 +107,7 @@ namespace GroundTemperatureManager {
 
         // Check if this instance of this model has already been retrieved
         for (int i = 0; i < numGTMs; ++i) {
-            auto currentModel(state.dataGrndTempModelMgr->groundTempModels[i]);
+            auto currentModel = state.dataGrndTempModelMgr->groundTempModels[i]; // (AUTO_OK_UNIQUE_PTR)
             // Check if the type and name match
             if (objectType == currentModel->objectType && objectName == currentModel->objectName) {
                 return state.dataGrndTempModelMgr->groundTempModels[i];

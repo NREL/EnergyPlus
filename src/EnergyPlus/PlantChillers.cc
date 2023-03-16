@@ -1943,7 +1943,6 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
 
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
@@ -1973,7 +1972,6 @@ namespace PlantChillers {
             this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
             if (this->Power != 0.0) {
@@ -3971,7 +3969,6 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
             this->FuelCOP = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         } else { // Chiller is running
@@ -3989,7 +3986,6 @@ namespace PlantChillers {
                 this->FuelCOP = 0.0;
             }
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         }
@@ -5898,7 +5894,6 @@ namespace PlantChillers {
             this->ExhaustStackTemp = 0.0;
             this->FuelCOP = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
@@ -5926,7 +5921,6 @@ namespace PlantChillers {
                 this->FuelCOP = 0.0;
             }
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         }
@@ -7311,7 +7305,6 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
             this->ActualCOP = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
@@ -7328,7 +7321,6 @@ namespace PlantChillers {
                 this->ActualCOP = 0.0;
             }
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
