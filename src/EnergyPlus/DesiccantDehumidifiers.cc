@@ -2094,7 +2094,6 @@ namespace DesiccantDehumidifiers {
         Real64 RC15;
 
         auto &desicDehum = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum);
-        auto &RhoAirStdInit = state.dataDesiccantDehumidifiers->RhoAirStdInit;
 
         // Setup internal variables for calculations
 
@@ -2320,24 +2319,20 @@ namespace DesiccantDehumidifiers {
         // Verify is requestd flow was delivered (must do after heating coil has executed to pass flow to RegenAirInNode)
         if (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate != RegenAirMassFlowRate) {
             // Initialize standard air density
-            if (state.dataDesiccantDehumidifiers->CalcSolidDesiccantDehumidifierMyOneTimeFlag) {
-                RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-            }
             ShowRecurringSevereErrorAtEnd(state,
                                           "Improper flow delivered by desiccant regen fan - RESULTS INVALID! Check regen fan capacity and schedule.",
                                           desicDehum.RegenFanErrorIndex1);
             ShowRecurringContinueErrorAtEnd(state, desicDehum.DehumType + '=' + desicDehum.Name, desicDehum.RegenFanErrorIndex2);
-            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             ShowRecurringContinueErrorAtEnd(state,
                                             format("Flow requested [m3/s] from {} = {}", desicDehum.RegenFanType, desicDehum.RegenFanName),
                                             desicDehum.RegenFanErrorIndex3,
-                                            (RegenAirMassFlowRate / RhoAirStdInit));
+                                            (RegenAirMassFlowRate / state.dataEnvrn->StdRhoAir));
             ShowRecurringContinueErrorAtEnd(
                 state,
                 "Flow request varied from delivered by [m3/s]",
                 desicDehum.RegenFanErrorIndex4,
-                ((RegenAirMassFlowRate - state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate) / RhoAirStdInit),
-                ((RegenAirMassFlowRate - state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate) / RhoAirStdInit));
+                ((RegenAirMassFlowRate - state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate) / state.dataEnvrn->StdRhoAir),
+                ((RegenAirMassFlowRate - state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate) / state.dataEnvrn->StdRhoAir));
         }
 
         // Verify is requestd heating was delivered
@@ -2438,11 +2433,6 @@ namespace DesiccantDehumidifiers {
         } else {
             // desiccant dehumidifier determines its own PLR
             CompanionCoilIndexNum = 0;
-        }
-
-        if (state.dataDesiccantDehumidifiers->CalcGenericDesiccantDehumidifierMyOneTimeFlag) {
-            state.dataDesiccantDehumidifiers->RhoAirStdInitCGDD = state.dataEnvrn->StdRhoAir;
-            state.dataDesiccantDehumidifiers->CalcGenericDesiccantDehumidifierMyOneTimeFlag = false;
         }
 
         if (HumRatNeeded < state.dataLoopNodes->Node(desicDehum.ProcAirInNode).HumRat) {
@@ -2841,9 +2831,8 @@ namespace DesiccantDehumidifiers {
 
         // check condenser minimum flow per rated total capacity
         if (DDPartLoadRatio > 0.0 && desicDehum.ExhaustFanMaxVolFlowRate > 0.0) {
-            VolFlowPerRatedTotQ =
-                (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
-                max(0.00001, (desicDehum.CompanionCoilCapacity * DDPartLoadRatio * state.dataDesiccantDehumidifiers->RhoAirStdInitCGDD));
+            VolFlowPerRatedTotQ = (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
+                                  max(0.00001, (desicDehum.CompanionCoilCapacity * DDPartLoadRatio * state.dataEnvrn->StdRhoAir));
             if (!state.dataGlobal->WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
                 ++desicDehum.ErrCount;
                 if (desicDehum.ErrCount < 2) {
