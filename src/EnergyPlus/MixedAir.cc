@@ -2626,9 +2626,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
 
     if (state.dataGlobal->BeginEnvrnFlag && state.dataMixedAir->OAControllerMyEnvrnFlag(OAControllerNum)) {
-        Real64 RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-        thisOAController.MinOAMassFlowRate = thisOAController.MinOA * RhoAirStdInit;
-        thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * RhoAirStdInit;
+        thisOAController.MinOAMassFlowRate = thisOAController.MinOA * state.dataEnvrn->StdRhoAir;
+        thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * state.dataEnvrn->StdRhoAir;
         state.dataMixedAir->OAControllerMyEnvrnFlag(OAControllerNum) = false;
         state.dataLoopNodes->Node(thisOAController.OANode).MassFlowRateMax = thisOAController.MaxOAMassFlowRate;
 
@@ -3295,12 +3294,6 @@ void InitOAMixer(EnergyPlusData &state, int const OAMixerNum)
     // Relief air data
     state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate = state.dataLoopNodes->Node(RelNode).MassFlowRate;
 }
-
-// End of Initialization Section of the Module
-//******************************************************************************
-
-// Beginning Calculation Section of the Module
-//******************************************************************************
 
 void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration)
 {

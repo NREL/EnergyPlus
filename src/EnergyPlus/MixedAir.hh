@@ -158,7 +158,6 @@ namespace MixedAir {
         std::string Name;
         std::string ControllerType;
         MixedAirControllerType ControllerType_Num = MixedAirControllerType::None; // Parameter equivalent of controller type
-        int OACtrlIndex = 0;
         LockoutType Lockout = LockoutType::NoLockoutPossible; // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
         // 2=LockoutWithCompressorPossible;
         bool FixedMin = true;                  // Fixed Minimum or Proportional Minimum
