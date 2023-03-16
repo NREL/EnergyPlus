@@ -177,7 +177,7 @@ namespace Psychrometrics {
                 print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
                 for (Loop = 0; Loop < static_cast<int>(PsychrometricFunction::Num); ++Loop) {
                     if (!PsyReportIt[Loop]) continue;
-                    const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
+                    const std::string istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
                     if (state.dataPsychCache->NumIterations[Loop] > 0) {
                         AverageIterations = double(state.dataPsychCache->NumIterations[Loop]) / double(state.dataPsychCache->NumTimesCalled[Loop]);
                         print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames[Loop], istring, AverageIterations);

@@ -48,7 +48,6 @@
 #include <cassert>
 
 // EnergyPlus headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -193,7 +192,6 @@ namespace WindowManager {
                     assert(material != nullptr);
                     if (material->group != Material::Group::WindowGas && material->group != Material::Group::WindowGasMixture &&
                         material->group != Material::Group::ComplexWindowGap && material->group != Material::Group::ComplexWindowShade) {
-
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.
