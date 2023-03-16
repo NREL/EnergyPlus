@@ -3449,7 +3449,7 @@ void WriteTableOfContents(EnergyPlusData &state)
 }
 
 void AddTOCReportPeriod(const int nReportPeriods,
-                        const std::string kw,
+                        const std::string &kw,
                         const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
                         std::ostream &tbl_stream)
 {
@@ -11145,7 +11145,7 @@ void WriteCompCostTable(EnergyPlusData &state)
 }
 
 // modify the ith row in the reportingperiod input verification table
-void writeRowReportPeriodInputVeri(const std::string reportType,
+void writeRowReportPeriodInputVeri(const std::string &reportType,
                                    Array2D_string &tableBody,
                                    const int rowid,
                                    const int periodIdx,
@@ -12567,7 +12567,7 @@ std::string formatReportPeriodTimestamp(const int year, const int month, const i
 }
 
 void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
-                                      const std::string reportKeyWord,
+                                      const std::string &reportKeyWord,
                                       const int periodIdx,
                                       const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData)
 {
@@ -12643,10 +12643,8 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     WriteSubtitle(state, tableName);
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
-        if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "ReportingPeriodSummary", "Entire Facility", tableName);
-        }
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+            tableBody, rowHead, columnHead, "ReportingPeriodSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
@@ -14477,7 +14475,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
                 if (state.dataOutRptPredefined->ShadowRelate(iShadRel).recKind == iKindRec) {
                     curRecSurf = state.dataOutRptPredefined->ShadowRelate(iShadRel).recSurf;
                     std::string const &name(state.dataSurface->Surface(state.dataOutRptPredefined->ShadowRelate(iShadRel).castSurf).Name);
-                    auto &elem = shadow_map[curRecSurf];            // Creates the entry if not present (and zero-initializes the int in the pair)
+                    auto &elem = shadow_map[curRecSurf];           // Creates the entry if not present (and zero-initializes the int in the pair)
                     elem.first += static_cast<int>(name.length()); // Accumulate total of name lengths
                     elem.second.push_back(&name);                  // Add this name
                 }

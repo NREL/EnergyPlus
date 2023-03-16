@@ -871,7 +871,8 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
                         }
 
                         {
-                            std::string const &plantLoopOperation = CurrentModuleObject; // different op schemes have different lower limit check values
+                            std::string const &plantLoopOperation =
+                                CurrentModuleObject; // different op schemes have different lower limit check values
 
                             if (plantLoopOperation == "PlantEquipmentOperation:CoolingLoad" ||
                                 plantLoopOperation == "PlantEquipmentOperation:HeatingLoad" ||
@@ -1393,9 +1394,8 @@ void FindCompSPInput(EnergyPlusData &state,
 
     SchemeNameFound = true;
 
-    DataLoopNode::ConnectionObjectType objType =
-        static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
- 							                    UtilityRoutines::MakeUPPERCase(CurrentModuleObject)));
+    DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
+        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(CurrentModuleObject)));
 
     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
         LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
@@ -2416,10 +2416,8 @@ void DistributePlantLoad(EnergyPlusData &state,
     {
         Real64 plant_capacity_to_this_point;
         Real64 largest_min_plr_to_this_point;
-        LoadPLRPoint(Real64 capacity, Real64 plr)
+        LoadPLRPoint(Real64 capacity, Real64 plr) : plant_capacity_to_this_point(capacity), largest_min_plr_to_this_point(plr)
         {
-            plant_capacity_to_this_point = capacity;
-            largest_min_plr_to_this_point = plr;
         }
     };
     std::vector<LoadPLRPoint> accrued_load_plr_values;

@@ -1927,7 +1927,7 @@ namespace ScheduleManager {
 
         if (NumCommaFileShading != 0) {
             auto const &values_json = schedule_file_shading_result->second["values"];
-            auto const headers = schedule_file_shading_result->second["header"].get<std::vector<std::string>>(); // (AUTO_OK_OBJ)
+            auto const headers = schedule_file_shading_result->second["header"].get<std::vector<std::string>>();  // (AUTO_OK_OBJ)
             auto const headers_set = schedule_file_shading_result->second["header"].get<std::set<std::string>>(); // (AUTO_OK_OBJ)
 
             for (auto const &header : headers_set) {

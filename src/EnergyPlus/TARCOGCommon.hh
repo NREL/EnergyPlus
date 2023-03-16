@@ -70,12 +70,9 @@ namespace TARCOGCommon {
         // Using/Aliasing
         using namespace TARCOGParams;
 
-        return (layertype == TARCOGLayerType::VENETBLIND_HORIZ ||
-                layertype == TARCOGLayerType::VENETBLIND_VERT ||
-                layertype == TARCOGLayerType::WOVSHADE ||
-                layertype == TARCOGLayerType::PERFORATED ||
-                layertype == TARCOGLayerType::BSDF ||
-		layertype == TARCOGLayerType::DIFFSHADE);
+        return (layertype == TARCOGLayerType::VENETBLIND_HORIZ || layertype == TARCOGLayerType::VENETBLIND_VERT ||
+                layertype == TARCOGLayerType::WOVSHADE || layertype == TARCOGLayerType::PERFORATED || layertype == TARCOGLayerType::BSDF ||
+                layertype == TARCOGLayerType::DIFFSHADE);
     }
 
     Real64 LDSumMax(Real64 Width, Real64 Height);

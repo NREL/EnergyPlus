@@ -3224,7 +3224,7 @@ namespace PlantPipingSystemsManager {
 
             // Create final region
             auto &thisPartition = ThesePartitionRegions[ThesePartitionRegions.size() - 1];
-	    auto tempRegion = GridRegion(thisPartition.Max, DirExtentMax, DirDirection, tempCellWidths); // (AUTO_OK_OBJ)
+            auto tempRegion = GridRegion(thisPartition.Max, DirExtentMax, DirDirection, tempCellWidths); // (AUTO_OK_OBJ)
             this->getCellWidths(tempRegion, tempRegion.thisRegionType);
             Regions.push_back(tempRegion);
 

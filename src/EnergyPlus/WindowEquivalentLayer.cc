@@ -209,13 +209,10 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
         assert(thisMaterial != nullptr);
 
-	Material::Group group1 = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->group;
-        if (group1 != Material::Group::GlassEquivalentLayer &&
-            group1 != Material::Group::ShadeEquivalentLayer &&
-	    group1 != Material::Group::DrapeEquivalentLayer &&
-	    group1 != Material::Group::ScreenEquivalentLayer && 
-            group1 != Material::Group::BlindEquivalentLayer &&
-	    group1 != Material::Group::GapEquivalentLayer)
+        Material::Group group1 = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->group;
+        if (group1 != Material::Group::GlassEquivalentLayer && group1 != Material::Group::ShadeEquivalentLayer &&
+            group1 != Material::Group::DrapeEquivalentLayer && group1 != Material::Group::ScreenEquivalentLayer &&
+            group1 != Material::Group::BlindEquivalentLayer && group1 != Material::Group::GapEquivalentLayer)
             continue;
 
         if (thisMaterial->group == Material::Group::GapEquivalentLayer) {

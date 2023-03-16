@@ -221,7 +221,6 @@ void GetBoilerInput(EnergyPlusData &state)
             thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
             thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
             ErrorsFound = true;
-            FuelTypeError = false;
         }
 
         thisBoiler.NomCap = state.dataIPShortCut->rNumericArgs(1);

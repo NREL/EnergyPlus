@@ -511,13 +511,12 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \default Maintenance
         elcc->RecurringCosts[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUCNoSpace, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        bool isNotRecurringCost = (elcc->RecurringCosts[iInObj].category != CostCategory::Maintenance &&
-                                   elcc->RecurringCosts[iInObj].category != CostCategory::Repair &&
-                                   elcc->RecurringCosts[iInObj].category != CostCategory::Operation &&
-                                   elcc->RecurringCosts[iInObj].category != CostCategory::Replacement && 
-                                   elcc->RecurringCosts[iInObj].category != CostCategory::MinorOverhaul &&
-                                   elcc->RecurringCosts[iInObj].category != CostCategory::MajorOverhaul &&
-                                   elcc->RecurringCosts[iInObj].category != CostCategory::OtherOperational);
+        bool isNotRecurringCost =
+            (elcc->RecurringCosts[iInObj].category != CostCategory::Maintenance && elcc->RecurringCosts[iInObj].category != CostCategory::Repair &&
+             elcc->RecurringCosts[iInObj].category != CostCategory::Operation && elcc->RecurringCosts[iInObj].category != CostCategory::Replacement &&
+             elcc->RecurringCosts[iInObj].category != CostCategory::MinorOverhaul &&
+             elcc->RecurringCosts[iInObj].category != CostCategory::MajorOverhaul &&
+             elcc->RecurringCosts[iInObj].category != CostCategory::OtherOperational);
         if (isNotRecurringCost) {
             elcc->RecurringCosts[iInObj].category = CostCategory::Maintenance;
             ShowWarningError(state,
@@ -723,8 +722,8 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \default Construction
         elcc->NonrecurringCost[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUCNoSpace, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        bool isNotNonRecurringCost = (elcc->NonrecurringCost[iInObj].category != CostCategory::Construction && 
-                                      elcc->NonrecurringCost[iInObj].category != CostCategory::Salvage && 
+        bool isNotNonRecurringCost = (elcc->NonrecurringCost[iInObj].category != CostCategory::Construction &&
+                                      elcc->NonrecurringCost[iInObj].category != CostCategory::Salvage &&
                                       elcc->NonrecurringCost[iInObj].category != CostCategory::OtherCapital);
         if (isNotNonRecurringCost) {
             elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;

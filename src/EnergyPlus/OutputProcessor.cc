@@ -4430,7 +4430,7 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::V;
         } else if (unitUpper == "KMOL/S") {
             return OutputProcessor::Unit::kmol_s;
-        } else if (unitUpper == "KG/S") {
+        } else if (unitUpper == "REV/MIN") {
             return OutputProcessor::Unit::rev_min;
         } else if (unitUpper == "W/M2-K") {
             return OutputProcessor::Unit::W_m2K;
@@ -4644,7 +4644,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             thisRvar.unitNameCustomEMS = customUnitName;
         }
         AssignReportNumber(state, op->CurrentReportNumber);
-	std::string const IDOut = fmt::to_string(op->CurrentReportNumber);
+        std::string const IDOut = fmt::to_string(op->CurrentReportNumber);
         thisRvar.ReportID = op->CurrentReportNumber;
         auto &thisVarPtr = thisRvar.VarPtr;
         thisVarPtr.Value = 0.0;

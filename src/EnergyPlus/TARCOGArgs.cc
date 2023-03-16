@@ -425,13 +425,9 @@ int ArgCheck(EnergyPlusData &state,
             return ArgCheck;
         }
 
-        if (LayerType(i) != TARCOGLayerType::SPECULAR &&
-	    LayerType(i) != TARCOGLayerType::WOVSHADE &&
-	    LayerType(i) != TARCOGLayerType::VENETBLIND_HORIZ &&
-	    LayerType(i) != TARCOGLayerType::PERFORATED &&
-	    LayerType(i) != TARCOGLayerType::DIFFSHADE &&
-	    LayerType(i) != TARCOGLayerType::BSDF &&
-	    LayerType(i) != TARCOGLayerType::VENETBLIND_VERT)
+        if (LayerType(i) != TARCOGLayerType::SPECULAR && LayerType(i) != TARCOGLayerType::WOVSHADE &&
+            LayerType(i) != TARCOGLayerType::VENETBLIND_HORIZ && LayerType(i) != TARCOGLayerType::PERFORATED &&
+            LayerType(i) != TARCOGLayerType::DIFFSHADE && LayerType(i) != TARCOGLayerType::BSDF && LayerType(i) != TARCOGLayerType::VENETBLIND_VERT)
 
         {
             ArgCheck = 22;

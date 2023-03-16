@@ -267,56 +267,41 @@ namespace DataSurfaces {
     // original expression: IntShade <= SHADE_FLAG <= BGBlind
     constexpr bool IS_SHADED_NO_GLARE_CTRL(WinShadingType const ShadingFlag)
     {
-        return (ShadingFlag == WinShadingType::IntShade ||
-		ShadingFlag == WinShadingType::SwitchableGlazing ||
-		ShadingFlag == WinShadingType::ExtShade ||
-                ShadingFlag == WinShadingType::ExtScreen ||
-		ShadingFlag == WinShadingType::IntBlind ||
-		ShadingFlag == WinShadingType::ExtBlind ||
-                ShadingFlag == WinShadingType::BGShade ||
-                ShadingFlag == WinShadingType::BGBlind);
+        return (ShadingFlag == WinShadingType::IntShade || ShadingFlag == WinShadingType::SwitchableGlazing ||
+                ShadingFlag == WinShadingType::ExtShade || ShadingFlag == WinShadingType::ExtScreen || ShadingFlag == WinShadingType::IntBlind ||
+                ShadingFlag == WinShadingType::ExtBlind || ShadingFlag == WinShadingType::BGShade || ShadingFlag == WinShadingType::BGBlind);
     }
 
     // ANY_SHADE: if SHADE_FLAG is any of the shading types including interior, exterior or between glass shades
     constexpr bool ANY_SHADE(WinShadingType const ShadingFlag)
     {
-        return (ShadingFlag == WinShadingType::IntShade ||
-                ShadingFlag == WinShadingType::ExtShade ||
-                ShadingFlag == WinShadingType::BGShade);
+        return (ShadingFlag == WinShadingType::IntShade || ShadingFlag == WinShadingType::ExtShade || ShadingFlag == WinShadingType::BGShade);
     }
 
     constexpr bool ANY_SHADE_SCREEN(WinShadingType const ShadingFlag)
     {
-        return (ShadingFlag == WinShadingType::IntShade ||
-		ShadingFlag == WinShadingType::ExtShade ||
-                ShadingFlag == WinShadingType::BGShade ||
+        return (ShadingFlag == WinShadingType::IntShade || ShadingFlag == WinShadingType::ExtShade || ShadingFlag == WinShadingType::BGShade ||
                 ShadingFlag == WinShadingType::ExtScreen);
     }
 
     constexpr bool ANY_BLIND(WinShadingType const ShadingFlag)
     {
-        return (ShadingFlag == WinShadingType::IntBlind ||
-		ShadingFlag == WinShadingType::ExtBlind ||
-		ShadingFlag == WinShadingType::BGBlind);
+        return (ShadingFlag == WinShadingType::IntBlind || ShadingFlag == WinShadingType::ExtBlind || ShadingFlag == WinShadingType::BGBlind);
     }
 
     constexpr bool ANY_INTERIOR_SHADE_BLIND(WinShadingType const ShadingFlag)
     {
-        return (ShadingFlag == WinShadingType::IntShade ||
-		ShadingFlag == WinShadingType::IntBlind);
+        return (ShadingFlag == WinShadingType::IntShade || ShadingFlag == WinShadingType::IntBlind);
     }
 
     constexpr bool ANY_EXTERIOR_SHADE_BLIND_SCREEN(WinShadingType const ShadingFlag)
     {
-        return (ShadingFlag == WinShadingType::ExtShade ||
-                ShadingFlag == WinShadingType::ExtBlind ||
-                ShadingFlag == WinShadingType::ExtScreen);
+        return (ShadingFlag == WinShadingType::ExtShade || ShadingFlag == WinShadingType::ExtBlind || ShadingFlag == WinShadingType::ExtScreen);
     }
 
     constexpr bool ANY_BETWEENGLASS_SHADE_BLIND(WinShadingType const ShadingFlag)
     {
-        return (ShadingFlag == WinShadingType::BGShade ||
-		ShadingFlag == WinShadingType::BGBlind);
+        return (ShadingFlag == WinShadingType::BGShade || ShadingFlag == WinShadingType::BGBlind);
     }
 
     // WindowShadingControl Slat Angle Control for Blinds
@@ -701,7 +686,7 @@ namespace DataSurfaces {
         Real64 Multiplier;                               // Multiplies glazed area, frame area and divider area (windows only)
 
         // Air boundaries and spaces
-        int RadEnclIndex;       // Pointer to raidant enclosure this surface belongs to
+        int RadEnclIndex = 0;   // Pointer to raidant enclosure this surface belongs to
         int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
         int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, EnclSolInfo(n).SurfacePtr(SolarEnclSurfIndex) points to this surface
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
@@ -1113,7 +1098,7 @@ namespace DataSurfaces {
     struct ShadingVertexData
     {
         // Members
-        int NVert;
+        int NVert = 0;
         Array1D<Real64> XV;
         Array1D<Real64> YV;
         Array1D<Real64> ZV;

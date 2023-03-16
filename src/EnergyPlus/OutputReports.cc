@@ -421,7 +421,7 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
     if ((int)state.dataDaylightingData->DaylRefPt.size() > 0) {
         for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-	    DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
+            DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
             std::string refPtType;
             if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
                 refPtType = "DEDayRefPt";
@@ -478,11 +478,13 @@ void DXFOut(EnergyPlusData &state,
     constexpr std::string_view Format_707("999\nDXF created from EnergyPlus\n");
     constexpr std::string_view Format_708("999\n{}{}{}\n");
 
-    constexpr std::string_view Format_715("  0\nPOLYLINE\n  8\n{}\n 62\n{:3}\n 66\n  1\n 10\n 0.0\n 20\n 0.0\n 30\n{:15.5F}\n 70\n   9\n 40\n{}\n 41\n{}\n");
+    constexpr std::string_view Format_715(
+        "  0\nPOLYLINE\n  8\n{}\n 62\n{:3}\n 66\n  1\n 10\n 0.0\n 20\n 0.0\n 30\n{:15.5F}\n 70\n   9\n 40\n{}\n 41\n{}\n");
     constexpr std::string_view Format_716("  0\nVERTEX\n  8\n{}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
     constexpr std::string_view Format_717("  0\nSEQEND\n  8\n{}\n");
-    constexpr std::string_view Format_704("  0\n3DFACE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 11\n{:15.5F}\n 21\n{:15.5F}\n "
-                              "31\n{:15.5F}\n 12\n{:15.5F}\n 22\n{:15.5F}\n 32\n{:15.5F}\n");
+    constexpr std::string_view Format_704(
+        "  0\n3DFACE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 11\n{:15.5F}\n 21\n{:15.5F}\n "
+        "31\n{:15.5F}\n 12\n{:15.5F}\n 22\n{:15.5F}\n 32\n{:15.5F}\n");
     constexpr std::string_view Format_704_0("  0\n3DFACE\n  8\n{}\n 62\n{:3}\n");
     constexpr std::string_view Format_704_1(" 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
     constexpr std::string_view Format_704_2(" 11\n{:15.5F}\n 21\n{:15.5F}\n 31\n{:15.5F}\n");
@@ -579,13 +581,13 @@ void DXFOut(EnergyPlusData &state,
                 Array1D<DataVectorTypes::dTriangle> mytriangles;
 
                 const int ntri = DXFEarClipping::Triangulate(state,
-                                                              thisSurface.Sides,
-                                                              thisSurface.Vertex,
-                                                              mytriangles,
-                                                              thisSurface.Azimuth,
-                                                              thisSurface.Tilt,
-                                                              thisSurface.Name,
-                                                              thisSurface.Class);
+                                                             thisSurface.Sides,
+                                                             thisSurface.Vertex,
+                                                             mytriangles,
+                                                             thisSurface.Azimuth,
+                                                             thisSurface.Tilt,
+                                                             thisSurface.Name,
+                                                             thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
                     const int vv0 = mytriangles(svert).vv0;
                     const int vv1 = mytriangles(svert).vv1;
@@ -661,13 +663,13 @@ void DXFOut(EnergyPlusData &state,
                     Array1D<DataVectorTypes::dTriangle> mytriangles;
 
                     const int ntri = DXFEarClipping::Triangulate(state,
-                                                                  thisSurface.Sides,
-                                                                  thisSurface.Vertex,
-                                                                  mytriangles,
-                                                                  thisSurface.Azimuth,
-                                                                  thisSurface.Tilt,
-                                                                  thisSurface.Name,
-                                                                  thisSurface.Class);
+                                                                 thisSurface.Sides,
+                                                                 thisSurface.Vertex,
+                                                                 mytriangles,
+                                                                 thisSurface.Azimuth,
+                                                                 thisSurface.Tilt,
+                                                                 thisSurface.Name,
+                                                                 thisSurface.Class);
                     for (int svert = 1; svert <= ntri; ++svert) {
                         const int vv0 = mytriangles(svert).vv0;
                         const int vv1 = mytriangles(svert).vv1;
@@ -815,7 +817,8 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     constexpr std::string_view Format_707("999\nDXF created from EnergyPlus\n");
     constexpr std::string_view Format_708("999\n{}{}{}\n");
 
-    constexpr std::string_view Format_715("  0\nPOLYLINE\n  8\n{}\n 62\n{:3}\n 66\n  1\n 10\n 0.0\n 20\n 0.0\n 30\n{:15.5F}\n 70\n   9\n 40\n{}\n 41\n{}\n");
+    constexpr std::string_view Format_715(
+        "  0\nPOLYLINE\n  8\n{}\n 62\n{:3}\n 66\n  1\n 10\n 0.0\n 20\n 0.0\n 30\n{:15.5F}\n 70\n   9\n 40\n{}\n 41\n{}\n");
     constexpr std::string_view Format_716("  0\nVERTEX\n  8\n{}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
     constexpr std::string_view Format_717("  0\nSEQEND\n  8\n{}\n");
     constexpr std::string_view Format_706("  0\nENDSEC\n  0\nEOF\n");
@@ -896,7 +899,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             ++surfcount;
 
             print(dxffile, Format_710, thisSurface.ZoneName + ':' + thisSurface.Name);
-	    std::string const TempZoneName = format("{}_{}", SaveZoneName, surfcount);
+            std::string const TempZoneName = format("{}_{}", SaveZoneName, surfcount);
             Real64 minz = 99999.0;
             for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
                 minz = min(minz, thisSurface.Vertex(vert).z);
@@ -1527,13 +1530,13 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         } else { // will be >4 sided polygon with triangulate option
             Array1D<DataVectorTypes::dTriangle> mytriangles;
             const int ntri = DXFEarClipping::Triangulate(state,
-                                                          thisSurface.Sides,
-                                                          thisSurface.Vertex,
-                                                          mytriangles,
-                                                          thisSurface.Azimuth,
-                                                          thisSurface.Tilt,
-                                                          thisSurface.Name,
-                                                          thisSurface.Class);
+                                                         thisSurface.Sides,
+                                                         thisSurface.Vertex,
+                                                         mytriangles,
+                                                         thisSurface.Azimuth,
+                                                         thisSurface.Tilt,
+                                                         thisSurface.Name,
+                                                         thisSurface.Class);
             for (int svert = 1; svert <= ntri; ++svert) {
                 const int vv0 = mytriangles(svert).vv0;
                 const int vv1 = mytriangles(svert).vv1;
@@ -1575,13 +1578,13 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<DataVectorTypes::dTriangle> mytriangles;
                 const int ntri = DXFEarClipping::Triangulate(state,
-                                                              thisSurface.Sides,
-                                                              thisSurface.Vertex,
-                                                              mytriangles,
-                                                              thisSurface.Azimuth,
-                                                              thisSurface.Tilt,
-                                                              thisSurface.Name,
-                                                              thisSurface.Class);
+                                                             thisSurface.Sides,
+                                                             thisSurface.Vertex,
+                                                             mytriangles,
+                                                             thisSurface.Azimuth,
+                                                             thisSurface.Tilt,
+                                                             thisSurface.Name,
+                                                             thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
                     const int vv0 = mytriangles(svert).vv0;
                     const int vv1 = mytriangles(svert).vv1;
@@ -1615,13 +1618,13 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<DataVectorTypes::dTriangle> mytriangles;
                 const int ntri = DXFEarClipping::Triangulate(state,
-                                                              thisSurface.Sides,
-                                                              thisSurface.Vertex,
-                                                              mytriangles,
-                                                              thisSurface.Azimuth,
-                                                              thisSurface.Tilt,
-                                                              thisSurface.Name,
-                                                              thisSurface.Class);
+                                                             thisSurface.Sides,
+                                                             thisSurface.Vertex,
+                                                             mytriangles,
+                                                             thisSurface.Azimuth,
+                                                             thisSurface.Tilt,
+                                                             thisSurface.Name,
+                                                             thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
                     const int vv0 = mytriangles(svert).vv0;
                     const int vv1 = mytriangles(svert).vv1;

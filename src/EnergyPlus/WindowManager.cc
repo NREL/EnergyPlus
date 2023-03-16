@@ -597,7 +597,7 @@ namespace WindowManager {
                         // calc Trans, TransVis, ReflectSolBeamFront, ReflectSolBeamBack, ReflectVisBeamFront, ReflectVisBeamBack
                         //  assuming wlt same as wle
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
-                            auto lam = state.dataWindowManager->wle[ILam - 1];
+                            Real64 lam = state.dataWindowManager->wle[ILam - 1];
                             state.dataWindowManager->wlt[IGlass - 1][ILam - 1] = lam;
                             state.dataWindowManager->t[IGlass - 1][ILam - 1] =
                                 Curve::CurveValue(state, thisMaterial->GlassSpecAngTransDataPtr, 0.0, lam);
@@ -670,7 +670,7 @@ namespace WindowManager {
                         }
                     } else {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
-                            auto lam = state.dataWindowManager->wle[ILam - 1];
+                            Real64 lam = state.dataWindowManager->wle[ILam - 1];
                             state.dataWindowManager->wlt[IGlass - 1][ILam - 1] = lam;
                             state.dataWindowManager->tPhi[IGlass - 1][ILam - 1] =
                                 Curve::CurveValue(state, thisMaterial->GlassSpecAngTransDataPtr, Phi, lam);
@@ -871,7 +871,7 @@ namespace WindowManager {
                         }
                     } else {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
-                            auto lam = state.dataWindowManager->wle[ILam - 1];
+                            Real64 lam = state.dataWindowManager->wle[ILam - 1];
                             state.dataWindowManager->wlt[IGlass - 1][ILam - 1] = lam;
                             state.dataWindowManager->tPhi[IGlass - 1][ILam - 1] =
                                 Curve::CurveValue(state, thisMaterial->GlassSpecAngTransDataPtr, Phi, lam);
@@ -1431,8 +1431,7 @@ namespace WindowManager {
                 }
 
                 // To check goodness of fit //Tuned
-                auto const &solBeamCoef(thisConstruct.TransSolBeamCoef);
-                auto const &visBeamCoef(thisConstruct.TransVisBeamCoef);
+
                 for (IPhi = 1; IPhi <= TotalIPhi; ++IPhi) {
                     tsolPhiFit(IPhi) = 0.0;
                     tvisPhiFit(IPhi) = 0.0;
@@ -1443,8 +1442,8 @@ namespace WindowManager {
                     Real64 cos_pow(1.0);
                     for (CoefNum = 1; CoefNum <= 6; ++CoefNum) {
                         cos_pow *= CosPhi;
-                        tsolPhiFit(IPhi) += solBeamCoef(CoefNum) * cos_pow;
-                        tvisPhiFit(IPhi) += visBeamCoef(CoefNum) * cos_pow;
+                        tsolPhiFit(IPhi) += thisConstruct.TransSolBeamCoef(CoefNum) * cos_pow;
+                        tvisPhiFit(IPhi) += thisConstruct.TransVisBeamCoef(CoefNum) * cos_pow;
                     }
                 }
             }
@@ -2167,8 +2166,8 @@ namespace WindowManager {
         int temp;
 
         // Shorthand references
-        auto &window(state.dataSurface->SurfaceWindow(SurfNum));
-        auto &surface(state.dataSurface->Surface(SurfNum));
+        auto &window = state.dataSurface->SurfaceWindow(SurfNum);
+        auto &surface = state.dataSurface->Surface(SurfNum);
         int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(surface.Zone);
 

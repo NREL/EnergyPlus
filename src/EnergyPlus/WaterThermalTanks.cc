@@ -674,14 +674,14 @@ bool getDesuperHtrInput(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
     static constexpr std::string_view RoutineName = "getDesuperHtrInput";
-    // Make local copies of IPShortCut because other getinputs might overwrite the ones in state
-    auto cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-    auto cAlphaArgs = state.dataIPShortCut->cAlphaArgs;
-    auto rNumericArgs = state.dataIPShortCut->rNumericArgs;
-    auto lNumericFieldBlanks = state.dataIPShortCut->lNumericFieldBlanks;
-    auto lAlphaFieldBlanks = state.dataIPShortCut->lAlphaFieldBlanks;
-    auto cAlphaFieldNames = state.dataIPShortCut->cAlphaFieldNames;
-    auto cNumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
+    // Make local copies of IPShortCut because other getinputs might overwrite the ones in state <-- need to fix this idiom
+    std::string cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+    Array1D<std::string> cAlphaArgs = state.dataIPShortCut->cAlphaArgs;
+    Array1D<Real64> rNumericArgs = state.dataIPShortCut->rNumericArgs;
+    Array1D<bool> lNumericFieldBlanks = state.dataIPShortCut->lNumericFieldBlanks;
+    Array1D<bool> lAlphaFieldBlanks = state.dataIPShortCut->lAlphaFieldBlanks;
+    Array1D<std::string> cAlphaFieldNames = state.dataIPShortCut->cAlphaFieldNames;
+    Array1D<std::string> cNumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
     cCurrentModuleObject = cCoilDesuperheater;
     for (int DesuperheaterNum = 1; DesuperheaterNum <= state.dataWaterThermalTanks->numWaterHeaterDesuperheater; ++DesuperheaterNum) {
@@ -4405,8 +4405,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             ErrorsFound = true;
                         } else {
 
-                            auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                                                   UtilityRoutines::MakeUPPERCase(Tank.Type));
+                            DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
+                                getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(Tank.Type)));
 
                             Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                        HPWH.OutletNodeName1,
@@ -6047,7 +6047,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
     // METHODOLOGY EMPLOYED:
     // Inlet and outlet nodes are initialized.  Scheduled values are retrieved for the current timestep.
 
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+    auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
 
     static constexpr std::string_view RoutineName("InitWaterThermalTank");
     static constexpr std::string_view GetWaterThermalTankInput("GetWaterThermalTankInput");
@@ -7968,7 +7968,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                 // Remove off cycle loads
                 // Apply on cycle loads
                 for (int i = 0; i < nTankNodes; i++) {
-                    auto &node(this->Node[i]);
+                    auto &node = this->Node[i];
                     Real64 NodeCapacitance = node.Mass * Cp;
                     A[i] += (node.OffCycLossCoeff - node.OnCycLossCoeff) / NodeCapacitance;
                     B[i] += (-node.OffCycParaLoad + node.OnCycParaLoad + (node.OnCycLossCoeff - node.OffCycLossCoeff) * this->AmbientTemp) /
@@ -7978,7 +7978,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                 // Remove on cycle loads
                 // Apply off cycle loads
                 for (int i = 0; i < nTankNodes; i++) {
-                    auto &node(this->Node[i]);
+                    auto &node = this->Node[i];
                     Real64 NodeCapacitance = node.Mass * Cp;
                     A[i] -= (node.OffCycLossCoeff - node.OnCycLossCoeff) / NodeCapacitance;
                     B[i] -= (-node.OffCycParaLoad + node.OnCycParaLoad + (node.OnCycLossCoeff - node.OffCycLossCoeff) * this->AmbientTemp) /
@@ -8014,7 +8014,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
 
             for (int i = 0; i < nTankNodes; i++) {
                 const int NodeNum = i + 1;
-                const auto &tank_node(this->Node(NodeNum));
+                const auto &tank_node = this->Node(NodeNum);
 
                 // Parasitic Loads and Losses to Ambient
                 if (this->HeaterOn1 || this->HeaterOn2) {
@@ -8696,7 +8696,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
     Real64 partLoadRatio = 0.0;
     Real64 NewTankTemp;
     {
-        auto const TankType(DesupHtr.TankTypeNum);
+        DataPlant::PlantEquipmentType const TankType = DesupHtr.TankTypeNum;
 
         if (TankType == DataPlant::PlantEquipmentType::WtrHeaterMixed || TankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
 
@@ -9275,7 +9275,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
             if ((HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
                 Real64 HPMinTemp = HPSetPointTemp - DeadBandTempDiff;
-                const auto HPMinTempChar = fmt::to_string(HPMinTemp);
+                const std::string HPMinTempChar = fmt::to_string(HPMinTemp);
                 ++HeatPump.HPSetPointError;
                 //  add logic for warmup, DataGlobals::KickOffSimulation and doing sizing here
                 if (HeatPump.HPSetPointError == 1) {
@@ -10874,7 +10874,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
 
     static constexpr std::string_view RoutineName("SizeSupplySidePlantConnections");
 
-    auto &PlantSizData(state.dataSize->PlantSizData);
+    auto &PlantSizData = state.dataSize->PlantSizData;
 
     Real64 tmpUseDesignVolFlowRate = this->UseDesignVolFlowRate;
     Real64 tmpSourceDesignVolFlowRate = this->SourceDesignVolFlowRate;
@@ -11505,7 +11505,7 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineName("SizeDemandSidePlantConnections");
 
-    auto &PlantSizData(state.dataSize->PlantSizData);
+    auto &PlantSizData = state.dataSize->PlantSizData;
 
     Real64 tankRecoverhours = this->SizingRecoveryTime;
     bool ErrorsFound = false;

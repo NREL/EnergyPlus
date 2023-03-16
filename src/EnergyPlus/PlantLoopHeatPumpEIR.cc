@@ -834,7 +834,7 @@ void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
             std::string const targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
             for (auto &potentialCompanionCoil : state.dataEIRPlantLoopHeatPump->heatPumps) {
                 DataPlant::PlantEquipmentType potentialCompanionType = potentialCompanionCoil.EIRHPType;
-		std::string potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
+                std::string potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
                 if (potentialCompanionName == thisCoilName) {
                     // skip the current coil
                     continue;

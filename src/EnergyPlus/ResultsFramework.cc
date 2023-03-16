@@ -837,7 +837,7 @@ namespace ResultsFramework {
                                                                 {"11", "November"},
                                                                 {"12", "December"}});
         // 01/01 24:00:00
-	std::string const month = datetime.substr(0, 2);
+        std::string const month = datetime.substr(0, 2);
         size_t const pos = datetime.find(' ');
         std::string time;
         if (pos != std::string::npos) {
