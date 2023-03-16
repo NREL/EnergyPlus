@@ -100,12 +100,9 @@ void ManageDemand(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   July 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ListNum;
 
     if (state.dataDemandManager->GetInput && !state.dataGlobal->DoingSizing) {
         GetDemandManagerInput(state);
@@ -119,7 +116,7 @@ void ManageDemand(EnergyPlusData &state)
             state.dataDemandManager->BeginDemandSim = true;
             if (state.dataDemandManager->ClearHistory) {
                 // Clear historical variables
-                for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
+                for (int ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
                     state.dataDemandManager->DemandManagerList(ListNum).History = 0.0;
                     state.dataDemandManager->DemandManagerList(ListNum).MeterDemand = 0.0;
                     state.dataDemandManager->DemandManagerList(ListNum).AverageDemand = 0.0;
@@ -169,7 +166,7 @@ void ManageDemand(EnergyPlusData &state)
 
                 SurveyDemandManagers(state); // Determines which Demand Managers can reduce demand
 
-                for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
+                for (int ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
                     SimulateDemandManagerList(
                         state, ListNum, state.dataDemandManager->ResimExt, state.dataDemandManager->ResimHB, state.dataDemandManager->ResimHVAC);
                 } // ListNum
@@ -185,7 +182,7 @@ void ManageDemand(EnergyPlusData &state)
                 }
             }
 
-            for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
+            for (int ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
                 ReportDemandManagerList(state, ListNum);
             } // ListNum
         }
@@ -204,37 +201,30 @@ void SimulateDemandManagerList(EnergyPlusData &state,
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   July 2005
     //       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
-    //       RE-ENGINEERED  na
 
     // Using/Aliasing
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MgrNum;
-    int MgrPtr;
-    Real64 AverageDemand;
-    Real64 OverLimit;
     bool OnPeak;
 
-    auto &DemandManagerList(state.dataDemandManager->DemandManagerList);
-    auto &DemandMgr(state.dataDemandManager->DemandMgr);
+    auto &demandManagerList = state.dataDemandManager->DemandManagerList(ListNum);
 
-    DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(state, DemandManagerList(ListNum).LimitSchedule);
-    DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
+    demandManagerList.ScheduledLimit = ScheduleManager::GetCurrentScheduleValue(state, demandManagerList.LimitSchedule);
+    demandManagerList.DemandLimit = demandManagerList.ScheduledLimit * demandManagerList.SafetyFraction;
 
-    DemandManagerList(ListNum).MeterDemand =
-        GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
-        GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::System) / TimeStepSysSec;
+    demandManagerList.MeterDemand =
+        GetInstantMeterValue(state, demandManagerList.Meter, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
+        GetInstantMeterValue(state, demandManagerList.Meter, OutputProcessor::TimeStepType::System) / TimeStepSysSec;
 
     // Calculate average demand over the averaging window including the current timestep meter demand
-    AverageDemand = DemandManagerList(ListNum).AverageDemand +
-                    (DemandManagerList(ListNum).MeterDemand - DemandManagerList(ListNum).History(1)) / DemandManagerList(ListNum).AveragingWindow;
+    Real64 AverageDemand =
+        demandManagerList.AverageDemand + (demandManagerList.MeterDemand - demandManagerList.History(1)) / demandManagerList.AveragingWindow;
 
-    if (DemandManagerList(ListNum).PeakSchedule == 0) {
+    if (demandManagerList.PeakSchedule == 0) {
         OnPeak = true;
     } else {
-        if (GetCurrentScheduleValue(state, DemandManagerList(ListNum).PeakSchedule) == 1) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, demandManagerList.PeakSchedule) == 1) {
             OnPeak = true;
         } else {
             OnPeak = false;
@@ -242,20 +232,20 @@ void SimulateDemandManagerList(EnergyPlusData &state,
     }
 
     if (OnPeak) {
-        OverLimit = AverageDemand - DemandManagerList(ListNum).DemandLimit;
+        Real64 OverLimit = AverageDemand - demandManagerList.DemandLimit;
 
         if (OverLimit > 0.0) {
 
-            switch (DemandManagerList(ListNum).ManagerPriority) {
+            switch (demandManagerList.ManagerPriority) {
             case ManagePriorityType::Sequential: { // Activate first Demand Manager that can reduce demand
 
-                for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
-                    MgrPtr = DemandManagerList(ListNum).Manager(MgrNum);
+                for (int MgrNum = 1; MgrNum <= demandManagerList.NumOfManager; ++MgrNum) {
+                    auto &demandMgr = state.dataDemandManager->DemandMgr(demandManagerList.Manager(MgrNum));
 
-                    if (DemandMgr(MgrPtr).CanReduceDemand) {
-                        DemandMgr(MgrPtr).Activate = true;
+                    if (demandMgr.CanReduceDemand) {
+                        demandMgr.Activate = true;
 
-                        switch (DemandMgr(MgrPtr).Type) {
+                        switch (demandMgr.Type) {
                         case ManagerType::ExtLights: {
                             ResimExt = true;
                         } break;
@@ -283,13 +273,13 @@ void SimulateDemandManagerList(EnergyPlusData &state,
             } break;
             case ManagePriorityType::All: { // Activate ALL Demand Managers that can reduce demand
 
-                for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
-                    MgrPtr = DemandManagerList(ListNum).Manager(MgrNum);
+                for (int MgrNum = 1; MgrNum <= demandManagerList.NumOfManager; ++MgrNum) {
+                    auto &demandMgr = state.dataDemandManager->DemandMgr(demandManagerList.Manager(MgrNum));
 
-                    if (DemandMgr(MgrPtr).CanReduceDemand) {
-                        DemandMgr(MgrPtr).Activate = true;
+                    if (demandMgr.CanReduceDemand) {
+                        demandMgr.Activate = true;
 
-                        switch (DemandMgr(MgrPtr).Type) {
+                        switch (demandMgr.Type) {
                         case ManagerType::ExtLights: {
                             ResimExt = true;
                         } break;
@@ -322,7 +312,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   July 2005
     //       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Gets the DEMAND MANAGER LIST input from the input file.
@@ -330,19 +319,16 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Standard EnergyPlus methodology.
 
-    // Using/Aliasing
-    using ScheduleManager::GetScheduleIndex;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
-    bool ErrorsFound(false);
 
     constexpr std::string_view cCurrentModuleObject = "DemandManagerAssignmentList";
     state.dataDemandManager->NumDemandManagerList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataDemandManager->NumDemandManagerList > 0) {
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
+        bool ErrorsFound = false;
 
         state.dataDemandManager->DemandManagerList.allocate(state.dataDemandManager->NumDemandManagerList);
 
@@ -391,7 +377,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             // Further checking for conflicting DEMAND MANAGER LISTs
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                thisDemandMgrList.LimitSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                thisDemandMgrList.LimitSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
 
                 if (thisDemandMgrList.LimitSchedule == 0) {
                     ShowSevereError(state,
@@ -407,7 +393,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             thisDemandMgrList.SafetyFraction = state.dataIPShortCut->rNumericArgs(1);
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                thisDemandMgrList.BillingSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+                thisDemandMgrList.BillingSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
 
                 if (thisDemandMgrList.BillingSchedule == 0) {
                     ShowSevereError(state,
@@ -421,7 +407,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                thisDemandMgrList.PeakSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
+                thisDemandMgrList.PeakSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
 
                 if (thisDemandMgrList.PeakSchedule == 0) {
                     ShowSevereError(state,
@@ -580,71 +566,50 @@ void GetDemandManagerInput(EnergyPlusData &state)
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   July 2005
     //       MODIFIED       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Gets the DEMAND MANAGER input from the input file.
 
-    // Using/Aliasing
-    using MixedAir::GetOAController;
-    using ScheduleManager::GetScheduleIndex;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumDemandMgrExtLights;
-    int NumDemandMgrLights;
-    int NumDemandMgrElecEquip;
-    int NumDemandMgrThermostats;
-    int NumDemandMgrVentilation;
-    int MgrNum;
-    int StartIndex;
-    int EndIndex;
-    int LoadNum;
-    int LoadPtr;
     int NumAlphas;            // Number of elements in the alpha array
     int NumNums;              // Number of elements in the numeric array
-    int MaxAlphas;            // Max number of elements in the alpha array
-    int MaxNums;              // Max number of elements in the numeric array
     int NumParams;            // Number of arguments total in an ObjectDef
-    int IOStat;               // IO Status when calling get input subroutine
     Array1D_string AlphArray; // Character string data
     Array1D<Real64> NumArray; // Numeric data
     bool ErrorsFound(false);
-    std::string CurrentModuleObject; // for ease in renaming.
-    int Item;
-    int Item1;
 
-    MaxAlphas = 0;
-    MaxNums = 0;
-    CurrentModuleObject = "DemandManager:ExteriorLights";
-    NumDemandMgrExtLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    int MaxAlphas = 0;
+    int MaxNums = 0;
+    std::string CurrentModuleObject = "DemandManager:ExteriorLights";
+    int NumDemandMgrExtLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     if (NumDemandMgrExtLights > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
     }
     CurrentModuleObject = "DemandManager:Lights";
-    NumDemandMgrLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    int NumDemandMgrLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     if (NumDemandMgrLights > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
     }
     CurrentModuleObject = "DemandManager:ElectricEquipment";
-    NumDemandMgrElecEquip = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    int NumDemandMgrElecEquip = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     if (NumDemandMgrElecEquip > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
     }
     CurrentModuleObject = "DemandManager:Thermostats";
-    NumDemandMgrThermostats = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    int NumDemandMgrThermostats = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     if (NumDemandMgrThermostats > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
     }
     CurrentModuleObject = "DemandManager:Ventilation";
-    NumDemandMgrVentilation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    int NumDemandMgrVentilation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     if (NumDemandMgrVentilation > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -659,17 +624,18 @@ void GetDemandManagerInput(EnergyPlusData &state)
     if (state.dataDemandManager->NumDemandMgr > 0) {
         AlphArray.dimension(MaxAlphas, std::string());
         NumArray.dimension(MaxNums, 0.0);
+        int IOStat; // IO Status when calling get input subroutine
 
         DemandMgr.allocate(state.dataDemandManager->NumDemandMgr);
         state.dataDemandManager->UniqueDemandMgrNames.reserve(state.dataDemandManager->NumDemandMgr);
 
         // Get input for DemandManager:ExteriorLights
-        StartIndex = 1;
-        EndIndex = NumDemandMgrExtLights;
+        int StartIndex = 1;
+        int EndIndex = NumDemandMgrExtLights;
 
         CurrentModuleObject = "DemandManager:ExteriorLights";
 
-        for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
+        for (int MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -694,7 +660,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::ExtLights;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                DemandMgr(MgrNum).AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
@@ -736,8 +702,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
             if (DemandMgr(MgrNum).NumOfLoads > 0) {
                 DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
 
-                for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataExteriorEnergyUse->ExteriorLights);
+                for (int LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
+                    int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataExteriorEnergyUse->ExteriorLights);
 
                     if (LoadPtr > 0) {
                         DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -767,7 +733,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
         CurrentModuleObject = "DemandManager:Lights";
 
-        for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
+        for (int MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -792,7 +758,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::Lights;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                DemandMgr(MgrNum).AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
@@ -831,8 +797,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             // Count actual pointers to controlled zones
             DemandMgr(MgrNum).NumOfLoads = 0;
-            for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->lightsObjects);
+            for (int LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
+                int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->lightsObjects);
                 if (LoadPtr > 0) {
                     DemandMgr(MgrNum).NumOfLoads += state.dataInternalHeatGains->lightsObjects(LoadPtr).numOfSpaces;
                 } else {
@@ -855,11 +821,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             if (DemandMgr(MgrNum).NumOfLoads > 0) {
                 DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
-                LoadNum = 0;
-                for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->lightsObjects);
+                int LoadNum = 0;
+                for (int Item = 1; Item <= NumAlphas - 4; ++Item) {
+                    int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->lightsObjects);
                     if (LoadPtr > 0) {
-                        for (Item1 = 1; Item1 <= state.dataInternalHeatGains->lightsObjects(LoadPtr).numOfSpaces; ++Item1) {
+                        for (int Item1 = 1; Item1 <= state.dataInternalHeatGains->lightsObjects(LoadPtr).numOfSpaces; ++Item1) {
                             ++LoadNum;
                             DemandMgr(MgrNum).Load(LoadNum) = state.dataInternalHeatGains->lightsObjects(LoadPtr).spaceStartPtr + Item1 - 1;
                         }
@@ -886,7 +852,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
         CurrentModuleObject = "DemandManager:ElectricEquipment";
 
-        for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
+        for (int MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -911,7 +877,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).Type = ManagerType::ElecEquip;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                DemandMgr(MgrNum).AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
@@ -950,8 +916,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             // Count actual pointers to controlled zones
             DemandMgr(MgrNum).NumOfLoads = 0;
-            for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->zoneElectricObjects);
+            for (int LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
+                int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->zoneElectricObjects);
                 if (LoadPtr > 0) {
                     DemandMgr(MgrNum).NumOfLoads += state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).numOfSpaces;
                 } else {
@@ -974,11 +940,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             if (DemandMgr(MgrNum).NumOfLoads > 0) {
                 DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
-                LoadNum = 0;
-                for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->zoneElectricObjects);
+                int LoadNum = 0;
+                for (int Item = 1; Item <= NumAlphas - 4; ++Item) {
+                    int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->zoneElectricObjects);
                     if (LoadPtr > 0) {
-                        for (Item1 = 1; Item1 <= state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).numOfSpaces; ++Item1) {
+                        for (int Item1 = 1; Item1 <= state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).numOfSpaces; ++Item1) {
                             ++LoadNum;
                             DemandMgr(MgrNum).Load(LoadNum) = state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).spaceStartPtr + Item1 - 1;
                         }
@@ -1005,7 +971,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
         CurrentModuleObject = "DemandManager:Thermostats";
 
-        for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
+        for (int MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -1031,7 +997,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::Thermostats;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                DemandMgr(MgrNum).AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
@@ -1085,8 +1051,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             // Count actual pointers to controlled zones
             DemandMgr(MgrNum).NumOfLoads = 0;
-            for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TStatObjects);
+            for (int LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
+                int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TStatObjects);
                 if (LoadPtr > 0) {
                     DemandMgr(MgrNum).NumOfLoads += state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones;
                 } else {
@@ -1107,11 +1073,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             if (DemandMgr(MgrNum).NumOfLoads > 0) {
                 DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
-                LoadNum = 0;
-                for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TStatObjects);
+                int LoadNum = 0;
+                for (int Item = 1; Item <= NumAlphas - 4; ++Item) {
+                    int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TStatObjects);
                     if (LoadPtr > 0) {
-                        for (Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones; ++Item1) {
+                        for (int Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones; ++Item1) {
                             ++LoadNum;
                             DemandMgr(MgrNum).Load(LoadNum) = state.dataZoneCtrls->TStatObjects(LoadPtr).TempControlledZoneStartPtr + Item1 - 1;
                         }
@@ -1137,7 +1103,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
         CurrentModuleObject = "DemandManager:Ventilation";
 
-        for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
+        for (int MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -1163,7 +1129,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::Ventilation;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                DemandMgr(MgrNum).AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
 
                 if (DemandMgr(MgrNum).AvailSchedule == 0) {
                     ShowSevereError(state,
@@ -1209,8 +1175,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             // Count actual pointers to air controllers
             DemandMgr(MgrNum).NumOfLoads = 0;
-            for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-                LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
+            for (int LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
+                int LoadPtr = MixedAir::GetOAController(state, AlphArray(LoadNum + AlphaShift));
                 if (LoadPtr > 0) {
                     ++DemandMgr(MgrNum).NumOfLoads;
                 } else {
@@ -1226,8 +1192,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             if (DemandMgr(MgrNum).NumOfLoads > 0) {
                 DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
-                for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-                    LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
+                for (int LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
+                    int LoadPtr = MixedAir::GetOAController(state, AlphArray(LoadNum + AlphaShift));
                     if (LoadPtr > 0) {
                         DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
                     }
@@ -1255,39 +1221,35 @@ void SurveyDemandManagers(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   July 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Checks to see if any demand managers can reduce the load
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MgrNum;
-    int LoadNum;
     int LoadPtr;
     bool CanReduceDemand;
 
-    auto &DemandMgr(state.dataDemandManager->DemandMgr);
+    for (int MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
-    for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
+        auto &demandMgr = state.dataDemandManager->DemandMgr(MgrNum);
 
-        DemandMgr(MgrNum).CanReduceDemand = false;
+        demandMgr.CanReduceDemand = false;
 
-        if (!DemandMgr(MgrNum).Available) continue;
-        if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Off) continue;
+        if (!demandMgr.Available) continue;
+        if (demandMgr.LimitControl == ManagerLimit::Off) continue;
 
-        if (DemandMgr(MgrNum).Active) continue; // This works for FIXED control action, but not VARIABLE
+        if (demandMgr.Active) continue; // This works for FIXED control action, but not VARIABLE
         // VARIABLE control could actually reduce demand farther, even if active already
 
-        for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-            LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
+        for (int LoadNum = 1; LoadNum <= demandMgr.NumOfLoads; ++LoadNum) {
+            LoadPtr = demandMgr.Load(LoadNum);
 
             // Check if this load can reduce demand
             // Assume FIXED control action for now, needs more sophisticated check for VARIABLE control
             LoadInterface(state, DemandAction::CheckCanReduce, MgrNum, LoadPtr, CanReduceDemand);
 
             if (CanReduceDemand) {
-                DemandMgr(MgrNum).CanReduceDemand = true;
+                demandMgr.CanReduceDemand = true;
                 break; // If any one load can reduce demand, then the whole demand manager can reduce demand
             }
 
@@ -1302,85 +1264,72 @@ void ActivateDemandManagers(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   July 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-
-    // METHODOLOGY EMPLOYED:
-
-    // USE STATEMENTS:
-
-    // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MgrNum;
-    int LoadNum;
     int LoadPtr;
-    int RotatedLoadNum;
-    bool CanReduceDemand;
 
-    auto &DemandMgr(state.dataDemandManager->DemandMgr);
+    for (int MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
-    for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
+        auto &demandMgr = state.dataDemandManager->DemandMgr(MgrNum);
 
-        if (DemandMgr(MgrNum).Activate) {
-            DemandMgr(MgrNum).Activate = false;
-            DemandMgr(MgrNum).Active = true;
+        if (demandMgr.Activate) {
+            bool CanReduceDemand;
+            demandMgr.Activate = false;
+            demandMgr.Active = true;
 
-            switch (DemandMgr(MgrNum).SelectionControl) {
+            switch (demandMgr.SelectionControl) {
             case ManagerSelection::All: {
                 // Turn ON limiting on all loads
-                for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                    LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
+                for (int LoadNum = 1; LoadNum <= demandMgr.NumOfLoads; ++LoadNum) {
+                    LoadPtr = demandMgr.Load(LoadNum);
                     LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                 } // LoadNum
 
             } break;
             case ManagerSelection::Many: { // All loads are limited except for one
-                if (DemandMgr(MgrNum).NumOfLoads > 1) {
+                if (demandMgr.NumOfLoads > 1) {
 
                     // Turn ON limiting on all loads
-                    for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                        LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
+                    for (int LoadNum = 1; LoadNum <= demandMgr.NumOfLoads; ++LoadNum) {
+                        LoadPtr = demandMgr.Load(LoadNum);
                         LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                     } // LoadNum
 
                     // Set next rotated load (from last time it was active)
-                    RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
+                    int RotatedLoadNum = demandMgr.RotatedLoadNum;
                     ++RotatedLoadNum;
-                    if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
-                    DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
+                    if (RotatedLoadNum > demandMgr.NumOfLoads) RotatedLoadNum = 1;
+                    demandMgr.RotatedLoadNum = RotatedLoadNum;
 
                     // Turn OFF limiting for the new rotated load
-                    LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                    LoadPtr = demandMgr.Load(RotatedLoadNum);
                     LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                 } else {
                     // Turn ON limiting for the one and only load
-                    LoadPtr = DemandMgr(MgrNum).Load(1);
+                    LoadPtr = demandMgr.Load(1);
                     LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                 }
 
             } break;
             case ManagerSelection::One: { // Only one load is limited
-                if (DemandMgr(MgrNum).NumOfLoads > 1) {
+                if (demandMgr.NumOfLoads > 1) {
                     // Turn OFF limiting on all loads
-                    for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                        LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
+                    for (int LoadNum = 1; LoadNum <= demandMgr.NumOfLoads; ++LoadNum) {
+                        LoadPtr = demandMgr.Load(LoadNum);
                         LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                     } // LoadNum
 
                     // Set next rotated load (from last time it was active)
-                    RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
+                    int RotatedLoadNum = demandMgr.RotatedLoadNum;
                     ++RotatedLoadNum;
-                    if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
-                    DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
+                    if (RotatedLoadNum > demandMgr.NumOfLoads) RotatedLoadNum = 1;
+                    demandMgr.RotatedLoadNum = RotatedLoadNum;
 
                     // Turn ON limiting for the new rotated load
-                    LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                    LoadPtr = demandMgr.Load(RotatedLoadNum);
                     LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                 } else {
                     // Turn ON limiting for the one and only load
-                    LoadPtr = DemandMgr(MgrNum).Load(1);
+                    LoadPtr = demandMgr.Load(1);
                     LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                 }
             } break;
@@ -1398,110 +1347,100 @@ void UpdateDemandManagers(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   July 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Expires limits and rotates loads after specified time duration.
     // It updates availability flags, expires managers that ended in the last timestep, etc.
 
-    // Using/Aliasing
-    using ScheduleManager::GetCurrentScheduleValue;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MgrNum;
-    int LoadNum;
     int LoadPtr;
     bool Available;
     bool CanReduceDemand;
     int RotatedLoadNum;
 
-    auto &DemandMgr(state.dataDemandManager->DemandMgr);
+    for (int MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
-    for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
+        auto &demandMgr = state.dataDemandManager->DemandMgr(MgrNum);
 
         // Check availability
-        //    IF (DemandMgr(MgrNum)%AvailSchedule .EQ. 0) THEN
-        //      Available = .TRUE.  ! No schedule defaults to available
-        //    ELSE
-        if (GetCurrentScheduleValue(state, DemandMgr(MgrNum).AvailSchedule) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, demandMgr.AvailSchedule) > 0.0) {
             Available = true;
         } else {
             Available = false;
         }
         //    END IF
 
-        DemandMgr(MgrNum).Available = Available;
+        demandMgr.Available = Available;
 
         // Update demand manager status
         if (Available) {
 
-            if (DemandMgr(MgrNum).Active) {
+            if (demandMgr.Active) {
 
-                DemandMgr(MgrNum).ElapsedTime += state.dataGlobal->MinutesPerTimeStep;
+                demandMgr.ElapsedTime += state.dataGlobal->MinutesPerTimeStep;
 
                 // Check for expiring limit duration
-                if (DemandMgr(MgrNum).ElapsedTime >= DemandMgr(MgrNum).LimitDuration) {
-                    DemandMgr(MgrNum).ElapsedTime = 0;
-                    DemandMgr(MgrNum).ElapsedRotationTime = 0;
-                    DemandMgr(MgrNum).Active = false;
+                if (demandMgr.ElapsedTime >= demandMgr.LimitDuration) {
+                    demandMgr.ElapsedTime = 0;
+                    demandMgr.ElapsedRotationTime = 0;
+                    demandMgr.Active = false;
 
                     // Demand Manager is not available, remove demand limits from all loads
-                    for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                        LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
+                    for (int LoadNum = 1; LoadNum <= demandMgr.NumOfLoads; ++LoadNum) {
+                        LoadPtr = demandMgr.Load(LoadNum);
                         LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                     } // LoadNum
 
                 } else {
 
-                    switch (DemandMgr(MgrNum).SelectionControl) {
+                    switch (demandMgr.SelectionControl) {
                     case ManagerSelection::All: {
                         // Do nothing; limits remain on all loads
 
                     } break;
                     case ManagerSelection::Many: { // All loads are limited except for one
-                        DemandMgr(MgrNum).ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
+                        demandMgr.ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
 
-                        if (DemandMgr(MgrNum).ElapsedRotationTime >= DemandMgr(MgrNum).RotationDuration) {
-                            DemandMgr(MgrNum).ElapsedRotationTime = 0;
+                        if (demandMgr.ElapsedRotationTime >= demandMgr.RotationDuration) {
+                            demandMgr.ElapsedRotationTime = 0;
 
-                            if (DemandMgr(MgrNum).NumOfLoads > 1) {
+                            if (demandMgr.NumOfLoads > 1) {
                                 // Turn ON limiting for the old rotated load
-                                RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
-                                LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                                RotatedLoadNum = demandMgr.RotatedLoadNum;
+                                LoadPtr = demandMgr.Load(RotatedLoadNum);
                                 LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
 
                                 // Set next rotated load
                                 ++RotatedLoadNum;
-                                if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
-                                DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
+                                if (RotatedLoadNum > demandMgr.NumOfLoads) RotatedLoadNum = 1;
+                                demandMgr.RotatedLoadNum = RotatedLoadNum;
 
                                 // Turn OFF limiting for the new rotated load
-                                LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                                LoadPtr = demandMgr.Load(RotatedLoadNum);
                                 LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                             }
                         }
 
                     } break;
                     case ManagerSelection::One: { // Only one load is limited
-                        DemandMgr(MgrNum).ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
+                        demandMgr.ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
 
-                        if (DemandMgr(MgrNum).ElapsedRotationTime >= DemandMgr(MgrNum).RotationDuration) {
-                            DemandMgr(MgrNum).ElapsedRotationTime = 0;
+                        if (demandMgr.ElapsedRotationTime >= demandMgr.RotationDuration) {
+                            demandMgr.ElapsedRotationTime = 0;
 
-                            if (DemandMgr(MgrNum).NumOfLoads > 1) {
+                            if (demandMgr.NumOfLoads > 1) {
                                 // Turn OFF limiting for the old rotated load
-                                RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
-                                LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                                RotatedLoadNum = demandMgr.RotatedLoadNum;
+                                LoadPtr = demandMgr.Load(RotatedLoadNum);
                                 LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
 
                                 // Set next rotated load
                                 ++RotatedLoadNum;
-                                if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
-                                DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
+                                if (RotatedLoadNum > demandMgr.NumOfLoads) RotatedLoadNum = 1;
+                                demandMgr.RotatedLoadNum = RotatedLoadNum;
 
                                 // Turn ON limiting for the new rotated load
-                                LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                                LoadPtr = demandMgr.Load(RotatedLoadNum);
                                 LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                             }
                         }
@@ -1513,11 +1452,11 @@ void UpdateDemandManagers(EnergyPlusData &state)
             }
 
         } else { // Demand Manager is not available
-            DemandMgr(MgrNum).Active = false;
+            demandMgr.Active = false;
 
             // Demand Manager is not available, remove demand limits from all loads
-            for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
+            for (int LoadNum = 1; LoadNum <= demandMgr.NumOfLoads; ++LoadNum) {
+                LoadPtr = demandMgr.Load(LoadNum);
                 LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
             } // LoadNum
         }
@@ -1531,8 +1470,6 @@ void ReportDemandManagerList(EnergyPlusData &state, int const ListNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   July 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates report variables.
@@ -1540,51 +1477,44 @@ void ReportDemandManagerList(EnergyPlusData &state, int const ListNum)
     // METHODOLOGY EMPLOYED:
     // Standard EnergyPlus methodology.
 
-    // Using/Aliasing
-    using ScheduleManager::GetCurrentScheduleValue;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 BillingPeriod;
-    int Item;
     int AveragingWindow;
     bool OnPeak;
     Real64 OverLimit;
 
-    auto &DemandManagerList(state.dataDemandManager->DemandManagerList);
+    auto &demandManagerList = state.dataDemandManager->DemandManagerList(ListNum);
 
-    if (DemandManagerList(ListNum).BillingSchedule == 0) {
+    if (demandManagerList.BillingSchedule == 0) {
         BillingPeriod = state.dataEnvrn->Month;
     } else {
-        BillingPeriod = GetCurrentScheduleValue(state, DemandManagerList(ListNum).BillingSchedule);
+        BillingPeriod = ScheduleManager::GetCurrentScheduleValue(state, demandManagerList.BillingSchedule);
     }
 
-    if (DemandManagerList(ListNum).BillingPeriod != BillingPeriod) {
+    if (demandManagerList.BillingPeriod != BillingPeriod) {
         // Reset variables for new billing period
-        // DemandManagerList(ListNum)%History = 0.0        ! Don't reset--continue from previous billing period
-        // DemandManagerList(ListNum)%AverageDemand = 0.0  ! Don't reset--continue from previous billing period
-        DemandManagerList(ListNum).PeakDemand = 0.0;
-        DemandManagerList(ListNum).OverLimitDuration = 0.0;
+        // demandManagerList%History = 0.0        ! Don't reset--continue from previous billing period
+        // demandManagerList%AverageDemand = 0.0  ! Don't reset--continue from previous billing period
+        demandManagerList.PeakDemand = 0.0;
+        demandManagerList.OverLimitDuration = 0.0;
 
-        DemandManagerList(ListNum).BillingPeriod = BillingPeriod;
+        demandManagerList.BillingPeriod = BillingPeriod;
     }
 
     // Add new timestep to demand history and subtract oldest timestep
-    AveragingWindow = DemandManagerList(ListNum).AveragingWindow;
-    DemandManagerList(ListNum).AverageDemand += (DemandManagerList(ListNum).MeterDemand - DemandManagerList(ListNum).History(1)) / AveragingWindow;
+    AveragingWindow = demandManagerList.AveragingWindow;
+    demandManagerList.AverageDemand += (demandManagerList.MeterDemand - demandManagerList.History(1)) / AveragingWindow;
 
     // Update demand history
-    for (Item = 1; Item <= AveragingWindow - 1; ++Item) {
-        DemandManagerList(ListNum).History(Item) = DemandManagerList(ListNum).History(Item + 1);
+    for (int Item = 1; Item <= AveragingWindow - 1; ++Item) {
+        demandManagerList.History(Item) = demandManagerList.History(Item + 1);
     }
-    DemandManagerList(ListNum).History(AveragingWindow) = DemandManagerList(ListNum).MeterDemand;
+    demandManagerList.History(AveragingWindow) = demandManagerList.MeterDemand;
 
-    if (DemandManagerList(ListNum).PeakSchedule == 0) {
+    if (demandManagerList.PeakSchedule == 0) {
         OnPeak = true;
     } else {
-        if (GetCurrentScheduleValue(state, DemandManagerList(ListNum).PeakSchedule) == 1) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, demandManagerList.PeakSchedule) == 1) {
             OnPeak = true;
         } else {
             OnPeak = false;
@@ -1592,18 +1522,18 @@ void ReportDemandManagerList(EnergyPlusData &state, int const ListNum)
     }
 
     if (OnPeak) {
-        DemandManagerList(ListNum).PeakDemand = max(DemandManagerList(ListNum).AverageDemand, DemandManagerList(ListNum).PeakDemand);
+        demandManagerList.PeakDemand = max(demandManagerList.AverageDemand, demandManagerList.PeakDemand);
 
-        OverLimit = DemandManagerList(ListNum).AverageDemand - DemandManagerList(ListNum).ScheduledLimit;
+        OverLimit = demandManagerList.AverageDemand - demandManagerList.ScheduledLimit;
         if (OverLimit > 0.0) {
-            DemandManagerList(ListNum).OverLimit = OverLimit;
-            DemandManagerList(ListNum).OverLimitDuration += (state.dataGlobal->MinutesPerTimeStep / 60.0);
+            demandManagerList.OverLimit = OverLimit;
+            demandManagerList.OverLimitDuration += (state.dataGlobal->MinutesPerTimeStep / 60.0);
         } else {
-            DemandManagerList(ListNum).OverLimit = 0.0;
+            demandManagerList.OverLimit = 0.0;
         }
 
     } else {
-        DemandManagerList(ListNum).OverLimit = 0.0;
+        demandManagerList.OverLimit = 0.0;
     }
 }
 
@@ -1613,30 +1543,22 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   August 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Provides a universal interface to handle all communication with the various load objects.
     // Demand managers for new types of loads can be easily added with a new CASE statement in this subroutine
     // and new GetInput code.
 
-    // Using/Aliasing
-    using MixedAir::OAGetFlowRate;
-    using MixedAir::OAGetMinFlowRate;
-    using MixedAir::OASetDemandManagerVentilationFlow;
-    using MixedAir::OASetDemandManagerVentilationState;
-
-    auto &DemandMgr(state.dataDemandManager->DemandMgr);
+    auto const &demandMgr = state.dataDemandManager->DemandMgr(MgrNum);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 LowestPower;
 
     CanReduceDemand = false;
 
-    switch (DemandMgr(MgrNum).Type) {
+    switch (demandMgr.Type) {
     case ManagerType::ExtLights: {
-        LowestPower = state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+        LowestPower = state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DesignLevel * demandMgr.LowerLimit;
         if (Action == DemandAction::CheckCanReduce) {
             if (state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
         } else if (Action == DemandAction::SetLimit) {
@@ -1647,7 +1569,7 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
         }
     } break;
     case ManagerType::Lights: {
-        LowestPower = state.dataHeatBal->Lights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+        LowestPower = state.dataHeatBal->Lights(LoadPtr).DesignLevel * demandMgr.LowerLimit;
         if (Action == DemandAction::CheckCanReduce) {
             if (state.dataHeatBal->Lights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
         } else if (Action == DemandAction::SetLimit) {
@@ -1659,7 +1581,7 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
 
     } break;
     case ManagerType::ElecEquip: {
-        LowestPower = state.dataHeatBal->ZoneElectric(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+        LowestPower = state.dataHeatBal->ZoneElectric(LoadPtr).DesignLevel * demandMgr.LowerLimit;
         if (Action == DemandAction::CheckCanReduce) {
             if (state.dataHeatBal->ZoneElectric(LoadPtr).Power > LowestPower) CanReduceDemand = true;
         } else if (Action == DemandAction::SetLimit) {
@@ -1672,14 +1594,14 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
     case ManagerType::Thermostats: {
         if (Action == DemandAction::CheckCanReduce) {
             if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) >
-                    DemandMgr(MgrNum).LowerLimit ||
+                    demandMgr.LowerLimit ||
                 state.dataHeatBalFanSys->ZoneThermostatSetPointHi(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) <
-                    DemandMgr(MgrNum).UpperLimit)
+                    demandMgr.UpperLimit)
                 CanReduceDemand = true; // Heating | Cooling
         } else if (Action == DemandAction::SetLimit) {
             state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = true;
-            state.dataZoneCtrls->TempControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
-            state.dataZoneCtrls->TempControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
+            state.dataZoneCtrls->TempControlledZone(LoadPtr).HeatingResetLimit = demandMgr.LowerLimit;
+            state.dataZoneCtrls->TempControlledZone(LoadPtr).CoolingResetLimit = demandMgr.UpperLimit;
         } else if (Action == DemandAction::ClearLimit) {
             state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = false;
         }
@@ -1688,14 +1610,14 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
                 DataHVACGlobals::ThermostatType::Uncontrolled) {
                 if (Action == DemandAction::CheckCanReduce) {
                     if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) >
-                            DemandMgr(MgrNum).LowerLimit ||
+                            demandMgr.LowerLimit ||
                         state.dataHeatBalFanSys->ZoneThermostatSetPointHi(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) <
-                            DemandMgr(MgrNum).UpperLimit)
+                            demandMgr.UpperLimit)
                         CanReduceDemand = true; // Heating
                 } else if (Action == DemandAction::SetLimit) {
                     state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = true;
-                    state.dataZoneCtrls->ComfortControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
-                    state.dataZoneCtrls->ComfortControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
+                    state.dataZoneCtrls->ComfortControlledZone(LoadPtr).HeatingResetLimit = demandMgr.LowerLimit;
+                    state.dataZoneCtrls->ComfortControlledZone(LoadPtr).CoolingResetLimit = demandMgr.UpperLimit;
                 } else if (Action == DemandAction::ClearLimit) {
                     state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = false;
                 }
@@ -1704,20 +1626,20 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
     } break;
     case ManagerType::Ventilation: {
         Real64 FlowRate(0);
-        FlowRate = OAGetFlowRate(state, LoadPtr);
+        FlowRate = MixedAir::OAGetFlowRate(state, LoadPtr);
         if (Action == DemandAction::CheckCanReduce) {
             CanReduceDemand = true;
         } else if (Action == DemandAction::SetLimit) {
-            OASetDemandManagerVentilationState(state, LoadPtr, true);
-            if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Fixed) {
-                OASetDemandManagerVentilationFlow(state, LoadPtr, DemandMgr(MgrNum).FixedRate);
-            } else if (DemandMgr(MgrNum).LimitControl == ManagerLimit::ReductionRatio) {
+            MixedAir::OASetDemandManagerVentilationState(state, LoadPtr, true);
+            if (demandMgr.LimitControl == ManagerLimit::Fixed) {
+                MixedAir::OASetDemandManagerVentilationFlow(state, LoadPtr, demandMgr.FixedRate);
+            } else if (demandMgr.LimitControl == ManagerLimit::ReductionRatio) {
                 Real64 DemandRate(0);
-                DemandRate = FlowRate * DemandMgr(MgrNum).ReductionRatio;
-                OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
+                DemandRate = FlowRate * demandMgr.ReductionRatio;
+                MixedAir::OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
             }
         } else if (Action == DemandAction::ClearLimit) {
-            OASetDemandManagerVentilationState(state, LoadPtr, false);
+            MixedAir::OASetDemandManagerVentilationState(state, LoadPtr, false);
         }
     } break;
     default:
@@ -1731,8 +1653,6 @@ void InitDemandManagers(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   September 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Provide external call to get Demand manager input after
