@@ -279,7 +279,7 @@ set(SAMAPI_EXPORT OFF FORCE)
 if(OPENGL_FOUND)
   target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/penumbra/include)
 endif()
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/kiva-ep/src)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/kiva/src)
 target_include_directories(project_options INTERFACE "${kiva_BINARY_DIR}/src/libkiva")
 target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/vendor/boost-1.61.0/")
 

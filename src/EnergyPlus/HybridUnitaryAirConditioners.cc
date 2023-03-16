@@ -186,19 +186,15 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
 
     // Locals
     int Loop;
-    auto &MySizeFlag = state.dataHybridUnitaryAC->MySizeFlag;
-    auto &MyEnvrnFlag = state.dataHybridUnitaryAC->MyEnvrnFlag;
-    auto &MyFanFlag = state.dataHybridUnitaryAC->MyFanFlag;
-    auto &MyZoneEqFlag = state.dataHybridUnitaryAC->MyZoneEqFlag; // used to set up zone equipment availability managers
-
     int InletNode;
 
     if (state.dataHybridUnitaryAC->HybridCoolOneTimeFlag) {
-        MySizeFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
-        MyEnvrnFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
-        MyFanFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
-        MyZoneEqFlag.allocate(state.dataHybridUnitaryAC->NumZoneHybridEvap);
-        MyZoneEqFlag = true;
+        // These three look like they are not used anywhere
+        state.dataHybridUnitaryAC->MySizeFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
+        state.dataHybridUnitaryAC->MyEnvrnFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
+        state.dataHybridUnitaryAC->MyFanFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
+
+        state.dataHybridUnitaryAC->MyZoneEqFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
         state.dataHybridUnitaryAC->HybridCoolOneTimeFlag = false;
     }
     if (!state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).Initialized) {
@@ -224,11 +220,11 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
 
     // set the availability status based on the availability manager list name
     if (allocated(ZoneComp)) {
-        if (MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
+        if (state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
             ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
             ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
-            MyZoneEqFlag(UnitNum) = false;
+            state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum) = false;
         }
         state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus =
             ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailStatus;

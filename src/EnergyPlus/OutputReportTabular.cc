@@ -3449,7 +3449,7 @@ void WriteTableOfContents(EnergyPlusData &state)
 }
 
 void AddTOCReportPeriod(const int nReportPeriods,
-                        const std::string kw,
+                        const std::string &kw,
                         const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
                         std::ostream &tbl_stream)
 {
@@ -6262,7 +6262,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     //   any additional report entries for the predefined reports.
 
     // Using/Aliasing
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     auto &iNumberOfAutoCalcedFields = state.dataOutput->iNumberOfAutoCalcedFields;
     auto &iNumberOfAutoSizedFields = state.dataOutput->iNumberOfAutoSizedFields;
     auto &iNumberOfDefaultedFields = state.dataOutput->iNumberOfDefaultedFields;
@@ -11146,7 +11146,7 @@ void WriteCompCostTable(EnergyPlusData &state)
 }
 
 // modify the ith row in the reportingperiod input verification table
-void writeRowReportPeriodInputVeri(const std::string reportType,
+void writeRowReportPeriodInputVeri(const std::string &reportType,
                                    Array2D_string &tableBody,
                                    const int rowid,
                                    const int periodIdx,
@@ -12568,7 +12568,7 @@ std::string formatReportPeriodTimestamp(const int year, const int month, const i
 }
 
 void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
-                                      const std::string reportKeyWord,
+                                      const std::string &reportKeyWord,
                                       const int periodIdx,
                                       const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData)
 {
@@ -12644,10 +12644,8 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     WriteSubtitle(state, tableName);
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
-        if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "ReportingPeriodSummary", "Entire Facility", tableName);
-        }
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+            tableBody, rowHead, columnHead, "ReportingPeriodSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
@@ -15268,7 +15266,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
     //   formula used is:
     //       SurfQRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
 
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
     auto &FinalSysSizing(state.dataSize->FinalSysSizing);

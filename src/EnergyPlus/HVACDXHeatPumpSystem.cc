@@ -131,7 +131,6 @@ namespace HVACDXHeatPumpSystem {
         int InletNodeNum;     // DX System inlet node number
         int OutletNodeNum;    // DX System outlet node number
 
-        auto &NumDXHeatPumpSystems(state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems);
         auto &DXHeatPumpSystem(state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
 
         // Obtains and Allocates DX Cooling System related parameters from input file
@@ -140,6 +139,8 @@ namespace HVACDXHeatPumpSystem {
             GetDXHeatPumpSystemInput(state);
             state.dataHVACDXHeatPumpSys->GetInputFlag = false;
         }
+
+        int NumDXHeatPumpSystems = state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems;
 
         // Find the correct DXSystemNumber
         if (CompIndex == 0) {
@@ -277,11 +278,12 @@ namespace HVACDXHeatPumpSystem {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-        auto &NumDXHeatPumpSystems(state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems);
         auto &DXHeatPumpSystem(state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
 
         CurrentModuleObject = "CoilSystem:Heating:DX";
-        NumDXHeatPumpSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        // Update Num in state and make local convenience copy
+        int NumDXHeatPumpSystems = state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         DXHeatPumpSystem.allocate(NumDXHeatPumpSystems);
         state.dataHVACDXHeatPumpSys->CheckEquipName.dimension(NumDXHeatPumpSystems, true);
@@ -462,7 +464,7 @@ namespace HVACDXHeatPumpSystem {
         // na
 
         // Using/Aliasing
-        auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
+        bool DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -471,7 +473,7 @@ namespace HVACDXHeatPumpSystem {
         int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
 
-        auto &NumDXHeatPumpSystems(state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems);
+        int NumDXHeatPumpSystems = state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems;
         auto &DXHeatPumpSystem(state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
 
         //  IF (MyOneTimeFlag) THEN

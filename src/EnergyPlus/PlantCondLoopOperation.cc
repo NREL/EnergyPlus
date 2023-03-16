@@ -2416,10 +2416,8 @@ void DistributePlantLoad(EnergyPlusData &state,
     {
         Real64 plant_capacity_to_this_point;
         Real64 largest_min_plr_to_this_point;
-        LoadPLRPoint(Real64 capacity, Real64 plr)
+        LoadPLRPoint(Real64 capacity, Real64 plr) : plant_capacity_to_this_point(capacity), largest_min_plr_to_this_point(plr)
         {
-            plant_capacity_to_this_point = capacity;
-            largest_min_plr_to_this_point = plr;
         }
     };
     std::vector<LoadPLRPoint> accrued_load_plr_values;

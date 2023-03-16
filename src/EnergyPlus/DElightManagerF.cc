@@ -345,7 +345,10 @@ namespace DElightManagerF {
                                     iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
                                     // Get the outside visible reflectance of this material layer
                                     // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                    rExtVisRefl = 1.0 - state.dataMaterial->Material(iMatlLayer)->AbsorpVisible;
+                                    auto const *thisMaterial =
+                                        dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(iMatlLayer));
+                                    assert(thisMaterial != nullptr);
+                                    rExtVisRefl = 1.0 - thisMaterial->AbsorpVisible;
                                 } else {
                                     rExtVisRefl = 0.0;
                                 }
@@ -851,7 +854,7 @@ namespace DElightManagerF {
     }
 
     void DElightElecLtgCtrl(int iNameLength,
-                            std::string cZoneName,
+                            std::string const &cZoneName,
                             Real64 dBldgLat,
                             Real64 dHISKF,
                             Real64 dHISUNF,

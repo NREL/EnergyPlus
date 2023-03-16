@@ -328,9 +328,8 @@ namespace ResultsFramework {
     {
     public:
         CSVWriter() = default;
-        explicit CSVWriter(std::size_t num_output_variables)
+        explicit CSVWriter(std::size_t num_output_variables) : outputVariableIndices(std::vector<bool>(num_output_variables, false))
         {
-            outputVariableIndices = std::vector<bool>(num_output_variables, false);
         }
 
         void writeOutput(EnergyPlusData &state,

@@ -4135,7 +4135,7 @@ namespace InternalHeatGains {
     }
 
     void setupIHGZonesAndSpaces(EnergyPlusData &state,
-                                const std::string objectType,
+                                const std::string &objectType,
                                 EPVector<InternalHeatGains::GlobalInternalGainMiscObject> &inputObjects,
                                 int &numInputObjects,
                                 int &numGainInstances,
@@ -8181,7 +8181,7 @@ namespace InternalHeatGains {
                     state.dataHeatBal->ZoneRpt(it->first).ITEAdjReturnTemp = state.dataHeatBal->Zone(it->first).AdjustedReturnTempByITE;
                 }
             }
-            it++;
+            ++it;
         }
 
     } // End CalcZoneITEq

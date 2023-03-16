@@ -745,7 +745,8 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
         if (TotLayers == 0) continue;
         int materNum = thisConstruct.LayerPoint(1);
         if (materNum == 0) continue; // error finding material number
-        auto const *thisMaterial = state.dataMaterial->Material(materNum);
+        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(materNum));
+        assert(thisMaterial != nullptr);
         if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
             // check for dynamic coating defined on interior surface
             if (thisSurface.ExtBoundCond != ExternalEnvironment) {
@@ -762,7 +763,7 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
     for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
         for (int Layer = 2; Layer <= thisConstruct.TotLayers; ++Layer) {
-            auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer));
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)));
             if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
                 ShowWarningError(state,
                                  format("MaterialProperty:VariableAbsorptance defined on a inside-layer materials, {}. This VariableAbsorptance "
