@@ -658,7 +658,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                                                      ErrorsFound);
             demandMgr.Name = AlphArray(1);
 
-            demandMgr.Type = demandMgr.Type = ManagerType::ExtLights;
+            demandMgr.Type = ManagerType::ExtLights;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 demandMgr.AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
@@ -757,7 +757,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                                                      ErrorsFound);
             demandMgr.Name = AlphArray(1);
 
-            demandMgr.Type = demandMgr.Type = ManagerType::Lights;
+            demandMgr.Type = ManagerType::Lights;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 demandMgr.AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
@@ -998,7 +998,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                                                      ErrorsFound);
             demandMgr.Name = AlphArray(1);
 
-            demandMgr.Type = demandMgr.Type = ManagerType::Thermostats;
+            demandMgr.Type = ManagerType::Thermostats;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 demandMgr.AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
@@ -1131,7 +1131,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                                                      ErrorsFound);
             demandMgr.Name = AlphArray(1);
 
-            demandMgr.Type = demandMgr.Type = ManagerType::Ventilation;
+            demandMgr.Type = ManagerType::Ventilation;
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 demandMgr.AvailSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
