@@ -59,7 +59,6 @@
 #include <ObjexxFCL/Vector4.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
@@ -254,7 +253,7 @@ namespace DataSurfaces {
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
     constexpr bool NOT_SHADED(WinShadingType const ShadingFlag)
     {
-        return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff));
+        return (ShadingFlag == WinShadingType::NoShade || ShadingFlag == WinShadingType::ShadeOff);
     }
 
     // IS_SHADED is the flag to indicate window has shade on or temporarily off but may be triggered on later to control daylight glare
@@ -268,43 +267,41 @@ namespace DataSurfaces {
     // original expression: IntShade <= SHADE_FLAG <= BGBlind
     constexpr bool IS_SHADED_NO_GLARE_CTRL(WinShadingType const ShadingFlag)
     {
-        return BITF_TEST_ANY(BITF(ShadingFlag),
-                             BITF(WinShadingType::IntShade) | BITF(WinShadingType::SwitchableGlazing) | BITF(WinShadingType::ExtShade) |
-                                 BITF(WinShadingType::ExtScreen) | BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) |
-                                 BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
+        return (ShadingFlag == WinShadingType::IntShade || ShadingFlag == WinShadingType::SwitchableGlazing ||
+                ShadingFlag == WinShadingType::ExtShade || ShadingFlag == WinShadingType::ExtScreen || ShadingFlag == WinShadingType::IntBlind ||
+                ShadingFlag == WinShadingType::ExtBlind || ShadingFlag == WinShadingType::BGShade || ShadingFlag == WinShadingType::BGBlind);
     }
 
     // ANY_SHADE: if SHADE_FLAG is any of the shading types including interior, exterior or between glass shades
     constexpr bool ANY_SHADE(WinShadingType const ShadingFlag)
     {
-        return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade));
+        return (ShadingFlag == WinShadingType::IntShade || ShadingFlag == WinShadingType::ExtShade || ShadingFlag == WinShadingType::BGShade);
     }
 
     constexpr bool ANY_SHADE_SCREEN(WinShadingType const ShadingFlag)
     {
-        return BITF_TEST_ANY(BITF(ShadingFlag),
-                             BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) |
-                                 BITF(WinShadingType::ExtScreen));
+        return (ShadingFlag == WinShadingType::IntShade || ShadingFlag == WinShadingType::ExtShade || ShadingFlag == WinShadingType::BGShade ||
+                ShadingFlag == WinShadingType::ExtScreen);
     }
 
     constexpr bool ANY_BLIND(WinShadingType const ShadingFlag)
     {
-        return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind));
+        return (ShadingFlag == WinShadingType::IntBlind || ShadingFlag == WinShadingType::ExtBlind || ShadingFlag == WinShadingType::BGBlind);
     }
 
     constexpr bool ANY_INTERIOR_SHADE_BLIND(WinShadingType const ShadingFlag)
     {
-        return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::IntShade) | BITF(WinShadingType::IntBlind));
+        return (ShadingFlag == WinShadingType::IntShade || ShadingFlag == WinShadingType::IntBlind);
     }
 
     constexpr bool ANY_EXTERIOR_SHADE_BLIND_SCREEN(WinShadingType const ShadingFlag)
     {
-        return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::ExtScreen));
+        return (ShadingFlag == WinShadingType::ExtShade || ShadingFlag == WinShadingType::ExtBlind || ShadingFlag == WinShadingType::ExtScreen);
     }
 
     constexpr bool ANY_BETWEENGLASS_SHADE_BLIND(WinShadingType const ShadingFlag)
     {
-        return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
+        return (ShadingFlag == WinShadingType::BGShade || ShadingFlag == WinShadingType::BGBlind);
     }
 
     // WindowShadingControl Slat Angle Control for Blinds

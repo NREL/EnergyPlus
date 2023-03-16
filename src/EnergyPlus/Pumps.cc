@@ -2042,7 +2042,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     Real64 DesVolFlowRatePerBranch; // local temporary for split of branch pumps
 
     auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
-    auto &thisOkToReport = state.dataPlnt->PlantFinalSizesOkayToReport;
+    bool thisOkToReport = state.dataPlnt->PlantFinalSizesOkayToReport;
 
     // Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
     if (thisPump.plantLoc.loopNum > 0) {
@@ -2145,7 +2145,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     }
 
     // Note that autocalculation of power is based on nominal volume flow, regardless of whether the flow was
-    //  auto sized or manually sized.  Thus, this must go after the flow sizing block above.
+    //  auto-sized or manually sized.  Thus, this must go after the flow sizing block above.
     if (thisPump.NomPowerUseWasAutoSized) {
         if (thisPump.NomVolFlowRate >= SmallWaterVolFlow) {
             switch (thisPump.powerSizingMethod) {

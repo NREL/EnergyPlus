@@ -247,7 +247,7 @@ void ManageRefrigeratedCaseRacks(EnergyPlusData &state)
     // Inter-system heat transfer via subcoolers and cascade condensers can be accommodated.
     // Secondary refrigeration cycles are also available.
 
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
 
     if (!state.dataRefrigCase->ManageRefrigeration) return;
 
@@ -393,24 +393,24 @@ void GetRefrigerationInput(EnergyPlusData &state)
     Array1D<Real64> Numbers;   // Numeric items for object
     Array2D<Real64> DayValues; // Array of schedule values
 
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-    auto &CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-    auto &System(state.dataRefrigCase->System);
-    auto &TransSystem(state.dataRefrigCase->TransSystem);
-    auto &Condenser(state.dataRefrigCase->Condenser);
-    auto &Compressor(state.dataRefrigCase->Compressor);
-    auto &GasCooler(state.dataRefrigCase->GasCooler);
-    auto &Subcooler(state.dataRefrigCase->Subcooler);
-    auto &CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-    auto &CompressorLists(state.dataRefrigCase->CompressorLists);
-    auto &Secondary(state.dataRefrigCase->Secondary);
-    auto &TransferLoadList(state.dataRefrigCase->TransferLoadList);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-    auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
-    auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-    auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
+    auto &CaseRAFraction = state.dataRefrigCase->CaseRAFraction;
+    auto &System = state.dataRefrigCase->System;
+    auto &TransSystem = state.dataRefrigCase->TransSystem;
+    auto &Condenser = state.dataRefrigCase->Condenser;
+    auto &Compressor = state.dataRefrigCase->Compressor;
+    auto &GasCooler = state.dataRefrigCase->GasCooler;
+    auto &Subcooler = state.dataRefrigCase->Subcooler;
+    auto &CaseAndWalkInList = state.dataRefrigCase->CaseAndWalkInList;
+    auto &CompressorLists = state.dataRefrigCase->CompressorLists;
+    auto &Secondary = state.dataRefrigCase->Secondary;
+    auto &TransferLoadList = state.dataRefrigCase->TransferLoadList;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
+    auto &AirChillerSet = state.dataRefrigCase->AirChillerSet;
+    auto &CoilSysCredit = state.dataRefrigCase->CoilSysCredit;
+    auto &CaseWIZoneReport = state.dataRefrigCase->CaseWIZoneReport;
 
     state.dataRefrigCase->NumSimulationCascadeCondensers =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:Cascade");
@@ -1029,7 +1029,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).defrostType = RefCaseDefrostType::None;
             }
 
-            auto DefType = RefrigCase(CaseNum).defrostType;
+            RefCaseDefrostType DefType = RefrigCase(CaseNum).defrostType;
             NumNum = 18;
             if (!lNumericBlanks(NumNum)) {
                 RefrigCase(CaseNum).DefrostPower = Numbers(NumNum);
@@ -4793,7 +4793,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if ((!lNumericBlanks(6)) && (Numbers(6) >= 1)) NumPumps = Numbers(6);
                 Secondary(SecondaryNum).NumPumps = NumPumps;
                 // Get pump power (users can input either power in W or head in Pa or both)
-                // Assume pump impeller efficiency is 0.78 (consistent with E+ Pump auto sizing assumption)
+                // Assume pump impeller efficiency is 0.78 (consistent with E+ Pump auto-sizing assumption)
                 // Assume pump motor efficiency is 0.85 (Goulds Pumps motor data sheet)
                 // It is important that tot rated head must be for specific fluid
                 Real64 PumpTotRatedHead(0.0); // Total pump rated head on secondary loop (Pa)
@@ -5879,7 +5879,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if ((Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) && (Condenser(CondNum).CondenserRejectHeatToZone))
                 System(RefrigSysNum).SystemRejectHeatToZone = true;
 
-            // Now do evaporative condenser auto sizing because it is a function of the system's cooling load
+            // Now do evaporative condenser auto-sizing because it is a function of the system's cooling load
             if (Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if (Condenser(CondNum).RatedAirFlowRate == DataGlobalConstants::AutoCalculate) {
                     Condenser(CondNum).RatedAirFlowRate = AirVolRateEvapCond * Condenser(CondNum).RatedCapacity;
@@ -7431,19 +7431,19 @@ void SetupReportInput(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Set up the report variables.
 
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-    auto &System(state.dataRefrigCase->System);
-    auto &TransSystem(state.dataRefrigCase->TransSystem);
-    auto &Condenser(state.dataRefrigCase->Condenser);
-    auto &Compressor(state.dataRefrigCase->Compressor);
-    auto &GasCooler(state.dataRefrigCase->GasCooler);
-    auto &Subcooler(state.dataRefrigCase->Subcooler);
-    auto &Secondary(state.dataRefrigCase->Secondary);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-    auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-    auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
+    auto &System = state.dataRefrigCase->System;
+    auto &TransSystem = state.dataRefrigCase->TransSystem;
+    auto &Condenser = state.dataRefrigCase->Condenser;
+    auto &Compressor = state.dataRefrigCase->Compressor;
+    auto &GasCooler = state.dataRefrigCase->GasCooler;
+    auto &Subcooler = state.dataRefrigCase->Subcooler;
+    auto &Secondary = state.dataRefrigCase->Secondary;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
+    auto &CoilSysCredit = state.dataRefrigCase->CoilSysCredit;
+    auto &CaseWIZoneReport = state.dataRefrigCase->CaseWIZoneReport;
 
     std::string Walkin_and_zone_name; // concat name for walk-in/zone credit reporting
 
@@ -10307,18 +10307,18 @@ void InitRefrigeration(EnergyPlusData &state)
 
     // Used to adjust accumulative variables when time step is repeated
 
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-    auto &System(state.dataRefrigCase->System);
-    auto &TransSystem(state.dataRefrigCase->TransSystem);
-    auto &Condenser(state.dataRefrigCase->Condenser);
-    auto &Compressor(state.dataRefrigCase->Compressor);
-    auto &GasCooler(state.dataRefrigCase->GasCooler);
-    auto &Secondary(state.dataRefrigCase->Secondary);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-    auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-    auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
+    auto &System = state.dataRefrigCase->System;
+    auto &TransSystem = state.dataRefrigCase->TransSystem;
+    auto &Condenser = state.dataRefrigCase->Condenser;
+    auto &Compressor = state.dataRefrigCase->Compressor;
+    auto &GasCooler = state.dataRefrigCase->GasCooler;
+    auto &Secondary = state.dataRefrigCase->Secondary;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
+    auto &CoilSysCredit = state.dataRefrigCase->CoilSysCredit;
+    auto &CaseWIZoneReport = state.dataRefrigCase->CaseWIZoneReport;
 
     // Zero display case, air-coil, and walk-in cooler credits (summed by zone)
     // to 0 each zone or sys time step
@@ -10665,10 +10665,10 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
     // do inits that should only occur when component model routines
     // are entered from plant, for water cooled Condensers and Refrigeration Racks
 
-    static constexpr std::string_view RoutineName("InitRefrigerationPlantConnections");
+    static constexpr std::string_view RoutineName = "InitRefrigerationPlantConnections";
 
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-    auto &Condenser(state.dataRefrigCase->Condenser);
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
+    auto &Condenser = state.dataRefrigCase->Condenser;
 
     // initialize plant topology information, if applicable
     if (state.dataRefrigCase->MyReferPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
@@ -10822,10 +10822,10 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
     Real64 BPress;                  // Barometric pressure at condenser air inlet node [Pa]
     bool EvapAvail;                 // Control for evap condenser availability
 
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-    auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
+    auto &AirChillerSet = state.dataRefrigCase->AirChillerSet;
 
     state.dataRefrigCase->TotalRackDeliveredCapacity = 0.0;
     state.dataRefrigCase->CompressorCOPactual = 0.0;
@@ -11969,18 +11969,18 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
     // The logical variable, UseSysTimeStep, determines whether we are evaluating only systems driven by
     // ZoneEquipmentManager on the system time step, or only system driven by HVACManager on the zone time step.
 
-    static constexpr std::string_view RoutineName("SimulateDetailedRefrigerationSystems");
-    Real64 constexpr MaxDelTFloatFrac(0.5); // max fraction allowed for difference between case and evaporator temperature
+    static constexpr std::string_view RoutineName = "SimulateDetailedRefrigerationSystems";
+    Real64 constexpr MaxDelTFloatFrac = 0.5; // max fraction allowed for difference between case and evaporator temperature
 
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
-    auto &System(state.dataRefrigCase->System);
-    auto &Condenser(state.dataRefrigCase->Condenser);
-    auto &Subcooler(state.dataRefrigCase->Subcooler);
-    auto &Secondary(state.dataRefrigCase->Secondary);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-    auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
-    auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
+    auto &System = state.dataRefrigCase->System;
+    auto &Condenser = state.dataRefrigCase->Condenser;
+    auto &Subcooler = state.dataRefrigCase->Subcooler;
+    auto &Secondary = state.dataRefrigCase->Secondary;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
+    auto &AirChillerSet = state.dataRefrigCase->AirChillerSet;
+    auto &CoilSysCredit = state.dataRefrigCase->CoilSysCredit;
 
     Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
     if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
@@ -12393,12 +12393,12 @@ void SimulateDetailedTransRefrigSystems(EnergyPlusData &state)
     // the load on the compressors. Iterations are used here to account for sharing of gas coolers
     // between independent refrigeration systems.
 
-    static constexpr std::string_view RoutineName("SimulateDetailedTransRefrigSystems");
+    static constexpr std::string_view RoutineName = "SimulateDetailedTransRefrigSystems";
 
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
-    auto &TransSystem(state.dataRefrigCase->TransSystem);
-    auto &GasCooler(state.dataRefrigCase->GasCooler);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
+    auto &TransSystem = state.dataRefrigCase->TransSystem;
+    auto &GasCooler = state.dataRefrigCase->GasCooler;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
 
     Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
     if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
@@ -12758,11 +12758,11 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
     // Lawrence Berkeley Laboratory and Resource Dynamics, Improving Fan System Performance,
     //   A Sourcebook for Industry, DOE/GO-102003-1294, April 2003
 
-    Real64 constexpr BleedRateConstant(5.0E-10); // water purge rate for evaporative
+    Real64 constexpr BleedRateConstant = 5.0E-10; // water purge rate for evaporative
     //  condensers (m3/W-s) equal to 3 GPM per 100 tons (BAC Engineering Reference)
 
-    auto &System(state.dataRefrigCase->System);
-    auto &Condenser(state.dataRefrigCase->Condenser);
+    auto &System = state.dataRefrigCase->System;
+    auto &Condenser = state.dataRefrigCase->Condenser;
 
     int CondID;               // Condenser Number
     int CondCreditWarnIndex1; // Used to sum up warning count
@@ -12818,7 +12818,7 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
     TotalLoadFromSystems = 0.0;
     EvapAvail = true;
     CondID = this->CondenserNum(1);
-    auto &condenser(Condenser(CondID));
+    auto &condenser = Condenser(CondID);
     RatedFanPower = condenser.RatedFanPower;
     RatedAirFlowRate = condenser.RatedAirFlowRate;
     FanMinAirFlowRatio = condenser.FanMinAirFlowRatio;
@@ -13171,10 +13171,10 @@ void TransRefrigSystemData::CalcGasCooler(EnergyPlusData &state, int const SysNu
     //     Part II: System modifications and comparisons of different solutions. International Journal of
     //     Refrigeration 31: 525-534.
 
-    static constexpr std::string_view RoutineName("RefrigeratedCase:CalcGasCooler");
+    static constexpr std::string_view RoutineName = "RefrigeratedCase:CalcGasCooler";
 
-    auto &TransSystem(state.dataRefrigCase->TransSystem);
-    auto &GasCooler(state.dataRefrigCase->GasCooler);
+    auto &TransSystem = state.dataRefrigCase->TransSystem;
+    auto &GasCooler = state.dataRefrigCase->GasCooler;
 
     int GasCoolerCreditWarnIndex;       // Warning counter
     Real64 ActualFanPower;              // Fan power after adjustments for partially loaded gas cooler [W]
@@ -13372,15 +13372,15 @@ void RefrigSystemData::CalculateCompressors(EnergyPlusData &state)
     Real64 HHiStageCompIn;            // Enthalpy at inlet of high-stage compressor (J/kg)
     Real64 HCaseInRated_base(0.0), HCompInRated_base(0.0); // Autodesk:Tuned Intermediate values for performance tuning
 
-    auto &Condenser(state.dataRefrigCase->Condenser);
-    auto &Compressor(state.dataRefrigCase->Compressor);
+    auto &Condenser = state.dataRefrigCase->Condenser;
+    auto &Compressor = state.dataRefrigCase->Compressor;
 
     Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
     if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
     Real64 const LocalTimeStepSec(LocalTimeStep * DataGlobalConstants::SecInHour);
 
     int CondID = this->CondenserNum(1);
-    auto const &Condenser1(Condenser(CondID));
+    auto const &Condenser1 = Condenser(CondID);
     Real64 const AccumLoad = max(0.0, (this->UnmetEnergy / LocalTimeStepSec)); // Load due to previously unmet compressor loads
     Real64 const NeededCapacity_base(this->TotalSystemLoad + AccumLoad + this->PipeHeatLoad + this->LSHXTrans);
 
@@ -13396,7 +13396,7 @@ void RefrigSystemData::CalculateCompressors(EnergyPlusData &state)
 
     for (int CompIndex = 1; CompIndex <= this->NumCompressors; ++CompIndex) {
         int CompID = this->CompressorNum(CompIndex);
-        auto &compressor(Compressor(CompID));
+        auto &compressor = Compressor(CompID);
         compressor.Power = 0.0;
         compressor.MassFlow = 0.0;
         compressor.Capacity = 0.0;
@@ -13407,7 +13407,7 @@ void RefrigSystemData::CalculateCompressors(EnergyPlusData &state)
     if (this->NumStages == 2) {
         for (int CompIndex = 1; CompIndex <= this->NumHiStageCompressors; ++CompIndex) {
             int CompID = this->HiStageCompressorNum(CompIndex);
-            auto &compressor(Compressor(CompID));
+            auto &compressor = Compressor(CompID);
             compressor.Power = 0.0;
             compressor.MassFlow = 0.0;
             compressor.Capacity = 0.0;
@@ -13527,7 +13527,7 @@ void RefrigSystemData::CalculateCompressors(EnergyPlusData &state)
             } else {
                 CompID = this->HiStageCompressorNum(CompIndex);
             } // StageIndex
-            auto &compressor(Compressor(CompID));
+            auto &compressor = Compressor(CompID);
 
             // need to use indiv compressor's rated subcool and superheat to adjust capacity to actual conditions
             switch (compressor.SubcoolRatingType) {
@@ -13755,8 +13755,8 @@ void TransRefrigSystemData::CalculateTransCompressors(EnergyPlusData &state)
     Real64 Xl;                          // Initial lower guess for iterative search
     Real64 Xnew(0.0);                   // New guess for iterative search
 
-    auto &Compressor(state.dataRefrigCase->Compressor);
-    auto &GasCooler(state.dataRefrigCase->GasCooler);
+    auto &Compressor = state.dataRefrigCase->Compressor;
+    auto &GasCooler = state.dataRefrigCase->GasCooler;
 
     Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
     if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
@@ -14107,12 +14107,12 @@ void RefrigSystemData::CalculateSubcoolers(EnergyPlusData &state)
     // REFERENCES:
     // ASHRAE 1006 Section 2: Refrigeration Accessories
 
-    static constexpr std::string_view RoutineName("CalculateSubcoolers");
-    Real64 TLiqInActualLocal(0.0); // Liquid T in, after condenser, before any mechanical subcooler
+    static constexpr std::string_view RoutineName = "CalculateSubcoolers";
+    Real64 TLiqInActualLocal = 0.0; // Liquid T in, after condenser, before any mechanical subcooler
 
-    auto &System(state.dataRefrigCase->System);
-    auto &Condenser(state.dataRefrigCase->Condenser);
-    auto &Subcooler(state.dataRefrigCase->Subcooler);
+    auto &System = state.dataRefrigCase->System;
+    auto &Condenser = state.dataRefrigCase->Condenser;
+    auto &Subcooler = state.dataRefrigCase->Subcooler;
 
     Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
     if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
@@ -14220,8 +14220,8 @@ void GetRefrigeratedRackIndex(EnergyPlusData &state,
     // This subroutine sets an index for a given refrigerated rack or refrigeration condenser
     //  -- issues error message if the rack or condenser is not found.
 
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-    auto &Condenser(state.dataRefrigCase->Condenser);
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
+    auto &Condenser = state.dataRefrigCase->Condenser;
 
     CheckRefrigerationInput(state);
 
@@ -14282,18 +14282,18 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
     std::string ChrOut;
     std::string ChrOut2;
 
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-    auto &System(state.dataRefrigCase->System);
-    auto &TransSystem(state.dataRefrigCase->TransSystem);
-    auto &Condenser(state.dataRefrigCase->Condenser);
-    auto &Compressor(state.dataRefrigCase->Compressor);
-    auto &GasCooler(state.dataRefrigCase->GasCooler);
-    auto &Subcooler(state.dataRefrigCase->Subcooler);
-    auto &Secondary(state.dataRefrigCase->Secondary);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-    auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
+    auto &System = state.dataRefrigCase->System;
+    auto &TransSystem = state.dataRefrigCase->TransSystem;
+    auto &Condenser = state.dataRefrigCase->Condenser;
+    auto &Compressor = state.dataRefrigCase->Compressor;
+    auto &GasCooler = state.dataRefrigCase->GasCooler;
+    auto &Subcooler = state.dataRefrigCase->Subcooler;
+    auto &Secondary = state.dataRefrigCase->Secondary;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
+    auto &AirChillerSet = state.dataRefrigCase->AirChillerSet;
 
     static constexpr std::string_view Format_104(
         "! <Refrigeration Compressor Rack>,Compressor Rack Name, # Refrigerated Cases Connected,# WalkIn Coolers "
@@ -15472,9 +15472,9 @@ void SecondaryLoopData::CalculateSecondary(EnergyPlusData &state, int const Seco
     Real64 VarFrac;                   // Pump power fraction for variable speed pump, dimensionless
     Real64 VolFlowRate;               // Used in dispatching pumps to meet load (m3/s)
 
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
 
     Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
     if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = state.dataHVACGlobal->TimeStepSys;
@@ -15706,8 +15706,8 @@ void SumZoneImpacts(EnergyPlusData &state)
     //   heat absorbed by suction piping, secondary loop distribution piping, and
     //   secondary receiver shells
 
-    auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-    auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+    auto &CoilSysCredit = state.dataRefrigCase->CoilSysCredit;
+    auto &CaseWIZoneReport = state.dataRefrigCase->CaseWIZoneReport;
 
     if (state.dataRefrigCase->UseSysTimeStep) { // air chillers
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -15817,8 +15817,8 @@ void SimAirChillerSet(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Called from Zone Equipment Manager.
 
-    auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
-    auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
+    auto &AirChillerSet = state.dataRefrigCase->AirChillerSet;
+    auto &CoilSysCredit = state.dataRefrigCase->CoilSysCredit;
 
     int ChillerSetID;
     Real64 RemainingOutputToCoolingSP; // Remaining requested load in zone
@@ -15898,11 +15898,11 @@ void AirChillerSetData::CalculateAirChillerSets(EnergyPlusData &state)
     // Called from Zone Equipment Manager.
     //       have however done the variable definitions for in and out.
 
-    Real64 AirChillerSetSchedule(0.0); // Schedule value for air chiller SET
-    Real64 QZNReqSens(0.0);            // Amount of sensible heat needed by the zone, NEGATIVE when cooling needed [W]
-    Real64 RemainQZNReqSens(0.0);      // Remaining amount of sensible heat needed by the zone [W]
+    Real64 AirChillerSetSchedule = 0.0; // Schedule value for air chiller SET
+    Real64 QZNReqSens = 0.0;            // Amount of sensible heat needed by the zone, NEGATIVE when cooling needed [W]
+    Real64 RemainQZNReqSens = 0.0;      // Remaining amount of sensible heat needed by the zone [W]
 
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
 
     // Note, all coils in a coil set are in the same zone
     // the coils may be served by different detailed systems
@@ -15946,13 +15946,13 @@ void FinalRateCoils(EnergyPlusData &state,
     //   Note that the coil fan, heater, and defrost would be unaffected because they
     //   would still be running at level calculated previously
 
-    auto &System(state.dataRefrigCase->System);
-    auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+    auto &System = state.dataRefrigCase->System;
+    auto &WarehouseCoil = state.dataRefrigCase->WarehouseCoil;
 
-    int NumCoils(0);
-    Real64 DeRateFactor(0.0);        // Ratio of energy available from system or secondary loop
-    Real64 InitLatCreditEnergy(0.0); // Latent credit energy before derate [W]
-    Real64 FrostReduction(0.0);      // Change in frost on coils based on derated latent load [kg]
+    int NumCoils = 0;
+    Real64 DeRateFactor = 0.0;        // Ratio of energy available from system or secondary loop
+    Real64 InitLatCreditEnergy = 0.0; // Latent credit energy before derate [W]
+    Real64 FrostReduction = 0.0;      // Change in frost on coils based on derated latent load [kg]
 
     {
         switch (SystemSourceType) {
@@ -15978,7 +15978,7 @@ void FinalRateCoils(EnergyPlusData &state,
         Real64 const time_step_sec(state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         for (int CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
             int CoilID = System(SystemID).CoilNum(CoilIndex);
-            auto &warehouse_coil(WarehouseCoil(CoilID));
+            auto &warehouse_coil = WarehouseCoil(CoilID);
 
             // need to adjust ice on coil due to reduction in latent load met by coil
             InitLatCreditEnergy = warehouse_coil.LatCreditEnergy;
@@ -16061,7 +16061,7 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
     if (this->HeaterSchedPtr > 0) HeaterSchedule = ScheduleManager::GetCurrentScheduleValue(state, this->HeaterSchedPtr);
 
     // Set local subroutine variables for convenience
-    auto FanSpeedControlType = this->FanType;
+    FanSpeedCtrlType FanSpeedControlType = this->FanType;
     Real64 AirVolumeFlowRated = this->RatedAirVolumeFlow;   // Coil rated air flow (m3/s)
     Real64 FanPowerRated = this->RatedFanPower;             // (W)
     Real64 HeaterLoad = this->HeaterPower * HeaterSchedule; // Total heater (except defrost) energy rate (W)
@@ -16463,12 +16463,12 @@ void FigureRefrigerationZoneGains(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // initialize zone gain terms at begin environment
 
-    auto &System(state.dataRefrigCase->System);
-    auto &TransSystem(state.dataRefrigCase->TransSystem);
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-    auto &Secondary(state.dataRefrigCase->Secondary);
-    auto &WalkIn(state.dataRefrigCase->WalkIn);
-    auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+    auto &System = state.dataRefrigCase->System;
+    auto &TransSystem = state.dataRefrigCase->TransSystem;
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
+    auto &Secondary = state.dataRefrigCase->Secondary;
+    auto &WalkIn = state.dataRefrigCase->WalkIn;
+    auto &RefrigCase = state.dataRefrigCase->RefrigCase;
 
     CheckRefrigerationInput(state);
 
@@ -16536,10 +16536,10 @@ void ZeroHVACValues(EnergyPlusData &state)
     // to zero when called on zone timestep. Otherwise, values may be held over when
     // no HVAC load calls module during that zone time step.
 
-    auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-    auto &Condenser(state.dataRefrigCase->Condenser);
+    auto &RefrigRack = state.dataRefrigCase->RefrigRack;
+    auto &Condenser = state.dataRefrigCase->Condenser;
 
-    int DemandARRID(0); // Index to water tank Demand used for evap condenser
+    int DemandARRID = 0; // Index to water tank Demand used for evap condenser
 
     if (state.dataRefrigCase->HaveRefrigRacks) {
         // HaveRefrigRacks is TRUE when NumRefrigeratedRAcks > 0
