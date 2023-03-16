@@ -1151,7 +1151,7 @@ namespace DataPlant {
                             } else {
                                 continue;
                             }
-                            auto const steps(this_loop_side.noLoadConstantSpeedBranchFlowRateSteps(ParallelBranchIndex));
+                            Real64 const steps = this_loop_side.noLoadConstantSpeedBranchFlowRateSteps(ParallelBranchIndex);
                             if (steps > 0.0) { // add in branches with zero MyLoad  in branch input order until satisfied
                                 if (tmpLoopFlow > AccumFlowSteps) {
                                     if (tmpLoopFlow <= AccumFlowSteps + steps) { // found it set requests and exit
