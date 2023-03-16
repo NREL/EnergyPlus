@@ -511,10 +511,13 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \default Maintenance
         elcc->RecurringCosts[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUCNoSpace, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        bool isNotRecurringCost = BITF_TEST_NONE(BITF(elcc->RecurringCosts[iInObj].category),
-                                                 BITF(CostCategory::Maintenance) | BITF(CostCategory::Repair) | BITF(CostCategory::Operation) |
-                                                     BITF(CostCategory::Replacement) | BITF(CostCategory::MinorOverhaul) |
-                                                     BITF(CostCategory::MajorOverhaul) | BITF(CostCategory::OtherOperational));
+        bool isNotRecurringCost = (elcc->RecurringCosts[iInObj].category != CostCategory::Maintenance &&
+                                   elcc->RecurringCosts[iInObj].category != CostCategory::Repair &&
+                                   elcc->RecurringCosts[iInObj].category != CostCategory::Operation &&
+                                   elcc->RecurringCosts[iInObj].category != CostCategory::Replacement && 
+                                   elcc->RecurringCosts[iInObj].category != CostCategory::MinorOverhaul &&
+                                   elcc->RecurringCosts[iInObj].category != CostCategory::MajorOverhaul &&
+                                   elcc->RecurringCosts[iInObj].category != CostCategory::OtherOperational);
         if (isNotRecurringCost) {
             elcc->RecurringCosts[iInObj].category = CostCategory::Maintenance;
             ShowWarningError(state,
@@ -720,9 +723,9 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \default Construction
         elcc->NonrecurringCost[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUCNoSpace, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        bool isNotNonRecurringCost =
-            BITF_TEST_NONE(BITF(elcc->NonrecurringCost[iInObj].category),
-                           BITF(CostCategory::Construction) | BITF(CostCategory::Salvage) | BITF(CostCategory::OtherCapital));
+        bool isNotNonRecurringCost = (elcc->NonrecurringCost[iInObj].category != CostCategory::Construction && 
+                                      elcc->NonrecurringCost[iInObj].category != CostCategory::Salvage && 
+                                      elcc->NonrecurringCost[iInObj].category != CostCategory::OtherCapital);
         if (isNotNonRecurringCost) {
             elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;
             ShowWarningError(state,

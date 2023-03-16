@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
@@ -210,10 +209,13 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
         assert(thisMaterial != nullptr);
 
-        if (BITF_TEST_NONE(BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->group),
-                           BITF(Material::Group::GlassEquivalentLayer) | BITF(Material::Group::ShadeEquivalentLayer) |
-                               BITF(Material::Group::DrapeEquivalentLayer) | BITF(Material::Group::ScreenEquivalentLayer) |
-                               BITF(Material::Group::BlindEquivalentLayer) | BITF(Material::Group::GapEquivalentLayer)))
+	Material::Group group1 = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->group;
+        if (group1 != Material::Group::GlassEquivalentLayer &&
+            group1 != Material::Group::ShadeEquivalentLayer &&
+	    group1 != Material::Group::DrapeEquivalentLayer &&
+	    group1 != Material::Group::ScreenEquivalentLayer && 
+            group1 != Material::Group::BlindEquivalentLayer &&
+	    group1 != Material::Group::GapEquivalentLayer)
             continue;
 
         if (thisMaterial->group == Material::Group::GapEquivalentLayer) {

@@ -48,7 +48,6 @@
 #include <cassert>
 
 // EnergyPlus headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -191,9 +190,10 @@ namespace WindowManager {
                     auto *materialBase(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     auto *material = dynamic_cast<Material::MaterialChild *>(materialBase);
                     assert(material != nullptr);
-                    if (BITF_TEST_NONE(BITF(material->group),
-                                       BITF(Material::Group::WindowGas) | BITF(Material::Group::WindowGasMixture) |
-                                           BITF(Material::Group::ComplexWindowGap) | BITF(Material::Group::ComplexWindowShade))) {
+                    if (material->group != Material::Group::WindowGas &&
+                        material->group != Material::Group::WindowGasMixture &&
+                        material->group != Material::Group::ComplexWindowGap &&
+			material->group != Material::Group::ComplexWindowShade) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.
