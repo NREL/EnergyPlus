@@ -1172,15 +1172,19 @@ namespace AirflowNetwork {
                     SpecifiedMassFlowData.emplace_back();
                     SpecifiedMassFlowData[i_mass].name = thisObjectName;
                     SpecifiedMassFlowData[i_mass].mass_flow = flow_rate;
-                    elements[thisObjectName] = &SpecifiedMassFlowData[i_mass]; // Yet another workaround
                     ++i_mass;
                 } else {
                     SpecifiedVolumeFlowData.emplace_back();
                     SpecifiedVolumeFlowData[i_vol].name = thisObjectName;
                     SpecifiedVolumeFlowData[i_vol].volume_flow = flow_rate;
-                    elements[thisObjectName] = &SpecifiedVolumeFlowData[i_vol]; // Yet another workaround
                     ++i_vol;
                 }
+            }
+            for (auto &afe : SpecifiedMassFlowData) {
+                elements[afe.name] = &afe; // Yet another workaround
+            }
+            for (auto &afe : SpecifiedVolumeFlowData) {
+                elements[afe.name] = &afe; // Yet another workaround
             }
         }
 

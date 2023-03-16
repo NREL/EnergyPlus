@@ -342,37 +342,16 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     // This routine checks some properties of entered constructions; sets some properties; and sets
     // an error flag for certain error conditions.
 
-    int InsideLayer;             // Inside Layer of Construct; for window construct, layer no. of inside glass
-    int MaterNum;                // Counters to keep track of the material number for a layer
-    int OutsideMaterNum;         // Material "number" of the Outside layer
-    int InsideMaterNum;          // Material "number" of the Inside layer
-    int Layer;                   // loop index for each of the construction layers
-    int TotLayers;               // Number of layers in a construction
-    int TotGlassLayers;          // Number of glass layers in a construction
-    int TotShadeLayers;          // Number of shade layers in a construction
-    int TotGasLayers;            // Number of gas layers in a construction
-    bool WrongMaterialsMix;      // True if window construction has a layer that is not glass, gas or shade
-    bool WrongWindowLayering;    // True if error in layering of a window construction
-    int MaterNumNext;            // Next material number in the layer sequence
-    int IGas;                    // Index for gases in a mixture of gases in a window gap
-    int LayNumSh;                // Number of shade/blind layer in a construction
-    int MatSh;                   // Material number of a shade/blind layer
-    int MatGapL;                 // Material number of the gas layer to the left (outer side) of a shade/blind layer
-    int MatGapR;                 // Material number of the gas layer to the right (innner side) of a shade/blind layer
-    int BlNum;                   // Blind number
-    bool ValidBGShadeBlindConst; // True if a valid window construction with between-glass shade/blind
-    int GlassLayNum;             // Glass layer number
-
     auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-    TotLayers = thisConstruct.TotLayers;
-    if (TotLayers == 0) return; // error condition, hopefully caught elsewhere
-    InsideLayer = TotLayers;
+    int TotLayers = thisConstruct.TotLayers;                // Number of layers in a construction
+    if (TotLayers == 0) return;                             // error condition, hopefully caught elsewhere
+    int InsideLayer = TotLayers;                            // Inside Layer of Construct; for window construct, layer no. of inside glass
     if (thisConstruct.LayerPoint(InsideLayer) <= 0) return; // Error condition
 
     //   window screen is not allowed on inside layer
 
     thisConstruct.DayltPropPtr = 0;
-    InsideMaterNum = thisConstruct.LayerPoint(InsideLayer);
+    int InsideMaterNum = thisConstruct.LayerPoint(InsideLayer); // Material "number" of the Inside layer
     if (InsideMaterNum != 0) {
         auto const *thisMaterialInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
         thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
@@ -382,7 +361,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         thisConstruct.ReflectVisDiffBack = 1.0 - thisMaterialInside->AbsorpVisible;
     }
 
-    OutsideMaterNum = thisConstruct.LayerPoint(1);
+    int OutsideMaterNum = thisConstruct.LayerPoint(1); // Material "number" of the Outside layer
     if (OutsideMaterNum != 0) {
         auto const *thisMaterialOutside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(OutsideMaterNum));
         assert(thisMaterialOutside != nullptr);
@@ -398,8 +377,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     // purposes of error checking.
 
     thisConstruct.TypeIsWindow = false;
-    for (Layer = 1; Layer <= TotLayers; ++Layer) {
-        MaterNum = thisConstruct.LayerPoint(Layer);
+    for (int Layer = 1; Layer <= TotLayers; ++Layer) {
+        int const MaterNum = thisConstruct.LayerPoint(Layer);
         if (MaterNum == 0) continue; // error -- has been caught will stop program later
         auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
         thisConstruct.TypeIsWindow =
@@ -424,12 +403,11 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
 
     if (thisConstruct.TypeIsWindow) {
 
+        bool WrongMaterialsMix = false;
         thisConstruct.NumCTFTerms = 0;
         thisConstruct.NumHistories = 0;
-        WrongMaterialsMix = false;
-        WrongWindowLayering = false;
-        for (Layer = 1; Layer <= TotLayers; ++Layer) {
-            MaterNum = thisConstruct.LayerPoint(Layer);
+        for (int Layer = 1; Layer <= TotLayers; ++Layer) {
+            int const MaterNum = thisConstruct.LayerPoint(Layer);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
             auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             WrongMaterialsMix =
@@ -475,11 +453,12 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
 
         // Find total glass layers, total shade/blind layers and total gas layers in a window construction
 
-        TotGlassLayers = 0;
-        TotShadeLayers = 0; // Includes shades, blinds, and screens
-        TotGasLayers = 0;
-        for (Layer = 1; Layer <= TotLayers; ++Layer) {
-            MaterNum = thisConstruct.LayerPoint(Layer);
+        bool WrongWindowLayering = false;
+        int TotGlassLayers = 0;
+        int TotShadeLayers = 0; // Includes shades, blinds, and screens
+        int TotGasLayers = 0;
+        for (int Layer = 1; Layer <= TotLayers; ++Layer) {
+            int const MaterNum = thisConstruct.LayerPoint(Layer);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
             auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             if (thisMaterial->group == Material::Group::WindowGlass) ++TotGlassLayers;
@@ -491,7 +470,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 thisMaterial->group == Material::Group::ComplexWindowGap)
                 ++TotGasLayers;
             if (Layer < TotLayers) {
-                MaterNumNext = thisConstruct.LayerPoint(Layer + 1);
+                int const MaterNumNext = thisConstruct.LayerPoint(Layer + 1);
                 // Adjacent layers of same type not allowed
                 if (MaterNumNext == 0) continue;
                 if (thisMaterial->group == state.dataMaterial->Material(MaterNumNext)->group) WrongWindowLayering = true;
@@ -520,8 +499,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         if (TotShadeLayers > 1) WrongWindowLayering = true; // At most one shade, screen or blind allowed
 
         // If there is a diffusing glass layer no shade, screen or blind is allowed
-        for (Layer = 1; Layer <= TotLayers; ++Layer) {
-            MaterNum = thisConstruct.LayerPoint(Layer);
+        for (int Layer = 1; Layer <= TotLayers; ++Layer) {
+            int const MaterNum = thisConstruct.LayerPoint(Layer);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
             auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
             assert(thisMaterial != nullptr);
@@ -535,9 +514,9 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
 
         // If there is a diffusing glass layer it must be the innermost layer
         if (TotGlassLayers > 1) {
-            GlassLayNum = 0;
-            for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                MaterNum = thisConstruct.LayerPoint(Layer);
+            int GlassLayNum = 0;
+            for (int Layer = 1; Layer <= TotLayers; ++Layer) {
+                int const MaterNum = thisConstruct.LayerPoint(Layer);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
                 auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
                 assert(thisMaterial != nullptr);
@@ -570,7 +549,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 // Quadruple pane not allowed.
                 WrongWindowLayering = true;
             } else if (TotGlassLayers == 2 || TotGlassLayers == 3) {
-                ValidBGShadeBlindConst = false;
+                bool ValidBGShadeBlindConst = false;
                 if (TotGlassLayers == 2) {
                     if (TotLayers != 5) {
                         WrongWindowLayering = true;
@@ -607,8 +586,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 } // End of check if TotGlassLayers = 2 or 3
                 if (!ValidBGShadeBlindConst) WrongWindowLayering = true;
                 if (!WrongWindowLayering) {
-                    LayNumSh = 2 * TotGlassLayers - 1;
-                    MatSh = thisConstruct.LayerPoint(LayNumSh);
+                    int const LayNumSh = 2 * TotGlassLayers - 1;
+                    int const MatSh = thisConstruct.LayerPoint(LayNumSh);
                     auto const *thisMaterialSh = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatSh));
                     assert(thisMaterialSh != nullptr);
                     // For double pane, shade/blind must be layer #3.
@@ -618,11 +597,11 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                     if (TotLayers != 2 * TotGlassLayers + 1) WrongWindowLayering = true;
                     if (!WrongWindowLayering) {
                         // Gas on either side of a between-glass shade/blind must be the same
-                        MatGapL = thisConstruct.LayerPoint(LayNumSh - 1);
-                        MatGapR = thisConstruct.LayerPoint(LayNumSh + 1);
+                        int const MatGapL = thisConstruct.LayerPoint(LayNumSh - 1);
+                        int const MatGapR = thisConstruct.LayerPoint(LayNumSh + 1);
                         auto const *thisMaterialGapL = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatGapL));
                         auto const *thisMaterialGapR = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatGapR));
-                        for (IGas = 1; IGas <= 5; ++IGas) {
+                        for (int IGas = 1; IGas <= 5; ++IGas) {
                             if ((thisMaterialGapL->gasTypes(IGas) != thisMaterialGapR->gasTypes(IGas)) ||
                                 (thisMaterialGapL->GasFract(IGas) != thisMaterialGapR->GasFract(IGas)))
                                 WrongWindowLayering = true;
@@ -630,7 +609,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                         // Gap width on either side of a between-glass shade/blind must be the same
                         if (std::abs(thisMaterialGapL->Thickness - thisMaterialGapR->Thickness) > 0.0005) WrongWindowLayering = true;
                         if (thisMaterialSh->group == Material::Group::WindowBlind) {
-                            BlNum = thisMaterialSh->BlindDataPtr;
+                            int const BlNum = thisMaterialSh->BlindDataPtr;
                             if (BlNum > 0) {
                                 if ((thisMaterialGapL->Thickness + thisMaterialGapR->Thickness) < state.dataMaterial->Blind(BlNum).SlatWidth) {
                                     ErrorsFound = true;
@@ -650,8 +629,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->group == Material::Group::WindowSimpleGlazing) {
             if (TotLayers > 1) {
                 // check that none of the other layers are glazing or gas
-                for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                    MaterNum = thisConstruct.LayerPoint(Layer);
+                for (int Layer = 1; Layer <= TotLayers; ++Layer) {
+                    int const MaterNum = thisConstruct.LayerPoint(Layer);
                     if (MaterNum == 0) continue; // error -- has been caught will stop program later
                     auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                     if (thisMaterial->group == Material::Group::WindowGlass) {
@@ -738,7 +717,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     if (thisMaterialOutside->group == Material::Group::EcoRoof) {
         thisConstruct.TypeIsEcoRoof = true;
         // need to check EcoRoof is not non-outside layer
-        for (Layer = 2; Layer <= TotLayers; ++Layer) {
+        for (int Layer = 2; Layer <= TotLayers; ++Layer) {
             if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->group == Material::Group::EcoRoof) {
                 ShowSevereError(state,
                                 format("CheckAndSetConstructionProperties: Interior Layer is EcoRoof for construction {}", thisConstruct.Name));
@@ -768,8 +747,6 @@ int AssignReverseConstructionNumber(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   December 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // For interzone, unentered surfaces, we need to have "reverse" constructions
@@ -782,11 +759,6 @@ int AssignReverseConstructionNumber(EnergyPlusData &state,
     // Return value
     int NewConstrNum; // Reverse Construction Number
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int nLayer;
-    int Loop;
-    bool Found;
-
     if (ConstrNum == 0) {
         // error caught elsewhere
         NewConstrNum = 0;
@@ -795,17 +767,17 @@ int AssignReverseConstructionNumber(EnergyPlusData &state,
 
     auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
     thisConstruct.IsUsed = true;
-    nLayer = 0;
+    int nLayer = 0;
     state.dataConstruction->LayerPoint = 0;
-    for (Loop = thisConstruct.TotLayers; Loop >= 1; --Loop) {
+    for (int Loop = thisConstruct.TotLayers; Loop >= 1; --Loop) {
         ++nLayer;
         state.dataConstruction->LayerPoint(nLayer) = thisConstruct.LayerPoint(Loop);
     }
 
     // now, got thru and see if there is a match already....
     NewConstrNum = 0;
-    for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
-        Found = true;
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
+        bool Found = true;
         for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
             if (state.dataConstruction->Construct(Loop).LayerPoint(nLayer) != state.dataConstruction->LayerPoint(nLayer)) {
                 Found = false;
