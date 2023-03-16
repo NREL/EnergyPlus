@@ -102,7 +102,7 @@ namespace WindowManager {
         // Tarcog thermal system for solving heat transfer through the window
         int activeConstrNum = CWCEHeatTransferFactory::getActiveConstructionNumber(state, surface, SurfNum);
         auto aFactory = CWCEHeatTransferFactory(state, surface, SurfNum, activeConstrNum); // (AUTO_OK)
-        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff); // (AUTO_OK_SHARED_PTR)
+        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff);                     // (AUTO_OK_SHARED_PTR)
         aSystem->setTolerance(solutionTolerance);
 
         // get previous timestep temperatures solution for faster iterations
@@ -176,7 +176,7 @@ namespace WindowManager {
             auto aGlassLayer = aLayers[totLayers - 2]; // (AUTO_OK_SHARED_PTR)
             Real64 ShadeArea = state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
             auto frontSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Front); // (AUTO_OK_SHARED_PTR)
-            auto backSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Back); // (AUTO_OK_SHARED_PTR)
+            auto backSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Back);   // (AUTO_OK_SHARED_PTR)
             Real64 EpsShIR1 = frontSurface->getEmissivity();
             Real64 EpsShIR2 = backSurface->getEmissivity();
             Real64 TauShIR = frontSurface->getTransmittance();
@@ -220,7 +220,7 @@ namespace WindowManager {
 
             //
             int totLayers = aLayers.size();
-            auto aGlassLayer = aLayers[totLayers - 1]; // (AUTO_OK_SHARED_PTR)
+            auto aGlassLayer = aLayers[totLayers - 1];                                  // (AUTO_OK_SHARED_PTR)
             auto backSurface = aGlassLayer->getSurface(FenestrationCommon::Side::Back); // (AUTO_OK_SHARED_PTR)
 
             Real64 h_cin = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
@@ -324,14 +324,14 @@ namespace WindowManager {
             const int numHorizDividers = frameDivider.HorDividers;
             const int numVertDividers = frameDivider.VertDividers;
 
-            Tarcog::ISO15099::FrameData dividerData{ 
+            Tarcog::ISO15099::FrameData dividerData{
                 dividerUvalue, dividerEdgeUValue, dividerProjectedDimension, dividerWettedLength, dividerAbsorptance};
 
             const Real64 tVis = state.dataConstruction->Construct(constrNum).VisTransNorm;
             const Real64 tSol = state.dataConstruction->Construct(constrNum).SolTransNorm;
 
             if (vision == DataSurfaces::NfrcVisionType::Single) {
-                Tarcog::ISO15099::WindowSingleVision window(windowWidth, windowHeight, tVis, tSol, insulGlassUnit); 
+                Tarcog::ISO15099::WindowSingleVision window(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
                 window.setFrameTop(frameData);
                 window.setFrameBottom(frameData);
                 window.setFrameLeft(frameData);
@@ -379,7 +379,7 @@ namespace WindowManager {
                     uvalue = window.uValue();
                 }
             } else {
-   	        Tarcog::ISO15099::WindowSingleVision window(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
+                Tarcog::ISO15099::WindowSingleVision window(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
                 window.setFrameTop(frameData);
                 window.setFrameBottom(frameData);
                 window.setFrameLeft(frameData);
@@ -429,13 +429,13 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff)
     {
-        auto Indoor = getIndoor(state); // (AUTO_OK_SHARED_PTR)
+        auto Indoor = getIndoor(state);                    // (AUTO_OK_SHARED_PTR)
         auto Outdoor = getOutdoor(state, t_HextConvCoeff); // (AUTO_OK_SHARED_PTR)
-        auto aIGU = getIGU(); // (AUTO_OK_OBJ)
+        auto aIGU = getIGU();                              // (AUTO_OK_OBJ)
 
         // pick-up all layers and put them in IGU (this includes gap layers as well)
         for (int i = 0; i < m_TotLay; ++i) {
-		auto aLayer = getIGULayer(state, i + 1); // (AUTO_OK_SHARED_PTR)
+            auto aLayer = getIGULayer(state, i + 1); // (AUTO_OK_SHARED_PTR)
             assert(aLayer != nullptr);
             // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
             // and it will be created here
@@ -456,9 +456,9 @@ namespace WindowManager {
     std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(
         EnergyPlusData &state, bool const useSummerConditions, const Real64 width, const Real64 height, const Real64 tilt)
     {
-        auto Indoor = getIndoorNfrc(useSummerConditions); // (AUTO_OK_SHARED_PTR)
+        auto Indoor = getIndoorNfrc(useSummerConditions);   // (AUTO_OK_SHARED_PTR)
         auto Outdoor = getOutdoorNfrc(useSummerConditions); // (AUTO_OK_SHARED_PTR)
-        auto aIGU = getIGU(width, height, tilt); // (AUTO_OK_OBJ)
+        auto aIGU = getIGU(width, height, tilt);            // (AUTO_OK_OBJ)
 
         m_SolidLayerIndex = 0;
         // pick-up all layers and put them in IGU (this includes gap layers as well)
@@ -484,7 +484,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     Material::MaterialBase *CWCEHeatTransferFactory::getLayerMaterial(EnergyPlusData &state, int const t_Index) const
     {
-	int ConstrNum = m_ConstructionNumber;
+        int ConstrNum = m_ConstructionNumber;
 
         // BSDF window do not have special shading flag
         if (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF &&
@@ -640,7 +640,8 @@ namespace WindowManager {
 
         std::shared_ptr<Tarcog::ISO15099::ISurface> frontSurface = std::make_shared<Tarcog::ISO15099::CSurface>(emissFront, transThermalFront);
         std::shared_ptr<Tarcog::ISO15099::ISurface> backSurface = std::make_shared<Tarcog::ISO15099::CSurface>(emissBack, transThermalBack);
-        auto aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUSolidLayer>(thickness, conductivity, frontSurface, backSurface); // (AUTO_OK_SHARED_PTR)
+        auto aSolidLayer =
+            std::make_shared<Tarcog::ISO15099::CIGUSolidLayer>(thickness, conductivity, frontSurface, backSurface); // (AUTO_OK_SHARED_PTR)
         if (createOpenness) {
             auto aOpenings = std::make_shared<Tarcog::ISO15099::CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront, Afront); // (AUTO_OK_SHARED_PTR)
             aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUShadeLayer>(aSolidLayer, aOpenings);
@@ -695,7 +696,7 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
         Real64 constexpr pres = 1e5; // Old code uses this constant pressure
-        auto aGas = getAir(); // (AUTO_OK_OBJ)
+        auto aGas = getAir();        // (AUTO_OK_OBJ)
         Real64 thickness = 0.0;
 
         const WinShadingType ShadeFlag = getShadeType(state, m_ConstructionNumber);
@@ -731,7 +732,7 @@ namespace WindowManager {
         Real64 gasPointer = material->GasPointer;
         auto *gasMaterial = state.dataMaterial->Material(gasPointer);
         auto aGas = getGas(gasMaterial); // (AUTO_OK_OBJ)
-        return std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas); 
+        return std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

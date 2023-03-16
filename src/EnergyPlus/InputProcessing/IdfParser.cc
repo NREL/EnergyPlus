@@ -239,8 +239,8 @@ json IdfParser::parse_idf(std::string_view idf, size_t &index, bool &success, js
             eat_comment(idf, index);
         } else {
             ++idfObjectCount;
-	    std::string const parsed_obj_name = parse_string(idf, index);
-	    std::string const obj_name = normalizeObjectType(parsed_obj_name);
+            std::string const parsed_obj_name = parse_string(idf, index);
+            std::string const obj_name = normalizeObjectType(parsed_obj_name);
             if (obj_name.empty()) {
                 errors_.emplace_back(
                     fmt::format("Line: {} Index: {} - \"{}\" is not a valid Object Type.", cur_line_num, index_into_cur_line, parsed_obj_name));
@@ -505,7 +505,7 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
     };
 
     auto const convert_int = [&convert_double, &index, this](std::string_view str) -> json { // (AUTO_OK)
-        auto const str_end = str.data() + str.size(); // have to do this for MSVC // (AUTO_OK)
+        auto const str_end = str.data() + str.size();                                        // have to do this for MSVC // (AUTO_OK)
         int val;
         auto result = FromChars::from_chars(str.data(), str.data() + str.size(), val); // (AUTO_OK)
         if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {

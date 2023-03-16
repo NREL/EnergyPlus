@@ -127,8 +127,8 @@ namespace UtilityRoutines {
 
         if (String.empty()) return rProcessNumber;
 
-	size_t const front_trim = String.find_first_not_of(' ');
-	size_t const back_trim = String.find_last_not_of(' ');
+        size_t const front_trim = String.find_first_not_of(' ');
+        size_t const back_trim = String.find_last_not_of(' ');
         if (front_trim == std::string::npos || back_trim == std::string::npos) {
             return rProcessNumber;
         } else {
@@ -529,7 +529,7 @@ namespace UtilityRoutines {
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings with DataGlobalConstants::AssignResourceTypeNum() (Boilers.cc and boilerSteam.cc)
 
-	std::string const SELECT_CASE_var = FuelTypeInput;
+        std::string const SELECT_CASE_var = FuelTypeInput;
 
         if (SELECT_CASE_var == "ELECTRICITY") {
             FuelTypeOutput = "Electricity";
@@ -1207,11 +1207,11 @@ void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Messag
 
     if (len(Message) < 50) {
         const std::string m = format("{}{}{}, at Simulation time={} {}",
-                              Message,
-                              cEnvHeader,
-                              state.dataEnvrn->EnvironmentName,
-                              state.dataEnvrn->CurMnDy,
-                              CreateSysTimeIntervalString(state));
+                                     Message,
+                                     cEnvHeader,
+                                     state.dataEnvrn->EnvironmentName,
+                                     state.dataEnvrn->CurMnDy,
+                                     CreateSysTimeIntervalString(state));
 
         ShowErrorMessage(state, format(" **   ~~~   ** {}", m), OutUnit1, OutUnit2);
         if (state.dataSQLiteProcedures->sqlite) {
@@ -1222,10 +1222,10 @@ void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Messag
         }
     } else {
         const std::string postfix = format("{}{}, at Simulation time={} {}",
-                                    cEnvHeader,
-                                    state.dataEnvrn->EnvironmentName,
-                                    state.dataEnvrn->CurMnDy,
-                                    CreateSysTimeIntervalString(state));
+                                           cEnvHeader,
+                                           state.dataEnvrn->EnvironmentName,
+                                           state.dataEnvrn->CurMnDy,
+                                           CreateSysTimeIntervalString(state));
         ShowErrorMessage(state, format(" **   ~~~   ** {}", Message));
         ShowErrorMessage(state, format(" **   ~~~   ** {}", postfix), OutUnit1, OutUnit2);
         if (state.dataSQLiteProcedures->sqlite) {

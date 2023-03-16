@@ -895,7 +895,7 @@ const json &InputProcessor::getJSONObjectItem(EnergyPlusData &state, std::string
 {
     std::string objTypeStr(ObjType);
     std::string objNameStr(ObjName);
-    
+
     auto objectInfo = ObjectInfo(objTypeStr, objNameStr); // (AUTO_OK_OBJ)
 
     auto obj_iter = epJSON.find(objTypeStr);
@@ -1584,7 +1584,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
     auto const &schema_properties = schema().at("properties");
 
     // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
-    auto processField = [&state](const std::string &field, const json &epJSONObj, const json &schema_field_obj) { 
+    auto processField = [&state](const std::string &field, const json &epJSONObj, const json &schema_field_obj) {
         bool hasDefault = false;
         bool canBeAutosized = false;
         bool canBeAutocalculated = false;

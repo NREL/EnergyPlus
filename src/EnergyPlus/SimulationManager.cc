@@ -1592,7 +1592,7 @@ namespace SimulationManager {
     {
         std::unique_ptr<fmt::ostream> result = nullptr;
 #ifdef _WIN32
-	std::string filePathStr = filePath.string();
+        std::string filePathStr = filePath.string();
         const char *path = filePathStr.c_str();
 #else
         const char *path = filePath.c_str();
@@ -2080,11 +2080,11 @@ namespace SimulationManager {
         // Formats
         static constexpr std::string_view Format_700 = "! <#Component Sets>,<Number of Component Sets>";
         static constexpr std::string_view Format_702 = "! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
-                                                     "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>";
+                                                       "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>";
         static constexpr std::string_view Format_720 = "! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>";
         static constexpr std::string_view Format_722 =
             "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>";
-        static constexpr std::string_view Format_723 = 
+        static constexpr std::string_view Format_723 =
             "! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
             "Priority>,<Cooling Priority>";
 

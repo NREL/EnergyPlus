@@ -191,10 +191,8 @@ namespace WindowManager {
                     auto *materialBase(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     auto *material = dynamic_cast<Material::MaterialChild *>(materialBase);
                     assert(material != nullptr);
-                    if (material->group != Material::Group::WindowGas &&
-			material->group != Material::Group::WindowGasMixture &&
-			material->group != Material::Group::ComplexWindowGap &&
-			material->group != Material::Group::ComplexWindowShade) {
+                    if (material->group != Material::Group::WindowGas && material->group != Material::Group::WindowGasMixture &&
+                        material->group != Material::Group::ComplexWindowGap && material->group != Material::Group::ComplexWindowShade) {
 
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
@@ -372,8 +370,8 @@ namespace WindowManager {
         if (m_Range == WavelengthRange::Visible) {
             m_Material = createVisibleRangeMaterial(state);
         } else {
-	    auto aVisibleRangeMaterial = createVisibleRangeMaterial(state); // (AUTO_OK_OBJ)
-	    auto aSolarRangeMaterial = createSolarRangeMaterial(state); // (AUTO_OK_OBJ)
+            auto aVisibleRangeMaterial = createVisibleRangeMaterial(state); // (AUTO_OK_OBJ)
+            auto aSolarRangeMaterial = createSolarRangeMaterial(state);     // (AUTO_OK_OBJ)
             // Ratio visible to solar range. It can be calculated from solar spectrum.
             Real64 ratio = 0.49;
             m_Material = std::make_shared<CMaterialDualBand>(aVisibleRangeMaterial, aSolarRangeMaterial, ratio);
@@ -589,10 +587,10 @@ namespace WindowManager {
     std::shared_ptr<CBSDFLayer> CWCELayerFactory::getBSDFLayer(EnergyPlusData &state)
     {
         if (!m_BSDFInitialized) {
-            auto res = init(state); // (AUTO_OK_SHARED_PTR)
+            auto res = init(state);                                      // (AUTO_OK_SHARED_PTR)
             const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full); // (AUTO_OK_OBJ)
 
-            CBSDFLayerMaker aMaker(res.first, aBSDF, res.second); 
+            CBSDFLayerMaker aMaker(res.first, aBSDF, res.second);
             m_BSDFLayer = aMaker.getLayer();
             m_BSDFInitialized = true;
         }

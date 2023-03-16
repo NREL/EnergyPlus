@@ -9036,7 +9036,7 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ErrorsFoundByConstruct = false;
             {
-		    std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(2);
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(2);
 
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     tmpAlgoInput = DataSurfaces::HeatTransferModel::CTF;
@@ -11943,7 +11943,8 @@ namespace SurfaceGeometry {
                       cOSCLimitsString);
             } else {
                 state.dataIPShortCut->cAlphaArgs(2) = "N/A";
-                constexpr std::string_view format = "Other Side Coefficients,{},{},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{}\n";
+                constexpr std::string_view format =
+                    "Other Side Coefficients,{},{},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{}\n";
                 print(state.files.eio,
                       format,
                       state.dataSurface->OSC(Loop).Name,
@@ -12855,8 +12856,8 @@ namespace SurfaceGeometry {
                         itnext = std::begin(vertices);
                     }
 
-                    auto curVertex = *it; // (AUTO_OK_OBJ) can't tell if a copy is the intended behavior here
-                    auto nextVertex = *itnext; // (AUTO_OK_OBJ) 
+                    auto curVertex = *it;      // (AUTO_OK_OBJ) can't tell if a copy is the intended behavior here
+                    auto nextVertex = *itnext; // (AUTO_OK_OBJ)
 
                     // now go through all the vertices and see if they are colinear with start and end vertices
                     for (const auto &testVertex : uniqVertices) {
@@ -16008,11 +16009,10 @@ namespace SurfaceGeometry {
             assert(thisMatLay != nullptr);
             auto *revMatLay = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(revConstLayer));
             assert(revMatLay != nullptr);
-            if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
+            if ((thisConstLayer != revConstLayer) ||                   // Not pointing to the same layer
                 (thisMatLay->group == Material::Group::WindowGlass) || // Not window glass or glass equivalent layer which have
                 (revMatLay->group == Material::Group::WindowGlass) ||  // to have certain properties flipped from front to back
-                (thisMatLay->group == Material::Group::GlassEquivalentLayer) ||
-                (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
+                (thisMatLay->group == Material::Group::GlassEquivalentLayer) || (revMatLay->group == Material::Group::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
                 Real64 constexpr SmallDiff = 0.0001;

@@ -4280,7 +4280,7 @@ void GetPlantSizingInput(EnergyPlusData &state)
         }
         if (NumAlphas > 3) {
             {
-		    std::string const &sizingFactorOption = state.dataIPShortCut->cAlphaArgs(4);
+                std::string const &sizingFactorOption = state.dataIPShortCut->cAlphaArgs(4);
                 if (sizingFactorOption == "NONE") {
                     state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = NoSizingFactorMode;
                 } else if (sizingFactorOption == "GLOBALHEATINGSIZINGFACTOR") {

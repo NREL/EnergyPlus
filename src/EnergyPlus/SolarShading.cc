@@ -3505,7 +3505,7 @@ void HTRANS(EnergyPlusData &state,
     int m = l1 + 1u;
     Int64 HCX_l;
     Int64 HCY_l;
-    Real64 SUM = 0.0;                                   // Sum variable
+    Real64 SUM = 0.0;                                  // Sum variable
     for (int N = 1; N <= NumVertices; ++N, ++l, ++m) { // [ l ] == ( NS, N ), [ m ] == ( NS, N + 1 )
         HCX_l = HCX_m;
         HCY_l = HCY_m;
@@ -8599,7 +8599,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             int ConstrNum = state.dataSurface->Surface(SurfNum2).Construction;
             if (state.dataSurface->Surface(SurfNum2).activeShadedConstruction > 0)
                 ConstrNum = state.dataSurface->Surface(SurfNum2).activeShadedConstruction;
-            auto aLayer = CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum); // (AUTO_OK_OBJ)
+            auto aLayer =
+                CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum); // (AUTO_OK_OBJ)
 
             ///////////////////////////////////////////////
             // Solar absorbed in window layers

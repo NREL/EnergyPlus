@@ -3635,9 +3635,9 @@ namespace WeatherManager {
                 // "123456789"
                 // becomes
                 // std::vector<int>{1,2,3,4,5,6,7,8,9};
-		std::stringstream reader = stringReader(PresWeathCodes);
+                std::stringstream reader = stringReader(PresWeathCodes);
                 for (auto &value : WCodesArr) {
-                    char c[2] = {0,0};          // a string of 2 characters, init both to 0
+                    char c[2] = {0, 0};   // a string of 2 characters, init both to 0
                     reader >> c[0];       // read next char into the first byte
                     value = std::atoi(c); // convert this short string into the appropriate int to read
                 }

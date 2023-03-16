@@ -82,15 +82,15 @@ namespace WindowManager {
         int NumAlphas;
         int IOStat;
 
-        auto aModel = std::make_unique<CWindowModel>(); // (AUTO_OK) 
+        auto aModel = std::make_unique<CWindowModel>(); // (AUTO_OK)
         int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, objectName);
         if (numCurrModels > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, objectName, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
-	    // Please consider using getEnumerationValue pattern here.
-	    // Consider that you are creating an entire map for the
-	    // sole purpose of looking up a single element
-            EnumParser<WindowsModel> aParser; 
+            // Please consider using getEnumerationValue pattern here.
+            // Consider that you are creating an entire map for the
+            // sole purpose of looking up a single element
+            EnumParser<WindowsModel> aParser;
             aModel->m_Model = aParser.StringToEnum(state, state.dataIPShortCut->cAlphaArgs(1));
         }
 

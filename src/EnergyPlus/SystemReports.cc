@@ -709,8 +709,8 @@ void InitEnergyReports(EnergyPlusData &state)
                              ++CompNum) {
                             {
                                 auto &thisVentRepComp = state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum)
-                                                          .Branch(BranchNum)
-                                                          .Comp(CompNum);
+                                                            .Branch(BranchNum)
+                                                            .Comp(CompNum);
                                 const std::string &CompType = thisVentRepComp.TypeOf;
                                 const std::string &CompName = thisVentRepComp.Name;
                                 int MatchLoop = 0;
@@ -738,8 +738,8 @@ void InitEnergyReports(EnergyPlusData &state)
                              ++CompNum) {
                             {
                                 auto &thisVentRepComp = state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum)
-                                                          .Branch(BranchNum)
-                                                          .Comp(CompNum);
+                                                            .Branch(BranchNum)
+                                                            .Comp(CompNum);
                                 const std::string &CompType = thisVentRepComp.TypeOf;
                                 const std::string &CompName = thisVentRepComp.Name;
                                 int MatchLoop = 0;
@@ -1117,8 +1117,9 @@ void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &A
                      state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).TotalComponents;
                      ++SupplySideCompNum) {
                     {
-                        auto const &thisVentRepComp = state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(
-                            SupplySideCompNum);
+                        auto const &thisVentRepComp =
+                            state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(
+                                SupplySideCompNum);
                         DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
                         DemandSideLoopNum = thisVentRepComp.ConnectPlant.LoopNum;
                         DemandSideBranchNum = thisVentRepComp.ConnectPlant.BranchNum;
@@ -2254,7 +2255,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                     for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                         {
-                            auto &thisSubComponent = 
+                            auto &thisSubComponent =
                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum);
                             thisSubComponent.TypeOf = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
                             thisSubComponent.Name = SubCompNames(SubCompNum);
@@ -2315,10 +2316,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                             {
                                 auto &thisSubSubComponent = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum)
-                                                              .Branch(BranchNum)
-                                                              .Comp(CompNum)
-                                                              .SubComp(SubCompNum)
-                                                              .SubSubComp(SubSubCompNum);
+                                                                .Branch(BranchNum)
+                                                                .Comp(CompNum)
+                                                                .SubComp(SubCompNum)
+                                                                .SubSubComp(SubSubCompNum);
                                 thisSubSubComponent.TypeOf = static_cast<std::string>(
                                     BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))]);
                                 thisSubSubComponent.Name = SubCompNames(SubSubCompNum);
@@ -2777,7 +2778,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
         for (CompNum = 1; CompNum <= state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
             for (SubCompNum = 1; SubCompNum <= state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipData(CompNum).NumSubEquip; ++SubCompNum) {
                 {
-                    auto &thisSubEquipData  = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipData(CompNum).SubEquipData(SubCompNum);
+                    auto &thisSubEquipData = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipData(CompNum).SubEquipData(SubCompNum);
                     std::string &TypeOfSubComp = thisSubEquipData.TypeOf;
                     std::string &NameOfSubComp = thisSubEquipData.Name;
 

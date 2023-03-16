@@ -4405,9 +4405,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             ErrorsFound = true;
                         } else {
 
-                            DataLoopNode::ConnectionObjectType objType =
-                                static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                                UtilityRoutines::MakeUPPERCase(Tank.Type)));
+                            DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
+                                getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(Tank.Type)));
 
                             Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                        HPWH.OutletNodeName1,
