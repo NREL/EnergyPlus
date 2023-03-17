@@ -8701,7 +8701,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 BaseSizer::reportSizerOutput(state,
                                              std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)),
                                              state.dataHVACVarRefFlow->VRF(VRFCond).Name,
-                                             "Design Size Resistive Defrost Heater Capacity",
+                                             "Design Size Resistive Defrost Heater Capacity [W]",
                                              DefrostCapacityDes);
             } else {
                 if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0) {
@@ -8709,7 +8709,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)),
                                                  state.dataHVACVarRefFlow->VRF(VRFCond).Name,
-                                                 "Design Size Resistive Defrost Heater Capacity",
+                                                 "Design Size Resistive Defrost Heater Capacity [W]",
                                                  DefrostCapacityDes,
                                                  "User-Specified Resistive Defrost Heater Capacity",
                                                  DefrostCapacityUser);
