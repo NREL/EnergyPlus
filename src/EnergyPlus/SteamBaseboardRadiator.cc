@@ -549,7 +549,7 @@ namespace SteamBaseboardRadiator {
             // Get schedule
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = Constant::ScheduleAlwaysOn;
             } else {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr =
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
@@ -1591,15 +1591,15 @@ namespace SteamBaseboardRadiator {
 
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotEnergy =
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys *
-            DataGlobalConstants::SecInHour;
+            Constant::SecInHour;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Energy =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvEnergy =
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys *
-            DataGlobalConstants::SecInHour;
+            Constant::SecInHour;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadEnergy =
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys *
-            DataGlobalConstants::SecInHour;
+            Constant::SecInHour;
     }
 
     void

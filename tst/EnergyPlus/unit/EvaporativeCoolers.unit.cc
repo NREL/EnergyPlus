@@ -739,7 +739,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     // set up the flow rates for a direct RDDSpecial
     thisEvapCooler.evapCoolerType = EvapCoolerType::DirectResearchSpecial;
     thisEvapCooler.Name = "MyDirectEvapCoolerRS";
-    thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisEvapCooler.SchedPtr = Constant::ScheduleAlwaysOn;
     thisEvapCooler.PumpPowerModifierCurveIndex = 1;
     thisEvapCooler.DirectEffectiveness = 0.75;
     thisEvapCooler.DesVolFlowRate = 1.0;

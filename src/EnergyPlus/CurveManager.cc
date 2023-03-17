@@ -3522,7 +3522,7 @@ namespace Curve {
         auto &curve = state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex);
 
         // Intermediate calculations
-        Real64 const CrossSectArea = (DataGlobalConstants::Pi / 4.0) * pow_2(curve.EquivDiameter);
+        Real64 const CrossSectArea = (Constant::Pi / 4.0) * pow_2(curve.EquivDiameter);
         Real64 const Velocity = MassFlow / (Density * CrossSectArea);
         Real64 const ReynoldsNumber = Density * curve.EquivDiameter * Velocity / Viscosity; // assuming mu here
         Real64 const RoughnessRatio = curve.EquivRoughness / curve.EquivDiameter;

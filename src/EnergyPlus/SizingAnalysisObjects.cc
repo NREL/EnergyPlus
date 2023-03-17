@@ -66,7 +66,7 @@ namespace EnergyPlus {
 
 ZoneTimestepObject::ZoneTimestepObject()
 {
-    kindOfSim = DataGlobalConstants::KindOfSim::Invalid;
+    kindOfSim = Constant::KindOfSim::Invalid;
     envrnNum = 0;
     dayOfSim = 0;
     hourOfDay = 0;
@@ -77,7 +77,7 @@ ZoneTimestepObject::ZoneTimestepObject()
 }
 
 ZoneTimestepObject::ZoneTimestepObject(
-    DataGlobalConstants::KindOfSim kindSim, // kind of simulation
+    Constant::KindOfSim kindSim, // kind of simulation
     int environmentNum,                     // index in Environment data structure, usually WeatherManager::Envrn
     int daySim,                             // days into simulation period, usually DataGlobals::DayOfSim
     int hourDay,                            // hour into day, 1-24, filled by DataGlobals::HourOfDay
@@ -263,10 +263,10 @@ ZoneTimestepObject SizingLog::GetLogVariableDataMax(EnergyPlusData &state)
     }
 
     for (auto &zt : ztStepObj) {
-        if (zt.envrnNum > 0 && zt.kindOfSim != DataGlobalConstants::KindOfSim::Invalid && zt.runningAvgDataValue > MaxVal) {
+        if (zt.envrnNum > 0 && zt.kindOfSim != Constant::KindOfSim::Invalid && zt.runningAvgDataValue > MaxVal) {
             MaxVal = zt.runningAvgDataValue;
             tmpztStepStamp = zt;
-        } else if (zt.envrnNum == 0 && zt.kindOfSim == DataGlobalConstants::KindOfSim::Invalid) { // null timestamp, problem to fix
+        } else if (zt.envrnNum == 0 && zt.kindOfSim == Constant::KindOfSim::Invalid) { // null timestamp, problem to fix
             ShowWarningMessage(state, "GetLogVariableDataMax: null timestamp in log");
         }
     }
@@ -309,11 +309,11 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData &state, Real64 
     // search environment structure for sizing periods
     // this is coded to occur before the additions to Environment structure that will occur to run them as HVAC Sizing sims
     for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
-        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == Constant::KindOfSim::DesignDay) {
             ++tmpLog.NumOfEnvironmentsInLogSet;
             ++tmpLog.NumOfDesignDaysInLogSet;
         }
-        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign) {
             ++tmpLog.NumOfEnvironmentsInLogSet;
             ++tmpLog.NumberOfSizingPeriodsInLogSet;
         }
@@ -322,10 +322,10 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData &state, Real64 
     // next fill in the count of steps into map
     for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
 
-        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == Constant::KindOfSim::DesignDay) {
             tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * state.dataGlobal->NumOfTimeStepInHour;
         }
-        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign) {
             tmpLog.ztStepCountByEnvrnMap[i] =
                 HoursPerDay * state.dataGlobal->NumOfTimeStepInHour * state.dataWeatherManager->Environment(i).TotalDays;
         }
@@ -660,7 +660,7 @@ bool PlantCoinicidentAnalysis::CheckTimeStampForNull(ZoneTimestepObject testStam
     if (testStamp.envrnNum != 0) {
         isNull = false;
     }
-    if (testStamp.kindOfSim != DataGlobalConstants::KindOfSim::Invalid) {
+    if (testStamp.kindOfSim != Constant::KindOfSim::Invalid) {
         isNull = false;
     }
 

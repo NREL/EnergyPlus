@@ -771,7 +771,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::DesignFlowRate;
                 if (lAlphaFieldBlanks(3)) {
-                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisInfiltration.SchedPtr = Constant::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisInfiltration.SchedPtr == 0) {
@@ -929,7 +929,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpecAlt::AirChanges:
                     if (thisInfiltration.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            thisInfiltration.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            thisInfiltration.DesignLevel = rNumericArgs(4) * thisSpace.Volume / Constant::SecInHour;
                             if (thisSpace.Volume <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Space Volume = 0.  0 Infiltration will result.",
@@ -1017,7 +1017,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::ShermanGrimsrud;
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisInfiltration.SchedPtr = Constant::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisInfiltration.SchedPtr == 0) {
@@ -1104,7 +1104,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::AIM2;
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisInfiltration.SchedPtr = Constant::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisInfiltration.SchedPtr == 0) {
@@ -1425,7 +1425,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 thisVentilation.ModelType = DataHeatBalance::VentilationModelType::DesignFlowRate;
                 if (lAlphaFieldBlanks(3)) {
-                    thisVentilation.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisVentilation.SchedPtr = Constant::ScheduleAlwaysOn;
                 } else {
                     thisVentilation.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisVentilation.SchedPtr == 0) {
@@ -1530,7 +1530,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::AirChanges:
                     if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            thisVentilation.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            thisVentilation.DesignLevel = rNumericArgs(4) * thisSpace.Volume / Constant::SecInHour;
                             if (thisSpace.Volume <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Space Volume = 0.  0 Ventilation will result.",
@@ -2109,7 +2109,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisVentilation.OpenAreaSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisVentilation.OpenAreaSchedPtr = Constant::ScheduleAlwaysOn;
                 } else {
                     thisVentilation.OpenAreaSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisVentilation.OpenAreaSchedPtr == 0) {
@@ -2125,7 +2125,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 thisVentilation.OpenEff = rNumericArgs(2);
-                if (thisVentilation.OpenEff != DataGlobalConstants::AutoCalculate &&
+                if (thisVentilation.OpenEff != Constant::AutoCalculate &&
                     (thisVentilation.OpenEff < 0.0 || thisVentilation.OpenEff > 1.0)) {
                     ShowSevereError(
                         state,
@@ -2150,7 +2150,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 thisVentilation.DiscCoef = rNumericArgs(5);
-                if (thisVentilation.DiscCoef != DataGlobalConstants::AutoCalculate &&
+                if (thisVentilation.DiscCoef != Constant::AutoCalculate &&
                     (thisVentilation.DiscCoef < 0.0 || thisVentilation.DiscCoef > 1.0)) {
                     ShowSevereError(
                         state,
@@ -2600,7 +2600,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisMixing.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisMixing.SchedPtr = Constant::ScheduleAlwaysOn;
                 } else {
                     thisMixing.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisMixing.SchedPtr == 0) {
@@ -2720,7 +2720,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::AirChanges:
                     if (thisMixing.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            thisMixing.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            thisMixing.DesignLevel = rNumericArgs(4) * thisSpace.Volume / Constant::SecInHour;
                             if (thisSpace.Volume <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Space Volume = 0.  0 Mixing will result.",
@@ -3213,7 +3213,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisMixing.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisMixing.SchedPtr = Constant::ScheduleAlwaysOn;
                 } else {
                     thisMixing.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisMixing.SchedPtr == 0) {
@@ -3333,7 +3333,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::AirChanges:
                     if (thisMixing.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            thisMixing.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            thisMixing.DesignLevel = rNumericArgs(4) * thisSpace.Volume / Constant::SecInHour;
                             if (thisSpace.Volume <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Space Volume = 0.  0 Cross Mixing will result.",
@@ -4291,7 +4291,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).ExteriorTotalSurfArea,
                                               state.dataHeatBal->Infiltration(Loop).DesignLevel);
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume,
-                                              state.dataHeatBal->Infiltration(Loop).DesignLevel * DataGlobalConstants::SecInHour);
+                                              state.dataHeatBal->Infiltration(Loop).DesignLevel * Constant::SecInHour);
 
         print(state.files.eio, "{:.3R},", state.dataHeatBal->Infiltration(Loop).ConstantTermCoef);
         print(state.files.eio, "{:.3R},", state.dataHeatBal->Infiltration(Loop).TemperatureTermCoef);
@@ -4339,7 +4339,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).FloorArea, state.dataHeatBal->Ventilation(Loop).DesignLevel);
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).TotOccupants, state.dataHeatBal->Ventilation(Loop).DesignLevel);
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume,
-                                              state.dataHeatBal->Ventilation(Loop).DesignLevel * DataGlobalConstants::SecInHour);
+                                              state.dataHeatBal->Ventilation(Loop).DesignLevel * Constant::SecInHour);
 
         if (state.dataHeatBal->Ventilation(Loop).FanType == DataHeatBalance::VentilationType::Exhaust) {
             print(state.files.eio, "Exhaust,");
@@ -4409,7 +4409,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).FloorArea, state.dataHeatBal->Mixing(Loop).DesignLevel);
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).TotOccupants, state.dataHeatBal->Mixing(Loop).DesignLevel);
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume,
-                                              state.dataHeatBal->Mixing(Loop).DesignLevel * DataGlobalConstants::SecInHour);
+                                              state.dataHeatBal->Mixing(Loop).DesignLevel * Constant::SecInHour);
 
         print(state.files.eio, "{},", state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).FromZone).Name);
         print(state.files.eio, "{:.2R}\n", state.dataHeatBal->Mixing(Loop).DeltaTemperature);
@@ -4444,7 +4444,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).FloorArea, state.dataHeatBal->CrossMixing(Loop).DesignLevel);
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).TotOccupants, state.dataHeatBal->CrossMixing(Loop).DesignLevel);
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume,
-                                              state.dataHeatBal->CrossMixing(Loop).DesignLevel * DataGlobalConstants::SecInHour);
+                                              state.dataHeatBal->CrossMixing(Loop).DesignLevel * Constant::SecInHour);
 
         print(state.files.eio, "{},", state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
         print(state.files.eio, "{:.2R}\n", state.dataHeatBal->CrossMixing(Loop).DeltaTemperature);

@@ -274,10 +274,10 @@ namespace Furnaces {
               HotWaterCoilMaxIterIndex2(0), EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0),
               EMSOverrideMoistZoneLoadRequest(false), EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Invalid),
               NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0),
-              CheckFanFlow(true), HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSHeatingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSCoolingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0),
+              CheckFanFlow(true), HeatVolumeFlowRate(Constant::MaxSpeedLevels, 0.0),
+              HeatMassFlowRate(Constant::MaxSpeedLevels, 0.0), CoolVolumeFlowRate(Constant::MaxSpeedLevels, 0.0),
+              CoolMassFlowRate(Constant::MaxSpeedLevels, 0.0), MSHeatingSpeedRatio(Constant::MaxSpeedLevels, 0.0),
+              MSCoolingSpeedRatio(Constant::MaxSpeedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0),
               ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
         {
         }

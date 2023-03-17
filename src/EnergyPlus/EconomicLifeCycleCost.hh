@@ -357,14 +357,14 @@ namespace EconomicLifeCycleCost {
     {
         // Members
         std::string name;                           // Name
-        DataGlobalConstants::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        Constant::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         int escalationStartYear;                    // Escalation Start Year 1900-2100
         int escalationStartMonth;                   // Escalation Start Month 1 to 12
         Array1D<Real64> Escalation;                 // Escalation by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UsePriceEscalationType() : resource(DataGlobalConstants::ResourceType::None), escalationStartYear(0), escalationStartMonth(0)
+        UsePriceEscalationType() : resource(Constant::ResourceType::None), escalationStartYear(0), escalationStartMonth(0)
         {
         }
     };
@@ -373,12 +373,12 @@ namespace EconomicLifeCycleCost {
     {
         // Members
         std::string name;                           // Name
-        DataGlobalConstants::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        Constant::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         Array1D<Real64> Adjustment;                 // Adjustment by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UseAdjustmentType() : resource(DataGlobalConstants::ResourceType::None)
+        UseAdjustmentType() : resource(Constant::ResourceType::None)
         {
         }
     };
@@ -388,7 +388,7 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;                           // Name - just for labeling output - use Category for aggregation
         SourceKindType SourceKind;                  // 1=recurring, 2=nonrecurring, 3=resource
-        DataGlobalConstants::ResourceType Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        Constant::ResourceType Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         CostCategory Category;                      // uses "costCat" constants above
         Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
@@ -400,7 +400,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         CashFlowType()
-            : SourceKind(SourceKindType::Invalid), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Invalid),
+            : SourceKind(SourceKindType::Invalid), Resource(Constant::ResourceType::None), Category(CostCategory::Invalid),
               pvKind(PrValKind::Invalid), presentValue(0.), orginalCost(0.)
         {
         }
@@ -501,7 +501,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
 
     // present value factors
     Array1D<Real64> SPV;
-    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> energySPV; // yearly equivalent to FEMP UPV* values
+    std::map<int, std::map<Constant::ResourceType, Real64>> energySPV; // yearly equivalent to FEMP UPV* values
 
     // arrays related to computing after tax cashflow and present value
     Array1D<Real64> DepreciatedCapital;
@@ -512,7 +512,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
 
     // arrays related to escalated energy costs
     Array1D<Real64> EscalatedTotEnergy;
-    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
+    std::map<int, std::map<Constant::ResourceType, Real64>> EscalatedEnergy;
 
     std::vector<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
     std::vector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;

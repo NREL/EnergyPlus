@@ -261,7 +261,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                 ShowContinueError(state, "Negative values will be treated as zero, and the simulation continues.");
             }
         } else {
-            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum = Constant::ScheduleAlwaysOn;
         }
     }
 
@@ -342,12 +342,12 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
     if (PltSizNum > 0) {
         Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                              state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                             DataGlobalConstants::InitConvTemp,
+                                                             Constant::InitConvTemp,
                                                              state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                              "SizeDistrict" + typeName);
         Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                 DataGlobalConstants::InitConvTemp,
+                                                                 Constant::InitConvTemp,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                  "SizeDistrict" + typeName);
         Real64 const NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
@@ -451,7 +451,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     int const OutletNode = this->OutletNodeNum;
     state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
     this->EnergyRate = std::abs(MyLoad);
-    this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 }
 
 void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)

@@ -826,7 +826,7 @@ namespace AirLoopHVACDOAS {
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
-                                                            DataGlobalConstants::HWInitConvTemp,
+                                                            Constant::HWInitConvTemp,
                                                             state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
@@ -840,7 +840,7 @@ namespace AirLoopHVACDOAS {
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                            DataGlobalConstants::CWInitConvTemp,
+                                                            Constant::CWInitConvTemp,
                                                             state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
@@ -855,7 +855,7 @@ namespace AirLoopHVACDOAS {
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                            DataGlobalConstants::CWInitConvTemp,
+                                                            Constant::CWInitConvTemp,
                                                             state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
@@ -955,12 +955,12 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::GetDesignDayConditions(EnergyPlusData &state)
     {
         for (auto &env : state.dataWeatherManager->Environment) {
-            if (env.KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay && env.KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodDesign)
+            if (env.KindOfEnvrn != Constant::KindOfSim::DesignDay && env.KindOfEnvrn != Constant::KindOfSim::RunPeriodDesign)
                 continue;
             if (env.maxCoolingOATSizing > this->SizingCoolOATemp) {
                 this->SizingCoolOATemp = env.maxCoolingOATSizing;
                 // DesignDayNum = 0 for KindOfSim == RunPeriodDesign
-                if (env.KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay &&
+                if (env.KindOfEnvrn == Constant::KindOfSim::DesignDay &&
                     state.dataWeatherManager->DesDayInput(env.DesignDayNum).PressureEntered) {
                     this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(
                         state, env.maxCoolingOADPSizing, state.dataWeatherManager->DesDayInput(env.DesignDayNum).PressBarom);
@@ -970,7 +970,7 @@ namespace AirLoopHVACDOAS {
             }
             if (env.minHeatingOATSizing < this->HeatOutTemp) {
                 this->HeatOutTemp = env.minHeatingOATSizing;
-                if (env.KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay &&
+                if (env.KindOfEnvrn == Constant::KindOfSim::DesignDay &&
                     state.dataWeatherManager->DesDayInput(env.DesignDayNum).PressureEntered) {
                     this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(
                         state, env.minHeatingOADPSizing, state.dataWeatherManager->DesDayInput(env.DesignDayNum).PressBarom);

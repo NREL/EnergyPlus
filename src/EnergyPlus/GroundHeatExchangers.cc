@@ -210,7 +210,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     this->numCoils = static_cast<int>(this->trenchLength / this->coilPitch);
 
     // Total tube length
-    this->totalTubeLength = DataGlobalConstants::Pi * this->coilDiameter * this->trenchLength * this->numTrenches / this->coilPitch;
+    this->totalTubeLength = Constant::Pi * this->coilDiameter * this->trenchLength * this->numTrenches / this->coilPitch;
 
     // Get g function data
     this->SubAGG = 15;
@@ -1047,7 +1047,7 @@ void GLHEVert::setupTimeVectors()
     while (true) {
         Real64 maxPossibleSimTime = exp(tempLNTTS.back()) * t_s;
         if (maxPossibleSimTime <
-            this->myRespFactors->maxSimYears * numDaysInYear * DataGlobalConstants::HoursInDay * DataGlobalConstants::SecInHour) {
+            this->myRespFactors->maxSimYears * numDaysInYear * Constant::HoursInDay * Constant::SecInHour) {
             tempLNTTS.push_back(tempLNTTS.back() + lnttsStepSize);
         } else {
             break;
@@ -1207,7 +1207,7 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
         thisCell.radius_inner = radius_conv + i * thisCell.thickness;
         thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
         thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-        thisCell.conductivity = log(radius_pipe_in / radius_conv) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_convection);
+        thisCell.conductivity = log(radius_pipe_in / radius_conv) / (2 * Constant::Pi * bh_equivalent_resistance_convection);
         thisCell.rhoCp = 1;
         Cells.push_back(thisCell);
     }
@@ -1220,7 +1220,7 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
         thisCell.radius_inner = radius_pipe_in + i * thisCell.thickness;
         thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
         thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-        thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_tube_grout);
+        thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * Constant::Pi * bh_equivalent_resistance_tube_grout);
         thisCell.rhoCp = this->pipe.rhoCp;
         Cells.push_back(thisCell);
     }
@@ -1233,7 +1233,7 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
         thisCell.radius_inner = radius_pipe_out + i * thisCell.thickness;
         thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
         thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-        thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_tube_grout);
+        thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * Constant::Pi * bh_equivalent_resistance_tube_grout);
         thisCell.rhoCp = grout.rhoCp;
         Cells.push_back(thisCell);
     }
@@ -1253,7 +1253,7 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
     // other non-geometric specific setup
     for (auto &thisCell : Cells) {
-        thisCell.vol = DataGlobalConstants::Pi * (pow_2(thisCell.radius_outer) - pow_2(thisCell.radius_inner));
+        thisCell.vol = Constant::Pi * (pow_2(thisCell.radius_outer) - pow_2(thisCell.radius_inner));
         thisCell.temperature = initial_temperature;
     }
 
@@ -1288,8 +1288,8 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
                 auto &thisCell = Cells[cell_index];
                 auto &eastCell = Cells[cell_index + 1];
 
-                Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
-                Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi * eastCell.conductivity);
+                Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * Constant::Pi * thisCell.conductivity);
+                Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * Constant::Pi * eastCell.conductivity);
                 Real64 AE = 1 / (FE1 + FE2);
 
                 Real64 AD = thisCell.rhoCp * thisCell.vol / time_step;
@@ -1316,12 +1316,12 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
                 auto &thisCell = Cells[cell_index];
                 auto &eastCell = Cells[cell_index + 1];
 
-                Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
-                Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi * eastCell.conductivity);
+                Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * Constant::Pi * thisCell.conductivity);
+                Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * Constant::Pi * eastCell.conductivity);
                 Real64 AE = 1 / (FE1 + FE2);
 
-                Real64 FW1 = log(westCell.radius_outer / westCell.radius_center) / (2 * DataGlobalConstants::Pi * westCell.conductivity);
-                Real64 FW2 = log(thisCell.radius_center / thisCell.radius_inner) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
+                Real64 FW1 = log(westCell.radius_outer / westCell.radius_center) / (2 * Constant::Pi * westCell.conductivity);
+                Real64 FW2 = log(thisCell.radius_center / thisCell.radius_inner) / (2 * Constant::Pi * thisCell.conductivity);
                 Real64 AW = -1 / (FW1 + FW2);
 
                 Real64 AD = thisCell.rhoCp * thisCell.vol / time_step;
@@ -1348,9 +1348,9 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
             if (leftCell.type == CellType::GROUT && rightCell.type == CellType::SOIL) {
 
-                Real64 left_conductance = 2 * DataGlobalConstants::Pi * leftCell.conductivity / log(leftCell.radius_outer / leftCell.radius_inner);
+                Real64 left_conductance = 2 * Constant::Pi * leftCell.conductivity / log(leftCell.radius_outer / leftCell.radius_inner);
                 Real64 right_conductance =
-                    2 * DataGlobalConstants::Pi * rightCell.conductivity / log(rightCell.radius_center / leftCell.radius_inner);
+                    2 * Constant::Pi * rightCell.conductivity / log(rightCell.radius_center / leftCell.radius_inner);
 
                 T_bhWall =
                     (left_conductance * leftCell.temperature + right_conductance * rightCell.temperature) / (left_conductance + right_conductance);
@@ -1360,7 +1360,7 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
         total_time += time_step;
 
-        GFNC_shortTimestep.push_back(2 * DataGlobalConstants::Pi * this->soil.k *
+        GFNC_shortTimestep.push_back(2 * Constant::Pi * this->soil.k *
                                      ((Cells[0].temperature - initial_temperature) / heat_flux - bhResistance));
         LNTTS_shortTimestep.push_back(log(total_time / t_s));
 
@@ -1694,7 +1694,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
         }             // m1
 
         this->myRespFactors->GFNC(NT) =
-            (gFunc * (this->coilDiameter / 2.0)) / (4 * DataGlobalConstants::Pi * fraction * this->numTrenches * this->numCoils);
+            (gFunc * (this->coilDiameter / 2.0)) / (4 * Constant::Pi * fraction * this->numTrenches * this->numCoils);
         this->myRespFactors->LNTTS(NT) = tLg;
 
     } // NT time
@@ -1770,7 +1770,7 @@ Real64 GLHESlinky::midFieldResponseFunction(int const m, int const n, int const 
     Real64 errFunc1 = std::erfc(0.5 * distance / sqrtAlphaT);
     Real64 errFunc2 = std::erfc(0.5 * sqrtDistDepth / sqrtAlphaT);
 
-    return 4 * pow_2(DataGlobalConstants::Pi) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
+    return 4 * pow_2(Constant::Pi) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
 }
 
 //******************************************************************************
@@ -1907,7 +1907,7 @@ Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1
     Real64 sumIntF(0.0);
     Real64 theta(0.0);
     constexpr Real64 theta1(0.0);
-    constexpr Real64 theta2(2 * DataGlobalConstants::Pi);
+    constexpr Real64 theta2(2 * Constant::Pi);
     Array1D<Real64> f(J0, 0.0);
 
     Real64 h = (theta2 - theta1) / (J0 - 1);
@@ -1952,7 +1952,7 @@ Real64 GLHESlinky::doubleIntegral(int const m, int const n, int const m1, int co
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     constexpr Real64 eta1(0.0);
-    constexpr Real64 eta2(2 * DataGlobalConstants::Pi);
+    constexpr Real64 eta2(2 * Constant::Pi);
 
     Real64 sumIntF(0.0);
     Array1D<Real64> g(I0, 0.0);
@@ -1994,7 +1994,7 @@ void GLHEVert::getAnnualTimeConstant()
 
     constexpr Real64 hrInYear(8760);
 
-    this->timeSS = (pow_2(this->bhLength) / (9.0 * this->soil.diffusivity)) / DataGlobalConstants::SecInHour / hrInYear;
+    this->timeSS = (pow_2(this->bhLength) / (9.0 * this->soil.diffusivity)) / Constant::SecInHour / hrInYear;
     this->timeSSFactor = this->timeSS * 8760.0;
 }
 
@@ -2077,7 +2077,7 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                            RoutineName);
 
-    Real64 kGroundFactor = 2.0 * DataGlobalConstants::Pi * this->soil.k;
+    Real64 kGroundFactor = 2.0 * Constant::Pi * this->soil.k;
 
     // Get time constants
     getAnnualTimeConstant();
@@ -2099,7 +2099,7 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
                                                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
                                                     state.dataHVACGlobal->SysTimeElapsed; //+ TimeStepsys
     state.dataGroundHeatExchanger->locHourOfDay =
-        static_cast<int>(mod(state.dataGroundHeatExchanger->currentSimTime, DataGlobalConstants::HoursInDay) + 1);
+        static_cast<int>(mod(state.dataGroundHeatExchanger->currentSimTime, Constant::HoursInDay) + 1);
     state.dataGroundHeatExchanger->locDayOfSim = static_cast<int>(state.dataGroundHeatExchanger->currentSimTime / 24 + 1);
 
     if (state.dataGlobal->DayOfSim > 1) {
@@ -2425,11 +2425,11 @@ void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
     }
 
     // CHECK IF A MONTH PASSES...
-    if (mod(((state.dataGroundHeatExchanger->locDayOfSim - 1) * DataGlobalConstants::HoursInDay + (state.dataGroundHeatExchanger->locHourOfDay)),
+    if (mod(((state.dataGroundHeatExchanger->locDayOfSim - 1) * Constant::HoursInDay + (state.dataGroundHeatExchanger->locHourOfDay)),
             hrsPerMonth) == 0 &&
         this->prevHour != state.dataGroundHeatExchanger->locHourOfDay) {
         Real64 MonthNum = static_cast<int>(
-            (state.dataGroundHeatExchanger->locDayOfSim * DataGlobalConstants::HoursInDay + state.dataGroundHeatExchanger->locHourOfDay) /
+            (state.dataGroundHeatExchanger->locDayOfSim * Constant::HoursInDay + state.dataGroundHeatExchanger->locHourOfDay) /
             hrsPerMonth);
         Real64 SumQnMonth = 0.0;
         for (int J = 1; J <= int(hrsPerMonth); ++J) {
@@ -2664,7 +2664,7 @@ Real64 GLHEVert::calcBHAverageResistance(EnergyPlusData &state)
 
     // Equation 13
 
-    Real64 const beta = 2 * DataGlobalConstants::Pi * this->grout.k * calcPipeResistance(state);
+    Real64 const beta = 2 * Constant::Pi * this->grout.k * calcPipeResistance(state);
 
     Real64 const final_term_1 = log(this->theta_2 / (2 * this->theta_1 * pow(1 - pow_4(this->theta_1), this->sigma)));
     Real64 const num_final_term_2 = pow_2(this->theta_3) * pow_2(1 - (4 * this->sigma * pow_4(this->theta_1)) / (1 - pow_4(this->theta_1)));
@@ -2673,7 +2673,7 @@ Real64 GLHEVert::calcBHAverageResistance(EnergyPlusData &state)
     Real64 const den_final_term_2 = den_final_term_2_pt_1 + den_final_term_2_pt_2;
     Real64 const final_term_2 = num_final_term_2 / den_final_term_2;
 
-    return (1 / (4 * DataGlobalConstants::Pi * this->grout.k)) * (beta + final_term_1 - final_term_2);
+    return (1 / (4 * Constant::Pi * this->grout.k)) * (beta + final_term_1 - final_term_2);
 }
 
 //******************************************************************************
@@ -2687,7 +2687,7 @@ Real64 GLHEVert::calcBHTotalInternalResistance(EnergyPlusData &state)
 
     // Equation 26
 
-    Real64 beta = 2 * DataGlobalConstants::Pi * this->grout.k * calcPipeResistance(state);
+    Real64 beta = 2 * Constant::Pi * this->grout.k * calcPipeResistance(state);
 
     Real64 final_term_1 = log(pow(1 + pow_2(this->theta_1), this->sigma) / (this->theta_3 * pow(1 - pow_2(this->theta_1), this->sigma)));
     Real64 num_term_2 = pow_2(this->theta_3) * pow_2(1 - pow_4(this->theta_1) + 4 * this->sigma * pow_2(this->theta_1));
@@ -2697,7 +2697,7 @@ Real64 GLHEVert::calcBHTotalInternalResistance(EnergyPlusData &state)
     Real64 den_term_2 = den_term_2_pt_1 - den_term_2_pt_2 + den_term_2_pt_3;
     Real64 final_term_2 = num_term_2 / den_term_2;
 
-    return (1 / (DataGlobalConstants::Pi * this->grout.k)) * (beta + final_term_1 - final_term_2);
+    return (1 / (Constant::Pi * this->grout.k)) * (beta + final_term_1 - final_term_2);
 }
 
 //******************************************************************************
@@ -2751,7 +2751,7 @@ Real64 GLHEVert::calcPipeConductionResistance()
     // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
     // for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy. 187:790-806.
 
-    return log(this->pipe.outDia / this->pipe.innerDia) / (2 * DataGlobalConstants::Pi * this->pipe.k);
+    return log(this->pipe.outDia / this->pipe.innerDia) / (2 * Constant::Pi * this->pipe.k);
 }
 
 //******************************************************************************
@@ -2794,7 +2794,7 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     constexpr Real64 upper_limit = 4000;
 
     Real64 const bhMassFlowRate = this->massFlowRate / this->myRespFactors->numBoreholes;
-    Real64 const reynoldsNum = 4 * bhMassFlowRate / (fluidViscosity * DataGlobalConstants::Pi * this->pipe.innerDia);
+    Real64 const reynoldsNum = 4 * bhMassFlowRate / (fluidViscosity * Constant::Pi * this->pipe.innerDia);
 
     Real64 nusseltNum = 0.0;
     if (reynoldsNum < lower_limit) {
@@ -2814,7 +2814,7 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
 
     Real64 h = nusseltNum * kFluid / this->pipe.innerDia;
 
-    return 1 / (h * DataGlobalConstants::Pi * this->pipe.innerDia);
+    return 1 / (h * Constant::Pi * this->pipe.innerDia);
 }
 
 //******************************************************************************
@@ -2920,7 +2920,7 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
     } else {
         // Re=Rho*V*D/Mu
         Real64 reynoldsNum = fluidDensity * pipeInnerDia *
-                             (singleSlinkyMassFlowRate / fluidDensity / (DataGlobalConstants::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
+                             (singleSlinkyMassFlowRate / fluidDensity / (Constant::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
         Real64 prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
         //   Convection Resistance
         if (reynoldsNum <= 2300) {
@@ -2933,11 +2933,11 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
             nusseltNum = 0.023 * std::pow(reynoldsNum, 0.8) * std::pow(prandtlNum, 0.35);
         }
         Real64 hci = nusseltNum * kFluid / pipeInnerDia;
-        Rconv = 1.0 / (2.0 * DataGlobalConstants::Pi * pipeInnerDia * hci);
+        Rconv = 1.0 / (2.0 * Constant::Pi * pipeInnerDia * hci);
     }
 
     //   Conduction Resistance
-    Real64 Rcond = std::log(this->pipe.outRadius / pipeInnerRad) / (2.0 * DataGlobalConstants::Pi * this->pipe.k) / 2.0; // pipe in parallel so /2
+    Real64 Rcond = std::log(this->pipe.outRadius / pipeInnerRad) / (2.0 * Constant::Pi * this->pipe.k) / 2.0; // pipe in parallel so /2
 
     return Rcond + Rconv;
 }
@@ -3041,7 +3041,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                        (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
-                      DataGlobalConstants::SecInHour;
+                      Constant::SecInHour;
 
     // Init more variables
 
@@ -3141,7 +3141,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 
     Real64 CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                       (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
-                     DataGlobalConstants::SecInHour;
+                     Constant::SecInHour;
 
     // Init more variables
 

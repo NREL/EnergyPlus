@@ -783,7 +783,7 @@ void GetPumpInput(EnergyPlusData &state)
         } else {
             // Calc Condensate Pump Water Volume Flow Rate
             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineNameNoColon);
-            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
+            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, DummyWaterIndex, RoutineName);
             thisPump.NomVolFlowRate = (thisPump.NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
         }
 
@@ -1506,7 +1506,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     if (thisPump.PumpInitFlag && state.dataGlobal->BeginEnvrnFlag) {
         if (thisPump.pumpType == PumpType::Cond) {
 
-            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
+            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, DummyWaterIndex, RoutineName);
             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineName);
             thisPump.NomVolFlowRate = (thisPump.NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
 
@@ -1527,7 +1527,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
         } else {
             auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
             TempWaterDensity =
-                GetDensityGlycol(state, thisPumpPlant.FluidName, DataGlobalConstants::InitConvTemp, thisPumpPlant.FluidIndex, RoutineName);
+                GetDensityGlycol(state, thisPumpPlant.FluidName, Constant::InitConvTemp, thisPumpPlant.FluidIndex, RoutineName);
             mdotMax = thisPump.NomVolFlowRate * TempWaterDensity;
             // mdotMin = PumpEquip(PumpNum)%MinVolFlowRate * TempWaterDensity
             // see note above
@@ -2047,9 +2047,9 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     // Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
     if (thisPump.plantLoc.loopNum > 0) {
         auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
-        TempWaterDensity = GetDensityGlycol(state, thisPumpPlant.FluidName, DataGlobalConstants::InitConvTemp, thisPumpPlant.FluidIndex, RoutineName);
+        TempWaterDensity = GetDensityGlycol(state, thisPumpPlant.FluidName, Constant::InitConvTemp, thisPumpPlant.FluidIndex, RoutineName);
     } else {
-        TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
+        TempWaterDensity = GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, DummyWaterIndex, RoutineName);
     }
 
     PlantSizNum = 0;
@@ -2095,7 +2095,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
                 if (!thisPumpPlant.LoopSide(thisPump.plantLoc.loopSideNum).BranchPumpsExist) {
                     // size pump to full flow of plant loop
                     if (thisPump.pumpType == PumpType::Cond) {
-                        TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
+                        TempWaterDensity = GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, DummyWaterIndex, RoutineName);
                         SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineNameSizePumps);
                         thisPump.NomSteamVolFlowRate = thisPlantSize.DesVolFlowRate * PumpSizFac;
                         thisPump.NomVolFlowRate = thisPump.NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -2106,7 +2106,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
                     // Distribute sizes evenly across all branch pumps
                     DesVolFlowRatePerBranch = thisPlantSize.DesVolFlowRate / thisPumpPlant.LoopSide(thisPump.plantLoc.loopSideNum).TotalPumps;
                     if (thisPump.pumpType == PumpType::Cond) {
-                        TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
+                        TempWaterDensity = GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, DummyWaterIndex, RoutineName);
                         SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineNameSizePumps);
                         thisPump.NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
                         thisPump.NomVolFlowRate = thisPump.NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -2241,9 +2241,9 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
         thisPumpRep.PumpHeattoFluid = daPumps->PumpHeattoFluid;
         thisPumpRep.OutletTemp = thisOutNode.Temp;
         thisPump.Power = daPumps->Power;
-        thisPump.Energy = thisPump.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        thisPump.Energy = thisPump.Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         thisPumpRep.ShaftPower = daPumps->ShaftPower;
-        thisPumpRep.PumpHeattoFluidEnergy = daPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        thisPumpRep.PumpHeattoFluidEnergy = daPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         switch (PumpType) {
         case PumpType::ConSpeed:
         case PumpType::VarSpeed:
@@ -2260,7 +2260,7 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
             break;
         }
         thisPumpRep.ZoneTotalGainRate = daPumps->Power - daPumps->PumpHeattoFluid;
-        thisPumpRep.ZoneTotalGainEnergy = thisPumpRep.ZoneTotalGainRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        thisPumpRep.ZoneTotalGainEnergy = thisPumpRep.ZoneTotalGainRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         thisPumpRep.ZoneConvGainRate = (1 - thisPump.SkinLossRadFraction) * thisPumpRep.ZoneTotalGainRate;
         thisPumpRep.ZoneRadGainRate = thisPump.SkinLossRadFraction * thisPumpRep.ZoneTotalGainRate;
     }

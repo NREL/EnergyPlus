@@ -246,7 +246,7 @@ namespace HVACVariableRefrigerantFlow {
         int CoolingMaxTempLimitIndex = 0;                   // Warning message recurring error index
         int HeatingMaxTempLimitIndex = 0;                   // Warning message recurring error index
         std::string FuelType;                               // Fuel type
-        DataGlobalConstants::ResourceType FuelTypeNum;      // Fuel type number
+        Constant::ResourceType FuelTypeNum;      // Fuel type number
         Real64 SUMultiplier;                                // exponential timer for mode changes
         Real64 TUCoolingLoad;                               // total TU cooling load for each VRF system
         Real64 TUHeatingLoad;                               // total TU heating load for each VRF system
@@ -397,7 +397,7 @@ namespace HVACVariableRefrigerantFlow {
               CoolCombRatioPTR(0), HeatCombRatioPTR(0), OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0),
               CoolElecConsumption(0.0), HeatElecConsumption(0.0), CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0),
               EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0),
-              FuelTypeNum(DataGlobalConstants::ResourceType::None), SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false),
+              FuelTypeNum(Constant::ResourceType::None), SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false),
               OperatingCOP(0.0), MinOATHeatRecovery(0.0), MaxOATHeatRecovery(0.0), HRCAPFTCool(0), HRCAPFTCoolConst(0.9), HRInitialCoolCapFrac(0.5),
               HRCoolCapTC(0.15), HREIRFTCool(0), HREIRFTCoolConst(1.1), HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0),
               HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0), HRHeatCapTC(0.0), HREIRFTHeat(0), HREIRFTHeatConst(1.1), HRInitialHeatEIRFrac(1.0),

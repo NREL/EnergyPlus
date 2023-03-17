@@ -389,7 +389,7 @@ namespace ExhaustAirSystemManager {
 
             thisExhSys.centralFan_Power = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->fanPower();
 
-            thisExhSys.centralFan_Energy = thisExhSys.centralFan_Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisExhSys.centralFan_Energy = thisExhSys.centralFan_Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         } else if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             Fans::SimulateFanComponents(state, thisExhSys.CentralFanName, FirstHVACIteration,
@@ -489,12 +489,12 @@ namespace ExhaustAirSystemManager {
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
                 if (availSchName == "") {
                     // blank
-                    thisExhCtrl.AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisExhCtrl.AvailScheduleNum = Constant::ScheduleAlwaysOn;
                 } else {
                     thisExhCtrl.AvailScheduleNum = ScheduleManager::GetScheduleIndex(state, availSchName);
                     if (thisExhCtrl.AvailScheduleNum == 0) {
                         // mismatch, reset to always on
-                        thisExhCtrl.AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+                        thisExhCtrl.AvailScheduleNum = Constant::ScheduleAlwaysOn;
                         ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
                         ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
                         ShowContinueError(state, "Availability Schedule is reset to Always ON.");

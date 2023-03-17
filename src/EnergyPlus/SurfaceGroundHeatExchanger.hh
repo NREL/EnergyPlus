@@ -107,23 +107,23 @@ namespace SurfaceGroundHeatExchanger {
         // conventional CTF terms
         int NumCTFTerms; // number of terms for surface
         // could be allocated rather than hard dimensioning.
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFin{};    // surf flux in ctf - X
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFout{};   // surf flux in ctf - Z
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFcross{}; // surf flux in ctf - Y
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFflux{};  // surf flux in ctf - F
+        std::array<Real64, Constant::MaxCTFTerms> CTFin{};    // surf flux in ctf - X
+        std::array<Real64, Constant::MaxCTFTerms> CTFout{};   // surf flux in ctf - Z
+        std::array<Real64, Constant::MaxCTFTerms> CTFcross{}; // surf flux in ctf - Y
+        std::array<Real64, Constant::MaxCTFTerms> CTFflux{};  // surf flux in ctf - F
         // QTF coefficients
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFSourceIn{};   // surf flux in ctf - Wi
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFSourceOut{};  // surf flux out ctf - Wo
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceOut{}; // surf flux in qtf - x
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceIn{};  // surf flux in qtf - y
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> CTFTSourceQ{};   // surf flux in qtf - f
+        std::array<Real64, Constant::MaxCTFTerms> CTFSourceIn{};   // surf flux in ctf - Wi
+        std::array<Real64, Constant::MaxCTFTerms> CTFSourceOut{};  // surf flux out ctf - Wo
+        std::array<Real64, Constant::MaxCTFTerms> CTFTSourceOut{}; // surf flux in qtf - x
+        std::array<Real64, Constant::MaxCTFTerms> CTFTSourceIn{};  // surf flux in qtf - y
+        std::array<Real64, Constant::MaxCTFTerms> CTFTSourceQ{};   // surf flux in qtf - f
         // History data
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TbtmHistory{};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TtopHistory{};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> TsrcHistory{};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QbtmHistory{};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QtopHistory{};
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> QsrcHistory{};
+        std::array<Real64, Constant::MaxCTFTerms> TbtmHistory{};
+        std::array<Real64, Constant::MaxCTFTerms> TtopHistory{};
+        std::array<Real64, Constant::MaxCTFTerms> TsrcHistory{};
+        std::array<Real64, Constant::MaxCTFTerms> QbtmHistory{};
+        std::array<Real64, Constant::MaxCTFTerms> QtopHistory{};
+        std::array<Real64, Constant::MaxCTFTerms> QsrcHistory{};
         Real64 QSrc;
         Real64 QSrcAvg;
         Real64 LastQSrc;
@@ -259,10 +259,10 @@ namespace SurfaceGroundHeatExchanger {
 
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
-    inline std::array<Real64, DataGlobalConstants::MaxCTFTerms>
-    eoshiftArray(std::array<Real64, DataGlobalConstants::MaxCTFTerms> const &a, int const shift, Real64 const initialValue)
+    inline std::array<Real64, Constant::MaxCTFTerms>
+    eoshiftArray(std::array<Real64, Constant::MaxCTFTerms> const &a, int const shift, Real64 const initialValue)
     {
-        std::array<Real64, DataGlobalConstants::MaxCTFTerms> o = {initialValue};
+        std::array<Real64, Constant::MaxCTFTerms> o = {initialValue};
         int const b(0 + std::max(shift, 0)), e(a.size() - 1 + std::min(shift, 0));
         for (int i = b, j = std::max(0 - shift, 0); i <= e; ++i, ++j) {
             o[j] = a[i];

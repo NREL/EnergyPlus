@@ -320,7 +320,7 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).UnitType_Num = FanCoilUnit_4Pipe;
             FanCoil(FanCoilNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                FanCoil(FanCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                FanCoil(FanCoilNum).SchedPtr = Constant::ScheduleAlwaysOn;
             } else {
                 FanCoil(FanCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (FanCoil(FanCoilNum).SchedPtr == 0) {
@@ -1252,7 +1252,7 @@ namespace FanCoilUnits {
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                 rho = GetDensityGlycol(state,
                                        state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidName,
-                                       DataGlobalConstants::HWInitConvTemp,
+                                       Constant::HWInitConvTemp,
                                        state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidIndex,
                                        RoutineName);
                 FanCoil(FanCoilNum).MaxHeatCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxHotWaterVolFlow;
@@ -1261,7 +1261,7 @@ namespace FanCoilUnits {
 
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::CWInitConvTemp,
+                                   Constant::CWInitConvTemp,
                                    state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).FluidIndex,
                                    RoutineName);
             FanCoil(FanCoilNum).MaxCoolCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxColdWaterVolFlow;
@@ -1891,12 +1891,12 @@ namespace FanCoilUnits {
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp,
+                                                       Constant::HWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidIndex,
                                                        RoutineNameNoSpace);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp,
+                                                           Constant::HWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidIndex,
                                                            RoutineNameNoSpace);
 
@@ -4687,7 +4687,7 @@ namespace FanCoilUnits {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+        ReportingConstant = TimeStepSys * Constant::SecInHour;
         state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatEnergy = state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatPower * ReportingConstant;
         state.dataFanCoilUnits->FanCoil(FanCoilNum).SensCoolEnergy = state.dataFanCoilUnits->FanCoil(FanCoilNum).SensCoolPower * ReportingConstant;
         state.dataFanCoilUnits->FanCoil(FanCoilNum).TotCoolEnergy = state.dataFanCoilUnits->FanCoil(FanCoilNum).TotCoolPower * ReportingConstant;

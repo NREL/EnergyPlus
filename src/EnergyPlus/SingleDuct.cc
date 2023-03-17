@@ -417,7 +417,7 @@ void GetSysInput(EnergyPlusData &state)
         }
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr == 0) {
@@ -670,7 +670,7 @@ void GetSysInput(EnergyPlusData &state)
                 }
             }
         }
-        if (Numbers(7) == DataGlobalConstants::AutoCalculate) {
+        if (Numbers(7) == Constant::AutoCalculate) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRateDuringReheat = Numbers(7);
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRateDuringReheat =
@@ -838,7 +838,7 @@ void GetSysInput(EnergyPlusData &state)
         }
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr == 0) {
@@ -1144,7 +1144,7 @@ void GetSysInput(EnergyPlusData &state)
         }
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr == 0) {
@@ -1364,7 +1364,7 @@ void GetSysInput(EnergyPlusData &state)
 
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr == 0) {
@@ -1565,7 +1565,7 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName = "";
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr == 0) {
@@ -1832,7 +1832,7 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatName = "";
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr == 0) {
@@ -2162,7 +2162,7 @@ void GetSysInput(EnergyPlusData &state)
 
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr == 0) {
@@ -2627,7 +2627,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
         if (this->HWplantLoc.loopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::HWInitConvTemp,
+                                   Constant::HWInitConvTemp,
                                    state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
                                    RoutineName);
         } else {
@@ -3289,8 +3289,8 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         } else {
             MaxAirVolFractionDuringReheatDes = 0.0;
         }
-        if (this->MaxAirVolFlowRateDuringReheat == DataGlobalConstants::AutoCalculate &&
-            this->MaxAirVolFractionDuringReheat == DataGlobalConstants::AutoCalculate) {
+        if (this->MaxAirVolFlowRateDuringReheat == Constant::AutoCalculate &&
+            this->MaxAirVolFractionDuringReheat == Constant::AutoCalculate) {
             // if both inputs are autosize (the default) report both out and save in the Sys array.
             BaseSizer::reportSizerOutput(
                 state, this->sysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
@@ -3303,8 +3303,8 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
             this->MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
             this->MaxAirVolFractionDuringReheat = MaxAirVolFractionDuringReheatDes;
-        } else if (this->MaxAirVolFlowRateDuringReheat == DataGlobalConstants::AutoCalculate &&
-                   this->MaxAirVolFractionDuringReheat != DataGlobalConstants::AutoCalculate) {
+        } else if (this->MaxAirVolFlowRateDuringReheat == Constant::AutoCalculate &&
+                   this->MaxAirVolFractionDuringReheat != Constant::AutoCalculate) {
             // if max reheat flow fraction was input, set the max reheat flow design value correspondingly, report both out.
             // Check for optional caution message that user input value is not within 10% of the design value.
             MaxAirVolFlowRateDuringReheatDes = this->MaxAirVolFractionDuringReheat * this->MaxAirVolFlowRate;
@@ -3337,8 +3337,8 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                 }
             }
-        } else if (this->MaxAirVolFlowRateDuringReheat != DataGlobalConstants::AutoCalculate &&
-                   this->MaxAirVolFractionDuringReheat == DataGlobalConstants::AutoCalculate) {
+        } else if (this->MaxAirVolFlowRateDuringReheat != Constant::AutoCalculate &&
+                   this->MaxAirVolFractionDuringReheat == Constant::AutoCalculate) {
             // if max reheat flow was input set the design max reheat flow frac to the corresponding value, report both out, save the design value
             // of the flow frac in Sys. Check for optional caution message that user input value is not within 10% of the design value.
             if (this->MaxAirVolFlowRate > 0.0) {
@@ -3584,13 +3584,13 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
 
                             rho = GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp,
+                                                   Constant::HWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
                                                    RoutineName);
 
                             Cp = GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp,
+                                                       Constant::HWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 

@@ -90,12 +90,12 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                             this->dataWaterCoilSizCoolDeltaT > 0.0) {
                             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                                state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                               DataGlobalConstants::CWInitConvTemp,
+                                                                               Constant::CWInitConvTemp,
                                                                                state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                                this->callingRoutine);
                             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                            state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                           DataGlobalConstants::CWInitConvTemp,
+                                                                           Constant::CWInitConvTemp,
                                                                            state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                            this->callingRoutine);
                             this->autoSizedValue = DesCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
@@ -122,12 +122,12 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                     if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)state.dataPlnt->PlantLoop.size() && CoilDesWaterDeltaT > 0.0) {
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                            state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                           DataGlobalConstants::CWInitConvTemp,
+                                                                           Constant::CWInitConvTemp,
                                                                            state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                            this->callingRoutine);
                         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                       DataGlobalConstants::CWInitConvTemp,
+                                                                       Constant::CWInitConvTemp,
                                                                        state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                        this->callingRoutine);
                         this->autoSizedValue = this->dataCapacityUsedForSizing / (CoilDesWaterDeltaT * Cp * rho);
@@ -171,9 +171,9 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                 state, this->compName, this->compType, this->dataDesInletWaterTemp + CoilDesWaterDeltaT);
         } else {
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntWaterTemp(
-                state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp);
+                state, this->compName, this->compType, Constant::CWInitConvTemp);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgWaterTemp(
-                state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp + CoilDesWaterDeltaT);
+                state, this->compName, this->compType, Constant::CWInitConvTemp + CoilDesWaterDeltaT);
         }
     }
     return this->autoSizedValue;

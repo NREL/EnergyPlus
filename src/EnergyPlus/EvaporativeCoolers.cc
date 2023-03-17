@@ -279,7 +279,7 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
@@ -378,7 +378,7 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
@@ -509,7 +509,7 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
@@ -631,7 +631,7 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
@@ -833,7 +833,7 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
@@ -3487,7 +3487,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             auto &thisZoneEvapUnit = ZoneEvapUnit(UnitLoop);
             thisZoneEvapUnit.Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                thisZoneEvapUnit.AvailSchedIndex = DataGlobalConstants::ScheduleAlwaysOn;
+                thisZoneEvapUnit.AvailSchedIndex = Constant::ScheduleAlwaysOn;
             } else {
                 thisZoneEvapUnit.AvailSchedIndex =
                     ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)

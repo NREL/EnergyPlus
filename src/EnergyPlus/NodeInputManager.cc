@@ -1012,7 +1012,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
 
     if (state.dataNodeInputMgr->CalcMoreNodeInfoMyOneTimeFlag) {
         RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-        RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp);
+        RhoWaterStdInit = RhoH2O(Constant::InitConvTemp);
         state.dataNodeInputMgr->NodeWetBulbRepReq.allocate(state.dataLoopNodes->NumOfNodes);
         NodeWetBulbSchedPtr.allocate(state.dataLoopNodes->NumOfNodes);
         NodeRelHumidityRepReq.allocate(state.dataLoopNodes->NumOfNodes);
@@ -1158,7 +1158,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
                                            nodeReportingStrings[iNode - 1]);
                 rhoStd = GetDensityGlycol(state,
                                           nodeFluidNames[iNode - 1],
-                                          DataGlobalConstants::InitConvTemp,
+                                          Constant::InitConvTemp,
                                           state.dataLoopNodes->Node(iNode).FluidIndex,
                                           nodeReportingStrings[iNode - 1]);
                 rho = GetDensityGlycol(state,

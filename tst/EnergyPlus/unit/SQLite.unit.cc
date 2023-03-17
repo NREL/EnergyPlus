@@ -120,13 +120,13 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        1, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay);
+        1, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay);
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
+        2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        3, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::RunPeriodDesign);
+        3, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::RunPeriodDesign);
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::RunPeriodWeather, 1);
+        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::RunPeriodWeather, 1);
     auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -143,10 +143,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // This should fail to insert due to foreign key constraint
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        5, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay, 100);
+        5, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay, 100);
     // This should fail to insert due to duplicate primary key
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
+        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
     result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 

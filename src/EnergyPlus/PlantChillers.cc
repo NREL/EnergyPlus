@@ -280,7 +280,7 @@ namespace PlantChillers {
                 // for transition purposes, add this node if not there.
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                        Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
@@ -288,7 +288,7 @@ namespace PlantChillers {
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                        Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -868,7 +868,7 @@ namespace PlantChillers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
@@ -882,7 +882,7 @@ namespace PlantChillers {
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
@@ -909,7 +909,7 @@ namespace PlantChillers {
             if (this->HeatRecActive) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp,
+                                                        Constant::HWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -1044,12 +1044,12 @@ namespace PlantChillers {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap =
@@ -1788,9 +1788,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         // check for problems (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -1914,7 +1914,7 @@ namespace PlantChillers {
         }
 
         this->QHeatRecovery = this->QHeatRecovered;
-        this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         this->HeatRecMdot = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
         this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
@@ -1926,7 +1926,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -2238,7 +2238,7 @@ namespace PlantChillers {
                 //  since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                        Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
@@ -2246,7 +2246,7 @@ namespace PlantChillers {
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                        Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -2889,7 +2889,7 @@ namespace PlantChillers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
@@ -2904,7 +2904,7 @@ namespace PlantChillers {
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
@@ -2930,7 +2930,7 @@ namespace PlantChillers {
             if (this->HeatRecActive) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp,
+                                                        Constant::HWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -3023,12 +3023,12 @@ namespace PlantChillers {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap =
@@ -3838,14 +3838,14 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         this->FuelEnergyUseRate = EngineDrivenFuelEnergy;
-        this->FuelEnergy = this->FuelEnergyUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->JacketEnergyRec = this->QJacketRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->LubeOilEnergyRec = this->QLubeOilRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ExhaustEnergyRec = this->QExhaustRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->FuelEnergy = this->FuelEnergyUseRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->JacketEnergyRec = this->QJacketRecovered * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->LubeOilEnergyRec = this->QLubeOilRecovered * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->ExhaustEnergyRec = this->QExhaustRecovered * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         this->QTotalHeatRecovered = this->QExhaustRecovered + this->QLubeOilRecovered + this->QJacketRecovered;
         this->TotalHeatEnergyRec = this->ExhaustEnergyRec + this->LubeOilEnergyRec + this->JacketEnergyRec;
         this->FuelEnergyUseRate = std::abs(this->FuelEnergyUseRate);
@@ -3950,7 +3950,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running
             // set node temperatures
@@ -4253,7 +4253,7 @@ namespace PlantChillers {
                 // since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                        Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
@@ -4261,7 +4261,7 @@ namespace PlantChillers {
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                        Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -4820,7 +4820,7 @@ namespace PlantChillers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
@@ -4834,7 +4834,7 @@ namespace PlantChillers {
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
@@ -4860,7 +4860,7 @@ namespace PlantChillers {
             if (this->HeatRecActive) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp,
+                                                        Constant::HWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -4953,12 +4953,12 @@ namespace PlantChillers {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap =
@@ -5814,14 +5814,14 @@ namespace PlantChillers {
 
         this->HeatRecOutletTemp = HeatRecOutTemp;
         this->HeatRecMdot = heatRecMdot;
-        this->HeatRecLubeEnergy = this->HeatRecLubeRate * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        this->HeatRecLubeEnergy = this->HeatRecLubeRate * (state.dataHVACGlobal->TimeStepSys * Constant::SecInHour);
         this->FuelEnergyIn = std::abs(fuelEnergyIn);
         this->FuelMassUsedRate = std::abs(fuelEnergyIn) / (this->FuelHeatingValue * KJtoJ);
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -5861,7 +5861,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -5913,8 +5913,8 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
 
             this->FuelEnergyUsedRate = this->FuelEnergyIn;
-            this->FuelEnergyUsed = this->FuelEnergyUsedRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-            this->FuelMassUsed = this->FuelMassUsedRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->FuelEnergyUsed = this->FuelEnergyUsedRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            this->FuelMassUsed = this->FuelMassUsedRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
             if (this->FuelEnergyUsedRate != 0.0) {
                 this->FuelCOP = this->QEvaporator / this->FuelEnergyUsedRate;
             } else {
@@ -6187,7 +6187,7 @@ namespace PlantChillers {
                 //  since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                        Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(4) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(4) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
@@ -6195,7 +6195,7 @@ namespace PlantChillers {
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                        Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -6529,7 +6529,7 @@ namespace PlantChillers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
@@ -6542,7 +6542,7 @@ namespace PlantChillers {
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
@@ -6643,12 +6643,12 @@ namespace PlantChillers {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap =
@@ -7257,9 +7257,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -7290,7 +7290,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
 
-        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             this->Power = 0.0;

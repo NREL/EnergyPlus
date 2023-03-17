@@ -337,7 +337,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
             // since it is not used elsewhere for connection
             if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                 if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                    DataGlobalConstants::MaxNameLength - 25) { // protect against long name leading to > 100 chars
+                    Constant::MaxNameLength - 25) { // protect against long name leading to > 100 chars
                     state.dataIPShortCut->cAlphaArgs(7) = state.dataIPShortCut->cAlphaArgs(1) + " INLET NODE FOR CONDENSER";
                 } else {
                     state.dataIPShortCut->cAlphaArgs(7) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 75) + " INLET NODE FOR CONDENSER";
@@ -345,7 +345,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
             }
             if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                 if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                    DataGlobalConstants::MaxNameLength - 26) { // protect against long name leading to > 100 chars
+                    Constant::MaxNameLength - 26) { // protect against long name leading to > 100 chars
                     state.dataIPShortCut->cAlphaArgs(8) = state.dataIPShortCut->cAlphaArgs(1) + " OUTLET NODE FOR CONDENSER";
                 } else {
                     state.dataIPShortCut->cAlphaArgs(8) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 74) + " OUTLET NODE FOR CONDENSER";
@@ -1184,7 +1184,7 @@ void ElectricEIRChillerSpecs::initEachEnvironment(EnergyPlusData &state)
 
     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::CWInitConvTemp,
+                                                   Constant::CWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
 
@@ -1222,7 +1222,7 @@ void ElectricEIRChillerSpecs::initEachEnvironment(EnergyPlusData &state)
     if (this->HeatRecActive) {
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::CWInitConvTemp,
+                                                Constant::CWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                 RoutineName);
         this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -1441,13 +1441,13 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
         if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
@@ -1504,7 +1504,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2284,7 +2284,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         }
 
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-            Real64 const RhoWater = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+            Real64 const RhoWater = Psychrometrics::RhoH2O(Constant::InitConvTemp);
             // CondMassFlowRate is already multiplied by PLR, convert to water use rate
             this->EvapWaterConsumpRate =
                 ((this->CondOutletHumRat - state.dataLoopNodes->Node(this->CondInletNodeNum).HumRat) * this->CondMassFlowRate) / RhoWater;
@@ -2395,7 +2395,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
     //  Reporting
 
     // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     if (MyLoad >= 0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
         // Set node conditions
@@ -2467,15 +2467,15 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
 
         // Set node flow rates;  for these load based models
         // assume that sufficient evaporator flow rate is available
-        this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
-        this->CondenserFanEnergyConsumption = this->CondenserFanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserFanEnergyConsumption = this->CondenserFanPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         if (this->Power != 0.0) {
             this->ActualCOP = (this->QEvaporator + this->ChillerFalseLoadRate) / this->Power;
         } else {
@@ -2489,7 +2489,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
         if (this->HeatRecActive) {
 
             PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-            this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
             state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
             this->HeatRecInletTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
             this->HeatRecMassFlow = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;

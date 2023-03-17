@@ -623,7 +623,7 @@ Real64 AnnualTable::getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor:
 {
     Real64 secondsInTimeStep;
     if (kindOfTimeStep == OutputProcessor::TimeStepType::Zone) {
-        secondsInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        secondsInTimeStep = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     } else {
         secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
     }

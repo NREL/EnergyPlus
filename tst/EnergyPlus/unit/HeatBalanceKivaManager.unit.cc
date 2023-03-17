@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult1 = kv1.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobalConstants::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + Constant::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 24C/20C
 
@@ -223,7 +223,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult2 = kv2.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobalConstants::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + Constant::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult3 = kv3.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobalConstants::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + Constant::KelvinConv, 0.001);
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 
@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + Constant::KelvinConv, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceKiva_setupKivaInstances_ThermalComfort)
@@ -725,7 +725,7 @@ TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
 
     Real64 TDewK = 264.25;
     Real64 expected_OSky = 5;
-    Real64 expected_ESky = (0.787 + 0.764 * std::log(TDewK / DataGlobalConstants::KelvinConv)) *
+    Real64 expected_ESky = (0.787 + 0.764 * std::log(TDewK / Constant::KelvinConv)) *
                            (1.0 + 0.0224 * expected_OSky - 0.0035 * pow_2(expected_OSky) + 0.00028 * pow_3(expected_OSky));
 
     EXPECT_NEAR(expected_ESky, km.kivaWeather.skyEmissivity[0], 0.01);

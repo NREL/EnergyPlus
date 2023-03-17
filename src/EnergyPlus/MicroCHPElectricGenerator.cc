@@ -374,7 +374,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID = Constant::ScheduleAlwaysOn;
             } else {
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID = ScheduleManager::GetScheduleIndex(state, AlphArray(9));
                 if (state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID == 0) {
@@ -1186,7 +1186,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             Qgenss = ThermEff * Qgross;    // W
         }
 
-        Real64 dt = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 dt = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
         Teng = FuncDetermineEngineTemp(
             TcwOut, this->A42Model.MCeng, this->A42Model.UAhx, this->A42Model.UAskin, thisAmbientTemp, Qgenss, this->A42Model.TengLast, dt);
@@ -1289,7 +1289,7 @@ Real64 FuncDetermineCoolantWaterExitTemp(Real64 const TcwIn,      // hot water i
     Real64 a = (MdotCpcw * TcwIn / MCcw) + (UAHX * Teng / MCcw);
     Real64 b = ((-1.0 * MdotCpcw / MCcw) + (-1.0 * UAHX / MCcw));
 
-    if (b * time < (-1.0 * DataGlobalConstants::MaxEXPArg)) {
+    if (b * time < (-1.0 * Constant::MaxEXPArg)) {
         return -a / b;
     } else {
         return (TcwoutLast + a / b) * std::exp(b * time) - a / b;
@@ -1440,7 +1440,7 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
     static constexpr std::string_view RoutineName("UpdateMicroCHPGeneratorRecords");
 
     this->A42Model.ACPowerGen = this->A42Model.Pnet; // electrical power produced [W]
-    this->A42Model.ACEnergyGen = this->A42Model.Pnet * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // energy produced (J)
+    this->A42Model.ACEnergyGen = this->A42Model.Pnet * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // energy produced (J)
     this->A42Model.QdotHX = this->A42Model.UAhx * (this->A42Model.Teng - this->A42Model.TcwOut);                           //  heat recovered rate (W)
 
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1451,7 +1451,7 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
 
     this->A42Model.QdotHR = this->PlantMassFlowRate * Cp * (this->A42Model.TcwOut - this->A42Model.TcwIn);
     this->A42Model.TotalHeatEnergyRec =
-        this->A42Model.QdotHR * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // heat recovered energy (J)
+        this->A42Model.QdotHR * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // heat recovered energy (J)
 
     this->A42Model.HeatRecInletTemp = this->A42Model.TcwIn;   // Heat Recovery Loop Inlet Temperature (C)
     this->A42Model.HeatRecOutletTemp = this->A42Model.TcwOut; // Heat Recovery Loop Outlet Temperature (C)
@@ -1459,24 +1459,24 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
     this->A42Model.FuelCompressPower = state.dataGenerator->FuelSupply(this->FuelSupplyID).PfuelCompEl;
     // electrical power used by fuel supply compressor [W]
     this->A42Model.FuelCompressEnergy = state.dataGenerator->FuelSupply(this->FuelSupplyID).PfuelCompEl * state.dataHVACGlobal->TimeStepSys *
-                                        DataGlobalConstants::SecInHour; // elect energy
+                                        Constant::SecInHour; // elect energy
     this->A42Model.FuelCompressSkinLoss = state.dataGenerator->FuelSupply(this->FuelSupplyID).QskinLoss;
     // heat rate of losses.by fuel supply compressor [W]
     this->A42Model.FuelEnergyHHV = this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).HHV *
                                    state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec * state.dataHVACGlobal->TimeStepSys *
-                                   DataGlobalConstants::SecInHour;
+                                   Constant::SecInHour;
     // reporting: Fuel Energy used (W)
     this->A42Model.FuelEnergyUseRateHHV = this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).HHV *
                                           state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
     // reporting: Fuel Energy used (J)
     this->A42Model.FuelEnergyLHV = this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000000.0 *
-                                   state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                                   state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     // reporting: Fuel Energy used (W)
     this->A42Model.FuelEnergyUseRateLHV = this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000000.0;
 
     this->A42Model.SkinLossPower = this->A42Model.QdotConvZone + this->A42Model.QdotRadZone;
     this->A42Model.SkinLossEnergy =
-        (this->A42Model.QdotConvZone + this->A42Model.QdotRadZone) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        (this->A42Model.QdotConvZone + this->A42Model.QdotRadZone) * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     this->A42Model.SkinLossConvect = this->A42Model.QdotConvZone;
     this->A42Model.SkinLossRadiat = this->A42Model.QdotRadZone;
 

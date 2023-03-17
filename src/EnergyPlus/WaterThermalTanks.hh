@@ -487,10 +487,10 @@ namespace WaterThermalTanks {
               HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
               WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0),
               ControlSensor2Height(-1.0), ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
-              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              HPWHAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HPWHWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              HPWHWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSAirSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSWaterSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
+              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(Constant::MaxSpeedLevels, 0.0),
+              HPWHAirMassFlowRate(Constant::MaxSpeedLevels, 0.0), HPWHWaterVolFlowRate(Constant::MaxSpeedLevels, 0.0),
+              HPWHWaterMassFlowRate(Constant::MaxSpeedLevels, 0.0), MSAirSpeedRatio(Constant::MaxSpeedLevels, 0.0),
+              MSWaterSpeedRatio(Constant::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
               CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }

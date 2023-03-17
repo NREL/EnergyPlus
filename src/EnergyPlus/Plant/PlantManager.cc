@@ -429,8 +429,8 @@ void GetPlantLoopData(EnergyPlusData &state)
         // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
         // a calculation there.
         this_loop.Volume = Num(5);
-        if (state.dataIPShortCut->lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate;
-        if (this_loop.Volume == DataGlobalConstants::AutoCalculate) {
+        if (state.dataIPShortCut->lNumericFieldBlanks(5)) this_loop.Volume = Constant::AutoCalculate;
+        if (this_loop.Volume == Constant::AutoCalculate) {
             this_loop.VolumeWasAutoSized = true;
         }
         // circulation time used to autocalculate loop volume
@@ -3173,7 +3173,7 @@ void SizePlantLoop(EnergyPlusData &state,
     if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
         FluidDensity = GetDensityGlycol(state,
                                         state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                        DataGlobalConstants::InitConvTemp,
+                                        Constant::InitConvTemp,
                                         state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
                                         RoutineName);
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
@@ -3311,7 +3311,7 @@ void ResizePlantLoopLevelSizes(EnergyPlusData &state, int const LoopNum // Suppl
     if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
         FluidDensity = GetDensityGlycol(state,
                                         state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                        DataGlobalConstants::InitConvTemp,
+                                        Constant::InitConvTemp,
                                         state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
                                         RoutineName);
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {

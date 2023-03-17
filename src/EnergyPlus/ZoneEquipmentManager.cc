@@ -1362,7 +1362,7 @@ void RezeroZoneSizingArrays(EnergyPlusData &state)
     }
 }
 
-void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
+void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallIndicator)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1404,7 +1404,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
     Real64 DeltaTemp;      // supply air delta temperature [deltaC]
 
     switch (CallIndicator) {
-    case DataGlobalConstants::CallIndicator::BeginDay: {
+    case Constant::CallIndicator::BeginDay: {
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
 
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -1432,7 +1432,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             calcZoneSizing.HeatSizingType = "Heating"; // string reported to eio
         }
     } break;
-    case DataGlobalConstants::CallIndicator::DuringDay: {
+    case Constant::CallIndicator::DuringDay: {
         TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
         Real64 FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
@@ -1488,7 +1488,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             }
         }
     } break;
-    case DataGlobalConstants::CallIndicator::EndDay: {
+    case Constant::CallIndicator::EndDay: {
         // average some of the zone sequences to reduce peakiness
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -1935,7 +1935,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             }
         }
     } break;
-    case DataGlobalConstants::CallIndicator::EndZoneSizingCalc: {
+    case Constant::CallIndicator::EndZoneSizingCalc: {
         // candidate EMS calling point to customize CalcFinalZoneSizing
         bool anyEMSRan;
         EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ZoneSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
@@ -5304,14 +5304,14 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                               state.dataZoneEquip->ZoneEquipAvail(zoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) ||
                             !state.afn->AirflowNetworkZoneFlag(zoneNum))
                             state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                                thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                                thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
                     } else if (!state.afn->AirflowNetworkZoneFlag(zoneNum)) {
                         state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                            thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                            thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
                     }
                 } else {
                     state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                        thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                        thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
                 }
             }
             // Intake fans will add some heat to the air, raising the temperature for an intake fan...
@@ -5342,7 +5342,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             Real64 angle = 0.0; // Angle between wind direction and effective angle
             Real64 Qw = 0.0;    // Volumetric flow driven by wind
             Real64 Qst = 0.0;   // Volumetric flow driven by stack effect
-            if (thisVentilation.OpenEff != DataGlobalConstants::AutoCalculate) {
+            if (thisVentilation.OpenEff != Constant::AutoCalculate) {
                 Cw = thisVentilation.OpenEff;
             } else {
                 //   Wind Dir (β1)                                        90°, min effectiveness
@@ -5400,7 +5400,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                     Cw = intercept + angle * slope;
                 }
             }
-            if (thisVentilation.DiscCoef != DataGlobalConstants::AutoCalculate) {
+            if (thisVentilation.DiscCoef != Constant::AutoCalculate) {
                 Cd = thisVentilation.DiscCoef;
             } else {
                 Cd = 0.40 + 0.0045 * std::abs(TempExt - thisMixingMAT);

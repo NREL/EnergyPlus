@@ -429,7 +429,7 @@ struct WindowManagerData : BaseGlobalStruct
 {
 
     static Real64 constexpr sigma = 5.6697e-8;                         // Stefan-Boltzmann constant
-    static Real64 constexpr TKelvin = DataGlobalConstants::KelvinConv; // conversion from Kelvin to Celsius
+    static Real64 constexpr TKelvin = Constant::KelvinConv; // conversion from Kelvin to Celsius
     static int constexpr nume = 107;                                   // Number of wavelength values in solar spectrum
     static int constexpr numt3 = 81;                                   // Number of wavelength values in the photopic response
 

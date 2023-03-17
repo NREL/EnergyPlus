@@ -297,7 +297,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
         thisPIU.Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisPIU.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisPIU.SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             thisPIU.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisPIU.SchedPtr == 0) {
@@ -535,7 +535,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
         thisPIU.Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisPIU.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisPIU.SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             thisPIU.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisPIU.SchedPtr == 0) {
@@ -871,7 +871,7 @@ void InitPIU(EnergyPlusData &state,
             // local plant fluid density
             Real64 const rho = GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::HWInitConvTemp,
+                                                Constant::HWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
                                                 RoutineName);
 
@@ -1347,12 +1347,12 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 
                             Real64 const rho = GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
-                                                                DataGlobalConstants::HWInitConvTemp,
+                                                                Constant::HWInitConvTemp,
                                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
                                                                 RoutineName);
                             Real64 const Cp = GetSpecificHeatGlycol(state,
                                                                     state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
-                                                                    DataGlobalConstants::HWInitConvTemp,
+                                                                    Constant::HWInitConvTemp,
                                                                     state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
                                                                     RoutineName);
 

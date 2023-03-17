@@ -283,7 +283,7 @@ namespace SteamCoils {
             state.dataSteamCoils->SteamCoil(CoilNum).Name = AlphArray(1);
             state.dataSteamCoils->SteamCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = Constant::ScheduleAlwaysOn;
             } else {
                 state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr == 0) {
@@ -1538,7 +1538,7 @@ namespace SteamCoils {
 
         // Report the SteamCoil energy from this component
         state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy =
-            state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     }
 
     // End of Reporting subroutines for the SteamCoil Module

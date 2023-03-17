@@ -1927,9 +1927,9 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
             state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
     }
 
-    this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     if (this->FuelEnergyUseRateLHV > 0.0) {
         this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
         this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
@@ -1937,8 +1937,8 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
         this->ElectricEfficiencyLHV = 0.0;
         this->ThermalEfficiencyLHV = 0.0;
     }
-    this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 }
 void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
 {
@@ -1967,7 +1967,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         // size mass flow rate
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
+                                                       Constant::InitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 

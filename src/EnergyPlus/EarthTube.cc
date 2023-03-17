@@ -613,16 +613,16 @@ void CalcEarthTube(EnergyPlusData &state)
             thisEarthTube.FanPower = thisZoneHB.EAMFL * thisEarthTube.FanPressure / (thisEarthTube.FanEfficiency * AirDensity);
         }
 
-        AverPipeAirVel = EVF / DataGlobalConstants::Pi / pow_2(thisEarthTube.r1);
+        AverPipeAirVel = EVF / Constant::Pi / pow_2(thisEarthTube.r1);
         AirMassFlowRate = EVF * AirDensity;
 
         // Calculation of Average Ground Temperature between Depth z1 and z2 at time t
         GroundTempz1z2t = thisEarthTube.AverSoilSurTemp -
                           thisEarthTube.ApmlSoilSurTemp *
-                              std::exp(-thisEarthTube.z * std::sqrt(DataGlobalConstants::Pi / 365.0 / thisEarthTube.SoilThermDiff)) *
-                              std::cos(2.0 * DataGlobalConstants::Pi / 365.0 *
+                              std::exp(-thisEarthTube.z * std::sqrt(Constant::Pi / 365.0 / thisEarthTube.SoilThermDiff)) *
+                              std::cos(2.0 * Constant::Pi / 365.0 *
                                        (state.dataEnvrn->DayOfYear - thisEarthTube.SoilSurPhaseConst -
-                                        thisEarthTube.z / 2.0 * std::sqrt(365.0 / DataGlobalConstants::Pi / thisEarthTube.SoilThermDiff)));
+                                        thisEarthTube.z / 2.0 * std::sqrt(365.0 / Constant::Pi / thisEarthTube.SoilThermDiff)));
         thisEarthTube.GroundTempz1z2t = GroundTempz1z2t;
 
         // Calculation of Convective Heat Transfer Coefficient at Inner Pipe Surface
@@ -644,10 +644,10 @@ void CalcEarthTube(EnergyPlusData &state)
         PipeHeatTransCoef = Nu * AirThermCond / 2.0 / thisEarthTube.r1;
 
         // Calculation of Thermal Resistance and Overall Heat Transfer Coefficient
-        Rc = 1.0 / 2.0 / DataGlobalConstants::Pi / thisEarthTube.r1 / PipeHeatTransCoef;
-        Rp = std::log((thisEarthTube.r1 + thisEarthTube.r2) / thisEarthTube.r1) / 2.0 / DataGlobalConstants::Pi / thisEarthTube.PipeThermCond;
+        Rc = 1.0 / 2.0 / Constant::Pi / thisEarthTube.r1 / PipeHeatTransCoef;
+        Rp = std::log((thisEarthTube.r1 + thisEarthTube.r2) / thisEarthTube.r1) / 2.0 / Constant::Pi / thisEarthTube.PipeThermCond;
         Rs = std::log((thisEarthTube.r1 + thisEarthTube.r2 + thisEarthTube.r3) / (thisEarthTube.r1 + thisEarthTube.r2)) / 2.0 /
-             DataGlobalConstants::Pi / thisEarthTube.SoilThermCond;
+             Constant::Pi / thisEarthTube.SoilThermCond;
         Rt = Rc + Rp + Rs;
         OverallHeatTransCoef = 1.0 / Rt;
 
@@ -742,7 +742,7 @@ void ReportEarthTube(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE: This subroutine fills remaining report variables.
 
-    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         auto &thisZone = state.dataEarthTube->ZnRptET(ZoneLoop);

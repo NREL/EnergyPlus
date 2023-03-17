@@ -249,7 +249,7 @@ void GetTESCoilInput(EnergyPlusData &state)
 
         state.dataPackagedThermalStorageCoil->TESCoil(item).Name = state.dataIPShortCut->cAlphaArgs(1);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum = Constant::ScheduleAlwaysOn;
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum == 0) {
@@ -360,7 +360,7 @@ void GetTESCoilInput(EnergyPlusData &state)
             break;
         case MediaType::Ice:
             if (!state.dataIPShortCut->lNumericFieldBlanks(2)) {
-                if (state.dataIPShortCut->rNumericArgs(2) == DataGlobalConstants::AutoCalculate) {
+                if (state.dataIPShortCut->rNumericArgs(2) == Constant::AutoCalculate) {
                     state.dataPackagedThermalStorageCoil->TESCoil(item).IceStorageCapacity = state.dataIPShortCut->rNumericArgs(2);
                 } else {
                     state.dataPackagedThermalStorageCoil->TESCoil(item).IceStorageCapacity =
@@ -1760,7 +1760,7 @@ void GetTESCoilInput(EnergyPlusData &state)
         state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterSetpointTemp = state.dataIPShortCut->rNumericArgs(39);
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(59)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterAvailSchedNum = Constant::ScheduleAlwaysOn;
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterAvailSchedNum =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(59));
@@ -2557,7 +2557,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirMassFlowRate =
         state.dataEnvrn->StdRhoAir * state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirVolumeFlow == DataGlobalConstants::AutoCalculate) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirVolumeFlow == Constant::AutoCalculate) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirVolumeFlow =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate *
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirFlowSizingFactor;
@@ -2671,7 +2671,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     }
 
     if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeModeAvailable &&
-        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap == DataGlobalConstants::AutoCalculate)) {
+        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap == Constant::AutoCalculate)) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap *
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedTotCapSizingFactor;
@@ -2683,7 +2683,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     }
 
     if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeModeAvailable &&
-        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap == DataGlobalConstants::AutoCalculate)) {
+        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap == Constant::AutoCalculate)) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap *
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCapSizingFactor;
@@ -2695,7 +2695,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     }
 
     if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable &&
-        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap == DataGlobalConstants::AutoCalculate)) {
+        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap == Constant::AutoCalculate)) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap *
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCapSizingFactor;
@@ -2707,7 +2707,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     }
 
     if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable &&
-        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap == DataGlobalConstants::AutoCalculate)) {
+        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap == Constant::AutoCalculate)) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap *
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCapSizingFactor;
@@ -2719,7 +2719,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     }
 
     if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyModeAvailable &&
-        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyRatedCapacity == DataGlobalConstants::AutoCalculate)) {
+        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyRatedCapacity == Constant::AutoCalculate)) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyRatedCapacity =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap *
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyRatedCapacitySizingFactor;
@@ -2731,7 +2731,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     }
 
     if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyModeAvailable &&
-        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap == DataGlobalConstants::AutoCalculate)) {
+        (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap == Constant::AutoCalculate)) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap *
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCapSizingFactor;
@@ -2745,7 +2745,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     switch (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia) {
     case MediaType::UserDefindFluid:
     case MediaType::Water:
-        if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidStorageVolume == DataGlobalConstants::AutoCalculate) {
+        if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidStorageVolume == Constant::AutoCalculate) {
 
             // for fluid tanks, assume a 10C deltaT or diff between max and min, whichever is smaller
             deltaT = min(FluidTankSizingDeltaT,
@@ -2754,24 +2754,24 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
 
             rho = GetDensityGlycol(state,
                                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageFluidName,
-                                   DataGlobalConstants::CWInitConvTemp,
+                                   Constant::CWInitConvTemp,
                                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageFluidIndex,
                                    calcTESWaterStorageTank);
             Cp = GetSpecificHeatGlycol(state,
                                        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageFluidName,
-                                       DataGlobalConstants::CWInitConvTemp,
+                                       Constant::CWInitConvTemp,
                                        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageFluidIndex,
                                        calcTESWaterStorageTank);
             if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap > 0.0 &&
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyModeAvailable) {
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidStorageVolume =
                     (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap *
-                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour) /
+                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageCapacitySizingFactor * Constant::SecInHour) /
                     (rho * Cp * deltaT);
             } else {
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidStorageVolume =
                     (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap *
-                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour) /
+                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageCapacitySizingFactor * Constant::SecInHour) /
                     (rho * Cp * deltaT);
             }
             BaseSizer::reportSizerOutput(state,
@@ -2782,16 +2782,16 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
         }
         break;
     case MediaType::Ice:
-        if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity == DataGlobalConstants::AutoCalculate) {
+        if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity == Constant::AutoCalculate) {
             if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap > 0.0 &&
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyModeAvailable) {
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity =
                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap *
-                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour;
+                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageCapacitySizingFactor * Constant::SecInHour;
             } else {
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity =
                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap *
-                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour;
+                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageCapacitySizingFactor * Constant::SecInHour;
             }
             BaseSizer::reportSizerOutput(state,
                                          "Coil:Cooling:DX:SingleSpeed:ThermalStorage",

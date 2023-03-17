@@ -308,7 +308,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).UnitType = CurrentModuleObject;
 
         if (lAlphaBlanks(2)) {
-            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = Constant::ScheduleAlwaysOn;
         } else {
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr =
                 GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
@@ -1840,7 +1840,7 @@ void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum) // n
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ReportingConstant;
 
-    ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseEnergy =
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate * ReportingConstant;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SensCoolingEnergy =

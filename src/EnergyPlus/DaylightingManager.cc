@@ -517,7 +517,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             for (int IHR = 1; IHR <= 24; ++IHR) {
                 if (state.dataSurface->SurfSunCosHourly(IHR)(3) < DataEnvironment::SunIsUpValue)
                     continue; // Skip if sun is below horizon //Autodesk SurfSunCosHourly was uninitialized here
-                state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(IHR)(3));
+                state.dataDaylightingManager->PHSUN = Constant::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(IHR)(3));
                 state.dataDaylightingManager->PHSUNHR(IHR) = state.dataDaylightingManager->PHSUN;
                 state.dataDaylightingManager->SPHSUNHR(IHR) = std::sin(state.dataDaylightingManager->PHSUN);
                 state.dataDaylightingManager->CPHSUNHR(IHR) = std::cos(state.dataDaylightingManager->PHSUN);
@@ -544,7 +544,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         state.dataDaylightingManager->GILSU(state.dataGlobal->HourOfDay) = 0.0;
         if (!(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay)(3) < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
             state.dataDaylightingManager->PHSUN =
-                DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay)(3));
+                Constant::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay)(3));
             state.dataDaylightingManager->PHSUNHR(state.dataGlobal->HourOfDay) = state.dataDaylightingManager->PHSUN;
             state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay) = std::sin(state.dataDaylightingManager->PHSUN);
             state.dataDaylightingManager->CPHSUNHR(state.dataGlobal->HourOfDay) = std::cos(state.dataDaylightingManager->PHSUN);
@@ -639,12 +639,12 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
 
     if (state.dataDaylightingData->DFSReportSizingDays) {
         if (state.dataGlobal->DoWeathSim && state.dataGlobal->DoDesDaySim) {
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) return;
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) return;
         }
     }
 
     if (state.dataDaylightingData->DFSReportAllShadowCalculationDays) {
-        if (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather) return;
+        if (state.dataGlobal->KindOfSim != Constant::KindOfSim::RunPeriodWeather) return;
     }
 
     // open a new file eplusout.dfs for saving the daylight factors
@@ -889,7 +889,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     // Azimuth of view vector in absolute coord sys
     AZVIEW = (thisDaylightControl.ViewAzimuthForGlare + state.dataHeatBal->Zone(zoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth +
               state.dataHeatBal->BuildingRotationAppendixG) *
-             DataGlobalConstants::DegToRadians;
+             Constant::DegToRadians;
     // View vector components in absolute coord sys
     VIEWVC(1) = std::sin(AZVIEW);
     VIEWVC(2) = std::cos(AZVIEW);
@@ -2302,7 +2302,7 @@ void InitializeCFSDaylighting(EnergyPlusData &state,
     int zoneNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex;
     AZVIEW = (state.dataDaylightingData->daylightControl(daylightCtrlNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(zoneNum).RelNorth +
               state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) *
-             DataGlobalConstants::DegToRadians;
+             Constant::DegToRadians;
 
     // Perform necessary calculations for window coordinates and vectors.  This will be used to calculate centroids for
     // each window element
@@ -2862,7 +2862,7 @@ void CFSRefPointPosFactor(EnergyPlusData &state,
 
             elPos = WindowComplexManager::DaylghtAltAndAzimuth(V);
 
-            XR = std::tan(std::abs(DataGlobalConstants::PiOvr2 - AZVIEW - elPos.Azimuth) + 0.001);
+            XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - elPos.Azimuth) + 0.001);
             YR = std::tan(elPos.Altitude + 0.001);
             RefPointMap.RefPtIntPosFac(iTrnRay) = DayltgGlarePositionFactor(XR, YR);
         }
@@ -2918,8 +2918,8 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
 
     assert(AzimSteps <= DataSurfaces::AzimAngStepsForSolReflCalc);
 
-    DPhi = DataGlobalConstants::PiOvr2 / (AltSteps / 2.0);
-    DTheta = DataGlobalConstants::Pi / AzimSteps;
+    DPhi = Constant::PiOvr2 / (AltSteps / 2.0);
+    DTheta = Constant::Pi / AzimSteps;
     SkyGndObs = 0.0;
     SkyGndUnObs = 0.0;
 
@@ -2952,7 +2952,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
         dOmegaGnd = CPhi * DTheta * DPhi;
         // Cosine of angle of incidence of ground ray on ground plane
         CosIncAngURay = SPhi;
-        IncAngSolidAngFac = CosIncAngURay * dOmegaGnd / DataGlobalConstants::Pi;
+        IncAngSolidAngFac = CosIncAngURay * dOmegaGnd / Constant::Pi;
         // Azimuth loop
         for (int ITheta = 1; ITheta <= 2 * AzimSteps; ++ITheta) {
             URay(1) = CPhi * cos_Theta(ITheta);
@@ -3216,10 +3216,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
                 state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
                 SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky *
-                                state.dataSolarShading->SurfDifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                                state.dataSolarShading->SurfDifShdgRatioIsoSky(NearestHitSurfNumX) / Constant::Pi;
             } else {
                 SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky *
-                                state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                                state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / Constant::Pi;
             }
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
             int l2(state.dataDaylightingManager->GILSK.index(iHour, 1));
@@ -3279,10 +3279,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     GroundHitPt(2) = RWIN2(2);
                 }
             }
-            Real64 const GILSK_mult((state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi) * ObTrans * SkyObstructionMult);
+            Real64 const GILSK_mult((state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * ObTrans * SkyObstructionMult);
             Real64 const TVISB_ObTrans(TVISB * ObTrans);
             Real64 const AVWLSU_add(TVISB_ObTrans * state.dataDaylightingManager->GILSU(iHour) *
-                                    (state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi));
+                                    (state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi));
             Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SurfSunCosHourly(iHour));
             assert(equal_dimensions(state.dataDaylightingManager->EDIRSK, state.dataDaylightingManager->AVWLSK));
             int l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
@@ -3455,9 +3455,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         for (JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                             // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
                             if (state.dataSurface->SurfWinMovableSlats(IWin)) {
-                                SlatAng = (JB - 1) * DataGlobalConstants::Pi / (Material::MaxSlatAngs - 1);
+                                SlatAng = (JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1);
                             } else {
-                                SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
                             }
                             TransBmBmMult(JB) = WindowManager::BlindBeamBeamTrans(ProfAng,
                                                                                   SlatAng,
@@ -3486,7 +3486,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
                         // Position factor for sun (note that AZVIEW is wrt y-axis and THSUN is wrt
                         // x-axis of absolute coordinate system.
-                        XR = std::tan(std::abs(DataGlobalConstants::PiOvr2 - AZVIEW - state.dataDaylightingManager->THSUN) + 0.001);
+                        XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - state.dataDaylightingManager->THSUN) + 0.001);
                         YR = std::tan(state.dataDaylightingManager->PHSUN + 0.001);
                         POSFAC = DayltgGlarePositionFactor(XR, YR);
 
@@ -3633,13 +3633,13 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             if (ANY_BLIND(ShType)) {
                                 ProfileAngle(state, IWin, SunVecMir, state.dataMaterial->Blind(BlNum).SlatOrientation, ProfAng);
                                 // Contribution of reflected beam passing through slats and reaching reference point
-                                Real64 const Pi_SlatAng_fac(DataGlobalConstants::Pi / (Material::MaxSlatAngs - 1));
+                                Real64 const Pi_SlatAng_fac(Constant::Pi / (Material::MaxSlatAngs - 1));
                                 for (JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                                     // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
                                     if (state.dataSurface->SurfWinMovableSlats(IWin)) {
                                         SlatAng = double(JB - 1) * Pi_SlatAng_fac;
                                     } else {
-                                        SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                        SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
                                     }
                                     TransBmBmMultRefl(JB) = WindowManager::BlindBeamBeamTrans(ProfAng,
                                                                                               SlatAng,
@@ -3669,7 +3669,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
                             PHSUNrefl = SunVecMir(3);
                             THSUNrefl = std::atan2(SunVecMir(2), SunVecMir(1));
-                            XR = std::tan(std::abs(DataGlobalConstants::PiOvr2 - AZVIEW - THSUNrefl) + 0.001);
+                            XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - THSUNrefl) + 0.001);
                             YR = std::tan(PHSUNrefl + 0.001);
                             POSFAC = DayltgGlarePositionFactor(XR, YR);
                             if (POSFAC != 0.0 && state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint) > 0.000001) {
@@ -3800,7 +3800,7 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
                     state.dataDaylightingManager->AVWLSK(iHour, JSH, ISky) / (NWX * NWY * state.dataDaylightingManager->GILSK(iHour, ISky));
                 thisDaylightControl.DaylBackFacSky(iHour, JSH, ISky, iRefPoint, loopwin) =
                     state.dataDaylightingManager->EINTSK(iHour, JSH, ISky) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
-                    (DataGlobalConstants::Pi * state.dataDaylightingManager->GILSK(iHour, ISky));
+                    (Constant::Pi * state.dataDaylightingManager->GILSK(iHour, ISky));
             } else {
                 thisDaylightControl.DaylIllFacSky(iHour, JSH, ISky, iRefPoint, loopwin) = 0.0;
                 thisDaylightControl.DaylSourceFacSky(iHour, JSH, ISky, iRefPoint, loopwin) = 0.0;
@@ -3823,10 +3823,10 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
 
                     thisDaylightControl.DaylBackFacSun(iHour, JSH, iRefPoint, loopwin) =
                         state.dataDaylightingManager->EINTSU(iHour, JSH) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
-                        (DataGlobalConstants::Pi * (state.dataDaylightingManager->GILSU(iHour) + 0.0001));
+                        (Constant::Pi * (state.dataDaylightingManager->GILSU(iHour) + 0.0001));
                     thisDaylightControl.DaylBackFacSunDisk(iHour, JSH, iRefPoint, loopwin) =
                         state.dataDaylightingManager->EINTSUdisk(iHour, JSH) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
-                        (DataGlobalConstants::Pi * (state.dataDaylightingManager->GILSU(iHour) + 0.0001));
+                        (Constant::Pi * (state.dataDaylightingManager->GILSU(iHour) + 0.0001));
                 } else {
                     thisDaylightControl.DaylIllFacSun(iHour, JSH, iRefPoint, loopwin) = 0.0;
                     thisDaylightControl.DaylIllFacSunDisk(iHour, JSH, iRefPoint, loopwin) = 0.0;
@@ -4299,12 +4299,12 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     auto &Zone(state.dataHeatBal->Zone);
 
     CosBldgRelNorth =
-        std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
     SinBldgRelNorth =
-        std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
     // these are only for Building Rotation for Appendix G when using world coordinate system
-    CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
-    SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+    CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
+    SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
 
     doTransform = false;
     OldAspectRatio = 1.0;
@@ -4472,8 +4472,8 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         if (state.dataDaylightingData->IllumMap(MapNum).zoneIndex > 0) {
             auto &zone(Zone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex));
             // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-            CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
-            SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
+            CosZoneRelNorth = std::cos(-zone.RelNorth * Constant::DegToRadians);
+            SinZoneRelNorth = std::sin(-zone.RelNorth * Constant::DegToRadians);
             if (state.dataDaylightingData->IllumMap(MapNum).Xnum * state.dataDaylightingData->IllumMap(MapNum).Ynum > 0) {
                 // Add additional daylighting reference points for map
                 AddMapPoints = state.dataDaylightingData->IllumMap(MapNum).Xnum * state.dataDaylightingData->IllumMap(MapNum).Ynum;
@@ -4857,10 +4857,10 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                                         cCurrentModuleObject,
                                         state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found so controls will always be available, and the simulation continues.");
-                daylightControl.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+                daylightControl.AvailSchedNum = Constant::ScheduleAlwaysOn;
             }
         } else {
-            daylightControl.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+            daylightControl.AvailSchedNum = Constant::ScheduleAlwaysOn;
         }
 
         int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5)));
@@ -5084,12 +5084,12 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
 
     // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
     CosBldgRelNorth =
-        std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
     SinBldgRelNorth =
-        std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
     // these are only for Building Rotation for Appendix G when using world coordinate system
-    CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
-    SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+    CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
+    SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
 
     doTransform = false;
     OldAspectRatio = 1.0;
@@ -5101,8 +5101,8 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
         auto &zone(state.dataHeatBal->Zone(daylCntrl.zoneIndex));
 
         // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-        CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
-        SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
+        CosZoneRelNorth = std::cos(-zone.RelNorth * Constant::DegToRadians);
+        SinZoneRelNorth = std::sin(-zone.RelNorth * Constant::DegToRadians);
 
         rLightLevel = InternalHeatGains::GetDesignLightingLevelForZone(state, daylCntrl.zoneIndex);
         InternalHeatGains::CheckLightsReplaceableMinMaxForZone(state, daylCntrl.zoneIndex);
@@ -5559,8 +5559,8 @@ void DayltgGlareWithIntWins(EnergyPlusData &state,
     int RefPoints = thisDaylightControl.TotalDaylRefPoints; // Number of daylighting reference points in zone
     for (int IL = 1; IL <= RefPoints; ++IL) {
         Real64 BackgroundLum =
-            thisDaylightControl.BacLum(IL) + thisEnclDaylight.InterReflIllFrIntWins * thisEnclDaylight.aveVisDiffReflect / DataGlobalConstants::Pi;
-        BackgroundLum = max(thisDaylightControl.IllumSetPoint(IL) * thisEnclDaylight.aveVisDiffReflect / DataGlobalConstants::Pi, BackgroundLum);
+            thisDaylightControl.BacLum(IL) + thisEnclDaylight.InterReflIllFrIntWins * thisEnclDaylight.aveVisDiffReflect / Constant::Pi;
+        BackgroundLum = max(thisDaylightControl.IllumSetPoint(IL) * thisEnclDaylight.aveVisDiffReflect / Constant::Pi, BackgroundLum);
 
         // Loop over exterior windows associated with zone
         for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
@@ -5607,8 +5607,8 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
     HISK.dim(4);
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const DTH((2.0 * DataGlobalConstants::Pi) / double(NTH)); // Sky integration azimuth stepsize (radians)
-    Real64 const DPH(DataGlobalConstants::PiOvr2 / double(NPH));     // Sky integration altitude stepsize (radians)
+    Real64 const DTH((2.0 * Constant::Pi) / double(NTH)); // Sky integration azimuth stepsize (radians)
+    Real64 const DPH(Constant::PiOvr2 / double(NPH));     // Sky integration altitude stepsize (radians)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IPH; // Altitude index for sky integration
@@ -6824,7 +6824,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     // Calculate glare index at each reference point assuming the daylight illuminance setpoint is
     //  met at both reference points, either by daylight or electric lights
     for (int IL = 1; IL <= NREFPT; ++IL) {
-        BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / DataGlobalConstants::Pi,
+        BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi,
                    thisDaylightControl.BacLum(IL));
         // DayltgGlare uses ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,1,loop) for unshaded windows, and
         //  ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for shaded windows
@@ -6954,7 +6954,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                 // Re-calc daylight and glare at shaded state. For switchable glazings, it is the fully dark state.
                 for (int IL = 1; IL <= NREFPT; ++IL) {
-                    BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / DataGlobalConstants::Pi,
+                    BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi,
                                RBACLU(IL, igroup));
                     // DayltgGlare uses ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for shaded state
                     DayltgGlare(state, IL, BACL, GLRNEW(IL), daylightCtrlNum);
@@ -7100,7 +7100,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                         RBACLU(IL, igroup) =
                                             thisDaylightControl.BacLum(IL) + (WBACLU(1, IL, igroup) - WBACLU(2, IL, igroup)) * (1.0 - tmpSWFactor);
                                         BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
-                                                       DataGlobalConstants::Pi,
+                                                       Constant::Pi,
                                                    RBACLU(IL, igroup));
                                         // needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
                                         tmpMult = (thisTVIS1 - (thisTVIS1 - thisTVIS2) * tmpSWFactor) / thisTVIS2;
@@ -7149,7 +7149,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                         RBACLU(IL, igroup) =
                                             thisDaylightControl.BacLum(IL) + (WBACLU(1, IL, igroup) - WBACLU(2, IL, igroup)) * (1.0 - tmpSWFactor);
                                         BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
-                                                       DataGlobalConstants::Pi,
+                                                       Constant::Pi,
                                                    RBACLU(IL, igroup));
 
                                         // needs to update SourceLumFromWinAtRefPt(IL,2,IWin) before re-calc DayltgGlare
@@ -7740,8 +7740,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // Azimuth ranges over a maximum of 2 Pi radians.
     // Altitude ranges over a maximum of Pi/2 radians between -Pi/2 < PH < +Pi/2, so that elements are not counted twice
     // PH = 0 at the horizon; PH = Pi/2 at the zenith
-    PHMIN = max(-DataGlobalConstants::PiOvr2, state.dataSurface->SurfWinPhi(IWin) - DataGlobalConstants::PiOvr2);
-    PHMAX = min(DataGlobalConstants::PiOvr2, state.dataSurface->SurfWinPhi(IWin) + DataGlobalConstants::PiOvr2);
+    PHMIN = max(-Constant::PiOvr2, state.dataSurface->SurfWinPhi(IWin) - Constant::PiOvr2);
+    PHMAX = min(Constant::PiOvr2, state.dataSurface->SurfWinPhi(IWin) + Constant::PiOvr2);
     DPH = (PHMAX - PHMIN) / double(NPHMAX);
 
     // Sky/ground element altitude integration
@@ -7758,9 +7758,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
         PhWin = state.dataSurface->SurfWinPhi(IWin);
         ThWin = state.dataSurface->SurfWinTheta(IWin);
         if (PhWin >= 0.0) {
-            if (PH >= DataGlobalConstants::PiOvr2 - PhWin) {
-                ThMin = -DataGlobalConstants::Pi;
-                ThMax = DataGlobalConstants::Pi;
+            if (PH >= Constant::PiOvr2 - PhWin) {
+                ThMin = -Constant::Pi;
+                ThMax = Constant::Pi;
             } else {
                 ACosTanTan = std::acos(-std::tan(PH) * std::tan(PhWin));
                 ThMin = ThWin - std::abs(ACosTanTan);
@@ -7768,9 +7768,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             }
 
         } else { // PhiSurf < 0.0
-            if (PH <= -PhWin - DataGlobalConstants::PiOvr2) {
-                ThMin = -DataGlobalConstants::Pi;
-                ThMax = DataGlobalConstants::Pi;
+            if (PH <= -PhWin - Constant::PiOvr2) {
+                ThMin = -Constant::Pi;
+                ThMax = Constant::Pi;
             } else {
                 ACosTanTan = std::acos(-std::tan(PH) * std::tan(PhWin));
                 ThMin = ThWin - std::abs(ACosTanTan);
@@ -7837,7 +7837,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     // Below, luminance of ground in cd/m2 is illuminance on ground in lumens/m2
                     // times ground reflectance, divided by pi, times obstruction multiplier.
                     ZSK(ISky) =
-                        (state.dataDaylightingManager->GILSK(IHR, ISky) * state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi) * COSB *
+                        (state.dataDaylightingManager->GILSK(IHR, ISky) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * COSB *
                         DA * ObTransM(IPH, ITH) * SkyObstructionMult(IPH, ITH);
                 }
                 // Determine if sun illuminates the point that ray hits the ground. If the solar reflection
@@ -7854,7 +7854,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     }
                     if (hitObs) SunObstructionMult = 0.0;
                 }
-                ZSU = (state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi) * COSB * DA *
+                ZSU = (state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * COSB * DA *
                       ObTransM(IPH, ITH) * SunObstructionMult;
             }
             // BEAM SOLAR AND SKY SOLAR REFLECTED FROM NEAREST OBSTRUCTION
@@ -7907,10 +7907,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
                         state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
                         SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky *
-                                        state.dataSolarShading->SurfDifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                                        state.dataSolarShading->SurfDifShdgRatioIsoSky(NearestHitSurfNumX) / Constant::Pi;
                     } else {
                         SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky *
-                                        state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, IHR, NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                                        state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, IHR, NearestHitSurfNumX) / Constant::Pi;
                     }
                     dReflObsSky = SkyReflVisLum * COSB * DA;
                     for (ISky = 1; ISky <= 4; ++ISky) {
@@ -7932,7 +7932,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                 // Make all transmitted light diffuse for a TDD with a bare diffuser
                 for (ISky = 1; ISky <= 4; ++ISky) {
-                    state.dataDaylightingManager->WLUMSK(IHR, 1, ISky) += ZSK(ISky) * TVISBR / DataGlobalConstants::Pi;
+                    state.dataDaylightingManager->WLUMSK(IHR, 1, ISky) += ZSK(ISky) * TVISBR / Constant::Pi;
                     FLFWSK(1, ISky) += ZSK(ISky) * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                     FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
@@ -7941,7 +7941,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     state.dataDaylightingManager->TDDFluxTrans(IHR, ISky, PipeNum) += ZSK(ISky) * TVISBR;
 
                     if (ISky == 1) {
-                        state.dataDaylightingManager->WLUMSU(IHR, 1) += ZSU * TVISBR / DataGlobalConstants::Pi;
+                        state.dataDaylightingManager->WLUMSU(IHR, 1) += ZSU * TVISBR / Constant::Pi;
                         FLFWSU(1) += ZSU * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                         FLCWSU(1) += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
@@ -8127,9 +8127,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         }
 
                         if (state.dataSurface->SurfWinMovableSlats(IWin)) {
-                            SlatAng = (JB - 1) * DataGlobalConstants::Pi / (Material::MaxSlatAngs - 1);
+                            SlatAng = (JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1);
                         } else {
-                            SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                            SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
                         }
                         DayltgInterReflectedIllumTransBmBmMult(JB) =
                             TVISBR * WindowManager::BlindBeamBeamTrans(ProfAng,
@@ -8162,13 +8162,13 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         // EXIT after first pass if not movable slats or exterior window screen
                         if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
-                        state.dataDaylightingManager->WLUMSK(IHR, JB + 1, ISky) += ZSK(ISky) * TransMult(JB) / DataGlobalConstants::Pi;
+                        state.dataDaylightingManager->WLUMSK(IHR, JB + 1, ISky) += ZSK(ISky) * TransMult(JB) / Constant::Pi;
                         FLFWSK(JB + 1, ISky) += ZSK(ISky) * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                         if (PH > 0.0 && (BlindOn || ScreenOn)) FLFWSK(JB + 1, ISky) += ZSK(ISky) * DayltgInterReflectedIllumTransBmBmMult(JB);
                         FLCWSK(JB + 1, ISky) += ZSK(ISky) * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
                         if (PH <= 0.0 && (BlindOn || ScreenOn)) FLCWSK(JB + 1, ISky) += ZSK(ISky) * DayltgInterReflectedIllumTransBmBmMult(JB);
                         if (ISky == 1) {
-                            state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU * TransMult(JB) / DataGlobalConstants::Pi;
+                            state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU * TransMult(JB) / Constant::Pi;
                             FLFWSU(JB + 1) += ZSU * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                             if (PH > 0.0 && (BlindOn || ScreenOn)) FLFWSU(JB + 1) += ZSU * DayltgInterReflectedIllumTransBmBmMult(JB);
                             FLCWSU(JB + 1) += ZSU * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
@@ -8251,7 +8251,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                 FLFWSUdisk(1) = 0.0; // Diffuse light only
 
-                state.dataDaylightingManager->WLUMSU(IHR, 1) += ZSU1 * TVISBSun / DataGlobalConstants::Pi;
+                state.dataDaylightingManager->WLUMSU(IHR, 1) += ZSU1 * TVISBSun / Constant::Pi;
                 FLFWSU(1) += ZSU1 * TVISBSun * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                 FLCWSU(1) += ZSU1 * TVISBSun * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
@@ -8342,9 +8342,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             }
                         }
                         if (state.dataSurface->SurfWinMovableSlats(IWin)) {
-                            SlatAng = (JB - 1) * DataGlobalConstants::Pi / (Material::MaxSlatAngs - 1);
+                            SlatAng = (JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1);
                         } else {
-                            SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                            SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
                         }
                         DayltgInterReflectedIllumTransBmBmMult(JB) =
                             TVISBSun * WindowManager::BlindBeamBeamTrans(ProfAng,
@@ -8364,9 +8364,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                                                       // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
                     }
 
-                    state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU1 * TransMult(JB) / DataGlobalConstants::Pi;
+                    state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU1 * TransMult(JB) / Constant::Pi;
                     state.dataDaylightingManager->WLUMSUdisk(IHR, JB + 1) =
-                        ZSU1 * DayltgInterReflectedIllumTransBmBmMult(JB) / DataGlobalConstants::Pi;
+                        ZSU1 * DayltgInterReflectedIllumTransBmBmMult(JB) / Constant::Pi;
                     FLFWSU(JB + 1) += ZSU1 * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                     FLFWSUdisk(JB + 1) = ZSU1 * DayltgInterReflectedIllumTransBmBmMult(JB);
                     FLCWSU(JB + 1) += ZSU1 * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
@@ -8446,7 +8446,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         } // End of check of interior/exterior/between-glass blind
                     }     // ShadeOn/BlindOn
 
-                    state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU1refl * TransMult(JB) / DataGlobalConstants::Pi;
+                    state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU1refl * TransMult(JB) / Constant::Pi;
                     FLFWSU(JB + 1) += ZSU1refl * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                     FLCWSU(JB + 1) += ZSU1refl * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
                 } // End of loop over slat angles
@@ -8537,20 +8537,20 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
             // BeamObstrMultiplier = ComplexWind(IWin)%DaylghtGeom(CurCplxFenState)%GndObstrMultiplier(WinEl, iIncElem)
             for (iSky = 1; iSky <= 4; ++iSky) {
                 ElementLuminanceSky(iSky, iIncElem) =
-                    state.dataDaylightingManager->GILSK(IHR, iSky) * state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi * LambdaInc;
+                    state.dataDaylightingManager->GILSK(IHR, iSky) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
             }
             ElementLuminanceSun(iIncElem) =
-                state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi * LambdaInc;
+                state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
         } else {
             // Ray from the element which is half sky and half ground
             for (iSky = 1; iSky <= 4; ++iSky) {
                 // in this case half of the pach is coming from the sky and half from the ground
                 ElementLuminanceSky(iSky, iIncElem) = 0.5 * DayltgSkyLuminance(state, iSky, Azimuth, Altitude) * LambdaInc;
                 ElementLuminanceSky(iSky, iIncElem) += 0.5 * state.dataDaylightingManager->GILSK(IHR, iSky) *
-                                                       state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi * LambdaInc;
+                                                       state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
             }
             ElementLuminanceSun(iIncElem) =
-                0.5 * state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi * LambdaInc;
+                0.5 * state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
         }
         // Sun beam calculations
         if ((SolBmIndex == iIncElem) && (state.dataHeatBal->SurfSunlitFracHR(IHR, IWin) > 0.0)) {
@@ -8982,7 +8982,7 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
             // Need to recalculate position factor for dominant direction in case of specular bsdf.  Otherwise this will produce
             // very inaccurate results because of position factor of the sun and bsdf pach can vary by lot
             if (iTrnElem == SolBmIndex) {
-                XR = std::tan(std::abs(DataGlobalConstants::PiOvr2 - AZVIEW - state.dataDaylightingManager->THSUN) + 0.001);
+                XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - state.dataDaylightingManager->THSUN) + 0.001);
                 YR = std::tan(state.dataDaylightingManager->PHSUN + 0.001);
                 PosFac = DayltgGlarePositionFactor(XR, YR);
                 RayZ = state.dataDaylightingManager->SPHSUN;
@@ -9067,7 +9067,7 @@ Real64 DayltgSkyLuminance(EnergyPlusData &state,
     Real64 Z4;
 
     SPHSKY = max(std::sin(PHSKY), 0.01); // Prevent floating point underflows
-    Z = DataGlobalConstants::PiOvr2 - state.dataDaylightingManager->PHSUN;
+    Z = Constant::PiOvr2 - state.dataDaylightingManager->PHSUN;
     if (ISky >= 1 && ISky <= 3) { // Following not needed for overcast sky
         COSG = SPHSKY * state.dataDaylightingManager->SPHSUN +
                std::cos(PHSKY) * state.dataDaylightingManager->CPHSUN * std::cos(THSKY - state.dataDaylightingManager->THSUN);
@@ -9136,14 +9136,14 @@ void ProfileAngle(EnergyPlusData &state,
     Real64 ThWin;   // Azimuth angle of WinNorm
 
     if (HorOrVert == DataWindowEquivalentLayer::Orientation::Horizontal) { // Profile angle for horizontal structures
-        ElevWin = DataGlobalConstants::PiOvr2 - state.dataSurface->Surface(SurfNum).Tilt * DataGlobalConstants::DegToRadians;
-        AzimWin = (90.0 - state.dataSurface->Surface(SurfNum).Azimuth) * DataGlobalConstants::DegToRadians;
+        ElevWin = Constant::PiOvr2 - state.dataSurface->Surface(SurfNum).Tilt * Constant::DegToRadians;
+        AzimWin = (90.0 - state.dataSurface->Surface(SurfNum).Azimuth) * Constant::DegToRadians;
         ElevSun = std::asin(CosDirSun(3));
         AzimSun = std::atan2(CosDirSun(2), CosDirSun(1));
         ProfileAng = std::atan(std::sin(ElevSun) / std::abs(std::cos(ElevSun) * std::cos(AzimWin - AzimSun))) - ElevWin;
     } else { // Profile angle for vertical structures
-        ElevWin = DataGlobalConstants::PiOvr2 - state.dataSurface->Surface(SurfNum).Tilt * DataGlobalConstants::DegToRadians;
-        AzimWin = state.dataSurface->Surface(SurfNum).Azimuth * DataGlobalConstants::DegToRadians; // 7952
+        ElevWin = Constant::PiOvr2 - state.dataSurface->Surface(SurfNum).Tilt * Constant::DegToRadians;
+        AzimWin = state.dataSurface->Surface(SurfNum).Azimuth * Constant::DegToRadians; // 7952
         AzimSun = std::atan2(CosDirSun(1), CosDirSun(2));                                          // 7952
         if (std::abs(ElevWin) < 0.1) {                                                             // Near-vertical window
             ProfileAng = AzimWin - AzimSun;                                                        // CR7952 allow sign changes.
@@ -9153,7 +9153,7 @@ void ProfileAngle(EnergyPlusData &state,
                                                                      // by WinNorm and vector along baseline of window
             auto &WinNormCrossBase = state.dataDaylightingManager->WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
             WinNorm = state.dataSurface->Surface(SurfNum).OutNormVec;
-            ThWin = AzimWin - DataGlobalConstants::PiOvr2;
+            ThWin = AzimWin - Constant::PiOvr2;
             Real64 const sin_ElevWin(std::sin(ElevWin));
             WinNormCrossBase(1) = -sin_ElevWin * std::cos(ThWin);
             WinNormCrossBase(2) = sin_ElevWin * std::sin(ThWin);
@@ -9164,7 +9164,7 @@ void ProfileAngle(EnergyPlusData &state,
             if ((AzimWin - AzimSun) < 0.0) ProfileAng = -1.0 * ProfileAng;
         }
         // Constrain to 0 to pi
-        if (ProfileAng > DataGlobalConstants::Pi) ProfileAng = 2.0 * DataGlobalConstants::Pi - ProfileAng;
+        if (ProfileAng > Constant::Pi) ProfileAng = 2.0 * Constant::Pi - ProfileAng;
     }
 }
 
@@ -9329,7 +9329,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
             DiffVisRefl = 0.0;
         }
     }
-    LumAtReflHitPtFrSun = CosIncAngAtHitPt * DiffVisRefl / DataGlobalConstants::Pi;
+    LumAtReflHitPtFrSun = CosIncAngAtHitPt * DiffVisRefl / Constant::Pi;
 }
 
 void DayltgInteriorMapIllum(EnergyPlusData &state)
@@ -10444,7 +10444,7 @@ void CalcMinIntWinSolidAngs(EnergyPlusData &state)
 
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-        thisEnclDaylight.MinIntWinSolidAng = 2.0 * DataGlobalConstants::Pi;
+        thisEnclDaylight.MinIntWinSolidAng = 2.0 * Constant::Pi;
         if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
         if (thisEnclDaylight.NumOfIntWinAdjEncls == 0) continue;
         for (int IWin : state.dataViewFactor->EnclSolInfo(enclNum).SurfacePtr) {

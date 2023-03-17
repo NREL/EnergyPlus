@@ -1170,7 +1170,7 @@ namespace SurfaceGroundHeatExchanger {
                                         RoutineName);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        ReD = 4.0 * WaterMassFlow / (DataGlobalConstants::Pi * MUactual * this->TubeDiameter * this->TubeCircuits);
+        ReD = 4.0 * WaterMassFlow / (Constant::Pi * MUactual * this->TubeDiameter * this->TubeCircuits);
 
         // Calculate the Nusselt number based on what flow regime one is in
         if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -1186,7 +1186,7 @@ namespace SurfaceGroundHeatExchanger {
 
         PipeLength = this->SurfaceLength * this->SurfaceWidth / this->TubeSpacing;
 
-        NTU = DataGlobalConstants::Pi * Kactual * NuD * PipeLength / (WaterMassFlow * CpWater);
+        NTU = Constant::Pi * Kactual * NuD * PipeLength / (WaterMassFlow * CpWater);
         // Calculate Epsilon*MassFlowRate*Cp
         if (-NTU >= DataPrecisionGlobals::EXP_LowerLimit) {
             CalcHXEffectTerm = (1.0 - std::exp(-NTU)) * WaterMassFlow * CpWater;
@@ -1247,8 +1247,8 @@ namespace SurfaceGroundHeatExchanger {
         // set previous surface temp
         OldSurfTemp = this->TtopHistory[1];
         // absolute temperatures
-        SurfTempAbs = OldSurfTemp + DataGlobalConstants::KelvinConv;
-        SkyTempAbs = ThisSkyTemp + DataGlobalConstants::KelvinConv;
+        SurfTempAbs = OldSurfTemp + Constant::KelvinConv;
+        SkyTempAbs = ThisSkyTemp + Constant::KelvinConv;
 
         // ASHRAE simple convection coefficient model for external surfaces.
         ConvCoef = CalcASHRAESimpExtConvectCoeff(this->TopRoughness, ThisWindSpeed);
@@ -1300,8 +1300,8 @@ namespace SurfaceGroundHeatExchanger {
             // make a surface heat balance and solve for temperature
             OldSurfTemp = this->TbtmHistory[1];
             // absolute temperatures
-            SurfTempAbs = OldSurfTemp + DataGlobalConstants::KelvinConv;
-            ExtTempAbs = ThisDryBulb + DataGlobalConstants::KelvinConv;
+            SurfTempAbs = OldSurfTemp + Constant::KelvinConv;
+            ExtTempAbs = ThisDryBulb + Constant::KelvinConv;
 
             // ASHRAE simple convection coefficient model for external surfaces.
             ConvCoef = CalcASHRAESimpExtConvectCoeff(this->TopRoughness, ThisWindSpeed);
@@ -1460,7 +1460,7 @@ namespace SurfaceGroundHeatExchanger {
                                DataPrecisionGlobals::constant_zero,
                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                RoutineName);
-        this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
+        this->DesignMassFlowRate = Constant::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
         InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum);
         RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
     }

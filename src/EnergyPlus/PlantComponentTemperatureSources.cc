@@ -134,7 +134,7 @@ namespace PlantComponentTemperatureSources {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
+                                                           Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
@@ -370,7 +370,7 @@ namespace PlantComponentTemperatureSources {
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             this->HeatRate = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
-            this->HeatEnergy = this->HeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->HeatEnergy = this->HeatRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         } else {
             this->OutletTemp = this->BoundaryTemp;
             this->HeatRate = 0.0;
@@ -398,9 +398,9 @@ namespace PlantComponentTemperatureSources {
         [[maybe_unused]] EnergyPlusData &state, const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
 
-        MaxLoad = DataGlobalConstants::BigNumber;
+        MaxLoad = Constant::BigNumber;
         MinLoad = 0.0;
-        OptLoad = DataGlobalConstants::BigNumber;
+        OptLoad = Constant::BigNumber;
     }
 
     void WaterSourceSpecs::getSizingFactor(Real64 &_SizFac)

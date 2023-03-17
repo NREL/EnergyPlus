@@ -279,7 +279,7 @@ namespace UnitVentilator {
 
             unitVent.Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                unitVent.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                unitVent.SchedPtr = Constant::ScheduleAlwaysOn;
             } else {
                 unitVent.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (unitVent.SchedPtr == 0) {
@@ -1204,7 +1204,7 @@ namespace UnitVentilator {
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp,
+                                                                   Constant::HWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
 
@@ -1961,12 +1961,12 @@ namespace UnitVentilator {
                                 }
                                 rho = FluidProperties::GetDensityGlycol(state,
                                                                         state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
-                                                                        DataGlobalConstants::HWInitConvTemp,
+                                                                        Constant::HWInitConvTemp,
                                                                         state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
                                                                         RoutineName);
                                 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                             state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
-                                                                            DataGlobalConstants::HWInitConvTemp,
+                                                                            Constant::HWInitConvTemp,
                                                                             state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
                                                                             RoutineName);
                                 MaxVolHotWaterFlowDes = DesHeatingLoad / (WaterCoilSizDeltaT * Cp * rho);

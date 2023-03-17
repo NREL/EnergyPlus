@@ -5222,8 +5222,8 @@ void InverseModelTemperature(EnergyPlusData &state,
             if (std::abs(delta_T) > 0.5) {
                 M_inf = (BB + CC * DD - ((11.0 / 6.0) * CC + AA) * zone.ZoneMeasuredTemperature) / (CpAir * delta_T);
             }
-            Real64 ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / zone.Volume * DataGlobalConstants::SecInHour));
-            M_inf = (ACH_inf / DataGlobalConstants::SecInHour) * zone.Volume * AirDensity;
+            Real64 ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / zone.Volume * Constant::SecInHour));
+            M_inf = (ACH_inf / Constant::SecInHour) * zone.Volume * AirDensity;
 
             // Overwrite variable with inverse solution
             zone.MCPIHM = M_inf;
@@ -5273,7 +5273,7 @@ void InverseModelTemperature(EnergyPlusData &state,
                                                              thisZoneHB.ZT,
                                                              thisZoneHB.ZoneAirHumRat) *
                            Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat)) *
-                          (state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour); // Inverse equation
+                          (state.dataGlobal->TimeStepZone * Constant::SecInHour); // Inverse equation
                 if ((MultpHM < 1.0) || (MultpHM > 30.0)) {                                   // Temperature capacity multiplier greater than
                                                                                              // 1 and less than 30
                     MultpHM = 1.0;                                                           // Default value 1.0
@@ -5447,8 +5447,8 @@ void InverseModelHumidity(EnergyPlusData &state,
             }
 
             // Add threshold for air change rate
-            Real64 ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / zone.Volume * DataGlobalConstants::SecInHour));
-            M_inf = (ACH_inf / DataGlobalConstants::SecInHour) * zone.Volume * AirDensity;
+            Real64 ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / zone.Volume * Constant::SecInHour));
+            M_inf = (ACH_inf / Constant::SecInHour) * zone.Volume * AirDensity;
             zone.MCPIHM = M_inf;
             zone.InfilOAAirChangeRateHM = ACH_inf;
         }
@@ -6275,8 +6275,8 @@ void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData &state, int const Tem
 
     // adjust zone operative setpoint
     if (!(tempControlledZone.AdaptiveComfortTempControl)) return; // do nothing to setpoint
-    if ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
-        (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
+    if ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != Constant::KindOfSim::DesignDay) &&
+        (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay)) {
         // Adjust run period cooling set point
         switch (AdaptiveComfortModelTypeIndex) {
         case static_cast<int>(AdaptiveComfortModel::ASH55_CENTRAL):

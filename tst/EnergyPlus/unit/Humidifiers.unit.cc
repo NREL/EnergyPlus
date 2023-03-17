@@ -86,8 +86,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
     thisHum.ThermalEffRated = 1.0;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = Constant::ScheduleAlwaysOn;
+    thisHum.SchedPtr = Constant::ScheduleAlwaysOn;
 
     state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 30.0;
@@ -121,8 +121,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
     thisHum.ThermalEffRated = 0.80;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = Constant::ScheduleAlwaysOn;
+    thisHum.SchedPtr = Constant::ScheduleAlwaysOn;
 
     state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 30.0;
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     HumidifierData thisHum;
 
     state->dataHVACGlobal->TimeStepSys = 0.25;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
@@ -165,8 +165,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.ThermalEffRated = 1.0;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = Constant::ScheduleAlwaysOn;
+    thisHum.SchedPtr = Constant::ScheduleAlwaysOn;
 
     state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 20.0;
@@ -242,7 +242,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     HumidifierData thisHum;
 
     state->dataHVACGlobal->TimeStepSys = 0.25;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
 
@@ -257,8 +257,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     thisHum.ThermalEffRated = 0.80;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = Constant::ScheduleAlwaysOn;
+    thisHum.SchedPtr = Constant::ScheduleAlwaysOn;
 
     state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 20.0;

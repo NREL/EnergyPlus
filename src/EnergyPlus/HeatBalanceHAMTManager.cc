@@ -751,10 +751,10 @@ namespace HeatBalanceHAMTManager {
                     thisMaterial->divs = thisMaterial->divmax;
                 }
                 // Check length of cell - reduce number of divisions if necessary
-                Real64 const sin_negPIOvr2 = std::sin(-DataGlobalConstants::Pi / 2.0);
+                Real64 const sin_negPIOvr2 = std::sin(-Constant::Pi / 2.0);
                 while (true) {
                     testlen = thisMaterial->Thickness *
-                              ((std::sin(DataGlobalConstants::Pi * (-1.0 / double(thisMaterial->divs)) - DataGlobalConstants::Pi / 2.0) / 2.0) -
+                              ((std::sin(Constant::Pi * (-1.0 / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0) -
                                (sin_negPIOvr2 / 2.0));
                     if (testlen > adjdist) break;
                     --thisMaterial->divs;
@@ -860,8 +860,8 @@ namespace HeatBalanceHAMTManager {
                     // Make cells smaller near the surface
                     cells(cid).length(1) =
                         thisMaterial->Thickness *
-                        ((std::sin(DataGlobalConstants::Pi * (-double(did) / double(thisMaterial->divs)) - DataGlobalConstants::Pi / 2.0) / 2.0) -
-                         (std::sin(DataGlobalConstants::Pi * (-double(did - 1) / double(thisMaterial->divs)) - DataGlobalConstants::Pi / 2.0) / 2.0));
+                        ((std::sin(Constant::Pi * (-double(did) / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0) -
+                         (std::sin(Constant::Pi * (-double(did - 1) / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0));
 
                     cells(cid).origin(1) = runor + cells(cid).length(1) / 2.0;
                     runor += cells(cid).length(1);
@@ -1498,7 +1498,7 @@ namespace HeatBalanceHAMTManager {
 
         SurfTempInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
 
-        state.dataMstBal->RhoVaporSurfIn(sid) = SurfTempInP / (461.52 * (thisZoneHB.MAT + DataGlobalConstants::KelvinConv));
+        state.dataMstBal->RhoVaporSurfIn(sid) = SurfTempInP / (461.52 * (thisZoneHB.MAT + Constant::KelvinConv));
     }
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid)
@@ -1653,7 +1653,7 @@ namespace HeatBalanceHAMTManager {
         // Return value
         Real64 WVDC;
 
-        WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv, 0.81)) / ambp;
+        WVDC = (2.e-7 * std::pow(Temperature + Constant::KelvinConv, 0.81)) / ambp;
 
         return WVDC;
     }

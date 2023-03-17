@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
     state->dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate = 0.2;
     state->dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio = 0.2;
-    state->dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr = Constant::ScheduleAlwaysOn;
     state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
 
     state->dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1) = 0.25;

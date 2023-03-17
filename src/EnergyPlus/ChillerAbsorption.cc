@@ -776,7 +776,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
 
     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::CWInitConvTemp,
+                                                   Constant::CWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
 
@@ -786,7 +786,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
 
     rho = FluidProperties::GetDensityGlycol(state,
                                             state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                            DataGlobalConstants::CWInitConvTemp,
+                                            Constant::CWInitConvTemp,
                                             state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                             RoutineName);
 
@@ -800,7 +800,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
         if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::HWInitConvTemp,
+                                                    Constant::HWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidIndex,
                                                     RoutineName);
 
@@ -976,13 +976,13 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpNomCap =
@@ -1150,7 +1150,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpCondVolFlowRate =
@@ -1390,12 +1390,12 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp,
+                                                                   Constant::HWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::HWInitConvTemp,
+                                                               Constant::HWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
@@ -1776,10 +1776,10 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
     } // IF(GeneratorInletNode .GT. 0)THEN
 
     // convert power to energy
-    this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 }
 
 void BLASTAbsorberSpecs::updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag)

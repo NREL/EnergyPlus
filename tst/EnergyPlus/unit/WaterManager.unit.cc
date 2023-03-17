@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     WaterManager::UpdatePrecipitation(*state);
 
     Real64 ExpectedNomAnnualRain = 0.80771;
-    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour;
+    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / Constant::SecInHour;
 
     Real64 NomAnnualRain = state->dataWaterData->RainFall.NomAnnualRain;
     EXPECT_NEAR(NomAnnualRain, ExpectedNomAnnualRain, 0.000001);
@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
 
     // Simulate a call for tank water that would produce 0.025m3 of draw in one timestep
     state->dataHVACGlobal->TimeStepSys = 10.0 / 60.0;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataWaterData->WaterStorage(TankNum).NumWaterDemands = 1;
     state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand.allocate(1);
     Real64 draw = 0.025;

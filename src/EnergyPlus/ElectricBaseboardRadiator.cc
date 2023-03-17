@@ -251,7 +251,7 @@ namespace ElectricBaseboardRadiator {
             ElecBaseboard(BaseboardNum).EquipName = state.dataIPShortCut->cAlphaArgs(1); // name of this baseboard
             ElecBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(2);
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                ElecBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                ElecBaseboard(BaseboardNum).SchedPtr = Constant::ScheduleAlwaysOn;
             } else {
                 ElecBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (ElecBaseboard(BaseboardNum).SchedPtr == 0) {

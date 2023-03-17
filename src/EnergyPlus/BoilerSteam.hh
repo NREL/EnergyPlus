@@ -71,7 +71,7 @@ namespace BoilerSteam {
     {
         // Members
         std::string Name;                                                                     // user identifier
-        DataGlobalConstants::ResourceType FuelType = DataGlobalConstants::ResourceType::None; // resource type
+        Constant::ResourceType FuelType = Constant::ResourceType::None; // resource type
         bool Available = false;                                                               // TRUE if machine available in current time step
         bool ON = false;                            // TRUE: simulate the machine at it's operating part load ratio
         bool MissingSetPointErrDone = false;        // Missing outlet node setpoint message flag

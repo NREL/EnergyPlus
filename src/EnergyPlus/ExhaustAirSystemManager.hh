@@ -66,7 +66,7 @@ namespace ExhaustAirSystemManager {
         // Members
         std::string Name = "";
 
-        int AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+        int AvailScheduleNum = Constant::ScheduleAlwaysOn;
         std::string ZoneMixerName = "";
         int ZoneMixerIndex = 0;
         int CentralFanTypeNum = 0;
@@ -98,7 +98,7 @@ namespace ExhaustAirSystemManager {
 
         std::string Name = "";
 
-        int AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+        int AvailScheduleNum = Constant::ScheduleAlwaysOn;
 
         std::string ZoneName = "";
         int ZoneNum = 0;

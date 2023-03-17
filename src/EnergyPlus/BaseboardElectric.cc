@@ -144,9 +144,9 @@ namespace BaseboardElectric {
         PowerMet = baseboard->baseboards(BaseboardNum).Power;
 
         baseboard->baseboards(BaseboardNum).Energy =
-            baseboard->baseboards(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            baseboard->baseboards(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         baseboard->baseboards(BaseboardNum).ElecUseLoad =
-            baseboard->baseboards(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            baseboard->baseboards(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     }
 
     void GetBaseboardInput(EnergyPlusData &state)
@@ -225,7 +225,7 @@ namespace BaseboardElectric {
                 thisBaseboard.EquipType = UtilityRoutines::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(2);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    thisBaseboard.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisBaseboard.SchedPtr = Constant::ScheduleAlwaysOn;
                 } else {
                     thisBaseboard.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                     if (thisBaseboard.SchedPtr == 0) {

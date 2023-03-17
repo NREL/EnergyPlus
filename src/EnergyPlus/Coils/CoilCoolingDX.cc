@@ -207,7 +207,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     }
 
     if (input_data.availability_schedule_name.empty()) {
-        this->availScheduleIndex = DataGlobalConstants::ScheduleAlwaysOn;
+        this->availScheduleIndex = Constant::ScheduleAlwaysOn;
     } else {
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
     }
@@ -308,7 +308,7 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         _,
                         "System");
 
-    if (this->performance.compressorFuelType != DataGlobalConstants::ResourceType::Electricity) {
+    if (this->performance.compressorFuelType != Constant::ResourceType::Electricity) {
         SetupOutputVariable(state,
                             "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Rate",
                             OutputProcessor::Unit::W,
@@ -723,7 +723,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
-    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     // update condensate collection tank
     if (this->condensateTankIndex > 0) {

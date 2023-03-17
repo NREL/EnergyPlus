@@ -426,15 +426,15 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
     for (I = 1; I <= 10; ++I) {
         TGO = TOUT + U * DT / HXO; // update glazing surface temps
         TGI = TIN - U * DT / HXI;
-        HRO = DataGlobalConstants::StefanBoltzmann * EO *
-              (pow_2(TGO + DataGlobalConstants::KelvinConv) + pow_2(TOUT + DataGlobalConstants::KelvinConv)) *
-              ((TGO + DataGlobalConstants::KelvinConv) + (TOUT + DataGlobalConstants::KelvinConv));
-        HRI = DataGlobalConstants::StefanBoltzmann * EI *
-              (pow_2(TGI + DataGlobalConstants::KelvinConv) + pow_2(TIN + DataGlobalConstants::KelvinConv)) *
-              ((TGI + DataGlobalConstants::KelvinConv) + (TIN + DataGlobalConstants::KelvinConv));
+        HRO = Constant::StefanBoltzmann * EO *
+              (pow_2(TGO + Constant::KelvinConv) + pow_2(TOUT + Constant::KelvinConv)) *
+              ((TGO + Constant::KelvinConv) + (TOUT + Constant::KelvinConv));
+        HRI = Constant::StefanBoltzmann * EI *
+              (pow_2(TGI + Constant::KelvinConv) + pow_2(TIN + Constant::KelvinConv)) *
+              ((TGI + Constant::KelvinConv) + (TIN + Constant::KelvinConv));
         // HCI = HIC_ASHRAE( Height, TGI, TI)  ! BAN June 2103 Raplaced with ISO Std 15099
-        TGIK = TGI + DataGlobalConstants::KelvinConv;
-        TIK = TIN + DataGlobalConstants::KelvinConv;
+        TGIK = TGI + Constant::KelvinConv;
+        TIK = TIN + Constant::KelvinConv;
         HCI = HCInWindowStandardRatings(state, Height, TGIK, TIK);
         if (HCI < 0.001) break;
         HXI = HCI + HRI;
@@ -722,7 +722,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
         SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
         Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
         TaIn = RefAirTemp;
-        TIN = TaIn + DataGlobalConstants::KelvinConv; // Inside air temperature, K
+        TIN = TaIn + Constant::KelvinConv; // Inside air temperature, K
 
         // now get "outside" air temperature
         if (SurfNumAdj > 0) {
@@ -730,9 +730,9 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             // condition
             ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
             RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
-            Tout = RefAirTemp + DataGlobalConstants::KelvinConv; // outside air temperature
+            Tout = RefAirTemp + Constant::KelvinConv; // outside air temperature
             tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
-                   DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+                   Constant::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
             // The IR radiance of this window's "exterior" surround is the IR radiance
             // from surfaces and high-temp radiant sources in the adjacent zone
@@ -749,31 +749,31 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                     for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                         SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
                         SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                         DataGlobalConstants::KelvinConv;
-                        OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
+                                         Constant::KelvinConv;
+                        OutSrdIR += Constant::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                     }
                 }
             }
             if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                 if (state.dataEnvrn->IsRain) {                 // Raining: since wind exposed, outside window surface gets wet
-                    Tout = state.dataSurface->SurfOutWetBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
+                    Tout = state.dataSurface->SurfOutWetBulbTemp(SurfNum) + Constant::KelvinConv;
                 } else { // Dry
-                    Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
+                    Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
                 }
             } else { // Window not exposed to wind
-                Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
+                Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
             }
             tsky = state.dataEnvrn->SkyTempKelvin;
-            Ebout = DataGlobalConstants::StefanBoltzmann * pow_4(Tout);
+            Ebout = Constant::StefanBoltzmann * pow_4(Tout);
             // ASHWAT model may be slightly different
             outir = state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *
-                        (state.dataSurface->SurfAirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) +
+                        (state.dataSurface->SurfAirSkyRadSplit(SurfNum) * Constant::StefanBoltzmann * pow_4(tsky) +
                          (1.0 - state.dataSurface->SurfAirSkyRadSplit(SurfNum)) * Ebout) +
                     state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
         }
     }
     // Outdoor conditions
-    TRMOUT = root_4(outir / DataGlobalConstants::StefanBoltzmann); // it is in Kelvin scale
+    TRMOUT = root_4(outir / Constant::StefanBoltzmann); // it is in Kelvin scale
     // indoor conditions
     LWAbsIn = EffectiveEPSLB(state.dataWindowEquivLayer->CFS(EQLNum));  // windows inside face effective thermal emissivity
     LWAbsOut = EffectiveEPSLF(state.dataWindowEquivLayer->CFS(EQLNum)); // windows outside face effective thermal emissivity
@@ -782,7 +782,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // IR incident on window from zone surfaces and high-temp radiant sources
     rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) +
            state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum);
-    TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
+    TRMIN = root_4(rmir / Constant::StefanBoltzmann); // TODO check model equation.
 
     NL = state.dataWindowEquivLayer->CFS(EQLNum).NL;
     QAllSWwinAbs({1, NL + 1}) = state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, {1, NL + 1});
@@ -808,7 +808,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
 
     // effective surface temperature is set to surface temperature calculated
     // by the fenestration layers temperature solver
-    SurfInsideTemp = T(NL) - DataGlobalConstants::KelvinConv;
+    SurfInsideTemp = T(NL) - Constant::KelvinConv;
     // Convective to room
     QCONV = H(NL) * (T(NL) - TIN);
     // Other convective = total conv - standard model prediction
@@ -816,7 +816,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // Save the extra convection term. This term is added to the zone air heat
     // balance equation
     state.dataSurface->SurfWinOtherConvHeatGain(SurfNum) = state.dataSurface->Surface(SurfNum).Area * QXConv;
-    SurfOutsideTemp = T(1) - DataGlobalConstants::KelvinConv;
+    SurfOutsideTemp = T(1) - Constant::KelvinConv;
     // Various reporting calculations
     InSideLayerType = state.dataWindowEquivLayer->CFS(EQLNum).L(NL).LTYPE;
     if (InSideLayerType == LayerType::GLAZE) {
@@ -826,7 +826,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     }
     state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
     NetIRHeatGainWindow = state.dataSurface->Surface(SurfNum).Area * LWAbsIn *
-                          (DataGlobalConstants::StefanBoltzmann * pow_4(SurfInsideTemp + DataGlobalConstants::KelvinConv) - rmir);
+                          (Constant::StefanBoltzmann * pow_4(SurfInsideTemp + Constant::KelvinConv) - rmir);
     ConvHeatGainWindow = state.dataSurface->Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
     // Window heat gain (or loss) is calculated here
     state.dataSurface->SurfWinHeatGain(SurfNum) =
@@ -951,7 +951,7 @@ HEMINT(EnergyPlusData &state,
     int iPX;
 
     X1 = 0.0; // integration limits
-    X2 = DataGlobalConstants::PiOvr2;
+    X2 = Constant::PiOvr2;
     nPan = 1;
     SUM = 0.0;
     for (K = 1; K <= KMAX; ++K) {
@@ -1099,7 +1099,7 @@ void RB_BEAM(EnergyPlusData &state,
     Real64 TAUBB_EXPO;   // exponent in the beam-beam transmittance model
     Real64 TAU_BT;       // beam-total transmittance
 
-    THETA = min(89.99 * DataGlobalConstants::DegToRadians, xTHETA);
+    THETA = min(89.99 * Constant::DegToRadians, xTHETA);
 
     if (TAU_BB0 > 0.9999) {
         TAU_BB = 1.0;
@@ -1114,13 +1114,13 @@ void RB_BEAM(EnergyPlusData &state,
         }
         TAU_BT = TAU_BT0 * std::pow(std::cos(THETA), TAUBT_EXPO); // always 0 - 1
 
-        Real64 const cos_TAU_BB0(std::cos(TAU_BB0 * DataGlobalConstants::PiOvr2));
-        THETA_CUTOFF = DataGlobalConstants::DegToRadians * (90.0 - 25.0 * cos_TAU_BB0);
+        Real64 const cos_TAU_BB0(std::cos(TAU_BB0 * Constant::PiOvr2));
+        THETA_CUTOFF = Constant::DegToRadians * (90.0 - 25.0 * cos_TAU_BB0);
         if (THETA >= THETA_CUTOFF) {
             TAU_BB = 0.0;
         } else {
             TAUBB_EXPO = 0.6 * std::pow(cos_TAU_BB0, 0.3);
-            TAU_BB = TAU_BB0 * std::pow(std::cos(DataGlobalConstants::PiOvr2 * THETA / THETA_CUTOFF), TAUBB_EXPO);
+            TAU_BB = TAU_BB0 * std::pow(std::cos(Constant::PiOvr2 * THETA / THETA_CUTOFF), TAUBB_EXPO);
             // BB correlation can produce results slightly larger than BT
             // Enforce consistency
             TAU_BB = min(TAU_BT, TAU_BB);
@@ -1254,7 +1254,7 @@ void IS_BEAM(EnergyPlusData &state,
     Real64 RHO_BT90;     // beam-total reflectance at 90 deg incidence
     Real64 TAU_BT;       // beam-total transmittance
 
-    Real64 const THETA(min(89.99 * DataGlobalConstants::DegToRadians, xTHETA)); // working incident angle, radians
+    Real64 const THETA(min(89.99 * Constant::DegToRadians, xTHETA)); // working incident angle, radians
     Real64 const COSTHETA(std::cos(THETA));
 
     RHO_W = RHO_BT0 / max(0.00001, 1.0 - TAU_BB0);
@@ -1274,7 +1274,7 @@ void IS_BEAM(EnergyPlusData &state,
             TAU_BB = 0.0;
         } else {
             B = -0.45 * std::log(max(TAU_BB0, 0.01)) + 0.1;
-            TAU_BB = P01(state, TAU_BB0 * std::pow(std::cos(DataGlobalConstants::PiOvr2 * THETA / THETA_CUTOFF), B), TauBB_Name);
+            TAU_BB = P01(state, TAU_BB0 * std::pow(std::cos(Constant::PiOvr2 * THETA / THETA_CUTOFF), B), TauBB_Name);
         }
 
         B = -0.65 * std::log(max(TAU_BT0, 0.01)) + 0.1;
@@ -1445,7 +1445,7 @@ void FM_BEAM(EnergyPlusData &state,
     Real64 RHO_BT90; // beam-total reflectance at 90 deg incidence
     Real64 TAU_BT;   // beam-total transmittance
 
-    THETA = std::abs(max(-89.99 * DataGlobalConstants::DegToRadians, min(89.99 * DataGlobalConstants::DegToRadians, xTHETA)));
+    THETA = std::abs(max(-89.99 * Constant::DegToRadians, min(89.99 * Constant::DegToRadians, xTHETA)));
     // limit -89.99 - +89.99
     // by symmetry, optical properties same at +/- theta
     Real64 const COSTHETA(std::cos(THETA));
@@ -1737,8 +1737,8 @@ void PD_BEAM(EnergyPlusData &state,
     Real64 TAUBF_BB_PERP;
     Real64 TAUBF_BD_PERP;
 
-    OMEGA_V = std::abs(max(-89.5 * DataGlobalConstants::DegToRadians, min(89.5 * DataGlobalConstants::DegToRadians, OHM_V_RAD)));
-    OMEGA_H = std::abs(max(-89.5 * DataGlobalConstants::DegToRadians, min(89.5 * DataGlobalConstants::DegToRadians, OHM_H_RAD)));
+    OMEGA_V = std::abs(max(-89.5 * Constant::DegToRadians, min(89.5 * Constant::DegToRadians, OHM_V_RAD)));
+    OMEGA_H = std::abs(max(-89.5 * Constant::DegToRadians, min(89.5 * Constant::DegToRadians, OHM_H_RAD)));
     // limit profile angles -89.5 - +89.5
     // by symmetry, properties same for +/- profile angle
 
@@ -3770,9 +3770,9 @@ void VB_SOL46_CURVE(EnergyPlusData &state,
     CORR = 1;
 
     // limit slat angle to +/- 90 deg
-    PHI = max(-DataGlobalConstants::DegToRadians * 90.0, min(DataGlobalConstants::DegToRadians * 90.0, PHIx));
+    PHI = max(-Constant::DegToRadians * 90.0, min(Constant::DegToRadians * 90.0, PHIx));
     // limit profile angle to +/- 89.5 deg
-    OMEGA = max(-DataGlobalConstants::DegToRadians * 89.5, min(DataGlobalConstants::DegToRadians * 89.5, OMEGAx));
+    OMEGA = max(-Constant::DegToRadians * 89.5, min(Constant::DegToRadians * 89.5, OMEGAx));
 
     SL_RAD = W / max(SL_WR, 0.0000001);
     SL_THETA = 2.0 * std::asin(0.5 * SL_WR);
@@ -4016,7 +4016,7 @@ void VB_SOL4(EnergyPlusData &state,
         //      PRINT *, PHI, OMEGA, DE, 'BOTLIT'
     }
     //  CHECK TO SEE IF VENETIAN BLIND IS CLOSED
-    if (std::abs(PHI - DataGlobalConstants::PiOvr2) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
+    if (std::abs(PHI - Constant::PiOvr2) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
 
         // CHECK TO SEE IF THERE ARE GAPS IN BETWEEN SLATS WHEN THE BLIND IS CLOSED
         if (W < S) { // YES, THERE ARE GAPS IN BETWEEN SLATS
@@ -4136,7 +4136,7 @@ void VB_SOL6(EnergyPlusData &state,
     }
 
     //  CHECK TO SEE IF VENETIAN BLIND IS CLOSED
-    if (std::abs(PHI - DataGlobalConstants::PiOvr2) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
+    if (std::abs(PHI - Constant::PiOvr2) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
 
         // CHECK TO SEE IF THERE ARE GAPS IN BETWEEN SLATS WHEN THE BLIND IS CLOSED
         if (W < S) { // YES, THERE ARE GAPS IN BETWEEN SLATS
@@ -4468,8 +4468,8 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
 
     ITRY = 0;
 
-    EB(0) = DataGlobalConstants::StefanBoltzmann * pow_4(TOUT);
-    EB(NL + 1) = DataGlobalConstants::StefanBoltzmann * pow_4(TIN);
+    EB(0) = Constant::StefanBoltzmann * pow_4(TOUT);
+    EB(NL + 1) = Constant::StefanBoltzmann * pow_4(TIN);
 
     ADIM = 3 * NL + 2; // DIMENSION OF A-MATRIX
 
@@ -4509,7 +4509,7 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
     //   FIRST ESTIMATE OF GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
     for (I = 1; I <= NL; ++I) {
         T(I) = TOUT + double(I) / double(NL + 1) * (TIN - TOUT);
-        EB(I) = DataGlobalConstants::StefanBoltzmann * pow_4(T(I));
+        EB(I) = Constant::StefanBoltzmann * pow_4(T(I));
     }
 
     CONVRG = 0;
@@ -4609,16 +4609,16 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
         //  CONVERT TEMPERATURE POTENTIAL CONVECTIVE COEFFICIENTS to
         //  BLACK EMISSIVE POWER POTENTIAL CONVECTIVE COEFFICIENTS
 
-        HHAT(0) = HC[0] * (1.0 / DataGlobalConstants::StefanBoltzmann) / ((TOUT_2 + pow_2(T(1))) * (TOUT + T(1)));
+        HHAT(0) = HC[0] * (1.0 / Constant::StefanBoltzmann) / ((TOUT_2 + pow_2(T(1))) * (TOUT + T(1)));
 
         Real64 T_I_2(pow_2(T(1))), T_IP_2;
         for (I = 1; I <= NL - 1; ++I) { // Scan the cavities
             T_IP_2 = pow_2(T(I + 1));
-            HHAT(I) = HC[I] * (1.0 / DataGlobalConstants::StefanBoltzmann) / ((T_I_2 + T_IP_2) * (T(I) + T(I + 1)));
+            HHAT(I) = HC[I] * (1.0 / Constant::StefanBoltzmann) / ((T_I_2 + T_IP_2) * (T(I) + T(I + 1)));
             T_I_2 = T_IP_2;
         }
 
-        HHAT(NL) = HC[NL] * (1.0 / DataGlobalConstants::StefanBoltzmann) / ((pow_2(T(NL)) + TIN_2) * (T(NL) + TIN));
+        HHAT(NL) = HC[NL] * (1.0 / Constant::StefanBoltzmann) / ((pow_2(T(NL)) + TIN_2) * (T(NL) + TIN));
 
         //  SET UP MATRIX
         XSOL = 0.0;
@@ -4627,7 +4627,7 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
         L = 1;
         A(1, L) = 1.0;
         A(2, L) = -1.0 * RHOB(0); //  -1.0 * RHOB_OUT
-        A(ADIM + 1, L) = EPSB_OUT * DataGlobalConstants::StefanBoltzmann * TRMOUT_4;
+        A(ADIM + 1, L) = EPSB_OUT * Constant::StefanBoltzmann * TRMOUT_4;
 
         for (I = 1; I <= NL; ++I) {
             L = 3 * I - 1;
@@ -4682,7 +4682,7 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
         L = 3 * NL + 2;
         A(3 * NL + 1, L) = -1.0 * RHOF(NL + 1); //   - 1.0 * RHOF_ROOM
         A(3 * NL + 2, L) = 1.0;
-        A(ADIM + 1, L) = EPSF_ROOM * DataGlobalConstants::StefanBoltzmann * TRMIN_4;
+        A(ADIM + 1, L) = EPSF_ROOM * Constant::StefanBoltzmann * TRMIN_4;
 
         //  SOLVE MATRIX
         //  Call SOLMATS for single precision matrix solution
@@ -4697,7 +4697,7 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
             JF(I) = XSOL(J);
             ++J;
             EB(I) = max(1.0, XSOL(J)); // prevent impossible temps
-            TNEW(I) = root_4(EB(I) / DataGlobalConstants::StefanBoltzmann);
+            TNEW(I) = root_4(EB(I) / Constant::StefanBoltzmann);
             ++J;
             JB[I] = XSOL(J);
             MAXERR = max(MAXERR, std::abs(TNEW(I) - T(I)) / TNEW(I));
@@ -4719,7 +4719,7 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
         //  UPDATE GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
         for (I = 1; I <= NL; ++I) {
             T(I) += ALPHA * (TNEW(I) - T(I));
-            EB(I) = DataGlobalConstants::StefanBoltzmann * pow_4(T(I));
+            EB(I) = Constant::StefanBoltzmann * pow_4(T(I));
         }
 
         //  CHECK FOR CONVERGENCE
@@ -4945,8 +4945,8 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
 
     ITRY = 0;
 
-    EB(0) = DataGlobalConstants::StefanBoltzmann * pow_4(TOUT);
-    EB(NL + 1) = DataGlobalConstants::StefanBoltzmann * pow_4(TIN);
+    EB(0) = Constant::StefanBoltzmann * pow_4(TOUT);
+    EB(NL + 1) = Constant::StefanBoltzmann * pow_4(TIN);
 
     ADIM = 3 * NL + 2; // DIMENSION OF A-MATRIX
 
@@ -4986,7 +4986,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
     //   FIRST ESTIMATE OF GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
     for (I = 1; I <= NL; ++I) {
         T(I) = TOUT + double(I) / double(NL + 1) * (TIN - TOUT);
-        EB(I) = DataGlobalConstants::StefanBoltzmann * pow_4(T(I));
+        EB(I) = Constant::StefanBoltzmann * pow_4(T(I));
     }
 
     CONVRG = 0;
@@ -5084,16 +5084,16 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
         //  CONVERT TEMPERATURE POTENTIAL CONVECTIVE COEFFICIENTS to
         //  BLACK EMISSIVE POWER POTENTIAL CONVECTIVE COEFFICIENTS
 
-        HHAT(0) = HC[0] * (1.0 / DataGlobalConstants::StefanBoltzmann) / ((TOUT_2 + pow_2(T(1))) * (TOUT + T(1)));
+        HHAT(0) = HC[0] * (1.0 / Constant::StefanBoltzmann) / ((TOUT_2 + pow_2(T(1))) * (TOUT + T(1)));
 
         Real64 T_I_2(pow_2(T(1))), T_IP_2;
         for (I = 1; I <= NL - 1; ++I) { // Scan the cavities
             T_IP_2 = pow_2(T(I + 1));
-            HHAT(I) = HC[I] * (1.0 / DataGlobalConstants::StefanBoltzmann) / ((T_I_2 + T_IP_2) * (T(I) + T(I + 1)));
+            HHAT(I) = HC[I] * (1.0 / Constant::StefanBoltzmann) / ((T_I_2 + T_IP_2) * (T(I) + T(I + 1)));
             T_I_2 = T_IP_2;
         }
 
-        HHAT(NL) = HC[NL] * (1.0 / DataGlobalConstants::StefanBoltzmann) / ((pow_2(T(NL)) + TIN_2) * (T(NL) + TIN));
+        HHAT(NL) = HC[NL] * (1.0 / Constant::StefanBoltzmann) / ((pow_2(T(NL)) + TIN_2) * (T(NL) + TIN));
 
         //  SET UP MATRIX
         XSOL = 0.0;
@@ -5102,7 +5102,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
         L = 1;
         A(1, L) = 1.0;
         A(2, L) = -1.0 * RHOB(0); //  -1.0 * RHOB_OUT
-        A(ADIM + 1, L) = EPSB_OUT * DataGlobalConstants::StefanBoltzmann * TRMOUT_4;
+        A(ADIM + 1, L) = EPSB_OUT * Constant::StefanBoltzmann * TRMOUT_4;
 
         for (I = 1; I <= NL; ++I) {
             L = 3 * I - 1;
@@ -5157,7 +5157,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
         L = 3 * NL + 2;
         A(3 * NL + 1, L) = -1.0 * RHOF(NL + 1); //   - 1.0 * RHOF_ROOM
         A(3 * NL + 2, L) = 1.0;
-        A(ADIM + 1, L) = EPSF_ROOM * DataGlobalConstants::StefanBoltzmann * TRMIN_4;
+        A(ADIM + 1, L) = EPSF_ROOM * Constant::StefanBoltzmann * TRMIN_4;
 
         //  SOLVE MATRIX
         //  Call SOLMATS for single precision matrix solution
@@ -5172,7 +5172,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
             JF(I) = XSOL(J);
             ++J;
             EB(I) = max(1.0, XSOL(J)); // prevent impossible temps
-            TNEW(I) = root_4(EB(I) / DataGlobalConstants::StefanBoltzmann);
+            TNEW(I) = root_4(EB(I) / Constant::StefanBoltzmann);
             ++J;
             JB[I] = XSOL(J);
             MAXERR = max(MAXERR, std::abs(TNEW(I) - T(I)) / TNEW(I));
@@ -5194,7 +5194,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
         //  UPDATE GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
         for (I = 1; I <= NL; ++I) {
             T(I) += ALPHA * (TNEW(I) - T(I));
-            EB(I) = DataGlobalConstants::StefanBoltzmann * pow_4(T(I));
+            EB(I) = Constant::StefanBoltzmann * pow_4(T(I));
         }
 
         //  CHECK FOR CONVERGENCE
@@ -5800,11 +5800,11 @@ void DL_RES_r2(Real64 const Tg,    // mean glass layer temperature, {K}
     Real64 const Td_2(pow_2(Td));
     Real64 const Tg_2(pow_2(Tg));
     Real64 const Tm_2(pow_2(Tm));
-    hr_gm = Epsg * Epsm * FSg_m * DataGlobalConstants::StefanBoltzmann * (Tg + Tm) * (Tg_2 + Tm_2);
-    hr_gd = Epsg * Epsdf * FSg_df * DataGlobalConstants::StefanBoltzmann * (Td + Tg) * (Td_2 + Tg_2) +
-            Epsg * Epsdb * FSg_db * DataGlobalConstants::StefanBoltzmann * (Td + Tg) * (Td_2 + Tg_2);
-    hr_md = Epsm * Epsdf * FSm_df * DataGlobalConstants::StefanBoltzmann * (Td + Tm) * (Td_2 + Tm_2) +
-            Epsm * Epsdb * FSm_db * DataGlobalConstants::StefanBoltzmann * (Td + Tm) * (Td_2 + Tm_2);
+    hr_gm = Epsg * Epsm * FSg_m * Constant::StefanBoltzmann * (Tg + Tm) * (Tg_2 + Tm_2);
+    hr_gd = Epsg * Epsdf * FSg_df * Constant::StefanBoltzmann * (Td + Tg) * (Td_2 + Tg_2) +
+            Epsg * Epsdb * FSg_db * Constant::StefanBoltzmann * (Td + Tg) * (Td_2 + Tg_2);
+    hr_md = Epsm * Epsdf * FSm_df * Constant::StefanBoltzmann * (Td + Tm) * (Td_2 + Tm_2) +
+            Epsm * Epsdb * FSm_db * Constant::StefanBoltzmann * (Td + Tm) * (Td_2 + Tm_2);
 }
 
 void SETUP4x4_A(Real64 const rhog, Real64 const rhodf, Real64 const rhodb, Real64 const taud, Real64 const rhom, Array2A<Real64> A)
@@ -5883,7 +5883,7 @@ Real64 FRA(Real64 const TM, // mean gas temp, K
     CP = ACP + BCP * TM + BCP * TM * TM;
     VISC = AVISC + BVISC * TM + BVISC * TM * TM;
 
-    FRA = (DataGlobalConstants::GravityConstant * RHOGAS * RHOGAS * DT * T * T * T * CP) / (VISC * K * TM * Z * Z);
+    FRA = (Constant::GravityConstant * RHOGAS * RHOGAS * DT * T * T * T * CP) / (VISC * K * TM * Z * Z);
 
     return FRA;
 }
@@ -5983,7 +5983,7 @@ Real64 HRadPar(Real64 const T1, // bounding surface temps [K]
     HRadPar = 0.0;
     if ((E1 > 0.001) && (E2 > 0.001)) {
         DV = (1.0 / E1) + (1.0 / E2) - 1.0;
-        HRadPar = (DataGlobalConstants::StefanBoltzmann / DV) * (T1 + T2) * (pow_2(T1) + pow_2(T2));
+        HRadPar = (Constant::StefanBoltzmann / DV) * (T1 + T2) * (pow_2(T1) + pow_2(T2));
     }
     return HRadPar;
 }
@@ -6371,9 +6371,9 @@ bool CFSUFactor(EnergyPlusData &state,
         return CFSUFactor;
     }
 
-    TOABS = TOUT + DataGlobalConstants::KelvinConv;
+    TOABS = TOUT + Constant::KelvinConv;
     TRMOUT = TOABS;
-    TIABS = TIN + DataGlobalConstants::KelvinConv;
+    TIABS = TIN + Constant::KelvinConv;
     TRMIN = TIABS;
 
     NL = FS.NL;
@@ -6790,11 +6790,11 @@ bool Specular_OffNormal(Real64 const THETA, // solar beam angle of incidence, fr
 
     Specular_OffNormal = true;
     THETA1 = std::abs(THETA);
-    if (THETA1 > DataGlobalConstants::PiOvr2 - DataGlobalConstants::DegToRadians) {
+    if (THETA1 > Constant::PiOvr2 - Constant::DegToRadians) {
         // theta > 89 deg
         RAT_TAU = 0.0;
         RAT_1MR = 0.0;
-    } else if (THETA1 >= DataGlobalConstants::DegToRadians) {
+    } else if (THETA1 >= Constant::DegToRadians) {
         // theta >= 1 deg
         N2 = 1.526;
         KL = 55.0 * 0.006;
@@ -7355,10 +7355,10 @@ bool VB_LWP(EnergyPlusData &state,
     RHOUFS_SLAT = 1.0 - L.LWP_MAT.EPSLF - L.LWP_MAT.TAUL; // upward surface
 
     // TODO: are there cases where 2 calls not needed (RHODFS_SLAT == RHOUFS_SLAT??)
-    VB_DIFF(state, L.S, L.W, DataGlobalConstants::DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLF, LLWP.TAUL);
+    VB_DIFF(state, L.S, L.W, Constant::DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLF, LLWP.TAUL);
     LLWP.EPSLF = 1.0 - RHOLF - LLWP.TAUL;
 
-    VB_DIFF(state, L.S, L.W, -DataGlobalConstants::DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLB, TAULX);
+    VB_DIFF(state, L.S, L.W, -Constant::DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLB, TAULX);
     LLWP.EPSLB = 1.0 - RHOLB - LLWP.TAUL;
 
     VB_LWP = true;
@@ -7393,7 +7393,7 @@ bool VB_SWP(EnergyPlusData &state,
                    L.S,
                    L.W,
                    SL_WR,
-                   DataGlobalConstants::DegToRadians * L.PHI_DEG,
+                   Constant::DegToRadians * L.PHI_DEG,
                    OMEGA,
                    L.SWP_MAT.RHOSBDD,
                    L.SWP_MAT.RHOSFDD,
@@ -7406,7 +7406,7 @@ bool VB_SWP(EnergyPlusData &state,
                    L.S,
                    L.W,
                    SL_WR,
-                   -DataGlobalConstants::DegToRadians * L.PHI_DEG,
+                   -Constant::DegToRadians * L.PHI_DEG,
                    OMEGA,
                    L.SWP_MAT.RHOSBDD,
                    L.SWP_MAT.RHOSFDD,
@@ -7446,7 +7446,7 @@ bool VB_SWP(EnergyPlusData &state,
     VB_DIFF(state,
             L.S,
             L.W,
-            DataGlobalConstants::DegToRadians * L.PHI_DEG,
+            Constant::DegToRadians * L.PHI_DEG,
             L.SWP_MAT.RHOSBDD,
             L.SWP_MAT.RHOSFDD,
             L.SWP_MAT.TAUS_DD,
@@ -7454,7 +7454,7 @@ bool VB_SWP(EnergyPlusData &state,
             LSWP.TAUS_DD);
 
     VB_DIFF(
-        state, L.S, L.W, -DataGlobalConstants::DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
+        state, L.S, L.W, -Constant::DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
 
     return true;
 }
@@ -7565,7 +7565,7 @@ bool DoShadeControl(EnergyPlusData &state,
 
     // must be consistent with IsControlledShade()
     if (IsVBLayer(L) && L.CNTRL != state.dataWindowEquivalentLayer->lscNONE) {
-        if (THETA < 0.0 || THETA >= DataGlobalConstants::PiOvr2) {
+        if (THETA < 0.0 || THETA >= Constant::PiOvr2) {
             OMEGA_DEG = -1.0; // diffuse only
         } else if (L.LTYPE == LayerType::VBHOR) {
             // horiz VB
@@ -7812,7 +7812,7 @@ float DensityCFSFillGas(CFSFILLGAS const &FG, // gas properties
     // Return value
     float DensityCFSFillGas;
 
-    DensityCFSFillGas = (P * FG.MHAT) / (DataGlobalConstants::UniversalGasConst * max(T, 1.0));
+    DensityCFSFillGas = (P * FG.MHAT) / (Constant::UniversalGasConst * max(T, 1.0));
 
     return DensityCFSFillGas;
 }
@@ -8103,7 +8103,7 @@ Real64 TRadC(Real64 const J,    // radiosity, W/m2
     // PURPOSE OF THIS FUNCTION:
     // Returns equivalent celsius scale temperature from radiosity
 
-    return root_4(J / (DataGlobalConstants::StefanBoltzmann * max(Emiss, 0.001))) - DataGlobalConstants::KelvinConv;
+    return root_4(J / (Constant::StefanBoltzmann * max(Emiss, 0.001))) - Constant::KelvinConv;
 }
 
 void CalcEQLOpticalProperty(EnergyPlusData &state,
@@ -8312,7 +8312,7 @@ Real64 HCInWindowStandardRatings(EnergyPlusData &state,
     Real64 Nuint;           // Nusselt number for interior surface convection
 
     TiltDeg = 90.0;
-    sineTilt = std::sin(TiltDeg * DataGlobalConstants::DegToRadians); // degrees as arg
+    sineTilt = std::sin(TiltDeg * Constant::DegToRadians); // degrees as arg
 
     // Begin calculating for ISO 15099 method.
     // mean film temperature
@@ -8325,7 +8325,7 @@ Real64 HCInWindowStandardRatings(EnergyPlusData &state,
     mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin;     // Table B.2 in ISO 15099
     Cp = 1002.737 + 1.2324E-2 * TmeanFilmKelvin;   // Table B.3 in ISO 15099
 
-    RaH = (pow_2(rho) * pow_3(Height) * DataGlobalConstants::GravityConstant * Cp * std::abs(TSurfIn - TAirIn)) /
+    RaH = (pow_2(rho) * pow_3(Height) * Constant::GravityConstant * Cp * std::abs(TSurfIn - TAirIn)) /
           (TmeanFilmKelvin * mu * lambda); // eq 132 in ISO 15099
 
     // eq. 135 in ISO 15099 (only need this one because tilt is 90 deg)
