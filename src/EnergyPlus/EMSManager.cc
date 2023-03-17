@@ -2323,10 +2323,9 @@ void SetupEMSInternalVariable(
     using namespace DataRuntimeLanguage;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InternalVarAvailNum; // loop index
     bool FoundDuplicate = false;
 
-    for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
+    for (int InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
         if ((UtilityRoutines::SameString(cDataTypeName, state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName)) &&
             (UtilityRoutines::SameString(cUniqueIDName, state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName))) {
             FoundDuplicate = true;
@@ -2352,7 +2351,7 @@ void SetupEMSInternalVariable(
             ++state.dataRuntimeLang->numEMSInternalVarsAvailable;
         }
 
-        InternalVarAvailNum = state.dataRuntimeLang->numEMSInternalVarsAvailable;
+        int InternalVarAvailNum = state.dataRuntimeLang->numEMSInternalVarsAvailable;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName = cDataTypeName;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName = cUniqueIDName;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).Units = cUnits;
@@ -2376,11 +2375,9 @@ void SetupEMSInternalVariable(
     using namespace DataRuntimeLanguage;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InternalVarAvailNum; // loop index
-
     bool FoundDuplicate = false;
 
-    for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
+    for (int InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
         if ((UtilityRoutines::SameString(cDataTypeName, state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName)) &&
             (UtilityRoutines::SameString(cUniqueIDName, state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName))) {
             FoundDuplicate = true;
@@ -2406,7 +2403,7 @@ void SetupEMSInternalVariable(
             ++state.dataRuntimeLang->numEMSInternalVarsAvailable;
         }
 
-        InternalVarAvailNum = state.dataRuntimeLang->numEMSInternalVarsAvailable;
+        int InternalVarAvailNum = state.dataRuntimeLang->numEMSInternalVarsAvailable;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName = cDataTypeName;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName = cUniqueIDName;
         state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).Units = cUnits;
