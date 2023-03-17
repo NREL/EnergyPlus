@@ -1216,7 +1216,6 @@ namespace EMSManager {
 
         VarType = OutputProcessor::VariableType::NotFound;
         VarIndex = 0;
-        bool Found = false;
         GetVariableKeyCountandType(state, VarName, NumKeys, VarType, AvgOrSum, StepType, Units);
 
         // note that schedules are not getting VarType set right...
@@ -1230,6 +1229,7 @@ namespace EMSManager {
                 VarIndex = KeyIndex(1);
             } else {
                 int KeyNum;
+                bool Found = false;
                 for (KeyNum = 1; KeyNum <= NumKeys; ++KeyNum) {
                     if (KeyName(KeyNum) == VarKeyName) {
                         Found = true;

@@ -769,7 +769,7 @@ void ReportEarthTube(EnergyPlusData &state)
                     thisZone.EarthTubeHeatLossRate = thisZoneHB.MCPE * (thisZoneHB.ZT - thisEarthTube.AirTemp);
                     thisZone.EarthTubeHeatGain = 0.0;
                     thisZone.EarthTubeHeatGainRate = 0.0;
-                } else if (thisZoneHB.ZT <= thisEarthTube.AirTemp) {
+                } else {
                     thisZone.EarthTubeHeatGain = thisZoneHB.MCPE * (thisEarthTube.AirTemp - thisZoneHB.ZT) * ReportingConstant;
                     thisZone.EarthTubeHeatGainRate = thisZoneHB.MCPE * (thisEarthTube.AirTemp - thisZoneHB.ZT);
                     thisZone.EarthTubeHeatLoss = 0.0;

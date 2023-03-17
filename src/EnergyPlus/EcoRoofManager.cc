@@ -89,16 +89,6 @@ namespace EcoRoofManager {
     // of Frankenstein and Koenig (2004) - DRDC/CRREL Technical Report TR-04-25.
     // Precipitation schedules and irrigation schedules can be used to define hourly moisture
     // inputs (m). Moisture transport updated Oct 2010.
-    // REFERENCES:
-    // OTHER NOTES:
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
-    using namespace DataSurfaces;
-    using namespace DataHeatBalance;
-
-    // Functions
 
     void CalcEcoRoof(EnergyPlusData &state,
                      int const SurfNum,   // Indicator of Surface Number for the current surface
@@ -111,7 +101,6 @@ namespace EcoRoofManager {
         //     AUTHOR          David Sailor and Toan Pham
         //     DATE WRITTEN    January 2007
         //     MODIFIED        David Sailor - to fix initialization between DD runs and during warm-up
-        //     RE-ENGINEERED   na
 
         // PURPOSE OF THIS MODULE:
 
@@ -127,14 +116,6 @@ namespace EcoRoofManager {
         // IFS Documentation, CY25R1 (April 2002), www.ecmwf.int/research/ifsdocs/CY24r1/Physics/
         // Physics-08-03.html.
         // The Atmospheric Boundary Layer - by J.R. Garratt (Cambridge Atmos. & Space Science Series), 316pp.
-        // Using/Aliasing
-        using namespace DataEnvironment;
-        using namespace DataHeatBalance;
-        using namespace DataHeatBalSurface;
-        using namespace DataSurfaces;
-        using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using ConvectionCoefficients::SetExtConvectionCoeff;
-        using ConvectionCoefficients::SetIntConvectionCoeff;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr Kv(0.4);           // Von Karmen's constant (source FASST)
@@ -221,16 +202,16 @@ namespace EcoRoofManager {
         Real64 HMovInsul = 0.0;                            // "Convection" coefficient of movable insulation
 
         if (state.dataSurface->Surface(SurfNum).ExtWind) {
-            InitExteriorConvectionCoeff(state,
-                                        SurfNum,
-                                        HMovInsul,
-                                        RoughSurf,
-                                        AbsThermSurf,
-                                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
-                                        state.dataHeatBalSurf->SurfHcExt(SurfNum),
-                                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
-                                        state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                        state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+            ConvectionCoefficients::InitExteriorConvectionCoeff(state,
+                                                                SurfNum,
+                                                                HMovInsul,
+                                                                RoughSurf,
+                                                                AbsThermSurf,
+                                                                state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
+                                                                state.dataHeatBalSurf->SurfHcExt(SurfNum),
+                                                                state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
+                                                                state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
+                                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
         // Long Wave Radiation (W/m^2)
         Real64 Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
@@ -259,8 +240,9 @@ namespace EcoRoofManager {
                             state.dataEcoRoofMgr->Tf,
                             state.dataEcoRoofMgr->Qsoil);
 
-            Ta = OutDryBulbTempAt(state,
-                                  state.dataSurface->Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
+            Ta = DataEnvironment::OutDryBulbTempAt(
+                state,
+                state.dataSurface->Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
             state.dataEcoRoofMgr->Tg = state.dataEcoRoofMgr->Tgold;
             state.dataEcoRoofMgr->Tf = state.dataEcoRoofMgr->Tfold;
 
@@ -686,43 +668,39 @@ namespace EcoRoofManager {
 
     void initEcoRoof(EnergyPlusData &state, int const SurfNum, int const ConstrNum)
     {
-        // Using/Aliasing
-        using namespace DataEnvironment;
-
         auto const *thisMat =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)));
         assert(thisMat != nullptr);
-        auto &thisEcoRoof = state.dataEcoRoofMgr;
         auto &thisSurf = state.dataSurface->Surface(SurfNum);
 
         // DJS July 2007
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
         if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
-            thisEcoRoof->Moisture = thisMat->InitMoisture;         // Initial moisture content in soil
-            thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // Start the root zone moisture at the same value as the surface.
-            thisEcoRoof->Alphag = 1.0 - thisMat->AbsorpSolar;      // albedo rather than absorptivity
+            state.dataEcoRoofMgr->Moisture = thisMat->InitMoisture;                  // Initial moisture content in soil
+            state.dataEcoRoofMgr->MeanRootMoisture = state.dataEcoRoofMgr->Moisture; // Start the root zone moisture at the same value as the surface.
+            state.dataEcoRoofMgr->Alphag = 1.0 - thisMat->AbsorpSolar;               // albedo rather than absorptivity
         }
 
-        if (state.dataGlobal->BeginEnvrnFlag && thisEcoRoof->CalcEcoRoofMyEnvrnFlag) {
-            thisEcoRoof->Tgold = OutDryBulbTempAt(state, thisSurf.Centroid.z); // OutDryBulbTemp initial guess
-            thisEcoRoof->Tfold = OutDryBulbTempAt(state, thisSurf.Centroid.z); // OutDryBulbTemp initial guess
-            thisEcoRoof->Tg = 10.0;
-            thisEcoRoof->Tf = 10.0;
-            thisEcoRoof->Vfluxf = 0.0;
-            thisEcoRoof->Vfluxg = 0.0;
-            thisEcoRoof->CumRunoff = 0.0;
-            thisEcoRoof->CumET = 0.0;
-            thisEcoRoof->CumPrecip = 0.0;
-            thisEcoRoof->CumIrrigation = 0.0;
-            thisEcoRoof->CurrentRunoff = 0.0;
-            thisEcoRoof->CurrentET = 0.0;
-            thisEcoRoof->CurrentPrecipitation = 0.0;
-            thisEcoRoof->CurrentIrrigation = 0.0;
-            thisEcoRoof->CalcEcoRoofMyEnvrnFlag = false;
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag) {
+            state.dataEcoRoofMgr->Tgold = DataEnvironment::OutDryBulbTempAt(state, thisSurf.Centroid.z); // OutDryBulbTemp initial guess
+            state.dataEcoRoofMgr->Tfold = DataEnvironment::OutDryBulbTempAt(state, thisSurf.Centroid.z); // OutDryBulbTemp initial guess
+            state.dataEcoRoofMgr->Tg = 10.0;
+            state.dataEcoRoofMgr->Tf = 10.0;
+            state.dataEcoRoofMgr->Vfluxf = 0.0;
+            state.dataEcoRoofMgr->Vfluxg = 0.0;
+            state.dataEcoRoofMgr->CumRunoff = 0.0;
+            state.dataEcoRoofMgr->CumET = 0.0;
+            state.dataEcoRoofMgr->CumPrecip = 0.0;
+            state.dataEcoRoofMgr->CumIrrigation = 0.0;
+            state.dataEcoRoofMgr->CurrentRunoff = 0.0;
+            state.dataEcoRoofMgr->CurrentET = 0.0;
+            state.dataEcoRoofMgr->CurrentPrecipitation = 0.0;
+            state.dataEcoRoofMgr->CurrentIrrigation = 0.0;
+            state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag = false;
         }
 
-        if (!state.dataGlobal->BeginEnvrnFlag) thisEcoRoof->CalcEcoRoofMyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag = true;
     }
 
     void UpdateSoilProps(EnergyPlusData &state,
@@ -758,10 +736,6 @@ namespace EcoRoofManager {
         // to moisture differences. Input and Output of moisture are partitioned between layers.
         // Soil thermal properties vary based on non-dimensionalization of experimental data for 8 typical soils.
         // Specifically, THERMAL PROPERTY = Dry Value + (fraction of moisture content)*Wet Value
-
-        // Using/Aliasing
-        using namespace DataEnvironment;
-        using namespace DataSurfaces;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 const depth_fac((161240.0 * std::pow(2.0, -2.3)) / 60.0);
