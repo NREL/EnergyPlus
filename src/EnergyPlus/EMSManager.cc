@@ -726,8 +726,7 @@ namespace EMSManager {
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                } else if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed &&
-                           ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed) {
+                } else if (ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed) {
                     cCurrentModuleObject = "ExternalInterface:Actuator";
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                              cCurrentModuleObject,
@@ -741,8 +740,7 @@ namespace EMSManager {
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                } else if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed &&
-                           ActuatorNum <= (state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
+                } else if (ActuatorNum <= (state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
                                            state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed)) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -758,9 +756,7 @@ namespace EMSManager {
                                                                              lAlphaFieldBlanks,
                                                                              cAlphaFieldNames,
                                                                              cNumericFieldNames);
-                } else if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
-                                             state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed &&
-                           ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
+                } else if (ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
                                               state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
                                               state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
