@@ -442,7 +442,7 @@ namespace EMSManager {
 
                     state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = RuntimeLanguageProcessor::SetErlValueNumber(
                         ScheduleManager::GetCurrentScheduleValue(state, state.dataRuntimeLang->Sensor(SensorNum).SchedNum),
-                                          state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value);
+                        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value);
                 }
             }
         }
@@ -479,9 +479,9 @@ namespace EMSManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int NumAlphas;   // Number of elements in the alpha array
-        int NumNums;     // Number of elements in the numeric array
-        int IOStat;      // IO Status when calling get input subroutine
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
@@ -491,7 +491,7 @@ namespace EMSManager {
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         OutputProcessor::VariableType VarType;
-        int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
+        int TotalArgs(0); // argument for call to GetObjectDefMaxArgs
         bool errFlag;
 
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
@@ -1015,8 +1015,8 @@ namespace EMSManager {
 
         // added for FMU
         for (int ActuatorNum = 1; ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
-                                                 state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
-                                                 state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed;
+                                                     state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
+                                                     state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed;
              ++ActuatorNum) {
             // If we process the ExternalInterface actuators, all we need to do is to change the
 
@@ -2030,20 +2030,10 @@ namespace EMSManager {
                              "[C]",
                              zone.OutWetBulbTempEMSOverrideOn,
                              zone.OutWetBulbTempEMSOverrideValue);
-            SetupEMSActuator(state,
-                             "Zone",
-                             zone.Name,
-                             "Outdoor Air Wind Speed",
-                             "[m/s]",
-                             zone.WindSpeedEMSOverrideOn,
-                             zone.WindSpeedEMSOverrideValue);
-            SetupEMSActuator(state,
-                             "Zone",
-                             zone.Name,
-                             "Outdoor Air Wind Direction",
-                             "[degree]",
-                             zone.WindDirEMSOverrideOn,
-                             zone.WindDirEMSOverrideValue);
+            SetupEMSActuator(
+                state, "Zone", zone.Name, "Outdoor Air Wind Speed", "[m/s]", zone.WindSpeedEMSOverrideOn, zone.WindSpeedEMSOverrideValue);
+            SetupEMSActuator(
+                state, "Zone", zone.Name, "Outdoor Air Wind Direction", "[degree]", zone.WindDirEMSOverrideOn, zone.WindDirEMSOverrideValue);
         }
     }
 
