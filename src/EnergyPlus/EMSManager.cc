@@ -554,8 +554,6 @@ namespace EMSManager {
         std::string cCurrentModuleObject;
         OutputProcessor::VariableType VarType;
         int VarIndex;
-        bool FoundObjectType;
-        bool FoundObjectName;
         bool FoundActuatorName;
         int NumErlProgramsThisManager; // temporary size of Erl programs in EMSProgramCallManager
         int ManagerProgramNum;         // index counter for Erl programs inside EMSProgramCallManager
@@ -812,16 +810,12 @@ namespace EMSManager {
                 state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName = cAlphaArgs(2);
                 state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ControlTypeName = cAlphaArgs(4);
 
-                FoundObjectType = false;
-                FoundObjectName = false;
                 FoundActuatorName = false;
                 for (ActuatorVariableNum = 1; ActuatorVariableNum <= state.dataRuntimeLang->numEMSActuatorsAvailable; ++ActuatorVariableNum) {
                     if (UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).ComponentTypeName,
                                                     cAlphaArgs(3))) {
-                        FoundObjectType = true;
                         if (UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).UniqueIDName,
                                                         cAlphaArgs(2))) {
-                            FoundObjectName = true;
                             if (UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).ControlTypeName,
                                                             cAlphaArgs(4))) {
                                 FoundActuatorName = true;
@@ -889,12 +883,10 @@ namespace EMSManager {
                     state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).UniqueIDName = cAlphaArgs(2);
                     state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).InternalDataTypeName = cAlphaArgs(3);
 
-                    FoundObjectType = false;
-                    FoundObjectName = false;
+                    bool FoundObjectName = false;
                     for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
                         if (UtilityRoutines::SameString(state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName,
                                                         cAlphaArgs(3))) {
-                            FoundObjectType = true;
                             if (UtilityRoutines::SameString(state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName,
                                                             cAlphaArgs(2))) {
                                 FoundObjectName = true;
@@ -1311,7 +1303,6 @@ namespace EMSManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumKeys;
-        int KeyNum;
         OutputProcessor::StoreType AvgOrSum;
         OutputProcessor::TimeStepType StepType;
         OutputProcessor::Unit Units(OutputProcessor::Unit::None);
@@ -1334,6 +1325,7 @@ namespace EMSManager {
             if (KeyName(1) == "ENVIRONMENT") {
                 VarIndex = KeyIndex(1);
             } else {
+                int KeyNum;
                 for (KeyNum = 1; KeyNum <= NumKeys; ++KeyNum) {
                     if (KeyName(KeyNum) == VarKeyName) {
                         Found = true;
@@ -1478,20 +1470,11 @@ namespace EMSManager {
         // the pattern for the basic node setpoints is a little different in that the actuators directly
         // affect the node variables, rather than using separate logical override flag and ems values
 
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int LoopNode; // local do loop index
-        // (could this ever cause a fault?) // It caused illegal memory access/corruption
-        // make it optional in Setup call?
-        int OutsideAirNodeNum; // local do loop index
-        int NodeNum;           // local index.
-
         state.dataEMSMgr->lDummy = false;
 
         if (state.dataLoopNodes->NumOfNodes > 0) {
 
-            for (LoopNode = 1; LoopNode <= state.dataLoopNodes->NumOfNodes; ++LoopNode) {
+            for (int LoopNode = 1; LoopNode <= state.dataLoopNodes->NumOfNodes; ++LoopNode) {
                 // setup the setpoint for each type of variable that can be controlled
                 SetupEMSActuator(state,
                                  "System Node Setpoint",
@@ -1561,8 +1544,8 @@ namespace EMSManager {
         } // NumOfNodes > 0
 
         if (state.dataOutAirNodeMgr->NumOutsideAirNodes > 0) {
-            for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++OutsideAirNodeNum) {
-                NodeNum = state.dataOutAirNodeMgr->OutsideAirNodeList(OutsideAirNodeNum);
+            for (int OutsideAirNodeNum = 1; OutsideAirNodeNum <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++OutsideAirNodeNum) {
+                int NodeNum = state.dataOutAirNodeMgr->OutsideAirNodeList(OutsideAirNodeNum);
                 SetupEMSActuator(state,
                                  "Outdoor Air System Node",
                                  state.dataLoopNodes->NodeID(NodeNum),
@@ -1621,20 +1604,15 @@ namespace EMSManager {
         // Trend arrays are pushed so that the latest value is
         //  always at index 1.  old values get lost.
 
-        int TrendNum(0); // local loop counter
-        int ErlVarNum(0);
-        int TrendDepth(0);
-        Real64 currentVal(0.0);
-
         // checks with quick return if no updates needed.
         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) return;
         if (state.dataRuntimeLang->NumErlTrendVariables == 0) return;
 
-        for (TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
-            ErlVarNum = state.dataRuntimeLang->TrendVariable(TrendNum).ErlVariablePointer;
-            TrendDepth = state.dataRuntimeLang->TrendVariable(TrendNum).LogDepth;
+        for (int TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
+            int ErlVarNum = state.dataRuntimeLang->TrendVariable(TrendNum).ErlVariablePointer;
+            int TrendDepth = state.dataRuntimeLang->TrendVariable(TrendNum).LogDepth;
             if ((ErlVarNum > 0) && (TrendDepth > 0)) {
-                currentVal = state.dataRuntimeLang->ErlVariable(ErlVarNum).Value.Number;
+                Real64 currentVal = state.dataRuntimeLang->ErlVariable(ErlVarNum).Value.Number;
                 // push into trend
                 state.dataRuntimeLang->TrendVariable(TrendNum).tempTrendARR = state.dataRuntimeLang->TrendVariable(TrendNum).TrendValARR;
                 state.dataRuntimeLang->TrendVariable(TrendNum).TrendValARR(1) = currentVal;
@@ -1709,9 +1687,6 @@ namespace EMSManager {
         // Provide method to verify that a specific node is (probably) managed by EMS
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string cControlTypeName;
-        std::string cComponentTypeName;
-        std::string cNodeName;
         bool FoundControl = CheckIfNodeSetPointManaged(state, NodeNum, SetPointType, false);
 
         if ((!ErrorFlag) && (!FoundControl)) {
@@ -1880,15 +1855,11 @@ namespace EMSManager {
         // DERIVED TYPE DEFINITIONS:
         // na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int numAirLoops(0);
-        int Loop(0);
-
         state.dataEMSMgr->lDummy2 = false;
 
         if (allocated(state.dataAirLoop->PriAirSysAvailMgr)) {
-            numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
-            for (Loop = 1; Loop <= numAirLoops; ++Loop) {
+            int numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
+            for (int Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(state,
                                  "AirLoopHVAC",
                                  state.dataAirSystemsData->PrimaryAirSystems(Loop).Name,
@@ -2236,16 +2207,14 @@ namespace EMSManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int ZoneNum;
-        auto &Zone(state.dataHeatBal->Zone);
+        if (!state.dataHeatBal->Zone.empty()) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                auto &zone = state.dataHeatBal->Zone(ZoneNum);
 
-        if (allocated(Zone)) {
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-
-                SetupEMSInternalVariable(state, "Zone Floor Area", Zone(ZoneNum).Name, "[m2]", Zone(ZoneNum).FloorArea);
-                SetupEMSInternalVariable(state, "Zone Air Volume", Zone(ZoneNum).Name, "[m3]", Zone(ZoneNum).Volume);
-                SetupEMSInternalVariable(state, "Zone Multiplier", Zone(ZoneNum).Name, "[ ]", Zone(ZoneNum).Multiplier);
-                SetupEMSInternalVariable(state, "Zone List Multiplier", Zone(ZoneNum).Name, "[ ]", Zone(ZoneNum).ListMultiplier);
+                SetupEMSInternalVariable(state, "Zone Floor Area", zone.Name, "[m2]", zone.FloorArea);
+                SetupEMSInternalVariable(state, "Zone Air Volume", zone.Name, "[m3]", zone.Volume);
+                SetupEMSInternalVariable(state, "Zone Multiplier", zone.Name, "[ ]", zone.Multiplier);
+                SetupEMSInternalVariable(state, "Zone List Multiplier", zone.Name, "[ ]", zone.ListMultiplier);
             }
         }
     }
@@ -2520,12 +2489,10 @@ void SetupEMSInternalVariable(
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InternalVarAvailNum; // loop index
-    bool FoundInternalDataType;
     bool FoundDuplicate;
 
     // Object Data
 
-    FoundInternalDataType = false;
     FoundDuplicate = false;
 
     for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
@@ -2581,12 +2548,10 @@ void SetupEMSInternalVariable(
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InternalVarAvailNum; // loop index
-    bool FoundInternalDataType;
     bool FoundDuplicate;
 
     // Object Data
 
-    FoundInternalDataType = false;
     FoundDuplicate = false;
 
     for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
