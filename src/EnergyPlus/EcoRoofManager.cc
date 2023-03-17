@@ -79,7 +79,6 @@ namespace EcoRoofManager {
     //       AUTHOR         David Sailor and Toan Pham, Portland State University
     //       DATE WRITTEN   Jan 2007
     //       MODIFIED       Oct 2010
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // Module for implementing an ecoroof (aka Green Roof)
@@ -103,7 +102,6 @@ namespace EcoRoofManager {
         //     MODIFIED        David Sailor - to fix initialization between DD runs and during warm-up
 
         // PURPOSE OF THIS MODULE:
-
         // To calculate the heat balance for surfaces with eco roof specified as outside surface
         // Note that only ONE ecoroof construction can be employed at present time. If multiple
         // surfaces have ecoroof as the outside layer the energy balance is only calculated for
@@ -723,10 +721,8 @@ namespace EcoRoofManager {
         //     AUTHOR          David Sailor
         //     DATE WRITTEN    Jan 2007
         //     MODIFIED        Stephen Forner, Portland State University (SF); 7/15/2010
-        //     RE-ENGINEERED   na
 
         // PURPOSE OF THIS MODULE:
-
         // Track moisture input/output to ecoroof soil media (precipitation, irrigation, evapotranspiration, runoff)
         // Update soil thermal properties associated with variations in soil moisture and update CTF calculations
         // for the ecoroof construction layer.
@@ -746,12 +742,6 @@ namespace EcoRoofManager {
         Real64 constexpr lambda(0.5); // These parameters are empirical constants
         // This is another parameter of the soil which describes the soil conductivity at the saturation point (m/s)
         Real64 constexpr SoilConductivitySaturation(5.157e-7);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RatioMax;
