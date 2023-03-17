@@ -146,16 +146,10 @@ namespace EcoRoofManager {
         Real64 constexpr Cpa(1005.6);       // Specific heat of Water Vapor. (J/Kg.K)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EcoLoop; // an integer loop variable for the simultaneous solution iteration
-
-        Real64 AbsThermSurf;                  // Thermal absoptance of the exterior surface
         Material::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
-        Real64 HMovInsul;                     // "Convection" coefficient of movable insulation
         Real64 Tgk;                           // Ground temperature in Kelvin
         Real64 Ta;                            // current air temperature
-        Real64 Ws;                            // Wind Speed (m/s)
         Real64 Waf;                           // Windspeed within canopy (m/s)
-        Real64 Latm;                          // Long Wave Radiation (W/m^2)
         Real64 qaf;                           // mixing ratio of air near canopy
         Real64 qg;                            // mixing ratio of air at surface.
         Real64 RS;                            // shortwave radiation
@@ -213,10 +207,7 @@ namespace EcoRoofManager {
         Real64 Qsoilpart1; // intermediate variable for evaluating Qsoil (part without the unknown)
         Real64 Qsoilpart2; // intermediate variable for evaluating Qsoil (part coeff of the ground temperature)
 
-        //  INTEGER,EXTERNAL :: GetNewUnitNumber ! external function to return a new (unique) unit for ecoroof writing
-        int unit(0); // not actually used in the function it is passed into
-
-        Ws = DataEnvironment::WindSpeedAt(state, state.dataSurface->Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
+        Real64 Ws = DataEnvironment::WindSpeedAt(state, state.dataSurface->Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
         if (Ws < 2.0) { // Later we need to adjust for building roof height...
             Ws = 2.0;   // Set minimum possible wind speed outside vegetation to 2.0 m/s
                         // consistent with FASST TR-04-25 p. x (W' = 2.0)
@@ -226,8 +217,8 @@ namespace EcoRoofManager {
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)));
         assert(thisMaterial != nullptr);
         RoughSurf = thisMaterial->Roughness;
-        AbsThermSurf = thisMaterial->AbsorpThermal;
-        HMovInsul = 0.0;
+        Real64 AbsThermSurf = thisMaterial->AbsorpThermal; // Thermal absoptance of the exterior surface
+        Real64 HMovInsul = 0.0;                            // "Convection" coefficient of movable insulation
 
         if (state.dataSurface->Surface(SurfNum).ExtWind) {
             InitExteriorConvectionCoeff(state,
@@ -241,9 +232,9 @@ namespace EcoRoofManager {
                                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
-
-        Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
-               1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
+        // Long Wave Radiation (W/m^2)
+        Real64 Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
+                      1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
 
         if (state.dataEcoRoofMgr->EcoRoofbeginFlag)
             initEcoRoofFirstTime(state, SurfNum, ConstrNum); // Initialization statements for first entry into ecoroof routines
@@ -252,6 +243,7 @@ namespace EcoRoofManager {
 
         // If current surface is = FirstEcoSurf then for this time step we need to update the soil moisture
         if (SurfNum == state.dataEcoRoofMgr->FirstEcoSurf) {
+            int unit(0); // not actually used in the function it is passed into
             UpdateSoilProps(state,
                             state.dataEcoRoofMgr->Moisture,
                             state.dataEcoRoofMgr->MeanRootMoisture,
@@ -461,7 +453,7 @@ namespace EcoRoofManager {
             LeafTK = state.dataEcoRoofMgr->Tf + DataGlobalConstants::KelvinConv;
             SoilTK = state.dataEcoRoofMgr->Tg + DataGlobalConstants::KelvinConv;
 
-            for (EcoLoop = 1; EcoLoop <= 3; ++EcoLoop) {
+            for (int EcoLoop = 1; EcoLoop <= 3; ++EcoLoop) {
                 P1 = sigmaf * (RS * (1.0 - state.dataEcoRoofMgr->Alphaf) + state.dataEcoRoofMgr->epsilonf * Latm) -
                      3.0 * sigmaf * state.dataEcoRoofMgr->epsilonf * state.dataEcoRoofMgr->epsilong * Sigma * pow_4(SoilTK) / EpsilonOne -
                      3.0 *
@@ -798,7 +790,6 @@ namespace EcoRoofManager {
         Real64 SatRatio;
         Real64 TestRatio;   // Ratio to determine if timestep change in properties is too abrupt for CTF
         Real64 AvgMoisture; // Average soil moisture over depth of ecoroof media
-        int index1;
 
         // NOTE:  As Energyplus calls the energy balance manager (and hence CalcEcoroof)
         // once for each surface within each zone that has an ecoroof
@@ -838,6 +829,7 @@ namespace EcoRoofManager {
             // This loop outputs the minimum number of time steps needed to keep the solution stable
             // The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
             if (thisMaterial->EcoRoofCalculationMethod == 2) {
+                int index1;
                 Real64 const depth_limit(depth_fac * std::pow(state.dataEcoRoofMgr->TopDepth + state.dataEcoRoofMgr->RootDepth, 2.07));
                 for (index1 = 1; index1 <= 20; ++index1) {
                     if (double(state.dataGlobal->MinutesPerTimeStep / index1) <= depth_limit) break;
