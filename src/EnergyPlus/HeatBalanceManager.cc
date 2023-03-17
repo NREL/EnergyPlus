@@ -58,7 +58,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>

@@ -837,8 +837,8 @@ namespace ResultsFramework {
                                                                 {"11", "November"},
                                                                 {"12", "December"}});
         // 01/01 24:00:00
-        auto const month = datetime.substr(0, 2);
-        auto const pos = datetime.find(' ');
+        std::string const month = datetime.substr(0, 2);
+        size_t const pos = datetime.find(' ');
         std::string time;
         if (pos != std::string::npos) {
             time = datetime.substr(pos);
@@ -982,7 +982,7 @@ namespace ResultsFramework {
 
         for (int Loop = 1; Loop <= NumOfRVariable; ++Loop) {
             RVar >>= RVariableTypes(Loop).VarPtr;
-            auto &rVar(RVar());
+            auto &rVar = RVar();
             if (rVar.Report && rVar.frequency == reportFrequency) {
                 Variable var;
                 if (RVariableTypes(Loop).units == OutputProcessor::Unit::customEMS) {
@@ -1082,7 +1082,7 @@ namespace ResultsFramework {
         // loop over values to suck in var info
         for (int Loop = 1; Loop <= NumOfIVariable; ++Loop) {
             IVar >>= IVariableTypes(Loop).VarPtr;
-            auto &iVar(IVar());
+            auto &iVar = IVar();
             if (iVar.Report && iVar.frequency == reportFrequency) {
                 OutputVariable var(IVariableTypes(Loop).VarName,
                                    reportFrequency,

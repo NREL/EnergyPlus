@@ -51,7 +51,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>

@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataConversions.hh>

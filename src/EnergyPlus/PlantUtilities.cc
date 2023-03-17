@@ -146,8 +146,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
     }
 
     Real64 const MdotOldRequest = state.dataLoopNodes->Node(InletNode).MassFlowRateRequest;
-    auto &loop_side(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum));
-    auto &comp(loop_side.Branch(plantLoc.branchNum).Comp(plantLoc.compNum));
+    auto &loop_side = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum);
+    auto &comp = loop_side.Branch(plantLoc.branchNum).Comp(plantLoc.compNum);
 
     if (comp.CurOpSchemeType == DataPlant::OpScheme::Demand) {
         // store flow request on inlet node
@@ -201,9 +201,9 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 bool EMSLoadOverride = false;
 
                 for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
-                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
+                    auto &thisComp = loop_side.Branch(plantLoc.branchNum).Comp(CompNum);
                     int const CompInletNodeNum = thisComp.NodeNumIn;
-                    auto &thisInletNode(state.dataLoopNodes->Node(CompInletNodeNum));
+                    auto &thisInletNode = state.dataLoopNodes->Node(CompInletNodeNum);
                     SeriesBranchHighFlowRequest = max(thisInletNode.MassFlowRateRequest, SeriesBranchHighFlowRequest);
                     SeriesBranchHardwareMaxLim = min(thisInletNode.MassFlowRateMax, SeriesBranchHardwareMaxLim);
                     SeriesBranchHardwareMinLim = max(thisInletNode.MassFlowRateMin, SeriesBranchHardwareMinLim);
@@ -230,7 +230,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                 for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
-                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
+                    auto &thisComp = loop_side.Branch(plantLoc.branchNum).Comp(CompNum);
                     int const CompInletNodeNum = thisComp.NodeNumIn;
                     int const CompOutletNodeNum = thisComp.NodeNumOut;
                     state.dataLoopNodes->Node(CompInletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
@@ -252,7 +252,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
 
                 for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
                     // check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
-                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
+                    auto &thisComp = loop_side.Branch(plantLoc.branchNum).Comp(CompNum);
                     if (thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0) EMSLoadOverride = true;
                 }
 
@@ -306,14 +306,14 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Set flow on node and branch while honoring constraints on actuated node
 
-    auto &a_node(state.dataLoopNodes->Node(ActuatedNode));
+    auto &a_node = state.dataLoopNodes->Node(ActuatedNode);
     if (plantLoc.loopNum == 0 || plantLoc.loopSideNum == DataPlant::LoopSideLocation::Invalid) {
         // early in simulation before plant loops are setup and found
         a_node.MassFlowRate = CompFlow;
         return;
     }
 
-    auto &loop_side(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum));
+    auto &loop_side = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum);
 
     // store original flow
     Real64 const MdotOldRequest = a_node.MassFlowRateRequest;
@@ -329,7 +329,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
     // Set loop flow rate
 
     if (plantLoc.loopNum > 0 && plantLoc.loopSideNum != DataPlant::LoopSideLocation::Invalid) {
-        auto const &branch(loop_side.Branch(plantLoc.branchNum));
+        auto const &branch = loop_side.Branch(plantLoc.branchNum);
         if (loop_side.FlowLock == DataPlant::FlowLock::Unlocked) {
             if (state.dataPlnt->PlantLoop(plantLoc.loopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
                 a_node.MassFlowRate = CompFlow;
@@ -344,7 +344,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
                 bool EMSLoadOverride = false;
                 // check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
                 for (int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
-                    auto const &comp(branch.Comp(CompNum));
+                    auto const &comp = branch.Comp(CompNum);
                     if (comp.EMSLoadOverrideOn && comp.EMSLoadOverrideValue == 0.0) EMSLoadOverride = true;
                 }
                 if (EMSLoadOverride) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
@@ -356,7 +356,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
                 a_node.MassFlowRate = min(a_node.MassFlowRateMax, a_node.MassFlowRate);
                 if (a_node.MassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) a_node.MassFlowRate = 0.0;
                 for (int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
-                    auto const &comp(branch.Comp(CompNum));
+                    auto const &comp = branch.Comp(CompNum);
                     if (ActuatedNode == comp.NodeNumIn) {
                         //            ! found controller set to inlet of a component.  now set that component's outlet
                         int const NodeNum = comp.NodeNumOut;
@@ -389,7 +389,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
         Real64 const a_node_MasFlowRate(a_node.MassFlowRate);
         Real64 const a_node_MasFlowRateRequest(a_node.MassFlowRateRequest);
         for (int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
-            auto const &comp(branch.Comp(CompNum));
+            auto const &comp = branch.Comp(CompNum);
             int NodeNum = comp.NodeNumIn;
             state.dataLoopNodes->Node(NodeNum).MassFlowRate = a_node_MasFlowRate;
             state.dataLoopNodes->Node(NodeNum).MassFlowRateRequest = a_node_MasFlowRateRequest;
@@ -439,7 +439,7 @@ Real64 RegulateCondenserCompFlowReqOp(EnergyPlusData &state, PlantLocation const
 
     CompCurLoad = DataPlant::CompData::getPlantComponent(state, plantLoc).MyLoad;
     CompRunFlag = DataPlant::CompData::getPlantComponent(state, plantLoc).ON;
-    auto CompOpScheme = DataPlant::CompData::getPlantComponent(state, plantLoc).CurOpSchemeType;
+    DataPlant::OpScheme CompOpScheme = DataPlant::CompData::getPlantComponent(state, plantLoc).CurOpSchemeType;
 
     if (CompRunFlag) {
 
@@ -1220,8 +1220,8 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
 
     int TotalConnected;
 
-    auto &loop_side_1(state.dataPlnt->PlantLoop(Loop1PlantLoc.loopNum).LoopSide(Loop1PlantLoc.loopSideNum));
-    auto &connected_1(loop_side_1.Connected);
+    auto &loop_side_1 = state.dataPlnt->PlantLoop(Loop1PlantLoc.loopNum).LoopSide(Loop1PlantLoc.loopSideNum);
+    auto &connected_1 = loop_side_1.Connected;
     if (allocated(connected_1)) {
         TotalConnected = ++loop_side_1.TotalConnected;
         connected_1.redimension(TotalConnected);
@@ -1234,8 +1234,8 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     connected_1(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(ComponentType);
     connected_1(TotalConnected).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
 
-    auto &loop_side_2(state.dataPlnt->PlantLoop(Loop2PlantLoc.loopNum).LoopSide(Loop2PlantLoc.loopSideNum));
-    auto &connected_2(loop_side_2.Connected);
+    auto &loop_side_2 = state.dataPlnt->PlantLoop(Loop2PlantLoc.loopNum).LoopSide(Loop2PlantLoc.loopSideNum);
+    auto &connected_2 = loop_side_2.Connected;
     if (allocated(connected_2)) {
         TotalConnected = ++loop_side_2.TotalConnected;
         connected_2.redimension(TotalConnected);
@@ -1583,9 +1583,9 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
     //   Store this in the history array of each node using EOSHIFT
 
     for (int ThisLoopNum = 1; ThisLoopNum <= isize(state.dataPlnt->PlantLoop); ++ThisLoopNum) {
-        auto &loop(state.dataPlnt->PlantLoop(ThisLoopNum));
+        auto &loop = state.dataPlnt->PlantLoop(ThisLoopNum);
         for (DataPlant::LoopSideLocation ThisLoopSide : DataPlant::LoopSideKeys) {
-            auto &loop_side(loop.LoopSide(ThisLoopSide));
+            auto &loop_side = loop.LoopSide(ThisLoopSide);
 
             if (FirstHVACIteration) {
                 loop_side.InletNode.TemperatureHistory = 0.0;
@@ -1661,13 +1661,13 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
     }
 
     for (LoopCtr = StartingLoopNum; LoopCtr <= EndingLoopNum; ++LoopCtr) {
-        auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
+        auto &this_loop = state.dataPlnt->PlantLoop(LoopCtr);
         for (DataPlant::LoopSideLocation LoopSideCtr : DataPlant::LoopSideKeys) {
-            auto &this_loop_side(this_loop.LoopSide(LoopSideCtr));
+            auto &this_loop_side = this_loop.LoopSide(LoopSideCtr);
             for (BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr) {
-                auto &this_branch(this_loop_side.Branch(BranchCtr));
+                auto &this_branch = this_loop_side.Branch(BranchCtr);
                 for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
-                    auto &this_component(this_branch.Comp(CompCtr));
+                    auto &this_component = this_branch.Comp(CompCtr);
                     if (this_component.Type == CompType) {
                         if (UtilityRoutines::SameString(CompName, this_component.Name)) {
                             FoundCompName = true;
@@ -1777,13 +1777,13 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
     FoundNode = false;
 
     for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
-        auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
+        auto &this_loop = state.dataPlnt->PlantLoop(LoopCtr);
         for (DataPlant::LoopSideLocation LoopSideCtr : DataPlant::LoopSideKeys) {
-            auto &this_loop_side(this_loop.LoopSide(LoopSideCtr));
+            auto &this_loop_side = this_loop.LoopSide(LoopSideCtr);
             for (BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr) {
-                auto &this_branch(this_loop_side.Branch(BranchCtr));
+                auto &this_branch = this_loop_side.Branch(BranchCtr);
                 for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
-                    auto &this_comp(this_branch.Comp(CompCtr));
+                    auto &this_comp = this_branch.Comp(CompCtr);
                     if (NodeNum == this_comp.NodeNumIn) {
                         FoundNode = true;
                         ++inFoundCount;
@@ -1869,7 +1869,7 @@ void SetAllPlantSimFlagsToValue(EnergyPlusData &state, bool const Value)
 
     // Loop over all loops
     for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
-        auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
+        auto &this_loop = state.dataPlnt->PlantLoop(LoopCtr);
         this_loop.LoopSide(DataPlant::LoopSideLocation::Demand).SimLoopSideNeeded = Value;
         this_loop.LoopSide(DataPlant::LoopSideLocation::Supply).SimLoopSideNeeded = Value;
     }
