@@ -110,7 +110,7 @@ std::string InputFile::readFile()
 
 nlohmann::json InputFile::readJSON()
 {
-    auto const ext = FileSystem::getFileType(filePath);
+    FileSystem::FileTypes const ext = FileSystem::getFileType(filePath);
     switch (ext) {
     case FileSystem::FileTypes::EpJSON:
     case FileSystem::FileTypes::JSON:
@@ -148,7 +148,7 @@ void InputFile::open(bool, bool)
 
 std::string InputFile::error_state_to_string() const
 {
-    const auto state = rdstate();
+    const std::istream::iostate state = rdstate();
 
     if (!is_open()) {
         return "file not opened'";
@@ -298,7 +298,7 @@ std::vector<std::string> InputOutputFile::getLines()
     if (os) {
         // avoid saving and reloading the file by simply reading the current input stream
         os->flush();
-        const auto last_pos = os->tellg();
+        const size_t last_pos = os->tellg();
         std::string line;
         std::vector<std::string> lines;
         os->seekg(0);
