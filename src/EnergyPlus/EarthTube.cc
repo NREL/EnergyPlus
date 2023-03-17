@@ -112,11 +112,9 @@ void ManageEarthTube(EnergyPlusData &state)
     // This driver manages the calls to all of
     // the other drivers and simulation algorithms.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool ErrorsFound(false);
-
     // Obtains and Allocates heat balance related parameters from input file
     if (state.dataEarthTube->GetInputFlag) {
+        bool ErrorsFound = false;
         GetEarthTube(state, ErrorsFound);
         state.dataEarthTube->GetInputFlag = false;
     }
@@ -746,7 +744,7 @@ void ReportEarthTube(EnergyPlusData &state)
 
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         auto &thisZone = state.dataEarthTube->ZnRptET(ZoneLoop);
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
+        auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
 
         // Break the infiltration load into heat gain and loss components.
         Real64 const AirDensity =
@@ -761,7 +759,7 @@ void ReportEarthTube(EnergyPlusData &state)
 
         thisZone.EarthTubeFanElec = 0.0;
         thisZone.EarthTubeAirTemp = 0.0;
-        for (auto &thisEarthTube : state.dataEarthTube->EarthTubeSys) {
+        for (auto const &thisEarthTube : state.dataEarthTube->EarthTubeSys) {
             if (thisEarthTube.ZonePtr == ZoneLoop) {
                 thisZone.EarthTubeFanElec = thisEarthTube.FanPower * ReportingConstant;
                 thisZone.EarthTubeFanElecPower = thisEarthTube.FanPower;
