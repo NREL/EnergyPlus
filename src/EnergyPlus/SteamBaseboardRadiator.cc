@@ -549,7 +549,7 @@ namespace SteamBaseboardRadiator {
             // Get schedule
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr =
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));

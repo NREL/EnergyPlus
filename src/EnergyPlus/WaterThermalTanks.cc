@@ -719,7 +719,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else {
-            DesupHtr.AvailSchedPtr = Constant::ScheduleAlwaysOn;
+            DesupHtr.AvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
         }
 
         // convert schedule name to pointer
@@ -1224,7 +1224,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else {
-            HPWH.AvailSchedPtr = Constant::ScheduleAlwaysOn;
+            HPWH.AvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
         }
 
         // Compressor Setpoint Temperature Schedule
@@ -2339,8 +2339,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.FluidIndex = Tank.waterIndex;
 
         // default to always on
-        Tank.SourceSideAvailSchedNum = Constant::ScheduleAlwaysOn;
-        Tank.UseSideAvailSchedNum = Constant::ScheduleAlwaysOn;
+        Tank.SourceSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
+        Tank.UseSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
 
         // A user field will be added in a later release
         Tank.EndUseSubcategoryName = "Water Heater";
@@ -2847,8 +2847,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.FluidIndex = Tank.waterIndex;
 
         // default to always on
-        Tank.SourceSideAvailSchedNum = Constant::ScheduleAlwaysOn;
-        Tank.UseSideAvailSchedNum = Constant::ScheduleAlwaysOn;
+        Tank.SourceSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
+        Tank.UseSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
 
         Tank.EndUseSubcategoryName = state.dataIPShortCut->cAlphaArgs(2);
 
@@ -3609,8 +3609,8 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         Tank.UseInletTempSchedule = 0;
 
         // default to always on
-        Tank.SourceSideAvailSchedNum = Constant::ScheduleAlwaysOn;
-        Tank.UseSideAvailSchedNum = Constant::ScheduleAlwaysOn;
+        Tank.SourceSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
+        Tank.UseSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
 
         if ((state.dataIPShortCut->rNumericArgs(6) > 1) || (state.dataIPShortCut->rNumericArgs(6) < 0)) {
             ShowSevereError(state,
@@ -3642,7 +3642,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         Tank.UseSidePlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-            Tank.UseSideAvailSchedNum = Constant::ScheduleAlwaysOn;
+            Tank.UseSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
             if (Tank.UseSideAvailSchedNum == 0) {
@@ -3666,7 +3666,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         }
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-            Tank.SourceSideAvailSchedNum = Constant::ScheduleAlwaysOn;
+            Tank.SourceSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(12));
             if (Tank.SourceSideAvailSchedNum == 0) {
@@ -3949,8 +3949,8 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         Tank.UseInletHeight = state.dataIPShortCut->rNumericArgs(10);
 
         // default to always on
-        Tank.SourceSideAvailSchedNum = Constant::ScheduleAlwaysOn;
-        Tank.UseSideAvailSchedNum = Constant::ScheduleAlwaysOn;
+        Tank.SourceSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
+        Tank.UseSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
 
         if (state.dataIPShortCut->rNumericArgs(10) == Constant::AutoCalculate) {
             Tank.UseInletHeight = Tank.Height; // top of tank
@@ -4083,7 +4083,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-            Tank.UseSideAvailSchedNum = Constant::ScheduleAlwaysOn;
+            Tank.UseSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
             if (Tank.UseSideAvailSchedNum == 0) {
@@ -4100,7 +4100,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-            Tank.SourceSideAvailSchedNum = Constant::ScheduleAlwaysOn;
+            Tank.SourceSideAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
             if (Tank.SourceSideAvailSchedNum == 0) {

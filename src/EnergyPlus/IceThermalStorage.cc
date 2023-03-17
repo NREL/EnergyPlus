@@ -826,7 +826,7 @@ namespace IceThermalStorage {
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleName =
                 state.dataIPShortCut->cAlphaArgs(2); // Detailed ice storage availability schedule name
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleIndex = Constant::ScheduleAlwaysOn;
+                state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleIndex = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleIndex =
                     ScheduleManager::GetScheduleIndex(state, state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleName);

@@ -290,7 +290,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType = HumidType::Electric;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                Humidifier(HumNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -365,7 +365,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType = HumidType::Gas;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                Humidifier(HumNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {

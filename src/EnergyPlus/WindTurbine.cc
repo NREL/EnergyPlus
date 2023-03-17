@@ -267,7 +267,7 @@ namespace WindTurbine {
 
             windTurbine.Schedule = state.dataIPShortCut->cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                windTurbine.SchedPtr = Constant::ScheduleAlwaysOn;
+                windTurbine.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 windTurbine.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (windTurbine.SchedPtr == 0) {

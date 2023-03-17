@@ -422,7 +422,7 @@ namespace TranspiredCollector {
             }
             state.dataTranspiredCollector->UTSC(Item).OSCMPtr = Found;
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataTranspiredCollector->UTSC(Item).SchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataTranspiredCollector->UTSC(Item).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataTranspiredCollector->UTSC(Item).SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (state.dataTranspiredCollector->UTSC(Item).SchedPtr == 0) {

@@ -1331,7 +1331,7 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
         state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedule = state.dataIPShortCut->cAlphaArgs(3);
         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr =
-                Constant::ScheduleAlwaysOn; // (Returns 1.0)
+                ScheduleManager::ScheduleAlwaysOn; // (Returns 1.0)
         } else {
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
@@ -1437,7 +1437,7 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
         if (NumAlphas > 6) {
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedule = state.dataIPShortCut->cAlphaArgs(7);
             if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr =
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));

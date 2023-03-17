@@ -3048,7 +3048,7 @@ namespace InternalHeatGains {
                         }
 
                         if (IHGAlphaFieldBlanks(5)) {
-                            thisZoneITEq.OperSchedPtr = Constant::ScheduleAlwaysOn;
+                            thisZoneITEq.OperSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                         } else {
                             thisZoneITEq.OperSchedPtr = GetScheduleIndex(state, IHGAlphas(5));
                         }
@@ -3089,7 +3089,7 @@ namespace InternalHeatGains {
                         }
 
                         if (IHGAlphaFieldBlanks(6)) {
-                            thisZoneITEq.CPULoadSchedPtr = Constant::ScheduleAlwaysOn;
+                            thisZoneITEq.CPULoadSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                         } else {
                             thisZoneITEq.CPULoadSchedPtr = GetScheduleIndex(state, IHGAlphas(6));
                         }

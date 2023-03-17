@@ -314,7 +314,7 @@ namespace RoomAirModelManager {
 
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSched = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID = Constant::ScheduleAlwaysOn;
+                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID == 0) {

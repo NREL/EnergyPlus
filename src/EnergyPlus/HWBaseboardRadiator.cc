@@ -519,7 +519,7 @@ namespace HWBaseboardRadiator {
             // Get schedule
             HWBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                HWBaseboard(BaseboardNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                HWBaseboard(BaseboardNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (HWBaseboard(BaseboardNum).SchedPtr == 0) {

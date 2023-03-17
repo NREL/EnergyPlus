@@ -388,7 +388,7 @@ namespace HVACUnitaryBypassVAV {
             CBVAV(CBVAVNum).UnitType = CurrentModuleObject;
             CBVAV(CBVAVNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                CBVAV(CBVAVNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                CBVAV(CBVAVNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 CBVAV(CBVAVNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                 if (CBVAV(CBVAVNum).SchedPtr == 0) {

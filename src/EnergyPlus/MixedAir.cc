@@ -1262,7 +1262,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
             thisVentilationMechanical.Name = AlphArray(1); // no need to check if AlphaArray(1) is empty since Json will catch missing required fields
             thisVentilationMechanical.SchName = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                thisVentilationMechanical.SchPtr = Constant::ScheduleAlwaysOn;
+                thisVentilationMechanical.SchPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisVentilationMechanical.SchPtr = GetScheduleIndex(state, AlphArray(2)); // convert schedule name to pointer
                 if (thisVentilationMechanical.SchPtr == 0) {
@@ -1586,7 +1586,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                     thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = 0.0;
                     thisVentilationMechanical.ZoneOAACHRate = 0.0;
                     thisVentilationMechanical.ZoneOAFlowMethod(ventMechZoneNum) = OAFlowCalcMethod::PerPerson;
-                    thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = Constant::ScheduleAlwaysOn;
+                    thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = ScheduleManager::ScheduleAlwaysOn;
                     ShowWarningError(state, format("{}{}=\"{}", RoutineName, CurrentModuleObject, thisVentilationMechanical.Name));
                     ShowContinueError(state,
                                       format("Cannot locate a matching DesignSpecification:OutdoorAir object for Zone=\"{}\".",

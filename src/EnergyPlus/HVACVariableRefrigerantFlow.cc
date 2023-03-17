@@ -1629,7 +1629,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfSys.VRFSystemTypeNum = VRF_HeatPump;
         thisVrfSys.VRFAlgorithmType = AlgorithmType::SysCurve;
         if (lAlphaFieldBlanks(2)) {
-            thisVrfSys.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisVrfSys.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisVrfSys.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
             if (thisVrfSys.SchedPtr == 0) {
@@ -2475,7 +2475,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrl.FuelTypeNum = Constant::ResourceType::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
-            thisVrfFluidCtrl.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisVrfFluidCtrl.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisVrfFluidCtrl.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
             if (thisVrfFluidCtrl.SchedPtr == 0) {
@@ -2877,7 +2877,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrlHR.FuelTypeNum = Constant::ResourceType::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
-            thisVrfFluidCtrlHR.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisVrfFluidCtrlHR.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisVrfFluidCtrlHR.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
             if (thisVrfFluidCtrlHR.SchedPtr == 0) {
@@ -3344,7 +3344,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
         thisVrfTU.VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;
         if (lAlphaFieldBlanks(2)) {
-            thisVrfTU.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisVrfTU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisVrfTU.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
             if (thisVrfTU.SchedPtr == 0) {

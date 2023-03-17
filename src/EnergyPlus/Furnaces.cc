@@ -1007,7 +1007,7 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
@@ -1619,7 +1619,7 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
@@ -3004,7 +3004,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
@@ -4004,7 +4004,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_WaterToAir;
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {

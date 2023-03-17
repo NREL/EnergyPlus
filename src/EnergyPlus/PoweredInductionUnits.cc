@@ -297,7 +297,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
         thisPIU.Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisPIU.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisPIU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisPIU.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisPIU.SchedPtr == 0) {
@@ -535,7 +535,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
         thisPIU.Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisPIU.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisPIU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisPIU.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisPIU.SchedPtr == 0) {

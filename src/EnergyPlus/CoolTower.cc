@@ -188,7 +188,7 @@ namespace CoolTower {
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name = state.dataIPShortCut->cAlphaArgs(1);     // Name of cooltower
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Schedule = state.dataIPShortCut->cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));

@@ -374,7 +374,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID = Constant::ScheduleAlwaysOn;
+                state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID = ScheduleManager::GetScheduleIndex(state, AlphArray(9));
                 if (state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID == 0) {

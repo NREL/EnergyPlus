@@ -261,7 +261,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                 ShowContinueError(state, "Negative values will be treated as zero, and the simulation continues.");
             }
         } else {
-            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum = Constant::ScheduleAlwaysOn;
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::ScheduleAlwaysOn;
         }
     }
 

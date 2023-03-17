@@ -249,7 +249,7 @@ void GetTESCoilInput(EnergyPlusData &state)
 
         state.dataPackagedThermalStorageCoil->TESCoil(item).Name = state.dataIPShortCut->cAlphaArgs(1);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum = Constant::ScheduleAlwaysOn;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum == 0) {
@@ -1760,7 +1760,7 @@ void GetTESCoilInput(EnergyPlusData &state)
         state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterSetpointTemp = state.dataIPShortCut->rNumericArgs(39);
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(59)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterAvailSchedNum = Constant::ScheduleAlwaysOn;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterAvailSchedNum =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(59));

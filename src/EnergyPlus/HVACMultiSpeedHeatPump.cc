@@ -626,7 +626,7 @@ namespace HVACMultiSpeedHeatPump {
 
             MSHeatPump(MSHPNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                MSHeatPump(MSHPNum).AvaiSchedPtr = Constant::ScheduleAlwaysOn;
+                MSHeatPump(MSHPNum).AvaiSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 MSHeatPump(MSHPNum).AvaiSchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (MSHeatPump(MSHPNum).AvaiSchedPtr == 0) {

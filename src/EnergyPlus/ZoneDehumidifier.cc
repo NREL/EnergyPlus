@@ -259,7 +259,7 @@ namespace ZoneDehumidifier {
 
             // A2,  \field Availability Schedule Name
             if (lAlphaBlanks(2)) {
-                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = Constant::ScheduleAlwaysOn;
+                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr =
                     GetScheduleIndex(state, Alphas(2)); // Convert schedule name to pointer

@@ -348,7 +348,7 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanType = cCurrentModuleObject;
         Fan(FanNum).AvailSchedName = cAlphaArgs(2);
         if (lAlphaFieldBlanks(2)) {
-            Fan(FanNum).AvailSchedPtrNum = Constant::ScheduleAlwaysOn;
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -433,7 +433,7 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanType = cCurrentModuleObject;
         Fan(FanNum).AvailSchedName = cAlphaArgs(2);
         if (lAlphaFieldBlanks(2)) {
-            Fan(FanNum).AvailSchedPtrNum = Constant::ScheduleAlwaysOn;
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -538,7 +538,7 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanType = cCurrentModuleObject;
         Fan(FanNum).AvailSchedName = cAlphaArgs(2);
         if (lAlphaFieldBlanks(2)) {
-            Fan(FanNum).AvailSchedPtrNum = Constant::ScheduleAlwaysOn;
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -632,7 +632,7 @@ void GetFanInput(EnergyPlusData &state)
                 }
             }
         } else {
-            Fan(FanNum).FlowFractSchedNum = Constant::ScheduleAlwaysOn;
+            Fan(FanNum).FlowFractSchedNum = ScheduleManager::ScheduleAlwaysOn;
         }
 
         if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
@@ -742,7 +742,7 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanType = cCurrentModuleObject;
         Fan(FanNum).AvailSchedName = cAlphaArgs(2);
         if (lAlphaFieldBlanks(2)) {
-            Fan(FanNum).AvailSchedPtrNum = Constant::ScheduleAlwaysOn;
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {

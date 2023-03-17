@@ -285,7 +285,7 @@ namespace HVACCooledBeam {
             }
             CoolBeam(CBNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                CoolBeam(CBNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                CoolBeam(CBNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 CoolBeam(CBNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (CoolBeam(CBNum).SchedPtr == 0) {

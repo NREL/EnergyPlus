@@ -427,7 +427,7 @@ namespace HVACFan {
         m_fanType = locCurrentModuleObject;
         m_fanType_Num = DataHVACGlobals::FanType_SystemModelObject;
         if (isAlphaFieldBlank(2)) {
-            availSchedIndex = Constant::ScheduleAlwaysOn;
+            availSchedIndex = ScheduleManager::ScheduleAlwaysOn;
         } else {
             availSchedIndex = ScheduleManager::GetScheduleIndex(state, alphaArgs(2));
             if (availSchedIndex == 0) {

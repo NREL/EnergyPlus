@@ -308,7 +308,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).UnitType = CurrentModuleObject;
 
         if (lAlphaBlanks(2)) {
-            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = Constant::ScheduleAlwaysOn;
+            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr =
                 GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer

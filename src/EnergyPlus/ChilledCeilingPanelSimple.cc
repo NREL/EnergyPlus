@@ -291,7 +291,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         // Get schedule
         ThisCP.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            ThisCP.SchedPtr = Constant::ScheduleAlwaysOn;
+            ThisCP.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             ThisCP.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (ThisCP.SchedPtr == 0) {

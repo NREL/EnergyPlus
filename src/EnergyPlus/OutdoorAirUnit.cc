@@ -325,7 +325,7 @@ namespace OutdoorAirUnit {
             // A2
             OutAirUnit(OAUnitNum).SchedName = state.dataIPShortCut->cAlphaArgs(2);
             if (lAlphaBlanks(2)) {
-                OutAirUnit(OAUnitNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                OutAirUnit(OAUnitNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 OutAirUnit(OAUnitNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
                 if (OutAirUnit(OAUnitNum).SchedPtr == 0) {

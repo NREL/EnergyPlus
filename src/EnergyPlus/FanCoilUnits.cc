@@ -320,7 +320,7 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).UnitType_Num = FanCoilUnit_4Pipe;
             FanCoil(FanCoilNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                FanCoil(FanCoilNum).SchedPtr = Constant::ScheduleAlwaysOn;
+                FanCoil(FanCoilNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 FanCoil(FanCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (FanCoil(FanCoilNum).SchedPtr == 0) {

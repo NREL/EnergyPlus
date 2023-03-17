@@ -2249,7 +2249,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     availSched = availSchedName;
     if (availSched.empty()) {
-        availSchedPtr = Constant::ScheduleAlwaysOn;
+        availSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     } else {
         availSchedPtr = ScheduleManager::GetScheduleIndex(state, availSchedName);
         if (availSchedPtr <= 0) {
@@ -2535,13 +2535,13 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
         // how to verify names are unique across objects? add to GlobalNames?
 
         if (modelType_ == InverterModelType::PVWatts) {
-            availSchedPtr_ = Constant::ScheduleAlwaysOn;
+            availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
             zoneNum_ = 0;
             heatLossesDestination_ = ThermalLossDestination::LostToOutside;
             zoneRadFract_ = 0;
         } else {
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                availSchedPtr_ = Constant::ScheduleAlwaysOn;
+                availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (availSchedPtr_ == 0) {
@@ -3016,7 +3016,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         // need a new general approach for verify names are unique across objects,  next gen GlobalNames
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = Constant::ScheduleAlwaysOn;
+            availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
@@ -3362,7 +3362,7 @@ ElectricStorage::ElectricStorage( // main constructor
         // how to verify names are unique across objects? add to GlobalNames?
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = Constant::ScheduleAlwaysOn;
+            availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
@@ -4690,7 +4690,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = Constant::ScheduleAlwaysOn;
+            availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {

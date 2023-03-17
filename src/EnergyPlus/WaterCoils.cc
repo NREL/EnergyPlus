@@ -345,7 +345,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
         state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
         if (lAlphaBlanks(2)) {
-            state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = Constant::ScheduleAlwaysOn;
+            state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
             if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
@@ -524,7 +524,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
         state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
         if (lAlphaBlanks(2)) {
-            state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = Constant::ScheduleAlwaysOn;
+            state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
             if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
@@ -763,7 +763,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
         state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
         if (lAlphaBlanks(2)) {
-            state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = Constant::ScheduleAlwaysOn;
+            state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
             if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {

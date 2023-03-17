@@ -378,7 +378,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -512,7 +512,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -654,7 +654,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -865,7 +865,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -1064,7 +1064,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {

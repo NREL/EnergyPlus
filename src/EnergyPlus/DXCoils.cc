@@ -929,7 +929,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilDX_CoolingSingleSpeed;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -1402,7 +1402,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -1952,7 +1952,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilDX_HeatingEmpirical;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -2406,7 +2406,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilDX_CoolingTwoSpeed;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -3852,7 +3852,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilDX_MultiSpeedCooling;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -4400,7 +4400,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilDX_MultiSpeedHeating;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -4888,7 +4888,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilVRF_Cooling;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -5033,7 +5033,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilVRF_Heating;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -5167,7 +5167,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilVRF_FluidTCtrl_Cooling;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {
@@ -5286,7 +5286,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.DXCoilType_Num = CoilVRF_FluidTCtrl_Heating;
         thisDXCoil.Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
-            thisDXCoil.SchedPtr = Constant::ScheduleAlwaysOn;
+            thisDXCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisDXCoil.SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (thisDXCoil.SchedPtr == 0) {

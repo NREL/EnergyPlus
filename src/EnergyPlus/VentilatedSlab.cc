@@ -330,7 +330,7 @@ namespace VentilatedSlab {
 
             ventSlab.Name = state.dataIPShortCut->cAlphaArgs(1);
             if (lAlphaBlanks(2)) {
-                ventSlab.SchedPtr = Constant::ScheduleAlwaysOn;
+                ventSlab.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else if ((ventSlab.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2))) == 0) { // convert schedule name to pointer
                 ShowSevereError(state,
                                 format(R"({}="{}" invalid {}="{}" not found.)",

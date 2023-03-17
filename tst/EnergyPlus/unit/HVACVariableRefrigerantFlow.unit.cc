@@ -248,7 +248,7 @@ protected:
         thisZoneEqConfig.ExhaustNode.allocate(NumZoneExhaustNodes);
         thisZoneEqConfig.ExhaustNode(1) = zoneExhNode1;
         thisZoneEqConfig.EquipListIndex = zoneNum;
-        thisZoneEqConfig.ReturnFlowSchedPtrNum = Constant::ScheduleAlwaysOn;
+        thisZoneEqConfig.ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
 
         auto &thisZone(state->dataHeatBal->Zone(zoneNum));
         thisZone.Name = "ZONE1";
@@ -8152,7 +8152,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     state->dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    state->dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr = Constant::ScheduleAlwaysOn; // fan is always on
+    state->dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn; // fan is always on
     state->dataHeatingCoils->HeatingCoil(CoilNum).NominalCapacity = 10000.0;
     state->dataHeatingCoils->HeatingCoil(CoilNum).Efficiency = 1.0;
     state->dataHeatingCoils->CheckEquipName.dimension(state->dataHeatingCoils->NumHeatingCoils, true);
@@ -8217,7 +8217,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     state->dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    state->dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr = Constant::ScheduleAlwaysOn; // fan is always on
+    state->dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn; // fan is always on
     state->dataHeatingCoils->HeatingCoil(CoilNum).NominalCapacity = 10000.0;
     state->dataHeatingCoils->HeatingCoil(CoilNum).Efficiency = 1.0;
     state->dataHeatingCoils->CheckEquipName.dimension(state->dataHeatingCoils->NumHeatingCoils, true);
@@ -8281,7 +8281,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = WaterCoils::CoilModel::HeatingSimple;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
-    state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = Constant::ScheduleAlwaysOn;
+    state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum = 1;
 
     // state->dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = Constant::ResourceType::Natural_Gas;
@@ -8398,7 +8398,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
-    state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = Constant::ScheduleAlwaysOn;
+    state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = 100.0;
     state->dataSteamCoils->SteamCoil(CoilNum).InletSteamPress = 101325.0;
     state->dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling = 0.0;

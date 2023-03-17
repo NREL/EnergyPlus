@@ -771,7 +771,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::DesignFlowRate;
                 if (lAlphaFieldBlanks(3)) {
-                    thisInfiltration.SchedPtr = Constant::ScheduleAlwaysOn;
+                    thisInfiltration.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisInfiltration.SchedPtr == 0) {
@@ -1017,7 +1017,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::ShermanGrimsrud;
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisInfiltration.SchedPtr = Constant::ScheduleAlwaysOn;
+                    thisInfiltration.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisInfiltration.SchedPtr == 0) {
@@ -1104,7 +1104,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::AIM2;
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisInfiltration.SchedPtr = Constant::ScheduleAlwaysOn;
+                    thisInfiltration.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisInfiltration.SchedPtr == 0) {
@@ -1425,7 +1425,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 thisVentilation.ModelType = DataHeatBalance::VentilationModelType::DesignFlowRate;
                 if (lAlphaFieldBlanks(3)) {
-                    thisVentilation.SchedPtr = Constant::ScheduleAlwaysOn;
+                    thisVentilation.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisVentilation.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisVentilation.SchedPtr == 0) {
@@ -2109,7 +2109,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisVentilation.OpenAreaSchedPtr = Constant::ScheduleAlwaysOn;
+                    thisVentilation.OpenAreaSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisVentilation.OpenAreaSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisVentilation.OpenAreaSchedPtr == 0) {
@@ -2600,7 +2600,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisMixing.SchedPtr = Constant::ScheduleAlwaysOn;
+                    thisMixing.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisMixing.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisMixing.SchedPtr == 0) {
@@ -3213,7 +3213,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 if (lAlphaFieldBlanks(3)) {
-                    thisMixing.SchedPtr = Constant::ScheduleAlwaysOn;
+                    thisMixing.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisMixing.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (thisMixing.SchedPtr == 0) {

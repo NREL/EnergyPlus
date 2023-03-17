@@ -279,7 +279,7 @@ namespace UnitVentilator {
 
             unitVent.Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                unitVent.SchedPtr = Constant::ScheduleAlwaysOn;
+                unitVent.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 unitVent.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (unitVent.SchedPtr == 0) {

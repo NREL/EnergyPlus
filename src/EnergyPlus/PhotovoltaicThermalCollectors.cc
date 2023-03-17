@@ -236,7 +236,7 @@ namespace PhotovoltaicThermalCollectors {
         int IOStatus;   // Used in GetObjectItem
         int Found;
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        using Constant::ScheduleAlwaysOn;
+        using ScheduleManager::ScheduleAlwaysOn;
         using DataSurfaces::OSCMData;
         using ScheduleManager::GetScheduleIndex;
 

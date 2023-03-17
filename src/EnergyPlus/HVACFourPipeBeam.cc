@@ -151,7 +151,7 @@ namespace FourPipeBeam {
         thisBeam->unitType = cCurrentModuleObject;
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisBeam->airAvailSchedNum = Constant::ScheduleAlwaysOn;
+            thisBeam->airAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisBeam->airAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisBeam->airAvailSchedNum == 0) {
@@ -167,7 +167,7 @@ namespace FourPipeBeam {
             }
         }
         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            thisBeam->coolingAvailSchedNum = Constant::ScheduleAlwaysOn;
+            thisBeam->coolingAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisBeam->coolingAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3)); // convert schedule name to index
             if (thisBeam->coolingAvailSchedNum == 0) {
@@ -183,7 +183,7 @@ namespace FourPipeBeam {
             }
         }
         if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-            thisBeam->heatingAvailSchedNum = Constant::ScheduleAlwaysOn;
+            thisBeam->heatingAvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisBeam->heatingAvailSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // convert schedule name to index
             if (thisBeam->heatingAvailSchedNum == 0) {

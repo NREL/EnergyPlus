@@ -5362,7 +5362,7 @@ namespace HeatBalanceManager {
                             errorsFound = true;
                         }
                     } else {
-                        thisConstruct.AirBoundaryMixingSched = Constant::ScheduleAlwaysOn;
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::ScheduleAlwaysOn;
                     }
                 }
             }

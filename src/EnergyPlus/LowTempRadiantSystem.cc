@@ -641,7 +641,7 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.SchedName = Alphas(3);
             if (lAlphaBlanks(3)) {
-                thisRadSys.SchedPtr = Constant::ScheduleAlwaysOn;
+                thisRadSys.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisRadSys.SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (thisRadSys.SchedPtr == 0) {
@@ -940,7 +940,7 @@ namespace LowTempRadiantSystem {
 
             thisCFloSys.SchedName = Alphas(3);
             if (lAlphaBlanks(3)) {
-                thisCFloSys.SchedPtr = Constant::ScheduleAlwaysOn;
+                thisCFloSys.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisCFloSys.SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (thisCFloSys.SchedPtr == 0) {
@@ -1185,7 +1185,7 @@ namespace LowTempRadiantSystem {
 
             thisElecSys.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                thisElecSys.SchedPtr = Constant::ScheduleAlwaysOn;
+                thisElecSys.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisElecSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (thisElecSys.SchedPtr == 0) {

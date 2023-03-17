@@ -181,9 +181,6 @@ namespace Constant {
     Real64 constexpr StefanBoltzmann = 5.6697E-8;           // Stefan-Boltzmann constant in W/(m2*K4)
     Real64 constexpr UniversalGasConst = 8314.462175;       // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ = 1.0E-9;                 // Conversion factor for J to GJ
-    int constexpr MaxSpeedLevels = 10;                      // Maximum number of speed that supports
-    int constexpr ScheduleAlwaysOn = -1;                    // Value when passed to schedule routines gives back 1.0 (on)
-    int constexpr MaxCTFTerms = 19; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(ResourceType ResourceTypeNum);
@@ -208,7 +205,6 @@ struct DataGlobalConstantsData : BaseGlobalStruct
         {Constant::EndUse::Refrigeration, 13},
         {Constant::EndUse::Cogeneration, 14},
     };
-    static int constexpr iEndUseSize = 14;
 
     std::vector<Constant::ResourceType> AllResourceTypes = {Constant::ResourceType::None,
                                                                        Constant::ResourceType::Electricity,

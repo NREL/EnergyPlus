@@ -489,12 +489,12 @@ namespace ExhaustAirSystemManager {
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
                 if (availSchName == "") {
                     // blank
-                    thisExhCtrl.AvailScheduleNum = Constant::ScheduleAlwaysOn;
+                    thisExhCtrl.AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisExhCtrl.AvailScheduleNum = ScheduleManager::GetScheduleIndex(state, availSchName);
                     if (thisExhCtrl.AvailScheduleNum == 0) {
                         // mismatch, reset to always on
-                        thisExhCtrl.AvailScheduleNum = Constant::ScheduleAlwaysOn;
+                        thisExhCtrl.AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
                         ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
                         ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
                         ShowContinueError(state, "Availability Schedule is reset to Always ON.");

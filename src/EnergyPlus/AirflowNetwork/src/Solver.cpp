@@ -4191,7 +4191,7 @@ namespace AirflowNetwork {
                 }
 
                 if (lAlphaBlanks(5)) {
-                    PressureControllerData(i).AvailSchedPtr = Constant::ScheduleAlwaysOn;
+                    PressureControllerData(i).AvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     PressureControllerData(i).AvailSchedPtr = GetScheduleIndex(m_state, Alphas(5));
                     if (PressureControllerData(i).AvailSchedPtr == 0) {
@@ -6573,7 +6573,7 @@ namespace AirflowNetwork {
         PressureSetFlag = 0;
 
         if (NumOfPressureControllers == 1) {
-            if (PressureControllerData(1).AvailSchedPtr == Constant::ScheduleAlwaysOn) {
+            if (PressureControllerData(1).AvailSchedPtr == ScheduleManager::ScheduleAlwaysOn) {
                 PressureSetFlag = PressureControllerData(1).ControlTypeSet;
             } else {
                 if (GetCurrentScheduleValue(m_state, PressureControllerData(1).AvailSchedPtr) > 0.0) {

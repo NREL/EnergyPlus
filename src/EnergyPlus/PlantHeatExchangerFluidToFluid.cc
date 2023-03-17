@@ -227,7 +227,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).Name = cAlphaArgs(1);
 
             if (lAlphaFieldBlanks(2)) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = Constant::ScheduleAlwaysOn;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum <= 0) {

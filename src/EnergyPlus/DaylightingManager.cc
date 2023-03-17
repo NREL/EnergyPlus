@@ -4857,10 +4857,10 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                                         cCurrentModuleObject,
                                         state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Schedule was not found so controls will always be available, and the simulation continues.");
-                daylightControl.AvailSchedNum = Constant::ScheduleAlwaysOn;
+                daylightControl.AvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
             }
         } else {
-            daylightControl.AvailSchedNum = Constant::ScheduleAlwaysOn;
+            daylightControl.AvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         }
 
         int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5)));
