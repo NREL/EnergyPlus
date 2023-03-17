@@ -3574,7 +3574,7 @@ namespace LowTempRadiantSystem {
         Real64 mdot;         // local temporary for fluid mass flow rate
         bool SysRunning;     // True when system is running
 
-        VarFlowRadDesignData variableFlowDesignDataObject = // Is this intended to be a copy?
+        VarFlowRadDesignData variableFlowDesignDataObject =                           // Is this intended to be a copy?
             state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
 
         auto &Surface = state.dataSurface->Surface;
@@ -3741,7 +3741,7 @@ namespace LowTempRadiantSystem {
         Real64 ZeroFlowSurfTemp;  // Temperature of radiant surface when flow is zero
         int ZoneNum;              // Zone pointer for this radiant system
 
-        VarFlowRadDesignData variableFlowDesignDataObject = // Is this intended to be a deep copy?
+        VarFlowRadDesignData variableFlowDesignDataObject =                           // Is this intended to be a deep copy?
             state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
 
         auto &Surface = state.dataSurface->Surface;
@@ -4239,7 +4239,7 @@ namespace LowTempRadiantSystem {
         int ZoneNum;            // number of zone being served
         Real64 mdot;            // local temporary for water mass flow rate kg/s
 
-        ConstantFlowRadDesignData ConstantFlowDesignDataObject = // Once again, is this supposed to be a deep copy?
+        ConstantFlowRadDesignData ConstantFlowDesignDataObject =                   // Once again, is this supposed to be a deep copy?
             state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
         auto &Surface = state.dataSurface->Surface;
         auto &Node = state.dataLoopNodes->Node;
@@ -4751,7 +4751,7 @@ namespace LowTempRadiantSystem {
         int ZoneNum;                  // number of zone being served
         Real64 ZoneMult;              // Zone multiplier for this system
 
-        ConstantFlowRadDesignData ConstantFlowDesignDataObject = // I repeat myself
+        ConstantFlowRadDesignData ConstantFlowDesignDataObject =                   // I repeat myself
             state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
         auto &Surface = state.dataSurface->Surface;
 

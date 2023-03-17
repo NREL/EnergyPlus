@@ -12373,8 +12373,10 @@ namespace Furnaces {
                                           GetMaxSpeedNumIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex),
                                           1.0,
                                           false);
-                state.dataHVACGlobal->MSHPMassFlowRateLow = GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 0.0, false);
-                state.dataHVACGlobal->MSHPMassFlowRateHigh = GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 1.0, false);
+                state.dataHVACGlobal->MSHPMassFlowRateLow =
+                    GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 0.0, false);
+                state.dataHVACGlobal->MSHPMassFlowRateHigh =
+                    GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 1.0, false);
             }
 
             // Set up fan flow rate during compressor off time

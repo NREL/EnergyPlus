@@ -1724,7 +1724,7 @@ namespace InternalHeatGains {
 
                     // Electric equipment design level calculation method.
                     {
-			    std::string const &equipmentLevel = IHGAlphas(4);
+                        std::string const &equipmentLevel = IHGAlphas(4);
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             Real64 spaceFrac = 1.0;
                             if (thisElecEqInput.numOfSpaces > 1) {
@@ -3247,7 +3247,7 @@ namespace InternalHeatGains {
                         if (zoneEqIndex > 0) { // zoneEqIndex could be zero in the case of an uncontrolled zone
                             auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
                             auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
-			    int key = thisZoneITEq.SupplyAirNodeNum;
+                            int key = thisZoneITEq.SupplyAirNodeNum;
                             thisZoneITEq.inControlledZone = true;
                             bool supplyNodeFound = false;
                             if (std::find(itStart, itEnd, key) != itEnd) {

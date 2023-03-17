@@ -505,20 +505,20 @@ namespace HVACMultiSpeedHeatPump {
 
         using BranchNodeConnections::SetUpCompSets;
         using DXCoils::GetDXCoilIndex;
-        using NodeInputManager::GetOnlySingleNode;
         using DXCoils::GetDXCoilNumberOfSpeeds;
+        using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
+        using FluidProperties::GetSatDensityRefrig;
         using HeatingCoils::GetCoilIndex;
         using HeatingCoils::GetCoilInletNode;
         using HeatingCoils::GetCoilOutletNode;
         using HeatingCoils::GetHeatingCoilIndex;
         using HeatingCoils::GetHeatingCoilNumberOfStages;
-        using WaterCoils::GetCoilMaxWaterFlowRate;
-        using WaterCoils::GetCoilWaterInletNode;
+        using NodeInputManager::GetOnlySingleNode;
         using SteamCoils::GetCoilAirOutletNode;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetSteamCoilIndex;
-        using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
-        using FluidProperties::GetSatDensityRefrig;
+        using WaterCoils::GetCoilMaxWaterFlowRate;
+        using WaterCoils::GetCoilWaterInletNode;
 
         // Locals
         // PARAMETERS
@@ -1277,7 +1277,8 @@ namespace HVACMultiSpeedHeatPump {
 
                     // Get the Supplemental Heating Coil Outlet Node
                     errFlag = false;
-                    SuppHeatCoilOutletNode = WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
+                    SuppHeatCoilOutletNode =
+                        WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
                     MSHeatPump(MSHPNum).SuppCoilAirOutletNode = SuppHeatCoilOutletNode;
                     if (errFlag) {
                         ShowContinueError(state,
@@ -1325,7 +1326,8 @@ namespace HVACMultiSpeedHeatPump {
                     }
 
                     // Get the Supplemental Heating Coil steam max volume flow rate
-                    MSHeatPump(MSHPNum).MaxSuppCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, MSHeatPump(MSHPNum).SuppHeatCoilNum, errFlag);
+                    MSHeatPump(MSHPNum).MaxSuppCoilFluidFlow =
+                        SteamCoils::GetCoilMaxSteamFlowRate(state, MSHeatPump(MSHPNum).SuppHeatCoilNum, errFlag);
                     if (MSHeatPump(MSHPNum).MaxSuppCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity =
@@ -1950,13 +1952,13 @@ namespace HVACMultiSpeedHeatPump {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
 
+        using DXCoils::GetDXCoilAvailSchPtr;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using ScheduleManager::GetCurrentScheduleValue;
         using SteamCoils::SimulateSteamCoilComponents;
-        using DXCoils::GetDXCoilAvailSchPtr;
         using WaterCoils::GetCoilMaxWaterFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -2072,7 +2074,8 @@ namespace HVACMultiSpeedHeatPump {
                 if (errFlag) {
                     ShowFatalError(state, "InitMSHeatPump: Program terminated for previous conditions.");
                 }
-                MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, MSHeatPump(MSHeatPumpNum).HeatCoilNum, ErrorsFound);
+                MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow =
+                    SteamCoils::GetCoilMaxSteamFlowRate(state, MSHeatPump(MSHeatPumpNum).HeatCoilNum, ErrorsFound);
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow > 0.0) {
                     SteamIndex =
                         0; // Function GetSatDensityRefrig will look up steam index if 0 is passed // TODO: Why do you want to re-look this up?

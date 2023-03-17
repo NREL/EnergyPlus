@@ -1397,10 +1397,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     using Fans::GetFanOutletNode;
     using Fans::GetFanType;
 
-    using MixedAir::GetOAMixerNodeNumbers;
-    using NodeInputManager::GetOnlySingleNode;
-    using ScheduleManager::CheckScheduleValueMinMax;
-    using ScheduleManager::GetScheduleIndex;
     using DataSizing::AutoSize;
     using DXCoils::GetCoilCondenserInletNode;
     using DXCoils::GetCoilTypeNum;
@@ -1413,7 +1409,11 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     using DXCoils::RatedOutdoorAirTempHeat;
     using DXCoils::RatedOutdoorWetBulbTempHeat;
     using DXCoils::SetDXCoolingCoilData;
+    using MixedAir::GetOAMixerNodeNumbers;
+    using NodeInputManager::GetOnlySingleNode;
     using OutAirNodeManager::CheckOutAirNodeNumber;
+    using ScheduleManager::CheckScheduleValueMinMax;
+    using ScheduleManager::GetScheduleIndex;
     using SingleDuct::GetATMixer;
     using WaterManager::SetupTankDemandComponent;
     using WaterManager::SetupTankSupplyComponent;
@@ -3705,10 +3705,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        thisVrfTU.CoolCoilIndex,
                                        errFlag,
                                        DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling));
-                        CCoilInletNodeNum =
-                            DXCoils::GetCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
-                        CCoilOutletNodeNum =
-                            DXCoils::GetCoilOutletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
+                        CCoilInletNodeNum = DXCoils::GetCoilInletNode(
+                            state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
+                        CCoilOutletNodeNum = DXCoils::GetCoilOutletNode(
+                            state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
                         thisVrfTU.coolCoilAirInNode = CCoilInletNodeNum;
                         thisVrfTU.coolCoilAirOutNode = CCoilOutletNodeNum;
 
@@ -4044,10 +4044,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        thisVrfTU.HeatCoilIndex,
                                        errFlag,
                                        DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating));
-                        HCoilInletNodeNum =
-                            DXCoils::GetCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
-                        HCoilOutletNodeNum =
-                            DXCoils::GetCoilOutletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
+                        HCoilInletNodeNum = DXCoils::GetCoilInletNode(
+                            state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
+                        HCoilOutletNodeNum = DXCoils::GetCoilOutletNode(
+                            state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
                         thisVrfTU.heatCoilAirInNode = HCoilInletNodeNum;
                         thisVrfTU.heatCoilAirOutNode = HCoilOutletNodeNum;
 
@@ -8399,9 +8399,9 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
             if (state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex > 0) {
                 DXCoilCap = DXCoils::GetCoilCapacityByIndexType(state,
-                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex,
-                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).DXCoolCoilType_Num,
-                                         errFlag);
+                                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex,
+                                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).DXCoolCoilType_Num,
+                                                                errFlag);
                 TUCoolingCapacity += DXCoilCap;
                 if (DXCoilCap == AutoSize) {
                     FoundAll = false;
@@ -8410,9 +8410,9 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             }
             if (state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex > 0) {
                 DXCoilCap = DXCoils::GetCoilCapacityByIndexType(state,
-                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex,
-                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).DXHeatCoilType_Num,
-                                         errFlag);
+                                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex,
+                                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).DXHeatCoilType_Num,
+                                                                errFlag);
                 TUHeatingCapacity += DXCoilCap;
                 if (DXCoilCap == AutoSize) {
                     FoundAll = false;
@@ -9377,7 +9377,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     Real64 SpecHumIn(0.0);  // specific humidity ratio at inlet node
     int TUListIndex;        // index to TU list for this VRF system
     int IndexToTUInTUList;  // index to TU in specific list for the VRF system
-    int ZoneNode; // Zone node of VRFTU is serving
+    int ZoneNode;           // Zone node of VRFTU is serving
 
     VRFCond = this->VRFSysNum;
     TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
@@ -12619,7 +12619,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     int IndexToTUInTUList;  // index to TU in specific list for the VRF system
     Real64 EvapTemp;        // evaporating temperature
     Real64 CondTemp;        // condensing temperature
-    int ZoneNode;                                                  // Zone node of VRFTU is serving
+    int ZoneNode;           // Zone node of VRFTU is serving
 
     VRFCond = this->VRFSysNum;
     TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;

@@ -896,7 +896,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     std::string_view NFRCname = NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const Real64 windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const Real64 windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                    const DataSurfaces::NfrcVisionType vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    const DataSurfaces::NfrcVisionType vision =
+                        NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
 
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
 
@@ -970,7 +971,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     for (unsigned int i = 0; i < totalStates; ++i) {
                         const Real64 windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         const Real64 windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                        const DataSurfaces::NfrcVisionType vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const DataSurfaces::NfrcVisionType vision =
+                            NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
 
                         const int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
                         const Real64 stateUValue = GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight);
@@ -5483,7 +5485,7 @@ void UpdateThermalHistories(EnergyPlusData &state)
 
                         if (construct.NumCTFTerms > 1) {
                             int const numCTFTerms = construct.NumCTFTerms;
-			    int m = state.dataHeatBalSurf->SurfTsrcHistM.index(SurfNum, numCTFTerms);
+                            int m = state.dataHeatBalSurf->SurfTsrcHistM.index(SurfNum, numCTFTerms);
                             int m1 = m + 1;
                             for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing [ l ] == ()
                                 // Real64 const SurfTsrcHistM_elem( SurfTsrcHistM( SurfNum, HistTermNum ) );

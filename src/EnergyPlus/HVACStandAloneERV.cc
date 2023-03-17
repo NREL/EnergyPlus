@@ -207,9 +207,9 @@ void GetStandAloneERV(EnergyPlusData &state)
     using Fans::GetFanOutletNode;
     using Fans::GetFanType;
 
-    using NodeInputManager::GetOnlySingleNode;
-    using HeatRecovery::GetHeatExchangerObjectTypeNum;
     using Curve::GetCurveIndex;
+    using HeatRecovery::GetHeatExchangerObjectTypeNum;
+    using NodeInputManager::GetOnlySingleNode;
     using OutAirNodeManager::CheckOutAirNodeNumber;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
