@@ -86,7 +86,6 @@ namespace EMSManager {
     //       DATE WRITTEN   June 2006
     //       MODIFIED       Brent Griffith
     //                      May - August 2009
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module manages the programmable energy management system(EMS).
@@ -132,7 +131,6 @@ namespace EMSManager {
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2009
         //       MODIFIED       Rui Zhang February 2010
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Determine if EMS is used in model and set flag
@@ -147,11 +145,7 @@ namespace EMSManager {
         // Using/Aliasing
         using General::ScanForReports;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        std::string cCurrentModuleObject;
-
-        cCurrentModuleObject = "EnergyManagementSystem:Sensor";
+        std::string cCurrentModuleObject = "EnergyManagementSystem:Sensor";
         state.dataRuntimeLang->NumSensors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Actuator";
@@ -271,11 +265,6 @@ namespace EMSManager {
         //                      added calling point argument and logic.
         //                      Collapsed SimulateEMS into this routine
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
         // Using/Aliasing
         using OutputProcessor::MeterType;
         using OutputProcessor::RealVariables;
@@ -388,8 +377,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // collect routines needed to initialize EMS
@@ -483,8 +470,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
@@ -501,7 +486,6 @@ namespace EMSManager {
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
         //       MODIFIED       BG April 2009, finishing, renaming, etc.
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the EMS input from the input file.
@@ -963,8 +947,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // contains Some input checks that need to be deferred until later in the simulation
@@ -1247,8 +1229,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // local helper routine intended to lookup report variables only.
@@ -1257,13 +1237,8 @@ namespace EMSManager {
         // METHODOLOGY EMPLOYED:
         // make calls to OutputProcessor methods GetVariableKeyCountandType and GetVariableKeys
 
-        // USE STATEMENTS:
-
         // Using/Aliasing
         using RuntimeLanguageProcessor::EvaluateStack;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumKeys;
@@ -1310,8 +1285,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // echo out actuators registered with SetupEMSActuator for user access
@@ -1372,18 +1345,12 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // echo out actuators registered with SetupEMSActuator for user access
 
         // METHODOLOGY EMPLOYED:
         // mine structure and write to eio file
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (state.dataRuntimeLang->OutputEMSInternalVarsFull) {
 
@@ -1423,8 +1390,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // make system nodes in model available for EMS control
@@ -1557,8 +1522,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Logged trend data
@@ -1593,7 +1556,6 @@ namespace EMSManager {
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
         //       MODIFIED       July 2020, Julien Marrec of EffiBEM: added option to check by handle (for API)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Provide method to verify that a specific node is (probably) managed by EMS
@@ -1644,8 +1606,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Provide method to verify that a specific node is (probably) managed by EMS
@@ -1706,8 +1666,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Julien Marrec of EffiBEM
         //       DATE WRITTEN   July 2020
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine checks any nodes where we couldn't find a Setpoint in EMS, after the PythonPlugin / API have been called
@@ -1793,31 +1751,9 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // make air system status available as EMS actuator
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         state.dataEMSMgr->lDummy2 = false;
 
@@ -1843,8 +1779,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // make calls to SetupEMSactuator for public data for Window Shades
@@ -1913,8 +1847,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Make zone thermostats, humidistats, and comfort controls available to EMS
@@ -1922,24 +1854,8 @@ namespace EMSManager {
         // METHODOLOGY EMPLOYED:
         // Loop over structures and call SetupEMSactuator for public data in DataZoneControls.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneControls;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop(0); // local do loop index
@@ -2002,8 +1918,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Setup EMS actuators available for surface convection coefficients
@@ -2035,8 +1949,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // setup EMS actuators available for surface construction
@@ -2074,8 +1986,6 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   May 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // setup EMS actuators for outside boundary conditions by surface
@@ -2142,34 +2052,9 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // set up zone-related info as internal data
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (!state.dataHeatBal->Zone.empty()) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -2189,19 +2074,12 @@ namespace EMSManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X Luo
         //       DATE WRITTEN   July 2017
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // setup EMS actuators for outside boundary conditions by surface
 
         // METHODOLOGY EMPLOYED:
         // loop through all surfaces, cycle if not heat transfer or outdoors BC
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // local loop index.
@@ -2280,7 +2158,6 @@ void SetupEMSActuator(EnergyPlusData &state,
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   June 2006
     //       MODIFIED       Brent Griffith April 2009,
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // register a new actuator for EMS
@@ -2335,8 +2212,6 @@ void SetupEMSActuator(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   May 2009
-    //       MODIFIED
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // register a new actuator for EMS
@@ -2391,8 +2266,6 @@ void SetupEMSActuator(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   August 2009
-    //       MODIFIED
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // register a new actuator for EMS
@@ -2442,8 +2315,6 @@ void SetupEMSInternalVariable(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   May 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Setup internal data source and make available to EMS
@@ -2453,11 +2324,7 @@ void SetupEMSInternalVariable(
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InternalVarAvailNum; // loop index
-    bool FoundDuplicate;
-
-    // Object Data
-
-    FoundDuplicate = false;
+    bool FoundDuplicate = false;
 
     for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
         if ((UtilityRoutines::SameString(cDataTypeName, state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName)) &&
@@ -2501,8 +2368,6 @@ void SetupEMSInternalVariable(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   May 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Setup internal data source and make available to EMS
@@ -2512,11 +2377,8 @@ void SetupEMSInternalVariable(
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InternalVarAvailNum; // loop index
-    bool FoundDuplicate;
 
-    // Object Data
-
-    FoundDuplicate = false;
+    bool FoundDuplicate = false;
 
     for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
         if ((UtilityRoutines::SameString(cDataTypeName, state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName)) &&
