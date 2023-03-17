@@ -305,8 +305,6 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     bool GetInputDesiccantDehumidifier = true; // First time, input is "gotten"
     bool InitDesiccantDehumidifierOneTimeFlag = true;
     bool MySetPointCheckFlag = true; // I think this actually needs to be a vector or a member variable on the struct, not just a single bool
-    bool CalcSolidDesiccantDehumidifierMyOneTimeFlag = true; // one time flag
-    bool CalcGenericDesiccantDehumidifierMyOneTimeFlag = true;
     Array1D<DesiccantDehumidifiers::DesiccantDehumidifierData> DesicDehum;
     std::unordered_map<std::string, std::string> UniqueDesicDehumNames;
 
@@ -316,9 +314,7 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     Real64 SteamDensity = 0.0; // density of steam at 100C
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
-    Real64 RhoAirStdInit = 0.0;
-    Real64 QRegen = 0.0;            // required coil load passed to sim heating coil routine (W)
-    Real64 RhoAirStdInitCGDD = 0.0; // standard air density (kg/m3)
+    Real64 QRegen = 0.0;          // required coil load passed to sim heating coil routine (W)
 
     void clear_state() override
     {
