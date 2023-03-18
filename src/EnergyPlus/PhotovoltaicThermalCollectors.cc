@@ -1115,7 +1115,7 @@ namespace PhotovoltaicThermalCollectors {
             Real64 HcExt(0.0);
             Real64 HrSky(0.0);
 
-            ConvectionCoefficients::InitExteriorConvectionCoeff(state,
+            Convect::InitExteriorConvectionCoeff(state,
                                                                 this->SurfNum,
                                                                 0.0,
                                                                 Material::SurfaceRoughness::VerySmooth,

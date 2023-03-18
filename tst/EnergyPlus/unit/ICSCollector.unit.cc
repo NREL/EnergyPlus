@@ -63,7 +63,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
@@ -117,14 +116,14 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
     Material::MaterialChild *p = new Material::MaterialChild;
     state->dataMaterial->Material.push_back(p);
-    dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MatNum))->AbsorpThermal = 0.8;
+    p->AbsorpThermal = 0.8;
     // allocate exterior vented cavity variable data
     state->dataHeatBal->ExtVentedCavity.allocate(1);
     state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
     state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
     state->dataHeatBal->Zone.allocate(ZoneNum);
-    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
+    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = Convect::HcInt_ASHRAESimple;
     // allocate surface temperature variable data
     state->dataHeatBalSurf->SurfOutsideTempHist.allocate(1);
     state->dataHeatBalSurf->SurfOutsideTempHist(1).allocate(NumOfSurf);

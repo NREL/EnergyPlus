@@ -51,7 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
-namespace EnergyPlus::ConvectionConstants {
+namespace EnergyPlus::Convect {
 
 // Data
 // MODULE PARAMETER DEFINITIONS:
@@ -274,6 +274,6 @@ enum class RefWind
     Num
 };
 
-} // namespace EnergyPlus::ConvectionConstants
+} // namespace EnergyPlus::Convect
 
 #endif

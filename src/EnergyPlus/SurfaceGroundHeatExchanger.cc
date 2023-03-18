@@ -1224,7 +1224,7 @@ namespace SurfaceGroundHeatExchanger {
         // calc surface heat balance
 
         // Using/Aliasing
-        using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
+        using Convect::CalcASHRAESimpExtConvectCoeff;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ConvCoef;     // convection coefficient
@@ -1287,7 +1287,7 @@ namespace SurfaceGroundHeatExchanger {
         // calc surface heat balances
 
         // Using/Aliasing
-        using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
+        using Convect::CalcASHRAESimpExtConvectCoeff;
 
         Real64 ConvCoef;    // convection coefficient
         Real64 RadCoef;     // radiation coefficient

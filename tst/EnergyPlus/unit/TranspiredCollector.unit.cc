@@ -69,7 +69,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;

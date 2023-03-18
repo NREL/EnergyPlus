@@ -818,30 +818,30 @@ namespace HeatBalanceManager {
                 std::string const &SELECT_CASE_var = AlphaName(1);
 
                 if (SELECT_CASE_var == "SIMPLE") {
-                    state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = Convect::HcInt_ASHRAESimple;
                     AlphaName(1) = "Simple";
 
                 } else if ((SELECT_CASE_var == "TARP")) {
-                    state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAETARP;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = Convect::HcInt_ASHRAETARP;
                     AlphaName(1) = "TARP";
 
                 } else if (SELECT_CASE_var == "CEILINGDIFFUSER") {
-                    state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_CeilingDiffuser;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = Convect::HcInt_CeilingDiffuser;
                     AlphaName(1) = "CeilingDiffuser";
 
                 } else if (SELECT_CASE_var == "TROMBEWALL") {
-                    state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_TrombeWall;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = Convect::HcInt_TrombeWall;
                     ShowSevereError(state,
                                     "GetInsideConvectionAlgorithm: TrombeWall has been used as a global definition. This is a zone oriented value.  "
                                     "Will be illegal in the future.");
                     AlphaName(1) = "TrombeWall";
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
-                    state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = Convect::HcInt_AdaptiveConvectionAlgorithm;
                     AlphaName(1) = "AdaptiveConvectionAlgorithm";
 
                 } else if (SELECT_CASE_var == "ASTMC1340") {
-                    state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASTMC1340;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = Convect::HcInt_ASTMC1340;
                     AlphaName(1) = "ASTMC1340";
 
                 } else {
@@ -849,13 +849,13 @@ namespace HeatBalanceManager {
                                      format("GetInsideConvectionAlgorithm: Invalid value for {}, defaulting to TARP, invalid value={}",
                                             state.dataHeatBalMgr->CurrentModuleObject,
                                             AlphaName(1)));
-                    state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAETARP;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = Convect::HcInt_ASHRAETARP;
                     AlphaName(1) = "TARP";
                 }
             }
         } else {
             // default value, if not specified
-            state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAETARP;
+            state.dataHeatBal->DefaultInsideConvectionAlgo = Convect::HcInt_ASHRAETARP;
             AlphaName(1) = "TARP";
         }
         constexpr const char *Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
@@ -882,23 +882,23 @@ namespace HeatBalanceManager {
                 std::string const &SELECT_CASE_var = AlphaName(1);
 
                 if ((SELECT_CASE_var == "SIMPLECOMBINED")) {
-                    state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = Convect::HcExt_ASHRAESimple;
                     AlphaName(1) = "SimpleCombined";
 
                 } else if ((SELECT_CASE_var == "TARP")) {
-                    state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAETARP;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = Convect::HcExt_ASHRAETARP;
                     AlphaName(1) = "TARP";
 
                 } else if (SELECT_CASE_var == "MOWITT") {
-                    state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_MoWiTTHcOutside;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = Convect::HcExt_MoWiTTHcOutside;
                     AlphaName(1) = "MoWitt";
 
                 } else if ((SELECT_CASE_var == "DOE-2")) {
-                    state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_DOE2HcOutside;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = Convect::HcExt_DOE2HcOutside;
                     AlphaName(1) = "DOE-2";
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
-                    state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = Convect::HcExt_AdaptiveConvectionAlgorithm;
                     AlphaName(1) = "AdaptiveConvectionAlgorithm";
 
                 } else {
@@ -906,13 +906,13 @@ namespace HeatBalanceManager {
                                      format("GetOutsideConvectionAlgorithm: Invalid value for {}, defaulting to DOE-2, invalid value={}",
                                             state.dataHeatBalMgr->CurrentModuleObject,
                                             AlphaName(1)));
-                    state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_DOE2HcOutside;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = Convect::HcExt_DOE2HcOutside;
                     AlphaName(1) = "DOE-2";
                 }
             }
         } else {
             // default value, if not specified
-            state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_DOE2HcOutside;
+            state.dataHeatBal->DefaultOutsideConvectionAlgo = Convect::HcExt_DOE2HcOutside;
             AlphaName(1) = "DOE-2";
         }
 
@@ -2679,22 +2679,22 @@ namespace HeatBalanceManager {
                 std::string const &SELECT_CASE_var = cAlphaArgs(2);
 
                 if (SELECT_CASE_var == "SIMPLE") {
-                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = Convect::HcInt_ASHRAESimple;
 
                 } else if ((SELECT_CASE_var == "TARP")) {
-                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAETARP;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = Convect::HcInt_ASHRAETARP;
 
                 } else if (SELECT_CASE_var == "CEILINGDIFFUSER") {
-                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ConvectionConstants::HcInt_CeilingDiffuser;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = Convect::HcInt_CeilingDiffuser;
 
                 } else if (SELECT_CASE_var == "TROMBEWALL") {
-                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ConvectionConstants::HcInt_TrombeWall;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = Convect::HcInt_TrombeWall;
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
-                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = Convect::HcInt_AdaptiveConvectionAlgorithm;
 
                 } else if (SELECT_CASE_var == "ASTMC1340") {
-                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ConvectionConstants::HcInt_ASTMC1340;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = Convect::HcInt_ASTMC1340;
 
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, cCurrentModuleObject, state.dataHeatBal->Zone(ZoneLoop).Name));
@@ -2712,19 +2712,19 @@ namespace HeatBalanceManager {
                 std::string const &SELECT_CASE_var = cAlphaArgs(3);
 
                 if ((SELECT_CASE_var == "SIMPLECOMBINED")) {
-                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = Convect::HcExt_ASHRAESimple;
 
                 } else if ((SELECT_CASE_var == "TARP")) {
-                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAETARP;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = Convect::HcExt_ASHRAETARP;
 
                 } else if (SELECT_CASE_var == "MOWITT") {
-                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ConvectionConstants::HcExt_MoWiTTHcOutside;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = Convect::HcExt_MoWiTTHcOutside;
 
                 } else if (SELECT_CASE_var == "DOE-2") {
-                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ConvectionConstants::HcExt_DOE2HcOutside;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = Convect::HcExt_DOE2HcOutside;
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
-                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = Convect::HcExt_AdaptiveConvectionAlgorithm;
 
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, cCurrentModuleObject, state.dataHeatBal->Zone(ZoneLoop).Name));

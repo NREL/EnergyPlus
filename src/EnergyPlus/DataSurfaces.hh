@@ -691,7 +691,7 @@ namespace DataSurfaces {
         int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, EnclSolInfo(n).SurfacePtr(SolarEnclSurfIndex) points to this surface
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
 
-        ConvectionConstants::SurfConvOrientation ConvOrientation; // Surface orientation for convection calculations
+        Convect::SurfConvOrientation ConvOrientation; // Surface orientation for convection calculations
 
         SurfaceCalcHashKey calcHashKey;        // Hash key used for determining if this surface requires unique calculations.
         bool IsSurfPropertyGndSurfacesDefined; // true if ground surfaces properties are listed for an external surface
@@ -720,7 +720,7 @@ namespace DataSurfaces {
               ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0), MirroredSurf(false), IsShadowing(false),
               IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0), activeWindowShadingControl(0),
               HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0), FrameDivider(0), Multiplier(1.0),
-              SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid),
+              SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), ConvOrientation(Convect::SurfConvOrientation::Invalid),
               IsSurfPropertyGndSurfacesDefined(false), SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false),
               UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0), SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false),
               SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
@@ -1080,7 +1080,7 @@ namespace DataSurfaces {
         // Members
         int WhichSurface;                                       // Which surface number this is applied to
         std::string SurfaceName;                                // Which surface (name)
-        ConvectionConstants::ConvCoefOverrideType OverrideType; // Override type, 1=value, 2=schedule, 3=model, 4=user curve
+        Convect::ConvCoefOverrideType OverrideType; // Override type, 1=value, 2=schedule, 3=model, 4=user curve
         Real64 OverrideValue;                                   // User specified value
         std::string ScheduleName;                               // Which surface (name)
         int ScheduleIndex;                                      // if type="schedule" is used
@@ -1089,7 +1089,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         ConvectionCoefficient()
-            : WhichSurface(0), OverrideType(ConvectionConstants::ConvCoefOverrideType::Invalid), OverrideValue(0.0), ScheduleIndex(0),
+            : WhichSurface(0), OverrideType(Convect::ConvCoefOverrideType::Invalid), OverrideValue(0.0), ScheduleIndex(0),
               UserCurveIndex(0), HcModelEq(0)
         {
         }
@@ -1392,12 +1392,12 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfTAirRefRpt;        // Flag for reference air temperature for reporting
     Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<ConvectionConstants::InConvClass>
+    Array1D<Convect::InConvClass>
         SurfIntConvClassification;             // current classification for inside face air flow regime and surface orientation
     Array1D<int> SurfIntConvClassificationRpt; // current classification for inside face air flow regime and surface orientation for reporting
     Array1D<int> SurfIntConvHcModelEq;         // current convection model for inside face
     Array1D<int> SurfIntConvHcUserCurveIndex;  // current index to user convection model if used
-    Array1D<ConvectionConstants::OutConvClass>
+    Array1D<Convect::OutConvClass>
         SurfOutConvClassification;                // current classification for outside face wind regime and convection orientation
     Array1D<int> SurfOutConvClassificationRpt;    // current classification for outside face wind regime and convection orientation for reporting
     Array1D<int> SurfOutConvHfModelEq;            // current convection model for forced convection at outside face
@@ -1411,7 +1411,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfIntConvZonePerimLength;   // [m] length of perimeter zone's exterior wall
     Array1D<Real64> SurfIntConvZoneHorizHydrDiam; // [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter
     Array1D<Real64> SurfIntConvWindowWallRatio;   // [-] area of windows over area of exterior wall for zone
-    Array1D<ConvectionConstants::InConvWinLoc> SurfIntConvWindowLocation; // relative location of window in zone for interior Hc models
+    Array1D<Convect::InConvWinLoc> SurfIntConvWindowLocation; // relative location of window in zone for interior Hc models
     Array1D<bool> SurfIntConvSurfGetsRadiantHeat;
     Array1D<bool> SurfIntConvSurfHasActiveInIt;
 

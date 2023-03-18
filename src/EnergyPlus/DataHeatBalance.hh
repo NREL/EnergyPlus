@@ -606,11 +606,11 @@ namespace DataHeatBalance {
         int humidityControlZoneIndex = 0;               // this is the index number for HumidityControlZone structure for lookup
         int AllSurfaceFirst = 0;                        // First surface in zone including air boundaries
         int AllSurfaceLast = -1;                        // Last  surface in zone including air boundaries
-        int InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple; // Ref: appropriate values for Inside Convection solution
+        int InsideConvectionAlgo = Convect::HcInt_ASHRAESimple; // Ref: appropriate values for Inside Convection solution
         int NumSurfaces = 0;                                                // Number of surfaces for this zone
         int NumSubSurfaces = 0;     // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
         int NumShadingSurfaces = 0; // Number of shading surfaces for this zone
-        int OutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple; // Ref: appropriate values for Outside Convection solution
+        int OutsideConvectionAlgo = Convect::HcExt_ASHRAESimple; // Ref: appropriate values for Outside Convection solution
         Vector Centroid;                                                     // Center of the zone found by averaging wall, floor, and roof centroids
         Real64 MinimumX = 0.0;                                               // Minimum X value for entire zone
         Real64 MaximumX = 0.0;                                               // Maximum X value for entire zone
@@ -1847,8 +1847,8 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 BuildingAzimuth = 0.0;           // North Axis of Building
     Real64 LoadsConvergTol = 0.0;           // Tolerance value for Loads Convergence
     Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
-    int DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
-    int DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
+    int DefaultInsideConvectionAlgo = Convect::HcInt_ASHRAESimple;
+    int DefaultOutsideConvectionAlgo = Convect::HcExt_ASHRAESimple;
     DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                // Solar Distribution Algorithm
     int InsideSurfIterations = 0;                                                                           // Counts inside surface iterations
     DataSurfaces::HeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting

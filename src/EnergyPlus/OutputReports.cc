@@ -1194,7 +1194,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                            << format("{:.2R}", thisSurface.Tilt) << "," << format("{:.2R}", thisSurface.Width) << ","
                            << format("{:.2R}", thisSurface.Height) << "," << format("{:.2R}", thisSurface.Reveal) << ",";
 
-                static constexpr std::array<std::string_view, (int)ConvectionConstants::ConvCoefOverrideType::Num> overrideTypeStrs = {
+                static constexpr std::array<std::string_view, (int)Convect::ConvCoefOverrideType::Num> overrideTypeStrs = {
                     "User Supplied Value", "User Supplied Schedule", "User Supplied Curve", "User Specified Model"};
 
                 if (state.dataSurface->SurfIntConvCoeffIndex(surf) > 0) {

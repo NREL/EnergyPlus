@@ -87,7 +87,7 @@ namespace CrossVentMgr {
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;
     using namespace DataRoomAirModel;
-    using ConvectionCoefficients::CalcDetailedHcInForDVModel;
+    using Convect::CalcDetailedHcInForDVModel;
 
     Real64 constexpr Cjet1(1.873);     // First correlation constant for the jet velocity
     Real64 constexpr Cjet2(0.243);     // Second correlation constant for the jet velocity

@@ -1351,7 +1351,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     // This then interfaces with the Hanby model for near-pipe region
 
     // Using/Aliasing
-    using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
+    using Convect::CalcASHRAESimpExtConvectCoeff;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr NumSections(20);

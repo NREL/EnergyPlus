@@ -308,7 +308,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace SolarShading;
-    using ConvectionCoefficients::InitInteriorConvectionCoeffs;
+    using Convect::InitInteriorConvectionCoeffs;
     using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
     using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
     using InternalHeatGains::ManageInternalHeatGains;
@@ -6856,9 +6856,9 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;
-    using ConvectionCoefficients::InitExteriorConvectionCoeff;
-    using ConvectionCoefficients::SetExtConvectionCoeff;
-    using ConvectionCoefficients::SetIntConvectionCoeff;
+    using Convect::InitExteriorConvectionCoeff;
+    using Convect::SetExtConvectionCoeff;
+    using Convect::SetIntConvectionCoeff;
     using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
@@ -7752,7 +7752,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         // The choice of 30 is not significant--just want to do this a couple of
         // times before the iteration limit is hit.
         if ((state.dataHeatBal->InsideSurfIterations > 0) && (mod(state.dataHeatBal->InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
-            ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.dataHeatBalSurf->SurfTempIn, ZoneToResimulate);
+            Convect::InitInteriorConvectionCoeffs(state, state.dataHeatBalSurf->SurfTempIn, ZoneToResimulate);
         }
 
         if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
@@ -8196,13 +8196,13 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         // Set Exterior Convection Coefficient...
                         if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) > 0) {
 
-                            state.dataHeatBalSurf->SurfHcExt(SurfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, SurfNum);
+                            state.dataHeatBalSurf->SurfHcExt(SurfNum) = Convect::SetExtConvectionCoeff(state, SurfNum);
 
                         } else if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
 
                             // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in
                             // subroutine)
-                            ConvectionCoefficients::InitExteriorConvectionCoeff(state,
+                            Convect::InitExteriorConvectionCoeff(state,
                                                                                 SurfNum,
                                                                                 0.0,
                                                                                 RoughSurf,
@@ -8220,7 +8220,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         } else { // Not Wind exposed
 
                             // Calculate exterior heat transfer coefficients for windspeed = 0
-                            ConvectionCoefficients::InitExteriorConvectionCoeff(state,
+                            Convect::InitExteriorConvectionCoeff(state,
                                                                                 SurfNum,
                                                                                 0.0,
                                                                                 RoughSurf,
@@ -8234,7 +8234,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     } else { // Interior Surface
 
                         if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) > 0) {
-                            state.dataHeatBalSurf->SurfHcExt(SurfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, SurfNum);
+                            state.dataHeatBalSurf->SurfHcExt(SurfNum) = Convect::SetExtConvectionCoeff(state, SurfNum);
                         } else {
                             // Exterior Convection Coefficient for the Interior or Interzone Window is the Interior Convection Coeff of
                             // same
@@ -8611,7 +8611,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         // The choice of 30 is not significant--just want to do this a couple of
         // times before the iteration limit is hit.
         if ((state.dataHeatBal->InsideSurfIterations > 0) && (mod(state.dataHeatBal->InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
-            ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.dataHeatBalSurf->SurfTempIn, ZoneToResimulate);
+            Convect::InitInteriorConvectionCoeffs(state, state.dataHeatBalSurf->SurfTempIn, ZoneToResimulate);
             // Since HConvIn has changed re-calculate a few terms - non-window surfaces
             for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
@@ -8894,13 +8894,13 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                 // Set Exterior Convection Coefficient...
                                 if (state.dataSurface->SurfExtConvCoeffIndex(surfNum) > 0) {
 
-                                    state.dataHeatBalSurf->SurfHcExt(surfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, surfNum);
+                                    state.dataHeatBalSurf->SurfHcExt(surfNum) = Convect::SetExtConvectionCoeff(state, surfNum);
 
                                 } else if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
 
                                     // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in
                                     // subroutine)
-                                    ConvectionCoefficients::InitExteriorConvectionCoeff(state,
+                                    Convect::InitExteriorConvectionCoeff(state,
                                                                                         surfNum,
                                                                                         0.0,
                                                                                         RoughSurf,
@@ -8918,7 +8918,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                 } else { // Not Wind exposed
 
                                     // Calculate exterior heat transfer coefficients for windspeed = 0
-                                    ConvectionCoefficients::InitExteriorConvectionCoeff(state,
+                                    Convect::InitExteriorConvectionCoeff(state,
                                                                                         surfNum,
                                                                                         0.0,
                                                                                         RoughSurf,
@@ -8933,7 +8933,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             } else { // Interior Surface
 
                                 if (state.dataSurface->SurfExtConvCoeffIndex(surfNum) > 0) {
-                                    state.dataHeatBalSurf->SurfHcExt(surfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, surfNum);
+                                    state.dataHeatBalSurf->SurfHcExt(surfNum) = Convect::SetExtConvectionCoeff(state, surfNum);
                                 } else {
                                     // Exterior Convection Coefficient for the Interior or Interzone Window is the Interior Convection Coeff of
                                     // same
@@ -9565,7 +9565,7 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     // derived from CalcPassiveTranspiredCollector
 
     // Using/Aliasing
-    using ConvectionCoefficients::InitExteriorConvectionCoeff;
+    using Convect::InitExteriorConvectionCoeff;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyWFnTdbTwbPb;

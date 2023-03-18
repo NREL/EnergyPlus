@@ -132,9 +132,9 @@ namespace EcoRoofManager {
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
         using namespace DataSurfaces;
-        using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using ConvectionCoefficients::SetExtConvectionCoeff;
-        using ConvectionCoefficients::SetIntConvectionCoeff;
+        using Convect::InitExteriorConvectionCoeff;
+        using Convect::SetExtConvectionCoeff;
+        using Convect::SetIntConvectionCoeff;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr Kv(0.4);           // Von Karmen's constant (source FASST)

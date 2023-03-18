@@ -3536,7 +3536,7 @@ namespace WindowManager {
         // by LU decomposition.
 
         // Using/Aliasing
-        using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
+        using Convect::CalcISO15099WindowIntConvCoeff;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3647,7 +3647,7 @@ namespace WindowManager {
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
             if (((state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) &&
-                 (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ConvectionConstants::HcInt_ASHRAETARP)) ||
+                 (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == Convect::HcInt_ASHRAETARP)) ||
                 (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == -2)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.

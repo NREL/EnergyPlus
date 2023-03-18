@@ -86,7 +86,7 @@
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus::ConvectionCoefficients {
+namespace EnergyPlus::Convect {
 
 // Module containing the routines dealing with the convection coefficients
 
@@ -112,9 +112,9 @@ using namespace DataVectorTypes;
 
 // Coefficients that modify the convection coeff based on surface roughness
 std::array<Real64, 6> const RoughnessMultiplier{2.17, 1.67, 1.52, 1.13, 1.11, 1.0};
-constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::RefTemp::Num)> RefTempNamesUC{
+constexpr std::array<std::string_view, static_cast<int>(Convect::RefTemp::Num)> RefTempNamesUC{
     "MEANAIRTEMPERATURE", "ADJACENTAIRTEMPERATURE", "SUPPLYAIRTEMPERATURE"};
-constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::RefWind::Num)> RefWindNamesUC{
+constexpr std::array<std::string_view, static_cast<int>(Convect::RefWind::Num)> RefWindNamesUC{
     "WEATHERFILE", "HEIGHTADJUST", "PARALLELCOMPONENT", "PARALLELCOMPONENTHEIGHTADJUST"};
 
 enum class ConvSurfDeltaT
@@ -218,14 +218,14 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             allocated(state.dataLoopNodes->Node)) {
             state.dataConvectionCoefficient->NodeCheck = false;
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (Zone(ZoneNum).InsideConvectionAlgo != ConvectionConstants::HcInt_CeilingDiffuser) continue;
+                if (Zone(ZoneNum).InsideConvectionAlgo != Convect::HcInt_CeilingDiffuser) continue;
                 if (Zone(ZoneNum).SystemZoneNodeNumber != 0) continue;
                 ShowSevereError(state,
                                 format("InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, but no system inlet node defined, Zone={}",
                                        Zone(ZoneNum).Name));
                 ShowContinueError(
                     state, format("Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone={}", Zone(ZoneNum).Name));
-                state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAETARP;
+                state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo = Convect::HcInt_ASHRAETARP;
             }
             // insert one-time setup for adaptive inside face
         }
@@ -240,13 +240,13 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
     if (state.dataGlobal->BeginEnvrnFlag && state.dataConvectionCoefficient->MyEnvirnFlag) {
         bool anyAdaptiveConvectionAlgorithm = false;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) {
+            if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == Convect::HcInt_AdaptiveConvectionAlgorithm) {
                 anyAdaptiveConvectionAlgorithm = true;
                 break;
             }
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) {
+            if (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == Convect::HcInt_AdaptiveConvectionAlgorithm) {
                 anyAdaptiveConvectionAlgorithm = true;
                 break;
             }
@@ -294,10 +294,10 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         switch (Zone(ZoneNum).InsideConvectionAlgo) {
-        case ConvectionConstants::HcInt_CeilingDiffuser:
+        case Convect::HcInt_CeilingDiffuser:
             CalcCeilingDiffuserIntConvCoeff(state, ZoneNum, SurfaceTemperatures);
             break;
-        case ConvectionConstants::HcInt_TrombeWall:
+        case Convect::HcInt_TrombeWall:
             CalcTrombeWallIntConvCoeff(state, ZoneNum, SurfaceTemperatures);
             break;
         default:;
@@ -326,7 +326,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     algoNum = std::abs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum));
                     standardAlgo = true;
                 } else if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) ==
-                           ConvectionConstants::HcInt_SetByZone) { // Not set by user, uses Zone Setting
+                           Convect::HcInt_SetByZone) { // Not set by user, uses Zone Setting
                     algoNum = Zone(ZoneNum).InsideConvectionAlgo;
                     standardAlgo = true;
                 } else {
@@ -336,14 +336,14 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 
                 if (standardAlgo) {
                     switch (algoNum) {
-                    case ConvectionConstants::HcInt_ASHRAESimple: {
+                    case Convect::HcInt_ASHRAESimple: {
                         CalcASHRAESimpleIntConvCoeff(
                             state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
                         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                         if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                             state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
                     } break;
-                    case ConvectionConstants::HcInt_ASHRAETARP: {
+                    case Convect::HcInt_ASHRAETARP: {
                         if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                             CalcASHRAEDetailedIntConvCoeff(
                                 state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
@@ -356,14 +356,14 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                         if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                             state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
                     } break;
-                    case ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm: {
+                    case Convect::HcInt_AdaptiveConvectionAlgorithm: {
                         ManageInsideAdaptiveConvectionAlgo(state, SurfNum);
                     } break;
-                    case ConvectionConstants::HcInt_CeilingDiffuser:
-                    case ConvectionConstants::HcInt_TrombeWall: {
+                    case Convect::HcInt_CeilingDiffuser:
+                    case Convect::HcInt_TrombeWall: {
                         // Already done above and can't be at individual surface
                     } break;
-                    case ConvectionConstants::HcInt_ASTMC1340: {
+                    case Convect::HcInt_ASTMC1340: {
                         CalcASTMC1340ConvCoeff(
                             state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
                     } break;
@@ -505,7 +505,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
     if (standardAlgo) {
 
         switch (algoNum) {
-        case ConvectionConstants::HcExt_ASHRAESimple:
+        case Convect::HcExt_ASHRAESimple:
             if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double windSpeed) -> double {
                     return windSpeed;
@@ -517,9 +517,9 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 HExt = CalcASHRAESimpExtConvectCoeff(Roughness, SurfWindSpeed); // includes radiation to sky, ground, and air
             }
             break;
-        case ConvectionConstants::HcExt_ASHRAETARP:
-        case ConvectionConstants::HcExt_BLASTHcOutside:
-        case ConvectionConstants::HcExt_TarpHcOutside:
+        case Convect::HcExt_ASHRAETARP:
+        case Convect::HcExt_BLASTHcOutside:
+        case Convect::HcExt_TarpHcOutside:
             //   Convection is split into forced and natural components. The total
             //   convective heat transfer coefficient is the sum of these components.
             //   Coefficients for subsurfaces are handled in a special way.  The values for perimeter and gross area
@@ -584,7 +584,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 HExt = Hn + Hf;
             }
             break;
-        case ConvectionConstants::HcExt_MoWiTTHcOutside:
+        case Convect::HcExt_MoWiTTHcOutside:
             if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
 
                 if (surface.Class == SurfaceClass::Wall) {
@@ -613,7 +613,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 }
             }
             break;
-        case ConvectionConstants::HcExt_DOE2HcOutside:
+        case Convect::HcExt_DOE2HcOutside:
             if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
                 if (surface.Class == SurfaceClass::Wall) {
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
@@ -655,7 +655,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 HExt = Hn + Hf;
             }
             break;
-        case ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm:
+        case Convect::HcExt_AdaptiveConvectionAlgorithm:
             ManageOutsideAdaptiveConvectionAlgo(state, SurfNum, HExt);
             break;
         default:
@@ -678,7 +678,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
 
     HExt = HExt * state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum);
 
-    if (TSurf == TSky || algoNum == ConvectionConstants::HcExt_ASHRAESimple) {
+    if (TSurf == TSky || algoNum == Convect::HcExt_ASHRAESimple) {
         HSky = 0.0;
     } else {
         // Compute sky radiation coefficient
@@ -686,7 +686,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
     }
 
-    if (TSurf == TAir || algoNum == ConvectionConstants::HcExt_ASHRAESimple) {
+    if (TSurf == TAir || algoNum == Convect::HcExt_ASHRAESimple) {
         HGround = 0.0;
         HAir = 0.0;
     } else {
@@ -773,7 +773,7 @@ int SetInsideAdaptiveConvectionAlgo(EnergyPlusData &state,
     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
         int HcInt = HcInt_ConvectionTypesMap.at(equationName);
         InsideAdaptiveConvectionAlgoParam = HcInt;
-        if (HcInt == ConvectionConstants::HcInt_UserCurve) {
+        if (HcInt == Convect::HcInt_UserCurve) {
             InsideAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcInsideUserCurve);
             if (InsideAdaptiveConvectionAlgoParam == 0) {
                 ShowSevereError(state, format("{}{}=\"{}, invalid value", RoutineName, CurrentModuleObject, equationName));
@@ -805,7 +805,7 @@ int SetOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
     if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
         int HcInt = HcExt_ConvectionTypesMap.at(equationName);
         OutsideAdaptiveConvectionAlgoParam = HcInt;
-        if (HcInt == ConvectionConstants::HcExt_UserCurve) {
+        if (HcInt == Convect::HcExt_UserCurve) {
             OutsideAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcOutsideUserCurve);
             if (OutsideAdaptiveConvectionAlgoParam == 0) {
                 ShowSevereError(state, format("{}{}=\"{}, invalid value", RoutineName, CurrentModuleObject, equationName));
@@ -851,74 +851,74 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                "ALLINTERIORFLOORS"};
 
     const std::unordered_map<std::string, int> HcInt_ConvectionTypesMap = {
-        {"VALUE", ConvectionConstants::HcInt_Value},
-        {"SCHEDULE", ConvectionConstants::HcInt_Schedule},
-        {"SIMPLE", ConvectionConstants::HcInt_ASHRAESimple},
-        {"TARP", ConvectionConstants::HcInt_ASHRAETARP},
-        {"ADAPTIVECONVECTIONALGORITHM", ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm},
-        {"ASTMC1340", ConvectionConstants::HcInt_ASTMC1340},
-        {"USERCURVE", ConvectionConstants::HcInt_UserCurve},
-        {"ASHRAEVERTICALWALL", ConvectionConstants::HcInt_ASHRAEVerticalWall},
-        {"WALTONUNSTABLEHORIZONTALORTILT", ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt},
-        {"WALTONSTABLEHORIZONTALORTILT", ConvectionConstants::HcInt_WaltonStableHorizontalOrTilt},
-        {"FISHERPEDERSENCEILINGDIFFUSERWALLS", ConvectionConstants::HcInt_FisherPedersenCeilDiffuserWalls},
-        {"FISHERPEDERSENCEILINGDIFFUSERCEILING", ConvectionConstants::HcInt_FisherPedersenCeilDiffuserCeiling},
-        {"FISHERPEDERSENCEILINGDIFFUSERFLOOR", ConvectionConstants::HcInt_FisherPedersenCeilDiffuserFloor},
-        {"ALAMDARIHAMMONDSTABLEHORIZONTAL", ConvectionConstants::HcInt_AlamdariHammondStableHorizontal},
-        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", ConvectionConstants::HcInt_AlamdariHammondUnstableHorizontal},
-        {"ALAMDARIHAMMONDVERTICALWALL", ConvectionConstants::HcInt_AlamdariHammondVerticalWall},
-        {"KHALIFAEQ3WALLAWAYFROMHEAT", ConvectionConstants::HcInt_KhalifaEq3WallAwayFromHeat},
-        {"KHALIFAEQ4CEILINGAWAYFROMHEAT", ConvectionConstants::HcInt_KhalifaEq4CeilingAwayFromHeat},
-        {"KHALIFAEQ5WALLNEARHEAT", ConvectionConstants::HcInt_KhalifaEq5WallNearHeat},
-        {"KHALIFAEQ6NONHEATEDWALLS", ConvectionConstants::HcInt_KhalifaEq6NonHeatedWalls},
-        {"KHALIFAEQ7CEILING", ConvectionConstants::HcInt_KhalifaEq7Ceiling},
-        {"AWBIHATTONHEATEDFLOOR", ConvectionConstants::HcInt_AwbiHattonHeatedFloor},
-        {"AWBIHATTONHEATEDWALL", ConvectionConstants::HcInt_AwbiHattonHeatedWall},
-        {"BEAUSOLEILMORRISONMIXEDASSISTEDWALL", ConvectionConstants::HcInt_BeausoleilMorrisonMixedAssistingWall},
-        {"BEAUSOLEILMORRISONMIXEDOPPOSINGWALL", ConvectionConstants::HcInt_BeausoleilMorrisonMixedOppossingWall},
-        {"BEAUSOLEILMORRISONMIXEDSTABLEFLOOR", ConvectionConstants::HcInt_BeausoleilMorrisonMixedStableFloor},
-        {"BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR", ConvectionConstants::HcInt_BeausoleilMorrisonMixedUnstableFloor},
-        {"BEAUSOLEILMORRISONMIXEDSTABLECEILING", ConvectionConstants::HcInt_BeausoleilMorrisonMixedStableCeiling},
-        {"BEAUSOLEILMORRISONMIXEDUNSTABLECEILING", ConvectionConstants::HcInt_BeausoleilMorrisonMixedUnstableCeiling},
-        {"FOHANNOPOLIDORIVERTICALWALL", ConvectionConstants::HcInt_FohannoPolidoriVerticalWall},
-        {"KARADAGCHILLEDCEILING", ConvectionConstants::HcInt_KaradagChilledCeiling},
-        {"ISO15099WINDOWS", ConvectionConstants::HcInt_ISO15099Windows},
-        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWindow},
-        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS", ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWalls},
-        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR", ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserFloor},
+        {"VALUE", Convect::HcInt_Value},
+        {"SCHEDULE", Convect::HcInt_Schedule},
+        {"SIMPLE", Convect::HcInt_ASHRAESimple},
+        {"TARP", Convect::HcInt_ASHRAETARP},
+        {"ADAPTIVECONVECTIONALGORITHM", Convect::HcInt_AdaptiveConvectionAlgorithm},
+        {"ASTMC1340", Convect::HcInt_ASTMC1340},
+        {"USERCURVE", Convect::HcInt_UserCurve},
+        {"ASHRAEVERTICALWALL", Convect::HcInt_ASHRAEVerticalWall},
+        {"WALTONUNSTABLEHORIZONTALORTILT", Convect::HcInt_WaltonUnstableHorizontalOrTilt},
+        {"WALTONSTABLEHORIZONTALORTILT", Convect::HcInt_WaltonStableHorizontalOrTilt},
+        {"FISHERPEDERSENCEILINGDIFFUSERWALLS", Convect::HcInt_FisherPedersenCeilDiffuserWalls},
+        {"FISHERPEDERSENCEILINGDIFFUSERCEILING", Convect::HcInt_FisherPedersenCeilDiffuserCeiling},
+        {"FISHERPEDERSENCEILINGDIFFUSERFLOOR", Convect::HcInt_FisherPedersenCeilDiffuserFloor},
+        {"ALAMDARIHAMMONDSTABLEHORIZONTAL", Convect::HcInt_AlamdariHammondStableHorizontal},
+        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", Convect::HcInt_AlamdariHammondUnstableHorizontal},
+        {"ALAMDARIHAMMONDVERTICALWALL", Convect::HcInt_AlamdariHammondVerticalWall},
+        {"KHALIFAEQ3WALLAWAYFROMHEAT", Convect::HcInt_KhalifaEq3WallAwayFromHeat},
+        {"KHALIFAEQ4CEILINGAWAYFROMHEAT", Convect::HcInt_KhalifaEq4CeilingAwayFromHeat},
+        {"KHALIFAEQ5WALLNEARHEAT", Convect::HcInt_KhalifaEq5WallNearHeat},
+        {"KHALIFAEQ6NONHEATEDWALLS", Convect::HcInt_KhalifaEq6NonHeatedWalls},
+        {"KHALIFAEQ7CEILING", Convect::HcInt_KhalifaEq7Ceiling},
+        {"AWBIHATTONHEATEDFLOOR", Convect::HcInt_AwbiHattonHeatedFloor},
+        {"AWBIHATTONHEATEDWALL", Convect::HcInt_AwbiHattonHeatedWall},
+        {"BEAUSOLEILMORRISONMIXEDASSISTEDWALL", Convect::HcInt_BeausoleilMorrisonMixedAssistingWall},
+        {"BEAUSOLEILMORRISONMIXEDOPPOSINGWALL", Convect::HcInt_BeausoleilMorrisonMixedOppossingWall},
+        {"BEAUSOLEILMORRISONMIXEDSTABLEFLOOR", Convect::HcInt_BeausoleilMorrisonMixedStableFloor},
+        {"BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR", Convect::HcInt_BeausoleilMorrisonMixedUnstableFloor},
+        {"BEAUSOLEILMORRISONMIXEDSTABLECEILING", Convect::HcInt_BeausoleilMorrisonMixedStableCeiling},
+        {"BEAUSOLEILMORRISONMIXEDUNSTABLECEILING", Convect::HcInt_BeausoleilMorrisonMixedUnstableCeiling},
+        {"FOHANNOPOLIDORIVERTICALWALL", Convect::HcInt_FohannoPolidoriVerticalWall},
+        {"KARADAGCHILLEDCEILING", Convect::HcInt_KaradagChilledCeiling},
+        {"ISO15099WINDOWS", Convect::HcInt_ISO15099Windows},
+        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", Convect::HcInt_GoldsteinNovoselacCeilingDiffuserWindow},
+        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS", Convect::HcInt_GoldsteinNovoselacCeilingDiffuserWalls},
+        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR", Convect::HcInt_GoldsteinNovoselacCeilingDiffuserFloor},
     };
 
     std::unordered_map<std::string, int> HcExt_ConvectionTypesMap = {
-        {"VALUE", ConvectionConstants::HcExt_Value},
-        {"SCHEDULE", ConvectionConstants::HcExt_Schedule},
-        {"TARP", ConvectionConstants::HcExt_TarpHcOutside},
-        {"SIMPLE", ConvectionConstants::HcExt_ASHRAESimple},
-        {"MOWITT", ConvectionConstants::HcExt_MoWiTTHcOutside},
-        {"DOE-2", ConvectionConstants::HcExt_DOE2HcOutside},
-        {"ADAPTIVECONVECTIONALGORITHM", ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm},
-        {"USERCURVE", ConvectionConstants::HcExt_UserCurve},
-        {"ASHRAEVERTICALWALL", ConvectionConstants::HcExt_NaturalASHRAEVerticalWall},
-        {"WALTONUNSTABLEHORIZONTALORTILT", ConvectionConstants::HcExt_NaturalWaltonUnstableHorizontalOrTilt},
-        {"WALTONSTABLEHORIZONTALORTILT", ConvectionConstants::HcExt_NaturalWaltonStableHorizontalOrTilt},
-        {"NUSSELTJURGES", ConvectionConstants::HcExt_NusseltJurges},
-        {"MCADAMS", ConvectionConstants::HcExt_McAdams},
-        {"MITCHELL", ConvectionConstants::HcExt_Mitchell},
-        {"CLEARROOF", ConvectionConstants::HcExt_ClearRoof},
-        {"EMMELVERTICAL", ConvectionConstants::HcExt_EmmelVertical},
-        {"EMMELROOF", ConvectionConstants::HcExt_EmmelRoof},
-        {"ALAMDARIHAMMONDVERTICALWALL", ConvectionConstants::HcExt_AlamdariHammondVerticalWall},
-        {"FOHANNOPOLIDORIVERTICALWALL", ConvectionConstants::HcExt_FohannoPolidoriVerticalWall},
-        {"ISO15099WINDOWS", ConvectionConstants::HcExt_ISO15099Windows},
-        {"ALAMDARIHAMMONDSTABLEHORIZONTAL", ConvectionConstants::HcExt_AlamdariHammondStableHorizontal},
-        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", ConvectionConstants::HcExt_AlamdariHammondUnstableHorizontal},
-        {"SIMPLECOMBINED", ConvectionConstants::HcExt_ASHRAESimpleCombined},
-        {"TARPWINDWARD", ConvectionConstants::HcExt_SparrowWindward},
-        {"TARPLEEWARD", ConvectionConstants::HcExt_SparrowLeeward},
-        {"MOWITTWINDWARD", ConvectionConstants::HcExt_MoWiTTWindward},
-        {"MOWITTLEEWARD", ConvectionConstants::HcExt_MoWiTTLeeward},
-        {"DOE2WINDWARD", ConvectionConstants::HcExt_DOE2Windward},
-        {"DOE2LEEWARD", ConvectionConstants::HcExt_DOE2Leeward},
-        {"BLOCKENWINDWARD", ConvectionConstants::HcExt_BlockenWindward},
+        {"VALUE", Convect::HcExt_Value},
+        {"SCHEDULE", Convect::HcExt_Schedule},
+        {"TARP", Convect::HcExt_TarpHcOutside},
+        {"SIMPLE", Convect::HcExt_ASHRAESimple},
+        {"MOWITT", Convect::HcExt_MoWiTTHcOutside},
+        {"DOE-2", Convect::HcExt_DOE2HcOutside},
+        {"ADAPTIVECONVECTIONALGORITHM", Convect::HcExt_AdaptiveConvectionAlgorithm},
+        {"USERCURVE", Convect::HcExt_UserCurve},
+        {"ASHRAEVERTICALWALL", Convect::HcExt_NaturalASHRAEVerticalWall},
+        {"WALTONUNSTABLEHORIZONTALORTILT", Convect::HcExt_NaturalWaltonUnstableHorizontalOrTilt},
+        {"WALTONSTABLEHORIZONTALORTILT", Convect::HcExt_NaturalWaltonStableHorizontalOrTilt},
+        {"NUSSELTJURGES", Convect::HcExt_NusseltJurges},
+        {"MCADAMS", Convect::HcExt_McAdams},
+        {"MITCHELL", Convect::HcExt_Mitchell},
+        {"CLEARROOF", Convect::HcExt_ClearRoof},
+        {"EMMELVERTICAL", Convect::HcExt_EmmelVertical},
+        {"EMMELROOF", Convect::HcExt_EmmelRoof},
+        {"ALAMDARIHAMMONDVERTICALWALL", Convect::HcExt_AlamdariHammondVerticalWall},
+        {"FOHANNOPOLIDORIVERTICALWALL", Convect::HcExt_FohannoPolidoriVerticalWall},
+        {"ISO15099WINDOWS", Convect::HcExt_ISO15099Windows},
+        {"ALAMDARIHAMMONDSTABLEHORIZONTAL", Convect::HcExt_AlamdariHammondStableHorizontal},
+        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", Convect::HcExt_AlamdariHammondUnstableHorizontal},
+        {"SIMPLECOMBINED", Convect::HcExt_ASHRAESimpleCombined},
+        {"TARPWINDWARD", Convect::HcExt_SparrowWindward},
+        {"TARPLEEWARD", Convect::HcExt_SparrowLeeward},
+        {"MOWITTWINDWARD", Convect::HcExt_MoWiTTWindward},
+        {"MOWITTLEEWARD", Convect::HcExt_MoWiTTLeeward},
+        {"DOE2WINDWARD", Convect::HcExt_DOE2Windward},
+        {"DOE2LEEWARD", Convect::HcExt_DOE2Leeward},
+        {"BLOCKENWINDWARD", Convect::HcExt_BlockenWindward},
     };
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -960,9 +960,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
         state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-        state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = static_cast<ConvectionConstants::RefTemp>(
+        state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = static_cast<Convect::RefTemp>(
             getEnumerationValue(RefTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
-        if (state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType == ConvectionConstants::RefTemp::Invalid) {
+        if (state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType == Convect::RefTemp::Invalid) {
             ShowSevereError(state,
                             format("GetUserSuppliedConvectionCoefficients: {}: Invalid Key choice Entered, for {}={}",
                                    CurrentModuleObject,
@@ -1085,9 +1085,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
         state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-        state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = static_cast<ConvectionConstants::RefWind>(
+        state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = static_cast<Convect::RefWind>(
             getEnumerationValue(RefWindNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
-        if (state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType == ConvectionConstants::RefWind::Invalid) {
+        if (state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType == Convect::RefWind::Invalid) {
             ShowSevereError(state,
                             format("GetUserSuppliedConvectionCoefficients: {}: Invalid Key choice Entered, for {}={}",
                                    CurrentModuleObject,
@@ -1310,11 +1310,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                         ExtValue = HcExt_ConvectionTypesMap.at(equationName);
 
-                        if ((ExtValue == ConvectionConstants::HcExt_ASHRAESimpleCombined) || (ExtValue == ConvectionConstants::HcExt_TarpHcOutside) ||
-                            (ExtValue == ConvectionConstants::HcExt_MoWiTTHcOutside) || (ExtValue == ConvectionConstants::HcExt_DOE2HcOutside) ||
-                            (ExtValue == ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm)) {
+                        if ((ExtValue == Convect::HcExt_ASHRAESimpleCombined) || (ExtValue == Convect::HcExt_TarpHcOutside) ||
+                            (ExtValue == Convect::HcExt_MoWiTTHcOutside) || (ExtValue == Convect::HcExt_DOE2HcOutside) ||
+                            (ExtValue == Convect::HcExt_AdaptiveConvectionAlgorithm)) {
                             PotentialAssignedValue = -ExtValue;
-                        } else if (ExtValue == ConvectionConstants::HcExt_Value) {
+                        } else if (ExtValue == Convect::HcExt_Value) {
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
@@ -1334,7 +1334,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ErrorsFound = true;
                             }
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::Value;
+                                Convect::ConvCoefOverrideType::Value;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                 ShowWarningError(state, format("{}{}=\"{}, duplicate value", RoutineName, CurrentModuleObject, Alphas(1)));
@@ -1345,12 +1345,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                          Alphas(Ptr + 2)));
                             }
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
-                        } else if (ExtValue == ConvectionConstants::HcExt_Schedule) { // Schedule
+                        } else if (ExtValue == Convect::HcExt_Schedule) { // Schedule
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::Schedule;
+                                Convect::ConvCoefOverrideType::Schedule;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex =
                                 ScheduleManager::GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
@@ -1362,12 +1362,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
                             }
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
-                        } else if (ExtValue == ConvectionConstants::HcExt_UserCurve) { // User curve
+                        } else if (ExtValue == Convect::HcExt_UserCurve) { // User curve
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::UserCurve;
+                                Convect::ConvCoefOverrideType::UserCurve;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
@@ -1377,13 +1377,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ErrorsFound = true;
                             }
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
-                        } else if (ExtValue > ConvectionConstants::HcExt_UserCurve) {
+                        } else if (ExtValue > Convect::HcExt_UserCurve) {
                             // specificmodel
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
+                                Convect::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
 
@@ -1407,11 +1407,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
                         IntValue = HcInt_ConvectionTypesMap.at(equationName);
-                        if ((IntValue == ConvectionConstants::HcInt_ASHRAESimple) || (IntValue == ConvectionConstants::HcInt_ASHRAETARP) ||
-                            (IntValue == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) ||
-                            (IntValue == ConvectionConstants::HcInt_ASTMC1340)) {
+                        if ((IntValue == Convect::HcInt_ASHRAESimple) || (IntValue == Convect::HcInt_ASHRAETARP) ||
+                            (IntValue == Convect::HcInt_AdaptiveConvectionAlgorithm) ||
+                            (IntValue == Convect::HcInt_ASTMC1340)) {
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
-                        } else if (IntValue == ConvectionConstants::HcInt_Value) {
+                        } else if (IntValue == Convect::HcInt_Value) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
@@ -1431,7 +1431,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ErrorsFound = true;
                             }
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::Value;
+                                Convect::ConvCoefOverrideType::Value;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                 ShowWarningError(state, format("{}{}=\"{}, duplicate value", RoutineName, CurrentModuleObject, Alphas(1)));
@@ -1442,12 +1442,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                          Alphas(Ptr + 2)));
                             }
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
-                        } else if (IntValue == ConvectionConstants::HcInt_Schedule) {
+                        } else if (IntValue == Convect::HcInt_Schedule) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::Schedule;
+                                Convect::ConvCoefOverrideType::Schedule;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex =
                                 ScheduleManager::GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
@@ -1459,12 +1459,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
                             }
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
-                        } else if (IntValue == ConvectionConstants::HcInt_UserCurve) {
+                        } else if (IntValue == Convect::HcInt_UserCurve) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::UserCurve;
+                                Convect::ConvCoefOverrideType::UserCurve;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
@@ -1474,13 +1474,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ErrorsFound = true;
                             }
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
-                        } else if (IntValue > ConvectionConstants::HcInt_UserCurve) {
+                        } else if (IntValue > Convect::HcInt_UserCurve) {
                             // specificmodel
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
+                                Convect::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).HcModelEq = IntValue;
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
 
@@ -1560,11 +1560,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                         ExtValue = HcExt_ConvectionTypesMap.at(equationName);
-                        if ((ExtValue == ConvectionConstants::HcExt_ASHRAESimple) || (ExtValue == ConvectionConstants::HcExt_ASHRAETARP) ||
-                            (ExtValue == ConvectionConstants::HcExt_MoWiTTHcOutside) || (ExtValue == ConvectionConstants::HcExt_DOE2HcOutside) ||
-                            (ExtValue == ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm)) {
+                        if ((ExtValue == Convect::HcExt_ASHRAESimple) || (ExtValue == Convect::HcExt_ASHRAETARP) ||
+                            (ExtValue == Convect::HcExt_MoWiTTHcOutside) || (ExtValue == Convect::HcExt_DOE2HcOutside) ||
+                            (ExtValue == Convect::HcExt_AdaptiveConvectionAlgorithm)) {
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", -ExtValue);
-                        } else if (ExtValue == ConvectionConstants::HcExt_Value) {
+                        } else if (ExtValue == Convect::HcExt_Value) {
                             // SimpleValueAssignment via UserExtConvectionCoeffs array
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
@@ -1585,7 +1585,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ErrorsFound = true;
                             }
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::Value;
+                                Convect::ConvCoefOverrideType::Value;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                 ShowWarningError(state, format("{}{}=\"{}, duplicate value", RoutineName, CurrentModuleObject, Alphas(1)));
@@ -1596,12 +1596,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                          Alphas(Ptr + 2)));
                             }
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
-                        } else if (ExtValue == ConvectionConstants::HcExt_Schedule) {
+                        } else if (ExtValue == Convect::HcExt_Schedule) {
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::Schedule;
+                                Convect::ConvCoefOverrideType::Schedule;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex =
                                 ScheduleManager::GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
@@ -1613,12 +1613,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
                             }
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
-                        } else if (ExtValue == ConvectionConstants::HcExt_UserCurve) { // User curve
+                        } else if (ExtValue == Convect::HcExt_UserCurve) { // User curve
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::UserCurve;
+                                Convect::ConvCoefOverrideType::UserCurve;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
@@ -1630,13 +1630,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
 
-                        } else if (ExtValue > ConvectionConstants::HcExt_UserCurve) {
+                        } else if (ExtValue > Convect::HcExt_UserCurve) {
                             // specificmodel
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
+                                Convect::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
@@ -1650,11 +1650,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
                         IntValue = HcInt_ConvectionTypesMap.at(equationName);
-                        if ((IntValue == ConvectionConstants::HcInt_ASHRAESimple) || (IntValue == ConvectionConstants::HcInt_ASHRAETARP) ||
-                            (IntValue == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm ||
-                             (IntValue == ConvectionConstants::HcInt_ASTMC1340))) {
+                        if ((IntValue == Convect::HcInt_ASHRAESimple) || (IntValue == Convect::HcInt_ASHRAETARP) ||
+                            (IntValue == Convect::HcInt_AdaptiveConvectionAlgorithm ||
+                             (IntValue == Convect::HcInt_ASTMC1340))) {
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
-                        } else if (IntValue == ConvectionConstants::HcInt_Value) {
+                        } else if (IntValue == Convect::HcInt_Value) {
                             // SimpleValueAssignment via UserExtConvectionCoeffs array
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
@@ -1675,7 +1675,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ErrorsFound = true;
                             }
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::Value;
+                                Convect::ConvCoefOverrideType::Value;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                 ShowWarningError(state, format("{}{}=\"{}, duplicate value", RoutineName, CurrentModuleObject, Alphas(1)));
@@ -1686,12 +1686,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                          Alphas(Ptr + 2)));
                             }
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
-                        } else if (IntValue == ConvectionConstants::HcInt_Schedule) {
+                        } else if (IntValue == Convect::HcInt_Schedule) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::Schedule;
+                                Convect::ConvCoefOverrideType::Schedule;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex =
                                 ScheduleManager::GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
@@ -1703,12 +1703,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
                             }
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
-                        } else if (IntValue == ConvectionConstants::HcInt_UserCurve) {
+                        } else if (IntValue == Convect::HcInt_UserCurve) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::UserCurve;
+                                Convect::ConvCoefOverrideType::UserCurve;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
@@ -1720,13 +1720,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             }
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
-                        } else if (IntValue > ConvectionConstants::HcInt_UserCurve) {
+                        } else if (IntValue > Convect::HcInt_UserCurve) {
                             // specificmodel
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
+                                Convect::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).HcModelEq = IntValue;
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
@@ -1766,7 +1766,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     }
 
     for (int Loop = 1; Loop <= state.dataSurface->TotIntConvCoeff; ++Loop) {
-        if (state.dataSurface->UserIntConvectionCoeffs(Loop).OverrideType != ConvectionConstants::ConvCoefOverrideType::Schedule) continue;
+        if (state.dataSurface->UserIntConvectionCoeffs(Loop).OverrideType != Convect::ConvCoefOverrideType::Schedule) continue;
         if (state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
         if (ScheduleManager::CheckScheduleValueMinMax(state,
                                                       state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex,
@@ -1789,7 +1789,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     }
 
     for (int Loop = 1; Loop <= state.dataSurface->TotExtConvCoeff; ++Loop) {
-        if (state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvectionConstants::ConvCoefOverrideType::Schedule) continue;
+        if (state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != Convect::ConvCoefOverrideType::Schedule) continue;
         if (state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
         if (ScheduleManager::CheckScheduleValueMinMax(state,
                                                       state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex,
@@ -1811,9 +1811,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         ErrorsFound = true;
     }
 
-    if (state.dataHeatBal->DefaultOutsideConvectionAlgo == ConvectionConstants::HcExt_ASHRAESimple ||
+    if (state.dataHeatBal->DefaultOutsideConvectionAlgo == Convect::HcExt_ASHRAESimple ||
         std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) {
-            return e.OutsideConvectionAlgo == ConvectionConstants::HcExt_ASHRAESimple;
+            return e.OutsideConvectionAlgo == Convect::HcExt_ASHRAESimple;
         })) {
         Count = 0;
         for (int Loop = 1; Loop <= state.dataSurface->TotExtConvCoeff; ++Loop) {
@@ -1821,10 +1821,10 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
             // Tests show that Zone will override the simple convection specification of global.
             if (SurfNum <= 0) continue;               // ignore this error condition
             if (Surface(SurfNum).Zone == 0) continue; // ignore this error condition
-            if (Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ConvectionConstants::HcExt_ASHRAESimple &&
-                ((state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType == ConvectionConstants::ConvCoefOverrideType::SpecifiedModel &&
-                  state.dataSurface->UserExtConvectionCoeffs(Loop).HcModelEq != ConvectionConstants::HcExt_ASHRAESimple) ||
-                 state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvectionConstants::ConvCoefOverrideType::SpecifiedModel)) {
+            if (Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == Convect::HcExt_ASHRAESimple &&
+                ((state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType == Convect::ConvCoefOverrideType::SpecifiedModel &&
+                  state.dataSurface->UserExtConvectionCoeffs(Loop).HcModelEq != Convect::HcExt_ASHRAESimple) ||
+                 state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != Convect::ConvCoefOverrideType::SpecifiedModel)) {
                 ++Count;
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowSevereError(
@@ -3883,16 +3883,16 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
     auto const &surface = state.dataSurface->Surface(SurfNum);
 
     switch (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).OverrideType) {
-    case ConvectionConstants::ConvCoefOverrideType::Value:
+    case Convect::ConvCoefOverrideType::Value:
         HExt = state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).OverrideValue;
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(HExt);
         }
-        state.dataSurface->SurfOutConvHfModelEq(SurfNum) = ConvectionConstants::HcExt_UserValue; // reporting
-        state.dataSurface->SurfOutConvHnModelEq(SurfNum) = ConvectionConstants::HcExt_None;      // reporting
+        state.dataSurface->SurfOutConvHfModelEq(SurfNum) = Convect::HcExt_UserValue; // reporting
+        state.dataSurface->SurfOutConvHnModelEq(SurfNum) = Convect::HcExt_None;      // reporting
         break;
-    case ConvectionConstants::ConvCoefOverrideType::Schedule:
+    case Convect::ConvCoefOverrideType::Schedule:
         HExt = ScheduleManager::GetCurrentScheduleValue(
             state, state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).ScheduleIndex);
         // Need to check for validity
@@ -3900,17 +3900,17 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(HExt);
         }
-        state.dataSurface->SurfOutConvHfModelEq(SurfNum) = ConvectionConstants::HcExt_UserSchedule; // reporting
-        state.dataSurface->SurfOutConvHnModelEq(SurfNum) = ConvectionConstants::HcExt_None;         // reporting
+        state.dataSurface->SurfOutConvHfModelEq(SurfNum) = Convect::HcExt_UserSchedule; // reporting
+        state.dataSurface->SurfOutConvHnModelEq(SurfNum) = Convect::HcExt_None;         // reporting
         break;
-    case ConvectionConstants::ConvCoefOverrideType::UserCurve:
+    case Convect::ConvCoefOverrideType::UserCurve:
         CalcUserDefinedOutsideHcModel(
             state, SurfNum, state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).UserCurveIndex, HExt);
         // Kiva convection handled in function above
-        state.dataSurface->SurfOutConvHfModelEq(SurfNum) = ConvectionConstants::HcExt_UserCurve; // reporting
-        state.dataSurface->SurfOutConvHnModelEq(SurfNum) = ConvectionConstants::HcExt_None;      // reporting
+        state.dataSurface->SurfOutConvHfModelEq(SurfNum) = Convect::HcExt_UserCurve; // reporting
+        state.dataSurface->SurfOutConvHnModelEq(SurfNum) = Convect::HcExt_None;      // reporting
         break;
-    case ConvectionConstants::ConvCoefOverrideType::SpecifiedModel:
+    case Convect::ConvCoefOverrideType::SpecifiedModel:
         EvaluateExtHcModels(state,
                             SurfNum,
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).HcModelEq,
@@ -3954,29 +3954,29 @@ Real64 SetIntConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
     auto const &surface = state.dataSurface->Surface(SurfNum);
 
     switch (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).OverrideType) {
-    case ConvectionConstants::ConvCoefOverrideType::Value:
+    case Convect::ConvCoefOverrideType::Value:
         HInt = state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).OverrideValue;
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
         }
-        state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_UserValue; // reporting
+        state.dataSurface->SurfIntConvHcModelEq(SurfNum) = Convect::HcInt_UserValue; // reporting
         break;
-    case ConvectionConstants::ConvCoefOverrideType::Schedule:
+    case Convect::ConvCoefOverrideType::Schedule:
         HInt = ScheduleManager::GetCurrentScheduleValue(
             state, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).ScheduleIndex);
         // Need to check for validity
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
         }
-        state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_UserSchedule; // reporting
+        state.dataSurface->SurfIntConvHcModelEq(SurfNum) = Convect::HcInt_UserSchedule; // reporting
         break;
-    case ConvectionConstants::ConvCoefOverrideType::UserCurve:
+    case Convect::ConvCoefOverrideType::UserCurve:
         CalcUserDefinedInsideHcModel(
             state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).UserCurveIndex, HInt);
         // Kiva convection handled in function above
-        state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_UserCurve; // reporting
+        state.dataSurface->SurfIntConvHcModelEq(SurfNum) = Convect::HcInt_UserCurve; // reporting
         break;
-    case ConvectionConstants::ConvCoefOverrideType::SpecifiedModel:
+    case Convect::ConvCoefOverrideType::SpecifiedModel:
         EvaluateIntHcModels(
             state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).HcModelEq, HInt);
         // Kiva convection handled in function above
@@ -4341,30 +4341,30 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                         ((Surface(SurfLoop).Class == SurfaceClass::Window) || (Surface(SurfLoop).Class == SurfaceClass::GlassDoor))) {
                         if (state.dataSurface->SurfIntConvWindowWallRatio(SurfLoop) < 0.5) {
                             if (Surface(SurfLoop).Centroid.z < Zone(ZoneLoop).Centroid.z) {
-                                state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = ConvectionConstants::InConvWinLoc::LowerPartOfExteriorWall;
+                                state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = Convect::InConvWinLoc::LowerPartOfExteriorWall;
                             } else {
-                                state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = ConvectionConstants::InConvWinLoc::UpperPartOfExteriorWall;
+                                state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = Convect::InConvWinLoc::UpperPartOfExteriorWall;
                             }
                         } else {
-                            state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = ConvectionConstants::InConvWinLoc::LargePartOfExteriorWall;
+                            state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = Convect::InConvWinLoc::LargePartOfExteriorWall;
                         }
                         if ((Surface(Surface(SurfLoop).BaseSurf).ExtBoundCond == ExternalEnvironment) &&
                             (Surface(Surface(SurfLoop).BaseSurf).Class == SurfaceClass::Wall)) {
                             if (Surface(Surface(SurfLoop).BaseSurf).Centroid.z < Surface(SurfLoop).Centroid.z) {
                                 state.dataSurface->SurfIntConvWindowLocation(Surface(SurfLoop).BaseSurf) =
-                                    ConvectionConstants::InConvWinLoc::WindowAboveThis;
+                                    Convect::InConvWinLoc::WindowAboveThis;
                             } else {
                                 state.dataSurface->SurfIntConvWindowLocation(Surface(SurfLoop).BaseSurf) =
-                                    ConvectionConstants::InConvWinLoc::WindowBelowThis;
+                                    Convect::InConvWinLoc::WindowBelowThis;
                             }
                         }
                     }
                     if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass::Wall) &&
-                        (state.dataSurface->SurfIntConvWindowLocation(SurfLoop) == ConvectionConstants::InConvWinLoc::NotSet)) {
+                        (state.dataSurface->SurfIntConvWindowLocation(SurfLoop) == Convect::InConvWinLoc::NotSet)) {
                         if (Surface(SurfLoop).Centroid.z < Zone(ZoneLoop).Centroid.z) {
-                            state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = ConvectionConstants::InConvWinLoc::WindowAboveThis;
+                            state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = Convect::InConvWinLoc::WindowAboveThis;
                         } else {
-                            state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = ConvectionConstants::InConvWinLoc::WindowBelowThis;
+                            state.dataSurface->SurfIntConvWindowLocation(SurfLoop) = Convect::InConvWinLoc::WindowBelowThis;
                         }
                     }
                 }
@@ -4372,7 +4372,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
         }
     } // loop over zones for inside face parameters
 
-    state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume = std::pow(BldgVolumeSum, ConvectionConstants::OneThird);
+    state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume = std::pow(BldgVolumeSum, Convect::OneThird);
 
     auto &NorthFacade = state.dataConvectionCoefficient->NorthFacade;
     auto &NorthEastFacade = state.dataConvectionCoefficient->NorthEastFacade;
@@ -4879,10 +4879,10 @@ void EvaluateIntHcModels(EnergyPlusData &state,
     // now call appropriate function to calculate Hc
     switch (ConvModelEquationNum) {
 
-    case ConvectionConstants::HcInt_UserCurve:
+    case Convect::HcInt_UserCurve:
         CalcUserDefinedInsideHcModel(state, SurfNum, state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum), tmpHc);
         break;
-    case ConvectionConstants::HcInt_ASHRAEVerticalWall:
+    case Convect::HcInt_ASHRAEVerticalWall:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [](double Tsurf, double Tamb, double, double, double) -> double { return CalcASHRAEVerticalWall(Tsurf - Tamb); };
         } else {
@@ -4890,7 +4890,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt:
+    case Convect::HcInt_WaltonUnstableHorizontalOrTilt:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
@@ -4900,7 +4900,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_WaltonStableHorizontalOrTilt:
+    case Convect::HcInt_WaltonStableHorizontalOrTilt:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
@@ -4910,7 +4910,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_FisherPedersenCeilDiffuserFloor: {
+    case Convect::HcInt_FisherPedersenCeilDiffuserFloor: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
         Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -4931,7 +4931,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     }
-    case ConvectionConstants::HcInt_FisherPedersenCeilDiffuserCeiling: {
+    case Convect::HcInt_FisherPedersenCeilDiffuserCeiling: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
         Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -4952,7 +4952,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     }
-    case ConvectionConstants::HcInt_FisherPedersenCeilDiffuserWalls: {
+    case Convect::HcInt_FisherPedersenCeilDiffuserWalls: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
         Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -4976,7 +4976,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     }
-    case ConvectionConstants::HcInt_AlamdariHammondStableHorizontal:
+    case Convect::HcInt_AlamdariHammondStableHorizontal:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 HorizHydrDiam = state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4987,7 +4987,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_AlamdariHammondVerticalWall:
+    case Convect::HcInt_AlamdariHammondVerticalWall:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 WallHeight = state.dataSurface->SurfIntConvZoneWallHeight(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -4998,7 +4998,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_AlamdariHammondUnstableHorizontal:
+    case Convect::HcInt_AlamdariHammondUnstableHorizontal:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 HorizHydrDiam = state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -5010,7 +5010,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_KhalifaEq3WallAwayFromHeat:
+    case Convect::HcInt_KhalifaEq3WallAwayFromHeat:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq3WallAwayFromHeat(Tsurf - Tamb); };
         } else {
@@ -5018,7 +5018,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_KhalifaEq4CeilingAwayFromHeat:
+    case Convect::HcInt_KhalifaEq4CeilingAwayFromHeat:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq4CeilingAwayFromHeat(Tsurf - Tamb); };
         } else {
@@ -5026,7 +5026,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_KhalifaEq5WallNearHeat:
+    case Convect::HcInt_KhalifaEq5WallNearHeat:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq5WallsNearHeat(Tsurf - Tamb); };
         } else {
@@ -5034,7 +5034,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_KhalifaEq6NonHeatedWalls:
+    case Convect::HcInt_KhalifaEq6NonHeatedWalls:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq6NonHeatedWalls(Tsurf - Tamb); };
         } else {
@@ -5042,7 +5042,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_KhalifaEq7Ceiling:
+    case Convect::HcInt_KhalifaEq7Ceiling:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq7Ceiling(Tsurf - Tamb); };
         } else {
@@ -5050,7 +5050,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_AwbiHattonHeatedFloor:
+    case Convect::HcInt_AwbiHattonHeatedFloor:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 HorizHydrDiam = state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -5061,7 +5061,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_AwbiHattonHeatedWall:
+    case Convect::HcInt_AwbiHattonHeatedWall:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 HorizHydrDiam = state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcAwbiHattonHeatedWall(Tsurf - Tamb, HorizHydrDiam); };
@@ -5070,7 +5070,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_BeausoleilMorrisonMixedAssistingWall:
+    case Convect::HcInt_BeausoleilMorrisonMixedAssistingWall:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedAssistedWall(Tsurf - Tamb,
@@ -5085,7 +5085,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_BeausoleilMorrisonMixedOppossingWall:
+    case Convect::HcInt_BeausoleilMorrisonMixedOppossingWall:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedOpposingWall(Tsurf - Tamb,
@@ -5100,7 +5100,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_BeausoleilMorrisonMixedStableCeiling:
+    case Convect::HcInt_BeausoleilMorrisonMixedStableCeiling:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedStableCeiling(Tsurf - Tamb,
@@ -5115,7 +5115,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_BeausoleilMorrisonMixedUnstableCeiling:
+    case Convect::HcInt_BeausoleilMorrisonMixedUnstableCeiling:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedUnstableCeiling(Tsurf - Tamb,
@@ -5130,7 +5130,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_BeausoleilMorrisonMixedStableFloor:
+    case Convect::HcInt_BeausoleilMorrisonMixedStableFloor:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedStableFloor(Tsurf - Tamb,
@@ -5145,7 +5145,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_BeausoleilMorrisonMixedUnstableFloor:
+    case Convect::HcInt_BeausoleilMorrisonMixedUnstableFloor:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedUnstableFloor(Tsurf - Tamb,
@@ -5160,7 +5160,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_FohannoPolidoriVerticalWall:
+    case Convect::HcInt_FohannoPolidoriVerticalWall:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 QdotConvection = -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum);
             Real64 WallHeight = state.dataSurface->SurfIntConvZoneWallHeight(SurfNum);
@@ -5180,7 +5180,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_KaradagChilledCeiling:
+    case Convect::HcInt_KaradagChilledCeiling:
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKaradagChilledCeiling(Tsurf - Tamb); };
         } else {
@@ -5188,12 +5188,12 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_ISO15099Windows:
+    case Convect::HcInt_ISO15099Windows:
         CalcISO15099WindowIntConvCoeff(state, SurfNum, Tsurface, Tzone);
         tmpHc = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWindow: {
+    case Convect::HcInt_GoldsteinNovoselacCeilingDiffuserWindow: {
         tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWindow(state,
                                                             state.dataSurface->SurfIntConvZonePerimLength(SurfNum),
                                                             state.dataSurface->SurfIntConvWindowWallRatio(SurfNum),
@@ -5209,7 +5209,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         break;
     }
-    case ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWalls: {
+    case Convect::HcInt_GoldsteinNovoselacCeilingDiffuserWalls: {
         tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWall(
             state, state.dataSurface->SurfIntConvZonePerimLength(SurfNum), state.dataSurface->SurfIntConvWindowLocation(SurfNum), ZoneNum);
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -5222,7 +5222,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         }
         break;
     }
-    case ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserFloor: {
+    case Convect::HcInt_GoldsteinNovoselacCeilingDiffuserFloor: {
         tmpHc = CalcGoldsteinNovoselacCeilingDiffuserFloor(state.dataSurface->SurfIntConvZonePerimLength(SurfNum), ZoneNum);
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
@@ -5238,7 +5238,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
 
     state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
 
-    if (tmpHc < ConvectionConstants::AdaptiveHcInsideLowLimit) tmpHc = ConvectionConstants::AdaptiveHcInsideLowLimit;
+    if (tmpHc < Convect::AdaptiveHcInsideLowLimit) tmpHc = Convect::AdaptiveHcInsideLowLimit;
 
     Hc = tmpHc;
 }
@@ -5274,11 +5274,11 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
 
     // first call Hn models
     switch (NaturalConvModelEqNum) {
-    case ConvectionConstants::HcExt_None:
+    case Convect::HcExt_None:
         Hn = 0.0;
         HnFn = KIVA_CONST_CONV(0.0);
         break;
-    case ConvectionConstants::HcExt_UserCurve:
+    case Convect::HcExt_UserCurve:
         CalcUserDefinedOutsideHcModel(state, SurfNum, state.dataSurface->SurfOutConvHnUserCurveIndex(SurfNum), Hn);
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double HfTerm, double Roughness, double CosTilt) -> double {
@@ -5287,31 +5287,31 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             };
         }
         break;
-    case ConvectionConstants::HcExt_NaturalASHRAEVerticalWall:
+    case Convect::HcExt_NaturalASHRAEVerticalWall:
         Hn = CalcASHRAEVerticalWall((SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)));
         HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcASHRAEVerticalWall(Tsurf - Tamb); };
         break;
-    case ConvectionConstants::HcExt_NaturalWaltonUnstableHorizontalOrTilt:
+    case Convect::HcExt_NaturalWaltonUnstableHorizontalOrTilt:
         Hn = CalcWaltonUnstableHorizontalOrTilt((SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                 surface.CosTilt); // TODO verify CosTilt in vs out
         HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
             return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
         };
         break;
-    case ConvectionConstants::HcExt_NaturalWaltonStableHorizontalOrTilt:
+    case Convect::HcExt_NaturalWaltonStableHorizontalOrTilt:
         Hn = CalcWaltonStableHorizontalOrTilt((SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                               surface.CosTilt); // TODO verify CosTilt in vs out
         HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
             return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
         };
         break;
-    case ConvectionConstants::HcExt_AlamdariHammondVerticalWall: {
+    case Convect::HcExt_AlamdariHammondVerticalWall: {
         Real64 FaceHeight = state.dataSurface->SurfOutConvFaceHeight(SurfNum);
         Hn = CalcAlamdariHammondVerticalWall(state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), FaceHeight, SurfNum);
         HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, FaceHeight); };
         break;
     }
-    case ConvectionConstants::HcExt_FohannoPolidoriVerticalWall:
+    case Convect::HcExt_FohannoPolidoriVerticalWall:
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             // Not compatible with Kiva (Exterior surfaces in Kiva are not currently reported. Also need to add cell-level convection.)
             ShowFatalError(state, format("Fohanno Polidori convection model not applicable for foundation surface ={}", surface.Name));
@@ -5323,7 +5323,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                                                  -SurfQdotConvOutRepPerArea(SurfNum),
                                                  SurfNum);
         break;
-    case ConvectionConstants::HcExt_AlamdariHammondStableHorizontal:
+    case Convect::HcExt_AlamdariHammondStableHorizontal:
         if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
             HydraulicDiameter = 4.0 * state.dataSurface->SurfOutConvFaceArea(SurfNum) / state.dataSurface->SurfOutConvFacePerimeter(SurfNum);
         } else {
@@ -5331,7 +5331,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         }
         Hn = CalcAlamdariHammondStableHorizontal(state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
         break;
-    case ConvectionConstants::HcExt_AlamdariHammondUnstableHorizontal:
+    case Convect::HcExt_AlamdariHammondUnstableHorizontal:
         if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
             HydraulicDiameter = 4.0 * state.dataSurface->SurfOutConvFaceArea(SurfNum) / state.dataSurface->SurfOutConvFacePerimeter(SurfNum);
         } else {
@@ -5353,19 +5353,19 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         state.dataMaterial->Material(state.dataConstruction->Construct(surface.Construction).LayerPoint(1))->Roughness;
 
     switch (ForcedConvModelEqNum) {
-    case ConvectionConstants::HcExt_None:
+    case Convect::HcExt_None:
         Hf = 0.0;
         HfTermFn = KIVA_HF_DEF;
         HfFn = KIVA_CONST_CONV(0.0);
         break;
-    case ConvectionConstants::HcExt_UserCurve:
+    case Convect::HcExt_UserCurve:
         CalcUserDefinedOutsideHcModel(state, SurfNum, state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum), Hf);
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HfTermFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f;
             HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out;
         }
         break;
-    case ConvectionConstants::HcExt_SparrowWindward:
+    case Convect::HcExt_SparrowWindward:
         Hf = CalcSparrowWindward(state,
                                  Roughness,
                                  state.dataSurface->SurfOutConvFacePerimeter(SurfNum),
@@ -5395,7 +5395,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         }
         HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         break;
-    case ConvectionConstants::HcExt_SparrowLeeward:
+    case Convect::HcExt_SparrowLeeward:
         Hf = CalcSparrowLeeward(state,
                                 Roughness,
                                 state.dataSurface->SurfOutConvFacePerimeter(SurfNum),
@@ -5424,7 +5424,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         }
         HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         break;
-    case ConvectionConstants::HcExt_MoWiTTWindward:
+    case Convect::HcExt_MoWiTTWindward:
         Hf = CalcMoWITTWindward(SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum), SurfWindSpeed);
         if (surface.Class == SurfaceClass::Floor) { // used for exterior grade
             HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
@@ -5438,7 +5438,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         }
         HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         break;
-    case ConvectionConstants::HcExt_MoWiTTLeeward:
+    case Convect::HcExt_MoWiTTLeeward:
         Hf = CalcMoWITTLeeward((SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), SurfWindSpeed);
         if (surface.Class == SurfaceClass::Floor) { // used for exterior grade
             HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedLeeward(windSpeed); };
@@ -5452,7 +5452,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         }
         HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         break;
-    case ConvectionConstants::HcExt_DOE2Windward:
+    case Convect::HcExt_DOE2Windward:
         Hf = CalcDOE2Windward(SurfOutTemp, state.dataSurface->SurfOutDryBulbTemp(SurfNum), surface.CosTilt, SurfWindSpeed, Roughness);
         if (surface.Class == SurfaceClass::Floor) { // used for exterior grade
             HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
@@ -5466,7 +5466,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         }
         HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         break;
-    case ConvectionConstants::HcExt_DOE2Leeward:
+    case Convect::HcExt_DOE2Leeward:
         Hf = CalcDOE2Leeward(SurfOutTemp, state.dataSurface->SurfOutDryBulbTemp(SurfNum), surface.CosTilt, SurfWindSpeed, Roughness);
         if (surface.Class == SurfaceClass::Floor) { // used for exterior grade
             HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
@@ -5482,24 +5482,24 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             return CalcDOE2Forced(Tsurf, Tamb, cosTilt, hfTerm, Roughness);
         };
         break;
-    case ConvectionConstants::HcExt_NusseltJurges:
+    case Convect::HcExt_NusseltJurges:
         Hf = CalcNusseltJurges(SurfWindSpeed);
         HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcNusseltJurges(windSpeed); };
         HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         break;
-    case ConvectionConstants::HcExt_McAdams:
+    case Convect::HcExt_McAdams:
         Hf = CalcMcAdams(SurfWindSpeed);
         HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMcAdams(windSpeed); };
         HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         break;
-    case ConvectionConstants::HcExt_Mitchell:
+    case Convect::HcExt_Mitchell:
         Hf = CalcMitchell(state, SurfWindSpeed, state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume, SurfNum);
         HfTermFn = [&](double, double, double, double windSpeed) -> double {
             return CalcMitchell(windSpeed, state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume);
         };
         HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
         break;
-    case ConvectionConstants::HcExt_ClearRoof:
+    case Convect::HcExt_ClearRoof:
         SurfWindDir = state.dataSurface->SurfOutWindDir(SurfNum);
         Hf = CalcClearRoof(state,
                            SurfNum,
@@ -5530,21 +5530,21 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             }
         }
         break;
-    case ConvectionConstants::HcExt_BlockenWindward:
+    case Convect::HcExt_BlockenWindward:
         Hf = CalcBlockenWindward(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, surface.Azimuth, SurfNum);
         // Not compatible with Kiva (doesn't use weather station windspeed)
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             ShowFatalError(state, format("Blocken Windward convection model not applicable for foundation surface ={}", surface.Name));
         }
         break;
-    case ConvectionConstants::HcExt_EmmelVertical:
+    case Convect::HcExt_EmmelVertical:
         Hf = CalcEmmelVertical(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, surface.Azimuth);
         // Not compatible with Kiva (doesn't use weather station windspeed)
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             ShowFatalError(state, format("Emmel Vertical convection model not applicable for foundation surface ={}", surface.Name));
         }
         break;
-    case ConvectionConstants::HcExt_EmmelRoof:
+    case Convect::HcExt_EmmelRoof:
         Hf = CalcEmmelRoof(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth);
         // Not compatible with Kiva (doesn't use weather station windspeed)
         if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -5560,13 +5560,13 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out =
             [=](double Tsurf, double Tamb, double HfTerm, double Roughness, double cosTilt) -> double {
             Real64 HcExt = HfFn(Tsurf, Tamb, HfTerm, Roughness, cosTilt) + HnFn(Tsurf, Tamb, HfTerm, Roughness, cosTilt);
-            if (HcExt < ConvectionConstants::AdaptiveHcOutsideLowLimit) HcExt = ConvectionConstants::AdaptiveHcOutsideLowLimit;
+            if (HcExt < Convect::AdaptiveHcOutsideLowLimit) HcExt = Convect::AdaptiveHcOutsideLowLimit;
             return HcExt;
         };
         Hc = 0.0; // Not used in Kiva
     }
 
-    if (Hc < ConvectionConstants::AdaptiveHcOutsideLowLimit) Hc = ConvectionConstants::AdaptiveHcOutsideLowLimit;
+    if (Hc < Convect::AdaptiveHcOutsideLowLimit) Hc = Convect::AdaptiveHcOutsideLowLimit;
 }
 
 void DynamicExtConvSurfaceClassification(EnergyPlusData &state, int const SurfNum) // surface number
@@ -5597,17 +5597,17 @@ void DynamicExtConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
 
         if (DeltaTemp < 0.0) {
-            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::RoofStable;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = Convect::OutConvClass::RoofStable;
         } else {
-            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::RoofUnstable;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = Convect::OutConvClass::RoofUnstable;
         }
 
     } else {
 
         if (Windward(surface.CosTilt, surface.Azimuth, surfWindDir)) {
-            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::WindwardVertWall;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = Convect::OutConvClass::WindwardVertWall;
         } else {
-            state.dataSurface->SurfOutConvClassification(SurfNum) = ConvectionConstants::OutConvClass::LeewardVertWall;
+            state.dataSurface->SurfOutConvClassification(SurfNum) = Convect::OutConvClass::LeewardVertWall;
         }
     }
 }
@@ -5620,50 +5620,50 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
     //       DATE WRITTEN   Aug 2010
 
     switch (state.dataSurface->SurfOutConvClassification(SurfNum)) {
-    case ConvectionConstants::OutConvClass::WindwardVertWall:
+    case Convect::OutConvClass::WindwardVertWall:
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
-        if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
+        if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == Convect::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardUserCurveNum;
         }
         state.dataSurface->SurfOutConvHnModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
-        if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
+        if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == Convect::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHnUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::OutConvClass::LeewardVertWall:
+    case Convect::OutConvClass::LeewardVertWall:
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
-        if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
+        if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == Convect::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardUserCurveNum;
         }
         state.dataSurface->SurfOutConvHnModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
-        if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
+        if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == Convect::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::OutConvClass::RoofStable:
+    case Convect::OutConvClass::RoofStable:
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
-        if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
+        if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == Convect::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofUserCurveNum;
         }
         state.dataSurface->SurfOutConvHnModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
-        if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
+        if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == Convect::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::OutConvClass::RoofUnstable:
+    case Convect::OutConvClass::RoofUnstable:
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
-        if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
+        if (state.dataSurface->SurfOutConvHfModelEq(SurfNum) == Convect::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofUserCurveNum;
         }
         state.dataSurface->SurfOutConvHnModelEq(SurfNum) = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
-        if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == ConvectionConstants::HcExt_UserCurve) {
+        if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == Convect::HcExt_UserCurve) {
             state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizUserCurveNum;
         }
@@ -5676,7 +5676,7 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
 
     // Set report var after surface has been classified
     state.dataSurface->SurfOutConvClassificationRpt(SurfNum) =
-        ConvectionConstants::OutConvClassReportVals[static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum))];
+        Convect::OutConvClassReportVals[static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum))];
 }
 
 void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNum) // surface number
@@ -5987,7 +5987,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 state.dataEnvrn->OutBaroPress,
                 state.dataLoopNodes->Node(ZoneNode).Temp,
                 Psychrometrics::PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-            Re = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, ConvectionConstants::OneThird));
+            Re = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, Convect::OneThird));
         } else {
             Re = 0.0;
         }
@@ -6006,104 +6006,104 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
     }
 
-    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvSurfDeltaT::Num>,
-                                (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<Convect::InConvClass, (int)ConvSurfDeltaT::Num>,
+                                (int)Convect::SurfConvOrientation::Num>
         A1{{
-            {ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Positive
-             ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Zero
-             ConvectionConstants::InConvClass::A1_UnstableHoriz},  // HorizontalDown, Negative
-            {ConvectionConstants::InConvClass::A1_StableTilted,    // TiltedDownward, Positive
-             ConvectionConstants::InConvClass::A1_StableTilted,    // TiltedDownward, Zero
-             ConvectionConstants::InConvClass::A1_UnstableTilted}, // TiltedDownward, Negative
-            {ConvectionConstants::InConvClass::A1_VertWalls,       // Vertical, Positive
-             ConvectionConstants::InConvClass::A1_VertWalls,       // Vertical, Zero
-             ConvectionConstants::InConvClass::A1_VertWalls},      // Vertical, Negative
-            {ConvectionConstants::InConvClass::A1_UnstableTilted,  // TiltedUpward, Positive
-             ConvectionConstants::InConvClass::A1_StableTilted,    // TiltedUpward, Zero
-             ConvectionConstants::InConvClass::A1_StableTilted},   // TiltedUpward, Negative
-            {ConvectionConstants::InConvClass::A1_UnstableHoriz,   // HorizontalUp, Positive
-             ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalUp, Zero
-             ConvectionConstants::InConvClass::A1_StableHoriz}     // HorizontalUp, Negative
+            {Convect::InConvClass::A1_StableHoriz,     // HorizontalDown, Positive
+             Convect::InConvClass::A1_StableHoriz,     // HorizontalDown, Zero
+             Convect::InConvClass::A1_UnstableHoriz},  // HorizontalDown, Negative
+            {Convect::InConvClass::A1_StableTilted,    // TiltedDownward, Positive
+             Convect::InConvClass::A1_StableTilted,    // TiltedDownward, Zero
+             Convect::InConvClass::A1_UnstableTilted}, // TiltedDownward, Negative
+            {Convect::InConvClass::A1_VertWalls,       // Vertical, Positive
+             Convect::InConvClass::A1_VertWalls,       // Vertical, Zero
+             Convect::InConvClass::A1_VertWalls},      // Vertical, Negative
+            {Convect::InConvClass::A1_UnstableTilted,  // TiltedUpward, Positive
+             Convect::InConvClass::A1_StableTilted,    // TiltedUpward, Zero
+             Convect::InConvClass::A1_StableTilted},   // TiltedUpward, Negative
+            {Convect::InConvClass::A1_UnstableHoriz,   // HorizontalUp, Positive
+             Convect::InConvClass::A1_StableHoriz,     // HorizontalUp, Zero
+             Convect::InConvClass::A1_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvSurfDeltaT::Num>,
-                                (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<Convect::InConvClass, (int)ConvSurfDeltaT::Num>,
+                                (int)Convect::SurfConvOrientation::Num>
         A2{{
-            {ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Positive
-             ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Zero
-             ConvectionConstants::InConvClass::A2_UnstableHoriz},      // HorizontalDown, Negative
-            {ConvectionConstants::InConvClass::A2_StableTilted,        // TiltedDownward, Positive
-             ConvectionConstants::InConvClass::A2_StableTilted,        // TiltedDownward, Zero
-             ConvectionConstants::InConvClass::A2_UnstableTilted},     // TiltedDownward, Negative
-            {ConvectionConstants::InConvClass::A2_VertWallsNonHeated,  // Vertical, Positive
-             ConvectionConstants::InConvClass::A2_VertWallsNonHeated,  // Vertical, Zero
-             ConvectionConstants::InConvClass::A2_VertWallsNonHeated}, // Vertical, Negative
-            {ConvectionConstants::InConvClass::A2_UnstableTilted,      // TiltedUpward, Positive
-             ConvectionConstants::InConvClass::A2_StableTilted,        // TiltedUpward, Zero
-             ConvectionConstants::InConvClass::A2_StableTilted},       // TiltedUpward, Negative
-            {ConvectionConstants::InConvClass::A2_UnstableHoriz,       // HorizontalUp, Positive
-             ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalUp, Zero
-             ConvectionConstants::InConvClass::A2_StableHoriz}         // HorizontalUp, Negative
+            {Convect::InConvClass::A2_StableHoriz,         // HorizontalDown, Positive
+             Convect::InConvClass::A2_StableHoriz,         // HorizontalDown, Zero
+             Convect::InConvClass::A2_UnstableHoriz},      // HorizontalDown, Negative
+            {Convect::InConvClass::A2_StableTilted,        // TiltedDownward, Positive
+             Convect::InConvClass::A2_StableTilted,        // TiltedDownward, Zero
+             Convect::InConvClass::A2_UnstableTilted},     // TiltedDownward, Negative
+            {Convect::InConvClass::A2_VertWallsNonHeated,  // Vertical, Positive
+             Convect::InConvClass::A2_VertWallsNonHeated,  // Vertical, Zero
+             Convect::InConvClass::A2_VertWallsNonHeated}, // Vertical, Negative
+            {Convect::InConvClass::A2_UnstableTilted,      // TiltedUpward, Positive
+             Convect::InConvClass::A2_StableTilted,        // TiltedUpward, Zero
+             Convect::InConvClass::A2_StableTilted},       // TiltedUpward, Negative
+            {Convect::InConvClass::A2_UnstableHoriz,       // HorizontalUp, Positive
+             Convect::InConvClass::A2_StableHoriz,         // HorizontalUp, Zero
+             Convect::InConvClass::A2_StableHoriz}         // HorizontalUp, Negative
         }};
 
-    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvSurfDeltaT::Num>,
-                                (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<Convect::InConvClass, (int)ConvSurfDeltaT::Num>,
+                                (int)Convect::SurfConvOrientation::Num>
         A3{{
-            {ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Positive
-             ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Zero
-             ConvectionConstants::InConvClass::A3_UnstableHoriz},  // HorizontalDown, Negative
-            {ConvectionConstants::InConvClass::A3_StableTilted,    // TiltedDownward, Positive
-             ConvectionConstants::InConvClass::A3_StableTilted,    // TiltedDownward, Zero
-             ConvectionConstants::InConvClass::A3_UnstableTilted}, // TiltedDownward, Negative
-            {ConvectionConstants::InConvClass::A3_VertWalls,       // Vertical, Positive
-             ConvectionConstants::InConvClass::A3_VertWalls,       // Vertical, Zero
-             ConvectionConstants::InConvClass::A3_VertWalls},      // Vertical, Negative
-            {ConvectionConstants::InConvClass::A3_UnstableTilted,  // TiltedUpward, Positive
-             ConvectionConstants::InConvClass::A3_StableTilted,    // TiltedUpward, Zero
-             ConvectionConstants::InConvClass::A3_StableTilted},   // TiltedUpward, Negative
-            {ConvectionConstants::InConvClass::A3_UnstableHoriz,   // HorizontalUp, Positive
-             ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalUp, Zero
-             ConvectionConstants::InConvClass::A3_StableHoriz}     // HorizontalUp, Negative
+            {Convect::InConvClass::A3_StableHoriz,     // HorizontalDown, Positive
+             Convect::InConvClass::A3_StableHoriz,     // HorizontalDown, Zero
+             Convect::InConvClass::A3_UnstableHoriz},  // HorizontalDown, Negative
+            {Convect::InConvClass::A3_StableTilted,    // TiltedDownward, Positive
+             Convect::InConvClass::A3_StableTilted,    // TiltedDownward, Zero
+             Convect::InConvClass::A3_UnstableTilted}, // TiltedDownward, Negative
+            {Convect::InConvClass::A3_VertWalls,       // Vertical, Positive
+             Convect::InConvClass::A3_VertWalls,       // Vertical, Zero
+             Convect::InConvClass::A3_VertWalls},      // Vertical, Negative
+            {Convect::InConvClass::A3_UnstableTilted,  // TiltedUpward, Positive
+             Convect::InConvClass::A3_StableTilted,    // TiltedUpward, Zero
+             Convect::InConvClass::A3_StableTilted},   // TiltedUpward, Negative
+            {Convect::InConvClass::A3_UnstableHoriz,   // HorizontalUp, Positive
+             Convect::InConvClass::A3_StableHoriz,     // HorizontalUp, Zero
+             Convect::InConvClass::A3_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvSurfDeltaT::Num>,
-                                (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<Convect::InConvClass, (int)ConvSurfDeltaT::Num>,
+                                (int)Convect::SurfConvOrientation::Num>
         B{{
-            {ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Positive
-             ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Zero
-             ConvectionConstants::InConvClass::B_UnstableHoriz},  // HorizontalDown, Negative
-            {ConvectionConstants::InConvClass::B_StableTilted,    // TiltedDownward, Positive
-             ConvectionConstants::InConvClass::B_StableTilted,    // TiltedDownward, Zero
-             ConvectionConstants::InConvClass::B_UnstableTilted}, // TiltedDownward, Negative
-            {ConvectionConstants::InConvClass::B_VertWalls,       // Vertical, Positive
-             ConvectionConstants::InConvClass::B_VertWalls,       // Vertical, Zero
-             ConvectionConstants::InConvClass::B_VertWalls},      // Vertical, Negative
-            {ConvectionConstants::InConvClass::B_UnstableTilted,  // TiltedUpward, Positive
-             ConvectionConstants::InConvClass::B_StableTilted,    // TiltedUpward, Zero
-             ConvectionConstants::InConvClass::B_StableTilted},   // TiltedUpward, Negative
-            {ConvectionConstants::InConvClass::B_UnstableHoriz,   // HorizontalUp, Positive
-             ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalUp, Zero
-             ConvectionConstants::InConvClass::B_StableHoriz}     // HorizontalUp, Negative
+            {Convect::InConvClass::B_StableHoriz,     // HorizontalDown, Positive
+             Convect::InConvClass::B_StableHoriz,     // HorizontalDown, Zero
+             Convect::InConvClass::B_UnstableHoriz},  // HorizontalDown, Negative
+            {Convect::InConvClass::B_StableTilted,    // TiltedDownward, Positive
+             Convect::InConvClass::B_StableTilted,    // TiltedDownward, Zero
+             Convect::InConvClass::B_UnstableTilted}, // TiltedDownward, Negative
+            {Convect::InConvClass::B_VertWalls,       // Vertical, Positive
+             Convect::InConvClass::B_VertWalls,       // Vertical, Zero
+             Convect::InConvClass::B_VertWalls},      // Vertical, Negative
+            {Convect::InConvClass::B_UnstableTilted,  // TiltedUpward, Positive
+             Convect::InConvClass::B_StableTilted,    // TiltedUpward, Zero
+             Convect::InConvClass::B_StableTilted},   // TiltedUpward, Negative
+            {Convect::InConvClass::B_UnstableHoriz,   // HorizontalUp, Positive
+             Convect::InConvClass::B_StableHoriz,     // HorizontalUp, Zero
+             Convect::InConvClass::B_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvSurfDeltaT::Num>,
-                                (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<Convect::InConvClass, (int)ConvSurfDeltaT::Num>,
+                                (int)Convect::SurfConvOrientation::Num>
         D{{
-            {ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Positive
-             ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Zero
-             ConvectionConstants::InConvClass::D_UnstableHoriz},  // HorizontalDown, Negative
-            {ConvectionConstants::InConvClass::D_StableTilted,    // TiltedDownward, Positive
-             ConvectionConstants::InConvClass::D_StableTilted,    // TiltedDownward, Zero
-             ConvectionConstants::InConvClass::D_UnstableTilted}, // TiltedDownward, Negative
-            {ConvectionConstants::InConvClass::D_Walls,           // Vertical, Positive
-             ConvectionConstants::InConvClass::D_Walls,           // Vertical, Zero
-             ConvectionConstants::InConvClass::D_Walls},          // Vertical, Negative
-            {ConvectionConstants::InConvClass::D_UnstableTilted,  // TiltedUpward, Positive
-             ConvectionConstants::InConvClass::D_StableTilted,    // TiltedUpward, Zero
-             ConvectionConstants::InConvClass::D_StableTilted},   // TiltedUpward, Negative
-            {ConvectionConstants::InConvClass::D_UnstableHoriz,   // HorizontalUp, Positive
-             ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalUp, Zero
-             ConvectionConstants::InConvClass::D_StableHoriz}     // HorizontalUp, Negative
+            {Convect::InConvClass::D_StableHoriz,     // HorizontalDown, Positive
+             Convect::InConvClass::D_StableHoriz,     // HorizontalDown, Zero
+             Convect::InConvClass::D_UnstableHoriz},  // HorizontalDown, Negative
+            {Convect::InConvClass::D_StableTilted,    // TiltedDownward, Positive
+             Convect::InConvClass::D_StableTilted,    // TiltedDownward, Zero
+             Convect::InConvClass::D_UnstableTilted}, // TiltedDownward, Negative
+            {Convect::InConvClass::D_Walls,           // Vertical, Positive
+             Convect::InConvClass::D_Walls,           // Vertical, Zero
+             Convect::InConvClass::D_Walls},          // Vertical, Negative
+            {Convect::InConvClass::D_UnstableTilted,  // TiltedUpward, Positive
+             Convect::InConvClass::D_StableTilted,    // TiltedUpward, Zero
+             Convect::InConvClass::D_StableTilted},   // TiltedUpward, Negative
+            {Convect::InConvClass::D_UnstableHoriz,   // HorizontalUp, Positive
+             Convect::InConvClass::D_StableHoriz,     // HorizontalUp, Zero
+             Convect::InConvClass::D_StableHoriz}     // HorizontalUp, Negative
         }};
 
     auto DeltaTempLambda = [](Real64 surfTemp, Real64 airTemp) {
@@ -6134,14 +6134,14 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             break;
         case SurfaceClass::Roof:
             if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A1_ChilledCeil;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::A1_ChilledCeil;
             } else {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = A1[iConvOrient][iDeltaTemp];
             }
             break;
         case SurfaceClass::Floor:
             if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A1_HeatedFloor;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::A1_HeatedFloor;
             } else {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = A1[iConvOrient][iDeltaTemp];
             }
@@ -6149,13 +6149,13 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
         case SurfaceClass::TDD_Diffuser:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A1_Windows;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::A1_Windows;
             break;
         default:
             assert(false);
         }
 
-        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass::Invalid) {
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == Convect::InConvClass::Invalid) {
             ShowSevereError(state,
                             format("DynamicIntConvSurfaceClassification: failed to resolve Hc model for A1 surface named{}", Surface(SurfNum).Name));
         }
@@ -6173,7 +6173,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         case SurfaceClass::Wall:
         case SurfaceClass::Door:
             if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A2_HeatedVerticalWall;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::A2_HeatedVerticalWall;
             } else {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = A2[iConvOrient][iDeltaTemp];
             }
@@ -6181,13 +6181,13 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
         case SurfaceClass::TDD_Diffuser:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A2_Windows;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::A2_Windows;
             break;
         default:
             assert(false);
         }
 
-        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass::Invalid) {
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == Convect::InConvClass::Invalid) {
             ShowSevereError(state,
                             format("DynamicIntConvSurfaceClassification: failed to resolve Hc model for A2 surface named{}", Surface(SurfNum).Name));
         }
@@ -6205,18 +6205,18 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             break;
         case SurfaceClass::IntMass:
             // assume horizontal upwards
-            state.dataSurface->SurfIntConvClassification(SurfNum) = A3[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
+            state.dataSurface->SurfIntConvClassification(SurfNum) = A3[int(Convect::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
             break;
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
         case SurfaceClass::TDD_Diffuser:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::A3_Windows;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::A3_Windows;
             break;
         default:
             assert(false);
         }
 
-        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass::Invalid) {
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == Convect::InConvClass::Invalid) {
             ShowSevereError(state,
                             format("DynamicIntConvSurfaceClassification: failed to resolve Hc model for A3 surface named{}", Surface(SurfNum).Name));
         }
@@ -6229,7 +6229,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         case SurfaceClass::Wall:
         case SurfaceClass::Door:
             if (state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfNum)) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::B_VertWallsNearHeat;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::B_VertWallsNearHeat;
             } else {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = B[iConvOrient][iDeltaTemp];
             }
@@ -6241,17 +6241,17 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
         case SurfaceClass::TDD_Diffuser:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::B_Windows;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::B_Windows;
             break;
         case SurfaceClass::IntMass:
             // assume horizontal upwards
-            state.dataSurface->SurfIntConvClassification(SurfNum) = B[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
+            state.dataSurface->SurfIntConvClassification(SurfNum) = B[int(Convect::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
             break;
         default:
             assert(false);
         }
 
-        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass::Invalid) {
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == Convect::InConvClass::Invalid) {
             ShowSevereError(state,
                             format("DynamicIntConvSurfaceClassification: failed to resolve Hc model for B surface named{}", Surface(SurfNum).Name));
         }
@@ -6262,27 +6262,27 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         switch (Surface(SurfNum).Class) {
         case SurfaceClass::Wall:
         case SurfaceClass::Door:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::C_Walls;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::C_Walls;
             break;
         case SurfaceClass::Roof:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::C_Ceiling;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::C_Ceiling;
             break;
         case SurfaceClass::Floor:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::C_Floor;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::C_Floor;
             break;
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
         case SurfaceClass::TDD_Diffuser:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::C_Windows;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::C_Windows;
             break;
         case SurfaceClass::IntMass:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::C_Floor;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::C_Floor;
             break;
         default:
             assert(false);
         }
 
-        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass::Invalid) {
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == Convect::InConvClass::Invalid) {
             ShowSevereError(state,
                             format("DynamicIntConvSurfaceClassification: failed to resolve Hc model for C surface named{}", Surface(SurfNum).Name));
         }
@@ -6301,17 +6301,17 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
         case SurfaceClass::TDD_Diffuser:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::D_Windows;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::D_Windows;
             break;
         case SurfaceClass::IntMass:
             // assume horizontal upwards.
-            state.dataSurface->SurfIntConvClassification(SurfNum) = D[int(ConvectionConstants::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
+            state.dataSurface->SurfIntConvClassification(SurfNum) = D[int(Convect::SurfConvOrientation::HorizontalUp)][iDeltaTemp];
             break;
         default:
             assert(false);
         }
 
-        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass::Invalid) {
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == Convect::InConvClass::Invalid) {
             ShowSevereError(state,
                             format("DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named{}", Surface(SurfNum).Name));
         }
@@ -6330,17 +6330,17 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             case InConvFlowRegime::C:
                 // assume forced flow is down along wall (ceiling diffuser)
                 if (deltaTemp > 0.0) { // surface is hotter so plume upwards and forces oppose
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_OpposFlowWalls;
+                    state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_OpposFlowWalls;
                 } else { // surface is cooler so plume down and forces assist
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_AssistFlowWalls;
+                    state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_AssistFlowWalls;
                 }
                 break;
             case InConvFlowRegime::D:
                 // assume forced flow is upward along wall (perimeter zone HVAC with fan)
                 if (deltaTemp > 0.0) { // surface is hotter so plume up and forces assist
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_AssistFlowWalls;
+                    state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_AssistFlowWalls;
                 } else { // surface is cooler so plume downward and forces oppose
-                    state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_OpposFlowWalls;
+                    state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_OpposFlowWalls;
                 }
                 break;
             default:
@@ -6351,35 +6351,35 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
         case SurfaceClass::Roof:
             if (deltaTemp > 0.0) { // surface is hotter so stable
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_StableCeiling;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_StableCeiling;
             } else {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_UnstableCeiling;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_UnstableCeiling;
             }
             break;
         case SurfaceClass::Floor:
             if (deltaTemp > 0.0) { // surface is hotter so unstable
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_UnstableFloor;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_UnstableFloor;
             } else {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_StableFloor;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_StableFloor;
             }
             break;
         case SurfaceClass::Window:
         case SurfaceClass::GlassDoor:
         case SurfaceClass::TDD_Diffuser:
-            state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_Windows;
+            state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_Windows;
             break;
         case SurfaceClass::IntMass:
             if (deltaTemp > 0.0) {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_UnstableFloor;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_UnstableFloor;
             } else {
-                state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::E_StableFloor;
+                state.dataSurface->SurfIntConvClassification(SurfNum) = Convect::InConvClass::E_StableFloor;
             }
             break;
         default:
             assert(false);
         }
 
-        if (state.dataSurface->SurfIntConvClassification(SurfNum) == ConvectionConstants::InConvClass::Invalid) {
+        if (state.dataSurface->SurfIntConvClassification(SurfNum) == Convect::InConvClass::Invalid) {
             ShowSevereError(state,
                             format("DynamicIntConvSurfaceClassification: failed to resolve Hc model for E surface named {}", Surface(SurfNum).Name));
         }
@@ -6394,7 +6394,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
     // Set report var after surface has been classified
     state.dataSurface->SurfIntConvClassificationRpt(SurfNum) =
-        ConvectionConstants::InConvClassReportVals[static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum))];
+        Convect::InConvClassReportVals[static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum))];
 }
 
 void MapIntConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum) // surface pointer index
@@ -6413,372 +6413,372 @@ void MapIntConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
     // if model type is user-defined, also store the index to the user curve to be used.
 
     switch (state.dataSurface->SurfIntConvClassification(SurfNum)) {
-    case ConvectionConstants::InConvClass::A1_VertWalls:
+    case Convect::InConvClass::A1_VertWalls:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A1_StableHoriz:
+    case Convect::InConvClass::A1_StableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A1_UnstableHoriz:
+    case Convect::InConvClass::A1_UnstableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A1_HeatedFloor:
+    case Convect::InConvClass::A1_HeatedFloor:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A1_ChilledCeil:
+    case Convect::InConvClass::A1_ChilledCeil:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A1_StableTilted:
+    case Convect::InConvClass::A1_StableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A1_UnstableTilted:
+    case Convect::InConvClass::A1_UnstableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A1_Windows:
+    case Convect::InConvClass::A1_Windows:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A2_VertWallsNonHeated:
+    case Convect::InConvClass::A2_VertWallsNonHeated:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A2_HeatedVerticalWall:
+    case Convect::InConvClass::A2_HeatedVerticalWall:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A2_StableHoriz:
+    case Convect::InConvClass::A2_StableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A2_UnstableHoriz:
+    case Convect::InConvClass::A2_UnstableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A2_StableTilted:
+    case Convect::InConvClass::A2_StableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A2_UnstableTilted:
+    case Convect::InConvClass::A2_UnstableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A2_Windows:
+    case Convect::InConvClass::A2_Windows:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A3_VertWalls:
+    case Convect::InConvClass::A3_VertWalls:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyVertWallEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A3_StableHoriz:
+    case Convect::InConvClass::A3_StableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A3_UnstableHoriz:
+    case Convect::InConvClass::A3_UnstableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A3_StableTilted:
+    case Convect::InConvClass::A3_StableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A3_UnstableTilted:
+    case Convect::InConvClass::A3_UnstableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::A3_Windows:
+    case Convect::InConvClass::A3_Windows:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyWindowsEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyWindowsUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::B_VertWalls:
+    case Convect::InConvClass::B_VertWalls:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::B_VertWallsNearHeat:
+    case Convect::InConvClass::B_VertWallsNearHeat:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::B_StableHoriz:
+    case Convect::InConvClass::B_StableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::B_UnstableHoriz:
+    case Convect::InConvClass::B_UnstableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::B_StableTilted:
+    case Convect::InConvClass::B_StableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::B_UnstableTilted:
+    case Convect::InConvClass::B_UnstableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::B_Windows:
+    case Convect::InConvClass::B_Windows:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::C_Walls:
+    case Convect::InConvClass::C_Walls:
         if ((state.dataSurface->SurfIntConvZonePerimLength(SurfNum) == 0.0) &&
             (state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum ==
-             ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWalls)) {
+             Convect::HcInt_GoldsteinNovoselacCeilingDiffuserWalls)) {
             // no perimeter, Goldstein Novolselac model not good so revert to fisher pedersen model
-            state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_FisherPedersenCeilDiffuserWalls;
+            state.dataSurface->SurfIntConvHcModelEq(SurfNum) = Convect::HcInt_FisherPedersenCeilDiffuserWalls;
         } else {
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum;
         }
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::C_Ceiling:
+    case Convect::InConvClass::C_Ceiling:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::C_Floor:
+    case Convect::InConvClass::C_Floor:
         if ((state.dataSurface->SurfIntConvZonePerimLength(SurfNum) == 0.0) &&
             (state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum ==
-             ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserFloor)) {
+             Convect::HcInt_GoldsteinNovoselacCeilingDiffuserFloor)) {
             // no perimeter, Goldstein Novolselac model not good so revert to fisher pedersen model
-            state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_FisherPedersenCeilDiffuserFloor;
+            state.dataSurface->SurfIntConvHcModelEq(SurfNum) = Convect::HcInt_FisherPedersenCeilDiffuserFloor;
         } else {
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum;
         }
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirFloorUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::C_Windows:
+    case Convect::InConvClass::C_Windows:
         if ((state.dataSurface->SurfIntConvZonePerimLength(SurfNum) == 0.0) &&
             (state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum ==
-             ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWindow)) {
+             Convect::HcInt_GoldsteinNovoselacCeilingDiffuserWindow)) {
             // no perimeter, Goldstein Novolselac model not good so revert to ISO15099
-            state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_ISO15099Windows;
+            state.dataSurface->SurfIntConvHcModelEq(SurfNum) = Convect::HcInt_ISO15099Windows;
         } else {
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum;
         }
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::D_Walls:
+    case Convect::InConvClass::D_Walls:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::D_StableHoriz:
+    case Convect::InConvClass::D_StableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::D_UnstableHoriz:
+    case Convect::InConvClass::D_UnstableHoriz:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::D_StableTilted:
+    case Convect::InConvClass::D_StableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::D_UnstableTilted:
+    case Convect::InConvClass::D_UnstableTilted:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::D_Windows:
+    case Convect::InConvClass::D_Windows:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::E_AssistFlowWalls:
+    case Convect::InConvClass::E_AssistFlowWalls:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyAssistingFlowWallEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyAssistingFlowWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::E_OpposFlowWalls:
+    case Convect::InConvClass::E_OpposFlowWalls:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyOpposingFlowWallEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyOpposingFlowWallUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::E_StableFloor:
+    case Convect::InConvClass::E_StableFloor:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableFloorUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::E_UnstableFloor:
+    case Convect::InConvClass::E_UnstableFloor:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::E_StableCeiling:
+    case Convect::InConvClass::E_StableCeiling:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::E_UnstableCeiling:
+    case Convect::InConvClass::E_UnstableCeiling:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingUserCurveNum;
         }
         break;
-    case ConvectionConstants::InConvClass::E_Windows:
+    case Convect::InConvClass::E_Windows:
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
-        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == ConvectionConstants::HcInt_UserCurve) {
+        if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == Convect::HcInt_UserCurve) {
             state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
                 state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedWindowsUserCurveNum;
         }
@@ -6849,15 +6849,15 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
     auto &UserCurve = state.dataConvectionCoefficient->HcInsideUserCurve(UserCurveNum);
 
     switch (UserCurve.ReferenceTempType) {
-    case ConvectionConstants::RefTemp::MeanAirTemp:
+    case Convect::RefTemp::MeanAirTemp:
         tmpAirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
-    case ConvectionConstants::RefTemp::AdjacentAirTemp:
+    case Convect::RefTemp::AdjacentAirTemp:
         tmpAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
         break;
-    case ConvectionConstants::RefTemp::SupplyAirTemp:
+    case Convect::RefTemp::SupplyAirTemp:
         tmpAirTemp = SupplyAirTemp;
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
         break;
@@ -6932,18 +6932,18 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
     auto const &surface = state.dataSurface->Surface(SurfNum);
 
     switch (UserCurve.WindSpeedType) {
-    case ConvectionConstants::RefWind::WeatherFile:
+    case Convect::RefWind::WeatherFile:
         windVel = state.dataEnvrn->WindSpeed;
         break;
-    case ConvectionConstants::RefWind::AtZ:
+    case Convect::RefWind::AtZ:
         windVel = state.dataSurface->SurfOutWindSpeed(SurfNum);
         break;
-    case ConvectionConstants::RefWind::ParallelComp:
+    case Convect::RefWind::ParallelComp:
         // WindSpeed , WindDir, surface Azimuth
         Theta = CalcWindSurfaceTheta(state.dataEnvrn->WindDir, surface.Azimuth);
         ThetaRad = Theta * DataGlobalConstants::DegToRadians;
         break;
-    case ConvectionConstants::RefWind::ParallelCompAtZ:
+    case Convect::RefWind::ParallelCompAtZ:
         // Surface WindSpeed , Surface WindDir, surface Azimuth
         Theta = CalcWindSurfaceTheta(state.dataSurface->SurfOutWindDir(SurfNum), surface.Azimuth);
         ThetaRad = Theta * DataGlobalConstants::DegToRadians;
@@ -7127,8 +7127,8 @@ Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,        // [
     // for buoyancy-driven convection in rooms.  Building Services Engineering
     // Research & Technology. Vol. 4, No. 3.
 
-    return std::pow(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, ConvectionConstants::OneFourth)) + (1.63 * pow_2(DeltaTemp)),
-                    ConvectionConstants::OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+    return std::pow(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, Convect::OneFourth)) + (1.63 * pow_2(DeltaTemp)),
+                    Convect::OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
 }
 
 Real64 CalcAlamdariHammondUnstableHorizontal(EnergyPlusData &state,
@@ -7180,7 +7180,7 @@ Real64 CalcAlamdariHammondStableHorizontal(Real64 const DeltaTemp,        // [C]
     // for buoyancy-driven convection in rooms.  Building Services Engineering
     // Research & Technology. Vol. 4, No. 3.
 
-    return 0.6 * std::pow(std::abs(DeltaTemp) / pow_2(HydraulicDiameter), ConvectionConstants::OneFifth);
+    return 0.6 * std::pow(std::abs(DeltaTemp) / pow_2(HydraulicDiameter), Convect::OneFifth);
 }
 
 Real64 CalcAlamdariHammondStableHorizontal(EnergyPlusData &state,
@@ -7232,8 +7232,8 @@ Real64 CalcAlamdariHammondVerticalWall(Real64 const DeltaTemp, // [C] temperatur
     // for buoyancy-driven convection in rooms.  Building Services Engineering
     // Research & Technology. Vol. 4, No. 3.
 
-    return std::pow(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, ConvectionConstants::OneFourth)) + (1.23 * pow_2(DeltaTemp)),
-                    ConvectionConstants::OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+    return std::pow(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, Convect::OneFourth)) + (1.23 * pow_2(DeltaTemp)),
+                    Convect::OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
 }
 
 Real64 CalcAlamdariHammondVerticalWall(EnergyPlusData &state,
@@ -7502,13 +7502,13 @@ Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const DeltaTemp,     // [C
     //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
     Real64 cofpow =
-        std::sqrt(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, ConvectionConstants::OneFourth)) +
-                  std::pow(1.23 * pow_2(DeltaTemp), ConvectionConstants::OneSixth)) +
+        std::sqrt(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, Convect::OneFourth)) +
+                  std::pow(1.23 * pow_2(DeltaTemp), Convect::OneSixth)) +
         pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) *
               (-0.199 + 0.190 * std::pow(AirChangeRate,
                                          0.8))); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
     Real64 Hc = std::pow(std::abs(cofpow),
-                         ConvectionConstants::OneThird); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+                         Convect::OneThird); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
     if (cofpow < 0.0) {
         Hc = -Hc;
     }
@@ -7588,20 +7588,20 @@ Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const DeltaTemp,     // [C
     Real64 cofpow;
 
     if (Height != 0.0) {
-        cofpow = std::sqrt(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, ConvectionConstants::OneFourth)) +
-                           std::pow(1.23 * pow_2(DeltaTemp), ConvectionConstants::OneSixth)) -
+        cofpow = std::sqrt(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, Convect::OneFourth)) +
+                           std::pow(1.23 * pow_2(DeltaTemp), Convect::OneSixth)) -
                  pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) *
                        (-0.199 + 0.190 * std::pow(AirChangeRate,
                                                   0.8))); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
         HcTmp1 = std::pow(std::abs(cofpow),
-                          ConvectionConstants::OneThird); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+                          Convect::OneThird); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
         if (cofpow < 0.0) {
             HcTmp1 = -HcTmp1;
         }
 
         HcTmp2 =
-            0.8 * std::pow(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, ConvectionConstants::OneFourth)) + (1.23 * pow_2(DeltaTemp)),
-                           ConvectionConstants::OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
+            0.8 * std::pow(pow_6(1.5 * std::pow(std::abs(DeltaTemp) / Height, Convect::OneFourth)) + (1.23 * pow_2(DeltaTemp)),
+                           Convect::OneSixth); // Tuned pow_6( std::pow( std::abs( DeltaTemp ), OneThird ) ) changed to pow_2( DeltaTemp )
     } else {
         HcTmp1 = 9.999;
         HcTmp2 = 9.999;
@@ -7680,9 +7680,9 @@ Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const DeltaTemp,         //
     //  air flow modeling within dynamic whole-building simulations.
     //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-    Real64 cofpow = pow_3(0.6 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, ConvectionConstants::OneFifth)) +
+    Real64 cofpow = pow_3(0.6 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, Convect::OneFifth)) +
                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (0.159 + 0.116 * std::pow(AirChangeRate, 0.8)));
-    Real64 Hc = std::pow(std::abs(cofpow), ConvectionConstants::OneThird);
+    Real64 Hc = std::pow(std::abs(cofpow), Convect::OneThird);
     if (cofpow < 0.0) {
         Hc = -Hc;
     }
@@ -7757,10 +7757,10 @@ Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const DeltaTemp,         
     //  air flow modeling within dynamic whole-building simulations.
     //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-    Real64 cofpow = std::sqrt(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, ConvectionConstants::OneFourth)) +
-                              pow_6(1.63 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird))) +
+    Real64 cofpow = std::sqrt(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, Convect::OneFourth)) +
+                              pow_6(1.63 * std::pow(std::abs(DeltaTemp), Convect::OneThird))) +
                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (0.159 + 0.116 * std::pow(AirChangeRate, 0.8)));
-    Real64 Hc = std::pow(std::abs(cofpow), ConvectionConstants::OneThird);
+    Real64 Hc = std::pow(std::abs(cofpow), Convect::OneThird);
     if (cofpow < 0.0) {
         Hc = -Hc;
     }
@@ -7837,9 +7837,9 @@ Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const DeltaTemp,         
     //  air flow modeling within dynamic whole-building simulations.
     //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-    Real64 cofpow = pow_3(0.6 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, ConvectionConstants::OneFifth)) +
+    Real64 cofpow = pow_3(0.6 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, Convect::OneFifth)) +
                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (-0.166 + 0.484 * std::pow(AirChangeRate, 0.8)));
-    Real64 Hc = std::pow(std::abs(cofpow), ConvectionConstants::OneThird);
+    Real64 Hc = std::pow(std::abs(cofpow), Convect::OneThird);
     if (cofpow < 0.0) {
         Hc = -Hc;
     }
@@ -7914,10 +7914,10 @@ Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const DeltaTemp,       
     //  air flow modeling within dynamic whole-building simulations.
     //  PhD. Thesis. University of Strathclyde, Glasgow, UK.
 
-    Real64 cofpow = std::sqrt(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, ConvectionConstants::OneFourth)) +
-                              pow_6(1.63 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird))) +
+    Real64 cofpow = std::sqrt(pow_6(1.4 * std::pow(std::abs(DeltaTemp) / HydraulicDiameter, Convect::OneFourth)) +
+                              pow_6(1.63 * std::pow(std::abs(DeltaTemp), Convect::OneThird))) +
                     pow_3(((SurfTemp - SupplyAirTemp) / std::abs(DeltaTemp)) * (-0.166 + 0.484 * std::pow(AirChangeRate, 0.8)));
-    Real64 Hc = std::pow(std::abs(cofpow), ConvectionConstants::OneThird);
+    Real64 Hc = std::pow(std::abs(cofpow), Convect::OneThird);
     if (cofpow < 0.0) {
         Hc = -Hc;
     }
@@ -8003,7 +8003,7 @@ Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperatur
     RaH = (g * BetaFilm * QdotConv * pow_4(Height) * Pr) / (k * pow_2(v));
 
     if (RaH <= 6.3e09) {
-        return 1.332 * std::pow(std::abs(DeltaTemp) / Height, ConvectionConstants::OneFourth);
+        return 1.332 * std::pow(std::abs(DeltaTemp) / Height, Convect::OneFourth);
     } else {
         return 1.235 * std::exp(0.0467 * Height) * std::pow(std::abs(DeltaTemp), 0.316);
     }
@@ -8066,7 +8066,7 @@ Real64 CalcKaradagChilledCeiling(Real64 const DeltaTemp) // [C] temperature diff
 Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 const AirSystemFlowRate,  // [m3/s] air system flow rate
                                                    Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                    Real64 const WindWallRatio,      // [ ] fraction of window area to wall area for zone
-                                                   ConvectionConstants::InConvWinLoc const WindowLocationType // index for location types
+                                                   Convect::InConvWinLoc const WindowLocationType // index for location types
 )
 {
 
@@ -8089,11 +8089,11 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 const AirSystemFlowRat
         if (WindWallRatio <= 0.5) {
 
             switch (WindowLocationType) {
-            case ConvectionConstants::InConvWinLoc::UpperPartOfExteriorWall:
-            case ConvectionConstants::InConvWinLoc::LargePartOfExteriorWall:
-            case ConvectionConstants::InConvWinLoc::NotSet:
+            case Convect::InConvWinLoc::UpperPartOfExteriorWall:
+            case Convect::InConvWinLoc::LargePartOfExteriorWall:
+            case Convect::InConvWinLoc::NotSet:
                 return 0.117 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
-            case ConvectionConstants::InConvWinLoc::LowerPartOfExteriorWall:
+            case Convect::InConvWinLoc::LowerPartOfExteriorWall:
                 return 0.093 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
             default:
                 // shouldn't come
@@ -8111,7 +8111,7 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 const AirSystemFlowRat
 Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
                                                    Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                    Real64 const WindWallRatio,      // [ ] fraction of window area to wall area for zone
-                                                   ConvectionConstants::InConvWinLoc const WindowLocationType, // index for location types
+                                                   Convect::InConvWinLoc const WindowLocationType, // index for location types
                                                    int const ZoneNum                                           // for messages
 )
 {
@@ -8120,10 +8120,10 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
     if (ZoneExtPerimLength > 0.0) {
         if (WindWallRatio <= 0.5) {
 
-            if (!((WindowLocationType == ConvectionConstants::InConvWinLoc::UpperPartOfExteriorWall) ||
-                  (WindowLocationType == ConvectionConstants::InConvWinLoc::LowerPartOfExteriorWall) ||
-                  (WindowLocationType == ConvectionConstants::InConvWinLoc::LargePartOfExteriorWall) ||
-                  (WindowLocationType == ConvectionConstants::InConvWinLoc::NotSet))) {
+            if (!((WindowLocationType == Convect::InConvWinLoc::UpperPartOfExteriorWall) ||
+                  (WindowLocationType == Convect::InConvWinLoc::LowerPartOfExteriorWall) ||
+                  (WindowLocationType == Convect::InConvWinLoc::LargePartOfExteriorWall) ||
+                  (WindowLocationType == Convect::InConvWinLoc::NotSet))) {
                 if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 == 0) {
                     ShowSevereMessage(state,
                                       "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (bad relative window location)");
@@ -8155,7 +8155,7 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
 
 Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 const AirSystemFlowRate,  // [m3/s] air system flow rate
                                                  Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
-                                                 ConvectionConstants::InConvWinLoc const WindowLocationType // index for location types
+                                                 Convect::InConvWinLoc const WindowLocationType // index for location types
 )
 {
 
@@ -8177,10 +8177,10 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 const AirSystemFlowRate,
     if (ZoneExtPerimLength > 0.0) {
 
         switch (WindowLocationType) {
-        case ConvectionConstants::InConvWinLoc::WindowAboveThis:
-        case ConvectionConstants::InConvWinLoc::NotSet:
+        case Convect::InConvWinLoc::WindowAboveThis:
+        case Convect::InConvWinLoc::NotSet:
             return 0.063 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
-        case ConvectionConstants::InConvWinLoc::WindowBelowThis:
+        case Convect::InConvWinLoc::WindowBelowThis:
             return 0.093 * std::pow(AirSystemFlowRate / ZoneExtPerimLength, 0.8);
         default:
             return 9.999;
@@ -8192,16 +8192,16 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 const AirSystemFlowRate,
 
 Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(EnergyPlusData &state,
                                                  Real64 const ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
-                                                 ConvectionConstants::InConvWinLoc const WindowLocationType, // index for location types
+                                                 Convect::InConvWinLoc const WindowLocationType, // index for location types
                                                  int const ZoneNum                                           // for messages
 )
 {
     Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(state, ZoneNum);
 
     if (ZoneExtPerimLength > 0.0) {
-        if (!((WindowLocationType == ConvectionConstants::InConvWinLoc::WindowAboveThis) ||
-              (WindowLocationType == ConvectionConstants::InConvWinLoc::WindowBelowThis) ||
-              (WindowLocationType == ConvectionConstants::InConvWinLoc::NotSet))) {
+        if (!((WindowLocationType == Convect::InConvWinLoc::WindowAboveThis) ||
+              (WindowLocationType == Convect::InConvWinLoc::WindowBelowThis) ||
+              (WindowLocationType == Convect::InConvWinLoc::NotSet))) {
 
             if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 == 0) {
                 ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (bad relative window location)");
@@ -8789,8 +8789,8 @@ Real64 CalcClearRoof(EnergyPlusData &state,
         eta = 1.0; // forced convection gone because no wind
     }
 
-    return eta * (k / Ln) * 0.15 * std::pow(RaLn, ConvectionConstants::OneThird) +
-           (k / x) * Rf * 0.0296 * std::pow(Rex, ConvectionConstants::FourFifths) * std::pow(Pr, ConvectionConstants::OneThird);
+    return eta * (k / Ln) * 0.15 * std::pow(RaLn, Convect::OneThird) +
+           (k / x) * Rf * 0.0296 * std::pow(Rex, Convect::FourFifths) * std::pow(Pr, Convect::OneThird);
 }
 
 Real64 CalcClearRoof(EnergyPlusData &state,
@@ -8836,7 +8836,7 @@ void CalcASTMC1340ConvCoeff(EnergyPlusData &state,
 
     int ZoneNum = surface.Zone;
     Real64 Volume = state.dataHeatBal->Zone(ZoneNum).Volume; // Volume of the zone in m3
-    Real64 Vair = std::pow(Volume, ConvectionConstants::OneThird) * CalcZoneSystemACH(state, ZoneNum) / 3600;
+    Real64 Vair = std::pow(Volume, Convect::OneThird) * CalcZoneSystemACH(state, ZoneNum) / 3600;
 
     state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
         CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperature, ZoneMeanAirTemperature, Vair, surface.Tilt);
@@ -8926,7 +8926,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
         } else if (Ra < 8000000) { // heat flow up
             Nun = 0.54 * std::pow(Ra, 0.25);
         } else {
-            Nun = 0.15 * std::pow(Ra, ConvectionConstants::OneThird);
+            Nun = 0.15 * std::pow(Ra, Convect::OneThird);
         }
     } else if (Tilt > 0 && Tilt < 90) { // Tilted roof
         if (DeltaTemp > 0) {            // heat flow down
@@ -8946,7 +8946,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
             if ((Ra / Pr) <= Grc) {
                 Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * 3.14159 / 180)), 0.25);
             } else {
-                Nun = 0.14 * (std::pow(Ra, ConvectionConstants::OneThird) - std::pow(Grc * Pr, ConvectionConstants::OneThird)) +
+                Nun = 0.14 * (std::pow(Ra, Convect::OneThird) - std::pow(Grc * Pr, Convect::OneThird)) +
                       0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
             }
         }
@@ -8956,7 +8956,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
         } else if (Ra < 8000000) { // heat flow up
             Nun = 0.54 * std::pow(Ra, 0.25);
         } else {
-            Nun = 0.15 * std::pow(Ra, ConvectionConstants::OneThird);
+            Nun = 0.15 * std::pow(Ra, Convect::OneThird);
         }
     } else if (Tilt > 90 && Tilt < 180) { // Tilted Floor
         if (DeltaTemp <= 0) {             // heat flow down
@@ -8976,7 +8976,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
             if ((Ra / Pr) <= Grc) {
                 Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
             } else {
-                Nun = 0.14 * (std::pow(Ra, ConvectionConstants::OneThird) - std::pow(Grc * Pr, ConvectionConstants::OneThird)) +
+                Nun = 0.14 * (std::pow(Ra, Convect::OneThird) - std::pow(Grc * Pr, Convect::OneThird)) +
                       0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
             }
         }
@@ -8984,39 +8984,39 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
         if (Ra < 1000000000) {
             Nun = 0.59 * std::pow(Ra, 0.25);
         } else {
-            Nun = 0.10 * std::pow(Ra, ConvectionConstants::OneThird);
+            Nun = 0.10 * std::pow(Ra, Convect::OneThird);
         }
     }
 
     // Forced convection (Nuf)
     if (Re < 500000) {
-        Nuf = 0.664 * std::pow(Pr, ConvectionConstants::OneThird) * std::pow(Re, 0.5);
+        Nuf = 0.664 * std::pow(Pr, Convect::OneThird) * std::pow(Re, 0.5);
     } else {
-        Nuf = std::pow(Pr, ConvectionConstants::OneThird) * ((0.037 * std::pow(Re, 0.8)) - 850);
+        Nuf = std::pow(Pr, Convect::OneThird) * ((0.037 * std::pow(Re, 0.8)) - 850);
     }
 
     // Combined convection coefficient
     hf = Nuf * k_SI / L;
     hn = Nun * k_SI / L;
-    h = std::pow((std::pow(hf, 3) + std::pow(hn, 3)), ConvectionConstants::OneThird);
+    h = std::pow((std::pow(hf, 3) + std::pow(hn, 3)), Convect::OneThird);
 
     return h;
 }
 
-ConvectionConstants::SurfConvOrientation GetSurfConvOrientation(Real64 const Tilt)
+Convect::SurfConvOrientation GetSurfConvOrientation(Real64 const Tilt)
 {
     if (Tilt < 5.0) {
-        return ConvectionConstants::SurfConvOrientation::HorizontalDown;
+        return Convect::SurfConvOrientation::HorizontalDown;
     } else if ((Tilt >= 5.0) && (Tilt < 85.0)) {
-        return ConvectionConstants::SurfConvOrientation::TiltedDownward;
+        return Convect::SurfConvOrientation::TiltedDownward;
     } else if ((Tilt >= 85.0) && (Tilt < 95.0)) {
-        return ConvectionConstants::SurfConvOrientation::Vertical;
+        return Convect::SurfConvOrientation::Vertical;
     } else if ((Tilt >= 95.0) && (Tilt < 175.0)) {
-        return ConvectionConstants::SurfConvOrientation::TiltedUpward;
+        return Convect::SurfConvOrientation::TiltedUpward;
     } else if (Tilt >= 175.0) {
-        return ConvectionConstants::SurfConvOrientation::HorizontalUp;
+        return Convect::SurfConvOrientation::HorizontalUp;
     } else {
-        return ConvectionConstants::SurfConvOrientation::Invalid;
+        return Convect::SurfConvOrientation::Invalid;
     }
 }
-} // namespace EnergyPlus::ConvectionCoefficients
+} // namespace EnergyPlus::Convect

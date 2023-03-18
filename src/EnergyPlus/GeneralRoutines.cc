@@ -888,7 +888,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // Nat. Vent. equations from ASHRAE HoF 2001 Chapt. 26
 
     // Using/Aliasing
-    using ConvectionCoefficients::InitExteriorConvectionCoeff;
+    using Convect::InitExteriorConvectionCoeff;
     using DataSurfaces::SurfaceData;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;

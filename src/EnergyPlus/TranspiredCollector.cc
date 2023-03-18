@@ -1008,7 +1008,7 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using ConvectionCoefficients::InitExteriorConvectionCoeff;
+        using Convect::InitExteriorConvectionCoeff;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyCpAirFnW;
