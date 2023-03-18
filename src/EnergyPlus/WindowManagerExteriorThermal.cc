@@ -101,7 +101,7 @@ namespace WindowManager {
         // Tarcog thermal system for solving heat transfer through the window
         int activeConstrNum = CWCEHeatTransferFactory::getActiveConstructionNumber(state, surface, SurfNum);
         auto aFactory = CWCEHeatTransferFactory(state, surface, SurfNum, activeConstrNum); // (AUTO_OK)
-        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff);                     // (AUTO_OK_SHARED_PTR)
+        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff);                     // (AUTO_OK_SPTR)
         aSystem->setTolerance(solutionTolerance);
 
         // get previous timestep temperatures solution for faster iterations
@@ -128,7 +128,7 @@ namespace WindowManager {
 
         auto aLayers = aSystem->getSolidLayers(); // (AUTO_OK_OBJ)
         int i = 1;
-        for (const auto &aLayer : aLayers) { // (AUTO_OK_SHARED_PTR)
+        for (const auto &aLayer : aLayers) { // (AUTO_OK_SPTR)
             Real64 aTemp = 0;
             for (auto aSide : FenestrationCommon::EnumSide()) { // (AUTO_OK) I don't understand what this construct is
                 aTemp = aLayer->getTemperature(aSide);
@@ -171,11 +171,11 @@ namespace WindowManager {
             int totLayers = aLayers.size();
             state.dataWindowManager->nglface = 2 * totLayers - 2;
             state.dataWindowManager->nglfacep = state.dataWindowManager->nglface + 2;
-            auto aShadeLayer = aLayers[totLayers - 1]; // (AUTO_OK_SHARED_PTR)
-            auto aGlassLayer = aLayers[totLayers - 2]; // (AUTO_OK_SHARED_PTR)
+            auto aShadeLayer = aLayers[totLayers - 1]; // (AUTO_OK_SPTR)
+            auto aGlassLayer = aLayers[totLayers - 2]; // (AUTO_OK_SPTR)
             Real64 ShadeArea = state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
-            auto frontSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Front); // (AUTO_OK_SHARED_PTR)
-            auto backSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Back);   // (AUTO_OK_SHARED_PTR)
+            auto frontSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Front); // (AUTO_OK_SPTR)
+            auto backSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Back);   // (AUTO_OK_SPTR)
             Real64 EpsShIR1 = frontSurface->getEmissivity();
             Real64 EpsShIR2 = backSurface->getEmissivity();
             Real64 TauShIR = frontSurface->getTransmittance();
@@ -219,8 +219,8 @@ namespace WindowManager {
 
             //
             int totLayers = aLayers.size();
-            auto aGlassLayer = aLayers[totLayers - 1];                                  // (AUTO_OK_SHARED_PTR)
-            auto backSurface = aGlassLayer->getSurface(FenestrationCommon::Side::Back); // (AUTO_OK_SHARED_PTR)
+            auto aGlassLayer = aLayers[totLayers - 1];                                  // (AUTO_OK_SPTR)
+            auto backSurface = aGlassLayer->getSurface(FenestrationCommon::Side::Back); // (AUTO_OK_SPTR)
 
             Real64 h_cin = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
             Real64 ConvHeatGainFrZoneSideOfGlass =
@@ -264,7 +264,7 @@ namespace WindowManager {
         auto &surface = state.dataSurface->Surface(surfNum);
         auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum, constrNum); // (AUTO_OK)
 
-        const auto winterGlassUnit = aFactory.getTarcogSystemForReporting(state, false, windowWidth, windowHeight, tilt); // (AUTO_OK_SHARED_PTR)
+        const auto winterGlassUnit = aFactory.getTarcogSystemForReporting(state, false, windowWidth, windowHeight, tilt); // (AUTO_OK_SPTR)
 
         return winterGlassUnit->getUValue();
     }
@@ -276,7 +276,7 @@ namespace WindowManager {
         auto &surface = state.dataSurface->Surface(surfNum);
         auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum, constrNum); // (AUTO_OK)
 
-        const auto summerGlassUnit = aFactory.getTarcogSystemForReporting(state, true, windowWidth, windowHeight, tilt); // (AUTO_OK_SHARED_PTR)
+        const auto summerGlassUnit = aFactory.getTarcogSystemForReporting(state, true, windowWidth, windowHeight, tilt); // (AUTO_OK_SPTR)
         return summerGlassUnit->getSHGC(state.dataConstruction->Construct(surface.Construction).SolTransNorm);
     }
 
@@ -300,11 +300,11 @@ namespace WindowManager {
             constexpr Real64 framehIntConvCoeff = 8.0;
             constexpr Real64 tilt = 90.0;
 
-            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, isSummer, windowWidth, windowHeight, tilt); // (AUTO_OK_SHARED_PTR)
+            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, isSummer, windowWidth, windowHeight, tilt); // (AUTO_OK_SPTR)
 
             const double centerOfGlassUvalue = insulGlassUnit->getUValue();
 
-            auto winterGlassUnit = aFactory.getTarcogSystemForReporting(state, false, windowWidth, windowHeight, tilt); // (AUTO_OK_SHARED_PTR)
+            auto winterGlassUnit = aFactory.getTarcogSystemForReporting(state, false, windowWidth, windowHeight, tilt); // (AUTO_OK_SPTR)
 
             const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, framehIntConvCoeff, framehExtConvCoeff);
             const double frameEdgeUValue = winterGlassUnit->getUValue() * frameDivider.FrEdgeToCenterGlCondRatio; // not sure about this
@@ -428,23 +428,23 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff)
     {
-        auto Indoor = getIndoor(state);                    // (AUTO_OK_SHARED_PTR)
-        auto Outdoor = getOutdoor(state, t_HextConvCoeff); // (AUTO_OK_SHARED_PTR)
+        auto Indoor = getIndoor(state);                    // (AUTO_OK_SPTR)
+        auto Outdoor = getOutdoor(state, t_HextConvCoeff); // (AUTO_OK_SPTR)
         auto aIGU = getIGU();                              // (AUTO_OK_OBJ)
 
         // pick-up all layers and put them in IGU (this includes gap layers as well)
         for (int i = 0; i < m_TotLay; ++i) {
-            auto aLayer = getIGULayer(state, i + 1); // (AUTO_OK_SHARED_PTR)
+            auto aLayer = getIGULayer(state, i + 1); // (AUTO_OK_SPTR)
             assert(aLayer != nullptr);
             // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
             // and it will be created here
             if (m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1) {
-                auto aAirLayer = getShadeToGlassLayer(state, i + 1); // (AUTO_OK_SHARED_PTR)
+                auto aAirLayer = getShadeToGlassLayer(state, i + 1); // (AUTO_OK_SPTR)
                 aIGU.addLayer(aAirLayer);
             }
             aIGU.addLayer(aLayer);
             if (m_ShadePosition == ShadePosition::Exterior && i == 0) {
-                auto aAirLayer = getShadeToGlassLayer(state, i + 1); // (AUTO_OK_SHARED_PTR)
+                auto aAirLayer = getShadeToGlassLayer(state, i + 1); // (AUTO_OK_SPTR)
                 aIGU.addLayer(aAirLayer);
             }
         }
@@ -455,24 +455,24 @@ namespace WindowManager {
     std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(
         EnergyPlusData &state, bool const useSummerConditions, const Real64 width, const Real64 height, const Real64 tilt)
     {
-        auto Indoor = getIndoorNfrc(useSummerConditions);   // (AUTO_OK_SHARED_PTR)
-        auto Outdoor = getOutdoorNfrc(useSummerConditions); // (AUTO_OK_SHARED_PTR)
+        auto Indoor = getIndoorNfrc(useSummerConditions);   // (AUTO_OK_SPTR)
+        auto Outdoor = getOutdoorNfrc(useSummerConditions); // (AUTO_OK_SPTR)
         auto aIGU = getIGU(width, height, tilt);            // (AUTO_OK_OBJ)
 
         m_SolidLayerIndex = 0;
         // pick-up all layers and put them in IGU (this includes gap layers as well)
         for (int i = 0; i < m_TotLay; ++i) {
-            auto aLayer = getIGULayer(state, i + 1); // (AUTO_OK_SHARED_PTR)
+            auto aLayer = getIGULayer(state, i + 1); // (AUTO_OK_SPTR)
             assert(aLayer != nullptr);
             // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
             // and it will be created here
             if (m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1) {
-                auto aAirLayer = getShadeToGlassLayer(state, i + 1); // (AUTO_OK_SHARED_PTR)
+                auto aAirLayer = getShadeToGlassLayer(state, i + 1); // (AUTO_OK_SPTR)
                 aIGU.addLayer(aAirLayer);
             }
             aIGU.addLayer(aLayer);
             if (m_ShadePosition == ShadePosition::Exterior && i == 0) {
-                auto aAirLayer = getShadeToGlassLayer(state, i + 1); // (AUTO_OK_SHARED_PTR)
+                auto aAirLayer = getShadeToGlassLayer(state, i + 1); // (AUTO_OK_SPTR)
                 aIGU.addLayer(aAirLayer);
             }
         }
@@ -639,10 +639,10 @@ namespace WindowManager {
 
         std::shared_ptr<Tarcog::ISO15099::ISurface> frontSurface = std::make_shared<Tarcog::ISO15099::CSurface>(emissFront, transThermalFront);
         std::shared_ptr<Tarcog::ISO15099::ISurface> backSurface = std::make_shared<Tarcog::ISO15099::CSurface>(emissBack, transThermalBack);
-        auto aSolidLayer =
-            std::make_shared<Tarcog::ISO15099::CIGUSolidLayer>(thickness, conductivity, frontSurface, backSurface); // (AUTO_OK_SHARED_PTR)
+        auto aSolidLayer = // (AUTO_OK_SPTR)
+            std::make_shared<Tarcog::ISO15099::CIGUSolidLayer>(thickness, conductivity, frontSurface, backSurface); 
         if (createOpenness) {
-            auto aOpenings = std::make_shared<Tarcog::ISO15099::CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront, Afront); // (AUTO_OK_SHARED_PTR)
+            auto aOpenings = std::make_shared<Tarcog::ISO15099::CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront, Afront); // (AUTO_OK_SPTR)
             aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUShadeLayer>(aSolidLayer, aOpenings);
         }
         static constexpr double standardizedRadiationIntensity = 783.0;
@@ -903,7 +903,7 @@ namespace WindowManager {
             tSky = 32.0 + Constant::KelvinConv;
             solarRadiation = 783.;
         }
-        auto Outdoor = // (AUTO_OK_SHARED_PTR)
+        auto Outdoor = // (AUTO_OK_SPTR)
             Tarcog::ISO15099::Environments::outdoor(airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
         Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH);
         return Outdoor;

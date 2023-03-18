@@ -703,7 +703,6 @@ void SimHVAC(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
-    auto &ErrEnvironmentName = state.dataHVACMgr->ErrEnvironmentName;
     int LoopNum;
 
     int AirSysNum;
@@ -993,7 +992,7 @@ void SimHVAC(EnergyPlusData &state)
     if ((state.dataHVACMgr->HVACManageIteration > state.dataConvergeParams->MaxIter) && (!state.dataGlobal->WarmupFlag)) {
         ++state.dataHVACMgr->ErrCount;
         if (state.dataHVACMgr->ErrCount < 15) {
-            ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
+            state.dataHVACMgr->ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
             ShowWarningError(state,
                              format("SimHVAC: Maximum iterations ({}) exceeded for all HVAC loops, at {}, {} {}",
                                     state.dataConvergeParams->MaxIter,
@@ -1368,7 +1367,7 @@ void SimHVAC(EnergyPlusData &state)
                             }
                             if (!FoundOscillationByDuplicate) {
 
-                                auto inletTempDotProd =
+                                Real64 inletTempDotProd =
                                     std::inner_product(std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(inletTemp), 0.0);
 
                                 Real64 summation4 = 0.0;
@@ -1454,7 +1453,7 @@ void SimHVAC(EnergyPlusData &state)
                                           format("Supply-to-Demand interface mass flow rate check value iteration history trace: {}", HistoryTrace));
 
                         // now work with history logs for mass flow to detect issues
-                        for (auto ThisLoopSide : DataPlant::LoopSideKeys) {
+                        for (DataPlant::LoopSideLocation ThisLoopSide : DataPlant::LoopSideKeys) {
 
                             auto &mdotHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory;
                             auto &mdotHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory;
@@ -1635,7 +1634,7 @@ void SimHVAC(EnergyPlusData &state)
                                           format("Supply-to-Demand interface temperature check value iteration history trace: {}", HistoryTrace));
 
                         // now work with history logs for mass flow to detect issues
-                        for (auto ThisLoopSide : DataPlant::LoopSideKeys) {
+                        for (DataPlant::LoopSideLocation ThisLoopSide : DataPlant::LoopSideKeys) {
 
                             auto &tempHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory;
                             auto &tempHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory;
@@ -1802,14 +1801,14 @@ void SimHVAC(EnergyPlusData &state)
                 }     // loop over plant loop systems
             }
         } else {
-            if (state.dataEnvrn->EnvironmentName == ErrEnvironmentName) {
+            if (state.dataEnvrn->EnvironmentName == state.dataHVACMgr->ErrEnvironmentName) {
                 ShowRecurringWarningErrorAtEnd(
                     state,
                     format("SimHVAC: Exceeding Maximum iterations for all HVAC loops, during {} continues", state.dataEnvrn->EnvironmentName),
                     state.dataHVACMgr->MaxErrCount);
             } else {
                 state.dataHVACMgr->MaxErrCount = 0;
-                ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
+                state.dataHVACMgr->ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                 ShowRecurringWarningErrorAtEnd(
                     state,
                     format("SimHVAC: Exceeding Maximum iterations for all HVAC loops, during {} continues", state.dataEnvrn->EnvironmentName),
@@ -2088,7 +2087,7 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
 
     for (AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
 
-        auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex));
+        auto &AirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex);
 
         for (SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {           // loop over the air loop supply outlets
             if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == DataHVACGlobals::AirDuctType::Cooling) { // check for cooling duct
@@ -2203,7 +2202,7 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     // METHODOLOGY EMPLOYED:
     // Checks if loop lockout flags are .TRUE.; if so, sets SimAirLoops to .TRUE.
 
-    auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
+    auto &AirLoopControlInfo = state.dataAirLoop->AirLoopControlInfo;
 
     for (int AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
         // check if economizer ia active and if there is a request that it be locked out
@@ -2304,12 +2303,12 @@ void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
     int GroupNum;
     int Mult;
 
-    auto &ZoneList(state.dataHeatBal->ZoneList);
-    auto &ZoneGroup(state.dataHeatBal->ZoneGroup);
-    auto &ZoneListSNLoadHeatEnergy(state.dataHeatBal->ZoneListSNLoadHeatEnergy);
-    auto &ZoneListSNLoadCoolEnergy(state.dataHeatBal->ZoneListSNLoadCoolEnergy);
-    auto &ZoneListSNLoadHeatRate(state.dataHeatBal->ZoneListSNLoadHeatRate);
-    auto &ZoneListSNLoadCoolRate(state.dataHeatBal->ZoneListSNLoadCoolRate);
+    auto &ZoneList = state.dataHeatBal->ZoneList;
+    auto &ZoneGroup = state.dataHeatBal->ZoneGroup;
+    auto &ZoneListSNLoadHeatEnergy = state.dataHeatBal->ZoneListSNLoadHeatEnergy;
+    auto &ZoneListSNLoadCoolEnergy = state.dataHeatBal->ZoneListSNLoadCoolEnergy;
+    auto &ZoneListSNLoadHeatRate = state.dataHeatBal->ZoneListSNLoadHeatRate;
+    auto &ZoneListSNLoadCoolRate = state.dataHeatBal->ZoneListSNLoadCoolRate;
 
     // Sum ZONE LIST and ZONE GROUP report variables
     for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
@@ -2472,14 +2471,14 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     state.dataHeatBal->ZoneTotalExfiltrationHeatLoss = 0.0;
     state.dataHeatBal->ZoneTotalExhaustHeatLoss = 0.0;
 
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &ZnAirRpt(state.dataHeatBal->ZnAirRpt);
-    auto &Ventilation(state.dataHeatBal->Ventilation);
-    auto &Mixing(state.dataHeatBal->Mixing);
-    auto &CrossMixing(state.dataHeatBal->CrossMixing);
-    auto &RefDoorMixing(state.dataHeatBal->RefDoorMixing);
-    auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
-    auto &Fan(state.dataFans->Fan);
+    auto &Zone = state.dataHeatBal->Zone;
+    auto &ZnAirRpt = state.dataHeatBal->ZnAirRpt;
+    auto &Ventilation = state.dataHeatBal->Ventilation;
+    auto &Mixing = state.dataHeatBal->Mixing;
+    auto &CrossMixing = state.dataHeatBal->CrossMixing;
+    auto &RefDoorMixing = state.dataHeatBal->RefDoorMixing;
+    auto &ZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig;
+    auto &Fan = state.dataFans->Fan;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
@@ -2960,8 +2959,8 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 
     bool CyclingFan(false); // TRUE means air loop operates in cycling fan mode at some point
 
-    auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
-    auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
+    auto &AirLoopControlInfo = state.dataAirLoop->AirLoopControlInfo;
+    auto &ZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig;
 
     if (!state.dataHVACGlobal->AirLoopsSimOnce) return;
 
@@ -3107,7 +3106,7 @@ void CheckAirLoopFlowBalance(EnergyPlusData &state)
     // Check for unbalanced airloop
     if (!state.dataGlobal->WarmupFlag && state.dataHVACGlobal->AirLoopsSimOnce) {
         for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-            auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
+            auto &thisAirLoopFlow = state.dataAirLoop->AirLoopFlow(AirLoopNum);
             if (!thisAirLoopFlow.FlowError) {
                 Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
                 if (unbalancedExhaustDelta > SmallMassFlow) {

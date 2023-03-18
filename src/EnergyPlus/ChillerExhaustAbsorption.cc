@@ -521,7 +521,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             thisChiller.CompType_Num = GeneratorType::Microturbine;
             thisChiller.ExhaustSourceName = state.dataIPShortCut->cAlphaArgs(18);
 
-            auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, thisChiller.ExhaustSourceName);
+            auto *thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, thisChiller.ExhaustSourceName);
             thisChiller.ExhaustAirInletNodeNum = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs *>(thisMTG)->CombustionAirOutletNodeNum;
         }
     }

@@ -48,9 +48,6 @@
 #ifndef DataGlobalConstants_hh_INCLUDED
 #define DataGlobalConstants_hh_INCLUDED
 
-// C++ Headers
-#include <map>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>

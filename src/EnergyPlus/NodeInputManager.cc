@@ -203,8 +203,8 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
     // Nodes have been found (TOTAL NODE NUMBER) or when HVAC warmup is
     // complete, whichever condition is reached first.
 
-    auto &Node(state.dataLoopNodes->Node);
-    auto &NodeID(state.dataLoopNodes->NodeID);
+    auto &Node = state.dataLoopNodes->Node;
+    auto &NodeID = state.dataLoopNodes->NodeID;
 
     if (!state.dataNodeInputMgr->NodeVarsSetup) {
         if (!state.dataErrTracking->AbortProcessing) {
@@ -1269,7 +1269,7 @@ void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
     for (int NodeNum = 1; NodeNum <= state.dataLoopNodes->NumOfNodes; ++NodeNum) {
         if (state.dataLoopNodes->MarkedNode(NodeNum).IsMarked) {
             if (state.dataNodeInputMgr->NodeRef(NodeNum) == 0) {
-                auto objType =
+                std::string_view objType =
                     BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(state.dataLoopNodes->MarkedNode(NodeNum).ObjectType)];
                 ShowSevereError(state, format("Node=\"{}\" did not find reference by another object.", state.dataLoopNodes->NodeID(NodeNum)));
                 ShowContinueError(state,

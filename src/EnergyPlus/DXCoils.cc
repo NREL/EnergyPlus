@@ -7740,7 +7740,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     }
                 }
                 CompType = thisDXCoil.DXCoilType;
-                // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+                // Auto-size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
                 state.dataSize->DataConstantUsedForSizing = thisDXCoil.RatedTotCap(Mode);
                 state.dataSize->DataFractionUsedForSizing = 0.000114;
                 TempSize = thisDXCoil.EvapCondAirFlow(Mode);
@@ -8078,7 +8078,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 if (!HardSizeNoDesRun) {
                     PrintFlag = false;
                     TempSize = DataSizing::AutoSize;
-                    // Auto size capacity at the highest speed
+                    // Auto-size capacity at the highest speed
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -8363,7 +8363,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = AutoCalculateSizing;
-                    // Auto size low speed flow to fraction of the highest speed capacity
+                    // Auto-size low speed flow to fraction of the highest speed capacity
                     state.dataSize->DataConstantUsedForSizing = thisDXCoil.MSRatedAirVolFlowRate(thisDXCoil.NumOfSpeeds);
                     if (!IsAutoSize && !HardSizeNoDesRun) state.dataSize->DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
                     state.dataSize->DataFractionUsedForSizing = (float)Mode / thisDXCoil.NumOfSpeeds;
@@ -8730,9 +8730,6 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    auto &DXCoilTotalCapacity = state.dataHVACGlobal->DXCoilTotalCapacity;
-    auto &HPWHInletDBTemp = state.dataHVACGlobal->HPWHInletDBTemp;
-    auto &HPWHInletWBTemp = state.dataHVACGlobal->HPWHInletWBTemp;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 RatedHeatingCapacity;     // Water heating rated capacity with or without condenser water pump heat (W)
@@ -8790,9 +8787,9 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
 
     // determine inlet air temperature type for curve objects
     if (Coil.InletAirTemperatureType == WetBulbIndicator) {
-        InletAirTemp = HPWHInletWBTemp;
+        InletAirTemp = state.dataHVACGlobal->HPWHInletWBTemp;
     } else {
-        InletAirTemp = HPWHInletDBTemp;
+        InletAirTemp = state.dataHVACGlobal->HPWHInletDBTemp;
     }
 
     // get output of Heating Capacity and Heating COP curves (curves default to 1 if user has not specified curve name)
@@ -9062,7 +9059,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
     state.dataDXCoils->HPWHHeatingCOP = TankHeatingCOP;
 
     // send DX coil total cooling capacity to HPWH for reporting
-    DXCoilTotalCapacity = EvapCoolingCapacity;
+    state.dataHVACGlobal->DXCoilTotalCapacity = EvapCoolingCapacity;
 
     Coil.TotalHeatingEnergyRate = TotalTankHeatingCapacity * PartLoadRatio;
 
@@ -9126,7 +9123,6 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    auto &HPWHCrankcaseDBTemp = state.dataHVACGlobal->HPWHCrankcaseDBTemp;
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using General::CreateSysTimeIntervalString;
@@ -9204,7 +9200,6 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     Real64 HeatingCoilPLF;       // heating coil PLF (function of PLR), used for cycling fan RH control
 
     auto &DXCT = state.dataHVACGlobal->DXCT;
-    auto &OnOffFanPartLoadFraction = state.dataHVACGlobal->OnOffFanPartLoadFraction;
 
     // If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
     if (present(PerfMode)) {
@@ -9309,8 +9304,8 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, OutdoorPressure);
         CompAmbTemp = OutdoorDryBulb;
     } else if (thisDXCoil.CondenserType(Mode) == DataHeatBalance::RefrigCondenserType::WaterHeater) {
-        CompAmbTemp = HPWHCrankcaseDBTemp;   // Temperature at HP water heater compressor
-        CondInletTemp = HPWHCrankcaseDBTemp; // Temperature at HP water heater compressor
+        CompAmbTemp = state.dataHVACGlobal->HPWHCrankcaseDBTemp;   // Temperature at HP water heater compressor
+        CondInletTemp = state.dataHVACGlobal->HPWHCrankcaseDBTemp; // Temperature at HP water heater compressor
     }
 
     // Initialize crankcase heater, operates below OAT defined in input deck for HP DX cooling coil
@@ -9711,7 +9706,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         }
 
         // If cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-        if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
+        if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
 
         //  Calculate full load output conditions
         if (thisDXCoil.UserSHRCurveExists) {
@@ -10228,7 +10223,6 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     }
 
     auto &DXCT = state.dataHVACGlobal->DXCT;
-    auto &OnOffFanPartLoadFraction = state.dataHVACGlobal->OnOffFanPartLoadFraction;
 
     MaxIter = 30;
     RF = 0.4;
@@ -10633,7 +10627,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
         }
 
         // If cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-        if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
+        if (FanOpMode == CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
 
         //  Calculate full load output conditions
         //            if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
@@ -12525,8 +12519,8 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
-    auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
+    Real64 MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+    Real64 MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
     auto &MSHPWasteHeat = state.dataHVACGlobal->MSHPWasteHeat;
 
     // Locals
@@ -13375,8 +13369,8 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
 
     // Using/Aliasing
     using Curve::CurveValue;
-    auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
-    auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
+    Real64 MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+    Real64 MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
     auto &MSHPWasteHeat = state.dataHVACGlobal->MSHPWasteHeat;
 
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -14530,7 +14524,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         // I'm not sure if there are any more of these instances in the codebase.  If so I am going to tag all of them with CONST_LAMBDA_CAPTURE.
         Real64 dbRated = CoolingCoilInletAirDryBulbTempRated;
         Real64 wbRated = CoolingCoilInletAirWetBulbTempRated;
-        auto f =
+        auto f = // (AUTO_OK_LAMBDA)
             [&state, DXCoilNum, TempDryBulb_Leaving_Apoint, TargetNetCapacity, par3, par7, fanInNode, fanOutNode, externalStatic, dbRated, wbRated](
                 Real64 SupplyAirMassFlowRate) {
                 static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");

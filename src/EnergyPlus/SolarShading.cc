@@ -3160,7 +3160,7 @@ void ComputeIntSolarAbsorpFactors(EnergyPlusData &state)
     Real64 HorizAreaSum;
 
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-        auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
+        auto &thisEnclosure = state.dataViewFactor->EnclSolInfo(enclosureNum);
 
         AreaSum = 0.0;
         TestFractSum = 0.0;
@@ -8599,8 +8599,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             int ConstrNum = state.dataSurface->Surface(SurfNum2).Construction;
             if (state.dataSurface->Surface(SurfNum2).activeShadedConstruction > 0)
                 ConstrNum = state.dataSurface->Surface(SurfNum2).activeShadedConstruction;
-            auto aLayer =
-                CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum); // (AUTO_OK_OBJ)
+            auto aLayer = // (AUTO_OK_OBJ)
+                CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum); 
 
             ///////////////////////////////////////////////
             // Solar absorbed in window layers
