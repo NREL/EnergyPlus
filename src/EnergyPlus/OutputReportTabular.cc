@@ -1804,20 +1804,20 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->sourceTypeNames(12) = "OtherFuel2";
 
         // initialize the end use names
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating)) = "Heating";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cooling)) = "Cooling";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorLights)) = "InteriorLights";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorLights)) = "ExteriorLights";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorEquipment)) = "InteriorEquipment";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorEquipment)) = "ExteriorEquipment";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Fans)) = "Fans";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Pumps)) = "Pumps";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRejection)) = "HeatRejection";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Humidification)) = "Humidifier";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRecovery)) = "HeatRecovery";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::WaterSystem)) = "WaterSystems";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Refrigeration)) = "Refrigeration";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cogeneration)) = "Cogeneration";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Heating)+1) = "Heating";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Cooling)+1) = "Cooling";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::InteriorLights)+1) = "InteriorLights";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::ExteriorLights)+1) = "ExteriorLights";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::InteriorEquipment)+1) = "InteriorEquipment";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::ExteriorEquipment)+1) = "ExteriorEquipment";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Fans)+1) = "Fans";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Pumps)+1) = "Pumps";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::HeatRejection)+1) = "HeatRejection";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Humidification)+1) = "Humidifier";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::HeatRecovery)+1) = "HeatRecovery";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::WaterSystem)+1) = "WaterSystems";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Refrigeration)+1) = "Refrigeration";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Cogeneration)+1) = "Cogeneration";
 
         // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
         ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
@@ -8207,8 +8207,8 @@ void WriteBEPSTable(EnergyPlusData &state)
             resourcePrimaryHeating = 0;
             heatingMaximum = 0.0;
             for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                if (collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating)) > heatingMaximum) {
-                    heatingMaximum = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating));
+                if (collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating)+1) > heatingMaximum) { // +1 because enum is 0-based
+                    heatingMaximum = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating)+1);
                     resourcePrimaryHeating = iResource;
                 }
             }
@@ -8682,38 +8682,26 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 10; // array assignment - same for all columns
             tableBody.allocate(13, 16);
             for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cogeneration));
-
+                for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) {
+                    useVal(iResource, iEndUse+1) = collapsedEndUse(iResource, iEndUse+1);
+                }
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
-            rowHead(1) = "Heating";
-            rowHead(2) = "Cooling";
-            rowHead(3) = "Interior Lighting";
-            rowHead(4) = "Exterior Lighting";
-            rowHead(5) = "Interior Equipment";
-            rowHead(6) = "Exterior Equipment";
-            rowHead(7) = "Fans";
-            rowHead(8) = "Pumps";
-            rowHead(9) = "Heat Rejection";
-            rowHead(10) = "Humidification";
-            rowHead(11) = "Heat Recovery";
-            rowHead(12) = "Water Systems";
-            rowHead(13) = "Refrigeration";
-            rowHead(14) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating)+1) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling)+1) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights)+1) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights)+1) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment)+1) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment)+1) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans)+1) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps)+1) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection)+1) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification)+1) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery)+1) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem)+1) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration)+1) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration)+1) = "Generators";
             rowHead(15) = "";
             rowHead(16) = "Total End Uses";
 
@@ -9152,36 +9140,29 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 7; // array assignment - same for all columns
             tableBody.allocate(13, 4);
             for (iResource = 1; iResource <= 13; ++iResource) {
-                normalVal(iResource, 1) =
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorLights)) +
-                    collapsedEndUse(iResource,
-                                    state.dataGlobalConst->iEndUse.at(
-                                        Constant::EndUse::ExteriorLights)); // Lights     <- InteriorLights | <- ExteriorLights
+                // Lights     <- InteriorLights | <- ExteriorLights
+		normalVal(iResource, 1) =
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::InteriorLights)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::ExteriorLights)+1); 
 
+                // HVAC       <- fans | <- pumps | <- heating | <- cooling | <- heat rejection | <- humidification | <- water system | <- domestic hot water		
                 normalVal(iResource, 2) =
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Fans)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Pumps)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cooling)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRejection)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Humidification)) +
-                    collapsedEndUse(iResource,
-                                    state.dataGlobalConst->iEndUse.at(
-                                        Constant::EndUse::WaterSystem)); // HVAC       <- fans | <- pumps | <- heating | <- cooling |
-                                                                                    // <- heat rejection | <- humidification | <- water system
-                                                                                    // domestic hot water
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Fans)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Pumps)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Cooling)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::HeatRejection)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Humidification)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::WaterSystem)+1); 
 
+                // Other <- InteriorEquipment | <- ExteriorEquipment | <- generator fuel | <- Heat Recovery (parasitics) | <- Refrigeration
                 normalVal(iResource, 3) =
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorEquipment)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorEquipment)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cogeneration)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRecovery)) +
-                    collapsedEndUse(iResource,
-                                    state.dataGlobalConst->iEndUse.at(
-                                        Constant::EndUse::Refrigeration)); // Other      <- InteriorEquipment | <- ExteriorEquipment |
-                                                                                      // <- generator fuel | <- Heat Recovery (parasitics) | <-
-                                                                                      // Refrigeration
-
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::InteriorEquipment)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::ExteriorEquipment)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Cogeneration)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::HeatRecovery)+1) +
+                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Refrigeration)+1); 
+                                                                                      
                 normalVal(iResource, 4) = collapsedTotal(iResource); // totals
             }
             // convert the normalized end use values to MJ from GJ if using J
@@ -10108,38 +10089,26 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             columnWidth = 10; // array assignment - same for all columns
             tableBody.allocate(12, 16);
             for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cogeneration));
-
+                for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) {
+                    useVal(iResource, iEndUse+1) = collapsedEndUse(iResource, iEndUse+1);
+		}
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
-            rowHead(1) = "Heating";
-            rowHead(2) = "Cooling";
-            rowHead(3) = "Interior Lighting";
-            rowHead(4) = "Exterior Lighting";
-            rowHead(5) = "Interior Equipment";
-            rowHead(6) = "Exterior Equipment";
-            rowHead(7) = "Fans";
-            rowHead(8) = "Pumps";
-            rowHead(9) = "Heat Rejection";
-            rowHead(10) = "Humidification";
-            rowHead(11) = "Heat Recovery";
-            rowHead(12) = "Water Systems";
-            rowHead(13) = "Refrigeration";
-            rowHead(14) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating)+1) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling)+1) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights)+1) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights)+1) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment)+1) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment)+1) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans)+1) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps)+1) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection)+1) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification)+1) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery)+1) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem)+1) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration)+1) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration)+1) = "Generators";
             rowHead(15) = "";
             rowHead(16) = "Total Source Energy End Use Components";
 
@@ -10195,7 +10164,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             tableBody = "";
             for (iResource = 1; iResource <= 12; ++iResource) {
-                for (int jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                 for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                     tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / largeConversionFactor, 2);
                 }
                 tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / largeConversionFactor, 2);
@@ -10573,38 +10542,27 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             columnWidth = 10; // array assignment - same for all columns
             tableBody.allocate(13, 17);
             for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cogeneration));
+		    for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) { 		    
+                    useVal(iResource, iEndUse+1) = collapsedEndUse(iResource, iEndUse+1);
+		}
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
             rowHead(1) = "Time of Peak";
-            rowHead(2) = "Heating";
-            rowHead(3) = "Cooling";
-            rowHead(4) = "Interior Lighting";
-            rowHead(5) = "Exterior Lighting";
-            rowHead(6) = "Interior Equipment";
-            rowHead(7) = "Exterior Equipment";
-            rowHead(8) = "Fans";
-            rowHead(9) = "Pumps";
-            rowHead(10) = "Heat Rejection";
-            rowHead(11) = "Humidification";
-            rowHead(12) = "Heat Recovery";
-            rowHead(13) = "Water Systems";
-            rowHead(14) = "Refrigeration";
-            rowHead(15) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating)+2) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling)+2) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights)+2) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights)+2) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment)+2) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment)+2) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans)+2) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps)+2) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection)+2) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification)+2) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery)+2) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem)+2) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration)+2) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration)+2) = "Generators";
             rowHead(16) = "";
             rowHead(17) = "Total End Uses";
 

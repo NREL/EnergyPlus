@@ -195,37 +195,37 @@ namespace OutputProcessor {
         op->NumExtraVars = 0;
 
         // Initialize end use category names - the indices must match up with endUseNames in OutputReportTabular
-        op->EndUseCategory.allocate(state.dataGlobalConst->iEndUse.size());
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating)).Name = "Heating";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cooling)).Name = "Cooling";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorLights)).Name = "InteriorLights";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorLights)).Name = "ExteriorLights";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorEquipment)).Name = "InteriorEquipment";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorEquipment)).Name = "ExteriorEquipment";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Fans)).Name = "Fans";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Pumps)).Name = "Pumps";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRejection)).Name = "HeatRejection";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Humidification)).Name = "Humidifier";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRecovery)).Name = "HeatRecovery";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::WaterSystem)).Name = "WaterSystems";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Refrigeration)).Name = "Refrigeration";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cogeneration)).Name = "Cogeneration";
+        op->EndUseCategory.allocate(static_cast<int>(Constant::EndUse::Num));
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Heating)+1).Name = "Heating";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cooling)+1).Name = "Cooling";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorLights)+1).Name = "InteriorLights";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorLights)+1).Name = "ExteriorLights";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorEquipment)+1).Name = "InteriorEquipment";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorEquipment)+1).Name = "ExteriorEquipment";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Fans)+1).Name = "Fans";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Pumps)+1).Name = "Pumps";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRejection)+1).Name = "HeatRejection";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Humidification)+1).Name = "Humidifier";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRecovery)+1).Name = "HeatRecovery";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::WaterSystem)+1).Name = "WaterSystems";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Refrigeration)+1).Name = "Refrigeration";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cogeneration)+1).Name = "Cogeneration";
 
         // Initialize display names for output table - this could go away if end use key names are changed to match
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Heating)).DisplayName = "Heating";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cooling)).DisplayName = "Cooling";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorLights)).DisplayName = "Interior Lighting";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorLights)).DisplayName = "Exterior Lighting";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::InteriorEquipment)).DisplayName = "Interior Equipment";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::ExteriorEquipment)).DisplayName = "Exterior Equipment";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Fans)).DisplayName = "Fans";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Pumps)).DisplayName = "Pumps";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRejection)).DisplayName = "Heat Rejection";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Humidification)).DisplayName = "Humidification";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::HeatRecovery)).DisplayName = "Heat Recovery";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::WaterSystem)).DisplayName = "Water Systems";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Refrigeration)).DisplayName = "Refrigeration";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(Constant::EndUse::Cogeneration)).DisplayName = "Generators";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Heating)+1).DisplayName = "Heating";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cooling)+1).DisplayName = "Cooling";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorLights)+1).DisplayName = "Interior Lighting";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorLights)+1).DisplayName = "Exterior Lighting";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorEquipment)+1).DisplayName = "Interior Equipment";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorEquipment)+1).DisplayName = "Exterior Equipment";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Fans)+1).DisplayName = "Fans";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Pumps)+1).DisplayName = "Pumps";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRejection)+1).DisplayName = "Heat Rejection";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Humidification)+1).DisplayName = "Humidification";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRecovery)+1).DisplayName = "Heat Recovery";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::WaterSystem)+1).DisplayName = "Water Systems";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Refrigeration)+1).DisplayName = "Refrigeration";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cogeneration)+1).DisplayName = "Generators";
 
         op->OutputInitialized = true;
 
@@ -3232,7 +3232,7 @@ namespace OutputProcessor {
         auto &op = state.dataOutputProcessor;
 
         bool Found = false;
-        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
+        for (size_t EndUseNum = 1; EndUseNum <= static_cast<size_t>(Constant::EndUse::Num); ++EndUseNum) {
             if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
 
                 for (EndUseSubNum = 1; EndUseSubNum <= op->EndUseCategory(EndUseNum).NumSubcategories; ++EndUseSubNum) {
@@ -3271,7 +3271,7 @@ namespace OutputProcessor {
         auto &op = state.dataOutputProcessor;
 
         bool Found = false;
-        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
+        for (size_t EndUseNum = 1; EndUseNum <= static_cast<size_t>(Constant::EndUse::Num); ++EndUseNum) {
             if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
 
                 for (int endUseSpTypeNum = 1; endUseSpTypeNum <= op->EndUseCategory(EndUseNum).numSpaceTypes; ++endUseSpTypeNum) {

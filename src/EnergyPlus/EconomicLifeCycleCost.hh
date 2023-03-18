@@ -501,7 +501,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
 
     // present value factors
     Array1D<Real64> SPV;
-    std::map<int, std::map<Constant::ResourceType, Real64>> energySPV; // yearly equivalent to FEMP UPV* values
+    std::map<int, std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>> energySPV; // yearly equivalent to FEMP UPV* values
 
     // arrays related to computing after tax cashflow and present value
     Array1D<Real64> DepreciatedCapital;
@@ -512,7 +512,7 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
 
     // arrays related to escalated energy costs
     Array1D<Real64> EscalatedTotEnergy;
-    std::map<int, std::map<Constant::ResourceType, Real64>> EscalatedEnergy;
+    std::map<int, std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>> EscalatedEnergy;
 
     std::vector<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
     std::vector<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;

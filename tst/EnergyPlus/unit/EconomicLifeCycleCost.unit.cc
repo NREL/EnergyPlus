@@ -434,22 +434,20 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->numResourcesUsed = 1;
 
     for (int year = 1; year <= state->dataEconLifeCycleCost->lengthStudyYears; ++year) {
-        std::map<Constant::ResourceType, Real64> yearMap;
-        for (auto iResource : state->dataGlobalConst->AllResourceTypes) {
-            yearMap.insert(std::pair<Constant::ResourceType, Real64>(iResource, 0.0));
-        }
-        state->dataEconLifeCycleCost->EscalatedEnergy.insert(std::pair<int, std::map<Constant::ResourceType, Real64>>(year, yearMap));
+        std::array<Real64, static_cast<int>(Constant::ResourceType::Num)> yearMap;
+	std::fill(yearMap.begin(), yearMap.end(), 0.0);
+        state->dataEconLifeCycleCost->EscalatedEnergy[year] = yearMap;
     }
 
     state->dataEconLifeCycleCost->EscalatedTotEnergy.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
     state->dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts(*state);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1).at(Constant::ResourceType::Electricity), 100., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2).at(Constant::ResourceType::Electricity), 110., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3).at(Constant::ResourceType::Electricity), 120., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4).at(Constant::ResourceType::Electricity), 130., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5).at(Constant::ResourceType::Electricity), 140., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1)[static_cast<int>(Constant::ResourceType::Electricity)], 100., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2)[static_cast<int>(Constant::ResourceType::Electricity)], 110., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3)[static_cast<int>(Constant::ResourceType::Electricity)], 120., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4)[static_cast<int>(Constant::ResourceType::Electricity)], 130., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5)[static_cast<int>(Constant::ResourceType::Electricity)], 140., 0.001);
 
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(1), 100., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(2), 110., 0.001);
@@ -471,11 +469,11 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts(*state);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1).at(Constant::ResourceType::Electricity), 103.0, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2).at(Constant::ResourceType::Electricity), 115.5, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3).at(Constant::ResourceType::Electricity), 128.4, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4).at(Constant::ResourceType::Electricity), 144.3, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5).at(Constant::ResourceType::Electricity), 161.0, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1)[static_cast<int>(Constant::ResourceType::Electricity)], 103.0, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2)[static_cast<int>(Constant::ResourceType::Electricity)], 115.5, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3)[static_cast<int>(Constant::ResourceType::Electricity)], 128.4, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4)[static_cast<int>(Constant::ResourceType::Electricity)], 144.3, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5)[static_cast<int>(Constant::ResourceType::Electricity)], 161.0, 0.001);
 
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(1), 103., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(2), 115.5, 0.001);
