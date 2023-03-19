@@ -2347,7 +2347,6 @@ void CreateDefaultComputation(EnergyPlusData &state)
     auto &qualify(state.dataEconTariff->qualify);
     auto &ratchet(state.dataEconTariff->ratchet);
     auto &chargeSimple(state.dataEconTariff->chargeSimple);
-    auto &chargeBlock(state.dataEconTariff->chargeBlock);
 
     // for each tariff that does not have a UtilityCost:Computation object go through the variables
     for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
@@ -2430,18 +2429,19 @@ void CreateDefaultComputation(EnergyPlusData &state)
             }
             // ChargeBlock
             for (kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
-                if (chargeBlock(kObj).tariffIndx == iTariff) {
-                    curObject = chargeBlock(kObj).namePt;
+                auto const &chargeBlock = state.dataEconTariff->chargeBlock(kObj);
+                if (chargeBlock.tariffIndx == iTariff) {
+                    curObject = chargeBlock.namePt;
                     econVar(curObject).Operator = opNOOP;
                     econVar(curObject).activeNow = true;
-                    addOperand(state, curObject, chargeBlock(kObj).sourcePt);
-                    addOperand(state, curObject, chargeBlock(kObj).blkSzMultPt);
-                    for (mBlock = 1; mBlock <= chargeBlock(kObj).numBlk; ++mBlock) {
-                        addOperand(state, curObject, chargeBlock(kObj).blkSzPt(mBlock));
-                        addOperand(state, curObject, chargeBlock(kObj).blkCostPt(mBlock));
+                    addOperand(state, curObject, chargeBlock.sourcePt);
+                    addOperand(state, curObject, chargeBlock.blkSzMultPt);
+                    for (mBlock = 1; mBlock <= chargeBlock.numBlk; ++mBlock) {
+                        addOperand(state, curObject, chargeBlock.blkSzPt(mBlock));
+                        addOperand(state, curObject, chargeBlock.blkCostPt(mBlock));
                     }
                     // now add a new "equation" for dependency of remainingPt on namePt
-                    remainPt = chargeBlock(kObj).remainingPt;
+                    remainPt = chargeBlock.remainingPt;
                     if (remainPt > 0) {
                         econVar(remainPt).Operator = opNOOP;
                         econVar(remainPt).activeNow = true;
@@ -2587,8 +2587,6 @@ void addOperand(EnergyPlusData &state, int const varMe, int const varOperand)
 
     int constexpr sizeIncrement(100);
 
-    auto &econVar(state.dataEconTariff->econVar);
-
     if (varOperand != 0) {
         // increment the numOperand and allocate/reallocate the array
         // if necessary
@@ -2603,13 +2601,15 @@ void addOperand(EnergyPlusData &state, int const varMe, int const varOperand)
                 state.dataEconTariff->operand.redimension(state.dataEconTariff->sizeOperand += sizeIncrement);
             }
         }
+        auto &econVar = state.dataEconTariff->econVar(varMe);
+
         // now add the dependency relationship
         state.dataEconTariff->operand(state.dataEconTariff->numOperand) = varOperand;
-        econVar(varMe).lastOperand = state.dataEconTariff->numOperand;
+        econVar.lastOperand = state.dataEconTariff->numOperand;
         // if it is the first time addOperand was called with the varMe value
         // then set the first pointer as well
         if (varMe != state.dataEconTariff->addOperand_prevVarMe) {
-            econVar(varMe).firstOperand = state.dataEconTariff->numOperand;
+            econVar.firstOperand = state.dataEconTariff->numOperand;
             state.dataEconTariff->addOperand_prevVarMe = varMe;
         }
     }
@@ -2624,22 +2624,20 @@ void addChargesToOperand(EnergyPlusData &state, int const curTariff, int const c
     //   for the categories that are summations of ECONOMICS:CHARGES:BLOCK
     //   and ECONOMICS:CHARGES:SIMPLE
 
-    int kObj;
-
-    auto &econVar(state.dataEconTariff->econVar);
-    auto &chargeSimple(state.dataEconTariff->chargeSimple);
-    auto &chargeBlock(state.dataEconTariff->chargeBlock);
+    auto &econVar = state.dataEconTariff->econVar;
+    auto const &chargeSimple = state.dataEconTariff->chargeSimple;
+    auto const &chargeBlock = state.dataEconTariff->chargeBlock;
 
     econVar(curPointer).Operator = opSUM;
     econVar(curPointer).activeNow = true;
-    for (kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
+    for (int kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
         if (chargeSimple(kObj).tariffIndx == curTariff) {
             if (chargeSimple(kObj).categoryPt == curPointer) {
                 addOperand(state, curPointer, chargeSimple(kObj).namePt);
             }
         }
     }
-    for (kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
+    for (int kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
         if (chargeBlock(kObj).tariffIndx == curTariff) {
             if (chargeBlock(kObj).categoryPt == curPointer) {
                 addOperand(state, curPointer, chargeBlock(kObj).namePt);
@@ -2667,24 +2665,19 @@ void GatherForEconomics(EnergyPlusData &state)
 
     using ScheduleManager::GetCurrentScheduleValue;
 
-    int iTariff;
     Real64 curInstantValue;
     Real64 curDemand;
     Real64 curEnergy;
-    bool isGood;
-    int curSeason;
-    int curMonth;
-    int curPeriod;
     Real64 curRTPprice;    // real time price
     Real64 curRTPbaseline; // real time price customer baseline load
     Real64 curRTPenergy;   // energy applied to real time price
     Real64 curRTPcost;     // cost for energy for current time
 
-    auto &tariff(state.dataEconTariff->tariff);
+    auto &tariff = state.dataEconTariff->tariff;
 
     if (state.dataEconTariff->numTariff >= 1) {
-        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-            isGood = false;
+        for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+            bool isGood = false;
             // if the meter is defined get the value
             if (tariff(iTariff).reportMeterIndx != 0) {
                 curInstantValue = GetCurrentMeterValue(state, tariff(iTariff).reportMeterIndx);
@@ -2697,6 +2690,9 @@ void GatherForEconomics(EnergyPlusData &state)
             tariff(iTariff).collectTime += state.dataGlobal->TimeStepZoneSec;
             // added *SecInHour when adding RTP support August 2008
             if (tariff(iTariff).collectTime >= tariff(iTariff).demWinTime * DataGlobalConstants::SecInHour) {
+                int curSeason;
+                int curMonth;
+                int curPeriod;
                 // get current value that has been converted into desired units
                 curDemand = tariff(iTariff).demandConv * tariff(iTariff).collectEnergy / tariff(iTariff).collectTime;
                 curEnergy = tariff(iTariff).energyConv * tariff(iTariff).collectEnergy;
