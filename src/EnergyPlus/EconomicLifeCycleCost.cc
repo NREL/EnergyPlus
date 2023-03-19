@@ -114,18 +114,13 @@ void GetInputForLifeCycleCost(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     //    Read the input file for "LifeCycleCost:Parameters" object.
 
-    // Using/Aliasing
-    using OutputReportTabular::AddTOCEntry;
-
-    auto &elcc(state.dataEconLifeCycleCost);
-
-    if (elcc->GetInput_GetLifeCycleCostInput) {
+    if (state.dataEconLifeCycleCost->GetInput_GetLifeCycleCostInput) {
         GetInputLifeCycleCostParameters(state);
         GetInputLifeCycleCostRecurringCosts(state);
         GetInputLifeCycleCostNonrecurringCost(state);
         GetInputLifeCycleCostUsePriceEscalation(state);
         GetInputLifeCycleCostUseAdjustment(state);
-        elcc->GetInput_GetLifeCycleCostInput = false;
+        state.dataEconLifeCycleCost->GetInput_GetLifeCycleCostInput = false;
     }
 }
 
@@ -807,14 +802,11 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     int iInObj;                      // loop index variable for reading in objects
-    int jFld;                        // loop counter
-    int jYear;                       // loop counter
     int NumFields;                   // Total number of elements
     int NumAlphas;                   // Number of elements in the alpha array
     int NumNums;                     // Number of elements in the numeric array
     Array1D_string AlphaArray;       // character string data
     Array1D<Real64> NumArray;        // numeric data
-    int IOStat;                      // IO Status when calling get input subroutine
     std::string CurrentModuleObject; // for ease in renaming.
 
     auto &elcc(state.dataEconLifeCycleCost);
@@ -830,6 +822,7 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
         elcc->UsePriceEscalation(iInObj).Escalation.allocate(elcc->lengthStudyYears);
     }
     if (elcc->numUsePriceEscalation > 0) {
+        int IOStat; // IO Status when calling get input subroutine
         for (iInObj = 1; iInObj <= elcc->numUsePriceEscalation; ++iInObj) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -844,7 +837,7 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
-            for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
                     ShowWarningError(state,
                                      format("In {} named {} a field was found containing LifeCycleCost: which may indicate a missing comma.",
@@ -923,7 +916,7 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             //      \begin-extensible
             // The array is from the baseDateYear until baseDateYear + lengthStudyYears
             // Set the array to default to 1.0
-            for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
+            for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 elcc->UsePriceEscalation(iInObj).Escalation(jYear) = 1.0;
             }
             // Since the years in the UsePriceEscalation may not match up with the baseDateYear and
@@ -934,7 +927,7 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             elcc->UsePriceEscalation_escEndYear = elcc->UsePriceEscalation_escStartYear + elcc->UsePriceEscalation_escNumYears - 1;
             elcc->UsePriceEscalation_earlierEndYear = min(elcc->UsePriceEscalation_escEndYear, elcc->lastDateYear);   // pick the earlier ending date
             elcc->UsePriceEscalation_laterStartYear = max(elcc->UsePriceEscalation_escStartYear, elcc->baseDateYear); // pick the later starting date
-            for (jYear = elcc->UsePriceEscalation_laterStartYear; jYear <= elcc->UsePriceEscalation_earlierEndYear; ++jYear) {
+            for (int jYear = elcc->UsePriceEscalation_laterStartYear; jYear <= elcc->UsePriceEscalation_earlierEndYear; ++jYear) {
                 elcc->UsePriceEscalation_curFld = 2 + jYear - elcc->UsePriceEscalation_escStartYear;
                 elcc->UsePriceEscalation_curEsc = 1 + jYear - elcc->baseDateYear;
                 if ((elcc->UsePriceEscalation_curFld <= NumNums) && (elcc->UsePriceEscalation_curFld >= 1)) {
@@ -959,16 +952,12 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     int iInObj;                      // loop index variable for reading in objects
-    int jFld;                        // loop counter
-    int jYear;                       // loop counter
     int NumFields;                   // Total number of elements
     int NumAlphas;                   // Number of elements in the alpha array
     int NumNums;                     // Number of elements in the numeric array
     Array1D_string AlphaArray;       // character string data
     Array1D<Real64> NumArray;        // numeric data
-    int IOStat;                      // IO Status when calling get input subroutine
     std::string CurrentModuleObject; // for ease in renaming.
-    int numFldsToUse;
 
     auto &elcc(state.dataEconLifeCycleCost);
 
@@ -983,6 +972,7 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
         elcc->UseAdjustment(iInObj).Adjustment.allocate(elcc->lengthStudyYears);
     }
     if (elcc->numUseAdjustment > 0) {
+        int IOStat; // IO Status when calling get input subroutine
         for (iInObj = 1; iInObj <= elcc->numUseAdjustment; ++iInObj) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -997,7 +987,7 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
-            for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
                     ShowWarningError(state,
                                      format("In {} named {} a field was found containing LifeCycleCost: which may indicate a missing comma.",
@@ -1033,11 +1023,11 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
             //       \type real
             //       \begin-extensible
             // Set the array to default to 1.0
-            for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
+            for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 elcc->UseAdjustment(iInObj).Adjustment(jYear) = 1.0;
             }
-            numFldsToUse = min(NumNums, elcc->lengthStudyYears);
-            for (jYear = 1; jYear <= numFldsToUse; ++jYear) {
+            int numFldsToUse = min(NumNums, elcc->lengthStudyYears);
+            for (int jYear = 1; jYear <= numFldsToUse; ++jYear) {
                 elcc->UseAdjustment(iInObj).Adjustment(jYear) = NumArray(jYear);
             }
         }
@@ -1466,7 +1456,6 @@ void ComputePresentValue(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 totalPV;
-    int curCategory;
     Real64 curDiscountRate;
     int iCashFlow;
     int jYear;
@@ -1580,7 +1569,7 @@ void ComputePresentValue(EnergyPlusData &state)
         elcc->CashFlow[i].presentValue = 0; // initialize value to zero before summing in next for loop
     }
     for (iCashFlow = CostCategory::Num; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
-        curCategory = elcc->CashFlow[iCashFlow].Category;
+        int curCategory = elcc->CashFlow[iCashFlow].Category;
         if ((curCategory < CostCategory::Num) && (curCategory >= 0)) {
             elcc->CashFlow[curCategory].presentValue += elcc->CashFlow[iCashFlow].presentValue;
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
@@ -1750,17 +1739,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
     Array1D_string rowHead;
     Array2D_string tableBody;
 
-    int numColumns;
-    int iYear;
-    int jObj;
-    int kMonth;
-    int curCashFlow;
-    int numRows;
-    int offset;
-    int numYears;
-    Real64 totalPV;
-
-    auto &elcc(state.dataEconLifeCycleCost);
+    auto const &elcc = state.dataEconLifeCycleCost;
 
     if (elcc->LCCparamPresent && state.dataOutRptTab->displayLifeCycleCostReport) {
         //---------------------------------
@@ -1827,7 +1806,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.deallocate();
         tableBody.deallocate();
         //---- Use Price Escalation
-        numColumns = max(1, elcc->numUsePriceEscalation);
+        int numColumns = max(1, elcc->numUsePriceEscalation);
         rowHead.allocate(elcc->lengthStudyYears + 2);
         columnHead.allocate(numColumns);
         columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -1836,18 +1815,18 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead = "none";
         rowHead(1) = "Resource";
         rowHead(2) = "Start Date";
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear + 2) = fmt::to_string(iYear);
         }
-        for (jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
+        for (int jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
             columnHead(jObj) = elcc->UsePriceEscalation(jObj).name;
             tableBody(jObj, 1) = GetResourceTypeChar(elcc->UsePriceEscalation(jObj).resource);
             tableBody(jObj, 2) = format("{} {}",
                                         UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->UsePriceEscalation(jObj).escalationStartMonth)],
                                         elcc->UsePriceEscalation(jObj).escalationStartYear);
         }
-        for (jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) {
-            for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) {
+            for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 tableBody(jObj, iYear + 2) = RealToStr(elcc->UsePriceEscalation(jObj).Escalation(iYear), 6);
             }
         }
@@ -1868,7 +1847,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         //---- Use Adjustment
         if (elcc->numUseAdjustment >= 1) { // only create table if objects used
             numColumns = max(1, elcc->numUseAdjustment);
-            numYears = elcc->lengthStudyYears - (elcc->serviceDateYear - elcc->baseDateYear);
+            int numYears = elcc->lengthStudyYears - (elcc->serviceDateYear - elcc->baseDateYear);
             rowHead.allocate(numYears + 1);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -1876,16 +1855,16 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             tableBody = "";
             columnHead = "none";
             rowHead(1) = "";
-            for (iYear = 1; iYear <= numYears; ++iYear) {
+            for (int iYear = 1; iYear <= numYears; ++iYear) {
                 rowHead(iYear + 1) =
                     format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear + iYear - 1);
             }
-            for (jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
+            for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = elcc->UseAdjustment(jObj).name;
                 tableBody(jObj, 1) = GetResourceTypeChar(elcc->UseAdjustment(jObj).resource);
             }
-            for (jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) {
-                for (iYear = 1; iYear <= numYears; ++iYear) {
+            for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) {
+                for (int iYear = 1; iYear <= numYears; ++iYear) {
                     tableBody(jObj, iYear + 1) = RealToStr(elcc->UseAdjustment(jObj).Adjustment(iYear), 6);
                 }
             }
@@ -1912,17 +1891,17 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody.allocate(numColumns, elcc->lengthStudyYears + 1);
         tableBody = "";
         rowHead(1) = "";
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear + 1) =
                 format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
         }
-        for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost); ++jObj) {
-            curCashFlow = CostCategory::Num + jObj;
+        for (int jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost); ++jObj) {
+            int curCashFlow = CostCategory::Num + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
 
             tableBody(jObj + 1, 1) = SourceKindTypeNames[static_cast<int>(elcc->CashFlow[curCashFlow].SourceKind)];
 
-            for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+            for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 tableBody(jObj + 1, iYear + 1) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
@@ -1956,19 +1935,19 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
         tableBody.allocate(numColumns, elcc->lengthStudyYears);
         tableBody = "";
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
         }
-        for (jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
-            curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
+        for (int jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
+            int curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
-            for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+            for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
         columnHead(numColumns) = Total;
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            tableBody(jObj + 1, iYear) =
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+            tableBody(elcc->numResourcesUsed + 1, iYear) =
                 RealToStr(elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
         WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
@@ -1992,26 +1971,27 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
         tableBody.allocate(numColumns, elcc->lengthStudyYears);
         tableBody = "";
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
         }
-        for (jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
-            curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
+        for (int jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
+            int curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
             ResourceType curResource = elcc->CashFlow[curCashFlow].Resource;
             if (elcc->CashFlow[curCashFlow].Resource != DataGlobalConstants::ResourceType::Water) {
-                for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+                for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                     tableBody(jObj + 1, iYear) = RealToStr(elcc->EscalatedEnergy.at(iYear).at(curResource), 2);
                 }
             } else { // for water just use the original cashflow since not involved in escalation
-                for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+                for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                     tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
                 }
             }
         }
         columnHead(numColumns) = Total;
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            tableBody(jObj + 1, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+            tableBody(elcc->numResourcesUsed + 1, iYear) =
+                RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
         WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2040,7 +2020,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead(tableColumnIndex) = CostCategoryNamesNoSpace[static_cast<int>(CostCategory)];
         }
         columnHead(4) = Total;
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CostCategory = CostCategory::Construction, tableColumnIndex = 1; CostCategory <= CostCategory::TotCaptl;
                  ++tableColumnIndex, ++CostCategory) {
@@ -2074,7 +2054,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         columnHead(10) = Total;
 
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::TotOper; ++CashFlowCostCategory) {
                 tableBody(CashFlowCostCategory + 1, iYear) = RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
@@ -2107,7 +2087,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         columnHead(10) = Total;
 
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::Water; ++CashFlowCostCategory) {
                 tableBody(CashFlowCostCategory + 1, iYear) = RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
@@ -2155,16 +2135,14 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead(14) = "tOpr";
             columnHead(15) = "tCap";
             columnHead(16) = "Totl";
-            for (jObj = CostCategory::Num; jObj < elcc->numCashFlow; ++jObj) {
+            for (int jObj = CostCategory::Num; jObj < elcc->numCashFlow; ++jObj) {
                 columnHead(jObj + 1) = elcc->CashFlow[jObj].name;
             }
-            for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
+            for (int kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
                 rowHead(kMonth) = format("{} {}",
                                          UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) - 1],
                                          elcc->baseDateYear + int((kMonth - 1) / 12));
-            }
-            for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
-                for (jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
+                for (int jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
                     tableBody(jObj + 1, kMonth) = RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
                 }
             }
@@ -2190,14 +2168,12 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth = 14; // array assignment - same for all columns
         tableBody.allocate(12, elcc->lengthStudyYears);
         tableBody = "";
-        for (kMonth = 1; kMonth <= 12; ++kMonth) {
+        for (int kMonth = 1; kMonth <= 12; ++kMonth) {
             columnHead(kMonth) = UtilityRoutines::MonthNamesCC[static_cast<int>(kMonth - 1)];
         }
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = fmt::to_string(elcc->baseDateYear + iYear - 1);
-        }
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            for (kMonth = 1; kMonth <= 12; ++kMonth) {
+            for (int kMonth = 1; kMonth <= 12; ++kMonth) {
                 tableBody(kMonth, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].mnAmount((iYear - 1) * 12 + kMonth), 2);
             }
         }
@@ -2216,7 +2192,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.deallocate();
         tableBody.deallocate();
         //---- Present Value for Recurring, Nonrecurring and Energy Costs
-        numRows = max(1, elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed);
+        int numRows = max(1, elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed);
         rowHead.allocate(numRows + 1);
         columnHead.allocate(5);
         columnWidth.allocate(5);
@@ -2228,10 +2204,10 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(3) = "Cost";
         columnHead(4) = "Present Value";
         columnHead(5) = "Present Value Factor";
-        totalPV = 0.0;
+        Real64 totalPV = 0.0;
         rowHead(numRows + 1) = TotalUC;
-        for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed); ++jObj) {
-            offset = CostCategory::Num;
+        for (int jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed); ++jObj) {
+            int offset = CostCategory::Num;
             rowHead(jObj + 1) = elcc->CashFlow[offset + jObj].name;
             switch (elcc->CashFlow[offset + jObj].Category) {
             case CostCategory::Maintenance:
@@ -2348,7 +2324,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(3) = "Present Value of Costs";
 
         totalPV = 0.0;
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             tableBody(1, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear), 2);
             // adjust for escalated energy costs
@@ -2391,7 +2367,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead(5) = "After Tax Present Value";
 
             totalPV = 0.0;
-            for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+            for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 rowHead(iYear) =
                     format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(elcc->DepreciatedCapital(iYear), 2);
