@@ -2830,7 +2830,6 @@ void ComputeTariff(EnergyPlusData &state)
 
     Real64 hugeValue;
     Real64 annualAggregate;
-    int annualCnt;
 
     auto &econVar = state.dataEconTariff->econVar;
     auto const &computation = state.dataEconTariff->computation;
@@ -2850,6 +2849,7 @@ void ComputeTariff(EnergyPlusData &state)
         setNativeVariables(state);
         for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             for (jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
+                int annualCnt = 0;
                 curStep = state.dataEconTariff->steps(jStep);
                 {
                     int const SELECT_CASE_var(curStep);
@@ -2993,7 +2993,6 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opANNUALAVERAGE) {
                         // takes the annual sum but ignores zeros
                         annualAggregate = 0.0;
-                        annualCnt = 0;
                         popStack(state, a, aPt);
                         for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
@@ -3009,7 +3008,6 @@ void ComputeTariff(EnergyPlusData &state)
                         }
                         pushStack(state, c, noVar);
                     } else if (SELECT_CASE_var == opANNUALOR) {
-                        annualCnt = 0;
                         popStack(state, a, aPt);
                         for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
@@ -3024,7 +3022,6 @@ void ComputeTariff(EnergyPlusData &state)
                         }
                         pushStack(state, c, noVar);
                     } else if (SELECT_CASE_var == opANNUALAND) {
-                        annualCnt = 0;
                         popStack(state, a, aPt);
                         for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
