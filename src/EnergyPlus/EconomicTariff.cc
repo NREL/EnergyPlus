@@ -2814,18 +2814,10 @@ void ComputeTariff(EnergyPlusData &state)
 
     // values used in specific operations
     Array1D<Real64> a(MaxNumMonths);
-    int aPt;
     Array1D<Real64> b(MaxNumMonths);
-    int bPt;
     Array1D<Real64> c(MaxNumMonths);
-    int cPt;
     Array1D<Real64> d(MaxNumMonths);
 
-    int iTariff;
-    int jStep;
-    int lMonth;
-    int nVar;
-    int curStep;
     int constexpr noVar(0);
 
     Real64 hugeValue;
@@ -2841,16 +2833,19 @@ void ComputeTariff(EnergyPlusData &state)
 
     hugeValue = HUGE_(Real64());
     //  Clear the isEvaluated flags for all economics variables.
-    for (nVar = 1; nVar <= state.dataEconTariff->numEconVar; ++nVar) {
+    for (int nVar = 1; nVar <= state.dataEconTariff->numEconVar; ++nVar) {
         econVar(nVar).isEvaluated = false;
     }
     if (state.dataEconTariff->numTariff >= 1) {
         state.dataOutRptTab->WriteTabularFiles = true;
         setNativeVariables(state);
-        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-            for (jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
+        for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+            for (int jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
                 int annualCnt = 0;
-                curStep = state.dataEconTariff->steps(jStep);
+                int curStep = state.dataEconTariff->steps(jStep);
+                int aPt;
+                int bPt;
+                int cPt;
                 {
                     int const SELECT_CASE_var(curStep);
                     if (SELECT_CASE_var == 0) { // end of line - assign variable and clear stack
@@ -2886,7 +2881,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opDIVIDE) {
                         popStack(state, a, aPt);
                         popStack(state, b, bPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (b(lMonth) != 0) {
                                 c(lMonth) = a(lMonth) / b(lMonth);
                             } else {
@@ -2917,7 +2912,7 @@ void ComputeTariff(EnergyPlusData &state)
                         for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
                              ++kStack) { // popStack modifies topOfStack
                             popStack(state, b, bPt);
-                            for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                                 if (b(lMonth) > a(lMonth)) {
                                     a(lMonth) = b(lMonth);
                                 }
@@ -2929,7 +2924,7 @@ void ComputeTariff(EnergyPlusData &state)
                         for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
                              ++kStack) { // popStack modifies topOfStack
                             popStack(state, b, bPt);
-                            for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                            for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                                 if (b(lMonth) < a(lMonth)) {
                                     a(lMonth) = b(lMonth);
                                 }
@@ -2939,7 +2934,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opEXCEEDS) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) > b(lMonth)) {
                                 c(lMonth) = a(lMonth) - b(lMonth);
                             } else {
@@ -2951,7 +2946,7 @@ void ComputeTariff(EnergyPlusData &state)
                         // takes the minimum but ignores zeros
                         annualAggregate = hugeValue;
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
                                 if (a(lMonth) < annualAggregate) {
                                     annualAggregate = a(lMonth);
@@ -2968,7 +2963,7 @@ void ComputeTariff(EnergyPlusData &state)
                         // takes the maximum but ignores zeros
                         annualAggregate = -hugeValue;
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
                                 if (a(lMonth) > annualAggregate) {
                                     annualAggregate = a(lMonth);
@@ -2985,7 +2980,7 @@ void ComputeTariff(EnergyPlusData &state)
                         // takes the maximum but ignores zeros
                         annualAggregate = 0.0;
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             annualAggregate += a(lMonth);
                         }
                         c = annualAggregate;
@@ -2994,7 +2989,7 @@ void ComputeTariff(EnergyPlusData &state)
                         // takes the annual sum but ignores zeros
                         annualAggregate = 0.0;
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
                                 annualAggregate += a(lMonth);
                                 ++annualCnt;
@@ -3009,7 +3004,7 @@ void ComputeTariff(EnergyPlusData &state)
                         pushStack(state, c, noVar);
                     } else if (SELECT_CASE_var == opANNUALOR) {
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
                                 ++annualCnt;
                             }
@@ -3023,7 +3018,7 @@ void ComputeTariff(EnergyPlusData &state)
                         pushStack(state, c, noVar);
                     } else if (SELECT_CASE_var == opANNUALAND) {
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
                                 ++annualCnt;
                             }
@@ -3039,7 +3034,7 @@ void ComputeTariff(EnergyPlusData &state)
                         // takes the maximum including zeros
                         annualAggregate = -hugeValue;
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) > annualAggregate) {
                                 annualAggregate = a(lMonth);
                             }
@@ -3050,7 +3045,7 @@ void ComputeTariff(EnergyPlusData &state)
                         // takes the maximum including zeros
                         annualAggregate = hugeValue;
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) < annualAggregate) {
                                 annualAggregate = a(lMonth);
                             }
@@ -3061,7 +3056,7 @@ void ComputeTariff(EnergyPlusData &state)
                         popStack(state, c, cPt);
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != 0) {
                                 d(lMonth) = b(lMonth);
                             } else {
@@ -3072,7 +3067,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opGREATERTHAN) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) > b(lMonth)) {
                                 c(lMonth) = 1.0;
                             } else {
@@ -3083,7 +3078,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opGREATEREQUAL) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) >= b(lMonth)) {
                                 c(lMonth) = 1.0;
                             } else {
@@ -3094,7 +3089,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opLESSTHAN) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) < b(lMonth)) {
                                 c(lMonth) = 1.0;
                             } else {
@@ -3105,7 +3100,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opLESSEQUAL) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) <= b(lMonth)) {
                                 c(lMonth) = 1.0;
                             } else {
@@ -3116,7 +3111,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opEQUAL) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) == b(lMonth)) {
                                 c(lMonth) = 1.0;
                             } else {
@@ -3127,7 +3122,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opNOTEQUAL) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) != b(lMonth)) {
                                 c(lMonth) = 1.0;
                             } else {
@@ -3138,7 +3133,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opAND) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if ((a(lMonth) != 0) && (b(lMonth) != 0)) {
                                 c(lMonth) = 1.0;
                             } else {
@@ -3149,7 +3144,7 @@ void ComputeTariff(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == opOR) {
                         popStack(state, b, bPt);
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if ((a(lMonth) != 0) || (b(lMonth) != 0)) {
                                 c(lMonth) = 1.0;
                             } else {
@@ -3159,7 +3154,7 @@ void ComputeTariff(EnergyPlusData &state)
                         pushStack(state, c, noVar);
                     } else if (SELECT_CASE_var == opNOT) {
                         popStack(state, a, aPt);
-                        for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
+                        for (int lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                             if (a(lMonth) == 0) {
                                 c(lMonth) = 1.0;
                             } else {
