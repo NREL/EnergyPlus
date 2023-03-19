@@ -2325,7 +2325,6 @@ void CreateDefaultComputation(EnergyPlusData &state)
     //    depends on and a list of entries that are dependant on that
     //    line.
 
-    int iTariff;
     int iVar;
     int jVar;
     int kObj;
@@ -2341,90 +2340,90 @@ void CreateDefaultComputation(EnergyPlusData &state)
     bool remainingVarFlag;
     int remainPt;
 
-    auto &tariff(state.dataEconTariff->tariff);
-    auto &econVar(state.dataEconTariff->econVar);
-    auto &computation(state.dataEconTariff->computation);
-    auto &qualify(state.dataEconTariff->qualify);
-    auto &ratchet(state.dataEconTariff->ratchet);
-    auto &chargeSimple(state.dataEconTariff->chargeSimple);
+    auto &econVar = state.dataEconTariff->econVar;
 
     // for each tariff that does not have a UtilityCost:Computation object go through the variables
-    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-        if (!computation(iTariff).isUserDef) {
+    for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+        auto &tariff = state.dataEconTariff->tariff(iTariff);
+        auto &computation = state.dataEconTariff->computation(iTariff);
+        if (!computation.isUserDef) {
             // clear all variables so that they are not active
             for (jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
                 econVar(jVar).activeNow = false;
             }
             // make all native variables active
-            for (jVar = tariff(iTariff).firstNative; jVar <= tariff(iTariff).lastNative; ++jVar) {
+            for (jVar = tariff.firstNative; jVar <= tariff.lastNative; ++jVar) {
                 econVar(jVar).activeNow = true;
             }
             //"clear" the dependOn array
             state.dataEconTariff->numOperand = 0;
             // Define the preset equations (category sumation)
-            curTotal = tariff(iTariff).ptTotal;
-            curSubtotal = tariff(iTariff).ptSubtotal;
-            curBasis = tariff(iTariff).ptBasis;
+            curTotal = tariff.ptTotal;
+            curSubtotal = tariff.ptSubtotal;
+            curBasis = tariff.ptBasis;
             // total SUM subtotal taxes
             econVar(curTotal).Operator = opSUM;
             econVar(curTotal).activeNow = true;
             addOperand(state, curTotal, curSubtotal);
-            addOperand(state, curTotal, tariff(iTariff).ptTaxes);
+            addOperand(state, curTotal, tariff.ptTaxes);
             // subtotal SUM basis adjustments surcharges
             econVar(curSubtotal).Operator = opSUM;
             econVar(curSubtotal).activeNow = true;
             addOperand(state, curSubtotal, curBasis);
-            addOperand(state, curSubtotal, tariff(iTariff).ptAdjustment);
-            addOperand(state, curSubtotal, tariff(iTariff).ptSurcharge);
+            addOperand(state, curSubtotal, tariff.ptAdjustment);
+            addOperand(state, curSubtotal, tariff.ptSurcharge);
             // basis SUM EnergyCharges DemandCharges ServiceCharges
             econVar(curBasis).Operator = opSUM;
             econVar(curBasis).activeNow = true;
-            addOperand(state, curBasis, tariff(iTariff).ptEnergyCharges);
-            addOperand(state, curBasis, tariff(iTariff).ptDemandCharges);
-            addOperand(state, curBasis, tariff(iTariff).ptServiceCharges);
+            addOperand(state, curBasis, tariff.ptEnergyCharges);
+            addOperand(state, curBasis, tariff.ptDemandCharges);
+            addOperand(state, curBasis, tariff.ptServiceCharges);
             // set up the equations for other objects
-            addChargesToOperand(state, iTariff, tariff(iTariff).ptEnergyCharges);
-            addChargesToOperand(state, iTariff, tariff(iTariff).ptDemandCharges);
-            addChargesToOperand(state, iTariff, tariff(iTariff).ptServiceCharges);
-            addChargesToOperand(state, iTariff, tariff(iTariff).ptAdjustment);
-            addChargesToOperand(state, iTariff, tariff(iTariff).ptSurcharge);
-            addChargesToOperand(state, iTariff, tariff(iTariff).ptTaxes);
+            addChargesToOperand(state, iTariff, tariff.ptEnergyCharges);
+            addChargesToOperand(state, iTariff, tariff.ptDemandCharges);
+            addChargesToOperand(state, iTariff, tariff.ptServiceCharges);
+            addChargesToOperand(state, iTariff, tariff.ptAdjustment);
+            addChargesToOperand(state, iTariff, tariff.ptSurcharge);
+            addChargesToOperand(state, iTariff, tariff.ptTaxes);
             // add the real time pricing to the energy charges
-            if (tariff(iTariff).chargeSchIndex != 0) {
-                addOperand(state, tariff(iTariff).ptEnergyCharges, tariff(iTariff).nativeRealTimePriceCosts);
+            if (tariff.chargeSchIndex != 0) {
+                addOperand(state, tariff.ptEnergyCharges, tariff.nativeRealTimePriceCosts);
             }
             // now add equations with NOOP to represent each object with its
             // dependancies
             // Qualify
             for (kObj = 1; kObj <= state.dataEconTariff->numQualify; ++kObj) {
-                if (qualify(kObj).tariffIndx == iTariff) {
-                    curObject = qualify(kObj).namePt;
+                auto const &qualify = state.dataEconTariff->qualify(kObj);
+                if (qualify.tariffIndx == iTariff) {
+                    curObject = qualify.namePt;
                     econVar(curObject).Operator = opNOOP;
                     econVar(curObject).activeNow = true;
-                    addOperand(state, curObject, qualify(kObj).sourcePt);
-                    addOperand(state, curObject, qualify(kObj).thresholdPt);
+                    addOperand(state, curObject, qualify.sourcePt);
+                    addOperand(state, curObject, qualify.thresholdPt);
                 }
             }
             // Ratchet
             for (kObj = 1; kObj <= state.dataEconTariff->numRatchet; ++kObj) {
-                if (ratchet(kObj).tariffIndx == iTariff) {
-                    curObject = ratchet(kObj).namePt;
+                auto const &ratchet = state.dataEconTariff->ratchet(kObj);
+                if (ratchet.tariffIndx == iTariff) {
+                    curObject = ratchet.namePt;
                     econVar(curObject).Operator = opNOOP;
                     econVar(curObject).activeNow = true;
-                    addOperand(state, curObject, ratchet(kObj).baselinePt);
-                    addOperand(state, curObject, ratchet(kObj).adjustmentPt);
-                    addOperand(state, curObject, ratchet(kObj).multiplierPt);
-                    addOperand(state, curObject, ratchet(kObj).offsetPt);
+                    addOperand(state, curObject, ratchet.baselinePt);
+                    addOperand(state, curObject, ratchet.adjustmentPt);
+                    addOperand(state, curObject, ratchet.multiplierPt);
+                    addOperand(state, curObject, ratchet.offsetPt);
                 }
             }
             // ChargeSimple
             for (kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
-                if (chargeSimple(kObj).tariffIndx == iTariff) {
-                    curObject = chargeSimple(kObj).namePt;
+                auto const &chargeSimple = state.dataEconTariff->chargeSimple(kObj);
+                if (chargeSimple.tariffIndx == iTariff) {
+                    curObject = chargeSimple.namePt;
                     econVar(curObject).Operator = opNOOP;
                     econVar(curObject).activeNow = true;
-                    addOperand(state, curObject, chargeSimple(kObj).sourcePt);
-                    addOperand(state, curObject, chargeSimple(kObj).costPerPt);
+                    addOperand(state, curObject, chargeSimple.sourcePt);
+                    addOperand(state, curObject, chargeSimple.costPerPt);
                 }
             }
             // ChargeBlock
@@ -2459,14 +2458,14 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 }
             }
             // make sure no compuation is already user defined
-            if (computation(iTariff).firstStep != 0) {
-                ShowWarningError(state, format("In UtilityCost:Tariff: Overwriting user defined tariff {}", tariff(iTariff).tariffName));
+            if (computation.firstStep != 0) {
+                ShowWarningError(state, format("In UtilityCost:Tariff: Overwriting user defined tariff {}", tariff.tariffName));
             }
             // initialize the computation
-            computation(iTariff).computeName = "Autogenerated - " + tariff(iTariff).tariffName;
-            computation(iTariff).firstStep = state.dataEconTariff->numSteps + 1;
-            computation(iTariff).lastStep = -1; // this will be incremented by addStep
-            computation(iTariff).isUserDef = false;
+            computation.computeName = "Autogenerated - " + tariff.tariffName;
+            computation.firstStep = state.dataEconTariff->numSteps + 1;
+            computation.lastStep = -1; // this will be incremented by addStep
+            computation.isUserDef = false;
             // now all "equations" are defined, treat the variables with the list
             // of dependancies as a directed acyclic graph and use "count down" algorithm
             // to do a topological sort of the variables into the order for computation
@@ -2537,8 +2536,8 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 ++loopCount;
             }
             if (loopCount > 100000) {
-                ShowWarningError(
-                    state, format("UtilityCost:Tariff: Loop count exceeded when counting dependancies in tariff: {}", tariff(iTariff).tariffName));
+                ShowWarningError(state,
+                                 format("UtilityCost:Tariff: Loop count exceeded when counting dependancies in tariff: {}", tariff.tariffName));
             }
             // make sure that all variables associated with the tariff are included
             remainingVarFlag = false;
@@ -2550,7 +2549,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
             if (remainingVarFlag) {
                 ShowWarningError(state,
                                  format("CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: {}",
-                                        tariff(iTariff).tariffName));
+                                        tariff.tariffName));
                 ShowContinueError(state, "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on.");
                 for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (econVar(iVar).tariffIndx == iTariff) {
@@ -2564,14 +2563,14 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 }
             }
             // set the end of the computations
-            computation(iTariff).lastStep = state.dataEconTariff->numSteps;
-            if (computation(iTariff).firstStep >= computation(iTariff).lastStep) {
-                computation(iTariff).firstStep = 0;
-                computation(iTariff).lastStep = -1;
+            computation.lastStep = state.dataEconTariff->numSteps;
+            if (computation.firstStep >= computation.lastStep) {
+                computation.firstStep = 0;
+                computation.lastStep = -1;
                 ShowWarningError(state,
                                  format("CreateDefaultComputation: In UtilityCost:Computation: No lines in the auto-generated computation can be "
                                         "interpreted in tariff: {}",
-                                        tariff(iTariff).tariffName));
+                                        tariff.tariffName));
             }
         }
     }
