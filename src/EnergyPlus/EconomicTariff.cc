@@ -858,25 +858,20 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
     //    Read the input file for "Economics:Charge:Block" objects.
 
     static constexpr std::string_view RoutineName("GetInputEconomicsChargeBlock: ");
-    int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
     bool isNotNumeric;
-    int jBlk;               // loop index for blocks
-    int alphaOffset;        // offset used in blocks for alpha array
-    Real64 hugeNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
-    int jFld;
+    int alphaOffset;                 // offset used in blocks for alpha array
+    Real64 hugeNumber(0.0);          // Autodesk Value not used but suppresses warning about HUGE_() call
     std::string CurrentModuleObject; // for ease in renaming.
-
-    auto &chargeBlock(state.dataEconTariff->chargeBlock);
-    auto &tariff(state.dataEconTariff->tariff);
 
     CurrentModuleObject = "UtilityCost:Charge:Block";
     hugeNumber = HUGE_(hugeNumber);
     state.dataEconTariff->numChargeBlock = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    chargeBlock.allocate(state.dataEconTariff->numChargeBlock);
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeBlock; ++iInObj) {
+    state.dataEconTariff->chargeBlock.allocate(state.dataEconTariff->numChargeBlock);
+    for (int iInObj = 1; iInObj <= state.dataEconTariff->numChargeBlock; ++iInObj) {
+        auto &chargeBlock = state.dataEconTariff->chargeBlock(iInObj);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  iInObj,
@@ -890,33 +885,27 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+        for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
                 ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
         // index of the tariff name in the tariff array
-        chargeBlock(iInObj).tariffIndx =
+        chargeBlock.tariffIndx =
             FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), chargeBlock(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
-        chargeBlock(iInObj).namePt = AssignVariablePt(state,
-                                                      state.dataIPShortCut->cAlphaArgs(1),
-                                                      true,
-                                                      varIsAssigned,
-                                                      varNotYetDefined,
-                                                      ObjType::ChargeBlock,
-                                                      iInObj,
-                                                      chargeBlock(iInObj).tariffIndx);
+        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), chargeBlock.tariffIndx, ErrorsFound, CurrentModuleObject);
+        chargeBlock.namePt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, ObjType::ChargeBlock, iInObj, chargeBlock.tariffIndx);
         // index of the variable in the variable array
-        chargeBlock(iInObj).sourcePt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, chargeBlock(iInObj).tariffIndx);
+        chargeBlock.sourcePt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, chargeBlock.tariffIndx);
         // enumerated list of the kind of season
-        chargeBlock(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
+        chargeBlock.season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
         // check to make sure a seasonal schedule is specified if the season is not annual
-        if (chargeBlock(iInObj).season != seasonAnnual) {
-            if (chargeBlock(iInObj).tariffIndx != 0) {
-                if (tariff(chargeBlock(iInObj).tariffIndx).seasonSchIndex == 0) {
+        if (chargeBlock.season != seasonAnnual) {
+            if (chargeBlock.tariffIndx != 0) {
+                if (state.dataEconTariff->tariff(chargeBlock.tariffIndx).seasonSchIndex == 0) {
                     ShowWarningError(state,
                                      format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, format("{}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
@@ -926,69 +915,57 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
             }
         }
         // index of the category in the variable array
-        chargeBlock(iInObj).categoryPt = AssignVariablePt(state,
-                                                          state.dataIPShortCut->cAlphaArgs(5),
-                                                          true,
-                                                          varIsAssigned,
-                                                          varNotYetDefined,
-                                                          ObjType::Category,
-                                                          iInObj,
-                                                          chargeBlock(iInObj).tariffIndx);
+        chargeBlock.categoryPt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, ObjType::Category, iInObj, chargeBlock.tariffIndx);
         // index of the remaining into variable in the variable array
-        chargeBlock(iInObj).remainingPt = AssignVariablePt(state,
-                                                           state.dataIPShortCut->cAlphaArgs(6),
-                                                           true,
-                                                           varIsAssigned,
-                                                           varNotYetDefined,
-                                                           ObjType::Category,
-                                                           iInObj,
-                                                           chargeBlock(iInObj).tariffIndx);
+        chargeBlock.remainingPt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(6), true, varIsAssigned, varNotYetDefined, ObjType::Category, iInObj, chargeBlock.tariffIndx);
         // block size multiplier
         if (len(state.dataIPShortCut->cAlphaArgs(7)) == 0) { // if blank
-            chargeBlock(iInObj).blkSzMultVal = 1.0;          // default is 1 if left blank
-            chargeBlock(iInObj).blkSzMultPt = 0;
+            chargeBlock.blkSzMultVal = 1.0;                  // default is 1 if left blank
+            chargeBlock.blkSzMultPt = 0;
         } else {
-            chargeBlock(iInObj).blkSzMultVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
-            chargeBlock(iInObj).blkSzMultPt = AssignVariablePt(state,
-                                                               state.dataIPShortCut->cAlphaArgs(7),
-                                                               isNotNumeric,
-                                                               varIsArgument,
-                                                               varNotYetDefined,
-                                                               ObjType::Invalid,
-                                                               0,
-                                                               chargeBlock(iInObj).tariffIndx);
+            chargeBlock.blkSzMultVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
+            chargeBlock.blkSzMultPt = AssignVariablePt(state,
+                                                       state.dataIPShortCut->cAlphaArgs(7),
+                                                       isNotNumeric,
+                                                       varIsArgument,
+                                                       varNotYetDefined,
+                                                       ObjType::Invalid,
+                                                       0,
+                                                       chargeBlock.tariffIndx);
         }
         // number of blocks used
-        chargeBlock(iInObj).numBlk = (NumAlphas - 7) / 2;
-        for (jBlk = 1; jBlk <= chargeBlock(iInObj).numBlk; ++jBlk) {
+        chargeBlock.numBlk = (NumAlphas - 7) / 2;
+        for (int jBlk = 1; jBlk <= chargeBlock.numBlk; ++jBlk) {
             alphaOffset = 7 + (jBlk - 1) * 2;
             // catch the "remaining" code word for the block size
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), "REMAINING")) {
-                chargeBlock(iInObj).blkSzVal(jBlk) = hugeNumber / 1000000; // using small portion of largest possible value to prevent overflow
-                chargeBlock(iInObj).blkSzPt(jBlk) = 0;
+                chargeBlock.blkSzVal(jBlk) = hugeNumber / 1000000; // using small portion of largest possible value to prevent overflow
+                chargeBlock.blkSzPt(jBlk) = 0;
             } else {
                 // array of block size
-                chargeBlock(iInObj).blkSzVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), isNotNumeric);
+                chargeBlock.blkSzVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), isNotNumeric);
 
-                chargeBlock(iInObj).blkSzPt(jBlk) = AssignVariablePt(state,
-                                                                     state.dataIPShortCut->cAlphaArgs(alphaOffset + 1),
-                                                                     isNotNumeric,
-                                                                     varIsArgument,
-                                                                     varNotYetDefined,
-                                                                     ObjType::Invalid,
-                                                                     0,
-                                                                     chargeBlock(iInObj).tariffIndx);
+                chargeBlock.blkSzPt(jBlk) = AssignVariablePt(state,
+                                                             state.dataIPShortCut->cAlphaArgs(alphaOffset + 1),
+                                                             isNotNumeric,
+                                                             varIsArgument,
+                                                             varNotYetDefined,
+                                                             ObjType::Invalid,
+                                                             0,
+                                                             chargeBlock.tariffIndx);
             }
             // array of block cost
-            chargeBlock(iInObj).blkCostVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 2), isNotNumeric);
-            chargeBlock(iInObj).blkCostPt(jBlk) = AssignVariablePt(state,
-                                                                   state.dataIPShortCut->cAlphaArgs(alphaOffset + 2),
-                                                                   isNotNumeric,
-                                                                   varIsArgument,
-                                                                   varNotYetDefined,
-                                                                   ObjType::Invalid,
-                                                                   0,
-                                                                   chargeBlock(iInObj).tariffIndx);
+            chargeBlock.blkCostVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 2), isNotNumeric);
+            chargeBlock.blkCostPt(jBlk) = AssignVariablePt(state,
+                                                           state.dataIPShortCut->cAlphaArgs(alphaOffset + 2),
+                                                           isNotNumeric,
+                                                           varIsArgument,
+                                                           varNotYetDefined,
+                                                           ObjType::Invalid,
+                                                           0,
+                                                           chargeBlock.tariffIndx);
         }
     }
 }
@@ -1898,18 +1875,13 @@ int AssignVariablePt(EnergyPlusData &state,
     //   Return the index of the variable.
 
     int AssignVariablePt;
-
-    std::string inNoSpaces;
-    int found;
-    int iVar;
-
     auto &econVar(state.dataEconTariff->econVar);
 
     if (flagIfNotNumeric && (len(stringIn) >= 1)) {
-        inNoSpaces = RemoveSpaces(state, stringIn);
-        found = 0;
+        std::string inNoSpaces = RemoveSpaces(state, stringIn);
+        int found = 0;
         if (allocated(econVar)) {
-            for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+            for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                 if (econVar(iVar).tariffIndx == tariffPt) {
                     if (UtilityRoutines::SameString(econVar(iVar).name, inNoSpaces)) {
                         found = iVar;
@@ -1959,35 +1931,35 @@ void incrementEconVar(EnergyPlusData &state)
 
     int constexpr sizeIncrement(100);
 
-    auto &econVar(state.dataEconTariff->econVar);
-
-    if (!allocated(econVar)) {
-        econVar.allocate(sizeIncrement);
+    if (!allocated(state.dataEconTariff->econVar)) {
+        state.dataEconTariff->econVar.allocate(sizeIncrement);
         state.dataEconTariff->sizeEconVar = sizeIncrement;
         state.dataEconTariff->numEconVar = 1;
     } else {
         ++state.dataEconTariff->numEconVar;
         // if larger than current size grow the array
         if (state.dataEconTariff->numEconVar > state.dataEconTariff->sizeEconVar) {
-            econVar.redimension(state.dataEconTariff->sizeEconVar += sizeIncrement);
+            state.dataEconTariff->econVar.redimension(state.dataEconTariff->sizeEconVar += sizeIncrement);
         }
     }
+    auto &econVar = state.dataEconTariff->econVar(state.dataEconTariff->numEconVar);
+
     // initialize new record) //Autodesk Most of these match default initialization so not needed
-    econVar(state.dataEconTariff->numEconVar).name = "";
-    econVar(state.dataEconTariff->numEconVar).tariffIndx = 0;
-    econVar(state.dataEconTariff->numEconVar).kindOfObj = ObjType::Invalid;
-    econVar(state.dataEconTariff->numEconVar).index = 0;
-    econVar(state.dataEconTariff->numEconVar).values = 0.0;
-    econVar(state.dataEconTariff->numEconVar).isArgument = false;
-    econVar(state.dataEconTariff->numEconVar).isAssigned = false;
-    econVar(state.dataEconTariff->numEconVar).specific = varNotYetDefined;
+    econVar.name = "";
+    econVar.tariffIndx = 0;
+    econVar.kindOfObj = ObjType::Invalid;
+    econVar.index = 0;
+    econVar.values = 0.0;
+    econVar.isArgument = false;
+    econVar.isAssigned = false;
+    econVar.specific = varNotYetDefined;
     //        econVar( numEconVar ).values = 0.0; //Autodesk Already initialized above
     // Autodesk Don't initialize cntMeDependOn
-    econVar(state.dataEconTariff->numEconVar).Operator = 0;
-    econVar(state.dataEconTariff->numEconVar).firstOperand = 1; // Autodesk Default initialization sets this to 0
-    econVar(state.dataEconTariff->numEconVar).lastOperand = 0;
-    econVar(state.dataEconTariff->numEconVar).activeNow = false;
-    econVar(state.dataEconTariff->numEconVar).isEvaluated = false;
+    econVar.Operator = 0;
+    econVar.firstOperand = 1; // Autodesk Default initialization sets this to 0
+    econVar.lastOperand = 0;
+    econVar.activeNow = false;
+    econVar.isEvaluated = false;
     // Autodesk Don't initialize isReported
     // Autodesk Don't initialize varUnitType
 }
