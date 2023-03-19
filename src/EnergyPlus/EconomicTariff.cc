@@ -765,21 +765,16 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
     //    Read the input file for "Economics:Charge:Simple" objects.
 
     static constexpr std::string_view RoutineName("GetInputEconomicsChargeSimple: ");
-    int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
     bool isNotNumeric;
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
 
-    auto &chargeSimple(state.dataEconTariff->chargeSimple);
-    auto &tariff(state.dataEconTariff->tariff);
-
-    CurrentModuleObject = "UtilityCost:Charge:Simple";
+    std::string CurrentModuleObject = "UtilityCost:Charge:Simple";
     state.dataEconTariff->numChargeSimple = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    chargeSimple.allocate(state.dataEconTariff->numChargeSimple);
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeSimple; ++iInObj) {
+    state.dataEconTariff->chargeSimple.allocate(state.dataEconTariff->numChargeSimple);
+    for (int iInObj = 1; iInObj <= state.dataEconTariff->numChargeSimple; ++iInObj) {
+        auto &chargeSimple = state.dataEconTariff->chargeSimple(iInObj);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  iInObj,
@@ -793,33 +788,33 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+        for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
                 ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
         // index of the tariff name in the tariff array
-        chargeSimple(iInObj).tariffIndx =
+        chargeSimple.tariffIndx =
             FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), chargeSimple(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
-        chargeSimple(iInObj).namePt = AssignVariablePt(state,
-                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                       true,
-                                                       varIsAssigned,
-                                                       varNotYetDefined,
-                                                       ObjType::ChargeSimple,
-                                                       iInObj,
-                                                       chargeSimple(iInObj).tariffIndx);
+        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), chargeSimple.tariffIndx, ErrorsFound, CurrentModuleObject);
+        chargeSimple.namePt = AssignVariablePt(state,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               true,
+                                               varIsAssigned,
+                                               varNotYetDefined,
+                                               ObjType::ChargeSimple,
+                                               iInObj,
+                                               chargeSimple.tariffIndx);
         // index of the variable in the variable array
-        chargeSimple(iInObj).sourcePt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, chargeSimple(iInObj).tariffIndx);
+        chargeSimple.sourcePt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, chargeSimple.tariffIndx);
         // enumerated list of the kind of season
-        chargeSimple(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
+        chargeSimple.season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
         // check to make sure a seasonal schedule is specified if the season is not annual
-        if (chargeSimple(iInObj).season != seasonAnnual) {
-            if (chargeSimple(iInObj).tariffIndx != 0) {
-                if (tariff(chargeSimple(iInObj).tariffIndx).seasonSchIndex == 0) {
+        if (chargeSimple.season != seasonAnnual) {
+            if (chargeSimple.tariffIndx != 0) {
+                if (state.dataEconTariff->tariff(chargeSimple.tariffIndx).seasonSchIndex == 0) {
                     ShowWarningError(state,
                                      format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, format("{}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
@@ -829,24 +824,12 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
             }
         }
         // index of the category in the variable array
-        chargeSimple(iInObj).categoryPt = AssignVariablePt(state,
-                                                           state.dataIPShortCut->cAlphaArgs(5),
-                                                           true,
-                                                           varIsAssigned,
-                                                           varNotYetDefined,
-                                                           ObjType::Category,
-                                                           iInObj,
-                                                           chargeSimple(iInObj).tariffIndx);
+        chargeSimple.categoryPt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, ObjType::Category, iInObj, chargeSimple.tariffIndx);
         // cost per unit value or variable
-        chargeSimple(iInObj).costPerVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(6), isNotNumeric);
-        chargeSimple(iInObj).costPerPt = AssignVariablePt(state,
-                                                          state.dataIPShortCut->cAlphaArgs(6),
-                                                          isNotNumeric,
-                                                          varIsArgument,
-                                                          varNotYetDefined,
-                                                          ObjType::Invalid,
-                                                          0,
-                                                          chargeSimple(iInObj).tariffIndx);
+        chargeSimple.costPerVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(6), isNotNumeric);
+        chargeSimple.costPerPt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(6), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, chargeSimple.tariffIndx);
     }
 }
 
@@ -1316,19 +1299,15 @@ void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfSca
 
     //   Scan the string from the end.
 
-    bool isInWord;
-    bool isSpace;
-    std::string::size_type iString;
-    std::string::size_type curEndOfScan;
-    std::string::size_type beginOfWord;
-    std::string::size_type endOfWord;
-
-    curEndOfScan = endOfScan;
+    size_t curEndOfScan = endOfScan;
     if (curEndOfScan != std::string::npos) {
         if (curEndOfScan >= len(lineOfText)) {
             curEndOfScan = len(lineOfText) - 1;
         }
         // check if currently on a space or not
+        bool isInWord;
+        size_t beginOfWord;
+        size_t endOfWord;
         if (lineOfText[curEndOfScan] == ' ') {
             isInWord = false;
             beginOfWord = 0;
@@ -1339,7 +1318,8 @@ void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfSca
             endOfWord = curEndOfScan;
         }
         // scan backwards from
-        for (iString = curEndOfScan; iString <= curEndOfScan; --iString) { // Unsigned will wrap to npos after 0
+        bool isSpace;
+        for (size_t iString = curEndOfScan; iString <= curEndOfScan; --iString) { // Unsigned will wrap to npos after 0
             if (lineOfText[iString] == ' ') {
                 isSpace = true;
             } else {
