@@ -858,10 +858,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const Tilt,             // Tilt of gap [Degrees]
                                   Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
                                   Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
-                                  DataSurfaces::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
-                                  Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
-                                  Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
-                                  Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                  Material::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                  Real64 const QdotSource,                    // Source/sink term, e.g. electricity exported from solar cell [W]
+                                  Real64 &TsBaffle,                           // Temperature of baffle (both sides) use lagged value on input [C]
+                                  Real64 &TaGap,                              // Temperature of air gap (assumed mixed) use lagged value on input [C]
                                   ObjexxFCL::Optional<Real64> HcGapRpt,
                                   ObjexxFCL::Optional<Real64> HrGapRpt,
                                   ObjexxFCL::Optional<Real64> IscRpt,
@@ -994,7 +994,9 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         InitExteriorConvectionCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
-        AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermal;
+        AbsThermSurf =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
+                ->AbsorpThermal;
         TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
         TsBaffK = TmpTsBaf + DataGlobalConstants::KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero

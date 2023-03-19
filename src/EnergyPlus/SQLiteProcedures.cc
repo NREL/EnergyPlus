@@ -101,7 +101,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
             int numNumbers;
             int status;
 
-            auto &sql_ort(state.dataOutRptTab);
+            auto &sql_ort = state.dataOutRptTab;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
             if (numAlphas > 0) {
@@ -171,7 +171,8 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             state.dataSQLiteProcedures->sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
         for (int materialNum = 1; materialNum <= state.dataMaterial->TotMaterials; ++materialNum) {
-            state.dataSQLiteProcedures->sqlite->addMaterialData(materialNum, state.dataMaterial->Material(materialNum));
+            auto const *thisMaterial = state.dataMaterial->Material(materialNum);
+            state.dataSQLiteProcedures->sqlite->addMaterialData(materialNum, thisMaterial);
         }
         for (int constructNum = 1; constructNum <= state.dataHeatBal->TotConstructs; ++constructNum) {
             auto const &construction = state.dataConstruction->Construct(constructNum);
@@ -2123,9 +2124,10 @@ void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData c
     zoneGroups.push_back(std::make_unique<ZoneGroup>(m_errorStream, m_db, number, zoneGroupData));
 }
 
-void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const *materialData)
+void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialBase const *materialData)
 {
-    materials.push_back(std::make_unique<Material>(m_errorStream, m_db, number, materialData));
+    materials.push_back(
+        std::make_unique<Material>(m_errorStream, m_db, number, dynamic_cast<const EnergyPlus::Material::MaterialChild *>(materialData)));
 }
 void SQLite::addConstructionData(int const number,
                                  EnergyPlus::Construction::ConstructionProps const &constructionData,

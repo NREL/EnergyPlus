@@ -71,7 +71,7 @@ namespace DElightManagerF {
     std::string ReplaceBlanksWithUnderscores(std::string const &InputString);
 
     void DElightElecLtgCtrl(int iNameLength,
-                            std::string cZoneName,
+                            std::string const &cZoneName,
                             Real64 dBldgLat,
                             Real64 dHISKF,
                             Real64 dHISUNF,

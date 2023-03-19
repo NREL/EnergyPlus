@@ -286,7 +286,7 @@ void GetPlantLoopData(EnergyPlusData &state)
     // Using/Aliasing
     using ScheduleManager::GetScheduleIndex;
     using SetPointManager::IsNodeOnSetPtManager;
-    auto localTempSetPt = SetPointManager::CtrlVarType::Temp;
+    SetPointManager::CtrlVarType localTempSetPt = SetPointManager::CtrlVarType::Temp;
     using NodeInputManager::GetOnlySingleNode;
     using namespace BranchInputManager;
     using DataSizing::AutoSize;
@@ -1849,7 +1849,7 @@ void GetPlantInput(EnergyPlusData &state)
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     //                    auto &this_comp_type(CompTypes(CompNum));
                     auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
-                    auto type = this_comp.TypeOf;
+                    // auto type = this_comp.TypeOf;
                     this_comp.oneTimeInit(state);
                 }
             }

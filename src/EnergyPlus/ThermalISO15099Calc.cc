@@ -2419,10 +2419,10 @@ void effectiveLayerCond(EnergyPlusData &state,
 {
     for (int i = 1; i <= nlayer; ++i) {
         if (LayerType(i) != TARCOGLayerType::SPECULAR) {
-            auto tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
-            auto nmix1 = nmix(i);
-            auto press1 = (pressure(i) + pressure(i + 1)) / 2.0;
-            for (auto j = 1; j <= maxgas; ++j) {
+            Real64 tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
+            Real64 nmix1 = nmix(i);
+            Real64 press1 = (pressure(i) + pressure(i + 1)) / 2.0;
+            for (int j = 1; j <= maxgas; ++j) {
                 state.dataThermalISO15099Calc->iprop1(j) = iprop(j, i);
                 state.dataThermalISO15099Calc->frct1(j) = frct(j, i);
             }
@@ -2998,7 +2998,7 @@ void storeIterationResults(EnergyPlusData &state,
 
     // Write headers for Rb and Rf
     for (i = 1; i <= 2 * nlayer; ++i) {
-        const auto a = fmt::format("{:3}", (i + 1) / 2); // this is just to simulate correct integer in brackets
+        const std::string a = fmt::format("{:3}", (i + 1) / 2); // this is just to simulate correct integer in brackets
         if (i == 1) {
             dynFormat = "";
         }
@@ -3022,7 +3022,7 @@ void storeIterationResults(EnergyPlusData &state,
 
     // Write header for temperatures
     for (i = 1; i <= 2 * nlayer; ++i) {
-        const auto a = fmt::format("{:3}", i);
+        const std::string a = fmt::format("{:3}", i);
         if (i == 1) {
             dynFormat = "";
         }
@@ -3047,7 +3047,7 @@ void storeIterationResults(EnergyPlusData &state,
     if (index == 0) {
         dynFormat = "  ";
         for (i = 1; i <= 2 * nlayer; ++i) {
-            const auto a = fmt::format("{:3}", i);
+            const std::string a = fmt::format("{:3}", i);
             if (i != 2 * nlayer) {
                 dynFormat += "theta(" + a + "),";
             } else {

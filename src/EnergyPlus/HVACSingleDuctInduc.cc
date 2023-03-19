@@ -244,7 +244,7 @@ namespace HVACSingleDuctInduc {
         int ADUNum;
         bool errFlag;
 
-        auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
+        auto &ZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig;
 
         // find the number of each type of induction unit
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
@@ -817,7 +817,7 @@ namespace HVACSingleDuctInduc {
         MaxVolColdWaterFlowDes = 0.0;
         MaxVolColdWaterFlowUser = 0.0;
 
-        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+        auto &TermUnitSizing = state.dataSize->TermUnitSizing;
 
         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow == AutoSize) {
             IsAutoSize = true;
@@ -1271,7 +1271,7 @@ namespace HVACSingleDuctInduc {
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
                 if (PowerMet > QToHeatSetPt + SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HotControlOffset;
-                    auto f =
+                    auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinColdWaterFlow, QToHeatSetPt, QPriOnly, PowerMet](Real64 const HWFlow) {
                             Real64 UnitOutput;
                             CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, HWFlow, MinColdWaterFlow, UnitOutput);
@@ -1323,7 +1323,7 @@ namespace HVACSingleDuctInduc {
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
                 if (PowerMet < QToCoolSetPt - SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).ColdControlOffset;
-                    auto f =
+                    auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, QToCoolSetPt, QPriOnly, PowerMet](Real64 const CWFlow) {
                             Real64 UnitOutput;
                             CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, CWFlow, UnitOutput);
@@ -1491,11 +1491,9 @@ namespace HVACSingleDuctInduc {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ItemNum;
 
-        auto &GetIUInputFlag = state.dataHVACSingleDuctInduc->GetIUInputFlag;
-
-        if (GetIUInputFlag) {
+        if (state.dataHVACSingleDuctInduc->GetIUInputFlag) {
             GetIndUnits(state);
-            GetIUInputFlag = false;
+            state.dataHVACSingleDuctInduc->GetIUInputFlag = false;
         }
 
         YesNo = false;

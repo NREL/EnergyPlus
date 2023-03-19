@@ -269,7 +269,7 @@ void KivaInstanceMap::setInitialBoundaryConditions(
         case KIVAZONE_TEMPCONTROL: {
 
             int controlTypeSchId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).CTSchedIndex;
-            auto controlType =
+            DataHVACGlobals::ThermostatType controlType =
                 static_cast<DataHVACGlobals::ThermostatType>(ScheduleManager::LookUpScheduleValue(state, controlTypeSchId, hour, timestep));
 
             switch (controlType) {
@@ -399,7 +399,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     Real64 Atotal = 0.0;
     Real64 TARadTotal = 0.0;
     Real64 TAConvTotal = 0.0;
-    for (auto &wl : wallSurfaces) {
+    for (int wl : wallSurfaces) {
         Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) +      // solar
                    state.dataHeatBal->SurfQdotRadIntGainsInPerArea(wl) + // internal gains
                    state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(wl);  // HVAC
@@ -715,7 +715,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 userSetExposedPerimeter = true;
                 useDetailedExposedPerimeter = expPerimMap[surfNum].useDetailedExposedPerimeter;
                 if (useDetailedExposedPerimeter) {
-                    for (auto s : expPerimMap[surfNum].isExposedPerimeter) {
+                    for (bool s : expPerimMap[surfNum].isExposedPerimeter) {
                         isExposedPerimeter.push_back(s);
                     }
                 } else {
@@ -731,7 +731,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
             Kiva::Polygon floorPolygon;
             for (std::size_t i = 0; i < surface.Vertex.size(); ++i) {
-                auto &v = surface.Vertex[i];
+                auto const &v = surface.Vertex[i];
                 floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));
                 if (!userSetExposedPerimeter) {
                     isExposedPerimeter.push_back(true);
@@ -746,8 +746,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 } else {
                     iNext = i + 1;
                 }
-                auto &v = surface.Vertex[i];
-                auto &vNext = surface.Vertex[iNext];
+                auto const &v = surface.Vertex[i];
+                auto const &vNext = surface.Vertex[iNext];
                 totalPerimeter += distance(v, vNext);
             }
 
@@ -761,8 +761,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                     } else {
                         iNext = i + 1;
                     }
-                    auto &p = floorPolygon.outer()[i];
-                    auto &pNext = floorPolygon.outer()[iNext];
+                    auto const &p = floorPolygon.outer()[i];
+                    auto const &pNext = floorPolygon.outer()[iNext];
                     Real64 perim = Kiva::getDistance(p, pNext);
                     total2DPerimeter += perim;
                     if (isExposedPerimeter[i]) {
@@ -786,9 +786,9 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
             std::map<std::pair<int, Real64>, WallGroup> combinationMap;
 
             if (!wallSurfaces.empty()) {
-                for (auto &wl : wallSurfaces) {
+                for (int wl : wallSurfaces) {
 
-                    auto &v = Surfaces(wl).Vertex;
+                    auto const &v = Surfaces(wl).Vertex;
                     size_t numVs = v.size();
                     // Enforce quadrilateralism
                     if (numVs > 4) {
@@ -953,11 +953,11 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 fnd.perimeterSurfaceWidth = 0.0;
 
                 // Add blocks
-                auto intHIns = foundationInputs[surface.OSCPtr].intHIns;
-                auto intVIns = foundationInputs[surface.OSCPtr].intVIns;
-                auto extHIns = foundationInputs[surface.OSCPtr].extHIns;
-                auto extVIns = foundationInputs[surface.OSCPtr].extVIns;
-                auto footing = foundationInputs[surface.OSCPtr].footing;
+                auto intHIns = foundationInputs[surface.OSCPtr].intHIns; // (AUTO_OK_OBJ) intend to make a copy?
+                auto intVIns = foundationInputs[surface.OSCPtr].intVIns; // (AUTO_OK_OBJ) intend to make a copy?
+                auto extHIns = foundationInputs[surface.OSCPtr].extHIns; // (AUTO_OK_OBJ) intend to make a copy?
+                auto extVIns = foundationInputs[surface.OSCPtr].extVIns; // (AUTO_OK_OBJ) intend to make a copy?
+                auto footing = foundationInputs[surface.OSCPtr].footing; // (AUTO_OK_OBJ) intend to make a copy?
 
                 if (std::abs(intHIns.width) > 0.0) {
                     intHIns.z += fnd.foundationDepth + fnd.slab.totalWidth();
@@ -1017,7 +1017,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 floorAggregator.add_instance(kivaInstances[inst].instance.ground.get(), floorWeight);
 
                 // Walls can only have one associated ground instance
-                for (auto &wl : wallIDs) {
+                for (int wl : wallIDs) {
                     surfaceMap[wl] = Kiva::Aggregator(Kiva::Surface::ST_WALL_INT);
                     surfaceMap[wl].add_instance(kivaInstances[inst].instance.ground.get(), 1.0);
                 }
@@ -1052,7 +1052,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
     }
 
     // Loop through Foundation surfaces and make sure they are all assigned to an instance
-    for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
+    for (int surfNum : state.dataSurface->AllHTKivaSurfaceList) {
         if (surfaceMap[surfNum].size() == 0) {
             ErrorsFound = true;
             ShowSevereError(state, format("Surface=\"{}\" has a 'Foundation' Outside Boundary Condition", Surfaces(surfNum).Name));
@@ -1078,7 +1078,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
           "Surface(s)\n");
 
     for (auto &kv : kivaInstances) {
-        auto grnd = kv.instance.ground.get();
+        auto grnd = kv.instance.ground.get(); // (AUTO_OK_OBJ)
 
         std::string constructionName;
         if (kv.constructionNum <= 0) {
@@ -1088,7 +1088,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
         }
 
         std::string wallSurfaceString;
-        for (auto &wl : kv.wallSurfaces) {
+        for (int wl : kv.wallSurfaces) {
             wallSurfaceString += "," + state.dataSurface->Surface(wl).Name;
         }
 
@@ -1171,7 +1171,7 @@ void KivaInstanceMap::plotDomain(EnergyPlusData &state)
 
 void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
 {
-    for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
+    for (int surfNum : state.dataSurface->AllHTKivaSurfaceList) {
         std::pair<EnergyPlusData *, std::string> contextPair{&state, format("Surface=\"{}\"", state.dataSurface->Surface(surfNum).Name)};
         Kiva::setMessageCallback(kivaErrorCallback, &contextPair);
         surfaceMap[surfNum].calc_weighted_results();

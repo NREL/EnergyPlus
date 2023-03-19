@@ -829,12 +829,12 @@ void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
 {
     for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
         if (!thisHP.companionCoilName.empty()) {
-            std::string const &thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
+            std::string const thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
             DataPlant::PlantEquipmentType thisCoilType = thisHP.EIRHPType;
-            std::string const &targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
+            std::string const targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
             for (auto &potentialCompanionCoil : state.dataEIRPlantLoopHeatPump->heatPumps) {
-                auto &potentialCompanionType = potentialCompanionCoil.EIRHPType;
-                auto potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
+                DataPlant::PlantEquipmentType potentialCompanionType = potentialCompanionCoil.EIRHPType;
+                std::string potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
                 if (potentialCompanionName == thisCoilName) {
                     // skip the current coil
                     continue;
@@ -893,7 +893,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
     bool errorsFound = false;
     std::string &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-    for (auto &classToInput : classesToInput) {
+    for (auto const &classToInput : classesToInput) {
         cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
         DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
             getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(cCurrentModuleObject)));
@@ -1324,7 +1324,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // will not shut down the branch
     auto &thisInletNode = state.dataLoopNodes->Node(this->loadSideNodes.inlet);
     auto &thisOutletNode = state.dataLoopNodes->Node(this->loadSideNodes.outlet);
-    auto &sim_component(DataPlant::CompData::getPlantComponent(state, this->loadSidePlantLoc));
+    auto &sim_component = DataPlant::CompData::getPlantComponent(state, this->loadSidePlantLoc);
     bool RunFlag = true;
     if ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad <= 0.0) || !RunFlag) {
         if (sim_component.FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) this->loadSideMassFlowRate = thisInletNode.MassFlowRate;
@@ -1933,8 +1933,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A4
             std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
             // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
-            srand(time(NULL));
-            std::string sourceSideOutletNodeName = format("DUMMY_CONDENSER_{}_{}", rand(), rand());
+            std::string sourceSideOutletNodeName = format("{}_SOURCE_SIDE_OUTLET_NODE", thisPLHP.name);
 
             // A5
             auto compCoilFound = fields.find(companionCoilFieldTag);
@@ -2097,7 +2096,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             } else {
                 auto eirDefrostCurveFound = fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name");
                 if (eirDefrostCurveFound != fields.end()) {
-                    std::string const &eirDefrostCurveName = UtilityRoutines::MakeUPPERCase(eirDefrostCurveFound.value().get<std::string>());
+                    std::string const eirDefrostCurveName = UtilityRoutines::MakeUPPERCase(eirDefrostCurveFound.value().get<std::string>());
                     thisPLHP.defrostEIRCurveIndex = Curve::GetCurveIndex(state, eirDefrostCurveName);
                     if (thisPLHP.defrostEIRCurveIndex == 0) {
                         ShowSevereError(
@@ -2184,7 +2183,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A16 cycling_ratio_factor_curve_name
             auto crfCurveFound = fields.find("cycling_ratio_factor_curve_name");
             if (crfCurveFound != fields.end()) {
-                std::string const &cycRatioCurveName = UtilityRoutines::MakeUPPERCase(crfCurveFound.value().get<std::string>());
+                std::string const cycRatioCurveName = UtilityRoutines::MakeUPPERCase(crfCurveFound.value().get<std::string>());
                 thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, cycRatioCurveName);
                 if (thisPLHP.cycRatioCurveIndex == 0) {
                     ShowSevereError(state,
@@ -2290,6 +2289,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                   DataLoopNode::ConnectionType::OutsideAir,
                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                   DataLoopNode::ObjectIsNotParent);
+
             if (nodeErrorsFound) errorsFound = true;
             BranchNodeConnections::TestCompSet(
                 state, cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName, classToInput.nodesType);

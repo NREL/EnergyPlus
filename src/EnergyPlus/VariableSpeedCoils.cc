@@ -6508,9 +6508,6 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
         QWasteHeat *= PartLoadRatio;
 
-        //  Add power to global variable so power can be summed by parent object
-        state.dataHVACGlobal->DXElecCoolingPower = state.dataVariableSpeedCoils->Winput;
-
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = state.dataVariableSpeedCoils->Winput;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal = state.dataVariableSpeedCoils->QLoadTotal;
@@ -7125,9 +7122,6 @@ namespace VariableSpeedCoils {
         //+ VarSpeedCoil(DXCoilNum)%BasinHeaterPower + VarSpeedCoil(DXCoilNum)%EvapCondPumpElecPower
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
 
-        //  Add power to global variable so power can be summed by parent object
-        state.dataHVACGlobal->DXElecCoolingPower = state.dataVariableSpeedCoils->Winput;
-
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower =
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * RuntimeFrac; // water heating pump power
@@ -7671,9 +7665,6 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
         QWasteHeat *= PartLoadRatio;
-
-        //  Add power to global variable so power can be summed by parent object
-        state.dataHVACGlobal->DXElecHeatingPower = state.dataVariableSpeedCoils->Winput;
 
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = state.dataVariableSpeedCoils->Winput;
@@ -8272,45 +8263,42 @@ namespace VariableSpeedCoils {
         int AirOutletNode;
         int WaterOutletNode;
 
-        // WatertoAirHP(DXCoilNum)%SimFlag=.FALSE.
-        if (!state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag) {
-            // Heatpump is off; just pass through conditions
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLatent = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 0.0;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = 0.0;
+        auto &varSpeedCoil = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum);
 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp =
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat =
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy =
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterTemp =
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterEnthalpy =
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterEnthalpy;
+        // WatertoAirHP(DXCoilNum)%SimFlag=.FALSE.
+        if (!varSpeedCoil.SimFlag) {
+            // Heatpump is off; just pass through conditions
+            varSpeedCoil.Power = 0.0;
+            varSpeedCoil.QLoadTotal = 0.0;
+            varSpeedCoil.QSensible = 0.0;
+            varSpeedCoil.QLatent = 0.0;
+            varSpeedCoil.QSource = 0.0;
+            varSpeedCoil.Energy = 0.0;
+            varSpeedCoil.EnergyLoadTotal = 0.0;
+            varSpeedCoil.EnergySensible = 0.0;
+            varSpeedCoil.EnergyLatent = 0.0;
+            varSpeedCoil.EnergySource = 0.0;
+            varSpeedCoil.COP = 0.0;
+            varSpeedCoil.RunFrac = 0.0;
+            varSpeedCoil.PartLoadRatio = 0.0;
+
+            varSpeedCoil.OutletAirDBTemp = varSpeedCoil.InletAirDBTemp;
+            varSpeedCoil.OutletAirHumRat = varSpeedCoil.InletAirHumRat;
+            varSpeedCoil.OutletAirEnthalpy = varSpeedCoil.InletAirEnthalpy;
+            varSpeedCoil.OutletWaterTemp = varSpeedCoil.InletWaterTemp;
+            varSpeedCoil.OutletWaterEnthalpy = varSpeedCoil.InletWaterEnthalpy;
         }
 
-        AirInletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum;
-        WaterInletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum;
-        AirOutletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirOutletNodeNum;
-        WaterOutletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterOutletNodeNum;
+        AirInletNode = varSpeedCoil.AirInletNodeNum;
+        WaterInletNode = varSpeedCoil.WaterInletNodeNum;
+        AirOutletNode = varSpeedCoil.AirOutletNodeNum;
+        WaterOutletNode = varSpeedCoil.WaterOutletNodeNum;
 
         // Set the air outlet  nodes of the WatertoAirHPSimple
         state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate; // LoadSideMassFlowRate
-        state.dataLoopNodes->Node(AirOutletNode).Temp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp;
-        state.dataLoopNodes->Node(AirOutletNode).HumRat = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat;
-        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy;
+        state.dataLoopNodes->Node(AirOutletNode).Temp = varSpeedCoil.OutletAirDBTemp;
+        state.dataLoopNodes->Node(AirOutletNode).HumRat = varSpeedCoil.OutletAirHumRat;
+        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = varSpeedCoil.OutletAirEnthalpy;
 
         // Set the air outlet nodes for properties that just pass through & not used
         state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
@@ -8325,49 +8313,54 @@ namespace VariableSpeedCoils {
         // Set the water outlet nodes for properties that just pass through & not used
         if (WaterInletNode != 0 && WaterOutletNode != 0) {
             SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
-            state.dataLoopNodes->Node(WaterOutletNode).Temp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterTemp;
-            state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterEnthalpy;
+            state.dataLoopNodes->Node(WaterOutletNode).Temp = varSpeedCoil.OutletWaterTemp;
+            state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = varSpeedCoil.OutletWaterEnthalpy;
         }
 
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power * TimeStepSysSec;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal * TimeStepSysSec;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible * TimeStepSysSec;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLatent * TimeStepSysSec;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource * TimeStepSysSec;
+        varSpeedCoil.Energy = varSpeedCoil.Power * TimeStepSysSec;
+        varSpeedCoil.EnergyLoadTotal = varSpeedCoil.QLoadTotal * TimeStepSysSec;
+        varSpeedCoil.EnergySensible = varSpeedCoil.QSensible * TimeStepSysSec;
+        varSpeedCoil.EnergyLatent = varSpeedCoil.QLatent * TimeStepSysSec;
+        varSpeedCoil.EnergySource = varSpeedCoil.QSource * TimeStepSysSec;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
         }
 
-        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).reportCoilFinalSizes) {
+        if (varSpeedCoil.reportCoilFinalSizes) {
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
-                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit ||
-                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingAirToAirVariableSpeed) { // cooling coil
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
-                        state,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolSens,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
-                } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingWaterToAirHPVSEquationFit ||
-                           state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingAirToAirVariableSpeed) { // heating coil
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
-                        state,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
+                if (varSpeedCoil.VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit ||
+                    varSpeedCoil.VSCoilType == Coil_CoolingAirToAirVariableSpeed) { // cooling coil
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
+                                                                                          varSpeedCoil.Name,
+                                                                                          varSpeedCoil.VarSpeedCoilType,
+                                                                                          varSpeedCoil.RatedCapCoolTotal,
+                                                                                          varSpeedCoil.RatedCapCoolSens,
+                                                                                          varSpeedCoil.RatedAirVolFlowRate,
+                                                                                          varSpeedCoil.RatedWaterMassFlowRate);
+                } else if (varSpeedCoil.VSCoilType == Coil_HeatingWaterToAirHPVSEquationFit ||
+                           varSpeedCoil.VSCoilType == Coil_HeatingAirToAirVariableSpeed) { // heating coil
+                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(state,
+                                                                                          varSpeedCoil.Name,
+                                                                                          varSpeedCoil.VarSpeedCoilType,
+                                                                                          varSpeedCoil.RatedCapHeat,
+                                                                                          varSpeedCoil.RatedCapHeat,
+                                                                                          varSpeedCoil.RatedAirVolFlowRate,
+                                                                                          varSpeedCoil.RatedWaterMassFlowRate);
                 }
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).reportCoilFinalSizes = false;
+                varSpeedCoil.reportCoilFinalSizes = false;
             }
+        }
+        if (varSpeedCoil.VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit || varSpeedCoil.VSCoilType == Coil_CoolingAirToAirVariableSpeed) {
+            //  Add power to global variable so power can be summed by parent object
+            state.dataHVACGlobal->DXElecCoolingPower = varSpeedCoil.Power;
+        } else if (varSpeedCoil.VSCoilType == Coil_HeatingWaterToAirHPVSEquationFit) {
+            //  Add power to global variable so power can be summed by parent object
+            state.dataHVACGlobal->DXElecHeatingPower = varSpeedCoil.Power;
+        } else if (varSpeedCoil.VSCoilType == Coil_HeatingAirToAirVariableSpeed) {
+            //  Add power to global variable so power can be summed by parent object
+            state.dataHVACGlobal->DXElecHeatingPower = varSpeedCoil.Power + varSpeedCoil.CrankcaseHeaterPower;
+            state.dataHVACGlobal->DefrostElecPower = varSpeedCoil.DefrostPower;
         }
     }
 

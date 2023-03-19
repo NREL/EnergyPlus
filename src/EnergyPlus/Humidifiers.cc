@@ -128,13 +128,12 @@ namespace Humidifiers {
         Real64 WaterAddNeeded; // output in kg/s needed from humidifier to meet humidity setpoint
 
         auto &Humidifier = state.dataHumidifiers->Humidifier;
-        auto &GetInputFlag = state.dataHumidifiers->GetInputFlag;
-        auto &NumHumidifiers = state.dataHumidifiers->NumHumidifiers;
+        int NumHumidifiers = state.dataHumidifiers->NumHumidifiers;
         auto &CheckEquipName = state.dataHumidifiers->CheckEquipName;
 
-        if (GetInputFlag) {
+        if (state.dataHumidifiers->GetInputFlag) {
             GetHumidifierInput(state);
-            GetInputFlag = false;
+            state.dataHumidifiers->GetInputFlag = false;
         }
 
         // Get the humidifier unit index
@@ -239,20 +238,20 @@ namespace Humidifiers {
         //  certain object in the input file
 
         auto &Humidifier = state.dataHumidifiers->Humidifier;
-        auto &NumElecSteamHums = state.dataHumidifiers->NumElecSteamHums;
-        auto &NumGasSteamHums = state.dataHumidifiers->NumGasSteamHums;
-        auto &NumHumidifiers = state.dataHumidifiers->NumHumidifiers;
         auto &HumidifierUniqueNames = state.dataHumidifiers->HumidifierUniqueNames;
         auto &CheckEquipName = state.dataHumidifiers->CheckEquipName;
 
+        // Update Nums in state and make local convenience copies
         CurrentModuleObject = "Humidifier:Steam:Electric";
-        NumElecSteamHums = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumElecSteamHums = state.dataHumidifiers->NumElecSteamHums =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         MaxNums = NumNumbers;
         MaxAlphas = NumAlphas;
         CurrentModuleObject = "Humidifier:Steam:Gas";
-        NumGasSteamHums = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        NumHumidifiers = NumElecSteamHums + NumGasSteamHums;
+        int NumGasSteamHums = state.dataHumidifiers->NumGasSteamHums =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumHumidifiers = state.dataHumidifiers->NumHumidifiers = NumElecSteamHums + NumGasSteamHums;
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);

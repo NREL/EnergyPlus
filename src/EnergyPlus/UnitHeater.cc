@@ -1041,8 +1041,8 @@ namespace UnitHeater {
         Real64 WaterCoilSizDeltaT;      // water coil deltaT for design water flow rate autosizing
         int CoilNum;                    // index of water coil object
 
-        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-        auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
+        auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
+        auto &CurZoneEqNum = state.dataSize->CurZoneEqNum;
 
         PltSizHeatNum = 0;
         ErrorsFound = false;
@@ -1714,7 +1714,7 @@ namespace UnitHeater {
                     CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
                     if ((FullOutput - state.dataUnitHeaters->QZnReq) > SmallLoad) {
                         // Unit heater full load capacity is able to meet the load, Find PLR
-                        auto opMode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode;
+                        int opMode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode;
 
                         auto f = [&state, UnitHeatNum, FirstHVACIteration, opMode](Real64 const PartLoadRatio) {
                             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
