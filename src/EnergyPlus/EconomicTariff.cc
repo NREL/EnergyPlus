@@ -2325,21 +2325,6 @@ void CreateDefaultComputation(EnergyPlusData &state)
     //    depends on and a list of entries that are dependant on that
     //    line.
 
-    int iVar;
-    int jVar;
-    int kObj;
-    int mBlock;
-    int kOperand;
-    int curBasis;
-    int curSubtotal;
-    int curTotal;
-    int curObject;
-    int numNoDepend;
-    int referVar;
-    int loopCount;
-    bool remainingVarFlag;
-    int remainPt;
-
     auto &econVar = state.dataEconTariff->econVar;
 
     // for each tariff that does not have a UtilityCost:Computation object go through the variables
@@ -2348,19 +2333,19 @@ void CreateDefaultComputation(EnergyPlusData &state)
         auto &computation = state.dataEconTariff->computation(iTariff);
         if (!computation.isUserDef) {
             // clear all variables so that they are not active
-            for (jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
+            for (int jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
                 econVar(jVar).activeNow = false;
             }
             // make all native variables active
-            for (jVar = tariff.firstNative; jVar <= tariff.lastNative; ++jVar) {
+            for (int jVar = tariff.firstNative; jVar <= tariff.lastNative; ++jVar) {
                 econVar(jVar).activeNow = true;
             }
             //"clear" the dependOn array
             state.dataEconTariff->numOperand = 0;
             // Define the preset equations (category sumation)
-            curTotal = tariff.ptTotal;
-            curSubtotal = tariff.ptSubtotal;
-            curBasis = tariff.ptBasis;
+            int curTotal = tariff.ptTotal;
+            int curSubtotal = tariff.ptSubtotal;
+            int curBasis = tariff.ptBasis;
             // total SUM subtotal taxes
             econVar(curTotal).Operator = opSUM;
             econVar(curTotal).activeNow = true;
@@ -2392,10 +2377,10 @@ void CreateDefaultComputation(EnergyPlusData &state)
             // now add equations with NOOP to represent each object with its
             // dependancies
             // Qualify
-            for (kObj = 1; kObj <= state.dataEconTariff->numQualify; ++kObj) {
+            for (int kObj = 1; kObj <= state.dataEconTariff->numQualify; ++kObj) {
                 auto const &qualify = state.dataEconTariff->qualify(kObj);
                 if (qualify.tariffIndx == iTariff) {
-                    curObject = qualify.namePt;
+                    int curObject = qualify.namePt;
                     econVar(curObject).Operator = opNOOP;
                     econVar(curObject).activeNow = true;
                     addOperand(state, curObject, qualify.sourcePt);
@@ -2403,10 +2388,10 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 }
             }
             // Ratchet
-            for (kObj = 1; kObj <= state.dataEconTariff->numRatchet; ++kObj) {
+            for (int kObj = 1; kObj <= state.dataEconTariff->numRatchet; ++kObj) {
                 auto const &ratchet = state.dataEconTariff->ratchet(kObj);
                 if (ratchet.tariffIndx == iTariff) {
-                    curObject = ratchet.namePt;
+                    int curObject = ratchet.namePt;
                     econVar(curObject).Operator = opNOOP;
                     econVar(curObject).activeNow = true;
                     addOperand(state, curObject, ratchet.baselinePt);
@@ -2416,10 +2401,10 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 }
             }
             // ChargeSimple
-            for (kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
+            for (int kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
                 auto const &chargeSimple = state.dataEconTariff->chargeSimple(kObj);
                 if (chargeSimple.tariffIndx == iTariff) {
-                    curObject = chargeSimple.namePt;
+                    int curObject = chargeSimple.namePt;
                     econVar(curObject).Operator = opNOOP;
                     econVar(curObject).activeNow = true;
                     addOperand(state, curObject, chargeSimple.sourcePt);
@@ -2427,20 +2412,20 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 }
             }
             // ChargeBlock
-            for (kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
+            for (int kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
                 auto const &chargeBlock = state.dataEconTariff->chargeBlock(kObj);
                 if (chargeBlock.tariffIndx == iTariff) {
-                    curObject = chargeBlock.namePt;
+                    int curObject = chargeBlock.namePt;
                     econVar(curObject).Operator = opNOOP;
                     econVar(curObject).activeNow = true;
                     addOperand(state, curObject, chargeBlock.sourcePt);
                     addOperand(state, curObject, chargeBlock.blkSzMultPt);
-                    for (mBlock = 1; mBlock <= chargeBlock.numBlk; ++mBlock) {
+                    for (int mBlock = 1; mBlock <= chargeBlock.numBlk; ++mBlock) {
                         addOperand(state, curObject, chargeBlock.blkSzPt(mBlock));
                         addOperand(state, curObject, chargeBlock.blkCostPt(mBlock));
                     }
                     // now add a new "equation" for dependency of remainingPt on namePt
-                    remainPt = chargeBlock.remainingPt;
+                    int remainPt = chargeBlock.remainingPt;
                     if (remainPt > 0) {
                         econVar(remainPt).Operator = opNOOP;
                         econVar(remainPt).activeNow = true;
@@ -2450,7 +2435,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
             }
             // Economic:Variable
             // make all of the user defined variables as active
-            for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+            for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                 if (econVar(iVar).tariffIndx == iTariff) {
                     if (econVar(iVar).kindOfObj == ObjType::Variable) {
                         econVar(iVar).activeNow = true;
@@ -2470,11 +2455,11 @@ void CreateDefaultComputation(EnergyPlusData &state)
             // of dependancies as a directed acyclic graph and use "count down" algorithm
             // to do a topological sort of the variables into the order for computation
             // First, clear the counters
-            for (jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
+            for (int jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
                 econVar(jVar).cntMeDependOn = 0;
             }
             // Second, add up the number of dependancies on each variable
-            for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+            for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                 if (econVar(iVar).activeNow) {
                     if (econVar(iVar).lastOperand >= econVar(iVar).firstOperand) {
                         econVar(iVar).cntMeDependOn = 1 + econVar(iVar).lastOperand - econVar(iVar).firstOperand;
@@ -2483,11 +2468,11 @@ void CreateDefaultComputation(EnergyPlusData &state)
             }
             // Third, start removing items with zero connections and decrease each
             //   counter.
-            numNoDepend = -1;
-            loopCount = 0;
+            int numNoDepend = -1;
+            int loopCount = 0;
             while ((numNoDepend != 0) || (loopCount > 100000)) {
                 numNoDepend = 0;
-                for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+                for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (econVar(iVar).activeNow) {
                         // find a variable that has no more dangling dependancies
                         if (econVar(iVar).cntMeDependOn == 0) {
@@ -2497,7 +2482,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
                                 if (econVar(iVar).lastOperand >= econVar(iVar).firstOperand) {
                                     // transfer variables and operator to the computation and list of steps
                                     // go through the operands backwards (end of line is evaluated first)
-                                    for (kOperand = econVar(iVar).lastOperand; kOperand >= econVar(iVar).firstOperand; --kOperand) {
+                                    for (int kOperand = econVar(iVar).lastOperand; kOperand >= econVar(iVar).firstOperand; --kOperand) {
                                         incrementSteps(state);
                                         state.dataEconTariff->steps(state.dataEconTariff->numSteps) = state.dataEconTariff->operand(kOperand);
                                     }
@@ -2514,10 +2499,10 @@ void CreateDefaultComputation(EnergyPlusData &state)
                             }
                             // go through each other variable looking for places where this variable is used
                             // and decrement their counters.
-                            for (jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
+                            for (int jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
                                 if (econVar(jVar).activeNow) {
-                                    for (kOperand = econVar(jVar).firstOperand; kOperand <= econVar(jVar).lastOperand; ++kOperand) {
-                                        referVar = state.dataEconTariff->operand(kOperand);
+                                    for (int kOperand = econVar(jVar).firstOperand; kOperand <= econVar(jVar).lastOperand; ++kOperand) {
+                                        int referVar = state.dataEconTariff->operand(kOperand);
                                         if (iVar == referVar) {
                                             --econVar(jVar).cntMeDependOn;
                                             // for each variable that has been decremented to zero increment the counter
@@ -2540,8 +2525,8 @@ void CreateDefaultComputation(EnergyPlusData &state)
                                  format("UtilityCost:Tariff: Loop count exceeded when counting dependancies in tariff: {}", tariff.tariffName));
             }
             // make sure that all variables associated with the tariff are included
-            remainingVarFlag = false;
-            for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+            bool remainingVarFlag = false;
+            for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                 if (econVar(iVar).activeNow) {
                     remainingVarFlag = true;
                 }
@@ -2551,11 +2536,11 @@ void CreateDefaultComputation(EnergyPlusData &state)
                                  format("CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: {}",
                                         tariff.tariffName));
                 ShowContinueError(state, "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on.");
-                for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
+                for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (econVar(iVar).tariffIndx == iTariff) {
                         if (econVar(iVar).activeNow) {
                             ShowContinueError(state, format("     {}", econVar(iVar).name));
-                            for (kOperand = econVar(iVar).firstOperand; kOperand <= econVar(iVar).lastOperand; ++kOperand) {
+                            for (int kOperand = econVar(iVar).firstOperand; kOperand <= econVar(iVar).lastOperand; ++kOperand) {
                                 ShowContinueError(state, format("        ->  {}", econVar(state.dataEconTariff->operand(kOperand)).name));
                             }
                         }
