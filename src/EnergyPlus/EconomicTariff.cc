@@ -2724,12 +2724,12 @@ void ComputeTariff(EnergyPlusData &state)
         for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             for (int jStep = state.dataEconTariff->computation(iTariff).firstStep; jStep <= state.dataEconTariff->computation(iTariff).lastStep;
                  ++jStep) {
-                int annualCnt = 0;
                 int curStep = state.dataEconTariff->steps(jStep);
-                int aPt;
-                int bPt;
-                int cPt;
                 {
+                    int annualCnt = 0;
+                    int aPt;
+                    int bPt;
+                    int cPt;
                     int const SELECT_CASE_var(curStep);
                     if (SELECT_CASE_var == 0) { // end of line - assign variable and clear stack
                         // if the stack still has two items on it then assign the values to the
