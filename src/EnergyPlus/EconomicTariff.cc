@@ -4724,7 +4724,6 @@ void selectTariff(EnergyPlusData &state)
     Array1D_int MinTariffIndex; // tariff index for the Minimum value
     int curMinTariffIndex;
 
-    auto &tariff(state.dataEconTariff->tariff);
     auto const &econVar(state.dataEconTariff->econVar);
 
     groupIndex.dimension(state.dataEconTariff->numTariff, 0);
@@ -4732,17 +4731,18 @@ void selectTariff(EnergyPlusData &state)
     int numMins = 0;
     MinTariffIndex.dimension(state.dataEconTariff->numTariff, 0);
     for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+        auto &tariff = state.dataEconTariff->tariff(iTariff);
         // compute the total annual cost of each tariff
-        int totalVarPt = tariff(iTariff).ptTotal;
-        int totEneVarPt = tariff(iTariff).nativeTotalEnergy;
+        int totalVarPt = tariff.ptTotal;
+        int totEneVarPt = tariff.nativeTotalEnergy;
         Real64 annualTotal = 0.0;
         Real64 annEneTotal = 0.0;
         for (int jMonth = 1; jMonth <= MaxNumMonths; ++jMonth) {
             annualTotal += econVar(totalVarPt).values(jMonth);
             annEneTotal += econVar(totEneVarPt).values(jMonth);
         }
-        tariff(iTariff).totalAnnualCost = annualTotal;
-        tariff(iTariff).totalAnnualEnergy = annEneTotal;
+        tariff.totalAnnualCost = annualTotal;
+        tariff.totalAnnualEnergy = annEneTotal;
         // Set the groupIndex
         if (groupIndex(iTariff) == 0) {
             // set the current item to the tariff index
@@ -4750,7 +4750,7 @@ void selectTariff(EnergyPlusData &state)
             groupIndex(iTariff) = groupCount;
             // set all remaining matching items to the same index
             for (int kTariff = iTariff + 1; kTariff <= state.dataEconTariff->numTariff; ++kTariff) {
-                if (UtilityRoutines::SameString(tariff(kTariff).groupName, tariff(iTariff).groupName)) {
+                if (UtilityRoutines::SameString(state.dataEconTariff->tariff(kTariff).groupName, tariff.groupName)) {
                     groupIndex(kTariff) = groupCount;
                 }
             }
@@ -4758,20 +4758,21 @@ void selectTariff(EnergyPlusData &state)
     }
     // First process the all tariff and identify the lowest cost for each type of meter and group.
     for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-        if (tariff(iTariff).isQualified) {
+        auto &tariff = state.dataEconTariff->tariff(iTariff);
+        if (tariff.isQualified) {
             bool isFound = false;
             for (int lMin = 1; lMin <= numMins; ++lMin) {
                 curMinTariffIndex = MinTariffIndex(lMin);
                 // find matching meter and group
-                if (tariff(iTariff).reportMeterIndx == tariff(curMinTariffIndex).reportMeterIndx) {
+                if (tariff.reportMeterIndx == state.dataEconTariff->tariff(curMinTariffIndex).reportMeterIndx) {
                     if (groupIndex(iTariff) == groupIndex(curMinTariffIndex)) {
                         isFound = true;
                         // found the matching mater and group now test if smaller Min is current tariff
-                        if (tariff(iTariff).totalAnnualCost < tariff(curMinTariffIndex).totalAnnualCost) {
+                        if (tariff.totalAnnualCost < state.dataEconTariff->tariff(curMinTariffIndex).totalAnnualCost) {
                             MinTariffIndex(lMin) = iTariff;
                             // select the new Minimum tariff and deselect the one that was just exceeded
-                            tariff(curMinTariffIndex).isSelected = false;
-                            tariff(iTariff).isSelected = true;
+                            state.dataEconTariff->tariff(curMinTariffIndex).isSelected = false;
+                            tariff.isSelected = true;
                         }
                     }
                 }
@@ -4783,7 +4784,7 @@ void selectTariff(EnergyPlusData &state)
                 }
                 MinTariffIndex(numMins) = iTariff;
                 // tariff(numMins)%isSelected = .TRUE.  !original
-                tariff(iTariff).isSelected = true; // BTG changed 2/7/2005     CR6573
+                tariff.isSelected = true; // BTG changed 2/7/2005     CR6573
             }
         }
     }
@@ -4798,16 +4799,17 @@ void selectTariff(EnergyPlusData &state)
         int lowestSurplusSoldTariff = 0;
         int lowestNetMeterTariff = 0;
         for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-            if (tariff(iTariff).isQualified) {
-                if (tariff(iTariff).isSelected) {
+            auto &tariff = state.dataEconTariff->tariff(iTariff);
+            if (tariff.isQualified) {
+                if (tariff.isSelected) {
                     if (groupIndex(iTariff) == mGroup) {
                         {
-                            int const SELECT_CASE_var(tariff(iTariff).kindElectricMtr);
+                            int const SELECT_CASE_var(tariff.kindElectricMtr);
                             if (SELECT_CASE_var == kindMeterElecSimple) {
                                 lowestSimpleTariff = iTariff;
                             } else if (SELECT_CASE_var == kindMeterElecProduced) {
                                 // don't show electric produced rates as ever selected since surplus sold is more relevant
-                                tariff(iTariff).isSelected = false;
+                                tariff.isSelected = false;
                             } else if (SELECT_CASE_var == kindMeterElecPurchased) {
                                 lowestPurchaseTariff = iTariff;
                             } else if (SELECT_CASE_var == kindMeterElecSurplusSold) {
@@ -4822,64 +4824,69 @@ void selectTariff(EnergyPlusData &state)
         }
         // compare the simple and purchased metered tariffs
         if ((lowestSimpleTariff > 0) && (lowestPurchaseTariff > 0)) {
-            if (tariff(lowestSimpleTariff).totalAnnualCost < tariff(lowestPurchaseTariff).totalAnnualCost) {
-                tariff(lowestPurchaseTariff).isSelected = false;
+            if (state.dataEconTariff->tariff(lowestSimpleTariff).totalAnnualCost <
+                state.dataEconTariff->tariff(lowestPurchaseTariff).totalAnnualCost) {
+                state.dataEconTariff->tariff(lowestPurchaseTariff).isSelected = false;
                 lowestPurchaseTariff = 0;
             } else {
-                tariff(lowestSimpleTariff).isSelected = false;
+                state.dataEconTariff->tariff(lowestSimpleTariff).isSelected = false;
                 lowestSimpleTariff = 0;
             }
         }
         // if surplus sold is negative use it otherwise don't
         if (lowestSurplusSoldTariff > 0) {
-            if (tariff(lowestSurplusSoldTariff).totalAnnualCost > 0) {
-                tariff(lowestSurplusSoldTariff).isSelected = false;
+            if (state.dataEconTariff->tariff(lowestSurplusSoldTariff).totalAnnualCost > 0) {
+                state.dataEconTariff->tariff(lowestSurplusSoldTariff).isSelected = false;
                 lowestSurplusSoldTariff = 0;
             }
         }
         // if netmetering is used compare it to simple plus surplus
         if (((lowestNetMeterTariff > 0) && (lowestSurplusSoldTariff > 0)) && (lowestSimpleTariff > 0)) {
-            if (tariff(lowestNetMeterTariff).totalAnnualCost <
-                (tariff(lowestSimpleTariff).totalAnnualCost + tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
-                tariff(lowestSimpleTariff).isSelected = false;
+            if (state.dataEconTariff->tariff(lowestNetMeterTariff).totalAnnualCost <
+                (state.dataEconTariff->tariff(lowestSimpleTariff).totalAnnualCost +
+                 state.dataEconTariff->tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
+                state.dataEconTariff->tariff(lowestSimpleTariff).isSelected = false;
                 lowestSimpleTariff = 0;
-                tariff(lowestSurplusSoldTariff).isSelected = false;
+                state.dataEconTariff->tariff(lowestSurplusSoldTariff).isSelected = false;
                 lowestSurplusSoldTariff = 0;
             } else {
-                tariff(lowestNetMeterTariff).isSelected = false;
+                state.dataEconTariff->tariff(lowestNetMeterTariff).isSelected = false;
                 lowestNetMeterTariff = 0;
             }
         }
         // if netmetering is used compare it to purchased plus surplus
         if (((lowestNetMeterTariff > 0) && (lowestSurplusSoldTariff > 0)) && (lowestPurchaseTariff > 0)) {
-            if (tariff(lowestNetMeterTariff).totalAnnualCost <
-                (tariff(lowestPurchaseTariff).totalAnnualCost + tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
-                tariff(lowestPurchaseTariff).isSelected = false;
+            if (state.dataEconTariff->tariff(lowestNetMeterTariff).totalAnnualCost <
+                (state.dataEconTariff->tariff(lowestPurchaseTariff).totalAnnualCost +
+                 state.dataEconTariff->tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
+                state.dataEconTariff->tariff(lowestPurchaseTariff).isSelected = false;
                 lowestPurchaseTariff = 0;
-                tariff(lowestSurplusSoldTariff).isSelected = false;
+                state.dataEconTariff->tariff(lowestSurplusSoldTariff).isSelected = false;
                 // lowestSurplusSoldTariff = 0; // not used after this point
             } else {
-                tariff(lowestNetMeterTariff).isSelected = false;
+                state.dataEconTariff->tariff(lowestNetMeterTariff).isSelected = false;
                 lowestNetMeterTariff = 0;
             }
         }
         // if netmetering is used compare it to simple only
         if ((lowestNetMeterTariff > 0) && (lowestSimpleTariff > 0)) {
-            if (tariff(lowestNetMeterTariff).totalAnnualCost < tariff(lowestSimpleTariff).totalAnnualCost) {
-                tariff(lowestSimpleTariff).isSelected = false;
+            if (state.dataEconTariff->tariff(lowestNetMeterTariff).totalAnnualCost <
+                state.dataEconTariff->tariff(lowestSimpleTariff).totalAnnualCost) {
+                state.dataEconTariff->tariff(lowestSimpleTariff).isSelected = false;
                 // lowestSimpleTariff = 0; // not used after this point
             } else {
-                tariff(lowestNetMeterTariff).isSelected = false;
+                state.dataEconTariff->tariff(lowestNetMeterTariff).isSelected = false;
                 lowestNetMeterTariff = 0;
             }
         }
         // if netmetering is used compare it to purchased only
         if ((lowestNetMeterTariff > 0) && (lowestPurchaseTariff > 0)) {
-            if (tariff(lowestNetMeterTariff).totalAnnualCost < tariff(lowestPurchaseTariff).totalAnnualCost) {
-                tariff(lowestPurchaseTariff).isSelected = false;
+            if (state.dataEconTariff->tariff(lowestNetMeterTariff).totalAnnualCost <
+                state.dataEconTariff->tariff(lowestPurchaseTariff).totalAnnualCost) {
+                state.dataEconTariff->tariff(lowestPurchaseTariff).isSelected = false;
                 // lowestPurchaseTariff = 0; // not used after this point
             } else {
-                tariff(lowestNetMeterTariff).isSelected = false;
+                state.dataEconTariff->tariff(lowestNetMeterTariff).isSelected = false;
                 // lowestNetMeterTariff = 0; // not used after this point
             }
         }
